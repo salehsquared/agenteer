@@ -53,3 +53,8 @@ export {
   stdinApprovalResolver,
   stdinAskUserResolver,
 } from "./resolvers/stdin-prompt.js";
+
+// Registry commands (M6).
+export { publishCommand, renderPublishResult } from "./commands/publish.js";
+export { installCommand, renderInstallResult, cliConfirm } from "./commands/install.js";
+export { searchCommand, renderSearchHits } from "./commands/search.js";

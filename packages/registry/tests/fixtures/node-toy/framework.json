@@ -1,0 +1,19 @@
+{
+  "manifest_version": 1,
+  "id": "@toy/node-triage",
+  "version": "1.2.0",
+  "name": "toy_triage",
+  "description": "Triage toy issues by priority.",
+  "determinism": "deterministic",
+  "required_actions": [
+    "net.http:api.github.com/**",
+    "context.read:issue.*",
+    "context.write:triage.*"
+  ],
+  "tags": ["toy", "triage"],
+  "side_effects": {
+    "writes_fs": false,
+    "network": true,
+    "mutates_ctx": true
+  }
+}

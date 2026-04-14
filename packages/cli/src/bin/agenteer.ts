@@ -26,6 +26,16 @@ import {
 } from "../commands/ctx.js";
 import { inspectSession, renderInspectReport } from "../commands/inspect.js";
 import { buildProviderForModels } from "../providers/index.js";
+import {
+  publishCommand,
+  renderPublishResult,
+} from "../commands/publish.js";
+import {
+  installCommand,
+  renderInstallResult,
+  cliConfirm,
+} from "../commands/install.js";
+import { searchCommand, renderSearchHits } from "../commands/search.js";
 
 async function main(argv: readonly string[]): Promise<number> {
   const [cmd, ...rest] = argv;
@@ -44,6 +54,12 @@ async function main(argv: readonly string[]): Promise<number> {
       return ctxCmd(rest);
     case "inspect":
       return inspectCmd(rest);
+    case "publish":
+      return publishCmd(rest);
+    case "install":
+      return installCmd(rest);
+    case "search":
+      return searchCmd(rest);
     default:
       console.error(`unknown command: ${cmd}`);
       printHelp();
@@ -60,6 +76,9 @@ Usage:
   agenteer resume  --session <dir> [--model <id>]* [--no-interactive]
   agenteer ctx     <list|get|lineage|diff> --session <dir> [...]
   agenteer inspect --session <dir>
+  agenteer publish --dir <pkg-dir> [--provenance] [--dry-run] [--registry <url>]
+  agenteer install <spec>  --workflow-dir <dir> [--yes] [--grant <cap>]* [--registry <url>]
+  agenteer search  <query> [--registry <url>]
 
 Common flags:
   --session <dir>   Session directory (context/ + evidence/ + session.yaml)
@@ -160,6 +179,67 @@ async function inspectCmd(argv: readonly string[]): Promise<number> {
   const report = await inspectSession(sessionDir);
   console.log(renderInspectReport(report));
   return 0;
+}
+
+async function publishCmd(argv: readonly string[]): Promise<number> {
+  const { flags } = parseArgs(argv);
+  const pkgDir = requireFlagString(flags, "dir");
+  const result = await publishCommand({
+    pkgDir,
+    provenance: flags["provenance"] === true,
+    dryRun: flags["dry-run"] === true,
+    ...(flagString(flags, "registry") ? { registry: flagString(flags, "registry")! } : {}),
+  });
+  console.log(renderPublishResult(result));
+  return result.ok ? 0 : 1;
+}
+
+async function installCmd(argv: readonly string[]): Promise<number> {
+  const { positional, flags } = parseArgs(argv);
+  const spec = positional[0];
+  if (!spec) {
+    console.error("install: missing package spec (e.g. @acme/node-bug-triage@^1.4.0)");
+    return 2;
+  }
+  const workflowDir = requireFlagString(flags, "workflow-dir");
+  const autoApprove = flags["yes"] === true;
+  const grants = collectStringList(flags, "grant");
+  const result = await installCommand({
+    workflowDir,
+    spec,
+    autoApprove,
+    grants,
+    ...(flagString(flags, "registry") ? { registry: flagString(flags, "registry")! } : {}),
+    confirm: (s) => cliConfirm({ summary_text: s.summary_text }),
+  });
+  console.log(renderInstallResult(result));
+  return result.ok ? 0 : 1;
+}
+
+async function searchCmd(argv: readonly string[]): Promise<number> {
+  const { positional, flags } = parseArgs(argv);
+  const query = positional.join(" ").trim();
+  if (!query) {
+    console.error("search: missing query");
+    return 2;
+  }
+  const hits = await searchCommand(query, {
+    ...(flagString(flags, "registry") ? { registry: flagString(flags, "registry")! } : {}),
+  });
+  console.log(renderSearchHits(hits));
+  return 0;
+}
+
+function collectStringList(
+  flags: Record<string, string | true>,
+  key: string,
+): string[] {
+  const out: string[] = [];
+  const v = flags[key];
+  if (typeof v === "string") out.push(v);
+  // npm argv can't repeat a flag into an array without a framework, so
+  // also accept comma-separated values: --grant fs.read:/tmp/**,model:foo
+  return out.flatMap((s) => s.split(",").map((t) => t.trim()).filter(Boolean));
 }
 
 async function loadSpec(path: string): Promise<unknown> {
