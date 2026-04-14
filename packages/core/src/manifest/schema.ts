@@ -28,6 +28,14 @@ const ManifestIdRe = /^@[a-z0-9][a-z0-9-]*\/node-[a-z0-9][a-z0-9-]*$/;
 
 const DeterminismSchema = z.enum(["deterministic", "stochastic"]);
 
+const SideEffectsDefault = {
+  writes_fs: false,
+  network: false,
+  mutates_ctx: false,
+  emits_ctx_variants: [] as string[],
+  reads_ctx_variants: [] as string[],
+};
+
 const SideEffectsSchema = z
   .object({
     writes_fs: z.boolean().default(false),
@@ -36,7 +44,13 @@ const SideEffectsSchema = z
     emits_ctx_variants: z.array(z.string()).default([]),
     reads_ctx_variants: z.array(z.string()).default([]),
   })
-  .default({});
+  .default(() => SideEffectsDefault);
+
+const RequiredCapabilitiesDefault = {
+  tool_use: false,
+  vision: false,
+  structured_output: "any" as const,
+};
 
 const RequiredCapabilitiesSchema = z
   .object({
@@ -45,7 +59,7 @@ const RequiredCapabilitiesSchema = z
     min_context_tokens: z.number().int().optional(),
     structured_output: z.enum(["native", "text_parse", "any"]).default("any"),
   })
-  .default({});
+  .default(() => RequiredCapabilitiesDefault);
 
 const PlannerHintsSchema = z
   .object({

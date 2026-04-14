@@ -15,10 +15,21 @@
  */
 
 import { ZodError } from "zod";
+import {
+  collectFromNodeRun,
+  type CollectFromNodeRunInput,
+  type EvidenceStore,
+  type EvidenceRecord,
+} from "@agenteer/trust/evidence";
+import {
+  diffSnapshots,
+  snapshot as fsSnapshot,
+  type AccessViolation,
+  type ResourceSnapshot,
+} from "@agenteer/trust/access";
 import { validateManifest, type NodeManifest, type NodeManifestInput } from "../manifest/index.js";
 import type { ContextStore } from "../context/store.js";
 import { sliceToReadonly } from "../context/slice.js";
-import type { EvidenceInput, EvidenceSink } from "../evidence/sink.js";
 import type { NodeRegistry } from "../node/registry.js";
 import type {
   JoinMode,
@@ -72,13 +83,21 @@ export interface RuntimeOptions {
   sessionId?: string;
   registry: NodeRegistry;
   contextStore: ContextStore;
-  evidenceSink: EvidenceSink;
+  /** @agenteer/trust evidence store (YamlEvidenceStore in production, MemoryEvidenceSink in tests). */
+  evidenceSink: EvidenceStore;
   events?: RuntimeEvents;
   caps?: Partial<RuntimeCaps>;
   clock?: () => Date;
   modelProvider?: ModelProvider;
-  /** Override the default action dispatcher (primarily for tests). */
   actionRegistry?: ActionRegistry;
+  /**
+   * Root for the §R1 access-guard snapshot. Defaults to process.cwd().
+   * Only nodes whose manifest declares `side_effects.writes_fs: true` or
+   * `shell.exec` required_actions trigger snapshotting.
+   */
+  accessSnapshotRoot?: string;
+  /** Policy when an access violation is detected. Defaults to "fail". */
+  accessViolationPolicy?: "fail" | "warn" | "off";
 }
 
 export interface RuntimeOutcome {
@@ -108,22 +127,26 @@ export class Runtime {
   readonly registry: NodeRegistry;
   readonly contextStore: ContextStore;
   readonly actions: ActionRegistry;
+  readonly evidenceStore: EvidenceStore;
 
-  private readonly evidenceSink: EvidenceSink;
   private readonly caps: RuntimeCaps;
   private readonly clock: () => Date;
   private readonly sessionId: string;
+  private readonly accessSnapshotRoot: string;
+  private readonly accessViolationPolicy: "fail" | "warn" | "off";
 
   constructor(opts: RuntimeOptions) {
     this.events = opts.events ?? new RuntimeEvents();
     this.registry = opts.registry;
     this.contextStore = opts.contextStore;
-    this.evidenceSink = opts.evidenceSink;
+    this.evidenceStore = opts.evidenceSink;
     this.caps = { ...DEFAULT_CAPS, ...(opts.caps ?? {}) };
     this.clock = opts.clock ?? (() => new Date());
     this.sessionId = opts.sessionId ?? newSessionId();
     this.actions =
       opts.actionRegistry ?? new StdActionRegistry({ modelProvider: opts.modelProvider });
+    this.accessSnapshotRoot = opts.accessSnapshotRoot ?? process.cwd();
+    this.accessViolationPolicy = opts.accessViolationPolicy ?? "fail";
   }
 
   /**
@@ -259,14 +282,16 @@ export class Runtime {
           retryable: result.retryable,
           timestamp: this.clock().toISOString(),
         });
-        await this.emitEvidence({
+        await this.emitPrimaryEvidence({
           nodeId,
-          manifest_id: currentSpawn.manifest_id,
-          lineage_id: frame.lineageId,
+          manifestId: currentSpawn.manifest_id,
+          lineageId: frame.lineageId,
+          manifest: entry.manifest,
           correlation: frame.correlation,
-          duration_ms: 0,
-          delta: { verdict: "fail" },
-          parent_node_run_id: frame.parentNodeId,
+          parentNodeRunId: frame.parentNodeId,
+          durationMs: 0,
+          result,
+          kindHint: inferEvidenceKind(entry.manifest),
         });
         return result;
       }
@@ -295,6 +320,16 @@ export class Runtime {
       });
 
       this.events.emit("node_start", this.startPayload(nodeId, currentSpawn.manifest_id, frame));
+
+      // Access guard (§R1): pre-snapshot for fs.write-capable / shell.exec
+      // nodes. Other nodes pay nothing.
+      const accessScope = deriveAccessScope(entry.manifest, rawsOf(granted));
+      const beforeSnapshot: ResourceSnapshot | null = accessScope
+        ? await fsSnapshot(
+            { include: accessScope.include, exclude: [".agenteer-session/**"] },
+            this.accessSnapshotRoot,
+          )
+        : null;
 
       const startMs = Date.now();
       let result: NodeResult;
@@ -339,16 +374,66 @@ export class Runtime {
         "failed",
         "replace_me",
       ];
+      const primaryKind = inferEvidenceKind(entry.manifest);
+      let primaryRecord: EvidenceRecord | null = null;
       if (evidenceKinds.includes(result.kind)) {
-        await this.emitEvidence({
+        primaryRecord = await this.emitPrimaryEvidence({
           nodeId,
-          manifest_id: currentSpawn.manifest_id,
-          lineage_id: frame.lineageId,
+          manifestId: currentSpawn.manifest_id,
+          lineageId: frame.lineageId,
+          manifest: entry.manifest,
           correlation: frame.correlation,
-          duration_ms: durationMs,
-          delta: extractDelta(result),
-          parent_node_run_id: frame.parentNodeId,
+          parentNodeRunId: frame.parentNodeId,
+          durationMs,
+          result,
+          kindHint: primaryKind,
         });
+      }
+
+      // Post-snapshot + access_scan auxiliary evidence (§R1 + §R2).
+      if (beforeSnapshot && accessScope) {
+        const afterSnapshot = await fsSnapshot(
+          { include: accessScope.include, exclude: [".agenteer-session/**"] },
+          this.accessSnapshotRoot,
+        );
+        const violations = diffSnapshots(
+          beforeSnapshot,
+          afterSnapshot,
+          accessScope.allowedWrites,
+          accessScope.allowedDeletes,
+          currentSpawn.manifest_id,
+        );
+        const writes = Array.from(afterSnapshot.files.keys()).filter(
+          (p) => beforeSnapshot.files.get(p)?.sha256 !== afterSnapshot.files.get(p)?.sha256,
+        );
+        const reads = accessScope.allowedReads.length > 0
+          ? Array.from(afterSnapshot.files.keys())
+          : [];
+        await this.emitAccessScanEvidence({
+          nodeId,
+          manifestId: currentSpawn.manifest_id,
+          lineageId: frame.lineageId,
+          parentNodeRunId: primaryRecord?.run.node_run_id ?? frame.parentNodeId,
+          scope: accessScope,
+          violations,
+          writes,
+          reads,
+        });
+        if (violations.length > 0 && this.accessViolationPolicy === "fail") {
+          result = {
+            kind: "failed",
+            reason: `access_violation:${violations[0]!.type}`,
+            retryable: false,
+            details: { violations },
+          };
+        } else if (violations.length > 0 && this.accessViolationPolicy === "warn") {
+          this.events.emit("error", {
+            nodeId,
+            error: `access_violations: ${violations.length}`,
+            fatal: false,
+            timestamp: this.clock().toISOString(),
+          });
+        }
       }
 
       this.events.emit(
@@ -723,22 +808,106 @@ export class Runtime {
     });
   }
 
-  private async emitEvidence(partial: Omit<EvidenceInput, "timestamp" | "verdict" | "kind">): Promise<void> {
-    const timestamp = this.clock().toISOString();
-    const verdict = partial.delta?.verdict ?? "inconclusive";
-    const record: EvidenceInput = {
-      ...partial,
-      timestamp,
-      verdict,
-      kind: "generic",
+  private async emitPrimaryEvidence(args: {
+    nodeId: string;
+    manifestId: string;
+    manifest: NodeManifest;
+    lineageId: string;
+    correlation: string;
+    parentNodeRunId?: string;
+    durationMs: number;
+    result: NodeResult;
+    kindHint?: CollectFromNodeRunInput["kind"];
+  }): Promise<EvidenceRecord> {
+    const verdict = verdictFromResult(args.result);
+    const summary = summaryForResult(args.result);
+    const command = `${args.manifestId}#${args.kindHint ?? "generic"}`;
+    const input: CollectFromNodeRunInput = {
+      kind: args.kindHint ?? "generic",
+      nodeId: args.manifestId,
+      nodeRunId: args.nodeId,
+      ...(args.parentNodeRunId ? { parentNodeRunId: args.parentNodeRunId } : {}),
+      lineageId: args.lineageId,
+      tool: { name: args.manifestId, command },
+      run: { timestamp: this.clock().toISOString(), trigger: "agent" },
+      result: {
+        verdict: verdict === "inconclusive" ? "skip" : verdict,
+        summary,
+      },
     };
-    const { id } = await this.evidenceSink.emit(record);
+    const record = await this.evidenceStore.put(this.asPrimaryEvidenceInput(input, args.lineageId));
     this.events.emit("evidence_emitted", {
-      evidenceId: id,
-      nodeId: record.nodeId,
-      verdict,
-      timestamp,
+      evidenceId: record.id,
+      nodeId: args.nodeId,
+      verdict: verdict === "skip" ? "inconclusive" : (verdict as "pass" | "fail" | "inconclusive"),
+      timestamp: record.run.timestamp,
     });
+    return record;
+  }
+
+  private async emitAccessScanEvidence(args: {
+    nodeId: string;
+    manifestId: string;
+    lineageId: string;
+    parentNodeRunId?: string;
+    scope: AccessScope;
+    violations: readonly AccessViolation[];
+    writes: readonly string[];
+    reads: readonly string[];
+  }): Promise<void> {
+    const verdict = args.violations.length === 0 ? "pass" : "fail";
+    const summary =
+      args.violations.length === 0
+        ? `access scan: ${args.writes.length} writes within declared fs.write scope`
+        : `access scan: ${args.violations.length} violation(s)`;
+    const input: CollectFromNodeRunInput = {
+      kind: "access_scan",
+      nodeId: args.manifestId,
+      nodeRunId: `scan_${args.nodeId}`,
+      ...(args.parentNodeRunId ? { parentNodeRunId: args.parentNodeRunId } : {}),
+      tool: {
+        name: "access_guard",
+        command: `snapshot_diff:${args.scope.allowedWrites.join(",")}`,
+      },
+      run: { timestamp: this.clock().toISOString(), trigger: "agent" },
+      result: { verdict, summary, exit_code: args.violations.length },
+      writes: [...args.writes],
+      reads: [...args.reads],
+    };
+    await collectFromNodeRun(this.evidenceStore, input);
+  }
+
+  private asPrimaryEvidenceInput(
+    input: CollectFromNodeRunInput,
+    lineageId: string,
+  ): Parameters<EvidenceStore["put"]>[0] {
+    // Funnel through trust's collector for consistency with auxiliaries.
+    // `collectFromNodeRun` builds the record and calls `store.put`, but
+    // we need the Record back. Trust's collector returns it; just call
+    // through and mirror the shape here.
+    return {
+      evidence_version: 1,
+      claim_refs: [],
+      run: {
+        timestamp: input.run.timestamp,
+        trigger: input.run.trigger,
+        ...(input.run.commit_sha ? { commit_sha: input.run.commit_sha } : {}),
+        node_id: input.nodeId,
+        node_run_id: input.nodeRunId,
+        ...(input.parentNodeRunId ? { parent_node_run_id: input.parentNodeRunId } : {}),
+        lineage_id: lineageId,
+      },
+      tool: {
+        name: input.tool.name,
+        command: input.tool.command,
+        exit_code: input.result.exit_code ?? (input.result.verdict === "pass" ? 0 : 1),
+      },
+      result: {
+        verdict: input.result.verdict,
+        summary: input.result.summary ?? `${input.tool.name} ${input.result.verdict}`,
+      },
+      kind: input.kind,
+    };
   }
 
   private async safePostflight(node: Node, result: NodeResult): Promise<void> {
@@ -791,13 +960,83 @@ export class Runtime {
   }
 }
 
-function extractDelta(result: NodeResult): EvidenceDelta | undefined {
-  if (result.kind === "output") return result.evidence;
-  if (result.kind === "failed") {
-    return result.evidence ?? { verdict: "fail" };
+function verdictFromResult(
+  result: NodeResult,
+): "pass" | "fail" | "inconclusive" | "skip" {
+  if (result.kind === "output") {
+    return result.evidence?.verdict ?? "pass";
   }
-  if (result.kind === "replace_me") return { verdict: "inconclusive" };
-  return undefined;
+  if (result.kind === "failed") {
+    return result.evidence?.verdict ?? "fail";
+  }
+  if (result.kind === "replace_me") return "inconclusive";
+  return "inconclusive";
+}
+
+function summaryForResult(result: NodeResult): string {
+  if (result.kind === "output") return "node produced output";
+  if (result.kind === "failed") return `failed: ${result.reason}`;
+  if (result.kind === "replace_me") return `replaced: ${result.reason}`;
+  if (result.kind === "needs_user") return "awaiting user input";
+  return "spawn";
+}
+
+function inferEvidenceKind(
+  manifest: NodeManifest,
+): CollectFromNodeRunInput["kind"] {
+  if (manifest.required_actions.some((r) => r.startsWith("shell.exec"))) {
+    return "shell_exec";
+  }
+  if (manifest.tags.includes("llm")) return "llm_call";
+  if (manifest.tags.includes("validator")) return "gate_check";
+  return "generic";
+}
+
+/**
+ * Derive the access-guard scope from a manifest + granted caps. Returns
+ * null when no snapshot is needed (per sub-plan §R1: only nodes with
+ * fs.write caps or shell.exec). Scope globs come from the node's granted
+ * capability set, not the declared manifest — dynamic augmentation may
+ * narrow them.
+ */
+interface AccessScope {
+  include: string[];
+  allowedWrites: string[];
+  allowedDeletes: string[];
+  allowedReads: string[];
+}
+
+function deriveAccessScope(
+  manifest: NodeManifest,
+  grantedCaps: readonly string[],
+): AccessScope | null {
+  const hasShell = grantedCaps.some((c) => c.startsWith("shell.exec:"));
+  const hasWrite = grantedCaps.some((c) => c.startsWith("fs.write:"));
+  if (!hasShell && !hasWrite && !manifest.side_effects.writes_fs) return null;
+
+  const reads = grantedCaps.filter((c) => c.startsWith("fs.read:")).map(scopeOf);
+  const writes = grantedCaps.filter((c) => c.startsWith("fs.write:")).map(scopeOf);
+  const deletes = grantedCaps.filter((c) => c.startsWith("fs.delete:")).map(scopeOf);
+
+  // If shell.exec is held but no fs scopes, we snapshot nothing — shell
+  // is coarse by design (sub-plan 02 §1.1.4). Any fs-visible effect of a
+  // subprocess is captured only when the declared fs.read/write scopes
+  // include it. No snapshot, no auxiliary evidence; spawn-time cap check
+  // + denylist still apply.
+  const include = [...new Set([...reads, ...writes, ...deletes])].filter((s) => s !== "*");
+  if (include.length === 0) return null;
+
+  return {
+    include,
+    allowedWrites: writes.filter((s) => s !== "*"),
+    allowedDeletes: [...deletes.filter((s) => s !== "*"), ...writes.filter((s) => s !== "*")],
+    allowedReads: reads.filter((s) => s !== "*"),
+  };
+}
+
+function scopeOf(cap: string): string {
+  const colon = cap.indexOf(":");
+  return colon < 0 ? cap : cap.slice(colon + 1);
 }
 
 /**

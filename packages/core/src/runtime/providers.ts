@@ -3,12 +3,18 @@
  *
  * The full structured-output wrapper (Anthropic tool_use / OpenAI
  * json_schema with text-parse fallback + retry) lives in
- * `@agenteer/trust/structured`, slated for M3. For M2, `MockModelProvider`
- * supports deterministic stdlib tests and any node that needs to pretend
- * a model answered.
+ * `@agenteer/trust/structured`. Production users wire a `ProviderLike`
+ * (raw LLM access) through `StructuredModelProvider` which uses trust's
+ * `StructuredProvider` internally. `MockModelProvider` remains the fast
+ * path for deterministic tests.
  */
 
 import type { z } from "zod";
+import {
+  StructuredProvider,
+  type ProviderLike,
+  type StructuredGenerateOpts,
+} from "@agenteer/trust/structured";
 
 export interface ModelCallDispatch<T = unknown> {
   readonly model_id: string;
@@ -87,5 +93,45 @@ export class RoutingModelProvider implements ModelProvider {
       if (p.supports(req.model_id)) return p.dispatch(req);
     }
     throw new Error(`RoutingModelProvider: no provider supports '${req.model_id}'`);
+  }
+}
+
+/**
+ * Bridges a raw `ProviderLike` (from `@agenteer/trust/structured`) into
+ * the runtime's `ModelProvider` surface via `StructuredProvider`. Gives
+ * stdlib nodes (e.g. `llm_call`) structured-output retry + native-first
+ * dispatch without each node wiring the wrapper itself.
+ */
+export class StructuredModelProvider implements ModelProvider {
+  readonly #structured: StructuredProvider;
+  readonly #modelId: string;
+
+  constructor(provider: ProviderLike) {
+    this.#structured = new StructuredProvider(provider);
+    this.#modelId = provider.modelId;
+  }
+
+  supports(model_id: string): boolean {
+    return this.#modelId === model_id;
+  }
+
+  async dispatch<T>(req: ModelCallDispatch<T>): Promise<ModelCallDispatchResult<T>> {
+    const opts: StructuredGenerateOpts<T> = {
+      systemPrompt: req.system ?? "",
+      userPrompt: req.prompt,
+      schema: (req.schema ??
+        (await import("zod")).z.unknown()) as NonNullable<typeof req.schema>,
+      schemaName: "model_call",
+      ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
+      ...(req.max_tokens !== undefined ? { max_tokens: req.max_tokens } : {}),
+      ...(req.signal ? { signal: req.signal } : {}),
+    };
+    const value = await this.#structured.generate(opts);
+    return {
+      value,
+      model: this.#modelId,
+      tokens: { prompt: 0, completion: 0 },
+      method: this.#structured.lastMethod === "text_parse" ? "text_parse" : "native",
+    };
   }
 }

@@ -75,6 +75,7 @@ export {
   type ModelCallDispatchResult,
   MockModelProvider,
   RoutingModelProvider,
+  StructuredModelProvider,
 } from "./runtime/providers.js";
 
 export {
@@ -127,10 +128,13 @@ export {
 } from "./manifest/index.js";
 
 export {
-  type EvidenceSink,
-  type EvidenceInput,
+  type EvidenceStore,
   type EvidenceRecord,
+  type EvidencePutInput,
+  type EvidenceKind,
   type EvidenceVerdict,
+  type StaleMarker as EvidenceStaleMarker,
+  type CollectFromNodeRunInput,
   MemoryEvidenceSink,
 } from "./evidence/sink.js";
 

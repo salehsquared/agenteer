@@ -1,0 +1,54 @@
+{
+  "name": "@agenteer/trust",
+  "version": "0.0.1",
+  "description": "Agenteer trust layer: evidence records, structured output, access guard, cross-check. Zero dependency on @agenteer/core.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./evidence": {
+      "types": "./dist/evidence/index.d.ts",
+      "default": "./dist/evidence/index.js"
+    },
+    "./structured": {
+      "types": "./dist/structured/index.d.ts",
+      "default": "./dist/structured/index.js"
+    },
+    "./access": {
+      "types": "./dist/access/index.d.ts",
+      "default": "./dist/access/index.js"
+    },
+    "./crosscheck": {
+      "types": "./dist/crosscheck/index.d.ts",
+      "default": "./dist/crosscheck/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "testing"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "yaml": "^2.8.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

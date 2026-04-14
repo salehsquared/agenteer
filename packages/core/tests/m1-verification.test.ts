@@ -375,8 +375,13 @@ describe("M1 — core runtime, node primitive, context v0 (M2-shape manifests)",
       );
     expect(lastPlannerRead).toBeDefined();
 
-    const refiningEvidence = evidenceSink.records.filter((r) => r.manifest_id.startsWith(REFINING_ID.replace(/-final$/, "")));
+    const refiningEvidence = evidenceSink.records.filter((r) => {
+      const nodeId = r.run.node_id ?? "";
+      return nodeId === REFINING_ID || nodeId === REFINING_FINAL_ID;
+    });
     expect(refiningEvidence.length).toBe(2);
-    expect(new Set(refiningEvidence.map((r) => r.lineage_id)).size).toBe(1);
+    // Sub-plan 00 §16.4: lineage_id is stable across the ReplaceMe chain.
+    const lineageIds = new Set(refiningEvidence.map((r) => r.run.lineage_id));
+    expect(lineageIds.size).toBe(1);
   });
 });
