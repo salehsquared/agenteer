@@ -58,6 +58,7 @@ import { newNodeRunId, newSessionId } from "../util/ids.js";
 import {
   type ActionRegistry,
   type DispatchContext,
+  type ToolRegistry,
   DispatchError,
   StdActionRegistry,
 } from "./dispatch.js";
@@ -89,6 +90,7 @@ export interface RuntimeOptions {
   caps?: Partial<RuntimeCaps>;
   clock?: () => Date;
   modelProvider?: ModelProvider;
+  toolRegistry?: ToolRegistry;
   actionRegistry?: ActionRegistry;
   /**
    * Root for the §R1 access-guard snapshot. Defaults to process.cwd().
@@ -144,7 +146,11 @@ export class Runtime {
     this.clock = opts.clock ?? (() => new Date());
     this.sessionId = opts.sessionId ?? newSessionId();
     this.actions =
-      opts.actionRegistry ?? new StdActionRegistry({ modelProvider: opts.modelProvider });
+      opts.actionRegistry ??
+      new StdActionRegistry({
+        ...(opts.modelProvider ? { modelProvider: opts.modelProvider } : {}),
+        ...(opts.toolRegistry ? { toolRegistry: opts.toolRegistry } : {}),
+      });
     this.accessSnapshotRoot = opts.accessSnapshotRoot ?? process.cwd();
     this.accessViolationPolicy = opts.accessViolationPolicy ?? "fail";
   }

@@ -32,6 +32,7 @@ export function covers(parent: ParsedCapability, child: ParsedCapability): boole
     case "spawn":
     case "context.read":
     case "context.write":
+    case "tool":
       return idCovers(parent.scope, child.scope);
   }
 }

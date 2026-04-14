@@ -75,10 +75,57 @@ export type JoinMode =
   | { mode: "race_with_budget"; budget_ms: number; min_results: number }
   | { mode: "detached" };
 
+/**
+ * Authoring sugar over append-only item ops. Master plan §R3 translation:
+ *   set(k, v)      → Decision item by default, or Artifact when value is
+ *                    wrapped with `asArtifact(...)`; supersedes chain.
+ *   delete(k)      → tombstone Decision item with supersedes link.
+ *   append(k, [v]) → Artifact item with refs.extends link.
+ *
+ * The store is never mutated; the runtime compiles these to `store.add(...)`
+ * calls in `runtime/patch.ts`.
+ *
+ * R3-A (M4): stdlib meta-nodes need Artifact-variant `set` so judge /
+ * planner verdicts land as Artifacts (not Decisions). Raw values stay
+ * Decision; `asArtifact()` marks a value as an Artifact at compile time.
+ */
 export interface CtxPatch {
   set?: Record<string, unknown>;
   delete?: readonly string[];
   append?: Record<string, unknown[]>;
+}
+
+/**
+ * Marker produced by `asArtifact()`. The patch compiler recognizes it via
+ * the reserved key `__ctx_variant` and emits an Artifact item instead of
+ * the default Decision. Reserved-key marker (vs. separate ops per R3-A
+ * option B) keeps the `set`/`delete`/`append` surface flat.
+ */
+export interface CtxArtifactMarker {
+  readonly __ctx_variant: "artifact";
+  readonly body: unknown;
+  readonly media_type?: string;
+  readonly schema_ref?: string;
+}
+
+export function asArtifact(
+  body: unknown,
+  opts: { media_type?: string; schema_ref?: string } = {},
+): CtxArtifactMarker {
+  return Object.freeze({
+    __ctx_variant: "artifact" as const,
+    body,
+    ...(opts.media_type !== undefined ? { media_type: opts.media_type } : {}),
+    ...(opts.schema_ref !== undefined ? { schema_ref: opts.schema_ref } : {}),
+  });
+}
+
+export function isArtifactMarker(value: unknown): value is CtxArtifactMarker {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as { __ctx_variant?: unknown }).__ctx_variant === "artifact"
+  );
 }
 
 export interface CtxGrant {

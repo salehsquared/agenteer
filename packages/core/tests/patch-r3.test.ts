@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { InMemoryContextStore, applyPatch } from "../src/index.js";
+import { InMemoryContextStore, applyPatch, asArtifact } from "../src/index.js";
 
 describe("applyPatch — master plan §R3 translation", () => {
   const ctx = {
@@ -45,6 +45,29 @@ describe("applyPatch — master plan §R3 translation", () => {
     expect(second.added[0]!.refs).toEqual([
       { kind: "extends", target: { scope: "ctx", id: first.added[0]!.id } },
     ]);
+  });
+
+  it("R3-A: set(k, asArtifact(body)) produces an Artifact, not a Decision", () => {
+    const store = new InMemoryContextStore(() => new Date("2026-04-13T00:00:00Z"));
+    const plan = { steps: [{ id: "A" }, { id: "B" }] };
+    const out = applyPatch(store, { set: { "plan.head": asArtifact(plan) } }, ctx);
+    expect(out.added[0]!.type).toBe("artifact");
+    if (out.added[0]!.content.kind !== "artifact") throw new Error("unreachable");
+    expect(out.added[0]!.content.body).toEqual(plan);
+    expect(out.added[0]!.content.media_type).toBe("application/json");
+  });
+
+  it("R3-A: asArtifact carries media_type through to the stored item", () => {
+    const store = new InMemoryContextStore(() => new Date("2026-04-13T00:00:00Z"));
+    const body = "# plan\n- step 1\n";
+    const out = applyPatch(
+      store,
+      { set: { "plan.markdown": asArtifact(body, { media_type: "text/markdown" }) } },
+      ctx,
+    );
+    if (out.added[0]!.content.kind !== "artifact") throw new Error("unreachable");
+    expect(out.added[0]!.content.media_type).toBe("text/markdown");
+    expect(out.added[0]!.content.body).toBe(body);
   });
 
   it("never mutates existing items — store stays append-only", () => {

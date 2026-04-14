@@ -14,7 +14,7 @@
  * emission.
  */
 
-import type { CtxPatch } from "../node/types.js";
+import { isArtifactMarker, type CtxPatch } from "../node/types.js";
 import type { ContextStore } from "../context/store.js";
 import type {
   ContextItem,
@@ -65,20 +65,40 @@ export function applyPatch(
       const refs: ContextRef[] = prior
         ? [{ kind: "supersedes", target: { scope: "ctx", id: prior.id } }]
         : [];
-      const added = store.add({
-        type: "decision",
-        content: {
-          kind: "decision",
-          question: `ctx.set(${key})`,
-          choice: stringifyForDecision(value),
-          alternatives: [],
-          rationale: JSON.stringify(value),
-        },
-        provenance: provenance(),
-        refs,
-        tags: [],
-        labels: { tag: key, ctx_op: "set" },
-      });
+
+      const draft: NewContextItem = isArtifactMarker(value)
+        ? {
+            type: "artifact",
+            content: {
+              kind: "artifact",
+              media_type: value.media_type ?? "application/json",
+              encoding: "inline_json",
+              body: value.body as NonNullable<
+                Extract<NewContextItem["content"], { kind: "artifact" }>["body"]
+              >,
+              ...(value.schema_ref !== undefined ? { schema_ref: value.schema_ref } : {}),
+            },
+            provenance: provenance(),
+            refs,
+            tags: [],
+            labels: { tag: key, ctx_op: "set" },
+          }
+        : {
+            type: "decision",
+            content: {
+              kind: "decision",
+              question: `ctx.set(${key})`,
+              choice: stringifyForDecision(value),
+              alternatives: [],
+              rationale: JSON.stringify(value),
+            },
+            provenance: provenance(),
+            refs,
+            tags: [],
+            labels: { tag: key, ctx_op: "set" },
+          };
+
+      const added = store.add(draft);
       outcome.added.push(added);
       outcome.setKeys.push(key);
     }

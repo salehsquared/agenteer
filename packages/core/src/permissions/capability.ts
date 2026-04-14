@@ -17,6 +17,12 @@ export const RESOURCE_TYPES = [
   "context.read",
   "context.write",
   "spawn",
+  /**
+   * `tool` — named external-adapter invocation surface used by
+   * `@agenteer/node-tool-call` (sub-plan 03 §2, master plan §R4). Scope
+   * is an id-glob over tool names; `tool:*` means any tool.
+   */
+  "tool",
 ] as const;
 
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
@@ -117,6 +123,7 @@ function validateScope(resource: ResourceType, scope: string, raw: string): void
     case "spawn":
     case "context.read":
     case "context.write":
+    case "tool":
       if (scope === "") {
         throw new CapabilityParseError(raw, `${resource} requires non-empty scope`);
       }

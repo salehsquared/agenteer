@@ -1,12 +1,13 @@
 /**
  * `@agenteer/node-shell-exec` — permissioned subprocess (sub-plan 03 §5).
  *
- * `shell.exec` is intentionally coarse (sub-plan 02 §1.1.4). At M2 we
- * enforce capability + denylist on cwd; snapshot-verify of fs.write scope
- * per §R1 lands with `@agenteer/trust/access` in M3.
+ * `shell.exec` is intentionally coarse (sub-plan 02 §1.1.4). Dispatch
+ * checks capability + denylist on cwd; the runtime's §R1 snapshot wrap
+ * catches writes that escape the declared `fs.write` scope. Streaming
+ * stdout/stderr uses the shared capture utility so `compile` / `test_run`
+ * behave identically.
  */
 
-import { spawn } from "node:child_process";
 import { z } from "zod";
 import {
   authorizeOperation,
@@ -18,6 +19,7 @@ import {
   type NodeResult,
   type NodeRuntimeHandle,
 } from "@agenteer/core";
+import { runCommand, tailOf } from "../shared/index.js";
 
 const MANIFEST: NodeManifest = makeManifest({
   id: "@agenteer/node-shell-exec",
@@ -46,9 +48,6 @@ const OutputSchema = z.object({
 type Input = z.input<typeof InputSchema>;
 type Output = z.infer<typeof OutputSchema>;
 
-const STDOUT_LIMIT = 256 * 1024; // sub-plan 03 §S.2
-const STDERR_LIMIT = 256 * 1024;
-
 export function shellExecFactory(): Node<Input, Output> {
   return {
     manifest: MANIFEST,
@@ -59,7 +58,7 @@ export function shellExecFactory(): Node<Input, Output> {
     async execute(input: NodeInput<Input>, handle: NodeRuntimeHandle): Promise<NodeResult<Output>> {
       const { command, cwd, stdin } = input.original;
       const timeout_ms = input.original.timeout_ms ?? 120_000;
-      // Capability gate (shell.exec:).
+
       try {
         authorizeOperation(handle.granted, { kind: "shell.exec" });
       } catch (err) {
@@ -70,7 +69,6 @@ export function shellExecFactory(): Node<Input, Output> {
           evidence: { verdict: "fail" },
         };
       }
-      // Denylist on cwd (other paths are caught by fs primitives when used).
       if (cwd) {
         try {
           assertNotDenied(cwd);
@@ -84,110 +82,41 @@ export function shellExecFactory(): Node<Input, Output> {
         }
       }
 
-      const start = Date.now();
-      return await runCommand(command, { cwd, timeout_ms, stdin, signal: handle.signal }).then(
-        (r) => ({
-          kind: "output" as const,
-          value: { ...r, duration_ms: Date.now() - start },
-          evidence: {
-            verdict: r.exit_code === 0 ? ("pass" as const) : ("fail" as const),
-            tool_output: { command, exit_code: r.exit_code, stdout_tail: r.stdout.slice(-4096) },
+      try {
+        const r = await runCommand(command, {
+          ...(cwd !== undefined ? { cwd } : {}),
+          ...(stdin !== undefined ? { stdin } : {}),
+          timeout_ms,
+          signal: handle.signal,
+        });
+        return {
+          kind: "output",
+          value: {
+            exit_code: r.exit_code,
+            stdout: r.stdout,
+            stderr: r.stderr,
+            duration_ms: r.duration_ms,
+            timed_out: r.timed_out,
           },
-        }),
-        (err: unknown) => ({
-          kind: "failed" as const,
+          evidence: {
+            verdict: r.exit_code === 0 && !r.timed_out ? "pass" : "fail",
+            tool_output: {
+              command,
+              exit_code: r.exit_code,
+              stdout_tail: tailOf(r.stdout),
+            },
+          },
+        };
+      } catch (err) {
+        return {
+          kind: "failed",
           reason: err instanceof Error ? err.message : String(err),
           retryable: true,
-          evidence: { verdict: "fail" as const },
-        }),
-      );
+          evidence: { verdict: "fail" },
+        };
+      }
     },
   };
 }
 
 export const shellExecManifest = MANIFEST;
-
-interface RunResult {
-  exit_code: number;
-  stdout: string;
-  stderr: string;
-  timed_out: boolean;
-}
-
-async function runCommand(
-  command: string,
-  opts: { cwd?: string; timeout_ms: number; stdin?: string; signal: AbortSignal },
-): Promise<RunResult> {
-  return await new Promise<RunResult>((resolve, reject) => {
-    const child = spawn(command, {
-      shell: true,
-      cwd: opts.cwd,
-    });
-
-    let stdout = "";
-    let stderr = "";
-    let stdoutTruncated = false;
-    let stderrTruncated = false;
-    let timedOut = false;
-    let settled = false;
-
-    child.stdout?.on("data", (chunk: Buffer | string) => {
-      const s = chunk.toString();
-      if (stdout.length + s.length > STDOUT_LIMIT) {
-        const room = Math.max(0, STDOUT_LIMIT - stdout.length);
-        stdout += s.slice(0, room);
-        stdoutTruncated = true;
-      } else {
-        stdout += s;
-      }
-    });
-    child.stderr?.on("data", (chunk: Buffer | string) => {
-      const s = chunk.toString();
-      if (stderr.length + s.length > STDERR_LIMIT) {
-        const room = Math.max(0, STDERR_LIMIT - stderr.length);
-        stderr += s.slice(0, room);
-        stderrTruncated = true;
-      } else {
-        stderr += s;
-      }
-    });
-
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill("SIGTERM");
-      const grace = setTimeout(() => child.kill("SIGKILL"), 5000);
-      grace.unref();
-    }, opts.timeout_ms);
-
-    const onAbort = () => {
-      child.kill("SIGTERM");
-    };
-    opts.signal.addEventListener("abort", onAbort, { once: true });
-
-    child.on("error", (err) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      opts.signal.removeEventListener("abort", onAbort);
-      reject(err);
-    });
-
-    child.on("close", (code) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      opts.signal.removeEventListener("abort", onAbort);
-      resolve({
-        exit_code: code ?? -1,
-        stdout: stdoutTruncated ? stdout + "\n[...stdout truncated...]" : stdout,
-        stderr: stderrTruncated ? stderr + "\n[...stderr truncated...]" : stderr,
-        timed_out: timedOut,
-      });
-    });
-
-    if (opts.stdin !== undefined) {
-      child.stdin?.write(opts.stdin);
-    }
-    child.stdin?.end();
-  });
-}

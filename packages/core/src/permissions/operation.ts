@@ -41,6 +41,10 @@ export interface ContextOp {
   kind: "context.read" | "context.write";
   variantId: string;
 }
+export interface ToolOp {
+  kind: "tool";
+  toolName: string;
+}
 
 export type Operation =
   | FsReadOp
@@ -50,7 +54,8 @@ export type Operation =
   | ShellExecOp
   | ModelOp
   | SpawnOp
-  | ContextOp;
+  | ContextOp
+  | ToolOp;
 
 export class OperationDenied extends Error {
   constructor(
@@ -94,6 +99,8 @@ function synthesizeCapability(op: Operation) {
     case "context.read":
     case "context.write":
       return parseCapability(`${op.kind}:${op.variantId}`);
+    case "tool":
+      return parseCapability(`tool:${op.toolName}`);
   }
 }
 

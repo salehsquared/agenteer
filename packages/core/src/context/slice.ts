@@ -36,11 +36,14 @@ function extractValue(item: ContextItem): unknown {
   const c = item.content;
   switch (c.kind) {
     case "artifact":
+      // R3-A: `ctx.set(k, asArtifact(body))` produces an Artifact item
+      // whose body IS the value the author wrote. `append(k, [...])`
+      // also produces an Artifact, but whose body is the appended list.
       return c.body;
     case "decision":
-      // Items produced by `ctx.set(...)` via the R3 patch compiler carry
-      // the original value JSON-encoded in `rationale`; decode so node
-      // authors get back the primitive they wrote.
+      // Items produced by plain `ctx.set(k, v)` carry the original value
+      // JSON-encoded in `rationale`; decode so node authors get back the
+      // primitive they wrote.
       if (item.labels["ctx_op"] === "set" && c.rationale !== undefined) {
         try {
           return JSON.parse(c.rationale);

@@ -8,6 +8,7 @@ export type {
   NodeSpawn,
   JoinMode,
   CtxPatch,
+  CtxArtifactMarker,
   CtxGrant,
   EvidenceDelta,
   NodeRuntimeHandle,
@@ -16,6 +17,8 @@ export type {
   ModelCallRequest,
   ModelCallResult,
 } from "./node/types.js";
+
+export { asArtifact, isArtifactMarker } from "./node/types.js";
 
 export {
   InMemoryNodeRegistry,
@@ -81,8 +84,11 @@ export {
 export {
   type ActionRegistry,
   type DispatchContext,
+  type ToolHandler,
+  type ToolRegistry,
   DispatchError,
   StdActionRegistry,
+  InMemoryToolRegistry,
 } from "./runtime/dispatch.js";
 
 // Permissions — sub-plan 02.
