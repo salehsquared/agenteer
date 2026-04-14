@@ -122,6 +122,15 @@ interface Frame {
   replacement_history: Array<{ nodeId: string; manifest_id: string; reason: string }>;
   granted: CapabilitySet;
   chainLength: number;
+  /**
+   * Context-capability delegation bound (master plan §Pillar 3 invariant:
+   * "a parent's slice-view bounds the child's selector scope"). Undefined
+   * at root (unrestricted). Set by `runChildren` to
+   *   parent.ctx ∪ ctx_grants.keys
+   * Children can declare more keys, but what they actually see is the
+   * intersection with this set — delegation mirrors the permission model.
+   */
+  ctxScope?: ReadonlySet<string>;
 }
 
 export class Runtime {
@@ -268,7 +277,7 @@ export class Runtime {
       const node = entry.instantiate();
       const nodeId = newNodeRunId();
       const granted = frame.granted;
-      const ctxSlice = this.materializeSliceForNode(node);
+      const ctxSlice = this.materializeSliceForNode(node, frame.ctxScope, nodeId);
 
       // Input schema validation — sub-plan 02 §2.4.
       const inputValidation = validateInput(node, currentInput);
@@ -525,6 +534,11 @@ export class Runtime {
         }
 
         case "spawn_children": {
+          // C1: compute the child ctxScope as parent.ctx ∪ ctx_grants.keys.
+          const scopeKeys = new Set<string>(node.ctx);
+          for (const g of result.ctx_grants ?? []) {
+            for (const k of g.keys) scopeKeys.add(k);
+          }
           const childrenResults = await this.runChildren({
             parentNodeId: nodeId,
             parentManifestId: currentSpawn.manifest_id,
@@ -535,6 +549,7 @@ export class Runtime {
             stats,
             children: result.children,
             join: result.join,
+            parentCtxScope: scopeKeys,
           });
 
           if (result.join.mode === "detached") {
@@ -565,6 +580,8 @@ export class Runtime {
     stats: RunStats;
     children: NodeSpawn[];
     join: JoinMode;
+    /** C1: parent ctx ∪ ctx_grants.keys — the delegation bound. */
+    parentCtxScope: ReadonlySet<string>;
   }): Promise<Array<{ correlation: string; manifest_id: string; result: NodeResult }>> {
     this.events.emit("spawn", {
       parentNodeId: args.parentNodeId,
@@ -629,6 +646,7 @@ export class Runtime {
         replacement_history: [],
         granted: auth.granted,
         chainLength: 0,
+        ctxScope: args.parentCtxScope,
       };
       launch.push(async () => {
         const r = await this.runFrame(spawn, frame, childAbort, args.stats);
@@ -694,8 +712,34 @@ export class Runtime {
     return settled;
   }
 
-  private materializeSliceForNode(node: Node) {
-    const keys = node.ctx;
+  private materializeSliceForNode(
+    node: Node,
+    ctxScope: ReadonlySet<string> | undefined,
+    nodeId: string,
+  ) {
+    // C1: filter the child's declared ctx keys against the parent's
+    // slice-view bound. Keys outside the bound are silently dropped; the
+    // node's slice for those tags is empty. We also emit a restriction
+    // event so debugging the "my node got no data" case is possible.
+    let keys = node.ctx;
+    if (ctxScope) {
+      const allowed: string[] = [];
+      const restricted: string[] = [];
+      for (const k of keys) {
+        if (ctxScope.has(k)) allowed.push(k);
+        else restricted.push(k);
+      }
+      if (restricted.length > 0) {
+        this.events.emit("ctx_scope_restricted", {
+          nodeId,
+          requested: [...keys],
+          allowed,
+          restricted,
+          timestamp: this.clock().toISOString(),
+        });
+      }
+      keys = allowed;
+    }
     const items = [];
     for (const key of keys) {
       const head = this.contextStore.getHeadByTag(key);

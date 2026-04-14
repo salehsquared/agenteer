@@ -15,6 +15,7 @@ import {
   type NodeRegistry,
   type RuntimeOutcome,
   type ModelProvider,
+  type ToolRegistry,
 } from "@agenteer/core";
 import { buildRuntime, buildStdlibRegistry, sessionResolvers } from "../workflow.js";
 import { loadSession } from "@agenteer/core";
@@ -36,6 +37,8 @@ export interface RunWorkflowOptions {
   sessionId?: string;
   spec: WorkflowSpec;
   modelProvider?: ModelProvider;
+  /** Tool registry forwarded to the Runtime for tool_call dispatch. */
+  toolRegistry?: ToolRegistry;
   /** Build a custom registry (default: stdlib). Bypasses session resolvers. */
   registry?: NodeRegistry;
   /** Extra registrations layered on top of the default stdlib registry. */
@@ -84,6 +87,7 @@ export async function runWorkflow(opts: RunWorkflowOptions): Promise<RunWorkflow
     sessionId,
     registry,
     ...(opts.modelProvider ? { modelProvider: opts.modelProvider } : {}),
+    ...(opts.toolRegistry ? { toolRegistry: opts.toolRegistry } : {}),
   });
 
   const outcome = await runtime.run(

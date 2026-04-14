@@ -24,7 +24,13 @@ import {
   ctxLineage,
   ctxList,
 } from "../commands/ctx.js";
-import { inspectSession, renderInspectReport } from "../commands/inspect.js";
+import {
+  inspectSession,
+  renderInspectReport,
+  renderCtxTimeline,
+  renderEvidenceTree,
+  renderPermissionDenials,
+} from "../commands/inspect.js";
 import { buildProviderForModels } from "../providers/index.js";
 import {
   publishCommand,
@@ -75,7 +81,7 @@ Usage:
   agenteer run     --spec <file> --session <dir> [--model <id>]*
   agenteer resume  --session <dir> [--model <id>]* [--no-interactive]
   agenteer ctx     <list|get|lineage|diff> --session <dir> [...]
-  agenteer inspect --session <dir>
+  agenteer inspect --session <dir> [--ctx-timeline | --evidence | --denials | --summary]
   agenteer publish --dir <pkg-dir> [--provenance] [--dry-run] [--registry <url>]
   agenteer install <spec>  --workflow-dir <dir> [--yes] [--grant <cap>]* [--registry <url>]
   agenteer search  <query> [--registry <url>]
@@ -106,6 +112,9 @@ async function runCmd(argv: readonly string[]): Promise<number> {
     `run: session=${sessionId} status=${outcome.finalStatus} steps=${outcome.totalSteps}`,
   );
   if (outcome.finalStatus === "suspended") console.log(`  resume with: agenteer resume --session ${sessionDir}`);
+  if (outcome.finalStatus === "failed" && outcome.rootResult?.kind === "failed") {
+    explainRunFailure(outcome.rootResult, spec.granted);
+  }
   return outcome.finalStatus === "completed" ? 0 : 1;
 }
 
@@ -122,7 +131,49 @@ async function resumeCmd(argv: readonly string[]): Promise<number> {
     ...(modelProvider ? { modelProvider } : {}),
   });
   console.log(`resume: session=${sessionId} status=${outcome.finalStatus}`);
+  if (outcome.finalStatus === "failed" && outcome.rootResult?.kind === "failed") {
+    explainRunFailure(outcome.rootResult, []);
+  }
   return outcome.finalStatus === "completed" ? 0 : 1;
+}
+
+/**
+ * When a runtime run fails, render an actionable explanation — not just
+ * `reason: "..."`. Matches `explainPermissionDenial` output when the
+ * failure is a spawn denial; falls back to the raw reason otherwise.
+ */
+function explainRunFailure(
+  result: { reason: string; details?: unknown },
+  grants: readonly string[],
+): void {
+  if (result.reason.startsWith("root_spawn_denied") || result.reason.startsWith("permission_denied")) {
+    const missing = (result.details as { missing?: string[] } | undefined)?.missing ?? [];
+    console.error(``);
+    console.error(`failure: ${result.reason}`);
+    if (missing.length > 0) {
+      console.error(`  missing caps:`);
+      for (const c of missing) console.error(`    - ${c}`);
+    }
+    if (grants.length > 0) {
+      console.error(`  current grants:`);
+      for (const c of grants) console.error(`    - ${c}`);
+    }
+    console.error(`  fix: add the missing cap(s) to your workflow spec's 'granted' list,`);
+    console.error(`       or attenuate the spawn via NodeSpawn.attenuate to disclaim them.`);
+    return;
+  }
+  if (result.reason === "input_schema_violation" || result.reason === "output_schema_violation") {
+    const issues = Array.isArray(result.details) ? result.details : [];
+    console.error(``);
+    console.error(`failure: ${result.reason}`);
+    for (const issue of issues as Array<{ path?: unknown[]; message?: string }>) {
+      const path = Array.isArray(issue.path) ? issue.path.join(".") || "<root>" : "<root>";
+      console.error(`  [${path}] ${issue.message ?? "invalid"}`);
+    }
+    return;
+  }
+  console.error(``);
+  console.error(`failure: ${result.reason}`);
 }
 
 async function ctxCmd(argv: readonly string[]): Promise<number> {
@@ -177,7 +228,27 @@ async function inspectCmd(argv: readonly string[]): Promise<number> {
   const { flags } = parseArgs(argv);
   const sessionDir = requireFlagString(flags, "session");
   const report = await inspectSession(sessionDir);
-  console.log(renderInspectReport(report));
+  // When a specific view flag is given, show only that section. Default:
+  // summary + all three detail views.
+  const showAll =
+    flags["ctx-timeline"] !== true &&
+    flags["evidence"] !== true &&
+    flags["denials"] !== true;
+  if (showAll || flags["summary"] === true) {
+    console.log(renderInspectReport(report));
+  }
+  if (showAll || flags["ctx-timeline"] === true) {
+    console.log("");
+    console.log(renderCtxTimeline(report.ctx_timeline));
+  }
+  if (showAll || flags["evidence"] === true) {
+    console.log("");
+    console.log(renderEvidenceTree(report.evidence_tree));
+  }
+  if (showAll || flags["denials"] === true) {
+    console.log("");
+    console.log(renderPermissionDenials(report.permission_denials));
+  }
   return 0;
 }
 

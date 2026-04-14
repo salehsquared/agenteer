@@ -30,7 +30,13 @@ export {
 export {
   inspectSession,
   renderInspectReport,
+  renderCtxTimeline,
+  renderEvidenceTree,
+  renderPermissionDenials,
   type InspectReport,
+  type CtxTimelineEntry,
+  type EvidenceChain,
+  type PermissionDenialEntry,
 } from "./commands/inspect.js";
 
 export {

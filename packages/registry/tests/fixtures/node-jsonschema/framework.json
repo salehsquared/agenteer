@@ -1,0 +1,27 @@
+{
+  "manifest_version": 1,
+  "id": "@toy/node-score",
+  "version": "0.1.0",
+  "name": "toy_score",
+  "description": "Scores a finding on a 0-100 scale; validates inputs via JSON Schema.",
+  "determinism": "deterministic",
+  "required_actions": [],
+  "tags": ["toy", "scoring"],
+  "input_schema": {
+    "type": "object",
+    "required": ["finding", "severity"],
+    "properties": {
+      "finding": { "type": "string", "minLength": 1 },
+      "severity": { "type": "string", "enum": ["low", "medium", "high"] }
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["score"],
+    "properties": {
+      "score": { "type": "integer", "minimum": 0, "maximum": 100 }
+    },
+    "additionalProperties": false
+  }
+}

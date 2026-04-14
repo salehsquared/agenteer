@@ -8,7 +8,7 @@
  * answers, we prompt on stdin to collect them before running.
  */
 
-import type { ModelProvider, NodeRegistry, RuntimeOutcome } from "@agenteer/core";
+import type { ModelProvider, NodeRegistry, RuntimeOutcome, ToolRegistry } from "@agenteer/core";
 import {
   loadSession,
   recordAnswer,
@@ -20,6 +20,8 @@ import { promptForAnswer } from "../resolvers/stdin-prompt.js";
 export interface ResumeWorkflowOptions {
   sessionDir: string;
   modelProvider?: ModelProvider;
+  /** Tool registry forwarded to the Runtime for tool_call dispatch. */
+  toolRegistry?: ToolRegistry;
   /** Build a custom registry (default: stdlib). Bypasses session resolvers. */
   registry?: NodeRegistry;
   /**
@@ -110,6 +112,7 @@ export async function resumeWorkflow(
     sessionId: refreshed.session_id,
     registry,
     ...(opts.modelProvider ? { modelProvider: opts.modelProvider } : {}),
+    ...(opts.toolRegistry ? { toolRegistry: opts.toolRegistry } : {}),
   });
 
   const outcome = await runtime.run(

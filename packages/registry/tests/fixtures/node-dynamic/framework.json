@@ -1,0 +1,17 @@
+{
+  "manifest_version": 1,
+  "id": "@toy/node-dynamic",
+  "version": "0.2.0",
+  "name": "toy_dynamic",
+  "description": "Demonstrates dynamic_actions disclosure.",
+  "determinism": "stochastic",
+  "dynamic_actions": true,
+  "dynamic_action_spec": "tool:${input.tool_name}",
+  "required_actions": [],
+  "tags": ["toy", "dynamic"],
+  "side_effects": {
+    "writes_fs": false,
+    "network": true,
+    "mutates_ctx": false
+  }
+}

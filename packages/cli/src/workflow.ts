@@ -25,6 +25,7 @@ import {
   type ModelProvider,
   type NodeRegistry,
   type SessionState,
+  type ToolRegistry,
 } from "@agenteer/core";
 import {
   approvalGateFactory,
@@ -101,6 +102,8 @@ export interface BuildRuntimeOptions {
   sessionId: string;
   registry: NodeRegistry;
   modelProvider?: ModelProvider;
+  /** Tool registry for `tool_call` / stdlib `tool.invoke` dispatch. */
+  toolRegistry?: ToolRegistry;
   events?: RuntimeEvents;
   accessSnapshotRoot?: string;
 }
@@ -126,6 +129,7 @@ export async function buildRuntime(opts: BuildRuntimeOptions): Promise<{
     evidenceSink,
     events,
     ...(opts.modelProvider ? { modelProvider: opts.modelProvider } : {}),
+    ...(opts.toolRegistry ? { toolRegistry: opts.toolRegistry } : {}),
     ...(opts.accessSnapshotRoot ? { accessSnapshotRoot: opts.accessSnapshotRoot } : {}),
   });
   return { runtime, recorder, contextStore, events };

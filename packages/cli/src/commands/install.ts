@@ -35,7 +35,41 @@ export async function cliConfirm(summary: {
 export function renderInstallResult(result: InstallResult): string {
   if (!result.ok) {
     const reason = result.reason ?? "unknown_error";
-    return `install failed: ${reason} (${result.spec})`;
+    const lines = [`install failed: ${reason} (${result.spec})`];
+    switch (reason) {
+      case "first_party_provenance_required":
+        lines.push(
+          `  fix: @agenteer/* packages must ship npm provenance attestations.`,
+        );
+        lines.push(
+          `       Publish with 'agenteer publish --provenance' from a GitHub Actions workflow.`,
+        );
+        break;
+      case "third_party_dynamic_actions_requires_confirmation":
+        lines.push(
+          `  fix: this package declares dynamic_actions: true. --yes is ignored for`,
+        );
+        lines.push(
+          `       third-party dynamic nodes. Re-run interactively, or provide a`,
+        );
+        lines.push(
+          `       confirm callback when calling installNode programmatically.`,
+        );
+        break;
+      case "validation_failed":
+        lines.push(
+          `  fix: the installed package failed framework.json validation. Try`,
+        );
+        lines.push(
+          `       'agenteer publish --dir <pkg> --dry-run' against the source to see`,
+        );
+        lines.push(`       the specific issues before re-publishing.`);
+        break;
+      case "declined_by_user":
+        lines.push(`  (no changes written; run again when you're ready to approve.)`);
+        break;
+    }
+    return lines.join("\n");
   }
   const lines = [
     `installed ${result.id}@${result.version} (range ${result.range})`,

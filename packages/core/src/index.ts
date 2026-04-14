@@ -148,6 +148,13 @@ export {
 
 export { newCorrelationId, newNodeRunId, newSessionId } from "./util/ids.js";
 
+export {
+  explainPermissionDenial,
+  explainManifestIssues,
+  renderExplainedIssues,
+  type ExplainedIssue,
+} from "./util/explain.js";
+
 // Session persistence + resume (M5).
 export {
   type SessionState,

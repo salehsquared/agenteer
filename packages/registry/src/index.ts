@@ -71,3 +71,6 @@ export {
   type SearchHit,
   type CuratedEntry,
 } from "./search.js";
+
+// A5: ajv JSON Schema → Zod bridge for non-Zod publishers.
+export { jsonSchemaToZod, compileNodeSchemas } from "./ajv-adapter.js";

@@ -64,7 +64,8 @@ export interface InstallResult {
   reason?:
     | "declined_by_user"
     | "validation_failed"
-    | "first_party_provenance_required";
+    | "first_party_provenance_required"
+    | "third_party_dynamic_actions_requires_confirmation";
   spec: string;
   id?: string;
   version?: string;
@@ -72,6 +73,8 @@ export interface InstallResult {
   manifest_hash?: string;
   provenance?: ProvenanceStatus;
   diff?: PermissionsDiff;
+  /** True when R4-A hard-stop fired; the caller must confirm interactively. */
+  dynamic_actions_hard_stop?: boolean;
 }
 
 export async function installNode(opts: InstallOptions): Promise<InstallResult> {
@@ -139,31 +142,63 @@ export async function installNode(opts: InstallOptions): Promise<InstallResult> 
     granted: opts.grants ?? [],
   });
 
+  // R4-A — install-time hard-stop for third-party dynamic_actions:true.
+  //
+  // Master plan ratification: packages that synthesize caps at dispatch
+  // time (master plan §R4 disclosure) turn the static permissions diff
+  // into a lower bound; actual caps exercised at runtime can be wider.
+  // For @agenteer/* we trust first-party review and let --yes stand.
+  // For everything else the disclosure flag must cost a real confirmation
+  // — otherwise the flag is cosmetic.
+  const isFirstParty = pkgName.startsWith("@agenteer/");
+  const dynamicActions = Boolean(loaded.manifest.dynamic_actions);
+  const hardStop = dynamicActions && !isFirstParty;
+
   // 4. Prompt.
   const summaryText = [
     `Installing ${loaded.packageJson.name}@${loaded.packageJson.version}`,
     `  Description: ${loaded.packageJson.description ?? "(none)"}`,
     `  License:     ${loaded.packageJson.license ?? "(unspecified)"}`,
     `  ${renderProvenanceLine(provenance)}`,
+    ...(dynamicActions
+      ? [
+          `  dynamic_actions: true — this node synthesizes capabilities`,
+          `    at dispatch time; required_actions below is a LOWER BOUND.`,
+          ...(loaded.manifest.dynamic_action_spec
+            ? [`    Spec: ${loaded.manifest.dynamic_action_spec}`]
+            : []),
+          ...(hardStop
+            ? [`    Third-party dynamic_actions — explicit confirmation required.`]
+            : []),
+        ]
+      : []),
     renderPermissionsDiff(loaded.packageJson.name, loaded.packageJson.version, diff)
       .split("\n")
       .slice(1)
       .join("\n"),
   ].join("\n");
 
-  let approved = Boolean(opts.autoApprove);
+  // Auto-approve is allowed for first-party AND third-party static
+  // manifests. For third-party dynamic_actions, it's IGNORED — the
+  // confirm callback is always invoked (hard-stop). A caller that wants
+  // scripted installs must supply a confirm that returns true; --yes
+  // alone no longer bypasses the prompt for these packages.
+  let approved = Boolean(opts.autoApprove) && !hardStop;
   if (!approved) {
     if (!opts.confirm) {
       await safeUninstall(npm, opts.workflowDir, pkgName);
       return {
         ok: false,
-        reason: "declined_by_user",
+        reason: hardStop
+          ? "third_party_dynamic_actions_requires_confirmation"
+          : "declined_by_user",
         spec,
         id: loaded.manifest.id,
         version: loaded.packageJson.version,
         manifest_hash: loaded.contentHash,
         provenance,
         diff,
+        ...(hardStop ? { dynamic_actions_hard_stop: true } : {}),
       };
     }
     approved = await opts.confirm({
@@ -187,6 +222,7 @@ export async function installNode(opts: InstallOptions): Promise<InstallResult> 
       manifest_hash: loaded.contentHash,
       provenance,
       diff,
+      ...(hardStop ? { dynamic_actions_hard_stop: true } : {}),
     };
   }
 

@@ -88,6 +88,18 @@ export interface RuntimeEventMap {
     reason: string;
     timestamp: string;
   };
+  /**
+   * C1: child declared ctx keys outside the parent's slice-view bound
+   * (parent.ctx ∪ ctx_grants.keys). Keys outside the bound are dropped
+   * from the child's materialized slice. Master plan §Pillar 3 invariant.
+   */
+  ctx_scope_restricted: {
+    nodeId: string;
+    requested: readonly string[];
+    allowed: readonly string[];
+    restricted: readonly string[];
+    timestamp: string;
+  };
 
   cache_hit: { nodeId: string; manifest: string; keyHash: string; timestamp: string };
   cache_miss: { nodeId: string; manifest: string; keyHash: string; timestamp: string };

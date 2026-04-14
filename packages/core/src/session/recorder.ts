@@ -65,6 +65,7 @@ export class SessionRecorder {
       "ctx_read",
       "ctx_patched",
       "permission_denied",
+      "ctx_scope_restricted",
       "cache_hit",
       "cache_miss",
       "evidence_emitted",

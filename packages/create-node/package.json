@@ -1,10 +1,13 @@
 {
-  "name": "@agenteer/registry",
+  "name": "@agenteer/create-node",
   "version": "0.0.1",
-  "description": "Agenteer registry: publish, install, search, and pin @agenteer-shape node packages via npm.",
+  "description": "Scaffold a new Agenteer node package ready to publish.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "create-agenteer-node": "./dist/bin/create-node.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -23,13 +26,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@agenteer/core": "0.0.1",
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
-    "yaml": "^2.8.2",
-    "zod": "^4.3.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.0.0",
     "vitest": "^3.2.4"
