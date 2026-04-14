@@ -20,7 +20,7 @@ The runtime is the only thing that applies state changes. Nodes return intents; 
 +-----------------------------------------------------+
 |  @agenteer/cli        bin + workflow runner         |
 +-----------------------------------------------------+
-|  @agenteer/stdlib     19 v1 nodes (factories)       |
+|  @agenteer/stdlib     18 v1 nodes (factories)       |
 +-----------------------------------------------------+
 |  @agenteer/registry   publish/install + ajv bridge  |
 +-----------------------------------------------------+
@@ -82,7 +82,7 @@ Capabilities are strings: `fs.read:/tmp/**`, `model:claude-*`, `tool:gh`, `net.h
 
 The kernel is:
 
-- **`parseCapability(s)`** → `ParsedCapability` (type, glob, optional operation).
+- **`parseCapability(s)`** → `ParsedCapability` (`resource` + `scope`).
 - **`isSubset(a, b)`** → `SubsetResult` — is `a` ⊆ `b`?
 - **`intersect(a, b)`** → the tightest capability set covering only what both allow.
 - **`authorizeSpawn({parent, child})`** → allow-with-effective-caps OR deny with `missing` list.
@@ -121,7 +121,7 @@ A session directory holds:
     <record-id>.yaml    — one file per evidence record
 ```
 
-When a node returns `needs_user`, the runtime suspends, the recorder writes `session.yaml` with the pending prompt, and `runtime.run()` returns `awaiting_user`. You respond, call `resume`, and the runtime replays from the suspension point using the `recordedAnswerResolver` to satisfy the prompt from disk.
+When a node returns `needs_user`, the runtime suspends, the recorder writes `session.yaml` with the pending prompt, and `runtime.run()` returns `suspended`. You respond, call `resume`, and the runtime replays from the suspension point using recorded answers plus the session-backed resolvers.
 
 Replay is **not** caching. Deterministic nodes re-run on resume (content-addressable ctx dedupes, so there's no corruption). Stochastic `llm_call` re-queries. Caching lands in v1.1.
 

@@ -10,7 +10,7 @@ Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `
 
 - **`@agenteer/core`** — Node primitive, runtime loop, context store (in-memory + FileContextStore), event bus, permission kernel, manifest schema, session persistence.
 - **`@agenteer/trust`** — evidence records, structured output with text-parse retry, filesystem access guard, cross-check engine. Zero dependency on core.
-- **`@agenteer/stdlib`** — 19 v1 nodes (5 primitives, 5 validators, 4 meta, 2 humans, 1 planner, 1 context).
+- **`@agenteer/stdlib`** — 18 v1 nodes (5 primitives, 5 validators, 4 meta, 2 humans, 1 planner, 1 context).
 - **`@agenteer/cli`** — `agenteer run / resume / ctx / inspect / publish / install / search`, plus Anthropic + OpenAI `ProviderLike` adapters.
 - **`@agenteer/registry`** — publishing, installing, permission-diff, `framework.lock`, ajv bridge.
 - **`@agenteer/create-node`** — `npx @agenteer/create-node @scope/node-name` scaffold.
@@ -32,6 +32,7 @@ import {
   MemoryEvidenceSink,
   Runtime,
   makeManifest,
+  type Node,
 } from "@agenteer/core";
 import { z } from "zod";
 
@@ -44,20 +45,23 @@ const manifest = makeManifest({
 });
 
 const registry = new InMemoryNodeRegistry();
-registry.register(manifest, () => ({
+registry.register(
   manifest,
-  inputSchema: z.object({ name: z.string() }),
-  outputSchema: z.object({ message: z.string() }),
-  ctx: [],
-  model: null,
-  async execute(input) {
-    return {
-      kind: "output",
-      value: { message: `hello, ${input.original.name}` },
-      evidence: { verdict: "pass" },
-    };
-  },
-}));
+  (): Node<{ name: string }, { message: string }> => ({
+    manifest,
+    inputSchema: z.object({ name: z.string() }),
+    outputSchema: z.object({ message: z.string() }),
+    ctx: [],
+    model: null,
+    async execute(input) {
+      return {
+        kind: "output",
+        value: { message: `hello, ${input.original.name}` },
+        evidence: { verdict: "pass" },
+      };
+    },
+  }),
+);
 
 const runtime = new Runtime({
   registry,
@@ -73,11 +77,27 @@ console.log(outcome.rootResult);
 // { kind: "output", value: { message: "hello, world" }, evidence: { verdict: "pass" } }
 ```
 
-Or install the CLI and drive from the shell:
+Or install the CLI and run a stdlib node from the shell:
 
 ```bash
 npm install -g @agenteer/cli
-agenteer --help
+```
+
+```yaml
+# workflow.yaml
+manifest_id: "@agenteer/node-regex-check"
+input:
+  input: "release 1.0.0-rc.1"
+  rules:
+    - id: contains-rc
+      pattern: "1\\.0\\.0-rc\\.1"
+      kind: must_match
+granted: []
+```
+
+```bash
+agenteer run --spec workflow.yaml --session ./.session
+agenteer inspect --session ./.session --summary
 ```
 
 A runnable demo using six stdlib nodes lives at [`examples/research-assistant/`](examples/research-assistant/README.md) — question → plan → approve → search → check → report.

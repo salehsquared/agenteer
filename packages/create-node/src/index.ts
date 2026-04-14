@@ -336,8 +336,9 @@ npm run build
 ## Publish
 
 \`\`\`bash
-# Validate + publish via the agenteer registry helper.
-agenteer publish --dir . --provenance
+# Validate first, then publish. Add --provenance in CI/OIDC when desired.
+agenteer publish --dir . --dry-run
+agenteer publish --dir .
 \`\`\`
 
 See \`docs/publishing-a-node.md\` in the agenteer repo for the full flow.

@@ -1,6 +1,6 @@
 # @agenteer/stdlib
 
-The 19 standard-library nodes for [Agenteer](https://github.com/salehsquared/agenteer). Each node ships with a hardened schema, explicit capability requirements, and a factory the runtime can register directly.
+The 18 standard-library nodes for [Agenteer](https://github.com/salehsquared/agenteer). Each node ships with a hardened schema, explicit capability requirements, and a factory the runtime can register directly.
 
 ## Install
 

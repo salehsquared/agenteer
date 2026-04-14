@@ -1,7 +1,7 @@
 /**
  * Capability grammar (sub-plan 02 §1.1).
  *
- * Format: `resource:scope`. 9 resource types; globs (`*`, `**`) only, no
+ * Format: `resource:scope`. 11 resource types; globs (`*`, `**`) only, no
  * regex, no negation. Hierarchical strings so subset check is a pure
  * string operation.
  */

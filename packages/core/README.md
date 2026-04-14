@@ -21,6 +21,7 @@ import {
   MemoryEvidenceSink,
   Runtime,
   makeManifest,
+  type Node,
 } from "@agenteer/core";
 import { z } from "zod";
 
@@ -33,20 +34,23 @@ const manifest = makeManifest({
 });
 
 const registry = new InMemoryNodeRegistry();
-registry.register(manifest, () => ({
+registry.register(
   manifest,
-  inputSchema: z.object({ who: z.string() }),
-  outputSchema: z.object({ greeting: z.string() }),
-  ctx: [],
-  model: null,
-  async execute(input) {
-    return {
-      kind: "output",
-      value: { greeting: `hello, ${input.original.who}` },
-      evidence: { verdict: "pass" },
-    };
-  },
-}));
+  (): Node<{ who: string }, { greeting: string }> => ({
+    manifest,
+    inputSchema: z.object({ who: z.string() }),
+    outputSchema: z.object({ greeting: z.string() }),
+    ctx: [],
+    model: null,
+    async execute(input) {
+      return {
+        kind: "output",
+        value: { greeting: `hello, ${input.original.who}` },
+        evidence: { verdict: "pass" },
+      };
+    },
+  }),
+);
 
 const runtime = new Runtime({
   registry,
@@ -77,8 +81,10 @@ console.log(outcome.rootResult);
 A capability is a string like `fs.read:/tmp/**`, `model:claude-*`, `tool:gh`, or `net.http:api.github.com/**`. Eleven resource types; glob-scoped; used to gate every `spawn` and every `callAction`.
 
 ```
-<type>:<glob>[#<operation>]
+<type>:<scope>
 ```
+
+`fs.read`, `fs.write`, and `fs.delete` scopes must be absolute paths or `*`. `shell.exec` is scopeless, so use `shell.exec:` with an empty scope. `net.http` scopes cover host/path only; the runtime does not encode HTTP method as a separate capability dimension.
 
 Children must declare required capabilities in their manifest. The runtime intersects parent grants with child requirements; the child runs with the intersection. If the intersection is empty or doesn't cover a needed capability, the spawn is denied at authorize time, before any code runs. See [capabilities.md](https://github.com/salehsquared/agenteer/blob/main/docs/capabilities.md) for the full grammar.
 

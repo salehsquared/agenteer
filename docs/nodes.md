@@ -56,7 +56,7 @@ const manifest = makeManifest({
 });
 ```
 
-**`required_actions`** is the single most important field. It's the capability envelope the runtime must grant for your node to spawn — not what your node can reach, but what the kernel will intersect with the parent's effective caps. Declare only what you need. If your node writes to `./src`, declare `fs.write:./src/**`, not `fs.write:**`. Narrow is safe; wide invites denials.
+**`required_actions`** is the single most important field. It's the capability envelope the runtime must grant for your node to spawn — not what your node can reach, but what the kernel will intersect with the parent's effective caps. Declare only what you need. Filesystem scopes must be absolute paths or `*`, so if your node writes under `/workspace/src`, declare `fs.write:/workspace/src/**`, not `fs.write:**`. Narrow is safe; wide invites denials.
 
 **`determinism`** hints to schedulers whether re-running with the same input always yields the same output. It doesn't change runtime behavior in 1.0, but v1.1 caching will key off it.
 
@@ -175,7 +175,7 @@ return {
 };
 ```
 
-The runtime suspends. The session records the pending prompt. `runtime.run()` returns with `finalStatus: "awaiting_user"`. The caller collects the answer (stdin, web form, whatever), calls `resume`, and the runtime re-enters `execute` with the answer threaded through the ctx slice.
+The runtime suspends. The session records the pending prompt. `runtime.run()` returns with `finalStatus: "suspended"`. The caller collects the answer, records it, calls `resume`, and the runtime re-enters `execute` through the session-backed resolvers.
 
 You don't have to structure `ask_user` around `needs_user` directly — you can just spawn `@agenteer/node-ask-user` as a child. But `needs_user` is the primitive if you need the prompt to come from inside your own logic.
 
@@ -250,7 +250,7 @@ outputSchema: z.object({ answer: z.string() }),
 
 Published node packages ship JSON Schema in `framework.json`. The registry's `compileNodeSchemas` uses the ajv bridge to wrap each JSON Schema in a `z.unknown().superRefine(...)` at install time. The Zod issue path preserves the JSON instancePath, so errors look the same either way.
 
-You can also ship both — Zod in the source (for types + in-process validation) and JSON Schema in the manifest (for publish). `makeManifest` accepts both and reconciles them.
+You can also ship both — Zod in the source (for types + in-process validation) and JSON Schema in `framework.json` for publish/install. `makeManifest` only builds manifest metadata; schema wiring lives on the node object and in the published manifest file.
 
 ## Testing a node
 
@@ -292,17 +292,24 @@ describe("my-node", () => {
 For stochastic nodes that call models, use `MockModelProvider`:
 
 ```ts
-import { MockModelProvider } from "@agenteer/core";
+import {
+  InMemoryContextStore,
+  InMemoryNodeRegistry,
+  MemoryEvidenceSink,
+  MockModelProvider,
+  Runtime,
+} from "@agenteer/core";
 
 const provider = new MockModelProvider({
-  handlers: [
-    (req) => req.prompt.includes("classify")
-      ? { value: { severity: "P1" }, tokens: { prompt: 10, completion: 5 } }
-      : null,
-  ],
+  "mock:model": () => ({ severity: "P1" }),
 });
 
-const runtime = new Runtime({ /* ... */, modelProvider: provider });
+const runtime = new Runtime({
+  registry: new InMemoryNodeRegistry(),
+  contextStore: new InMemoryContextStore(),
+  evidenceSink: new MemoryEvidenceSink(),
+  modelProvider: provider,
+});
 ```
 
 ## Common pitfalls

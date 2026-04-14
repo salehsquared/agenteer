@@ -11,7 +11,7 @@ import {
 } from "../src/index.js";
 
 describe("capability grammar (sub-plan 02 §1.1)", () => {
-  it("parses each of the 9 resource types", () => {
+  it("parses each of the 11 resource types", () => {
     for (const raw of [
       "fs.read:/src/**",
       "fs.write:/out/**",

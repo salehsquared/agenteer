@@ -62,7 +62,7 @@ stale_markers: []                         # populated when upstream changes
 
 The `pass/fail/error` distinction is load-bearing. `fail` means "the thing we tested is wrong"; `error` means "we couldn't test it." Downstream gates treat these differently — a `fail` blocks progression; an `error` typically signals "fix your tooling and rerun."
 
-Nodes return a minimal `EvidenceDelta` with the verdict subset `pass | fail | inconclusive`. The runtime expands this into a full record. `inconclusive` in the delta maps to either `skip` or `error` in the stored record depending on context.
+Nodes return a minimal `EvidenceDelta` with the verdict subset `pass | fail | inconclusive`. The runtime expands this into a full record. In the primary node-run path, `inconclusive` is stored as `skip`.
 
 ## Primary vs auxiliary
 
@@ -216,8 +216,8 @@ Common queries:
 
 Two implementations ship in 1.0:
 
-- **`MemoryEvidenceSink`** (from `@agenteer/core/evidence/sink`). In-process Map; drops on exit. Use in tests.
-- **`YamlEvidenceStore`** (from `@agenteer/trust/evidence/yaml-store`). Durable, one YAML file per record, append-only. Use in sessions.
+- **`MemoryEvidenceSink`** (from `@agenteer/core`). In-process Map; drops on exit. Use in tests.
+- **`YamlEvidenceStore`** (from `@agenteer/trust/evidence`). Durable, one YAML file per record, append-only. Use in sessions.
 
 Both implement the same `EvidenceStore` interface; the runtime doesn't care which you pass. If you want S3 or SQLite backing, implement the interface yourself — four methods (`put`, `get`, `list`, `markStale`).
 

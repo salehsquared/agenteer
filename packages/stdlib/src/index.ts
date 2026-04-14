@@ -1,5 +1,5 @@
 /**
- * @agenteer/stdlib — v1 standard library (M5 adds ask_user: 19 nodes).
+ * @agenteer/stdlib — v1 standard library (M5 adds ask_user: 18 nodes).
  *
  *   Primitives (5):  file_read, file_write, shell_exec, llm_call, tool_call
  *   Validators (5):  compile, test_run, regex_check, typecheck, json_schema_validate

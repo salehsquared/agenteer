@@ -16,7 +16,7 @@ First npm release. Six packages published under the `@agenteer` organization, al
 
 - **`@agenteer/core`** — Runtime, Node primitive, content-addressable context store (in-memory + file-backed), event bus, permission kernel (eleven resource types), manifest schema, session persistence.
 - **`@agenteer/trust`** — evidence records with YAML storage, structured LLM output with text-parse retry, filesystem access guard, cross-check engine. Zero runtime dependency on `@agenteer/core`.
-- **`@agenteer/stdlib`** — 19 hardened nodes: 5 primitives, 5 validators, 4 meta, 2 human-in-the-loop, 1 planner, 1 context curator (query mode).
+- **`@agenteer/stdlib`** — 18 hardened nodes: 5 primitives, 5 validators, 4 meta, 2 human-in-the-loop, 1 planner, 1 context curator (query mode).
 - **`@agenteer/registry`** — publish, install, search, permission-diff, `framework.lock` management, ajv JSON-Schema → Zod bridge.
 - **`@agenteer/cli`** — `run / resume / ctx / inspect / publish / install / search` subcommands, plus Anthropic and OpenAI `ProviderLike` adapters.
 - **`@agenteer/create-node`** — `npx @agenteer/create-node @scope/node-name` scaffold.
@@ -50,9 +50,9 @@ First npm release. Six packages published under the `@agenteer` organization, al
 
 - 175/175 tests green
 - 6 published packages
-- 19 stdlib nodes
+- 18 stdlib nodes
 - 11 capability resource types
 - 7 CLI subcommands
 
-[Unreleased]: https://github.com/salehsquared/agenteer/compare/v1.0.0-rc.1...HEAD
-[1.0.0-rc.1]: https://github.com/salehsquared/agenteer/releases/tag/v1.0.0-rc.1
+[Unreleased]: https://github.com/salehsquared/agenteer/compare/04dee2f...HEAD
+[1.0.0-rc.1]: https://github.com/salehsquared/agenteer/commit/04dee2f
