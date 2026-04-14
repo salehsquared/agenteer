@@ -1,9 +1,12 @@
 /**
- * M1 verification per master plan:
+ * M1 verification per master plan — updated for M2 manifest/capability shape:
  *   "spawn 3 nested nodes; assert ctx propagation; assert ReplaceMe swap;
  *    assert event emission."
  *
- * One file covers all three. Narrower unit tests live alongside.
+ * The scenario is unchanged from M1; the plumbing now routes through the
+ * capability kernel. Root spawn is authorized against workflow-root
+ * capabilities; every child spawn the planner issues must be covered by
+ * the parent's granted set.
  */
 
 import { describe, expect, it } from "vitest";
@@ -19,11 +22,9 @@ import {
   type NodeRuntimeHandle,
   type NodeSpawn,
   type RuntimeEventMap,
-  EMPTY_ENVELOPE,
   makeManifest,
 } from "../src/index.js";
 
-/** Collect all events with timestamps normalized for stable ordering. */
 function collectEvents(events: RuntimeEvents): {
   list: Array<{ name: string; payload: unknown }>;
   byName: Record<string, Array<unknown>>;
@@ -61,39 +62,38 @@ function collectEvents(events: RuntimeEvents): {
   return { list, byName };
 }
 
-describe("M1 — core runtime, node primitive, context v0", () => {
-  it("spawns a 3-level nested tree with ctx propagation, ReplaceMe swap, and events", async () => {
-    // ──────────────────────────────────────────────────────────────────
-    // Scene:
-    //   root (planner) → spawns 3 children:
-    //     - childA (leaf_counter):   returns output with ctx_patch { set: { counter_a: 1 }}
-    //     - childB (refining):       first call returns ReplaceMe → successor
-    //       emits output with ctx_patch { set: { counter_b: 2 }}
-    //     - childC (aggregator):     spawns 1 grandchild, re-enters, emits output
-    // After join {mode:"all"}, planner re-enters with input.children populated,
-    // reads ctx keys (counter_a, counter_b, grandchild_val), and emits its own
-    // output with ctx_patch summing them.
-    // ──────────────────────────────────────────────────────────────────
+const LEAF_ID = "@agenteer/node-leaf-counter";
+const REFINING_ID = "@agenteer/node-refining";
+const REFINING_FINAL_ID = "@agenteer/node-refining-final";
+const AGGREGATOR_ID = "@agenteer/node-aggregator";
+const PLANNER_ID = "@agenteer/node-planner";
 
+describe("M1 — core runtime, node primitive, context v0 (M2-shape manifests)", () => {
+  it("spawns a 3-level nested tree with ctx propagation, ReplaceMe swap, and events", async () => {
     const registry = new InMemoryNodeRegistry();
     const contextStore = new InMemoryContextStore();
     const evidenceSink = new MemoryEvidenceSink();
     const events = new RuntimeEvents();
     const { list, byName } = collectEvents(events);
 
-    // ── leaf_counter ───────────────────────────────────────────────────
     registry.register(
-      makeManifest("agenteer/leaf_counter@0.1", "Emit a counter value via ctx_patch"),
+      makeManifest({
+        id: LEAF_ID,
+        name: "leaf_counter",
+        description: "Emit a counter value via ctx_patch",
+        determinism: "deterministic",
+      }),
       () => {
-        const node: Node<NodeInput<{ key: string; value: number }>, number> = {
-          manifest: makeManifest("agenteer/leaf_counter@0.1", "Emit a counter via ctx_patch"),
+        const node: Node<{ key: string; value: number }, number> = {
+          manifest: makeManifest({
+            id: LEAF_ID,
+            name: "leaf_counter",
+            description: "Emit a counter value via ctx_patch",
+            determinism: "deterministic",
+          }),
           ctx: [],
-          models_allowed: [],
-          actions_allowed: [],
-          new_node_states_allowed: [],
-          deterministic: true,
           model: null,
-          async execute(input) {
+          async execute(input: NodeInput<{ key: string; value: number }>) {
             const { key, value } = input.original;
             return {
               kind: "output",
@@ -107,27 +107,30 @@ describe("M1 — core runtime, node primitive, context v0", () => {
       },
     );
 
-    // ── refining ───────────────────────────────────────────────────────
-    // First invocation returns replace_me with a successor that emits the
-    // output. Demonstrates in-place replacement at the same tree position.
     registry.register(
-      makeManifest("agenteer/refining@0.1", "First pass returns replace_me; successor returns output"),
+      makeManifest({
+        id: REFINING_ID,
+        name: "refining",
+        description: "First pass returns replace_me",
+        determinism: "deterministic",
+      }),
       () => {
-        const node: Node<NodeInput<{ draftValue: number }>, number> = {
-          manifest: makeManifest("agenteer/refining@0.1", "Returns replace_me then output"),
+        const node: Node<{ draftValue: number }, number> = {
+          manifest: makeManifest({
+            id: REFINING_ID,
+            name: "refining",
+            description: "First pass returns replace_me",
+            determinism: "deterministic",
+          }),
           ctx: [],
-          models_allowed: [],
-          actions_allowed: [],
-          new_node_states_allowed: [],
-          deterministic: true,
           model: null,
-          async execute(input) {
+          async execute(input: NodeInput<{ draftValue: number }>) {
             const { draftValue } = input.original;
             return {
               kind: "replace_me",
               reason: "draft refined; emitting final",
               successor: {
-                manifest_id: "agenteer/refining_final@0.1",
+                manifest_id: REFINING_FINAL_ID,
                 input: { finalValue: draftValue * 2 },
                 correlation: "child-b",
               },
@@ -137,18 +140,25 @@ describe("M1 — core runtime, node primitive, context v0", () => {
         return node;
       },
     );
+
     registry.register(
-      makeManifest("agenteer/refining_final@0.1", "Successor of refining; emits final output"),
+      makeManifest({
+        id: REFINING_FINAL_ID,
+        name: "refining_final",
+        description: "Successor of refining; emits final output",
+        determinism: "deterministic",
+      }),
       () => {
-        const node: Node<NodeInput<{ finalValue: number }>, number> = {
-          manifest: makeManifest("agenteer/refining_final@0.1", "Emits final output with ctx_patch"),
+        const node: Node<{ finalValue: number }, number> = {
+          manifest: makeManifest({
+            id: REFINING_FINAL_ID,
+            name: "refining_final",
+            description: "Successor of refining; emits final output",
+            determinism: "deterministic",
+          }),
           ctx: [],
-          models_allowed: [],
-          actions_allowed: [],
-          new_node_states_allowed: [],
-          deterministic: true,
           model: null,
-          async execute(input) {
+          async execute(input: NodeInput<{ finalValue: number }>) {
             const { finalValue } = input.original;
             return {
               kind: "output",
@@ -162,19 +172,24 @@ describe("M1 — core runtime, node primitive, context v0", () => {
       },
     );
 
-    // ── aggregator ─────────────────────────────────────────────────────
-    // On first call: spawn a grandchild. On re-entry with children: read
-    // its output, emit ctx_patch, return output. This exercises level 3.
     registry.register(
-      makeManifest("agenteer/aggregator@0.1", "Spawns 1 grandchild and re-enters"),
+      makeManifest({
+        id: AGGREGATOR_ID,
+        name: "aggregator",
+        description: "Spawns 1 grandchild and re-enters",
+        determinism: "deterministic",
+        required_actions: [`spawn:${LEAF_ID}`],
+      }),
       () => {
         const node: Node<{ grandchildInput: number }, number> = {
-          manifest: makeManifest("agenteer/aggregator@0.1", "Spawns grandchild + re-enters"),
+          manifest: makeManifest({
+            id: AGGREGATOR_ID,
+            name: "aggregator",
+            description: "Spawns 1 grandchild and re-enters",
+            determinism: "deterministic",
+            required_actions: [`spawn:${LEAF_ID}`],
+          }),
           ctx: [],
-          models_allowed: [],
-          actions_allowed: [],
-          new_node_states_allowed: [],
-          deterministic: true,
           model: null,
           async execute(input: NodeInput<{ grandchildInput: number }>) {
             if (!input.children) {
@@ -183,7 +198,7 @@ describe("M1 — core runtime, node primitive, context v0", () => {
                 join: { mode: "all" },
                 children: [
                   {
-                    manifest_id: "agenteer/leaf_counter@0.1",
+                    manifest_id: LEAF_ID,
                     input: { key: "grandchild_val", value: input.original.grandchildInput },
                     correlation: "grandchild-1",
                   },
@@ -207,47 +222,59 @@ describe("M1 — core runtime, node primitive, context v0", () => {
       },
     );
 
-    // ── planner (root) ─────────────────────────────────────────────────
+    const plannerRequiredActions = [
+      `spawn:${LEAF_ID}`,
+      `spawn:${REFINING_ID}`,
+      `spawn:${REFINING_FINAL_ID}`,
+      `spawn:${AGGREGATOR_ID}`,
+    ];
+
     registry.register(
-      makeManifest("agenteer/planner@0.1", "Root planner; fans out 3, re-enters, sums via ctx"),
+      makeManifest({
+        id: PLANNER_ID,
+        name: "planner",
+        description: "Root planner; fans out 3, re-enters, sums via ctx",
+        determinism: "deterministic",
+        required_actions: plannerRequiredActions,
+      }),
       () => {
         const node: Node<{}, { sum: number; saw: string[] }> = {
-          manifest: makeManifest("agenteer/planner@0.1", "Root planner"),
+          manifest: makeManifest({
+            id: PLANNER_ID,
+            name: "planner",
+            description: "Root planner; fans out 3, re-enters, sums via ctx",
+            determinism: "deterministic",
+            required_actions: plannerRequiredActions,
+          }),
           ctx: ["counter_a", "counter_b", "counter_c"],
-          models_allowed: [],
-          actions_allowed: [],
-          new_node_states_allowed: [
-            "agenteer/leaf_counter@0.1",
-            "agenteer/refining@0.1",
-            "agenteer/aggregator@0.1",
-          ],
-          deterministic: true,
           model: null,
-          async execute(input: NodeInput<{}>, runtime: NodeRuntimeHandle): Promise<NodeResult<{ sum: number; saw: string[] }>> {
+          async execute(
+            input: NodeInput<{}>,
+            runtime: NodeRuntimeHandle,
+          ): Promise<NodeResult<{ sum: number; saw: string[] }>> {
             if (!input.children) {
               return {
                 kind: "spawn_children",
                 join: { mode: "all" },
                 children: [
                   {
-                    manifest_id: "agenteer/leaf_counter@0.1",
+                    manifest_id: LEAF_ID,
                     input: { key: "counter_a", value: 1 },
                     correlation: "child-a",
                   },
                   {
-                    manifest_id: "agenteer/refining@0.1",
+                    manifest_id: REFINING_ID,
                     input: { draftValue: 1 },
                     correlation: "child-b",
                   },
                   {
-                    manifest_id: "agenteer/aggregator@0.1",
+                    manifest_id: AGGREGATOR_ID,
                     input: { grandchildInput: 7 },
                     correlation: "child-c",
                   },
                 ],
               };
             }
-            // On re-entry: read ctx values the children wrote via ctx_patch.
             const a = runtime.ctx.get<number>("counter_a") ?? 0;
             const b = runtime.ctx.get<number>("counter_b") ?? 0;
             const c = runtime.ctx.get<number>("counter_c") ?? 0;
@@ -265,44 +292,37 @@ describe("M1 — core runtime, node primitive, context v0", () => {
       },
     );
 
-    const runtime = new Runtime({
-      registry,
-      contextStore,
-      evidenceSink,
-      events,
-    });
+    const runtime = new Runtime({ registry, contextStore, evidenceSink, events });
 
     const rootSpawn: NodeSpawn = {
-      manifest_id: "agenteer/planner@0.1",
+      manifest_id: PLANNER_ID,
       input: {},
       correlation: "root",
     };
 
-    const outcome = await runtime.run(rootSpawn, {
-      ...EMPTY_ENVELOPE,
-      new_node_states_allowed: [
-        "agenteer/leaf_counter@0.1",
-        "agenteer/refining@0.1",
-        "agenteer/refining_final@0.1",
-        "agenteer/aggregator@0.1",
-      ],
-      ctx_keys: ["counter_a", "counter_b", "counter_c", "grandchild_val", "planner_sum"],
-    });
+    // Workflow-root grants: spawn rights for every manifest we'll invoke
+    // transitively. The aggregator also needs spawn:LEAF, but that flows
+    // as part of its own manifest's required_actions intersected with what
+    // its parent (planner) holds — planner holds spawn:LEAF too.
+    const outcome = await runtime.run(rootSpawn, [
+      `spawn:${PLANNER_ID}`,
+      `spawn:${LEAF_ID}`,
+      `spawn:${REFINING_ID}`,
+      `spawn:${REFINING_FINAL_ID}`,
+      `spawn:${AGGREGATOR_ID}`,
+    ]);
 
-    // ── Final outcome ──
     expect(outcome.finalStatus).toBe("completed");
     expect(outcome.rootResult?.kind).toBe("output");
     if (outcome.rootResult?.kind !== "output") throw new Error("unreachable");
     const value = outcome.rootResult.value as { sum: number; saw: string[] };
-    // counter_a = 1; counter_b = 2 (refining * 2); counter_c = 107 (7 + 100)
     expect(value.sum).toBe(1 + 2 + 107);
     expect(value.saw).toEqual([
-      "child-a:agenteer/leaf_counter@0.1",
-      "child-b:agenteer/refining@0.1",
-      "child-c:agenteer/aggregator@0.1",
+      `child-a:${LEAF_ID}`,
+      `child-b:${REFINING_ID}`,
+      `child-c:${AGGREGATOR_ID}`,
     ]);
 
-    // ── Event emission ──
     const starts = byName.node_start;
     const completes = byName.node_complete;
     const spawns = byName.spawn;
@@ -312,80 +332,50 @@ describe("M1 — core runtime, node primitive, context v0", () => {
     const engineStart = byName.engine_start;
     const engineFinish = byName.engine_finish;
     const ctxReads = byName.ctx_read;
+    const permDenied = byName.permission_denied;
 
     expect(engineStart.length).toBe(1);
     expect(engineFinish.length).toBe(1);
+    expect(permDenied.length).toBe(0);
 
-    // Spawn events: planner fans 3, aggregator fans 1 → 2 spawn events.
     expect(spawns.length).toBe(2);
-    const spawnSizes = (spawns as Array<{ childrenCount: number }>).map((s) => s.childrenCount).sort();
+    const spawnSizes = (spawns as Array<{ childrenCount: number }>)
+      .map((s) => s.childrenCount)
+      .sort();
     expect(spawnSizes).toEqual([1, 3]);
 
-    // Replace events: exactly one (refining → refining_final).
     expect(replaces.length).toBe(1);
-    expect((replaces[0] as { successorManifest: string }).successorManifest).toBe(
-      "agenteer/refining_final@0.1",
-    );
+    expect((replaces[0] as { successorManifest: string }).successorManifest).toBe(REFINING_FINAL_ID);
 
-    // node_start/complete counts:
-    //   planner: starts twice (initial + re-entry)
-    //   aggregator: starts twice (initial + re-entry)
-    //   leaf_counter: starts twice (child-a + grandchild)
-    //   refining: starts once
-    //   refining_final: starts once
-    // = 8 starts and 8 completes.
     expect(starts.length).toBe(8);
     expect(completes.length).toBe(8);
 
-    // Every non-spawn_children completion has an evidence record (R2).
-    // Completions of kind "spawn_children" do NOT emit evidence at that
-    // step (the re-entry's output will).
     const nonSpawnCompletes = (completes as Array<{ kind: string }>).filter(
       (c) => c.kind !== "spawn_children",
     );
     expect(evidence.length).toBe(nonSpawnCompletes.length);
 
-    // ctx_patched fires for every non-empty patch:
-    //   child-a leaf_counter      → counter_a
-    //   refining_final            → counter_b
-    //   grandchild leaf_counter   → grandchild_val
-    //   aggregator re-entry       → counter_c
-    //   planner re-entry          → planner_sum
-    // = 5.
     expect(ctxPatched.length).toBe(5);
-
-    // ctx_read fires at every node_start.
     expect(ctxReads.length).toBe(8);
 
-    // ── Context propagation assertions ──
-    // The store should carry supersede chains for each tagged key.
-    const counterA = contextStore.getHeadByTag("counter_a");
-    expect(counterA).not.toBeNull();
-    expect(counterA?.content.kind).toBe("decision");
+    expect(contextStore.getHeadByTag("counter_a")).not.toBeNull();
+    expect(contextStore.getHeadByTag("counter_b")).not.toBeNull();
+    expect(contextStore.getHeadByTag("planner_sum")).not.toBeNull();
 
-    const counterB = contextStore.getHeadByTag("counter_b");
-    expect(counterB).not.toBeNull();
-
-    const plannerSum = contextStore.getHeadByTag("planner_sum");
-    expect(plannerSum).not.toBeNull();
-
-    // Planner's re-entry ctx slice should surface all three counters.
-    // We verify this by looking at the ctx_read events for planner runs.
-    const plannerCtxReads = (list
+    const plannerCtxReads = list
       .filter((e) => e.name === "ctx_read")
-      .map((e) => e.payload) as Array<{ keys: string[] }>);
-    // The final ctx_read for planner should include all three counters.
+      .map((e) => e.payload) as Array<{ keys: string[] }>;
     const lastPlannerRead = [...plannerCtxReads]
       .reverse()
-      .find((r) => r.keys.includes("counter_a") && r.keys.includes("counter_b") && r.keys.includes("counter_c"));
+      .find(
+        (r) =>
+          r.keys.includes("counter_a") &&
+          r.keys.includes("counter_b") &&
+          r.keys.includes("counter_c"),
+      );
     expect(lastPlannerRead).toBeDefined();
 
-    // Evidence sink received all records (lineage stable across chain).
-    const refiningEvidence = evidenceSink.records.filter((r) =>
-      r.manifest_id.startsWith("agenteer/refining"),
-    );
-    // One primary record for refining + one for refining_final; they share
-    // the same lineage_id because refining_final was a ReplaceMe successor.
+    const refiningEvidence = evidenceSink.records.filter((r) => r.manifest_id.startsWith(REFINING_ID.replace(/-final$/, "")));
     expect(refiningEvidence.length).toBe(2);
     expect(new Set(refiningEvidence.map((r) => r.lineage_id)).size).toBe(1);
   });

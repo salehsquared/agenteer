@@ -1,73 +1,71 @@
 /**
- * Node primitive, NodeResult discriminated union, and the runtime handle
- * shape. Sub-plan 00 §3–§5 is the canonical design. Key invariants
- * enforced in M1:
+ * Node primitive (sub-plan 00 §3–§5, post-M2).
  *
- *   I1. NodeResult is the only channel a node uses to express composition
- *       intent. No imperative `spawnChild` on the handle.
- *   I4. `execute` never mutates shared state; the runtime is the only
- *       writer.
- *   I5. Every completed `execute` produces exactly one primary evidence
- *       record (master plan §R2).
+ * M2 changes from M1:
+ *   - NodeManifest is the Zod-validated manifest from sub-plan 02.
+ *   - Capability envelope replaces the ad-hoc `models_allowed` /
+ *     `actions_allowed` / `new_node_states_allowed` fields.
+ *   - Authorization is the kernel's job (permissions/kernel.ts) and runs
+ *     on every spawn; empty-allowlist-allows is gone.
+ *   - Per-node Zod I/O schemas land on the Node instance (manifest carries
+ *     JSON Schema for publish; M2 ships Zod directly).
  */
 
-import type { PermissionEnvelope } from "../permissions/envelope.js";
+import type { z } from "zod";
+import type { CapabilitySet } from "../permissions/index.js";
+import type { NodeManifest } from "../manifest/index.js";
 import type { ReadonlyContextSlice } from "../context/types.js";
 
-export interface NodeManifest {
-  readonly id: string;
-  readonly version: string;
-  readonly publisher: "agenteer" | "user" | "community";
-  /** SHA-256 of the implementation. Optional in M1; M2 publishes will set it. */
-  readonly sha256?: string;
-  readonly description: string;
-}
+export type { NodeManifest };
 
 export interface Node<Input = unknown, Output = unknown> {
   readonly manifest: NodeManifest;
 
-  /** Which context tags this node declares it will read. */
+  /**
+   * Zod schemas for in-process validation. Optional; absence means "trust
+   * caller" (for test doubles). Publishers ship JSON Schema in the
+   * manifest; the runtime prefers Zod when present for precise errors.
+   */
+  readonly inputSchema?: z.ZodType<Input>;
+  readonly outputSchema?: z.ZodType<Output>;
+
+  /** Declared ctx variants this node reads (namespace labels). */
   readonly ctx: readonly string[];
 
-  /** null = inherit parent's set. M2 kernel intersects at spawn. */
-  readonly models_allowed: readonly string[] | null;
-  readonly actions_allowed: readonly string[] | null;
-  readonly new_node_states_allowed: readonly string[] | null;
-
-  /** Pure-function flag. Enables cache-on-(manifest, input, ctx). */
-  readonly deterministic: boolean;
-
-  /** Concrete model, or null for deterministic/human nodes. */
+  /**
+   * Null for deterministic/human nodes; a concrete model id otherwise.
+   * The runtime enforces the matching `model:<id>` capability via the
+   * action dispatcher when the node calls `handle.callModel`.
+   */
   readonly model: string | null;
 
   /** User-authored entry point. */
-  execute(input: Input, runtime: NodeRuntimeHandle): Promise<NodeResult<Output>>;
+  execute(input: NodeInput<Input>, runtime: NodeRuntimeHandle): Promise<NodeResult<Output>>;
 
   preflight?(ctx: ReadonlyContextSlice): string | null;
   postflight?(result: NodeResult<Output>): void | Promise<void>;
   onCancel?(): void | Promise<void>;
 }
 
-/** A node factory — produced by `registerNode`. */
 export type NodeFactory<I = unknown, O = unknown> = () => Node<I, O>;
 
-/** Sub-plan 00 §4.1. */
 export type NodeResult<Output = unknown> =
   | { kind: "output"; value: Output; ctx_patch?: CtxPatch; evidence?: EvidenceDelta }
   | { kind: "replace_me"; successor: NodeSpawn; reason: string; ctx_patch?: CtxPatch }
   | { kind: "spawn_children"; children: NodeSpawn[]; join: JoinMode; ctx_grants?: CtxGrant[] }
   | { kind: "needs_user"; prompt: string; schema?: unknown; resume_hint?: string }
-  | { kind: "failed"; reason: string; retryable: boolean; evidence?: EvidenceDelta };
+  | { kind: "failed"; reason: string; retryable: boolean; evidence?: EvidenceDelta; details?: unknown };
 
 export interface NodeSpawn {
   manifest_id: string;
   input: unknown;
-  grants?: Partial<{
-    models_allowed: readonly string[];
-    actions_allowed: readonly string[];
-    new_node_states_allowed: readonly string[];
-    ctx_keys: readonly string[];
-  }>;
+  /**
+   * Explicit capability attenuation — master plan pillar 3, sub-plan 02
+   * §1.4. Must be a subset of the parent's effective caps. Absent →
+   * inherit parent's full effective set (intersected with child's
+   * manifest `required_actions` at the kernel).
+   */
+  attenuate?: readonly string[];
   correlation: string;
 }
 
@@ -77,15 +75,6 @@ export type JoinMode =
   | { mode: "race_with_budget"; budget_ms: number; min_results: number }
   | { mode: "detached" };
 
-/**
- * Authoring sugar over append-only item ops. Master plan §R3 translation:
- *   set(k, v)      → Decision item, labels.tag = k, refs.supersedes chain.
- *   delete(k)      → tombstone Decision item with supersedes link.
- *   append(k, [v]) → Artifact item with refs.extends link.
- *
- * The store is never mutated; the runtime compiles these to `store.add(...)`
- * calls in `runtime/patch.ts`.
- */
 export interface CtxPatch {
   set?: Record<string, unknown>;
   delete?: readonly string[];
@@ -103,7 +92,6 @@ export interface EvidenceDelta {
   tool_output?: { command?: string; exit_code?: number; stdout_tail?: string };
 }
 
-/** Opaque to nodes; runtime-side debugging. */
 export interface NodeLineage {
   readonly nodeId: string;
   readonly lineageId: string;
@@ -118,39 +106,36 @@ export interface NodeRuntimeHandle {
   readonly signal: AbortSignal;
   readonly correlation: string;
   readonly lineage: NodeLineage;
-  readonly envelope: PermissionEnvelope;
+  /** Capabilities granted to THIS node (sub-plan 02 §1.3 "granted"). */
+  readonly granted: CapabilitySet;
 
   log(payload: { level: "debug" | "info" | "warn"; message: string; data?: unknown }): void;
 
-  /**
-   * Model call surface. M1: throws "not implemented in M1" — LLM invocation
-   * wiring is M2's provider layer. Kept on the handle so node authors
-   * write against the final surface from day one.
-   */
   callModel<T>(req: ModelCallRequest<T>): Promise<ModelCallResult<T>>;
-
-  /**
-   * Action dispatcher. M1: throws "not implemented in M1". Full capability
-   * enforcement lives in M2 (permissions kernel) and M3 (trust/access).
-   */
   callAction<T>(name: string, args: unknown): Promise<T>;
 }
 
 export interface ModelCallRequest<T = unknown> {
+  readonly model_id: string;
   readonly prompt: string;
   readonly system?: string;
-  readonly schema?: unknown;
+  readonly schema?: z.ZodType<T>;
+  readonly temperature?: number;
   readonly max_tokens?: number;
-  readonly __result_type_marker?: T;
 }
 
 export interface ModelCallResult<T = unknown> {
   readonly value: T;
   readonly model: string;
   readonly tokens: { prompt: number; completion: number };
+  readonly method: "native" | "text_parse" | "mock";
 }
 
-/** Input shape at spawn time. Sub-plan 00 §6.3: same-manifest re-entry. */
+/**
+ * Execute's input envelope. First call: `{ original, children: undefined }`.
+ * Re-entry after SpawnChildren join: `{ original, children: [...] }`.
+ * Re-entry after ReplaceMe: `{ original: successor.input }`.
+ */
 export interface NodeInput<T = unknown> {
   original: T;
   children?: ReadonlyArray<{

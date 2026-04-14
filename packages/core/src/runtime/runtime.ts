@@ -1,24 +1,21 @@
 /**
- * Runtime loop. Dispatches nodes, interprets NodeResult, handles
- * ReplaceMe / SpawnChildren / NeedsUser, emits typed events, and enforces
- * global caps. M1 scope:
+ * Runtime loop (post-M2).
  *
- *   - One coherent tree execution per `run(rootSpawn, rootGrants)`.
- *   - In-memory context store (injected).
- *   - No caching, no resume, no LLM provider. callModel/callAction on the
- *     handle throw; those surfaces land in M2+.
- *   - Evidence is emitted via EvidenceSink; MemoryEvidenceSink suffices
- *     for M1 verification.
+ * Responsibilities:
+ *   - Dispatch nodes, interpret NodeResult, handle ReplaceMe / SpawnChildren / NeedsUser.
+ *   - Validate I/O against Zod schemas (sub-plan 02 §2.4) before execute and after.
+ *   - Authorize every spawn via the kernel (sub-plan 02 §1.3, §1.5 Layer A).
+ *   - Expose `callModel` / `callAction` through a permission-checked dispatcher.
+ *   - Emit typed events and one primary evidence record per completed execute (R2).
+ *   - Compile CtxPatch → store.add per master plan §R3.
  *
- * Invariants (master plan, sub-plan 00):
- *   - Returned-intent composition (Q-1): no imperative spawn on the handle.
- *   - ReplaceMe inherits the retiring node's envelope, keeps correlation,
- *     same position in tree (sub-plan 00 §7).
- *   - Re-entry model A on SpawnChildren joins (sub-plan 00 §6.3).
- *   - applyPatch compiles CtxPatch → store.add per R3.
- *   - Evidence: one primary record per completed execute (R2).
+ * M1 behavior removed:
+ *   - The naive PermissionEnvelope + "empty-allowlist allows everything" is gone.
+ *     Strict-deny is on: every child spawn requires capabilities the parent holds.
  */
 
+import { ZodError } from "zod";
+import { validateManifest, type NodeManifest, type NodeManifestInput } from "../manifest/index.js";
 import type { ContextStore } from "../context/store.js";
 import { sliceToReadonly } from "../context/slice.js";
 import type { EvidenceInput, EvidenceSink } from "../evidence/sink.js";
@@ -31,20 +28,29 @@ import type {
   NodeSpawn,
   NodeRuntimeHandle,
   NodeLineage,
-  NodeManifest,
   EvidenceDelta,
   ModelCallRequest,
   ModelCallResult,
 } from "../node/types.js";
 import { RuntimeEvents, type NodeResultKind } from "../events/events.js";
 import {
-  type PermissionEnvelope,
-  intersect as intersectEnv,
-  isSpawnAllowed,
-} from "../permissions/envelope.js";
+  type CapabilitySet,
+  capabilitySet,
+  authorizeSpawn,
+  type AuthorizeSpawnDeny,
+  rawsOf,
+  augmentRequired,
+} from "../permissions/index.js";
 import { applyPatch } from "./patch.js";
 import { createChildAbort, createRootAbort, type AbortHandle } from "./abort.js";
 import { newNodeRunId, newSessionId } from "../util/ids.js";
+import {
+  type ActionRegistry,
+  type DispatchContext,
+  DispatchError,
+  StdActionRegistry,
+} from "./dispatch.js";
+import type { ModelProvider } from "./providers.js";
 
 export interface RuntimeCaps {
   max_steps: number;
@@ -70,9 +76,10 @@ export interface RuntimeOptions {
   events?: RuntimeEvents;
   caps?: Partial<RuntimeCaps>;
   clock?: () => Date;
+  modelProvider?: ModelProvider;
+  /** Override the default action dispatcher (primarily for tests). */
+  actionRegistry?: ActionRegistry;
 }
-
-export type RootGrants = PermissionEnvelope;
 
 export interface RuntimeOutcome {
   sessionId: string;
@@ -86,18 +93,13 @@ interface RunStats {
   steps: number;
 }
 
-/**
- * Frame metadata tracked per logical node position in the tree. The
- * position is stable across a replacement chain; `currentNodeId` and
- * `chainLength` track progression within it.
- */
 interface Frame {
   readonly correlation: string;
   readonly depth: number;
   readonly parentNodeId?: string;
   readonly lineageId: string;
   replacement_history: Array<{ nodeId: string; manifest_id: string; reason: string }>;
-  envelope: PermissionEnvelope;
+  granted: CapabilitySet;
   chainLength: number;
 }
 
@@ -105,6 +107,7 @@ export class Runtime {
   readonly events: RuntimeEvents;
   readonly registry: NodeRegistry;
   readonly contextStore: ContextStore;
+  readonly actions: ActionRegistry;
 
   private readonly evidenceSink: EvidenceSink;
   private readonly caps: RuntimeCaps;
@@ -119,57 +122,92 @@ export class Runtime {
     this.caps = { ...DEFAULT_CAPS, ...(opts.caps ?? {}) };
     this.clock = opts.clock ?? (() => new Date());
     this.sessionId = opts.sessionId ?? newSessionId();
+    this.actions =
+      opts.actionRegistry ?? new StdActionRegistry({ modelProvider: opts.modelProvider });
   }
 
-  async run(rootSpawn: NodeSpawn, rootGrants: RootGrants): Promise<RuntimeOutcome> {
+  /**
+   * Run a root spawn to completion.
+   * `rootGrants` is the workflow-root capability set (the "actor as workflow" from
+   * sub-plan 02 §1.5). Every descendant can only attenuate downward.
+   */
+  async run(
+    rootSpawn: NodeSpawn,
+    rootGrants: CapabilitySet | readonly string[],
+  ): Promise<RuntimeOutcome> {
     const start = Date.now();
     const rootAbort = createRootAbort();
     const stats: RunStats = { steps: 0 };
+    const grants = capabilitySet(rootGrants);
+
     this.events.emit("engine_start", {
       sessionId: this.sessionId,
       rootManifest: rootSpawn.manifest_id,
       timestamp: this.clock().toISOString(),
     });
 
-    const rootFrame: Frame = {
-      correlation: rootSpawn.correlation,
-      depth: 0,
-      lineageId: newNodeRunId(),
-      replacement_history: [],
-      envelope: rootGrants,
-      chainLength: 0,
-    };
+    // Root frame: we authorize the root spawn against itself so the
+    // "granted" set is what the root's own manifest required. The root
+    // IS the workflow; its "parent effective" is `rootGrants`. Dynamic
+    // actions (§R4) are augmented from rootSpawn.input before auth.
+    const rootEntry = this.registry.lookup(rootSpawn.manifest_id);
+    const rootRequired = buildEffectiveRequired(rootEntry.manifest, rootSpawn.input);
+    const rootAuth = authorizeSpawn({
+      parentEffective: grants,
+      childManifestRequired: rootRequired,
+      parentAttenuation: rootSpawn.attenuate ? capabilitySet(rootSpawn.attenuate) : undefined,
+      childManifestId: rootSpawn.manifest_id,
+      parentNodeId: "<root>",
+    });
 
     let status: RuntimeOutcome["finalStatus"] = "completed";
     let rootResult: NodeResult | undefined;
-    try {
-      rootResult = await this.runFrame(rootSpawn, rootFrame, rootAbort, stats);
-      if (rootResult.kind === "failed") status = "failed";
-      else if (rootResult.kind === "needs_user") status = "suspended";
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      if (message === "CAP_EXHAUSTED") {
-        status = "exhausted";
-      } else if (rootAbort.signal.aborted) {
-        status = "cancelled";
-      } else {
-        status = "failed";
-        this.events.emit("error", {
-          error: message,
-          fatal: true,
-          timestamp: this.clock().toISOString(),
-        });
+
+    if (!rootAuth.ok) {
+      this.emitPermissionDenied("<root>", rootAuth);
+      rootResult = {
+        kind: "failed",
+        reason: `root_spawn_denied:${rootAuth.reason}`,
+        retryable: false,
+        details: { missing: rootAuth.missing.map((c) => c.raw) },
+      };
+      status = "failed";
+    } else {
+      const rootFrame: Frame = {
+        correlation: rootSpawn.correlation,
+        depth: 0,
+        lineageId: newNodeRunId(),
+        replacement_history: [],
+        granted: rootAuth.granted,
+        chainLength: 0,
+      };
+      try {
+        rootResult = await this.runFrame(rootSpawn, rootFrame, rootAbort, stats);
+        if (rootResult.kind === "failed") status = "failed";
+        else if (rootResult.kind === "needs_user") status = "suspended";
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (message === "CAP_EXHAUSTED") status = "exhausted";
+        else if (rootAbort.signal.aborted) status = "cancelled";
+        else {
+          status = "failed";
+          this.events.emit("error", {
+            error: message,
+            fatal: true,
+            timestamp: this.clock().toISOString(),
+          });
+        }
       }
-    } finally {
-      const engineStatus: "completed" | "failed" | "cancelled" | "exhausted" =
-        status === "suspended" ? "completed" : status;
-      this.events.emit("engine_finish", {
-        sessionId: this.sessionId,
-        finalStatus: engineStatus,
-        totalSteps: stats.steps,
-        timestamp: this.clock().toISOString(),
-      });
     }
+
+    const engineStatus: "completed" | "failed" | "cancelled" | "exhausted" =
+      status === "suspended" ? "completed" : status;
+    this.events.emit("engine_finish", {
+      sessionId: this.sessionId,
+      finalStatus: engineStatus,
+      totalSteps: stats.steps,
+      timestamp: this.clock().toISOString(),
+    });
 
     return {
       sessionId: this.sessionId,
@@ -180,11 +218,6 @@ export class Runtime {
     };
   }
 
-  /**
-   * Run one logical tree-position to a terminal result, consuming the
-   * replacement chain internally. The returned NodeResult is what the
-   * position reports upward (either Output, Failed, or NeedsUser).
-   */
   private async runFrame(
     spawn: NodeSpawn,
     frame: Frame,
@@ -198,16 +231,45 @@ export class Runtime {
     let currentSpawn = spawn;
     let currentInput: NodeInput<unknown> = { original: spawn.input };
 
-    // Replacement chain loop. Exits on output / failed / needs_user, or by
-    // re-entering through spawn_children (which drives recursion).
     while (true) {
       stats.steps += 1;
       if (stats.steps > this.caps.max_steps) throw new Error("CAP_EXHAUSTED");
 
-      const node = this.registry.instantiate(currentSpawn.manifest_id);
+      const entry = this.registry.lookup(currentSpawn.manifest_id);
+      const node = entry.instantiate();
       const nodeId = newNodeRunId();
-      const envelope = frame.envelope; // replacement inherits the retiring node's envelope
-      const ctxSlice = this.materializeSliceForNode(node, envelope);
+      const granted = frame.granted;
+      const ctxSlice = this.materializeSliceForNode(node);
+
+      // Input schema validation — sub-plan 02 §2.4.
+      const inputValidation = validateInput(node, currentInput);
+      if (!inputValidation.ok) {
+        const result: NodeResult = {
+          kind: "failed",
+          reason: "input_schema_violation",
+          retryable: false,
+          details: inputValidation.issues,
+        };
+        this.events.emit("node_start", this.startPayload(nodeId, currentSpawn.manifest_id, frame));
+        this.events.emit("node_complete", this.completePayload(nodeId, currentSpawn.manifest_id, frame, "failed", 0));
+        this.events.emit("node_failed", {
+          nodeId,
+          manifest: currentSpawn.manifest_id,
+          reason: result.reason,
+          retryable: result.retryable,
+          timestamp: this.clock().toISOString(),
+        });
+        await this.emitEvidence({
+          nodeId,
+          manifest_id: currentSpawn.manifest_id,
+          lineage_id: frame.lineageId,
+          correlation: frame.correlation,
+          duration_ms: 0,
+          delta: { verdict: "fail" },
+          parent_node_run_id: frame.parentNodeId,
+        });
+        return result;
+      }
 
       this.events.emit("ctx_read", {
         nodeId,
@@ -227,18 +289,12 @@ export class Runtime {
           parentNodeId: frame.parentNodeId,
           replacement_history: [...frame.replacement_history],
         },
-        envelope,
+        granted,
         ctxSliceHandle: ctxSlice,
         signal: abort.signal,
       });
 
-      this.events.emit("node_start", {
-        nodeId,
-        manifest: currentSpawn.manifest_id,
-        correlation: frame.correlation,
-        depth: frame.depth,
-        timestamp: this.clock().toISOString(),
-      });
+      this.events.emit("node_start", this.startPayload(nodeId, currentSpawn.manifest_id, frame));
 
       const startMs = Date.now();
       let result: NodeResult;
@@ -247,7 +303,7 @@ export class Runtime {
         if (typeof pre === "string") {
           result = { kind: "failed", reason: `preflight: ${pre}`, retryable: false };
         } else {
-          result = await node.execute(currentInput, handle);
+          result = await node.execute(currentInput as NodeInput<unknown>, handle);
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -255,10 +311,21 @@ export class Runtime {
       }
       const durationMs = Date.now() - startMs;
 
+      // Output schema validation — sub-plan 02 §2.4.
+      if (result.kind === "output") {
+        const outCheck = validateOutput(node, result.value);
+        if (!outCheck.ok) {
+          result = {
+            kind: "failed",
+            reason: "output_schema_violation",
+            retryable: false,
+            details: outCheck.issues,
+          };
+        }
+      }
+
       await this.safePostflight(node, result);
 
-      // Apply ctx_patch in the frame's scope BEFORE downstream dispatch.
-      // Applies to output / replace_me (sub-plan 00 §4.3).
       this.applyPatchFromResult(result, {
         nodeId,
         nodeRunId: nodeId,
@@ -267,9 +334,6 @@ export class Runtime {
         ctxSliceHash: ctxSlice.materialized_hash,
       });
 
-      // Emit a primary evidence record for the completed execute (R2).
-      // We skip emission for spawn_children (the parent will emit on its
-      // re-entry) and for needs_user (separate lifecycle).
       const evidenceKinds: ReadonlyArray<NodeResult["kind"]> = [
         "output",
         "failed",
@@ -287,14 +351,10 @@ export class Runtime {
         });
       }
 
-      this.events.emit("node_complete", {
-        nodeId,
-        manifest: currentSpawn.manifest_id,
-        correlation: frame.correlation,
-        kind: result.kind as NodeResultKind,
-        durationMs,
-        timestamp: this.clock().toISOString(),
-      });
+      this.events.emit(
+        "node_complete",
+        this.completePayload(nodeId, currentSpawn.manifest_id, frame, result.kind as NodeResultKind, durationMs),
+      );
 
       switch (result.kind) {
         case "output":
@@ -327,6 +387,33 @@ export class Runtime {
               retryable: false,
             };
           }
+          // ReplaceMe inherits the retiring node's envelope — but the successor's
+          // manifest's `required_actions` may be narrower. Re-authorize to
+          // recompute the granted set. Dynamic actions (§R4) are augmented
+          // from the successor's input.
+          const successorEntry = this.registry.lookup(result.successor.manifest_id);
+          const successorAuth = authorizeSpawn({
+            parentEffective: frame.granted, // successor may not escalate
+            childManifestRequired: buildEffectiveRequired(
+              successorEntry.manifest,
+              result.successor.input,
+            ),
+            parentAttenuation: result.successor.attenuate
+              ? capabilitySet(result.successor.attenuate)
+              : frame.granted,
+            childManifestId: result.successor.manifest_id,
+            parentNodeId: nodeId,
+          });
+          if (!successorAuth.ok) {
+            this.emitPermissionDenied(nodeId, successorAuth);
+            return {
+              kind: "failed",
+              reason: `replace_me_denied:${successorAuth.reason}`,
+              retryable: false,
+              details: { missing: successorAuth.missing.map((c) => c.raw) },
+            };
+          }
+          frame.granted = successorAuth.granted;
           frame.replacement_history.push({
             nodeId,
             manifest_id: currentSpawn.manifest_id,
@@ -348,8 +435,7 @@ export class Runtime {
           const childrenResults = await this.runChildren({
             parentNodeId: nodeId,
             parentManifestId: currentSpawn.manifest_id,
-            parentCorrelation: frame.correlation,
-            parentEnvelope: envelope,
+            parentGranted: frame.granted,
             parentDepth: frame.depth,
             parentLineageId: frame.lineageId,
             parentAbort: abort,
@@ -358,12 +444,10 @@ export class Runtime {
             join: result.join,
           });
 
-          // Detached: resolve as empty output, no re-entry (sub-plan 00 §6.4).
           if (result.join.mode === "detached") {
             return { kind: "output", value: undefined };
           }
 
-          // Re-enter same manifest with augmented input (model A; Q-2).
           currentInput = {
             original: currentInput.original,
             children: childrenResults.map((c) => ({
@@ -381,8 +465,7 @@ export class Runtime {
   private async runChildren(args: {
     parentNodeId: string;
     parentManifestId: string;
-    parentCorrelation: string;
-    parentEnvelope: PermissionEnvelope;
+    parentGranted: CapabilitySet;
     parentDepth: number;
     parentLineageId: string;
     parentAbort: AbortHandle;
@@ -398,21 +481,52 @@ export class Runtime {
       timestamp: this.clock().toISOString(),
     });
 
-    // Validate each child spawn against parent's envelope.
+    // Authorize each child against parent's effective + child manifest's
+    // required_actions. Denials are materialized as Failed results so the
+    // parent sees them on re-entry instead of the whole runtime aborting.
+    const launch: Array<() => Promise<{ correlation: string; manifest_id: string; result: NodeResult }>> = [];
     for (const spawn of args.children) {
-      const ok = isSpawnAllowed(args.parentEnvelope, spawn.manifest_id);
-      if (!ok.allowed) {
-        this.events.emit("permission_denied", {
-          nodeId: args.parentNodeId,
-          attempted: { spawnManifest: spawn.manifest_id },
-          reason: ok.reason ?? "spawn_not_allowed",
-          timestamp: this.clock().toISOString(),
-        });
+      const entry = (() => {
+        try {
+          return this.registry.lookup(spawn.manifest_id);
+        } catch {
+          return null;
+        }
+      })();
+      if (!entry) {
+        launch.push(async () => ({
+          correlation: spawn.correlation,
+          manifest_id: spawn.manifest_id,
+          result: {
+            kind: "failed" as const,
+            reason: "manifest_not_found",
+            retryable: false,
+            details: { manifest_id: spawn.manifest_id },
+          },
+        }));
+        continue;
       }
-    }
-
-    const launch = args.children.map((spawn) => {
-      const childEnvelope = intersectEnv(args.parentEnvelope, spawn.grants ?? null);
+      const auth = authorizeSpawn({
+        parentEffective: args.parentGranted,
+        childManifestRequired: buildEffectiveRequired(entry.manifest, spawn.input),
+        parentAttenuation: spawn.attenuate ? capabilitySet(spawn.attenuate) : undefined,
+        childManifestId: spawn.manifest_id,
+        parentNodeId: args.parentNodeId,
+      });
+      if (!auth.ok) {
+        this.emitPermissionDenied(args.parentNodeId, auth, spawn.manifest_id);
+        launch.push(async () => ({
+          correlation: spawn.correlation,
+          manifest_id: spawn.manifest_id,
+          result: {
+            kind: "failed" as const,
+            reason: `permission_denied:${auth.reason}`,
+            retryable: false,
+            details: { missing: auth.missing.map((c) => c.raw) },
+          },
+        }));
+        continue;
+      }
       const childAbort = createChildAbort(args.parentAbort.signal);
       const frame: Frame = {
         correlation: spawn.correlation,
@@ -420,32 +534,26 @@ export class Runtime {
         parentNodeId: args.parentNodeId,
         lineageId: newNodeRunId(),
         replacement_history: [],
-        envelope: childEnvelope,
+        granted: auth.granted,
         chainLength: 0,
       };
-      return async () => {
-        const result = await this.runFrame(spawn, frame, childAbort, args.stats);
-        return { correlation: spawn.correlation, manifest_id: spawn.manifest_id, result, childAbort };
-      };
-    });
+      launch.push(async () => {
+        const r = await this.runFrame(spawn, frame, childAbort, args.stats);
+        return { correlation: spawn.correlation, manifest_id: spawn.manifest_id, result: r };
+      });
+    }
 
-    // Bounded concurrency. "any"/"race_with_budget" short-circuit.
-    return await this.joinChildren(launch, args.join);
+    return this.joinChildren(launch, args.join);
   }
 
   private async joinChildren(
-    launch: Array<() => Promise<{ correlation: string; manifest_id: string; result: NodeResult; childAbort: AbortHandle }>>,
+    launch: Array<() => Promise<{ correlation: string; manifest_id: string; result: NodeResult }>>,
     join: JoinMode,
   ): Promise<Array<{ correlation: string; manifest_id: string; result: NodeResult }>> {
     const limit = Math.max(1, this.caps.max_concurrent_children);
     const pending = launch.slice();
-    const inFlight: Array<Promise<{
-      correlation: string;
-      manifest_id: string;
-      result: NodeResult;
-      childAbort: AbortHandle;
-    }>> = [];
-    const settled: Array<{ correlation: string; manifest_id: string; result: NodeResult; childAbort: AbortHandle }> = [];
+    const inFlight: Array<Promise<{ correlation: string; manifest_id: string; result: NodeResult }>> = [];
+    const settled: Array<{ correlation: string; manifest_id: string; result: NodeResult }> = [];
     let completed = 0;
 
     const startNext = () => {
@@ -454,10 +562,8 @@ export class Runtime {
         inFlight.push(next());
       }
     };
-
     startNext();
 
-    // race_with_budget: fire a wall clock timer.
     let budgetTimer: NodeJS.Timeout | null = null;
     let budgetHit = false;
     if (join.mode === "race_with_budget") {
@@ -471,72 +577,45 @@ export class Runtime {
         const winner = await Promise.race(
           inFlight.map((p, idx) => p.then((r) => ({ r, idx }))),
         );
-        // Remove the settled promise from inFlight.
         inFlight.splice(winner.idx, 1);
         settled.push(winner.r);
         completed += 1;
 
         if (join.mode === "any" && winner.r.result.kind === "output") {
-          // Cancel the rest.
-          for (const launcher of pending.splice(0)) void launcher; // drop
-          // Signal abort on remaining in-flight via their abort handles.
-          // Child aborts are captured in `winner.r`/settled entries; the
-          // simple approach: we track abort via pending array — but
-          // in-flight children had their aborts captured by the launcher
-          // closures. For M1 we rely on the next await to observe aborts
-          // via the child frame's own signals, which are parented to the
-          // shared parent abort. We DON'T force-cancel siblings here
-          // beyond letting them settle; the runtime's global cap catches
-          // runaways. (M2 improves this via a sibling abort group.)
+          pending.splice(0);
           break;
         }
-
         if (join.mode === "race_with_budget") {
           const enough = completed >= join.min_results;
           if (enough || budgetHit) {
-            for (const _launcher of pending.splice(0)) void _launcher;
+            pending.splice(0);
             break;
           }
         }
-
         startNext();
       }
     } finally {
       if (budgetTimer) clearTimeout(budgetTimer);
     }
 
-    return settled.map(({ correlation, manifest_id, result }) => ({
-      correlation,
-      manifest_id,
-      result,
-    }));
+    return settled;
   }
 
-  private materializeSliceForNode(node: Node, envelope: PermissionEnvelope) {
-    // M1 slice semantics: the node's declared `ctx` keys are intersected
-    // with the envelope's `ctx_keys` (if non-empty); each key resolves to
-    // the head of its supersede chain in the store. Tombstones excluded.
-    const declared = node.ctx;
-    const keys = envelope.ctx_keys.length === 0
-      ? declared
-      : declared.filter((k) => envelope.ctx_keys.includes(k));
-
+  private materializeSliceForNode(node: Node) {
+    const keys = node.ctx;
     const items = [];
     for (const key of keys) {
       const head = this.contextStore.getHeadByTag(key);
       if (!head) continue;
-      // Skip tombstones.
       if (head.content.kind === "decision" && head.content.choice === "tombstone") continue;
       items.push(head);
     }
-
     const spec = {
       name: "__node_slice__",
       selector: { tags: {} },
       stale_policy: "allow" as const,
       freeze: "snapshot" as const,
     };
-    // Build a MaterializedSlice manually for determinism.
     const materialized = {
       spec,
       materialized_at: this.clock().toISOString(),
@@ -551,18 +630,22 @@ export class Runtime {
     nodeId: string;
     correlation: string;
     lineage: NodeLineage;
-    envelope: PermissionEnvelope;
+    granted: CapabilitySet;
     ctxSliceHandle: ReturnType<typeof sliceToReadonly>;
     signal: AbortSignal;
   }): NodeRuntimeHandle {
     const events = this.events;
+    const actions = this.actions;
     const nodeId = args.nodeId;
+    const granted = args.granted;
+    const signal = args.signal;
+    const dispatchCtx: DispatchContext = { granted, signal };
     return {
       ctx: args.ctxSliceHandle,
-      signal: args.signal,
+      signal,
       correlation: args.correlation,
       lineage: args.lineage,
-      envelope: args.envelope,
+      granted,
       log(payload) {
         events.emit("error", {
           nodeId,
@@ -571,11 +654,41 @@ export class Runtime {
           timestamp: new Date().toISOString(),
         });
       },
-      async callModel<T>(_req: ModelCallRequest<T>): Promise<ModelCallResult<T>> {
-        throw new Error("callModel not implemented in M1 (provider layer ships in M2)");
+      async callModel<T>(req: ModelCallRequest<T>): Promise<ModelCallResult<T>> {
+        try {
+          const res = await actions.dispatchModel<T>({ ...req }, dispatchCtx);
+          return {
+            value: res.value,
+            model: res.model,
+            tokens: res.tokens,
+            method: res.method,
+          };
+        } catch (err) {
+          if (err instanceof DispatchError) {
+            events.emit("permission_denied", {
+              nodeId,
+              attempted: { model: req.model_id },
+              reason: err.message,
+              timestamp: new Date().toISOString(),
+            });
+          }
+          throw err;
+        }
       },
-      async callAction<T>(_name: string, _args: unknown): Promise<T> {
-        throw new Error("callAction not implemented in M1 (action dispatcher ships in M2)");
+      async callAction<T>(name: string, callArgs: unknown): Promise<T> {
+        try {
+          return (await actions.dispatch(name, callArgs, dispatchCtx)) as T;
+        } catch (err) {
+          if (err instanceof DispatchError) {
+            events.emit("permission_denied", {
+              nodeId,
+              attempted: { action: name },
+              reason: err.message,
+              timestamp: new Date().toISOString(),
+            });
+          }
+          throw err;
+        }
       },
     };
   }
@@ -633,8 +746,48 @@ export class Runtime {
     try {
       await node.postflight(result);
     } catch {
-      // postflight errors are non-fatal per sub-plan 00 §3.2.
+      /* non-fatal */
     }
+  }
+
+  private emitPermissionDenied(
+    parentNodeId: string,
+    deny: AuthorizeSpawnDeny,
+    spawnManifest?: string,
+  ): void {
+    this.events.emit("permission_denied", {
+      nodeId: parentNodeId,
+      attempted: spawnManifest ? { spawnManifest } : {},
+      reason: `${deny.reason}: missing=${deny.missing.map((c) => c.raw).join(",")}`,
+      timestamp: this.clock().toISOString(),
+    });
+  }
+
+  private startPayload(nodeId: string, manifest: string, frame: Frame) {
+    return {
+      nodeId,
+      manifest,
+      correlation: frame.correlation,
+      depth: frame.depth,
+      timestamp: this.clock().toISOString(),
+    };
+  }
+
+  private completePayload(
+    nodeId: string,
+    manifest: string,
+    frame: Frame,
+    kind: NodeResultKind,
+    durationMs: number,
+  ) {
+    return {
+      nodeId,
+      manifest,
+      correlation: frame.correlation,
+      kind,
+      durationMs,
+      timestamp: this.clock().toISOString(),
+    };
   }
 }
 
@@ -647,9 +800,25 @@ function extractDelta(result: NodeResult): EvidenceDelta | undefined {
   return undefined;
 }
 
+/**
+ * Compose the effective `childManifestRequired` capability set for spawn
+ * auth. Parses declared `required_actions` and augments from
+ * `dynamic_action_spec` per master plan §R4 using the spawn's input.
+ */
+function buildEffectiveRequired(manifest: NodeManifest, input: unknown): CapabilitySet {
+  const declared = capabilitySet(manifest.required_actions);
+  if (!manifest.dynamic_actions) return declared;
+  const augmented = augmentRequired(
+    declared.caps,
+    manifest.dynamic_actions,
+    manifest.dynamic_action_spec,
+    input,
+  );
+  return { caps: augmented };
+}
+
 function hashKeysAndHeads(keys: readonly string[], items: ReadonlyArray<{ id: string }>): string {
   const payload = keys.map((k, i) => `${k}:${items[i]?.id ?? ""}`).join("|");
-  // Stable short hash — not a security hash, just an identity.
   let h = 0;
   for (let i = 0; i < payload.length; i += 1) {
     h = (h * 31 + payload.charCodeAt(i)) | 0;
@@ -657,17 +826,68 @@ function hashKeysAndHeads(keys: readonly string[], items: ReadonlyArray<{ id: st
   return `sl_${(h >>> 0).toString(16).padStart(8, "0")}`;
 }
 
-/** Provide NodeManifest-typed default for tests / bootstrap. */
-export function makeManifest(
-  id: string,
-  description: string,
-  overrides: Partial<NodeManifest> = {},
-): NodeManifest {
-  return {
-    id,
-    version: "0.0.1",
-    publisher: "agenteer",
-    description,
-    ...overrides,
+function validateInput(
+  node: Node,
+  input: NodeInput<unknown>,
+): { ok: true } | { ok: false; issues: unknown } {
+  if (!node.inputSchema) return { ok: true };
+  // Validate the "original" payload; children presence is runtime-managed.
+  const parse = node.inputSchema.safeParse(input.original);
+  if (parse.success) return { ok: true };
+  const errors: readonly unknown[] = parse.error instanceof ZodError ? parse.error.issues : [];
+  return { ok: false, issues: errors };
+}
+
+function validateOutput(
+  node: Node,
+  output: unknown,
+): { ok: true } | { ok: false; issues: unknown } {
+  if (!node.outputSchema) return { ok: true };
+  const parse = node.outputSchema.safeParse(output);
+  if (parse.success) return { ok: true };
+  const errors: readonly unknown[] = parse.error instanceof ZodError ? parse.error.issues : [];
+  return { ok: false, issues: errors };
+}
+
+/** Test/bootstrap helper — builds a minimal manifest with safe defaults. */
+export function makeManifest(input: {
+  id: string;
+  name: string;
+  description: string;
+  determinism: "deterministic" | "stochastic";
+  required_actions?: readonly string[];
+  version?: string;
+  side_effects?: Partial<NodeManifest["side_effects"]>;
+  tags?: string[];
+  dynamic_actions?: boolean;
+  dynamic_action_spec?: string;
+}): NodeManifest {
+  const required_actions = [...(input.required_actions ?? [])];
+  const dynamic_spec = input.dynamic_action_spec ?? "";
+  const combinedForDetect = [...required_actions, dynamic_spec].join(" ");
+  const needsFs =
+    /\bfs\.write:|\bfs\.delete:|\bshell\.exec:/.test(combinedForDetect);
+  const needsNet =
+    /\bnet\.(http|dns):|\bshell\.exec:/.test(combinedForDetect);
+  const raw: NodeManifestInput = {
+    manifest_version: 1,
+    id: input.id,
+    version: input.version ?? "0.1.0",
+    name: input.name,
+    description: input.description,
+    required_actions,
+    determinism: input.determinism,
+    side_effects: {
+      writes_fs: needsFs || (input.side_effects?.writes_fs ?? false),
+      network: needsNet || (input.side_effects?.network ?? false),
+      mutates_ctx: input.side_effects?.mutates_ctx ?? false,
+      emits_ctx_variants: input.side_effects?.emits_ctx_variants ?? [],
+      reads_ctx_variants: input.side_effects?.reads_ctx_variants ?? [],
+    },
+    tags: input.tags ?? [],
+    ...(input.dynamic_actions
+      ? { dynamic_actions: true as const, dynamic_action_spec: input.dynamic_action_spec ?? "" }
+      : {}),
   };
+  return validateManifest(raw);
 }

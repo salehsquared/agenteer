@@ -1,4 +1,4 @@
-// Public surface for @agenteer/core (M1).
+// Public surface for @agenteer/core (M2).
 
 export type {
   Node,
@@ -64,18 +64,67 @@ export {
   type RuntimeOptions,
   type RuntimeOutcome,
   type RuntimeCaps,
-  type RootGrants,
   makeManifest,
 } from "./runtime/runtime.js";
 
 export { applyPatch, type ApplyPatchContext, type ApplyPatchOutcome } from "./runtime/patch.js";
 
 export {
-  type PermissionEnvelope,
-  EMPTY_ENVELOPE,
-  intersect as intersectEnvelope,
-  isSpawnAllowed,
-} from "./permissions/envelope.js";
+  type ModelProvider,
+  type ModelCallDispatch,
+  type ModelCallDispatchResult,
+  MockModelProvider,
+  RoutingModelProvider,
+} from "./runtime/providers.js";
+
+export {
+  type ActionRegistry,
+  type DispatchContext,
+  DispatchError,
+  StdActionRegistry,
+} from "./runtime/dispatch.js";
+
+// Permissions — sub-plan 02.
+export {
+  RESOURCE_TYPES,
+  type ResourceType,
+  type Capability,
+  type ParsedCapability,
+  type CapabilitySet,
+  type SubsetResult,
+  type AuthorizeSpawnArgs,
+  type AuthorizeSpawnResult,
+  type AuthorizeSpawnAllow,
+  type AuthorizeSpawnDeny,
+  type Operation,
+  CapabilityParseError,
+  OperationDenied,
+  DenylistViolation,
+  parseCapability,
+  parseCapabilitySet,
+  capabilitySet,
+  emptyCapabilitySet,
+  isSubset,
+  intersect as intersectCapabilities,
+  covers,
+  capabilityCoversOperation,
+  authorizeSpawn,
+  authorizeOperation,
+  isOperationAllowed,
+  assertNotDenied,
+  isDenied,
+  rawsOf,
+  unsafeCapability,
+} from "./permissions/index.js";
+
+// Manifest — sub-plan 02.
+export {
+  NodeManifestSchema,
+  validateManifest,
+  tryValidateManifest,
+  ManifestValidationError,
+  type NodeManifestInput,
+} from "./manifest/index.js";
 
 export {
   type EvidenceSink,
