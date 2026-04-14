@@ -1,7 +1,30 @@
 {
   "name": "@agenteer/core",
-  "version": "0.0.1",
-  "description": "Core runtime, Node primitive, and context store for Agenteer.",
+  "version": "1.0.0-rc.1",
+  "description": "Core runtime, Node primitive, and context store for Agenteer — a debuggable, capability-gated agentic framework.",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "agents",
+    "agentic",
+    "runtime",
+    "capability",
+    "context",
+    "llm",
+    "workflow",
+    "orchestration"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/core"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,10 +36,15 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -b",
@@ -24,7 +52,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@agenteer/trust": "0.0.1",
+    "@agenteer/trust": "1.0.0-rc.1",
     "yaml": "^2.8.2",
     "zod": "^4.3.6"
   },

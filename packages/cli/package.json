@@ -1,7 +1,28 @@
 {
   "name": "@agenteer/cli",
-  "version": "0.0.1",
-  "description": "Agenteer CLI: run workflows, resume sessions, inspect context and traces.",
+  "version": "1.0.0-rc.1",
+  "description": "Agenteer CLI: run workflows, resume sessions, inspect context and traces, publish and install nodes.",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "cli",
+    "workflow",
+    "session",
+    "inspect",
+    "publish",
+    "llm"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/cli"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,10 +37,15 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -b",
@@ -27,10 +53,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@agenteer/core": "0.0.1",
-    "@agenteer/registry": "0.0.1",
-    "@agenteer/stdlib": "0.0.1",
-    "@agenteer/trust": "0.0.1",
+    "@agenteer/core": "1.0.0-rc.1",
+    "@agenteer/registry": "1.0.0-rc.1",
+    "@agenteer/stdlib": "1.0.0-rc.1",
+    "@agenteer/trust": "1.0.0-rc.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {

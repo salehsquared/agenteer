@@ -1,7 +1,26 @@
 {
   "name": "@agenteer/create-node",
-  "version": "0.0.1",
-  "description": "Scaffold a new Agenteer node package ready to publish.",
+  "version": "1.0.0-rc.1",
+  "description": "Scaffold a new Agenteer node package ready to publish. Run with `npx @agenteer/create-node @scope/node-name`.",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "scaffold",
+    "create",
+    "template",
+    "npx"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/create-node"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,10 +35,15 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -b",

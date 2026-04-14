@@ -140,7 +140,7 @@ function templatePackageJson(args: {
           prepublishOnly: "tsc -b",
         },
         dependencies: {
-          "@agenteer/core": "^0.0.1",
+          "@agenteer/core": "^1.0.0-rc.1",
           zod: "^4.3.6",
         },
         devDependencies: {
@@ -317,7 +317,7 @@ function templateReadme(packageName: string, description: string): string {
 
 ${description}
 
-An [Agenteer](https://github.com/) node package.
+An [Agenteer](https://github.com/salehsquared/agenteer) node package.
 
 ## Install
 

@@ -1,7 +1,29 @@
 {
   "name": "@agenteer/stdlib",
-  "version": "0.0.1",
-  "description": "Agenteer standard library — hardened, publishable nodes (primitives, validators, meta, humans, planner).",
+  "version": "1.0.0-rc.1",
+  "description": "Agenteer standard library — 19 hardened, publishable nodes (primitives, validators, meta, humans, planner, context).",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "stdlib",
+    "nodes",
+    "primitives",
+    "validators",
+    "planner",
+    "llm",
+    "tools"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/stdlib"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,10 +35,15 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -b",
@@ -24,8 +51,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@agenteer/core": "0.0.1",
-    "@agenteer/trust": "0.0.1",
+    "@agenteer/core": "1.0.0-rc.1",
+    "@agenteer/trust": "1.0.0-rc.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {

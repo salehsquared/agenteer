@@ -1,7 +1,29 @@
 {
   "name": "@agenteer/registry",
-  "version": "0.0.1",
-  "description": "Agenteer registry: publish, install, search, and pin @agenteer-shape node packages via npm.",
+  "version": "1.0.0-rc.1",
+  "description": "Agenteer registry: publish, install, search, and pin Agenteer-shaped node packages via npm.",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "registry",
+    "npm",
+    "publish",
+    "install",
+    "ajv",
+    "json-schema",
+    "manifest"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/registry"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,10 +35,15 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -b",
@@ -24,7 +51,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@agenteer/core": "0.0.1",
+    "@agenteer/core": "1.0.0-rc.1",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "yaml": "^2.8.2",

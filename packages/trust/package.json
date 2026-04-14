@@ -1,7 +1,29 @@
 {
   "name": "@agenteer/trust",
-  "version": "0.0.1",
-  "description": "Agenteer trust layer: evidence records, structured output, access guard, cross-check. Zero dependency on @agenteer/core.",
+  "version": "1.0.0-rc.1",
+  "description": "Agenteer trust layer: evidence records, structured output with retry, filesystem access guard, cross-check engine. Zero dependency on @agenteer/core.",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "evidence",
+    "structured-output",
+    "zod",
+    "cross-check",
+    "llm",
+    "trust",
+    "observability"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/trust"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -34,10 +56,15 @@
   "files": [
     "dist",
     "src",
-    "testing"
+    "testing",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -b",

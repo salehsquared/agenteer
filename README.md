@@ -4,7 +4,7 @@
 
 A greenfield agentic framework whose pitch is that every piece of state — context, evidence, permission decisions — is inspectable, replayable, and bounded by an explicit capability grammar. Nodes compose via returned intents, sessions pause and resume on disk, and community packages ship through npm under a strict `@<scope>/node-<name>` convention.
 
-Status: **v1.0 release candidate.** M1 → M6 implemented, plus three v1.0 gate items (dynamic-actions install hard-stop, parent-slice bounds on child spawn, ajv JSON-Schema bridge). 175 / 175 tests green.
+Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `@agenteer/*` scope. M1 → M6 implemented, plus three v1.0 gate items (dynamic-actions install hard-stop, parent-slice bounds on child spawn, ajv JSON-Schema bridge). 175 / 175 tests green.
 
 ## Packages
 
@@ -56,6 +56,9 @@ That's a deliberate v1.0 scoping decision. Dynamically-conceptualized node types
 
 ## Docs
 
+- [Architecture](docs/architecture.md) — top-down tour: runtime loop, context, evidence, kernel, sessions.
+- [Capabilities](docs/capabilities.md) — the grammar, intersection rules, and `dynamic_actions` semantics.
+- [CLI reference](docs/cli.md) — every command, every flag.
 - [Publishing a node](docs/publishing-a-node.md) — scaffold, validate, publish, troubleshoot.
 - [Verdaccio verification](packages/registry/VERDACCIO.md) — real-registry walkthrough for the publish → install story.
 - [Research assistant demo](examples/research-assistant/README.md) — runnable 6-stdlib-node composition.
