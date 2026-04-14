@@ -66,7 +66,13 @@ export interface RuntimeEventMap {
     chainLength: number;
     timestamp: string;
   };
-  needs_user: { nodeId: string; prompt: string; timestamp: string };
+  needs_user: {
+    nodeId: string;
+    manifest: string;
+    prompt: string;
+    resume_hint: string;
+    timestamp: string;
+  };
 
   ctx_read: { nodeId: string; keys: string[]; materializedHash: string; timestamp: string };
   ctx_patched: {

@@ -1,15 +1,15 @@
 /**
- * @agenteer/stdlib — v1 standard library (M4 complete: 18 nodes).
+ * @agenteer/stdlib — v1 standard library (M5 adds ask_user: 19 nodes).
  *
  *   Primitives (5):  file_read, file_write, shell_exec, llm_call, tool_call
  *   Validators (5):  compile, test_run, regex_check, typecheck, json_schema_validate
  *   Meta (4):        parallel_fanout, cross_check, judge_with_stripped_ctx, repair_loop
- *   Humans (1):      approval_gate          (ask_user deferred to M5)
+ *   Humans (2):      approval_gate, ask_user (M5)
  *   Planner (1):     default_planner
- *   Context (1):     context_curator        (master plan open #15 — shipped)
+ *   Context (1):     context_curator
  *
  * `registerStdlib` registers M2-shape nodes (file_read/write/shell_exec/
- * json_schema_validate/llm_call). M4 nodes with external dependencies
+ * json_schema_validate/llm_call). Nodes with external dependencies
  * (provider/resolver/tool registry) are exported as factories for the
  * caller to wire and register individually.
  */
@@ -45,6 +45,7 @@ import { repairLoopFactory, repairLoopManifest } from "./meta/repair_loop.js";
 // Context, humans, planner
 import { contextCuratorFactory, contextCuratorManifest } from "./context/context_curator.js";
 import { approvalGateFactory, approvalGateManifest } from "./humans/approval_gate.js";
+import { askUserFactory, askUserManifest } from "./humans/ask_user.js";
 import { defaultPlannerFactory, defaultPlannerManifest } from "./planner/default_planner.js";
 
 export {
@@ -84,6 +85,8 @@ export {
   contextCuratorManifest,
   approvalGateFactory,
   approvalGateManifest,
+  askUserFactory,
+  askUserManifest,
   defaultPlannerFactory,
   defaultPlannerManifest,
 };
@@ -91,6 +94,7 @@ export {
 export type { CompileAdapter } from "./validators/compile.js";
 export type { TestAdapter, TestReport } from "./validators/test_run.js";
 export type { ApprovalResolver } from "./humans/approval_gate.js";
+export type { AskUserResolver, AskUserFactoryOptions } from "./humans/ask_user.js";
 export type { ProviderResolver } from "./meta/cross_check.js";
 export * from "./shared/index.js";
 
@@ -140,5 +144,6 @@ export const STDLIB_MANIFEST_IDS = [
   repairLoopManifest.id,
   contextCuratorManifest.id,
   approvalGateManifest.id,
+  askUserManifest.id,
   defaultPlannerManifest.id,
 ] as const;

@@ -51,6 +51,8 @@ export {
   hashItemContent,
 } from "./context/store.js";
 
+export { FileContextStore, type FileContextStoreOptions } from "./context/file-store.js";
+
 export { sliceToReadonly } from "./context/slice.js";
 export { canonicalize, sha256Hex, itemContentHash, finalizeItem } from "./context/hash.js";
 
@@ -145,3 +147,27 @@ export {
 } from "./evidence/sink.js";
 
 export { newCorrelationId, newNodeRunId, newSessionId } from "./util/ids.js";
+
+// Session persistence + resume (M5).
+export {
+  type SessionState,
+  type SessionStatus,
+  type PendingPrompt,
+  type UserAnswer,
+  type RootSpawnSnapshot,
+  SessionStateSchema,
+  createSession,
+  loadSession,
+  saveSession,
+  updateSession,
+  setSessionStatus,
+  recordPendingPrompt,
+  recordAnswer,
+  sessionStatePath,
+  sessionEventsPath,
+  sessionEvidenceDir,
+  SessionRecorder,
+  type SessionRecorderOptions,
+  recordedAnswerResolver,
+  type RecordedAnswerResolver,
+} from "./session/index.js";

@@ -464,7 +464,9 @@ export class Runtime {
         case "needs_user":
           this.events.emit("needs_user", {
             nodeId,
+            manifest: currentSpawn.manifest_id,
             prompt: result.prompt,
+            resume_hint: result.resume_hint ?? nodeId,
             timestamp: this.clock().toISOString(),
           });
           return result;

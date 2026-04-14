@@ -1,10 +1,13 @@
 {
-  "name": "@agenteer/core",
+  "name": "@agenteer/cli",
   "version": "0.0.1",
-  "description": "Core runtime, Node primitive, and context store for Agenteer.",
+  "description": "Agenteer CLI: run workflows, resume sessions, inspect context and traces.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "agenteer": "./dist/bin/agenteer.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -24,11 +27,13 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@agenteer/core": "0.0.1",
+    "@agenteer/stdlib": "0.0.1",
     "@agenteer/trust": "0.0.1",
-    "yaml": "^2.8.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "vitest": "^3.2.4"
   }
 }
