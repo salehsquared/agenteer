@@ -45,11 +45,11 @@ A single `runtime.run(rootSpawn, grantedCaps)` call:
 2. **Build the root frame.** Each frame carries an `effectiveCaps` set (the intersection) and a `ctxScope` set (parent ctx ∪ ctx grants).
 3. **Materialize the slice.** The node declares what ctx items it needs via `ctx: [...selectors]`. The runtime materializes those as a read-only slice — filtered by `ctxScope`, which is how parent-slice bounds are enforced.
 4. **Run `execute()`.** The node does its work and returns an intent:
-   - `{kind: "output", value, evidence}` — done; value becomes a ctx artifact.
-   - `{kind: "spawn_children", children, ctx_grants?}` — push new frames onto the queue.
-   - `{kind: "needs_user", prompt}` — suspend; the session records the pending prompt.
-   - `{kind: "error", reason}` — record a failure evidence record and propagate.
-   - `{kind: "replace_me", with}` — replace the current frame with a new spawn (tail-call).
+   - `{kind: "output", value, ctx_patch?, evidence?}` — done; value becomes a ctx artifact.
+   - `{kind: "spawn_children", children, join, ctx_grants?}` — push new frames onto the queue and re-enter `execute` after the join.
+   - `{kind: "needs_user", prompt, schema?, resume_hint?}` — suspend; the session records the pending prompt.
+   - `{kind: "failed", reason, retryable, evidence?, details?}` — record a failure evidence record and propagate.
+   - `{kind: "replace_me", successor, reason, ctx_patch?}` — replace the current frame with a new spawn (tail-call).
 5. **Apply the intent.** The runtime applies the ctx patch, writes evidence, emits events, and loops to the next frame.
 6. **Loop until the queue is empty.**
 
@@ -70,7 +70,7 @@ Two stores ship: `InMemoryContextStore` (tests, transient) and `FileContextStore
 
 ## Evidence: a record per verdict
 
-Every node run emits one **primary** evidence record — `pass`, `fail`, or `neutral` with a title, tool/command, exit code, and timestamps. Nodes can emit **auxiliary** records for sub-checks (access scans, cross-checks, sub-tests). All records are grouped by `lineage_id` so the full trace through a subtree is legible in one grep.
+Every node run emits one **primary** evidence record with a verdict (`pass`, `fail`, `error`, `skip`, or `timeout`), a tool/command, an exit code, and timestamps. Nodes typically return a minimal `EvidenceDelta` (`{verdict, claims?, tool_output?}`) and the runtime fills in the rest. Nodes can emit **auxiliary** records for sub-checks (access scans, cross-checks, sub-tests). All records are grouped by `lineage_id` so the full trace through a subtree is legible in one grep.
 
 Evidence is YAML on disk, append-only. The `EvidenceStore` interface is the seam — the default `YamlEvidenceStore` writes to `.session/evidence/`, but you can plug in anything (SQLite, S3) that honors the same API.
 

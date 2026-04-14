@@ -15,17 +15,86 @@ Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `
 - **`@agenteer/registry`** — publishing, installing, permission-diff, `framework.lock`, ajv bridge.
 - **`@agenteer/create-node`** — `npx @agenteer/create-node @scope/node-name` scaffold.
 
-## Install + run
+## Quickstart
+
+Install from npm:
 
 ```bash
+npm install @agenteer/core @agenteer/stdlib @agenteer/trust zod
+```
+
+Run a two-node workflow end to end:
+
+```ts
+import {
+  InMemoryContextStore,
+  InMemoryNodeRegistry,
+  MemoryEvidenceSink,
+  Runtime,
+  makeManifest,
+} from "@agenteer/core";
+import { z } from "zod";
+
+const manifest = makeManifest({
+  id: "@example/node-greet",
+  name: "greet",
+  description: "Greets the given name.",
+  determinism: "deterministic",
+  required_actions: [],
+});
+
+const registry = new InMemoryNodeRegistry();
+registry.register(manifest, () => ({
+  manifest,
+  inputSchema: z.object({ name: z.string() }),
+  outputSchema: z.object({ message: z.string() }),
+  ctx: [],
+  model: null,
+  async execute(input) {
+    return {
+      kind: "output",
+      value: { message: `hello, ${input.original.name}` },
+      evidence: { verdict: "pass" },
+    };
+  },
+}));
+
+const runtime = new Runtime({
+  registry,
+  contextStore: new InMemoryContextStore(),
+  evidenceSink: new MemoryEvidenceSink(),
+});
+
+const outcome = await runtime.run(
+  { manifest_id: manifest.id, input: { name: "world" }, correlation: "root" },
+  [`spawn:${manifest.id}`],
+);
+console.log(outcome.rootResult);
+// { kind: "output", value: { message: "hello, world" }, evidence: { verdict: "pass" } }
+```
+
+Or install the CLI and drive from the shell:
+
+```bash
+npm install -g @agenteer/cli
+agenteer --help
+```
+
+A runnable demo using six stdlib nodes lives at [`examples/research-assistant/`](examples/research-assistant/README.md) — question → plan → approve → search → check → report.
+
+## Dev setup (contributing to the monorepo)
+
+Only needed if you're working **on** Agenteer itself, not using it:
+
+```bash
+git clone https://github.com/salehsquared/agenteer.git
+cd agenteer
 npm install
 npm run build
 npm test
 ```
 
-Requires Node ≥ 20.
-
-A runnable demo lives at [`examples/research-assistant/`](examples/research-assistant/README.md) — six stdlib nodes composing a question → plan → approve → search → check → report flow.
+Requires Node ≥ 20. The test suite is 175 tests across 43 files; expect ~3 seconds.
 
 ## What you get at v1.0
 
@@ -58,10 +127,13 @@ That's a deliberate v1.0 scoping decision. Dynamically-conceptualized node types
 
 - [Architecture](docs/architecture.md) — top-down tour: runtime loop, context, evidence, kernel, sessions.
 - [Capabilities](docs/capabilities.md) — the grammar, intersection rules, and `dynamic_actions` semantics.
+- [Writing a node](docs/nodes.md) — Node contract, intents, ctx patches, evidence deltas.
+- [Evidence records](docs/evidence.md) — verdict semantics, lineage, staleness, reading a trace.
 - [CLI reference](docs/cli.md) — every command, every flag.
 - [Publishing a node](docs/publishing-a-node.md) — scaffold, validate, publish, troubleshoot.
 - [Verdaccio verification](packages/registry/VERDACCIO.md) — real-registry walkthrough for the publish → install story.
 - [Research assistant demo](examples/research-assistant/README.md) — runnable 6-stdlib-node composition.
+- [Changelog](CHANGELOG.md) — per-release notes.
 
 ## Layout
 
@@ -76,7 +148,14 @@ packages/
 examples/
   research-assistant/  — runnable demo
 docs/
-  publishing-a-node.md
+  architecture.md      — system tour
+  capabilities.md      — permission grammar
+  nodes.md             — how to write a node
+  evidence.md          — evidence records, lineage, staleness
+  cli.md               — CLI reference
+  publishing-a-node.md — node-author publish flow
+CHANGELOG.md
+LICENSE
 ```
 
 ## License
