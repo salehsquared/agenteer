@@ -73,7 +73,7 @@ registerStdlib(registry);
 
 Nodes with external wiring (provider, tool registry, resolver) are exported as factories so you can wire them yourself:
 
-```ts
+```text
 import {
   approvalGateFactory, approvalGateManifest,
   askUserFactory, askUserManifest,

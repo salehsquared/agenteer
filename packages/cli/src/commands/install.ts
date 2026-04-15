@@ -76,7 +76,10 @@ export function renderInstallResult(result: InstallResult): string {
     `  manifest_hash: ${result.manifest_hash}`,
   ];
   if (result.diff && result.diff.new_required.length > 0) {
-    lines.push(`  note: workflow grants extended with ${result.diff.new_required.length} new cap(s)`);
+    lines.push(
+      `  note: node declares ${result.diff.new_required.length} cap(s) not yet in workflow.granted; ` +
+        `add them to the workflow spec before running to avoid kernel denials`,
+    );
   }
   if (result.provenance) {
     lines.push(`  provenance: ${result.provenance.present ? "ok" : "missing"}`);

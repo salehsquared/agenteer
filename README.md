@@ -4,7 +4,7 @@
 
 A greenfield agentic framework whose pitch is that every piece of state — context, evidence, permission decisions — is inspectable, replayable, and bounded by an explicit capability grammar. Nodes compose via returned intents, sessions pause and resume on disk, and community packages ship through npm under a strict `@<scope>/node-<name>` convention.
 
-Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `@agenteer/*` scope. M1 → M6 implemented, plus three v1.0 gate items (dynamic-actions install hard-stop, parent-slice bounds on child spawn, ajv JSON-Schema bridge). 175 / 175 tests green.
+Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `@agenteer/*` scope. M1 → M6 implemented, plus three v1.0 gate items (dynamic-actions install hard-stop, parent-slice bounds on child spawn, ajv JSON-Schema bridge). The full suite (`npm test`) is green on every merge; see [CHANGELOG.md](./CHANGELOG.md) for per-release numbers.
 
 ## Packages
 
@@ -114,7 +114,7 @@ npm run build
 npm test
 ```
 
-Requires Node ≥ 20. The test suite is 175 tests across 43 files; expect ~3 seconds.
+Requires Node ≥ 20. `npm test` runs the full cross-package suite in a few seconds; the CHANGELOG lists the count for each release.
 
 ## What you get at v1.0
 
@@ -142,6 +142,18 @@ Requires Node ≥ 20. The test suite is 175 tests across 43 files; expect ~3 sec
 If you want new capabilities in a workflow, install more nodes (`agenteer install @acme/node-foo`) or register a custom node via `extraRegistrations`. Don't expect the planner to invent them.
 
 That's a deliberate v1.0 scoping decision. Dynamically-conceptualized node types are a research problem that belongs somewhere else in the stack — likely an agent that *authors* a node package (producing a publishable `framework.json`) rather than a planner that synthesizes at plan-emit time without a verification story.
+
+## Versioning
+
+All six `@agenteer/*` packages release in **lockstep** through `1.0.0`. Internal deps pin sibling versions **exactly** (e.g. `"@agenteer/core": "1.0.0-rc.1"`, not `^1.0.0-rc.1`).
+
+What this means if you publish changes:
+
+- A patch to any package requires **re-publishing every package** that depends on it at a new version, so the exact-pinned dep still resolves.
+- There is no selective upgrade path for consumers of `@agenteer/cli` to pick up a `@agenteer/core` fix without a new `cli` release.
+- After `1.0.0` stable, packages may version independently when a change is contained to a single package; until then, treat a release as the six-package set.
+
+If you patch one package locally for a bugfix PR, bump all six versions together in the same commit and publish them as a batch. See [CHANGELOG.md](./CHANGELOG.md#versioning).
 
 ## Docs
 

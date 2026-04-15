@@ -63,23 +63,27 @@ export async function scaffoldNode(opts: ScaffoldNodeOptions): Promise<ScaffoldN
   const determinism = opts.determinism ?? "deterministic";
   const requiredActions = opts.requiredActions ?? [];
   const author = opts.author ?? "";
+  const scaffoldVersion = "0.1.0";
 
   const files: Record<string, string> = {
     "package.json": templatePackageJson({
       packageName: opts.packageName,
       description,
       author,
+      version: scaffoldVersion,
     }),
     "framework.json": templateFrameworkJson({
       packageName: opts.packageName,
       description,
       determinism,
       requiredActions,
+      version: scaffoldVersion,
     }),
     "tsconfig.json": templateTsconfig(),
     "src/index.ts": templateSrcIndex(opts.packageName, determinism),
     "tests/node.test.ts": templateTest(opts.packageName),
     "README.md": templateReadme(opts.packageName, description),
+    "LICENSE": templateLicense(author),
     ".gitignore": `node_modules\ndist\n*.tsbuildinfo\n`,
   };
 
@@ -111,12 +115,13 @@ function templatePackageJson(args: {
   packageName: string;
   description: string;
   author: string;
+  version: string;
 }): string {
   return (
     JSON.stringify(
       {
         name: args.packageName,
-        version: "0.1.0",
+        version: args.version,
         description: args.description,
         type: "module",
         main: "./dist/index.js",
@@ -133,14 +138,14 @@ function templatePackageJson(args: {
             default: "./dist/index.js",
           },
         },
-        files: ["dist", "src", "framework.json"],
+        files: ["dist", "src", "framework.json", "LICENSE", "README.md"],
         scripts: {
           build: "tsc -b",
           test: "vitest run",
           prepublishOnly: "tsc -b",
         },
         dependencies: {
-          "@agenteer/core": "^1.0.0-rc.1",
+          "@agenteer/core": "^1.0.0-rc.2",
           zod: "^4.3.6",
         },
         devDependencies: {
@@ -160,13 +165,14 @@ function templateFrameworkJson(args: {
   description: string;
   determinism: "deterministic" | "stochastic";
   requiredActions: readonly string[];
+  version: string;
 }): string {
   return (
     JSON.stringify(
       {
         manifest_version: 1,
         id: args.packageName,
-        version: "0.1.0",
+        version: args.version,
         name: args.packageName.split("/")[1]!.replace(/^node-/, "").replace(/-/g, "_"),
         description: args.description,
         determinism: args.determinism,
@@ -319,10 +325,10 @@ ${description}
 
 An [Agenteer](https://github.com/salehsquared/agenteer) node package.
 
-## Install
+## Install (into a workflow)
 
 \`\`\`bash
-agenteer install ${packageName} --workflow-dir ./my-workflow
+npx @agenteer/cli install ${packageName} --workflow-dir ./my-workflow
 \`\`\`
 
 ## Develop
@@ -337,16 +343,48 @@ npm run build
 
 \`\`\`bash
 # Validate first, then publish. Add --provenance in CI/OIDC when desired.
-agenteer publish --dir . --dry-run
-agenteer publish --dir .
+npx @agenteer/cli publish --dir . --dry-run
+npx @agenteer/cli publish --dir .
 \`\`\`
 
 See \`docs/publishing-a-node.md\` in the agenteer repo for the full flow.
 
+## Versioning
+
+\`framework.json.version\` must match \`package.json.version\`. The registry
+rejects publishes where they drift. Bump both when you cut a release.
+
 ## Edit
 
-- \`framework.json\` — the published manifest. Keep \`id\` in sync with \`package.json\` \`name\`.
+- \`framework.json\` — the published manifest. Keep \`id\` in sync with \`package.json\` \`name\` and \`version\` in sync with \`package.json\` \`version\`.
 - \`src/index.ts\` — runtime logic. Replace the TODO.
 - \`tests/node.test.ts\` — vitest harness; expand as the node grows.
+`;
+}
+
+function templateLicense(author: string): string {
+  const year = new Date().getFullYear();
+  const holder = author.trim() !== "" ? author : "the package author";
+  return `MIT License
+
+Copyright (c) ${year} ${holder}
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 `;
 }

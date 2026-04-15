@@ -1,6 +1,6 @@
 {
   "name": "@agenteer/cli",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Agenteer CLI: run workflows, resume sessions, inspect context and traces, publish and install nodes.",
   "keywords": [
     "agenteer",
@@ -47,15 +47,16 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && chmod +x dist/bin/agenteer.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@agenteer/core": "1.0.0-rc.1",
-    "@agenteer/registry": "1.0.0-rc.1",
-    "@agenteer/stdlib": "1.0.0-rc.1",
-    "@agenteer/trust": "1.0.0-rc.1",
+    "@agenteer/core": "1.0.0-rc.2",
+    "@agenteer/registry": "1.0.0-rc.2",
+    "@agenteer/stdlib": "1.0.0-rc.2",
+    "@agenteer/trust": "1.0.0-rc.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {

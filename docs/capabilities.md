@@ -137,7 +137,7 @@ A capability allow-list can be paired with a denylist floor for paths that are n
 
 Denied spawns are recorded and can be rendered with `explainPermissionDenial()`:
 
-```ts
+```text
 import { explainPermissionDenial } from "@agenteer/core";
 
 const text = explainPermissionDenial({

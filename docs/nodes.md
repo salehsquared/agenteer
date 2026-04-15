@@ -6,7 +6,7 @@ How to author a custom node for Agenteer. Read [architecture.md](architecture.md
 
 A node is an object that implements `Node<Input, Output>` from `@agenteer/core`:
 
-```ts
+```text
 import type {
   Node, NodeInput, NodeResult, NodeRuntimeHandle, NodeManifest,
 } from "@agenteer/core";
@@ -26,10 +26,11 @@ const myNode: Node<MyInput, MyOutput> = {
   },
 };
 ```
+(Shape shown as prose — see [create-node's scaffold](https://github.com/salehsquared/agenteer/tree/main/packages/create-node) for a compilable reference implementation.)
 
 Node authors ship a **factory**: `() => Node<I, O>`. Factories let the runtime instantiate a fresh node per spawn, which matters if your node holds any per-run state. Registrations pass the factory, not a pre-built instance:
 
-```ts
+```text
 registry.register(manifest, () => myNodeInstance);
 ```
 
@@ -68,7 +69,7 @@ const manifest = makeManifest({
 
 ### The input envelope
 
-```ts
+```text
 interface NodeInput<T> {
   original: T;                             // your typed input, matches inputSchema
   children?: ReadonlyArray<{               // populated on re-entry after spawn_children
@@ -83,7 +84,7 @@ First call: `input.children` is `undefined`. If your previous result was `spawn_
 
 ### The runtime handle
 
-```ts
+```text
 interface NodeRuntimeHandle {
   readonly ctx: ReadonlyContextSlice;      // your materialized view of ctx
   readonly signal: AbortSignal;             // abort signal for long ops
@@ -109,7 +110,7 @@ interface NodeRuntimeHandle {
 
 #### `output` — you're done
 
-```ts
+```text
 return {
   kind: "output",
   value: { severity: "P2", component: "auth" },
@@ -122,7 +123,7 @@ return {
 
 #### `spawn_children` — you need parallel sub-work
 
-```ts
+```text
 return {
   kind: "spawn_children",
   children: [
@@ -149,7 +150,7 @@ After the join, the runtime re-calls `execute` with `input.children` populated. 
 
 #### `replace_me` — you'd rather be a different node
 
-```ts
+```text
 return {
   kind: "replace_me",
   successor: {
@@ -166,7 +167,7 @@ The runtime replaces your frame with the successor's spawn. Evidence for the suc
 
 #### `needs_user` — ask the human
 
-```ts
+```text
 return {
   kind: "needs_user",
   prompt: "Is this bug already filed? (yes / no)",
@@ -181,7 +182,7 @@ You don't have to structure `ask_user` around `needs_user` directly — you can 
 
 #### `failed` — something went wrong
 
-```ts
+```text
 return {
   kind: "failed",
   reason: "primary LLM returned an unparseable response 3 times",
@@ -197,7 +198,7 @@ This is a controlled failure, not an exception. The runtime records a fail evide
 
 `CtxPatch` has three operations:
 
-```ts
+```text
 interface CtxPatch {
   set?: Record<string, unknown>;          // create/supersede by key
   delete?: readonly string[];              // tombstone
@@ -206,7 +207,7 @@ interface CtxPatch {
 ```
 
 - **`set`** creates a Decision item by default, or an Artifact when you wrap the value:
-  ```ts
+  ```text
   import { asArtifact } from "@agenteer/core";
   return {
     kind: "output",
@@ -227,7 +228,7 @@ Patches are applied atomically by the runtime. They can't be mutated mid-executi
 
 Your node returns a minimal `EvidenceDelta`:
 
-```ts
+```text
 interface EvidenceDelta {
   verdict: "pass" | "fail" | "inconclusive";
   claims?: readonly string[];              // claim-ref ids this evidence supports
@@ -243,7 +244,7 @@ You don't have to return evidence. If you omit it, the runtime still records a m
 
 In-tree nodes ship Zod schemas directly:
 
-```ts
+```text
 inputSchema: z.object({ question: z.string().min(1) }),
 outputSchema: z.object({ answer: z.string() }),
 ```
@@ -256,7 +257,7 @@ You can also ship both — Zod in the source (for types + in-process validation)
 
 Spin up a real runtime in your test. It's fast (ms) and catches integration issues that unit tests miss:
 
-```ts
+```text
 import { describe, expect, it } from "vitest";
 import {
   InMemoryContextStore,
@@ -288,6 +289,7 @@ describe("my-node", () => {
   });
 });
 ```
+(The scaffold at `packages/create-node/src/index.ts` (`templateTest`) renders this exact structure with a real input — it's the compilable reference.)
 
 For stochastic nodes that call models, use `MockModelProvider`:
 

@@ -23,6 +23,7 @@ export interface PackageValidationIssue {
     | "bad_package_name"
     | "missing_framework_keyword"
     | "id_mismatch"
+    | "version_mismatch"
     | "manifest_load_failed";
   message: string;
 }
@@ -66,6 +67,18 @@ export async function validateNodePackage(pkgDir: string): Promise<PackageValida
     issues.push({
       code: "id_mismatch",
       message: `framework.json id '${loaded.manifest.id}' does not match package.json name '${loaded.packageJson.name}'`,
+    });
+  }
+
+  if (
+    typeof loaded.manifest.version === "string" &&
+    loaded.manifest.version !== loaded.packageJson.version
+  ) {
+    issues.push({
+      code: "version_mismatch",
+      message:
+        `framework.json version '${loaded.manifest.version}' does not match package.json version '${loaded.packageJson.version}'. ` +
+        `Bump both together so publish/install consumers see a consistent version.`,
     });
   }
 

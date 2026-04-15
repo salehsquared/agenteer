@@ -15,7 +15,7 @@
 
 import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { parseArgs, flagString, requireFlagString } from "../util/args.js";
+import { parseArgs, flagString, flagList, requireFlagString } from "../util/args.js";
 import { runWorkflow, WorkflowSpecSchema } from "../commands/run.js";
 import { resumeWorkflow } from "../commands/resume.js";
 import {
@@ -302,15 +302,10 @@ async function searchCmd(argv: readonly string[]): Promise<number> {
 }
 
 function collectStringList(
-  flags: Record<string, string | true>,
+  flags: Parameters<typeof flagList>[0],
   key: string,
 ): string[] {
-  const out: string[] = [];
-  const v = flags[key];
-  if (typeof v === "string") out.push(v);
-  // npm argv can't repeat a flag into an array without a framework, so
-  // also accept comma-separated values: --grant fs.read:/tmp/**,model:foo
-  return out.flatMap((s) => s.split(",").map((t) => t.trim()).filter(Boolean));
+  return flagList(flags, key);
 }
 
 async function loadSpec(path: string): Promise<unknown> {
@@ -320,13 +315,10 @@ async function loadSpec(path: string): Promise<unknown> {
 }
 
 function collectModelIds(
-  flags: Record<string, string | true>,
+  flags: Parameters<typeof flagList>[0],
   extras: readonly string[],
 ): string[] {
-  const model = flags["model"];
-  const ids: string[] = [...extras];
-  if (typeof model === "string") ids.push(model);
-  return ids;
+  return [...extras, ...flagList(flags, "model")];
 }
 
 main(process.argv.slice(2))

@@ -29,7 +29,7 @@ The scaffold ships:
 Edit `src/index.ts`. The key contract (sub-plan 00 §3):
 
 - Return a `NodeResult` union: `output`, `replace_me`, `spawn_children`, `needs_user`, or `failed`.
-- Declare `required_actions` in `framework.json` — anything you'll `callAction` for (`shell.exec:...`, `net.http:...`, `model:...`, `tool:...`, `spawn:@other/node-*`).
+- Declare `required_actions` in `framework.json` — anything you'll `callAction` for (`shell.exec:`, `net.http:api.example.com/**`, `model:claude-*`, `tool:gh`, `spawn:@other/node-*`).
 - Keep determinism honest: if your node calls an LLM, set `"determinism": "stochastic"`. The runtime uses this to decide caching eligibility (v1.1) and to set expectations for resume behavior.
 
 ## 3. Declare input/output schemas
@@ -57,7 +57,7 @@ Common capability patterns:
 | Use any Claude model | `model:claude-*` |
 | Use a custom tool | `tool:gh` |
 | Spawn a subtask | `spawn:@acme/node-subtask` |
-| Run a shell command | `shell.exec:npm|tsc` |
+| Run any shell command | `shell.exec:` (scopeless — command text is not part of the capability grammar; filter commands in the runner) |
 
 Capabilities are globs only — no regex. Wildcards: `*` (one segment) and `**` (multiple). See sub-plan 02 §1.1 for the grammar.
 

@@ -54,11 +54,11 @@ cd node-bug-triage
 npm install
 npm test          # smoke test should pass
 npm run build
-agenteer publish --dir . --dry-run
-agenteer publish --dir .
+npx @agenteer/cli publish --dir . --dry-run
+npx @agenteer/cli publish --dir .
 ```
 
-Add `--provenance` when you're publishing from a CI/OIDC environment that supports npm provenance. See the [publishing guide](https://github.com/salehsquared/agenteer/blob/main/docs/publishing-a-node.md) for the full walkthrough, or `agenteer install <your-package>` to try it from a fresh workflow.
+Add `--provenance` when you're publishing from a CI/OIDC environment that supports npm provenance. See the [publishing guide](https://github.com/salehsquared/agenteer/blob/main/docs/publishing-a-node.md) for the full walkthrough, or `npx @agenteer/cli install <your-package> --workflow-dir ./my-workflow` to try it from a fresh workflow.
 
 ## License
 

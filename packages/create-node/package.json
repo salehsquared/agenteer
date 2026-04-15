@@ -1,6 +1,6 @@
 {
   "name": "@agenteer/create-node",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Scaffold a new Agenteer node package ready to publish. Run with `npx @agenteer/create-node @scope/node-name`.",
   "keywords": [
     "agenteer",
@@ -45,9 +45,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && chmod +x dist/bin/create-node.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {},
   "devDependencies": {

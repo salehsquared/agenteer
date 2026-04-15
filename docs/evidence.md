@@ -132,7 +132,7 @@ Two places evidence lands:
 
 Return an `EvidenceDelta`:
 
-```ts
+```text
 return {
   kind: "output",
   value: /* ... */,
@@ -219,18 +219,28 @@ Two implementations ship in 1.0:
 - **`MemoryEvidenceSink`** (from `@agenteer/core`). In-process Map; drops on exit. Use in tests.
 - **`YamlEvidenceStore`** (from `@agenteer/trust/evidence`). Durable, one YAML file per record, append-only. Use in sessions.
 
-Both implement the same `EvidenceStore` interface; the runtime doesn't care which you pass. If you want S3 or SQLite backing, implement the interface yourself — four methods (`put`, `get`, `list`, `markStale`).
+Both implement the same `EvidenceStore` interface; the runtime doesn't care which you pass. If you want S3 or SQLite backing, implement the interface yourself. The full surface is:
+
+- `put(record)` — append a record.
+- `get(id)` — look up by id.
+- `list(filter?)` — filter by verdict, kind, claims, staleness, run timestamps, etc.
+- `queryByClaim({ type, id })` — reverse index into claim-refs.
+- `markStale(id, marker)` / `markAllStale(filter?, marker?)` — manual staleness.
+- `refreshStaleness()` — re-evaluate and report stale records / touched claim-refs.
+- `on(event, handler)` — subscribe to `put` / `stale` / `refresh` events.
 
 ## Using evidence outside Agenteer
 
 `@agenteer/trust/evidence` is intentionally standalone. You can adopt evidence records in any Node project, even without the runtime:
 
-```ts
+```text
 import { YamlEvidenceStore, EvidenceRecordSchema } from "@agenteer/trust/evidence";
 
 const store = new YamlEvidenceStore({ dir: "./evidence" });
-await store.put({ /* ... */ });
+await store.put({ /* ... EvidencePutInput ... */ });
 ```
+
+For the complete put shape (`id`, `evidence_version`, `run`, `tool`, `result`, `claim_refs`) see the "Directly, outside the node lifecycle" block above, which is a full compilable example.
 
 Useful for CI pipelines that want a durable audit trail, for test reporters that want claim-based gating, or for any system that benefits from "structured verdict with stale tracking" as a primitive.
 
