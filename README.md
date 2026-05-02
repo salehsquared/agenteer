@@ -163,6 +163,8 @@ If you patch one package locally for a bugfix PR, bump all six versions together
 - [Evidence records](docs/evidence.md) — verdict semantics, lineage, staleness, reading a trace.
 - [CLI reference](docs/cli.md) — every command, every flag.
 - [Publishing a node](docs/publishing-a-node.md) — scaffold, validate, publish, troubleshoot.
+- [Research pipeline](docs/research-pipeline.md) — CLI-first dogfood loop for dataset-backed research packets.
+- [Research pipeline nodes](examples/research-pipeline-nodes/README.md) — reusable deterministic nodes for protocol design, critique, scout, analysis, QA, manifest, and export.
 - [Verdaccio verification](packages/registry/VERDACCIO.md) — real-registry walkthrough for the publish → install story.
 - [Research assistant demo](examples/research-assistant/README.md) — runnable 6-stdlib-node composition.
 - [Changelog](CHANGELOG.md) — per-release notes.

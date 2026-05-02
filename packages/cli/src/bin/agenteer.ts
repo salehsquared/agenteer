@@ -42,6 +42,46 @@ import {
   cliConfirm,
 } from "../commands/install.js";
 import { searchCommand, renderSearchHits } from "../commands/search.js";
+import {
+  labMedbreviaNhanesCommand,
+  renderLabMedbreviaNhanesResult,
+} from "../commands/lab.js";
+import {
+  researchDesignCommand,
+  researchCritiquePacketCommand,
+  researchApprovePacketCommand,
+  researchAnalyzeLocalCommand,
+  researchCheckpointCommand,
+  researchArtifactManifestCommand,
+  researchLoopStatusCommand,
+  researchLoopNoteCommand,
+  researchRunnerSpecCommand,
+  researchExportPacketCommand,
+  researchPipelineStagesCommand,
+  researchReviewReportCommand,
+  researchInspectPacketCommand,
+  researchQuestionsCommand,
+  researchScoutPlanCommand,
+  renderResearchPacketCritique,
+  renderResearchApproval,
+  renderResearchAnalysisResult,
+  renderResearchCheckpoint,
+  renderResearchCheckpointJson,
+  renderResearchArtifactManifest,
+  renderResearchLoopStatus,
+  renderResearchLoopStatusJson,
+  renderResearchLoopNote,
+  renderResearchRunnerSpec,
+  renderResearchPacketExport,
+  renderResearchPipelineStages,
+  renderResearchPipelineStagesJson,
+  renderResearchReportReview,
+  renderResearchPacketInspect,
+  renderResearchDesignResult,
+  renderResearchQuestions,
+  renderResearchScoutPlan,
+  type ResearchProject,
+} from "../commands/research.js";
 
 async function main(argv: readonly string[]): Promise<number> {
   const [cmd, ...rest] = argv;
@@ -66,6 +106,10 @@ async function main(argv: readonly string[]): Promise<number> {
       return installCmd(rest);
     case "search":
       return searchCmd(rest);
+    case "lab":
+      return labCmd(rest);
+    case "research":
+      return researchCmd(rest);
     default:
       console.error(`unknown command: ${cmd}`);
       printHelp();
@@ -85,6 +129,22 @@ Usage:
   agenteer publish --dir <pkg-dir> [--provenance] [--dry-run] [--registry <url>]
   agenteer install <spec>  --workflow-dir <dir> [--yes] [--grant <cap>]* [--registry <url>]
   agenteer search  <query> [--registry <url>]
+  agenteer lab     medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
+  agenteer research design --project medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
+  agenteer research questions --project medbrevia-nhanes --repo <medbrevia_v3> [--limit <n>]
+  agenteer research stages [--json]
+  agenteer research inspect --packet <dir>
+  agenteer research critique --packet <dir>
+  agenteer research scout --packet <dir>
+  agenteer research approve --packet <dir> [--note <text>]
+  agenteer research analyze --packet <dir> --fixture <rows.json>
+  agenteer research review-report --packet <dir>
+  agenteer research manifest --packet <dir>
+  agenteer research runner-spec --packet <dir>
+  agenteer research export --packet <dir> --out <dir>
+  agenteer research loop-status [--state <dir>] [--json]
+  agenteer research loop-note --cycle <n> --summary <text> [--next <text>] [--state <dir>]
+  agenteer research checkpoint --packet <dir> [--json]
 
 Common flags:
   --session <dir>   Session directory (context/ + evidence/ + session.yaml)
@@ -299,6 +359,152 @@ async function searchCmd(argv: readonly string[]): Promise<number> {
   });
   console.log(renderSearchHits(hits));
   return 0;
+}
+
+async function labCmd(argv: readonly string[]): Promise<number> {
+  const [sub, ...rest] = argv;
+  const { flags } = parseArgs(rest);
+  switch (sub) {
+    case "medbrevia-nhanes": {
+      const repoDir = requireFlagString(flags, "repo");
+      const question = requireFlagString(flags, "question");
+      const result = await labMedbreviaNhanesCommand({
+        repoDir,
+        question,
+        ...(flagString(flags, "out") ? { outDir: flagString(flags, "out")! } : {}),
+      });
+      console.log(renderLabMedbreviaNhanesResult(result));
+      if (result.outDir) console.log(`wrote: ${result.outDir}`);
+      return result.diagnostics.blockers.length ? 1 : 0;
+    }
+    default:
+      console.error(`lab: unknown subcommand '${sub ?? ""}'`);
+      console.error("usage: agenteer lab medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]");
+      return 2;
+  }
+}
+
+async function researchCmd(argv: readonly string[]): Promise<number> {
+  const [sub, ...rest] = argv;
+  const { flags } = parseArgs(rest);
+  switch (sub) {
+    case "design": {
+      const project = requireFlagString(flags, "project") as ResearchProject;
+      const repoDir = requireFlagString(flags, "repo");
+      const question = requireFlagString(flags, "question");
+      const result = await researchDesignCommand({
+        project,
+        repoDir,
+        question,
+        ...(flagString(flags, "out") ? { outDir: flagString(flags, "out")! } : {}),
+      });
+      console.log(renderResearchDesignResult(result));
+      if (result.outDir) console.log(`wrote: ${result.outDir}`);
+      return result.diagnostics.blockers.length ? 1 : 0;
+    }
+    case "questions": {
+      const project = requireFlagString(flags, "project") as ResearchProject;
+      const repoDir = requireFlagString(flags, "repo");
+      const limitText = flagString(flags, "limit");
+      const limit = limitText ? Number.parseInt(limitText, 10) : undefined;
+      const candidates = await researchQuestionsCommand({
+        project,
+        repoDir,
+        ...(Number.isFinite(limit) && limit! > 0 ? { limit } : {}),
+      });
+      console.log(renderResearchQuestions(candidates));
+      return 0;
+    }
+    case "stages": {
+      const stages = researchPipelineStagesCommand();
+      console.log(flags.json === true ? renderResearchPipelineStagesJson(stages) : renderResearchPipelineStages(stages));
+      return 0;
+    }
+    case "inspect": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchInspectPacketCommand(packetDir);
+      console.log(renderResearchPacketInspect(result));
+      return result.blockers ? 1 : 0;
+    }
+    case "critique": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchCritiquePacketCommand(packetDir);
+      console.log(renderResearchPacketCritique(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "scout": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchScoutPlanCommand(packetDir, flagString(flags, "fixture"));
+      console.log(renderResearchScoutPlan(result));
+      return 0;
+    }
+    case "approve": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchApprovePacketCommand(packetDir, flagString(flags, "note") ?? "");
+      console.log(renderResearchApproval(result));
+      return 0;
+    }
+    case "analyze": {
+      const packetDir = requireFlagString(flags, "packet");
+      const fixture = requireFlagString(flags, "fixture");
+      const result = await researchAnalyzeLocalCommand(packetDir, fixture);
+      console.log(renderResearchAnalysisResult(result));
+      return 0;
+    }
+    case "review-report": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchReviewReportCommand(packetDir);
+      console.log(renderResearchReportReview(result));
+      return result.status === "pass" ? 0 : 1;
+    }
+    case "manifest": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchArtifactManifestCommand(packetDir);
+      console.log(renderResearchArtifactManifest(result));
+      return 0;
+    }
+    case "runner-spec": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchRunnerSpecCommand(packetDir);
+      console.log(renderResearchRunnerSpec(result));
+      return 0;
+    }
+    case "export": {
+      const packetDir = requireFlagString(flags, "packet");
+      const outDir = requireFlagString(flags, "out");
+      const result = await researchExportPacketCommand(packetDir, outDir);
+      console.log(renderResearchPacketExport(result));
+      return 0;
+    }
+    case "loop-status": {
+      const result = await researchLoopStatusCommand(flagString(flags, "state") ?? undefined);
+      console.log(flags.json === true ? renderResearchLoopStatusJson(result) : renderResearchLoopStatus(result));
+      return result.stateExists ? 0 : 1;
+    }
+    case "loop-note": {
+      const cycleText = requireFlagString(flags, "cycle");
+      const cycle = Number.parseInt(cycleText, 10);
+      if (!Number.isFinite(cycle) || cycle < 1) throw new Error("research loop-note: --cycle must be a positive integer");
+      const result = await researchLoopNoteCommand({
+        cycle,
+        summary: requireFlagString(flags, "summary"),
+        ...(flagString(flags, "next") ? { nextAction: flagString(flags, "next")! } : {}),
+        ...(flagString(flags, "state") ? { stateDir: flagString(flags, "state")! } : {}),
+      });
+      console.log(renderResearchLoopNote(result));
+      return 0;
+    }
+    case "checkpoint": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchCheckpointCommand(packetDir);
+      console.log(flags.json === true ? renderResearchCheckpointJson(result) : renderResearchCheckpoint(result));
+      return 0;
+    }
+    default:
+      console.error(`research: unknown subcommand '${sub ?? ""}'`);
+      console.error("usage: agenteer research design --project medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]");
+      return 2;
+  }
 }
 
 function collectStringList(
