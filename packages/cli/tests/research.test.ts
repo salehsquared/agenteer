@@ -56,6 +56,30 @@ import {
   renderResearchRealStudyChecklistJson,
   renderResearchAdapterGapReport,
   renderResearchAdapterGapReportJson,
+  renderResearchVariableMap,
+  renderResearchVariableMapJson,
+  renderResearchVariableMapSuggestion,
+  renderResearchVariableMapSuggestionJson,
+  renderResearchVariableMapApplyResult,
+  renderResearchVariableMapApplyResultJson,
+  renderResearchWorkflowScorecard,
+  renderResearchWorkflowScorecardJson,
+  renderResearchEvidenceGapReport,
+  renderResearchEvidenceGapReportJson,
+  renderResearchPacketDiff,
+  renderResearchPacketDiffJson,
+  renderResearchNodeProposal,
+  renderResearchNodeProposalJson,
+  renderResearchNodeProposalRegistry,
+  renderResearchNodeProposalRegistryJson,
+  renderResearchCostLedger,
+  renderResearchCostLedgerJson,
+  renderResearchQuestionBank,
+  renderResearchQuestionBankJson,
+  renderResearchQuestionReadiness,
+  renderResearchQuestionReadinessJson,
+  renderResearchSchemaInference,
+  renderResearchSchemaInferenceJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
   renderResearchCheckpoint,
@@ -88,6 +112,18 @@ import {
   researchRealLocalRunnerSpecCommand,
   researchRealStudyChecklistCommand,
   researchAdapterGapReportCommand,
+  researchVariableMapCommand,
+  researchSuggestVariableMapCommand,
+  researchApplyVariableMapSuggestionsCommand,
+  researchWorkflowScorecardCommand,
+  researchEvidenceGapReportCommand,
+  researchPacketDiffCommand,
+  researchNodeProposalCommand,
+  researchNodeProposalRegistryCommand,
+  researchCostLedgerCommand,
+  researchQuestionBankCommand,
+  researchQuestionReadinessCommand,
+  researchInferSchemaCommand,
   researchPipelineStagesCommand,
   researchApprovePacketCommand,
   researchCheckpointCommand,
@@ -510,6 +546,328 @@ describe("researchDesignCommand", () => {
       await rm(repo, { recursive: true, force: true });
       await rm(outDir, { recursive: true, force: true });
     }
+  });
+
+  it("records variable mappings for real local data adapters", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-variable-map-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, "[]\n");
+
+      const map = await researchVariableMapCommand(outDir, dataFile, ["LBXVIDMS:vitamin_d", "BPXSY1:systolic"]);
+      const parsed = JSON.parse(renderResearchVariableMapJson(map)) as {
+        schemaVersion: number;
+        variableMap: { mappings: unknown[] };
+      };
+
+      expect(map.mappings).toHaveLength(2);
+      expect(map.mappings[0]?.column).toBe("vitamin_d");
+      expect(renderResearchVariableMap(map)).toContain("research variable map");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("infers schema from local JSON rows", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-schema-infer-"));
+    const file = path.join(dir, "rows.json");
+    try {
+      await writeFile(file, `${JSON.stringify([
+        { AGE: 44, SEX: "male", HTN: true },
+        { AGE: 58, SEX: "female", HTN: false },
+      ], null, 2)}\n`);
+
+      const schema = await researchInferSchemaCommand(file);
+      const parsed = JSON.parse(renderResearchSchemaInferenceJson(schema)) as {
+        schemaVersion: number;
+        schemaInference: { columns: Array<{ name: string }> };
+      };
+
+      expect(schema.columns.find(column => column.name === "AGE")?.inferredType).toBe("number");
+      expect(schema.columns.find(column => column.name === "SEX")?.inferredType).toBe("string");
+      expect(renderResearchSchemaInference(schema)).toContain("research schema inference");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("suggests variable mappings from required runner variables and inferred schema", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-variable-map-suggest-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, `${JSON.stringify([
+        { LBXVIDMS: 19, BPXSY1: 132, WTMEC2YR: 0.4 },
+        { LBXVIDMS: 33, BPXSY1: 118, WTMEC2YR: 0.6 },
+      ], null, 2)}\n`);
+      await researchDataAccessManifestCommand(outDir, [dataFile]);
+      await researchRealLocalRunnerSpecCommand(outDir);
+
+      const result = await researchSuggestVariableMapCommand(outDir, dataFile);
+      const parsed = JSON.parse(renderResearchVariableMapSuggestionJson(result)) as {
+        schemaVersion: number;
+        variableMapSuggestion: { suggestions: Array<{ variable: string; column: string }> };
+      };
+
+      expect(result.suggestions).toContainEqual(expect.objectContaining({ variable: "BPXSY1", column: "BPXSY1" }));
+      expect(result.suggestions).toContainEqual(expect.objectContaining({ variable: "LBXVIDMS", column: "LBXVIDMS" }));
+      expect(renderResearchVariableMapSuggestion(result)).toContain("research variable map suggestions");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.variableMapSuggestion.suggestions.some(suggestion => suggestion.variable === "WTMEC2YR")).toBe(true);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("applies variable map suggestions and closes adapter gaps when all variables match", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-variable-map-apply-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await researchScoutPlanCommand(outDir);
+      const scout = JSON.parse(await readFile(path.join(outDir, "scout-plan.json"), "utf-8")) as { requiredVariables: string[] };
+      const row = Object.fromEntries(scout.requiredVariables.map(variable => [variable, variable === "RIAGENDR" ? 1 : 10]));
+      await writeFile(dataFile, `${JSON.stringify([row], null, 2)}\n`);
+      await researchDataAccessManifestCommand(outDir, [dataFile]);
+      await researchRealLocalRunnerSpecCommand(outDir);
+
+      const applied = await researchApplyVariableMapSuggestionsCommand(outDir, dataFile);
+      const parsed = JSON.parse(renderResearchVariableMapApplyResultJson(applied)) as {
+        schemaVersion: number;
+        variableMapApplyResult: { adapterStatus: string };
+      };
+
+      expect(applied.adapterStatus).toBe("mapping_ready");
+      expect(applied.skippedVariables).toHaveLength(0);
+      expect(renderResearchVariableMapApplyResult(applied)).toContain("research apply variable map suggestions");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.variableMapApplyResult.adapterStatus).toBe("mapping_ready");
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("scores workflow packets with evaluator-first checks", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-workflow-scorecard-"));
+    try {
+      await researchSimulateStudyCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Is smoking history associated with measured blood pressure differently by sex among NHANES adults?",
+        outDir,
+      });
+      await researchDataAccessManifestCommand(outDir, [path.join(outDir, "rows.json")]);
+      await researchRealLocalRunnerSpecCommand(outDir);
+      await researchApplyVariableMapSuggestionsCommand(outDir, path.join(outDir, "rows.json"));
+
+      const scorecard = await researchWorkflowScorecardCommand(outDir);
+      const parsed = JSON.parse(renderResearchWorkflowScorecardJson(scorecard)) as {
+        schemaVersion: number;
+        workflowScorecard: { score: number; checks: unknown[] };
+      };
+
+      expect(scorecard.score).toBeGreaterThanOrEqual(60);
+      expect(scorecard.status).not.toBe("blocked");
+      expect(renderResearchWorkflowScorecard(scorecard)).toContain("research workflow scorecard");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.workflowScorecard.checks).toHaveLength(8);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("reports evidence gaps for generated research reports", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-evidence-gap-"));
+    try {
+      await researchSimulateStudyCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Among NHANES adults, is self-reported high blood pressure associated with measured hypertension?",
+        outDir,
+      });
+      await researchArtifactManifestCommand(outDir);
+      await researchProvenanceCommand(outDir);
+
+      const report = await researchEvidenceGapReportCommand(outDir);
+      const parsed = JSON.parse(renderResearchEvidenceGapReportJson(report)) as {
+        schemaVersion: number;
+        evidenceGapReport: { checks: Array<{ id: string }> };
+      };
+
+      expect(report.checks.map(check => check.id)).toEqual(expect.arrayContaining(["report", "analysis-artifact", "fixture-caveat", "citation-coverage"]));
+      expect(report.checks.find(check => check.id === "fixture-caveat")?.status).toBe("pass");
+      expect(renderResearchEvidenceGapReport(report)).toContain("research evidence gap report");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.evidenceGapReport.checks.length).toBeGreaterThan(3);
+      expect(JSON.parse(await readFile(path.join(outDir, "evidence-gap-report.json"), "utf-8"))).toMatchObject({ status: report.status });
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("diffs tracked artifacts between research packets", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-packet-diff-"));
+    const base = path.join(dir, "base");
+    const compare = path.join(dir, "compare");
+    try {
+      await mkdir(base);
+      await mkdir(compare);
+      await writeFile(path.join(base, "design.json"), "{\"version\":1}\n");
+      await writeFile(path.join(compare, "design.json"), "{\"version\":2}\n");
+      await writeFile(path.join(compare, "report.md"), "# Report\n");
+
+      const diff = await researchPacketDiffCommand(base, compare);
+      const parsed = JSON.parse(renderResearchPacketDiffJson(diff)) as {
+        schemaVersion: number;
+        packetDiff: { addedArtifacts: string[]; changedArtifacts: string[] };
+      };
+
+      expect(diff.addedArtifacts).toContain("report.md");
+      expect(diff.changedArtifacts).toContain("design.json");
+      expect(renderResearchPacketDiff(diff)).toContain("research packet diff");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.packetDiff.addedArtifacts).toContain("report.md");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("creates node proposals with evaluator and cost metadata", () => {
+    const proposal = researchNodeProposalCommand({
+      id: "citation-coverage",
+      purpose: "Check report claims against cited evidence records.",
+      evaluator: "research evidence-gap --packet <packet>",
+      rollback: "Remove node if it blocks fixture-only packets without factual claims.",
+      costUsd: 0,
+    });
+    const parsed = JSON.parse(renderResearchNodeProposalJson(proposal)) as {
+      schemaVersion: number;
+      nodeProposal: { status: string; promotionCriteria: string[] };
+    };
+
+    expect(proposal.status).toBe("candidate");
+    expect(proposal.promotionCriteria.length).toBeGreaterThan(1);
+    expect(renderResearchNodeProposal(proposal)).toContain("research node proposal");
+    expect(parsed.schemaVersion).toBe(1);
+    expect(parsed.nodeProposal.status).toBe("candidate");
+  });
+
+  it("loads node proposal registries from JSON proposal files", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-node-registry-"));
+    try {
+      const proposal = researchNodeProposalCommand({
+        id: "scorecard",
+        purpose: "Evaluate packet promotion readiness.",
+        evaluator: "research workflow-scorecard --packet <packet>",
+        rollback: "Rollback if scorecard creates false blockers.",
+        costUsd: 0,
+      });
+      await writeFile(path.join(dir, "scorecard.json"), renderResearchNodeProposalJson(proposal));
+
+      const registry = await researchNodeProposalRegistryCommand(dir);
+      const parsed = JSON.parse(renderResearchNodeProposalRegistryJson(registry)) as {
+        schemaVersion: number;
+        nodeProposalRegistry: { proposals: Array<{ id: string }> };
+      };
+
+      expect(registry.proposals.map(item => item.id)).toContain("scorecard");
+      expect(registry.totalCostEnvelopeUsd).toBe(0);
+      expect(renderResearchNodeProposalRegistry(registry)).toContain("research node proposal registry");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.nodeProposalRegistry.proposals[0]?.id).toBe("scorecard");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes observed and proposed research loop costs", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-cost-ledger-"));
+    const packet = path.join(dir, "packet");
+    const proposals = path.join(dir, "proposals");
+    try {
+      await mkdir(packet);
+      await mkdir(proposals);
+      await writeFile(path.join(packet, "runner-spec.json"), JSON.stringify({
+        safety: { cloudSpendUsd: 0 },
+      }));
+      await writeFile(path.join(proposals, "candidate.json"), renderResearchNodeProposalJson(researchNodeProposalCommand({
+        id: "candidate",
+        purpose: "Try a local evaluator.",
+        evaluator: "npm test",
+        rollback: "Remove if noisy.",
+        costUsd: 0,
+      })));
+
+      const ledger = await researchCostLedgerCommand({ packetDir: packet, proposalDir: proposals });
+      const parsed = JSON.parse(renderResearchCostLedgerJson(ledger)) as {
+        schemaVersion: number;
+        costLedger: { status: string };
+      };
+
+      expect(ledger.status).toBe("within_budget");
+      expect(ledger.observedCloudSpendUsd).toBe(0);
+      expect(renderResearchCostLedger(ledger)).toContain("research cost ledger");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.costLedger.status).toBe("within_budget");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("provides general medical research question bank candidates", () => {
+    const bank = researchQuestionBankCommand("medical");
+    const parsed = JSON.parse(renderResearchQuestionBankJson(bank)) as {
+      schemaVersion: number;
+      questionBank: { questions: Array<{ id: string; datasetNeeds: string[] }> };
+    };
+
+    expect(bank.questions.map(question => question.id)).toContain("clinical-prediction-calibration");
+    expect(bank.questions.every(question => question.datasetNeeds.length > 1)).toBe(true);
+    expect(renderResearchQuestionBank(bank)).toContain("research question bank");
+    expect(parsed.schemaVersion).toBe(1);
+    expect(parsed.questionBank.questions[0]?.datasetNeeds.length).toBeGreaterThan(1);
+  });
+
+  it("scores registry-independent question readiness before protocol design", () => {
+    const readiness = researchQuestionReadinessCommand("Among adults with hypertension, is medication adherence associated with blood pressure control?");
+    const parsed = JSON.parse(renderResearchQuestionReadinessJson(readiness)) as {
+      schemaVersion: number;
+      questionReadiness: { score: number; status: string };
+    };
+
+    expect(readiness.status).toBe("ready_for_protocol");
+    expect(readiness.score).toBe(100);
+    expect(renderResearchQuestionReadiness(readiness)).toContain("research question readiness");
+    expect(parsed.schemaVersion).toBe(1);
+    expect(parsed.questionReadiness.status).toBe("ready_for_protocol");
   });
 
   it("renders reusable research pipeline stages as machine-readable JSON", () => {
@@ -1320,6 +1678,7 @@ describe("researchDesignCommand", () => {
       expect(dashboard.checks.find(check => check.id === "provenance")?.status).toBe("pass");
       expect(renderResearchQaDashboard(dashboard)).toContain("research QA dashboard");
       expect(parsed.schemaVersion).toBe(1);
+      expect(JSON.parse(await readFile(path.join(packetDir, "qa-dashboard.json"), "utf-8"))).toMatchObject({ status: dashboard.status });
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(packetDir, { recursive: true, force: true });

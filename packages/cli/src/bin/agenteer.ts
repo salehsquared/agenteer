@@ -77,6 +77,18 @@ import {
   researchRealLocalRunnerSpecCommand,
   researchRealStudyChecklistCommand,
   researchAdapterGapReportCommand,
+  researchVariableMapCommand,
+  researchSuggestVariableMapCommand,
+  researchApplyVariableMapSuggestionsCommand,
+  researchWorkflowScorecardCommand,
+  researchEvidenceGapReportCommand,
+  researchPacketDiffCommand,
+  researchNodeProposalCommand,
+  researchNodeProposalRegistryCommand,
+  researchCostLedgerCommand,
+  researchQuestionBankCommand,
+  researchQuestionReadinessCommand,
+  researchInferSchemaCommand,
   researchPipelineStagesCommand,
   researchReviewReportCommand,
   researchInspectPacketCommand,
@@ -134,6 +146,30 @@ import {
   renderResearchRealStudyChecklistJson,
   renderResearchAdapterGapReport,
   renderResearchAdapterGapReportJson,
+  renderResearchVariableMap,
+  renderResearchVariableMapJson,
+  renderResearchVariableMapSuggestion,
+  renderResearchVariableMapSuggestionJson,
+  renderResearchVariableMapApplyResult,
+  renderResearchVariableMapApplyResultJson,
+  renderResearchWorkflowScorecard,
+  renderResearchWorkflowScorecardJson,
+  renderResearchEvidenceGapReport,
+  renderResearchEvidenceGapReportJson,
+  renderResearchPacketDiff,
+  renderResearchPacketDiffJson,
+  renderResearchNodeProposal,
+  renderResearchNodeProposalJson,
+  renderResearchNodeProposalRegistry,
+  renderResearchNodeProposalRegistryJson,
+  renderResearchCostLedger,
+  renderResearchCostLedgerJson,
+  renderResearchQuestionBank,
+  renderResearchQuestionBankJson,
+  renderResearchQuestionReadiness,
+  renderResearchQuestionReadinessJson,
+  renderResearchSchemaInference,
+  renderResearchSchemaInferenceJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
   renderResearchReportReview,
@@ -213,6 +249,18 @@ Usage:
   agenteer research real-runner-spec --packet <dir> [--json]
   agenteer research real-study-checklist --packet <dir> [--json]
   agenteer research adapter-gap-report --packet <dir> [--json]
+  agenteer research variable-map --packet <dir> --file <path> --map <VAR:COLUMN>* [--json]
+  agenteer research suggest-variable-map --packet <dir> --file <rows.json> [--json]
+  agenteer research apply-variable-map-suggestions --packet <dir> --file <rows.json> [--json]
+  agenteer research workflow-scorecard --packet <dir> [--json]
+  agenteer research evidence-gap --packet <dir> [--json]
+  agenteer research packet-diff --base <dir> --compare <dir> [--json]
+  agenteer research node-proposal --id <id> --purpose <text> --evaluator <text> --rollback <text> [--cost-usd <n>] [--promotion <text>*] [--json]
+  agenteer research node-registry --dir <proposal-dir> [--json]
+  agenteer research cost-ledger [--packet <dir>] [--proposal-dir <dir>] [--hard-stop-usd <n>] [--json]
+  agenteer research question-bank [--domain <medical|public-health>] [--json]
+  agenteer research question-readiness --question <text> [--json]
+  agenteer research infer-schema --file <rows.json> [--json]
   agenteer research stages [--json]
   agenteer research inspect --packet <dir>
   agenteer research critique --packet <dir>
@@ -604,6 +652,77 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       const result = await researchAdapterGapReportCommand(requireFlagString(flags, "packet"));
       console.log(flags.json === true ? renderResearchAdapterGapReportJson(result) : renderResearchAdapterGapReport(result));
       return result.status === "mapping_ready" ? 0 : 1;
+    }
+    case "variable-map": {
+      const result = await researchVariableMapCommand(requireFlagString(flags, "packet"), requireFlagString(flags, "file"), flagList(flags, "map"));
+      console.log(flags.json === true ? renderResearchVariableMapJson(result) : renderResearchVariableMap(result));
+      return 0;
+    }
+    case "suggest-variable-map": {
+      const result = await researchSuggestVariableMapCommand(requireFlagString(flags, "packet"), requireFlagString(flags, "file"));
+      console.log(flags.json === true ? renderResearchVariableMapSuggestionJson(result) : renderResearchVariableMapSuggestion(result));
+      return result.unmatchedVariables.length ? 1 : 0;
+    }
+    case "apply-variable-map-suggestions": {
+      const result = await researchApplyVariableMapSuggestionsCommand(requireFlagString(flags, "packet"), requireFlagString(flags, "file"));
+      console.log(flags.json === true ? renderResearchVariableMapApplyResultJson(result) : renderResearchVariableMapApplyResult(result));
+      return result.adapterStatus === "mapping_ready" ? 0 : 1;
+    }
+    case "workflow-scorecard": {
+      const result = await researchWorkflowScorecardCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchWorkflowScorecardJson(result) : renderResearchWorkflowScorecard(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "evidence-gap": {
+      const result = await researchEvidenceGapReportCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchEvidenceGapReportJson(result) : renderResearchEvidenceGapReport(result));
+      return result.status === "ready" ? 0 : 1;
+    }
+    case "packet-diff": {
+      const result = await researchPacketDiffCommand(requireFlagString(flags, "base"), requireFlagString(flags, "compare"));
+      console.log(flags.json === true ? renderResearchPacketDiffJson(result) : renderResearchPacketDiff(result));
+      return 0;
+    }
+    case "node-proposal": {
+      const result = researchNodeProposalCommand({
+        id: requireFlagString(flags, "id"),
+        purpose: requireFlagString(flags, "purpose"),
+        evaluator: requireFlagString(flags, "evaluator"),
+        rollback: requireFlagString(flags, "rollback"),
+        costUsd: Number(flagString(flags, "cost-usd") ?? "0"),
+        promotion: flagList(flags, "promotion"),
+      });
+      console.log(flags.json === true ? renderResearchNodeProposalJson(result) : renderResearchNodeProposal(result));
+      return 0;
+    }
+    case "node-registry": {
+      const result = await researchNodeProposalRegistryCommand(requireFlagString(flags, "dir"));
+      console.log(flags.json === true ? renderResearchNodeProposalRegistryJson(result) : renderResearchNodeProposalRegistry(result));
+      return 0;
+    }
+    case "cost-ledger": {
+      const result = await researchCostLedgerCommand({
+        packetDir: flagString(flags, "packet") ?? undefined,
+        proposalDir: flagString(flags, "proposal-dir") ?? undefined,
+        hardStopUsd: Number(flagString(flags, "hard-stop-usd") ?? "30"),
+      });
+      console.log(flags.json === true ? renderResearchCostLedgerJson(result) : renderResearchCostLedger(result));
+      return result.status === "within_budget" ? 0 : 1;
+    }
+    case "question-bank": {
+      const result = researchQuestionBankCommand(flagString(flags, "domain") ?? "medical");
+      console.log(flags.json === true ? renderResearchQuestionBankJson(result) : renderResearchQuestionBank(result));
+      return 0;
+    }
+    case "question-readiness": {
+      const result = researchQuestionReadinessCommand(requireFlagString(flags, "question"));
+      console.log(flags.json === true ? renderResearchQuestionReadinessJson(result) : renderResearchQuestionReadiness(result));
+      return result.status === "ready_for_protocol" ? 0 : 1;
+    }
+    case "infer-schema": {
+      const result = await researchInferSchemaCommand(requireFlagString(flags, "file"));
+      console.log(flags.json === true ? renderResearchSchemaInferenceJson(result) : renderResearchSchemaInference(result));
+      return 0;
     }
     case "stages": {
       const stages = researchPipelineStagesCommand();

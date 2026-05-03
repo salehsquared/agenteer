@@ -117,6 +117,18 @@ agenteer research data-access --packet ./packet --file ./rows.parquet --json
 agenteer research real-runner-spec --packet ./packet --json
 agenteer research real-study-checklist --packet ./packet --json
 agenteer research adapter-gap-report --packet ./packet --json
+agenteer research variable-map --packet ./packet --file ./rows.parquet --map BPXSY1:systolic --json
+agenteer research suggest-variable-map --packet ./packet --file ./rows.json --json
+agenteer research apply-variable-map-suggestions --packet ./packet --file ./rows.json --json
+agenteer research workflow-scorecard --packet ./packet --json
+agenteer research evidence-gap --packet ./packet --json
+agenteer research packet-diff --base ./packet-v1 --compare ./packet-v2 --json
+agenteer research node-proposal --id evidence-gap --purpose "..." --evaluator "..." --rollback "..." --json
+agenteer research node-registry --dir ./node-proposals --json
+agenteer research cost-ledger --packet ./packet --proposal-dir ./node-proposals --json
+agenteer research question-bank --domain medical --json
+agenteer research question-readiness --question "..." --json
+agenteer research infer-schema --file ./rows.json --json
 agenteer research ro-crate --packet ./packet --json
 agenteer research provenance --packet ./packet --json
 agenteer research qa-dashboard --packet ./packet --json

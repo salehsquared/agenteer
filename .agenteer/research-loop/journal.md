@@ -267,3 +267,78 @@ Next: Cycle 55 should add an adapter gap report that compares packet requirement
 Added adapter-gap-report command to compare real local runner requirements against declared data access state and identify missing variable mapping evidence.
 
 Next: Cycle 56 should add a variable-map command to record file-to-variable mappings for real local data adapters.
+## Cycle 56
+
+Added variable-map command to record file-to-variable mappings for real local data adapters and let adapter-gap-report recognize mapped variables.
+
+Next: Cycle 57 should add a schema inference command for local JSON fixtures to suggest variable mappings automatically.
+## Cycle 57
+
+Added infer-schema command for local JSON rows to support automatic variable mapping and adapter setup.
+
+Next: Cycle 58 should add variable-map suggestion from inferred schema and required runner variables.
+## Cycle 58
+
+Added suggest-variable-map to infer local data columns and propose real-runner variable mappings.
+
+Next: Cycle 59 should add accepted-suggestion persistence or validation so adapter gaps can close from suggested maps.
+## Cycle 59
+
+Added apply-variable-map-suggestions to persist accepted schema-derived mappings and verify adapter readiness.
+
+Next: Cycle 60 should incorporate current external agentic-workflow research into Agenteer/research-pipeline design guidance.
+## Cycle 60
+
+Added agentic workflow research notes from current Google/DeepMind papers, Deep Research API material, Polymath, and a small X signal sample.
+
+Next: Cycle 61 should add a workflow/node scorecard command to turn evaluator-first principles into CLI artifacts.
+## Cycle 61
+
+Added workflow-scorecard to evaluate packet readiness with explicit evaluator checks for QA, methods, report review, provenance, RO-Crate, adapter readiness, and manifesting.
+
+Next: Cycle 62 should persist QA dashboard artifacts so scorecards and manifests do not depend on implicit recomputation.
+## Cycle 62
+
+Persisted qa-dashboard.json and included it in research artifact manifests and exports.
+
+Next: Cycle 63 should add report evidence-gap/citation coverage checks for deep-research-style traceability.
+## Cycle 63
+
+Added evidence-gap report command for report traceability, artifact support, caveat presence, provenance, and citation coverage.
+
+Next: Cycle 64 should integrate evidence-gap status into the workflow scorecard.
+## Cycle 64
+
+Integrated evidence-gap status into workflow-scorecard and converted score calculation to a weighted percentage.
+
+Next: Cycle 65 should add packet diffing to compare research packet progression across cycles.
+## Cycle 65
+
+Added packet-diff for hashed tracked artifact comparisons and score deltas across research packets.
+
+Next: Cycle 66 should add node candidate metadata/proposal records with evaluator and cost envelopes.
+## Cycle 66
+
+Added node-proposal command for candidate node metadata, evaluator, rollback, promotion criteria, and cost envelope.
+
+Next: Cycle 67 should add a node proposal registry so candidate nodes can be accumulated and inspected.
+## Cycle 67
+
+Added node-registry command to inspect accumulated candidate node proposals and cost envelopes.
+
+Next: Cycle 68 should add a cost ledger command for explicit local/cloud spend accounting.
+## Cycle 68
+
+Added cost-ledger for observed packet spend, proposed node cost envelopes, and hard-stop budget status.
+
+Next: Cycle 69 should add a research question bank that goes beyond NHANES-specific candidate generation.
+## Cycle 69
+
+Added general question-bank command for medical/public-health research questions with dataset needs, design stressors, and analysis families.
+
+Next: Cycle 70 should add question-to-protocol readiness scoring for registry-independent questions.
+## Cycle 70
+
+Added question-readiness to score registry-independent research questions before protocol design.
+
+Next: Resume at cycle 71 by adding protocol skeleton generation for question-bank/readiness outputs.

@@ -474,6 +474,135 @@ export interface ResearchAdapterGapReport {
   nextAction: string;
 }
 
+export interface ResearchVariableMap {
+  packetDir: string;
+  mapPath: string;
+  mappings: Array<{
+    variable: string;
+    file: string;
+    column: string;
+  }>;
+}
+
+export interface ResearchVariableMapSuggestion {
+  packetDir: string;
+  file: string;
+  requiredVariables: string[];
+  suggestions: Array<{
+    variable: string;
+    column: string;
+    confidence: "high" | "medium";
+    reason: string;
+  }>;
+  unmatchedVariables: string[];
+  nextAction: string;
+}
+
+export interface ResearchVariableMapApplyResult {
+  packetDir: string;
+  file: string;
+  mapPath: string;
+  appliedMappings: ResearchVariableMap["mappings"];
+  skippedVariables: string[];
+  adapterStatus: ResearchAdapterGapReport["status"];
+  nextAction: string;
+}
+
+export interface ResearchWorkflowScorecard {
+  packetDir: string;
+  score: number;
+  status: "promote" | "improve" | "blocked";
+  checks: Array<{
+    id: string;
+    points: number;
+    maxPoints: number;
+    status: "pass" | "partial" | "fail";
+    detail: string;
+  }>;
+  nextAction: string;
+}
+
+export interface ResearchEvidenceGapReport {
+  packetDir: string;
+  status: "ready" | "needs_evidence";
+  reportPath: string | null;
+  citationCount: number;
+  checks: Array<{
+    id: string;
+    status: "pass" | "missing" | "needs_review";
+    detail: string;
+  }>;
+  nextAction: string;
+}
+
+export interface ResearchPacketDiff {
+  basePacketDir: string;
+  comparePacketDir: string;
+  addedArtifacts: string[];
+  removedArtifacts: string[];
+  changedArtifacts: string[];
+  unchangedArtifacts: string[];
+  scoreDelta: number | null;
+  nextAction: string;
+}
+
+export interface ResearchNodeProposal {
+  id: string;
+  purpose: string;
+  expectedEvaluator: string;
+  rollbackCondition: string;
+  costEnvelopeUsd: number;
+  promotionCriteria: string[];
+  status: "candidate";
+}
+
+export interface ResearchNodeProposalRegistry {
+  registryDir: string;
+  proposals: ResearchNodeProposal[];
+  totalCostEnvelopeUsd: number;
+  nextAction: string;
+}
+
+export interface ResearchCostLedger {
+  packetDir: string | null;
+  proposalDir: string | null;
+  observedCloudSpendUsd: number;
+  proposedCostEnvelopeUsd: number;
+  hardStopUsd: number;
+  status: "within_budget" | "hard_stop";
+  entries: Array<{ source: string; amountUsd: number; kind: "observed" | "proposed" }>;
+  nextAction: string;
+}
+
+export interface ResearchQuestionBank {
+  domain: string;
+  questions: Array<{
+    id: string;
+    question: string;
+    datasetNeeds: string[];
+    designStress: string[];
+    analysisFamily: string;
+  }>;
+}
+
+export interface ResearchQuestionReadiness {
+  question: string;
+  score: number;
+  status: "ready_for_protocol" | "needs_clarification";
+  missing: string[];
+  suggestedCommands: string[];
+}
+
+export interface ResearchSchemaInference {
+  file: string;
+  rowCount: number;
+  columns: Array<{
+    name: string;
+    inferredType: "number" | "string" | "boolean" | "mixed" | "empty";
+    nonMissing: number;
+  }>;
+}
+
 export async function researchDesignCommand(
   opts: ResearchDesignOptions,
 ): Promise<ResearchDesignResult> {
@@ -1180,12 +1309,14 @@ export async function researchQaDashboardCommand(packetDir: string): Promise<Res
     : checks.some(check => check.status === "missing" || check.status === "needs_review")
       ? "needs_review"
       : "ready";
-  return {
+  const dashboard: ResearchQaDashboard = {
     packetDir: resolved,
     status,
     checks,
     nextAction: status === "ready" ? "Packet is ready for durable review or downstream consumption." : "Resolve missing or needs-review checks before calling the packet ready.",
   };
+  await writeFile(path.join(resolved, "qa-dashboard.json"), `${JSON.stringify(dashboard, null, 2)}\n`);
+  return dashboard;
 }
 
 export function renderResearchQaDashboard(dashboard: ResearchQaDashboard): string {
@@ -1607,11 +1738,13 @@ export async function researchAdapterGapReportCommand(packetDir: string): Promis
   const resolved = path.resolve(packetDir);
   const realRunner = await readJsonIfPresent(path.join(resolved, "real-runner-spec.json")) as ResearchRealLocalRunnerSpec | null;
   const dataAccess = await readJsonIfPresent(path.join(resolved, "data-access.json")) as ResearchDataAccessManifest | null;
+  const variableMap = await readJsonIfPresent(path.join(resolved, "variable-map.json")) as ResearchVariableMap | null;
   const requiredVariables = realRunner?.requiredVariables ?? [];
+  const mappedVariables = new Set(variableMap?.mappings.map(mapping => mapping.variable) ?? []);
   const missingEvidence = [
     ...(!dataAccess ? ["data-access.json"] : []),
     ...(!realRunner ? ["real-runner-spec.json"] : []),
-    ...requiredVariables.map(variable => `variable:${variable}`),
+    ...requiredVariables.filter(variable => !mappedVariables.has(variable)).map(variable => `variable:${variable}`),
   ];
   return {
     packetDir: resolved,
@@ -1640,6 +1773,597 @@ export function renderResearchAdapterGapReportJson(report: ResearchAdapterGapRep
   return `${JSON.stringify({
     schemaVersion: 1,
     adapterGapReport: report,
+  }, null, 2)}\n`;
+}
+
+export async function researchVariableMapCommand(packetDir: string, file: string, mappings: string[]): Promise<ResearchVariableMap> {
+  const resolved = path.resolve(packetDir);
+  const resolvedFile = path.resolve(file);
+  const parsedMappings = mappings.map(mapping => {
+    const [variable, column] = mapping.split(":");
+    if (!variable || !column) throw new Error(`invalid --map '${mapping}', expected VARIABLE:COLUMN`);
+    return { variable, file: resolvedFile, column };
+  });
+  const result: ResearchVariableMap = {
+    packetDir: resolved,
+    mapPath: path.join(resolved, "variable-map.json"),
+    mappings: parsedMappings,
+  };
+  await writeFile(result.mapPath, `${JSON.stringify(result, null, 2)}\n`);
+  return result;
+}
+
+export function renderResearchVariableMap(result: ResearchVariableMap): string {
+  return [
+    `research variable map: ${result.packetDir}`,
+    `  path: ${result.mapPath}`,
+    `  mappings: ${result.mappings.length}`,
+    ...result.mappings.map(mapping => `  - ${mapping.variable} -> ${mapping.file}#${mapping.column}`),
+  ].join("\n");
+}
+
+export function renderResearchVariableMapJson(result: ResearchVariableMap): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    variableMap: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchSuggestVariableMapCommand(packetDir: string, file: string): Promise<ResearchVariableMapSuggestion> {
+  const resolved = path.resolve(packetDir);
+  const realRunner = await readJsonIfPresent(path.join(resolved, "real-runner-spec.json")) as ResearchRealLocalRunnerSpec | null;
+  const requiredVariables = realRunner?.requiredVariables ?? [];
+  const schema = await researchInferSchemaCommand(file);
+  const columnsByName = new Map(schema.columns.map(column => [column.name, column]));
+  const columnsByNormalizedName = new Map(schema.columns.map(column => [normalizeVariableName(column.name), column]));
+  const suggestions: ResearchVariableMapSuggestion["suggestions"] = [];
+  for (const variable of requiredVariables) {
+    const exact = columnsByName.get(variable);
+    if (exact) {
+      suggestions.push({
+        variable,
+        column: exact.name,
+        confidence: "high",
+        reason: "Required variable exactly matches an observed column name.",
+      });
+      continue;
+    }
+    const normalized = columnsByNormalizedName.get(normalizeVariableName(variable));
+    if (normalized) {
+      suggestions.push({
+        variable,
+        column: normalized.name,
+        confidence: "medium",
+        reason: "Required variable matches an observed column after case and punctuation normalization.",
+      });
+    }
+  }
+  const suggestedVariables = new Set(suggestions.map(suggestion => suggestion.variable));
+  const unmatchedVariables = requiredVariables.filter(variable => !suggestedVariables.has(variable));
+  return {
+    packetDir: resolved,
+    file: schema.file,
+    requiredVariables,
+    suggestions,
+    unmatchedVariables,
+    nextAction: unmatchedVariables.length
+      ? "Review unmatched variables, then persist accepted mappings with research variable-map."
+      : `Persist accepted mappings with: agenteer research variable-map --packet ${resolved} --file ${schema.file} ${suggestions.map(suggestion => `--map ${suggestion.variable}:${suggestion.column}`).join(" ")}`,
+  };
+}
+
+export function renderResearchVariableMapSuggestion(result: ResearchVariableMapSuggestion): string {
+  return [
+    `research variable map suggestions: ${result.packetDir}`,
+    `  file: ${result.file}`,
+    `  required variables: ${result.requiredVariables.join(", ") || "(none)"}`,
+    `  suggestions: ${result.suggestions.length}`,
+    ...result.suggestions.map(suggestion => `  - ${suggestion.variable} -> ${suggestion.column} (${suggestion.confidence}): ${suggestion.reason}`),
+    `  unmatched: ${result.unmatchedVariables.join(", ") || "(none)"}`,
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchVariableMapSuggestionJson(result: ResearchVariableMapSuggestion): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    variableMapSuggestion: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchApplyVariableMapSuggestionsCommand(packetDir: string, file: string): Promise<ResearchVariableMapApplyResult> {
+  const suggestion = await researchSuggestVariableMapCommand(packetDir, file);
+  const map = await researchVariableMapCommand(
+    suggestion.packetDir,
+    suggestion.file,
+    suggestion.suggestions.map(item => `${item.variable}:${item.column}`),
+  );
+  const gap = await researchAdapterGapReportCommand(suggestion.packetDir);
+  return {
+    packetDir: suggestion.packetDir,
+    file: suggestion.file,
+    mapPath: map.mapPath,
+    appliedMappings: map.mappings,
+    skippedVariables: suggestion.unmatchedVariables,
+    adapterStatus: gap.status,
+    nextAction: gap.status === "mapping_ready"
+      ? "Adapter mapping evidence is complete; proceed to local real-data runner implementation or human review."
+      : "Resolve skipped variables before real-data execution.",
+  };
+}
+
+export function renderResearchVariableMapApplyResult(result: ResearchVariableMapApplyResult): string {
+  return [
+    `research apply variable map suggestions: ${result.packetDir}`,
+    `  file: ${result.file}`,
+    `  map: ${result.mapPath}`,
+    `  applied mappings: ${result.appliedMappings.length}`,
+    `  skipped: ${result.skippedVariables.join(", ") || "(none)"}`,
+    `  adapter status: ${result.adapterStatus}`,
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchVariableMapApplyResultJson(result: ResearchVariableMapApplyResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    variableMapApplyResult: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchWorkflowScorecardCommand(packetDir: string): Promise<ResearchWorkflowScorecard> {
+  const resolved = path.resolve(packetDir);
+  const persistedQa = await readJsonIfPresent(path.join(resolved, "qa-dashboard.json")) as ResearchQaDashboard | null;
+  const qa = persistedQa ?? await researchQaDashboardCommand(resolved);
+  const methods = await readJsonIfPresent(path.join(resolved, "methods-validation.json")) as ResearchMethodsValidationResult | null;
+  const reportReview = await readJsonIfPresent(path.join(resolved, "report-review.json")) as ResearchReportReview | null;
+  const persistedEvidenceGap = await readJsonIfPresent(path.join(resolved, "evidence-gap-report.json")) as ResearchEvidenceGapReport | null;
+  const evidenceGap = persistedEvidenceGap ?? await researchEvidenceGapReportCommand(resolved);
+  const provenance = await readJsonIfPresent(path.join(resolved, "provenance.json")) as ResearchProvenanceGraph["graph"] | ResearchProvenanceGraph | null;
+  const provenanceGraph = provenance && "graph" in provenance ? provenance.graph : provenance;
+  const roCrate = await readJsonIfPresent(path.join(resolved, "ro-crate-metadata.json")) as ResearchRoCrateMetadata | null;
+  const adapterGap = await researchAdapterGapReportCommand(resolved).catch(() => null);
+  const manifest = await readJsonIfPresent(path.join(resolved, "artifact-manifest.json")) as ResearchArtifactManifest | null;
+  const checks: ResearchWorkflowScorecard["checks"] = [
+    scoreCheck("qa-dashboard", qa?.status === "ready" ? 20 : qa ? 10 : 0, 20, qa ? `QA status ${qa.status}.` : "QA dashboard missing."),
+    scoreCheck("methods-validation", methods?.status === "pass" ? 15 : methods ? 7 : 0, 15, methods ? `Methods validation status ${methods.status}.` : "Methods validation missing."),
+    scoreCheck("report-review", reportReview?.status === "pass" ? 15 : reportReview ? 7 : 0, 15, reportReview ? `Report review status ${reportReview.status}.` : "Report review missing."),
+    scoreCheck("provenance", provenanceGraph ? 15 : 0, 15, provenanceGraph ? `${provenanceGraph.entities.length} provenance entities recorded.` : "Provenance graph missing."),
+    scoreCheck("ro-crate", roCrate ? 10 : 0, 10, roCrate ? "RO-Crate metadata present." : "RO-Crate metadata missing."),
+    scoreCheck("evidence-gap", evidenceGap.status === "ready" ? 10 : 5, 10, `Evidence gap status ${evidenceGap.status}.`),
+    scoreCheck("adapter-readiness", adapterGap?.status === "mapping_ready" ? 15 : adapterGap ? 7 : 0, 15, adapterGap ? `Adapter status ${adapterGap.status}.` : "Adapter gap report unavailable."),
+    scoreCheck("manifest", manifest?.artifacts.length ? 10 : 0, 10, manifest?.artifacts.length ? `${manifest.artifacts.length} artifacts manifest recorded.` : "Artifact manifest missing."),
+  ];
+  const earned = checks.reduce((sum, check) => sum + check.points, 0);
+  const possible = checks.reduce((sum, check) => sum + check.maxPoints, 0);
+  const score = possible ? Math.round((earned / possible) * 100) : 0;
+  const status: ResearchWorkflowScorecard["status"] = checks.some(check => check.status === "fail" && check.maxPoints >= 15)
+    ? "blocked"
+    : score >= 85 ? "promote" : "improve";
+  return {
+    packetDir: resolved,
+    score,
+    status,
+    checks,
+    nextAction: status === "promote"
+      ? "Promote this packet shape as a stronger fixture and increase task difficulty."
+      : "Address failed or partial evaluator checks before promoting this packet shape.",
+  };
+}
+
+export function renderResearchWorkflowScorecard(result: ResearchWorkflowScorecard): string {
+  return [
+    `research workflow scorecard: ${result.packetDir}`,
+    `  score: ${result.score}/100`,
+    `  status: ${result.status}`,
+    ...result.checks.map(check => `  - [${check.status}] ${check.id}: ${check.points}/${check.maxPoints} ${check.detail}`),
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchWorkflowScorecardJson(result: ResearchWorkflowScorecard): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    workflowScorecard: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchEvidenceGapReportCommand(packetDir: string): Promise<ResearchEvidenceGapReport> {
+  const resolved = path.resolve(packetDir);
+  const reportPath = path.join(resolved, "report.md");
+  const reportExists = await exists(reportPath);
+  const report = reportExists ? await readFile(reportPath, "utf-8") : "";
+  const analysis = await exists(path.join(resolved, "analysis-result.json"));
+  const design = await exists(path.join(resolved, "design.json"));
+  const manifest = await exists(path.join(resolved, "artifact-manifest.json"));
+  const provenance = await exists(path.join(resolved, "provenance.json"));
+  const citationCount = Array.from(report.matchAll(/\[[0-9]+\]|\(https?:\/\/[^)]+\)/g)).length;
+  const claimsPopulationEstimate = /\b(population estimate|nationally representative|prevalence|risk ratio|odds ratio|hazard ratio)\b/i.test(report);
+  const declaresFixtureOnly = /\blocal fixture\b/i.test(report) && /\bunweighted\b/i.test(report);
+  const checks: ResearchEvidenceGapReport["checks"] = [
+    {
+      id: "report",
+      status: reportExists ? "pass" : "missing",
+      detail: reportExists ? "report.md is present." : "report.md is missing.",
+    },
+    {
+      id: "analysis-artifact",
+      status: analysis ? "pass" : "missing",
+      detail: analysis ? "analysis-result.json is present." : "analysis-result.json is missing.",
+    },
+    {
+      id: "design-artifact",
+      status: design ? "pass" : "missing",
+      detail: design ? "design.json is present." : "design.json is missing.",
+    },
+    {
+      id: "lineage-artifacts",
+      status: manifest && provenance ? "pass" : manifest || provenance ? "needs_review" : "missing",
+      detail: manifest && provenance ? "Manifest and provenance are present." : "Manifest and provenance should both be present.",
+    },
+    {
+      id: "fixture-caveat",
+      status: declaresFixtureOnly ? "pass" : "needs_review",
+      detail: declaresFixtureOnly ? "Report declares local fixture and unweighted limitations." : "Report should declare fixture/unweighted limitations unless it is a real-data survey analysis.",
+    },
+    {
+      id: "citation-coverage",
+      status: citationCount > 0 || !claimsPopulationEstimate ? "pass" : "needs_review",
+      detail: citationCount > 0 ? `${citationCount} citation-like reference(s) found.` : "No citation-like references found; acceptable only for local fixture reports without external factual claims.",
+    },
+  ];
+  const status: ResearchEvidenceGapReport["status"] = checks.some(check => check.status === "missing" || check.status === "needs_review")
+    ? "needs_evidence"
+    : "ready";
+  const result: ResearchEvidenceGapReport = {
+    packetDir: resolved,
+    status,
+    reportPath: reportExists ? reportPath : null,
+    citationCount,
+    checks,
+    nextAction: status === "ready"
+      ? "Report evidence coverage is sufficient for this packet stage."
+      : "Add missing artifacts, caveats, provenance, or citations before treating the report as publishable.",
+  };
+  await writeFile(path.join(resolved, "evidence-gap-report.json"), `${JSON.stringify(result, null, 2)}\n`);
+  return result;
+}
+
+export function renderResearchEvidenceGapReport(result: ResearchEvidenceGapReport): string {
+  return [
+    `research evidence gap report: ${result.packetDir}`,
+    `  status: ${result.status}`,
+    `  report: ${result.reportPath ?? "missing"}`,
+    `  citations: ${result.citationCount}`,
+    ...result.checks.map(check => `  - [${check.status}] ${check.id}: ${check.detail}`),
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchEvidenceGapReportJson(result: ResearchEvidenceGapReport): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    evidenceGapReport: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchPacketDiffCommand(basePacketDir: string, comparePacketDir: string): Promise<ResearchPacketDiff> {
+  const base = path.resolve(basePacketDir);
+  const compare = path.resolve(comparePacketDir);
+  const baseArtifacts = await artifactDigestMap(base);
+  const compareArtifacts = await artifactDigestMap(compare);
+  const baseNames = new Set(baseArtifacts.keys());
+  const compareNames = new Set(compareArtifacts.keys());
+  const addedArtifacts = Array.from(compareNames).filter(name => !baseNames.has(name)).sort((a, b) => a.localeCompare(b));
+  const removedArtifacts = Array.from(baseNames).filter(name => !compareNames.has(name)).sort((a, b) => a.localeCompare(b));
+  const shared = Array.from(compareNames).filter(name => baseNames.has(name));
+  const changedArtifacts = shared.filter(name => baseArtifacts.get(name) !== compareArtifacts.get(name)).sort((a, b) => a.localeCompare(b));
+  const unchangedArtifacts = shared.filter(name => baseArtifacts.get(name) === compareArtifacts.get(name)).sort((a, b) => a.localeCompare(b));
+  const baseScorecard = await readJsonIfPresent(path.join(base, "workflow-scorecard.json")) as ResearchWorkflowScorecard | { workflowScorecard?: ResearchWorkflowScorecard } | null;
+  const compareScorecard = await readJsonIfPresent(path.join(compare, "workflow-scorecard.json")) as ResearchWorkflowScorecard | { workflowScorecard?: ResearchWorkflowScorecard } | null;
+  const baseScore = workflowScoreFromUnknown(baseScorecard);
+  const compareScore = workflowScoreFromUnknown(compareScorecard);
+  return {
+    basePacketDir: base,
+    comparePacketDir: compare,
+    addedArtifacts,
+    removedArtifacts,
+    changedArtifacts,
+    unchangedArtifacts,
+    scoreDelta: typeof baseScore === "number" && typeof compareScore === "number" ? compareScore - baseScore : null,
+    nextAction: addedArtifacts.length || removedArtifacts.length || changedArtifacts.length
+      ? "Review changed artifacts and score delta before promoting the newer packet."
+      : "Packets have identical tracked artifacts.",
+  };
+}
+
+export function renderResearchPacketDiff(result: ResearchPacketDiff): string {
+  return [
+    `research packet diff: ${result.basePacketDir} -> ${result.comparePacketDir}`,
+    `  added: ${result.addedArtifacts.join(", ") || "(none)"}`,
+    `  removed: ${result.removedArtifacts.join(", ") || "(none)"}`,
+    `  changed: ${result.changedArtifacts.join(", ") || "(none)"}`,
+    `  unchanged: ${result.unchangedArtifacts.length}`,
+    `  score delta: ${result.scoreDelta ?? "unknown"}`,
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchPacketDiffJson(result: ResearchPacketDiff): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    packetDiff: result,
+  }, null, 2)}\n`;
+}
+
+export function researchNodeProposalCommand(opts: {
+  id: string;
+  purpose: string;
+  evaluator: string;
+  rollback: string;
+  costUsd?: number;
+  promotion?: string[];
+}): ResearchNodeProposal {
+  return {
+    id: opts.id.trim(),
+    purpose: opts.purpose.trim(),
+    expectedEvaluator: opts.evaluator.trim(),
+    rollbackCondition: opts.rollback.trim(),
+    costEnvelopeUsd: opts.costUsd ?? 0,
+    promotionCriteria: opts.promotion?.length ? opts.promotion : [
+      "Focused tests pass.",
+      "Local fixture evaluation improves or preserves workflow score.",
+      "No cloud spend is required for default verification.",
+    ],
+    status: "candidate",
+  };
+}
+
+export function renderResearchNodeProposal(result: ResearchNodeProposal): string {
+  return [
+    `research node proposal: ${result.id}`,
+    `  purpose: ${result.purpose}`,
+    `  evaluator: ${result.expectedEvaluator}`,
+    `  rollback: ${result.rollbackCondition}`,
+    `  cost envelope: $${result.costEnvelopeUsd}`,
+    `  promotion: ${result.promotionCriteria.join("; ")}`,
+  ].join("\n");
+}
+
+export function renderResearchNodeProposalJson(result: ResearchNodeProposal): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    nodeProposal: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchNodeProposalRegistryCommand(registryDir: string): Promise<ResearchNodeProposalRegistry> {
+  const resolved = path.resolve(registryDir);
+  const names = await readdir(resolved).catch(() => []);
+  const proposals = (await Promise.all(names
+    .filter(name => name.endsWith(".json"))
+    .sort((a, b) => a.localeCompare(b))
+    .map(async name => {
+      const parsed = JSON.parse(await readFile(path.join(resolved, name), "utf-8")) as ResearchNodeProposal | { nodeProposal?: ResearchNodeProposal };
+      return "nodeProposal" in parsed ? parsed.nodeProposal ?? null : parsed;
+    }))).filter((proposal): proposal is ResearchNodeProposal => Boolean(proposal));
+  const totalCostEnvelopeUsd = proposals.reduce((sum, proposal) => sum + proposal.costEnvelopeUsd, 0);
+  return {
+    registryDir: resolved,
+    proposals,
+    totalCostEnvelopeUsd,
+    nextAction: proposals.length
+      ? "Review candidate evaluators and promote the highest-leverage node into the pipeline."
+      : "Add candidate node proposal JSON files to this registry.",
+  };
+}
+
+export function renderResearchNodeProposalRegistry(result: ResearchNodeProposalRegistry): string {
+  return [
+    `research node proposal registry: ${result.registryDir}`,
+    `  proposals: ${result.proposals.length}`,
+    `  total cost envelope: $${result.totalCostEnvelopeUsd}`,
+    ...result.proposals.map(proposal => `  - ${proposal.id}: ${proposal.purpose} (evaluator: ${proposal.expectedEvaluator})`),
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchNodeProposalRegistryJson(result: ResearchNodeProposalRegistry): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    nodeProposalRegistry: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchCostLedgerCommand(opts: { packetDir?: string; proposalDir?: string; hardStopUsd?: number }): Promise<ResearchCostLedger> {
+  const hardStopUsd = opts.hardStopUsd ?? 30;
+  const entries: ResearchCostLedger["entries"] = [];
+  let packetDir: string | null = null;
+  if (opts.packetDir) {
+    packetDir = path.resolve(opts.packetDir);
+    const runner = await readJsonIfPresent(path.join(packetDir, "runner-spec.json")) as ResearchRunnerSpec | null;
+    const realRunner = await readJsonIfPresent(path.join(packetDir, "real-runner-spec.json")) as ResearchRealLocalRunnerSpec | null;
+    if (runner) entries.push({ source: "runner-spec.json", amountUsd: runner.safety.cloudSpendUsd, kind: "observed" });
+    if (realRunner) entries.push({ source: "real-runner-spec.json", amountUsd: realRunner.safety.cloudSpendUsd, kind: "observed" });
+  }
+  let proposalDir: string | null = null;
+  if (opts.proposalDir) {
+    const registry = await researchNodeProposalRegistryCommand(opts.proposalDir);
+    proposalDir = registry.registryDir;
+    for (const proposal of registry.proposals) {
+      entries.push({ source: `node-proposal:${proposal.id}`, amountUsd: proposal.costEnvelopeUsd, kind: "proposed" });
+    }
+  }
+  const observedCloudSpendUsd = entries.filter(entry => entry.kind === "observed").reduce((sum, entry) => sum + entry.amountUsd, 0);
+  const proposedCostEnvelopeUsd = entries.filter(entry => entry.kind === "proposed").reduce((sum, entry) => sum + entry.amountUsd, 0);
+  const status: ResearchCostLedger["status"] = observedCloudSpendUsd > hardStopUsd || proposedCostEnvelopeUsd > hardStopUsd ? "hard_stop" : "within_budget";
+  return {
+    packetDir,
+    proposalDir,
+    observedCloudSpendUsd,
+    proposedCostEnvelopeUsd,
+    hardStopUsd,
+    status,
+    entries,
+    nextAction: status === "within_budget"
+      ? "Continue preferring local deterministic verification before any paid execution."
+      : "Stop paid/cloud escalation and reduce proposed or observed spend before continuing.",
+  };
+}
+
+export function renderResearchCostLedger(result: ResearchCostLedger): string {
+  return [
+    "research cost ledger",
+    `  packet: ${result.packetDir ?? "(none)"}`,
+    `  proposals: ${result.proposalDir ?? "(none)"}`,
+    `  observed cloud spend: $${result.observedCloudSpendUsd}`,
+    `  proposed cost envelope: $${result.proposedCostEnvelopeUsd}`,
+    `  hard stop: $${result.hardStopUsd}`,
+    `  status: ${result.status}`,
+    ...result.entries.map(entry => `  - [${entry.kind}] ${entry.source}: $${entry.amountUsd}`),
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchCostLedgerJson(result: ResearchCostLedger): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    costLedger: result,
+  }, null, 2)}\n`;
+}
+
+export function researchQuestionBankCommand(domain = "medical"): ResearchQuestionBank {
+  const normalized = domain.trim().toLowerCase();
+  const shared: ResearchQuestionBank["questions"] = [
+    {
+      id: "medication-adherence-control",
+      question: "Among adults with diagnosed hypertension, is medication adherence associated with blood pressure control?",
+      datasetNeeds: ["diagnosis history", "medication use or adherence", "measured blood pressure", "demographics", "sampling design if survey data"],
+      designStress: ["confounding by disease severity", "self-report measurement error", "subcohort eligibility"],
+      analysisFamily: "cross-sectional association or target-trial emulation if longitudinal timing exists",
+    },
+    {
+      id: "screening-access-stage",
+      question: "Among adults eligible for cancer screening, is healthcare access associated with diagnosis stage at detection?",
+      datasetNeeds: ["screening eligibility", "healthcare access", "diagnosis stage", "age/sex/risk factors", "follow-up timing"],
+      designStress: ["selection bias", "lead-time bias", "time window alignment"],
+      analysisFamily: "cohort or case-only stage distribution model",
+    },
+    {
+      id: "lab-marker-risk-gradient",
+      question: "Do cardiometabolic biomarkers vary across socioeconomic strata after accounting for age, sex, race/ethnicity, and BMI?",
+      datasetNeeds: ["biomarker labs", "socioeconomic measure", "anthropometrics", "demographics"],
+      designStress: ["nonlinear gradients", "missing labs", "survey weighting"],
+      analysisFamily: "weighted descriptive regression or generalized additive model",
+    },
+    {
+      id: "clinical-prediction-calibration",
+      question: "Does an existing clinical risk score remain calibrated across demographic subgroups in a newer dataset?",
+      datasetNeeds: ["risk score inputs", "outcome follow-up", "demographics", "calibration horizon"],
+      designStress: ["transportability", "subgroup calibration", "label leakage"],
+      analysisFamily: "prediction validation with calibration and discrimination metrics",
+    },
+  ];
+  return {
+    domain: normalized,
+    questions: normalized === "public-health" ? shared.filter(item => item.id !== "clinical-prediction-calibration") : shared,
+  };
+}
+
+export function renderResearchQuestionBank(result: ResearchQuestionBank): string {
+  return [
+    `research question bank: ${result.domain}`,
+    ...result.questions.map(question => [
+      `  - ${question.id}: ${question.question}`,
+      `    needs: ${question.datasetNeeds.join(", ")}`,
+      `    stress: ${question.designStress.join("; ")}`,
+      `    analysis: ${question.analysisFamily}`,
+    ].join("\n")),
+  ].join("\n");
+}
+
+export function renderResearchQuestionBankJson(result: ResearchQuestionBank): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    questionBank: result,
+  }, null, 2)}\n`;
+}
+
+export function researchQuestionReadinessCommand(question: string): ResearchQuestionReadiness {
+  const decomposition = researchDecomposeQuestionCommand(question);
+  const missing = [
+    ...(!decomposition.population ? ["population"] : []),
+    ...(!decomposition.exposureOrPredictor ? ["exposure_or_predictor"] : []),
+    ...(!decomposition.outcome ? ["outcome"] : []),
+    ...(decomposition.intent === "causal" ? ["target_trial_components"] : []),
+  ];
+  const score = Math.max(0, 100 - missing.length * 25);
+  return {
+    question: decomposition.question,
+    score,
+    status: missing.length ? "needs_clarification" : "ready_for_protocol",
+    missing,
+    suggestedCommands: [
+      `agenteer research decompose-question --question ${JSON.stringify(decomposition.question)} --json`,
+      `agenteer research clarification-plan --question ${JSON.stringify(decomposition.question)} --json`,
+      ...(missing.length ? [] : [`agenteer research select-method --question ${JSON.stringify(decomposition.question)} --json`]),
+    ],
+  };
+}
+
+export function renderResearchQuestionReadiness(result: ResearchQuestionReadiness): string {
+  return [
+    `research question readiness: ${result.status}`,
+    `  score: ${result.score}/100`,
+    `  question: ${result.question}`,
+    `  missing: ${result.missing.join(", ") || "(none)"}`,
+    ...result.suggestedCommands.map(command => `  - ${command}`),
+  ].join("\n");
+}
+
+export function renderResearchQuestionReadinessJson(result: ResearchQuestionReadiness): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    questionReadiness: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchInferSchemaCommand(file: string): Promise<ResearchSchemaInference> {
+  const resolved = path.resolve(file);
+  const rows = JSON.parse(await readFile(resolved, "utf-8")) as Array<Record<string, unknown>>;
+  const columns = uniqueStrings(rows.flatMap(row => Object.keys(row))).map(name => {
+    const values = rows.map(row => row[name]).filter(hasValue);
+    const types = uniqueStrings(values.map(value => typeof value));
+    const inferredType: ResearchSchemaInference["columns"][number]["inferredType"] =
+      values.length === 0 ? "empty"
+        : types.length > 1 ? "mixed"
+          : types[0] === "number" || types[0] === "string" || types[0] === "boolean" ? types[0] : "mixed";
+    return {
+      name,
+      inferredType,
+      nonMissing: values.length,
+    };
+  });
+  return {
+    file: resolved,
+    rowCount: rows.length,
+    columns,
+  };
+}
+
+export function renderResearchSchemaInference(result: ResearchSchemaInference): string {
+  return [
+    `research schema inference: ${result.file}`,
+    `  rows: ${result.rowCount}`,
+    `  columns: ${result.columns.length}`,
+    ...result.columns.map(column => `  - ${column.name}: ${column.inferredType} (${column.nonMissing} non-missing)`),
+  ].join("\n");
+}
+
+export function renderResearchSchemaInferenceJson(result: ResearchSchemaInference): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    schemaInference: result,
   }, null, 2)}\n`;
 }
 
@@ -2274,12 +2998,15 @@ async function listResearchArtifactNames(packetDir: string): Promise<string[]> {
     "design.md",
     "workflow.yaml",
     "scout-plan.json",
+    "variable-map.json",
     "runner-spec.json",
     "approval.json",
     "analysis-result.json",
     "data-access.json",
+    "evidence-gap-report.json",
     "methods-validation.json",
     "provenance.json",
+    "qa-dashboard.json",
     "real-runner-spec.json",
     "report.md",
     "report-review.json",
@@ -2289,6 +3016,14 @@ async function listResearchArtifactNames(packetDir: string): Promise<string[]> {
   return (await readdir(packetDir))
     .filter(name => artifactAllowlist.has(name))
     .sort((a, b) => a.localeCompare(b));
+}
+
+async function artifactDigestMap(packetDir: string): Promise<Map<string, string>> {
+  const entries = await Promise.all((await listResearchArtifactNames(packetDir)).map(async name => {
+    const bytes = await readFile(path.join(packetDir, name));
+    return [name, createHash("sha256").update(bytes).digest("hex")] as const;
+  }));
+  return new Map(entries);
 }
 
 function buildNhanesQuestions(registry: NhanesRegistry): ResearchQuestionCandidate[] {
@@ -3122,6 +3857,26 @@ function hasAnyValue(row: Record<string, unknown>, variables: readonly string[])
 
 function hasValue(value: unknown): boolean {
   return value !== null && value !== undefined && value !== "" && !(typeof value === "number" && Number.isNaN(value));
+}
+
+function normalizeVariableName(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function scoreCheck(id: string, points: number, maxPoints: number, detail: string): ResearchWorkflowScorecard["checks"][number] {
+  return {
+    id,
+    points,
+    maxPoints,
+    status: points === maxPoints ? "pass" : points > 0 ? "partial" : "fail",
+    detail,
+  };
+}
+
+function workflowScoreFromUnknown(value: ResearchWorkflowScorecard | { workflowScorecard?: ResearchWorkflowScorecard } | null): number | null {
+  if (!value) return null;
+  if ("workflowScorecard" in value) return value.workflowScorecard?.score ?? null;
+  return "score" in value && typeof value.score === "number" ? value.score : null;
 }
 
 function extractVariableNames(expression: string): string[] {
