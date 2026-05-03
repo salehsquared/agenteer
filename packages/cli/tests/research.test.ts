@@ -38,6 +38,24 @@ import {
   renderResearchProvenanceJson,
   renderResearchQaDashboard,
   renderResearchQaDashboardJson,
+  renderResearchSuppressionPolicy,
+  renderResearchSuppressionPolicyJson,
+  renderResearchRegistrySearch,
+  renderResearchRegistrySearchJson,
+  renderResearchEstimandSketch,
+  renderResearchEstimandSketchJson,
+  renderResearchStudySimulation,
+  renderResearchStudySimulationJson,
+  renderResearchRealStudyReadiness,
+  renderResearchRealStudyReadinessJson,
+  renderResearchDataAccessManifest,
+  renderResearchDataAccessManifestJson,
+  renderResearchRealLocalRunnerSpec,
+  renderResearchRealLocalRunnerSpecJson,
+  renderResearchRealStudyChecklist,
+  renderResearchRealStudyChecklistJson,
+  renderResearchAdapterGapReport,
+  renderResearchAdapterGapReportJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
   renderResearchCheckpoint,
@@ -61,6 +79,15 @@ import {
   researchRoCrateCommand,
   researchProvenanceCommand,
   researchQaDashboardCommand,
+  researchSuppressionPolicyCommand,
+  researchRegistrySearchCommand,
+  researchEstimandSketchCommand,
+  researchSimulateStudyCommand,
+  researchRealStudyReadinessCommand,
+  researchDataAccessManifestCommand,
+  researchRealLocalRunnerSpecCommand,
+  researchRealStudyChecklistCommand,
+  researchAdapterGapReportCommand,
   researchPipelineStagesCommand,
   researchApprovePacketCommand,
   researchCheckpointCommand,
@@ -134,6 +161,24 @@ describe("researchDesignCommand", () => {
       expect(parsed.registry.variableCount).toBe(2);
     } finally {
       await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("searches registry variables by query terms", async () => {
+    const repo = await makeRepo();
+    const registryPath = path.join(repo, "data", "analytics", "nhanes", "registry.json");
+    try {
+      const result = await researchRegistrySearchCommand(registryPath, "blood pressure");
+      const parsed = JSON.parse(renderResearchRegistrySearchJson(result)) as {
+        schemaVersion: number;
+        registrySearch: { matches: Array<{ name: string }> };
+      };
+
+      expect(result.matches.map(match => match.name)).toEqual(expect.arrayContaining(["BPXSY1", "BPXDI1"]));
+      expect(renderResearchRegistrySearch(result)).toContain("research registry search");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
     }
   });
 
@@ -241,6 +286,230 @@ describe("researchDesignCommand", () => {
     ]);
     expect(renderResearchPipelineStages(stages)).toContain("@agenteer/node-research-protocol-design");
     expect(stages.find(stage => stage.id === "approval")?.humanReview).toBe(true);
+  });
+
+  it("evaluates small-count suppression policy", () => {
+    const suppressed = researchSuppressionPolicyCommand(7);
+    const displayed = researchSuppressionPolicyCommand(20);
+
+    expect(suppressed.status).toBe("suppress");
+    expect(displayed.status).toBe("display");
+    expect(renderResearchSuppressionPolicy(suppressed)).toContain("status: suppress");
+    expect(JSON.parse(renderResearchSuppressionPolicyJson(suppressed)).schemaVersion).toBe(1);
+  });
+
+  it("sketches estimands from research question intent", () => {
+    const causal = researchEstimandSketchCommand("What is the effect of beta blockers on mortality among adults with heart failure?");
+    const diagnostic = researchEstimandSketchCommand("Among adults, is self-reported hypertension associated with measured hypertension?");
+
+    expect(causal.intent).toBe("causal");
+    expect(causal.targetQuantity).toContain("causal effect");
+    expect(causal.requiredAssumptions).toContain("exchangeability/positivity/consistency");
+    expect(diagnostic.intent).toBe("diagnostic");
+    expect(diagnostic.targetQuantity).toContain("diagnostic accuracy");
+    expect(renderResearchEstimandSketch(causal)).toContain("research estimand sketch");
+    expect(JSON.parse(renderResearchEstimandSketchJson(causal)).schemaVersion).toBe(1);
+  });
+
+  it("runs a complete synthetic study simulation from a realistic question", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-simulated-study-"));
+    try {
+      const result = await researchSimulateStudyCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Among NHANES adults, is self-reported high blood pressure associated with measured hypertension?",
+        outDir,
+      });
+      const parsed = JSON.parse(renderResearchStudySimulationJson(result)) as {
+        schemaVersion: number;
+        studySimulation: { completedStages: string[] };
+      };
+
+      expect(result.completedStages).toEqual(expect.arrayContaining([
+        "design",
+        "analysis",
+        "ro-crate",
+        "provenance",
+        "qa-dashboard",
+      ]));
+      expect(result.qaStatus).not.toBe("blocked");
+      expect(renderResearchStudySimulation(result)).toContain("research study simulation");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("distinguishes synthetic packets from real-study readiness", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-real-readiness-"));
+    try {
+      await researchSimulateStudyCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Among NHANES adults, is self-reported high blood pressure associated with measured hypertension?",
+        outDir,
+      });
+
+      const readiness = await researchRealStudyReadinessCommand(outDir);
+      const parsed = JSON.parse(renderResearchRealStudyReadinessJson(readiness)) as {
+        schemaVersion: number;
+        realStudyReadiness: { status: string };
+      };
+
+      expect(readiness.status).toBe("not_ready");
+      expect(readiness.requirements.find(requirement => requirement.id === "real-data-runner")?.status).toBe("missing");
+      expect(renderResearchRealStudyReadiness(readiness)).toContain("research real-study readiness");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("recognizes data-access and real-runner specs as real-study readiness progress", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-real-ready-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, "[]\n");
+      await researchDataAccessManifestCommand(outDir, [dataFile]);
+      await researchRealLocalRunnerSpecCommand(outDir);
+
+      const readiness = await researchRealStudyReadinessCommand(outDir);
+
+      expect(readiness.requirements.find(requirement => requirement.id === "real-data-runner")?.status).toBe("pass");
+      expect(readiness.requirements.find(requirement => requirement.id === "data-access-manifest")?.status).toBe("pass");
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("writes a read-only data access manifest for real-data adapters", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-data-access-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, "[]\n");
+
+      const manifest = await researchDataAccessManifestCommand(outDir, [dataFile]);
+      const parsed = JSON.parse(renderResearchDataAccessManifestJson(manifest)) as {
+        schemaVersion: number;
+        dataAccess: { readOnly: boolean };
+      };
+
+      expect(manifest.readOnly).toBe(true);
+      expect(manifest.files[0]?.exists).toBe(true);
+      expect(renderResearchDataAccessManifest(manifest)).toContain("research data access manifest");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("writes a real-local runner spec separate from fixture execution", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-real-runner-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, "[]\n");
+      await researchDataAccessManifestCommand(outDir, [dataFile]);
+
+      const spec = await researchRealLocalRunnerSpecCommand(outDir);
+      const parsed = JSON.parse(renderResearchRealLocalRunnerSpecJson(spec)) as {
+        schemaVersion: number;
+        realLocalRunnerSpec: { mode: string };
+      };
+
+      expect(spec.mode).toBe("real_local_files");
+      expect(spec.dataAccessManifest).toContain("data-access.json");
+      expect(spec.safety.readOnlyData).toBe(true);
+      expect(renderResearchRealLocalRunnerSpec(spec)).toContain("real-local runner");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("emits an ordered checklist for moving packets to real local execution", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-real-checklist-"));
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+
+      const checklist = await researchRealStudyChecklistCommand(outDir);
+      const parsed = JSON.parse(renderResearchRealStudyChecklistJson(checklist)) as {
+        schemaVersion: number;
+        realStudyChecklist: { nextCommand: string | null };
+      };
+
+      expect(checklist.items[0]?.command).toContain("research data-access");
+      expect(checklist.nextCommand).toContain("research data-access");
+      expect(renderResearchRealStudyChecklist(checklist)).toContain("research real-study checklist");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("reports adapter gaps for required variable mapping evidence", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-adapter-gap-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, "[]\n");
+      await researchDataAccessManifestCommand(outDir, [dataFile]);
+      await researchRealLocalRunnerSpecCommand(outDir);
+
+      const report = await researchAdapterGapReportCommand(outDir);
+      const parsed = JSON.parse(renderResearchAdapterGapReportJson(report)) as {
+        schemaVersion: number;
+        adapterGapReport: { status: string };
+      };
+
+      expect(report.status).toBe("needs_mapping");
+      expect(report.missingEvidence.some(item => item.startsWith("variable:"))).toBe(true);
+      expect(renderResearchAdapterGapReport(report)).toContain("research adapter gap report");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
   });
 
   it("renders reusable research pipeline stages as machine-readable JSON", () => {

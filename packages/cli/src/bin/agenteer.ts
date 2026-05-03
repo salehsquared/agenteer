@@ -68,6 +68,15 @@ import {
   researchRoCrateCommand,
   researchProvenanceCommand,
   researchQaDashboardCommand,
+  researchSuppressionPolicyCommand,
+  researchRegistrySearchCommand,
+  researchEstimandSketchCommand,
+  researchSimulateStudyCommand,
+  researchRealStudyReadinessCommand,
+  researchDataAccessManifestCommand,
+  researchRealLocalRunnerSpecCommand,
+  researchRealStudyChecklistCommand,
+  researchAdapterGapReportCommand,
   researchPipelineStagesCommand,
   researchReviewReportCommand,
   researchInspectPacketCommand,
@@ -107,6 +116,24 @@ import {
   renderResearchProvenanceJson,
   renderResearchQaDashboard,
   renderResearchQaDashboardJson,
+  renderResearchSuppressionPolicy,
+  renderResearchSuppressionPolicyJson,
+  renderResearchRegistrySearch,
+  renderResearchRegistrySearchJson,
+  renderResearchEstimandSketch,
+  renderResearchEstimandSketchJson,
+  renderResearchStudySimulation,
+  renderResearchStudySimulationJson,
+  renderResearchRealStudyReadiness,
+  renderResearchRealStudyReadinessJson,
+  renderResearchDataAccessManifest,
+  renderResearchDataAccessManifestJson,
+  renderResearchRealLocalRunnerSpec,
+  renderResearchRealLocalRunnerSpecJson,
+  renderResearchRealStudyChecklist,
+  renderResearchRealStudyChecklistJson,
+  renderResearchAdapterGapReport,
+  renderResearchAdapterGapReportJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
   renderResearchReportReview,
@@ -177,6 +204,15 @@ Usage:
   agenteer research ro-crate --packet <dir> [--json]
   agenteer research provenance --packet <dir> [--json]
   agenteer research qa-dashboard --packet <dir> [--json]
+  agenteer research suppression-policy --count <n> [--threshold <n>] [--json]
+  agenteer research registry-search --registry <registry.json> --query <text> [--limit <n>] [--json]
+  agenteer research estimand-sketch --question <text> [--json]
+  agenteer research simulate-study --project medbrevia-nhanes --repo <medbrevia_v3> --question <text> --out <dir> [--json]
+  agenteer research real-study-readiness --packet <dir> [--json]
+  agenteer research data-access --packet <dir> --file <path>* [--json]
+  agenteer research real-runner-spec --packet <dir> [--json]
+  agenteer research real-study-checklist --packet <dir> [--json]
+  agenteer research adapter-gap-report --packet <dir> [--json]
   agenteer research stages [--json]
   agenteer research inspect --packet <dir>
   agenteer research critique --packet <dir>
@@ -511,6 +547,63 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       const result = await researchQaDashboardCommand(requireFlagString(flags, "packet"));
       console.log(flags.json === true ? renderResearchQaDashboardJson(result) : renderResearchQaDashboard(result));
       return result.status === "blocked" ? 1 : 0;
+    }
+    case "suppression-policy": {
+      const count = Number.parseInt(requireFlagString(flags, "count"), 10);
+      const thresholdText = flagString(flags, "threshold");
+      const threshold = thresholdText ? Number.parseInt(thresholdText, 10) : 16;
+      if (!Number.isFinite(count) || count < 0) throw new Error("research suppression-policy: --count must be a nonnegative integer");
+      if (!Number.isFinite(threshold) || threshold < 1) throw new Error("research suppression-policy: --threshold must be a positive integer");
+      const result = researchSuppressionPolicyCommand(count, threshold);
+      console.log(flags.json === true ? renderResearchSuppressionPolicyJson(result) : renderResearchSuppressionPolicy(result));
+      return 0;
+    }
+    case "registry-search": {
+      const limitText = flagString(flags, "limit");
+      const limit = limitText ? Number.parseInt(limitText, 10) : 20;
+      const result = await researchRegistrySearchCommand(requireFlagString(flags, "registry"), requireFlagString(flags, "query"), limit);
+      console.log(flags.json === true ? renderResearchRegistrySearchJson(result) : renderResearchRegistrySearch(result));
+      return 0;
+    }
+    case "estimand-sketch": {
+      const result = researchEstimandSketchCommand(requireFlagString(flags, "question"));
+      console.log(flags.json === true ? renderResearchEstimandSketchJson(result) : renderResearchEstimandSketch(result));
+      return 0;
+    }
+    case "simulate-study": {
+      const result = await researchSimulateStudyCommand({
+        project: requireFlagString(flags, "project") as ResearchProject,
+        repoDir: requireFlagString(flags, "repo"),
+        question: requireFlagString(flags, "question"),
+        outDir: requireFlagString(flags, "out"),
+      });
+      console.log(flags.json === true ? renderResearchStudySimulationJson(result) : renderResearchStudySimulation(result));
+      return result.qaStatus === "blocked" ? 1 : 0;
+    }
+    case "real-study-readiness": {
+      const result = await researchRealStudyReadinessCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchRealStudyReadinessJson(result) : renderResearchRealStudyReadiness(result));
+      return result.status === "ready_for_local_real_data" ? 0 : 1;
+    }
+    case "data-access": {
+      const result = await researchDataAccessManifestCommand(requireFlagString(flags, "packet"), flagList(flags, "file"));
+      console.log(flags.json === true ? renderResearchDataAccessManifestJson(result) : renderResearchDataAccessManifest(result));
+      return result.files.every(file => file.exists) ? 0 : 1;
+    }
+    case "real-runner-spec": {
+      const result = await researchRealLocalRunnerSpecCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchRealLocalRunnerSpecJson(result) : renderResearchRealLocalRunnerSpec(result));
+      return result.dataAccessManifest ? 0 : 1;
+    }
+    case "real-study-checklist": {
+      const result = await researchRealStudyChecklistCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchRealStudyChecklistJson(result) : renderResearchRealStudyChecklist(result));
+      return 0;
+    }
+    case "adapter-gap-report": {
+      const result = await researchAdapterGapReportCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchAdapterGapReportJson(result) : renderResearchAdapterGapReport(result));
+      return result.status === "mapping_ready" ? 0 : 1;
     }
     case "stages": {
       const stages = researchPipelineStagesCommand();

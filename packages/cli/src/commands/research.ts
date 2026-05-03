@@ -380,6 +380,100 @@ export interface ResearchQaDashboard {
   nextAction: string;
 }
 
+export interface ResearchSuppressionPolicyResult {
+  count: number;
+  threshold: number;
+  status: "display" | "suppress";
+  reason: string;
+  source: string;
+}
+
+export interface ResearchRegistrySearchResult {
+  registryPath: string;
+  query: string;
+  matches: Array<{
+    name: string;
+    domain: string | null;
+    label: string | null;
+  }>;
+}
+
+export interface ResearchEstimandSketch {
+  question: string;
+  intent: ResearchQuestionDecomposition["intent"];
+  targetQuantity: string;
+  contrast: string;
+  population: string | null;
+  exposureOrPredictor: string | null;
+  outcome: string | null;
+  requiredAssumptions: string[];
+  disallowedLanguage: string[];
+}
+
+export interface ResearchStudySimulationResult {
+  packetDir: string;
+  exportDir: string;
+  question: string;
+  fixturePath: string;
+  completedStages: string[];
+  qaStatus: ResearchQaDashboard["status"];
+  nextAction: string;
+}
+
+export interface ResearchRealStudyReadiness {
+  packetDir: string;
+  status: "not_ready" | "ready_for_local_real_data";
+  requirements: Array<{
+    id: string;
+    status: "pass" | "missing";
+    detail: string;
+  }>;
+  nextAction: string;
+}
+
+export interface ResearchDataAccessManifest {
+  packetDir: string;
+  manifestPath: string;
+  dataset: string;
+  files: Array<{ path: string; role: string; exists: boolean }>;
+  readOnly: true;
+  notes: string[];
+}
+
+export interface ResearchRealLocalRunnerSpec {
+  packetDir: string;
+  generatedAtIso: string;
+  runnerVersion: 0;
+  mode: "real_local_files";
+  dataAccessManifest: string | null;
+  requiredVariables: string[];
+  safety: {
+    cloudSpendUsd: 0;
+    readOnlyData: true;
+    requiresHumanApproval: true;
+  };
+}
+
+export interface ResearchRealStudyChecklist {
+  packetDir: string;
+  items: Array<{
+    order: number;
+    command: string;
+    reason: string;
+    done: boolean;
+  }>;
+  nextCommand: string | null;
+}
+
+export interface ResearchAdapterGapReport {
+  packetDir: string;
+  requiredVariables: string[];
+  declaredFiles: number;
+  missingEvidence: string[];
+  status: "needs_mapping" | "mapping_ready";
+  nextAction: string;
+}
+
 export async function researchDesignCommand(
   opts: ResearchDesignOptions,
 ): Promise<ResearchDesignResult> {
@@ -1111,6 +1205,444 @@ export function renderResearchQaDashboardJson(dashboard: ResearchQaDashboard): s
   }, null, 2)}\n`;
 }
 
+export function researchSuppressionPolicyCommand(count: number, threshold = 16): ResearchSuppressionPolicyResult {
+  return {
+    count,
+    threshold,
+    status: count < threshold ? "suppress" : "display",
+    reason: count < threshold
+      ? `Count ${count} is below the reliability/privacy threshold ${threshold}.`
+      : `Count ${count} meets or exceeds the threshold ${threshold}.`,
+    source: "CDC/NCHS statistical reliability and small-count suppression practices.",
+  };
+}
+
+export function renderResearchSuppressionPolicy(result: ResearchSuppressionPolicyResult): string {
+  return [
+    "research suppression policy",
+    `  count: ${result.count}`,
+    `  threshold: ${result.threshold}`,
+    `  status: ${result.status}`,
+    `  reason: ${result.reason}`,
+  ].join("\n");
+}
+
+export function renderResearchSuppressionPolicyJson(result: ResearchSuppressionPolicyResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    suppressionPolicy: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchRegistrySearchCommand(registryPath: string, query: string, limit = 20): Promise<ResearchRegistrySearchResult> {
+  const resolved = path.resolve(registryPath);
+  const registry = JSON.parse(await readFile(resolved, "utf-8")) as { variables?: unknown };
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const variables = Array.isArray(registry.variables) ? registry.variables : [];
+  const matches = variables
+    .filter(isRecord)
+    .map(variable => ({
+      name: typeof variable.name === "string" ? variable.name : "",
+      domain: typeof variable.domain === "string" ? variable.domain : null,
+      label: typeof variable.label === "string" ? variable.label : null,
+    }))
+    .filter(variable => {
+      const haystack = [variable.name, variable.domain, variable.label].filter(Boolean).join(" ").toLowerCase();
+      return terms.every(term => haystack.includes(term));
+    })
+    .slice(0, limit);
+  return {
+    registryPath: resolved,
+    query,
+    matches,
+  };
+}
+
+export function renderResearchRegistrySearch(result: ResearchRegistrySearchResult): string {
+  return [
+    `research registry search: ${result.registryPath}`,
+    `  query: ${result.query}`,
+    `  matches: ${result.matches.length}`,
+    ...result.matches.map(match => `  - ${match.name} (${match.domain ?? "unknown"}): ${match.label ?? "(no label)"}`),
+  ].join("\n");
+}
+
+export function renderResearchRegistrySearchJson(result: ResearchRegistrySearchResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    registrySearch: result,
+  }, null, 2)}\n`;
+}
+
+export function researchEstimandSketchCommand(question: string): ResearchEstimandSketch {
+  const decomposition = researchDecomposeQuestionCommand(question);
+  const targetQuantity = decomposition.intent === "causal"
+    ? "causal effect under an explicitly specified target trial"
+    : decomposition.intent === "prediction"
+      ? "out-of-sample predictive performance"
+      : decomposition.intent === "diagnostic"
+        ? "diagnostic accuracy relative to a reference standard"
+        : decomposition.intent === "descriptive"
+          ? "descriptive distribution or prevalence"
+          : "observational association";
+  const contrast = decomposition.intent === "diagnostic"
+    ? "test-positive versus reference-standard-positive classification"
+    : decomposition.intent === "prediction"
+      ? "predicted risk versus observed outcome"
+      : decomposition.intent === "causal"
+        ? "intervention strategy A versus strategy B"
+        : decomposition.exposureOrPredictor
+          ? `${decomposition.exposureOrPredictor} groups or levels`
+          : "comparison groups require clarification";
+  const requiredAssumptions = uniqueStrings([
+    "well-defined population",
+    "valid outcome definition",
+    decomposition.intent === "causal" ? "exchangeability/positivity/consistency" : null,
+    decomposition.intent === "prediction" ? "development-validation separation" : null,
+    decomposition.intent === "diagnostic" ? "reference standard validity" : null,
+    "missing-data handling plan",
+  ]);
+  const disallowedLanguage = decomposition.intent === "causal"
+    ? ["causal claims without target-trial specification"]
+    : decomposition.intent === "prediction"
+      ? ["causal interpretation", "clinical deployment claims without validation"]
+      : decomposition.intent === "diagnostic"
+        ? ["screening recommendation without clinical utility analysis"]
+        : ["causal language", "population estimate claims without design-aware methods"];
+  return {
+    question: decomposition.question,
+    intent: decomposition.intent,
+    targetQuantity,
+    contrast,
+    population: decomposition.population,
+    exposureOrPredictor: decomposition.exposureOrPredictor,
+    outcome: decomposition.outcome,
+    requiredAssumptions,
+    disallowedLanguage,
+  };
+}
+
+export function renderResearchEstimandSketch(result: ResearchEstimandSketch): string {
+  return [
+    "research estimand sketch",
+    `  intent: ${result.intent}`,
+    `  target quantity: ${result.targetQuantity}`,
+    `  contrast: ${result.contrast}`,
+    `  population: ${result.population ?? "(needs clarification)"}`,
+    `  exposure/predictor: ${result.exposureOrPredictor ?? "(needs clarification)"}`,
+    `  outcome: ${result.outcome ?? "(needs clarification)"}`,
+    `  assumptions: ${result.requiredAssumptions.join(", ")}`,
+    `  disallowed language: ${result.disallowedLanguage.join(", ")}`,
+  ].join("\n");
+}
+
+export function renderResearchEstimandSketchJson(result: ResearchEstimandSketch): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    estimandSketch: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchSimulateStudyCommand(opts: ResearchDesignOptions): Promise<ResearchStudySimulationResult> {
+  const packetDir = path.resolve(opts.outDir ?? path.join(process.cwd(), "agenteer-research-simulated-study"));
+  await mkdir(packetDir, { recursive: true });
+  const design = await researchDesignCommand({ ...opts, outDir: packetDir });
+  const fixturePath = path.join(packetDir, "rows.json");
+  await writeFile(fixturePath, `${JSON.stringify(buildSyntheticStudyRows(design.protocol), null, 2)}\n`);
+  const completedStages: string[] = ["design", "fixture"];
+  await researchCritiquePacketCommand(packetDir);
+  completedStages.push("critique");
+  await researchValidateMethodsCommand(packetDir);
+  completedStages.push("methods-validation");
+  await researchScoutPlanCommand(packetDir, fixturePath);
+  completedStages.push("scout");
+  await researchDataQualityCommand(fixturePath);
+  completedStages.push("data-quality");
+  await researchRunnerSpecCommand(packetDir);
+  completedStages.push("runner-spec");
+  await researchApprovePacketCommand(packetDir, "Approved synthetic study simulation for end-to-end pipeline pressure testing.");
+  completedStages.push("approval");
+  await researchAnalyzeLocalCommand(packetDir, fixturePath);
+  completedStages.push("analysis");
+  await researchReviewReportCommand(packetDir);
+  completedStages.push("report-review");
+  await researchArtifactManifestCommand(packetDir);
+  completedStages.push("manifest");
+  await researchRoCrateCommand(packetDir);
+  completedStages.push("ro-crate");
+  await researchProvenanceCommand(packetDir);
+  completedStages.push("provenance");
+  await researchArtifactManifestCommand(packetDir);
+  const exportDir = path.join(packetDir, "export");
+  await researchExportPacketCommand(packetDir, exportDir);
+  completedStages.push("export");
+  const qa = await researchQaDashboardCommand(packetDir);
+  completedStages.push("qa-dashboard");
+  return {
+    packetDir,
+    exportDir,
+    question: opts.question,
+    fixturePath,
+    completedStages,
+    qaStatus: qa.status,
+    nextAction: qa.nextAction,
+  };
+}
+
+export function renderResearchStudySimulation(result: ResearchStudySimulationResult): string {
+  return [
+    `research study simulation: ${result.packetDir}`,
+    `  question: ${result.question}`,
+    `  fixture: ${result.fixturePath}`,
+    `  export: ${result.exportDir}`,
+    `  qa: ${result.qaStatus}`,
+    `  stages: ${result.completedStages.join(", ")}`,
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchStudySimulationJson(result: ResearchStudySimulationResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    studySimulation: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchRealStudyReadinessCommand(packetDir: string): Promise<ResearchRealStudyReadiness> {
+  const resolved = path.resolve(packetDir);
+  const runner = await readJsonIfPresent(path.join(resolved, "runner-spec.json")) as ResearchRunnerSpec | null;
+  const realRunner = await readJsonIfPresent(path.join(resolved, "real-runner-spec.json")) as ResearchRealLocalRunnerSpec | null;
+  const design = await readJsonIfPresent(path.join(resolved, "design.json")) as LabMedbreviaNhanesResult | null;
+  const requirements: ResearchRealStudyReadiness["requirements"] = [
+    {
+      id: "design-packet",
+      status: design ? "pass" : "missing",
+      detail: design ? "design.json is present." : "design.json is required.",
+    },
+    {
+      id: "fixture-runner-spec",
+      status: runner ? "pass" : "missing",
+      detail: runner ? `Fixture runner mode is ${runner.mode}.` : "runner-spec.json is useful for synthetic fixture execution.",
+    },
+    {
+      id: "real-data-runner",
+      status: realRunner?.mode === "real_local_files" ? "pass" : "missing",
+      detail: realRunner ? "real-runner-spec.json declares real_local_files execution." : "real-runner-spec.json is required for real local dataset execution.",
+    },
+    {
+      id: "data-access-manifest",
+      status: await exists(path.join(resolved, "data-access.json")) ? "pass" : "missing",
+      detail: "data-access.json should describe local data files, schemas, and access constraints.",
+    },
+    {
+      id: "survey-methods",
+      status: design?.protocol.surveyDesign.weightVariable ? "pass" : "missing",
+      detail: design?.protocol.surveyDesign.weightVariable
+        ? `Survey weight ${design.protocol.surveyDesign.weightVariable} is specified.`
+        : "Survey or sampling design requirements must be explicit for population estimates.",
+    },
+  ];
+  const status = requirements.every(requirement => requirement.status === "pass") ? "ready_for_local_real_data" : "not_ready";
+  return {
+    packetDir: resolved,
+    status,
+    requirements,
+    nextAction: status === "ready_for_local_real_data"
+      ? "Run with a real-data adapter under cost and permission controls."
+      : "Implement the missing real-data adapter requirements before claiming real study execution.",
+  };
+}
+
+export function renderResearchRealStudyReadiness(result: ResearchRealStudyReadiness): string {
+  return [
+    `research real-study readiness: ${result.packetDir}`,
+    `  status: ${result.status}`,
+    `  next: ${result.nextAction}`,
+    "  requirements:",
+    ...result.requirements.map(requirement => `    - [${requirement.status}] ${requirement.id}: ${requirement.detail}`),
+  ].join("\n");
+}
+
+export function renderResearchRealStudyReadinessJson(result: ResearchRealStudyReadiness): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    realStudyReadiness: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchDataAccessManifestCommand(packetDir: string, files: string[]): Promise<ResearchDataAccessManifest> {
+  const resolved = path.resolve(packetDir);
+  const design = await readJsonIfPresent(path.join(resolved, "design.json")) as LabMedbreviaNhanesResult | null;
+  const manifestPath = path.join(resolved, "data-access.json");
+  const manifest: ResearchDataAccessManifest = {
+    packetDir: resolved,
+    manifestPath,
+    dataset: design?.protocol.dataset ?? "unknown",
+    files: await Promise.all(files.map(async (file, index) => ({
+      path: path.resolve(file),
+      role: index === 0 ? "primary-data" : "supporting-data",
+      exists: await exists(path.resolve(file)),
+    }))),
+    readOnly: true,
+    notes: [
+      "Data files are declared read-only for research pipeline execution.",
+      "Adapters should fail closed if a declared data file is missing or mutable write access is requested.",
+    ],
+  };
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return manifest;
+}
+
+export function renderResearchDataAccessManifest(manifest: ResearchDataAccessManifest): string {
+  return [
+    `research data access manifest: ${manifest.packetDir}`,
+    `  dataset: ${manifest.dataset}`,
+    `  read-only: ${manifest.readOnly}`,
+    `  files: ${manifest.files.length}`,
+    ...manifest.files.map(file => `  - [${file.exists ? "present" : "missing"}] ${file.role}: ${file.path}`),
+  ].join("\n");
+}
+
+export function renderResearchDataAccessManifestJson(manifest: ResearchDataAccessManifest): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    dataAccess: manifest,
+  }, null, 2)}\n`;
+}
+
+export async function researchRealLocalRunnerSpecCommand(packetDir: string): Promise<ResearchRealLocalRunnerSpec> {
+  const resolved = path.resolve(packetDir);
+  const design = await readJsonIfPresent(path.join(resolved, "design.json")) as LabMedbreviaNhanesResult | null;
+  const scout = await readScoutIfPresent(resolved);
+  const spec: ResearchRealLocalRunnerSpec = {
+    packetDir: resolved,
+    generatedAtIso: new Date().toISOString(),
+    runnerVersion: 0,
+    mode: "real_local_files",
+    dataAccessManifest: await exists(path.join(resolved, "data-access.json")) ? path.join(resolved, "data-access.json") : null,
+    requiredVariables: scout?.requiredVariables ?? (design ? uniqueStrings([
+      ...design.protocol.exposure.variables,
+      ...design.protocol.endpoint.variables,
+      ...design.protocol.covariates,
+      ...(design.protocol.stratifiers ?? []),
+      design.protocol.surveyDesign.weightVariable,
+      design.protocol.surveyDesign.strataVariable,
+      design.protocol.surveyDesign.psuVariable,
+    ]) : []),
+    safety: {
+      cloudSpendUsd: 0,
+      readOnlyData: true,
+      requiresHumanApproval: true,
+    },
+  };
+  await writeFile(path.join(resolved, "real-runner-spec.json"), `${JSON.stringify(spec, null, 2)}\n`);
+  return spec;
+}
+
+export function renderResearchRealLocalRunnerSpec(spec: ResearchRealLocalRunnerSpec): string {
+  return [
+    `research real-local runner spec: ${spec.packetDir}`,
+    `  mode: ${spec.mode}`,
+    `  data access: ${spec.dataAccessManifest ?? "missing"}`,
+    `  required variables: ${spec.requiredVariables.join(", ") || "(none)"}`,
+    `  safety: cloud=$${spec.safety.cloudSpendUsd} read_only=${spec.safety.readOnlyData} approval=${spec.safety.requiresHumanApproval}`,
+  ].join("\n");
+}
+
+export function renderResearchRealLocalRunnerSpecJson(spec: ResearchRealLocalRunnerSpec): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    realLocalRunnerSpec: spec,
+  }, null, 2)}\n`;
+}
+
+export async function researchRealStudyChecklistCommand(packetDir: string): Promise<ResearchRealStudyChecklist> {
+  const resolved = path.resolve(packetDir);
+  const dataAccessDone = await exists(path.join(resolved, "data-access.json"));
+  const realRunnerDone = await exists(path.join(resolved, "real-runner-spec.json"));
+  const readiness = await researchRealStudyReadinessCommand(resolved);
+  const items: ResearchRealStudyChecklist["items"] = [
+    {
+      order: 1,
+      command: `agenteer research data-access --packet ${resolved} --file <real-data-file> --json`,
+      reason: "Declare read-only local data files and access constraints.",
+      done: dataAccessDone,
+    },
+    {
+      order: 2,
+      command: `agenteer research real-runner-spec --packet ${resolved} --json`,
+      reason: "Create a non-fixture runner contract for read-only local files.",
+      done: realRunnerDone,
+    },
+    {
+      order: 3,
+      command: `agenteer research real-study-readiness --packet ${resolved} --json`,
+      reason: "Verify the packet is ready before claiming real-data execution.",
+      done: readiness.status === "ready_for_local_real_data",
+    },
+  ];
+  return {
+    packetDir: resolved,
+    items,
+    nextCommand: items.find(item => !item.done)?.command ?? null,
+  };
+}
+
+export function renderResearchRealStudyChecklist(checklist: ResearchRealStudyChecklist): string {
+  return [
+    `research real-study checklist: ${checklist.packetDir}`,
+    `  next: ${checklist.nextCommand ?? "(complete)"}`,
+    ...checklist.items.map(item => `  ${item.order}. [${item.done ? "done" : "todo"}] ${item.command}\n     ${item.reason}`),
+  ].join("\n");
+}
+
+export function renderResearchRealStudyChecklistJson(checklist: ResearchRealStudyChecklist): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    realStudyChecklist: checklist,
+  }, null, 2)}\n`;
+}
+
+export async function researchAdapterGapReportCommand(packetDir: string): Promise<ResearchAdapterGapReport> {
+  const resolved = path.resolve(packetDir);
+  const realRunner = await readJsonIfPresent(path.join(resolved, "real-runner-spec.json")) as ResearchRealLocalRunnerSpec | null;
+  const dataAccess = await readJsonIfPresent(path.join(resolved, "data-access.json")) as ResearchDataAccessManifest | null;
+  const requiredVariables = realRunner?.requiredVariables ?? [];
+  const missingEvidence = [
+    ...(!dataAccess ? ["data-access.json"] : []),
+    ...(!realRunner ? ["real-runner-spec.json"] : []),
+    ...requiredVariables.map(variable => `variable:${variable}`),
+  ];
+  return {
+    packetDir: resolved,
+    requiredVariables,
+    declaredFiles: dataAccess?.files.length ?? 0,
+    missingEvidence,
+    status: missingEvidence.length ? "needs_mapping" : "mapping_ready",
+    nextAction: missingEvidence.length
+      ? "Add schema/variable mapping evidence for required variables before real-data execution."
+      : "Adapter inputs have declared files and variable mapping evidence.",
+  };
+}
+
+export function renderResearchAdapterGapReport(report: ResearchAdapterGapReport): string {
+  return [
+    `research adapter gap report: ${report.packetDir}`,
+    `  status: ${report.status}`,
+    `  declared files: ${report.declaredFiles}`,
+    `  required variables: ${report.requiredVariables.join(", ") || "(none)"}`,
+    `  missing evidence: ${report.missingEvidence.join(", ") || "(none)"}`,
+    `  next: ${report.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchAdapterGapReportJson(report: ResearchAdapterGapReport): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    adapterGapReport: report,
+  }, null, 2)}\n`;
+}
+
 export function renderResearchDesignResult(result: ResearchDesignResult): string {
   return renderLabMedbreviaNhanesResult(result);
 }
@@ -1745,8 +2277,10 @@ async function listResearchArtifactNames(packetDir: string): Promise<string[]> {
     "runner-spec.json",
     "approval.json",
     "analysis-result.json",
+    "data-access.json",
     "methods-validation.json",
     "provenance.json",
+    "real-runner-spec.json",
     "report.md",
     "report-review.json",
     "ro-crate-metadata.json",
@@ -2523,6 +3057,54 @@ function isEligible(row: Record<string, unknown>): boolean {
   const status = row.RIDSTATR == null ? 2 : Number(row.RIDSTATR);
   const age = row.RIDAGEYR == null ? 20 : Number(row.RIDAGEYR);
   return status === 2 && age >= 20;
+}
+
+function buildSyntheticStudyRows(protocol: LabMedbreviaNhanesResult["protocol"]): Array<Record<string, unknown>> {
+  const base = [
+    { SEQN: 1, RIDSTATR: 2, RIDAGEYR: 44, RIAGENDR: 1, RIDRETH3: 3, WTMEC2YR: 1, SDMVSTRA: 1, SDMVPSU: 1 },
+    { SEQN: 2, RIDSTATR: 2, RIDAGEYR: 58, RIAGENDR: 2, RIDRETH3: 4, WTMEC2YR: 1, SDMVSTRA: 1, SDMVPSU: 2 },
+    { SEQN: 3, RIDSTATR: 2, RIDAGEYR: 66, RIAGENDR: 1, RIDRETH3: 2, WTMEC2YR: 1, SDMVSTRA: 2, SDMVPSU: 1 },
+    { SEQN: 4, RIDSTATR: 2, RIDAGEYR: 52, RIAGENDR: 2, RIDRETH3: 1, WTMEC2YR: 1, SDMVSTRA: 2, SDMVPSU: 2 },
+  ];
+  return base.map((row, index) => ({
+    ...row,
+    ...syntheticValuesForProtocol(protocol, index),
+  }));
+}
+
+function syntheticValuesForProtocol(protocol: LabMedbreviaNhanesResult["protocol"], index: number): Record<string, unknown> {
+  const row: Record<string, unknown> = {
+    BMXBMI: [24, 31, 29, 35][index],
+    LBXGH: [5.4, 6.1, 7.2, 5.8][index],
+    LBXVIDMS: [42, 74, 38, 86][index],
+    BPXSY1: [142, 118, 136, 122][index],
+    BPXSY2: [140, 116, 132, 124][index],
+    BPXSY3: [138, 120, 134, 126][index],
+    BPXDI1: [86, 72, 82, 76][index],
+    BPXDI2: [84, 70, 80, 74][index],
+    BPXDI3: [82, 74, 78, 72][index],
+    BPQ020: [1, 2, 2, 1][index],
+    SMQ020: [1, 2, 1, 2][index],
+    HIQ011: [1, 2, 1, 2][index],
+    INDFMPIR: [0.9, 2.4, 4.2, 1.8][index],
+    URDACT: [10, 30, 80, 18][index],
+    LBXSCR: [0.8, 1.0, 1.4, 0.9][index],
+    LBXTC: [210, 190, 175, 205][index],
+    LBDHDD: [42, 50, 56, 44][index],
+    LBXTR: [160, 120, 100, 150][index],
+  };
+  for (const variable of uniqueStrings([
+    ...protocol.exposure.variables,
+    ...protocol.endpoint.variables,
+    ...protocol.covariates,
+    ...(protocol.stratifiers ?? []),
+    protocol.surveyDesign.weightVariable,
+    protocol.surveyDesign.strataVariable,
+    protocol.surveyDesign.psuVariable,
+  ])) {
+    if (!(variable in row)) row[variable] = index % 2 === 0 ? 1 : 2;
+  }
+  return row;
 }
 
 function isEligibleForProtocol(

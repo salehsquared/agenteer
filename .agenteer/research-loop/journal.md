@@ -217,3 +217,53 @@ Next: Cycle 45 should expand the stage manifest to include the new reusable node
 Expanded canonical research stage manifest to include methods-validation, data-quality, RO-Crate, provenance, and QA-dashboard stages in the node-backed pipeline order.
 
 Next: Cycle 46 should add a privacy/reliability suppression policy command for small cells and unstable medical estimates.
+## Cycle 46
+
+Added suppression-policy command to encode small-count reliability/privacy threshold decisions as structured output.
+
+Next: Cycle 47 should add registry variable search to improve dataset understanding and variable discovery.
+## Cycle 47
+
+Added registry-search command for dataset variable discovery by query terms, returning structured variable matches.
+
+Next: Cycle 48 should add an estimand sketch command to separate association, causal, prediction, diagnostic, and descriptive targets.
+## Cycle 48
+
+Added estimand-sketch command to make target quantity, contrast, assumptions, and disallowed language explicit from research question intent.
+
+Next: Cycle 49 should add a study simulation command that generates full synthetic study packets from realistic questions for stronger end-to-end testing.
+## Cycle 49
+
+Added simulate-study command that runs a complete synthetic local study packet from a realistic question through design, validation, scout, data-quality, analysis, review, reproducibility, export, and QA.
+
+Next: Cycle 50 should add a real-study readiness command that distinguishes synthetic simulation from real dataset execution and lists missing adapter requirements.
+## Cycle 50
+
+Added real-study-readiness command to explicitly separate synthetic study simulations from true local real-data execution and list missing adapter requirements.
+
+Next: Cycle 51 should add data-access manifest generation for real dataset adapters.
+## Cycle 51
+
+Added data-access command to write read-only data access manifests for future real-data adapters and include data-access.json in artifact manifests.
+
+Next: Cycle 52 should add a runner adapter spec for real local files, separate from the current local_fixture runner.
+## Cycle 52
+
+Added real-runner-spec command for read-only local file execution contracts distinct from synthetic local_fixture runner specs.
+
+Next: Cycle 53 should update real-study-readiness to recognize real-runner-spec and data-access as progress toward real local execution.
+## Cycle 53
+
+Updated real-study-readiness to recognize real-runner-spec.json and data-access.json as concrete progress toward read-only real local data execution.
+
+Next: Cycle 54 should add a real-study packet checklist command that emits ordered actions to move from simulation to real local execution.
+## Cycle 54
+
+Added real-study-checklist command that emits ordered commands for moving a packet from synthetic simulation toward read-only real local data execution.
+
+Next: Cycle 55 should add an adapter gap report that compares packet requirements to declared data access files and missing variables.
+## Cycle 55
+
+Added adapter-gap-report command to compare real local runner requirements against declared data access state and identify missing variable mapping evidence.
+
+Next: Cycle 56 should add a variable-map command to record file-to-variable mappings for real local data adapters.

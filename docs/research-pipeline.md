@@ -105,13 +105,22 @@ agenteer research questions --project medbrevia-nhanes --repo /path/to/medbrevia
 agenteer research methods-framework --json
 agenteer research validate-methods --packet ./packet --json
 agenteer research registry-inspect --registry ./registry.json --json
+agenteer research registry-search --registry ./registry.json --query "blood pressure" --json
 agenteer research decompose-question --question "..." --json
 agenteer research clarification-plan --question "..." --json
 agenteer research data-quality --fixture ./rows.json --json
 agenteer research select-method --question "..." --json
+agenteer research estimand-sketch --question "..." --json
+agenteer research simulate-study --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet --json
+agenteer research real-study-readiness --packet ./packet --json
+agenteer research data-access --packet ./packet --file ./rows.parquet --json
+agenteer research real-runner-spec --packet ./packet --json
+agenteer research real-study-checklist --packet ./packet --json
+agenteer research adapter-gap-report --packet ./packet --json
 agenteer research ro-crate --packet ./packet --json
 agenteer research provenance --packet ./packet --json
 agenteer research qa-dashboard --packet ./packet --json
+agenteer research suppression-policy --count 12 --json
 agenteer research stages
 agenteer research stages --json
 agenteer research design --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet
