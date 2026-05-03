@@ -261,6 +261,125 @@ export interface ResearchPacketExport {
   summaryPath: string;
 }
 
+export interface ResearchPacketSummary {
+  packetDir: string;
+  generatedAtIso: string;
+  stages: ResearchPipelineStage[];
+  checkpoint: ResearchCheckpoint;
+  manifest: ResearchArtifactManifest | null;
+  reportReview: ResearchReportReview | null;
+  exportRecord: ResearchPacketExport | null;
+  nextAction: string;
+}
+
+export interface ResearchMethodsFrameworkItem {
+  id: string;
+  appliesTo: string[];
+  purpose: string;
+  pipelineImplication: string;
+  sourceUrl: string;
+}
+
+export interface ResearchMethodsFramework {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  items: ResearchMethodsFrameworkItem[];
+}
+
+export interface ResearchMethodsValidationResult {
+  packetDir: string;
+  status: "pass" | "needs_review" | "blocked";
+  appliedFrameworkItems: string[];
+  issues: ResearchCritiqueIssue[];
+}
+
+export interface ResearchRegistryInspectResult {
+  registryPath: string;
+  dataset: string;
+  cycles: string[];
+  domainCount: number;
+  variableCount: number;
+  weightRuleCount: number;
+  warnings: ResearchCritiqueIssue[];
+  nextAction: string;
+}
+
+export interface ResearchQuestionDecomposition {
+  question: string;
+  intent: "association" | "causal" | "prediction" | "diagnostic" | "descriptive";
+  population: string | null;
+  exposureOrPredictor: string | null;
+  outcome: string | null;
+  stratifierOrModifier: string | null;
+  requiredMethods: string[];
+  clarificationPrompts: string[];
+}
+
+export interface ResearchClarificationPlan {
+  question: string;
+  status: "needs_clarification" | "ready_for_protocol_design";
+  items: Array<{
+    id: string;
+    priority: "required" | "recommended";
+    prompt: string;
+    reason: string;
+  }>;
+  nextAction: string;
+}
+
+export interface ResearchDataQualityProfile {
+  fixturePath: string;
+  rowCount: number;
+  variableCount: number;
+  variables: Array<{
+    name: string;
+    missing: number;
+    missingRate: number;
+    codedUnknown: number;
+    observed: number;
+  }>;
+  warnings: ResearchCritiqueIssue[];
+}
+
+export interface ResearchMethodSelection {
+  question: string;
+  intent: ResearchQuestionDecomposition["intent"];
+  recommendedAnalysis: string;
+  requiredChecks: string[];
+  cautions: string[];
+}
+
+export interface ResearchRoCrateMetadata {
+  packetDir: string;
+  cratePath: string;
+  metadata: {
+    "@context": string;
+    "@graph": Array<Record<string, unknown>>;
+  };
+}
+
+export interface ResearchProvenanceGraph {
+  packetDir: string;
+  provenancePath: string;
+  graph: {
+    schemaVersion: 1;
+    entities: Array<{ id: string; type: "artifact"; path: string; sha256?: string }>;
+    activities: Array<{ id: string; type: string; generated: string[]; used: string[] }>;
+    agents: Array<{ id: string; type: string; role: string }>;
+  };
+}
+
+export interface ResearchQaDashboard {
+  packetDir: string;
+  status: "ready" | "needs_review" | "blocked";
+  checks: Array<{
+    id: string;
+    status: "pass" | "missing" | "needs_review" | "blocked";
+    detail: string;
+  }>;
+  nextAction: string;
+}
+
 export async function researchDesignCommand(
   opts: ResearchDesignOptions,
 ): Promise<ResearchDesignResult> {
@@ -284,13 +403,18 @@ export function researchPipelineStagesCommand(): ResearchPipelineStage[] {
   return [
     { id: "design", nodeId: "@agenteer/node-research-protocol-design", purpose: "Create a protocol packet from a question and dataset registry.", humanReview: false },
     { id: "critique", nodeId: "@agenteer/node-research-protocol-critique", purpose: "Run deterministic methodology checks before execution.", humanReview: false },
+    { id: "methods-validation", nodeId: "@agenteer/node-research-methods-validation", purpose: "Validate packet methods against broader medical research policy.", humanReview: false },
     { id: "scout", nodeId: "@agenteer/node-research-scout-plan", purpose: "Plan or compute cohort and complete-case feasibility.", humanReview: false },
+    { id: "data-quality", nodeId: "@agenteer/node-research-data-quality", purpose: "Profile fixture data quality, missingness, and coded unknown values.", humanReview: false },
     { id: "runner-spec", nodeId: "@agenteer/node-research-runner-spec", purpose: "Define the zero-cloud execution contract.", humanReview: false },
     { id: "approval", nodeId: "human:approval", purpose: "Record human-in-the-loop approval before analysis.", humanReview: true },
     { id: "analysis", nodeId: "@agenteer/node-research-analyze-local", purpose: "Run bounded local fixture analysis.", humanReview: false },
     { id: "report-review", nodeId: "@agenteer/node-research-report-review", purpose: "Check report artifacts against packet-specific QA requirements.", humanReview: false },
     { id: "manifest", nodeId: "@agenteer/node-research-artifact-manifest", purpose: "Hash packet artifacts for reproducibility.", humanReview: false },
+    { id: "ro-crate", nodeId: "@agenteer/node-research-ro-crate", purpose: "Write RO-Crate-style metadata for research packet artifacts.", humanReview: false },
+    { id: "provenance", nodeId: "@agenteer/node-research-provenance", purpose: "Write a PROV-style graph for packet artifacts and activities.", humanReview: false },
     { id: "export", nodeId: "@agenteer/node-research-export", purpose: "Copy manifest-backed artifacts into a durable export directory.", humanReview: false },
+    { id: "qa-dashboard", nodeId: "@agenteer/node-research-qa-dashboard", purpose: "Summarize lifecycle, methods, reproducibility, and export readiness.", humanReview: false },
   ];
 }
 
@@ -308,6 +432,682 @@ export function renderResearchPipelineStagesJson(stages: readonly ResearchPipeli
   return `${JSON.stringify({
     schemaVersion: 1,
     stages,
+  }, null, 2)}\n`;
+}
+
+export function researchMethodsFrameworkCommand(): ResearchMethodsFramework {
+  return {
+    schemaVersion: 1,
+    generatedAtIso: new Date().toISOString(),
+    items: [
+      {
+        id: "strobe",
+        appliesTo: ["observational", "cohort", "case-control", "cross-sectional"],
+        purpose: "Transparent reporting for observational epidemiology.",
+        pipelineImplication: "Report QA should check population, variables, bias, study size, statistical methods, participant flow, descriptive data, outcomes, limitations, and generalizability.",
+        sourceUrl: "https://www.strobe-statement.org/",
+      },
+      {
+        id: "tripod",
+        appliesTo: ["prediction", "diagnosis", "prognosis", "machine-learning"],
+        purpose: "Transparent reporting for clinical prediction model development, validation, or updating.",
+        pipelineImplication: "Prediction workflows need explicit model purpose, development/validation split, calibration, discrimination, missing data handling, and intended use.",
+        sourceUrl: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4297220/",
+      },
+      {
+        id: "target-trial-emulation",
+        appliesTo: ["causal", "treatment-comparison", "intervention"],
+        purpose: "Clarify causal questions from observational data by specifying the hypothetical randomized trial being emulated.",
+        pipelineImplication: "Causal workflows should require eligibility, strategies, assignment, follow-up, outcomes, causal contrast, assumptions, and analysis plan before causal language is allowed.",
+        sourceUrl: "https://jamanetwork.com/journals/jama/fullarticle/2799678",
+      },
+      {
+        id: "real-world-evidence-fitness",
+        appliesTo: ["ehr", "claims", "registry", "real-world-data"],
+        purpose: "Assess whether routinely collected health data are fit for a specific research purpose.",
+        pipelineImplication: "Dataset registry and scout stages should evaluate relevance and reliability of exposure, outcome, timing, coding, completeness, and provenance.",
+        sourceUrl: "https://www.fda.gov/science-research/science-and-research-special-topics/real-world-evidence",
+      },
+      {
+        id: "survey-design",
+        appliesTo: ["complex-survey", "nhanes", "population-estimate"],
+        purpose: "Protect validity of survey estimates by respecting weights, strata, PSUs, and subpopulation rules.",
+        pipelineImplication: "Runner specs must distinguish local fixtures from population estimates and require survey design variables for weighted analyses.",
+        sourceUrl: "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+      },
+      {
+        id: "missing-data",
+        appliesTo: ["observational", "registry", "ehr", "survey"],
+        purpose: "Make missingness assumptions and handling strategies explicit.",
+        pipelineImplication: "Scout and data-quality stages should summarize missingness and require a plan for complete-case analysis, imputation, weighting, or sensitivity analysis.",
+        sourceUrl: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8168830/",
+      },
+      {
+        id: "fair",
+        appliesTo: ["metadata", "dataset-registry", "artifact-export"],
+        purpose: "Make research assets findable, accessible, interoperable, and reusable.",
+        pipelineImplication: "Packets should expose stable identifiers, machine-readable metadata, explicit formats, and reusable artifact manifests.",
+        sourceUrl: "https://www.nature.com/articles/sdata201618",
+      },
+      {
+        id: "ro-crate",
+        appliesTo: ["artifact-export", "reproducibility", "workflow-package"],
+        purpose: "Package research data, code, outputs, and metadata as a structured research object.",
+        pipelineImplication: "Export should evolve from copied files into a standards-aligned research crate with metadata about datasets, code, commands, and outputs.",
+        sourceUrl: "https://www.researchobject.org/ro-crate/specification/1.2/introduction.html",
+      },
+      {
+        id: "w3c-prov",
+        appliesTo: ["provenance", "lineage", "agent-audit"],
+        purpose: "Represent entities, activities, and agents involved in producing artifacts.",
+        pipelineImplication: "Agenteer should link prompts, validations, approvals, commands, inputs, generated code, outputs, and reviewers in a provenance graph.",
+        sourceUrl: "https://www.w3.org/TR/prov-overview/",
+      },
+    ],
+  };
+}
+
+export function renderResearchMethodsFramework(framework: ResearchMethodsFramework): string {
+  return [
+    "research methods framework",
+    "",
+    ...framework.items.map(item =>
+      `${item.id}: ${item.purpose}\n  applies: ${item.appliesTo.join(", ")}\n  implication: ${item.pipelineImplication}\n  source: ${item.sourceUrl}`,
+    ),
+  ].join("\n");
+}
+
+export function renderResearchMethodsFrameworkJson(framework: ResearchMethodsFramework): string {
+  return `${JSON.stringify(framework, null, 2)}\n`;
+}
+
+export async function researchValidateMethodsCommand(packetDir: string): Promise<ResearchMethodsValidationResult> {
+  const resolved = path.resolve(packetDir);
+  const packet = JSON.parse(await readFile(path.join(resolved, "design.json"), "utf-8")) as LabMedbreviaNhanesResult;
+  const scout = await readScoutIfPresent(resolved);
+  const protocol = packet.protocol;
+  const question = protocol.clinicalQuestion.toLowerCase();
+  const caveats = protocol.caveats.join("\n").toLowerCase();
+  const applied = new Set<string>(["strobe"]);
+  const issues: ResearchCritiqueIssue[] = [];
+
+  if (/\b(cause|causal|effect of|impact of|prevent|reduce|improve|treatment|intervention)\b/.test(question)) {
+    applied.add("target-trial-emulation");
+    issues.push({
+      severity: "blocker",
+      code: "CAUSAL_LANGUAGE_REQUIRES_TARGET_TRIAL_SPEC",
+      message: "The question implies causal interpretation; specify target-trial components before causal language is allowed.",
+    });
+  }
+
+  if (/\b(predict|prediction|risk score|prognos|diagnostic model|classification model|machine learning)\b/.test(question)) {
+    applied.add("tripod");
+    issues.push({
+      severity: "blocker",
+      code: "PREDICTION_QUESTION_REQUIRES_TRIPOD_PLAN",
+      message: "Prediction-model questions need a TRIPOD/TRIPOD+AI development or validation plan.",
+    });
+  }
+
+  if (protocol.surveyDesign.weightVariable || protocol.surveyDesign.strataVariable || protocol.surveyDesign.psuVariable) {
+    applied.add("survey-design");
+    if (!protocol.surveyDesign.weightVariable || !protocol.surveyDesign.strataVariable || !protocol.surveyDesign.psuVariable) {
+      issues.push({
+        severity: "warning",
+        code: "INCOMPLETE_SURVEY_DESIGN",
+        message: "Survey analyses should identify weight, strata, and PSU variables or explicitly state why one is unavailable.",
+      });
+    }
+  }
+
+  applied.add("missing-data");
+  if (!scout?.metrics) {
+    issues.push({
+      severity: "warning",
+      code: "MISSINGNESS_NOT_COMPUTED",
+      message: "No computed scout metrics found; missingness and complete-case feasibility have not been quantified.",
+    });
+  }
+
+  applied.add("real-world-evidence-fitness");
+  if (!packet.source?.registrySha256) {
+    issues.push({
+      severity: "warning",
+      code: "MISSING_DATASET_FITNESS_TRACE",
+      message: "Dataset registry hash is missing, weakening data fitness and provenance review.",
+    });
+  }
+
+  applied.add("fair");
+  applied.add("w3c-prov");
+  if (!await exists(path.join(resolved, "artifact-manifest.json"))) {
+    issues.push({
+      severity: "warning",
+      code: "MISSING_REPRODUCIBILITY_MANIFEST",
+      message: "No artifact manifest exists yet; packet is not ready for reproducible review/export.",
+    });
+  }
+
+  if ((question.includes("associated") || question.includes("relate")) && !/observational|cross-sectional|non-causal/.test(caveats)) {
+    issues.push({
+      severity: "warning",
+      code: "MISSING_ASSOCIATION_CAVEAT",
+      message: "Association questions should preserve observational, cross-sectional, or non-causal caveats.",
+    });
+  }
+
+  if (!issues.length) {
+    issues.push({
+      severity: "note",
+      code: "METHODS_VALIDATION_READY",
+      message: "No deterministic methods-validation issues found.",
+    });
+  }
+
+  const result: ResearchMethodsValidationResult = {
+    packetDir: resolved,
+    status: issues.some(issue => issue.severity === "blocker")
+      ? "blocked"
+      : issues.some(issue => issue.severity === "warning")
+        ? "needs_review"
+        : "pass",
+    appliedFrameworkItems: Array.from(applied).sort((a, b) => a.localeCompare(b)),
+    issues,
+  };
+  await writeFile(path.join(resolved, "methods-validation.json"), `${JSON.stringify(result, null, 2)}\n`);
+  return result;
+}
+
+export function renderResearchMethodsValidation(result: ResearchMethodsValidationResult): string {
+  return [
+    `research methods validation: ${result.packetDir}`,
+    `  status: ${result.status}`,
+    `  framework: ${result.appliedFrameworkItems.join(", ")}`,
+    "  issues:",
+    ...result.issues.map(issue => `    - [${issue.severity}] ${issue.code}: ${issue.message}`),
+  ].join("\n");
+}
+
+export function renderResearchMethodsValidationJson(result: ResearchMethodsValidationResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    methodsValidation: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchRegistryInspectCommand(registryPath: string): Promise<ResearchRegistryInspectResult> {
+  const resolved = path.resolve(registryPath);
+  const registry = JSON.parse(await readFile(resolved, "utf-8")) as {
+    dataset?: unknown;
+    cycles?: unknown;
+    domains?: unknown;
+    variables?: unknown;
+    weightRules?: unknown;
+  };
+  const variables = Array.isArray(registry.variables) ? registry.variables : [];
+  const cycles = Array.isArray(registry.cycles)
+    ? registry.cycles.map(cycle => isRecord(cycle) && typeof cycle.id === "string" ? cycle.id : String(cycle))
+    : [];
+  const domains = isRecord(registry.domains) ? Object.keys(registry.domains) : [];
+  const weightRules = Array.isArray(registry.weightRules) ? registry.weightRules : [];
+  const warnings: ResearchCritiqueIssue[] = [];
+  if (typeof registry.dataset !== "string" || !registry.dataset.trim()) {
+    warnings.push({ severity: "warning", code: "MISSING_DATASET_ID", message: "Registry should include a stable dataset identifier." });
+  }
+  if (!variables.length) {
+    warnings.push({ severity: "blocker", code: "MISSING_VARIABLES", message: "Registry has no variables; protocol design cannot select exposures, outcomes, or covariates." });
+  }
+  if (!domains.length) {
+    warnings.push({ severity: "warning", code: "MISSING_DOMAINS", message: "Registry has no domains; dataset coverage and question generation will be weak." });
+  }
+  if (!cycles.length) {
+    warnings.push({ severity: "warning", code: "MISSING_CYCLES", message: "Registry has no cycles or time windows; reproducibility and temporal scope are underspecified." });
+  }
+  if (!weightRules.length) {
+    warnings.push({ severity: "note", code: "NO_WEIGHT_RULES", message: "No survey/weight rules were found; this is acceptable for non-survey datasets but should be explicit." });
+  }
+  return {
+    registryPath: resolved,
+    dataset: typeof registry.dataset === "string" && registry.dataset.trim() ? registry.dataset : "(missing)",
+    cycles,
+    domainCount: domains.length,
+    variableCount: variables.length,
+    weightRuleCount: weightRules.length,
+    warnings,
+    nextAction: warnings.some(issue => issue.severity === "blocker")
+      ? "Add variables before protocol design."
+      : "Use this registry for question generation, protocol design, or dataset-specific validator development.",
+  };
+}
+
+export function renderResearchRegistryInspect(result: ResearchRegistryInspectResult): string {
+  return [
+    `research registry inspect: ${result.registryPath}`,
+    `  dataset: ${result.dataset}`,
+    `  cycles: ${result.cycles.join(", ") || "(none)"}`,
+    `  domains: ${result.domainCount}`,
+    `  variables: ${result.variableCount}`,
+    `  weight rules: ${result.weightRuleCount}`,
+    `  next: ${result.nextAction}`,
+    "  warnings:",
+    ...result.warnings.map(issue => `    - [${issue.severity}] ${issue.code}: ${issue.message}`),
+  ].join("\n");
+}
+
+export function renderResearchRegistryInspectJson(result: ResearchRegistryInspectResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    registry: result,
+  }, null, 2)}\n`;
+}
+
+export function researchDecomposeQuestionCommand(question: string): ResearchQuestionDecomposition {
+  const normalized = question.trim();
+  const lower = normalized.toLowerCase();
+  const intent: ResearchQuestionDecomposition["intent"] =
+    /\b(predict|prediction|risk score|prognos|machine learning)\b/.test(lower) ? "prediction"
+      : /\b(sensitivity|specificity|diagnostic|screening|self-reported|self reported)\b/.test(lower) ? "diagnostic"
+        : /\b(cause|causal|effect of|impact of|prevent|reduce|improve|treatment|intervention)\b/.test(lower) ? "causal"
+          : /\b(prevalence|how common|distribution|describe|patterned by)\b/.test(lower) ? "descriptive"
+            : "association";
+  const population = extractQuestionPart(normalized, /\b(?:among|in)\s+(.+?)(?:,\s+|\s+is\s+|\s+are\s+|\s+does\s+|\s+do\s+|\s+how\s+)/i);
+  const stratifierOrModifier = extractQuestionPart(normalized, /\b(?:by|across|stratified by|differently by)\s+([^?]+?)(?:\s+among|\s+in|\?|$)/i);
+  const exposureOrPredictor =
+    extractQuestionPart(normalized, /\bis\s+(.+?)\s+(?:associated with|related to|predictive of|patterned by)\s+/i)
+    ?? extractQuestionPart(normalized, /\bdoes\s+(.+?)\s+(?:relate to|predict|affect|impact)\s+/i)
+    ?? extractQuestionPart(normalized, /\b(?:effect of|impact of)\s+(.+?)\s+on\s+/i);
+  const outcome =
+    extractQuestionPart(normalized, /\b(?:associated with|related to|predictive of|relate to|predict|affect|impact)\s+(.+?)(?:\s+differently by|\s+after|\s+among|\s+in|\s+by|\?|$)/i)
+    ?? extractQuestionPart(normalized, /\bon\s+(.+?)(?:\s+after|\s+among|\s+in|\s+by|\?|$)/i);
+  const requiredMethods = uniqueStrings([
+    "strobe",
+    intent === "causal" ? "target-trial-emulation" : null,
+    intent === "prediction" ? "tripod" : null,
+    intent === "diagnostic" ? "diagnostic-performance" : null,
+    "missing-data",
+  ]);
+  const clarificationPrompts = [
+    population ? null : "Specify the target population and eligibility criteria.",
+    exposureOrPredictor ? null : "Specify the primary exposure, predictor, or grouping variable.",
+    outcome ? null : "Specify the primary outcome or endpoint.",
+    intent === "causal" ? "Specify target-trial components before using causal language." : null,
+    stratifierOrModifier ? "Clarify whether the modifier is for stratification, interaction testing, or adjustment." : null,
+  ].filter((prompt): prompt is string => Boolean(prompt));
+  return {
+    question: normalized,
+    intent,
+    population,
+    exposureOrPredictor,
+    outcome,
+    stratifierOrModifier,
+    requiredMethods,
+    clarificationPrompts,
+  };
+}
+
+export function renderResearchQuestionDecomposition(result: ResearchQuestionDecomposition): string {
+  return [
+    "research question decomposition",
+    `  intent: ${result.intent}`,
+    `  population: ${result.population ?? "(needs clarification)"}`,
+    `  exposure/predictor: ${result.exposureOrPredictor ?? "(needs clarification)"}`,
+    `  outcome: ${result.outcome ?? "(needs clarification)"}`,
+    `  stratifier/modifier: ${result.stratifierOrModifier ?? "(none)"}`,
+    `  methods: ${result.requiredMethods.join(", ")}`,
+    "  clarifications:",
+    ...result.clarificationPrompts.map(prompt => `    - ${prompt}`),
+  ].join("\n");
+}
+
+export function renderResearchQuestionDecompositionJson(result: ResearchQuestionDecomposition): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    decomposition: result,
+  }, null, 2)}\n`;
+}
+
+export function researchClarificationPlanCommand(question: string): ResearchClarificationPlan {
+  const decomposition = researchDecomposeQuestionCommand(question);
+  const items: ResearchClarificationPlan["items"] = decomposition.clarificationPrompts.map((prompt, index) => ({
+    id: `clarify-${index + 1}`,
+    priority: prompt.includes("Specify the primary") || prompt.includes("target population") || prompt.includes("target-trial")
+      ? "required"
+      : "recommended",
+    prompt,
+    reason: prompt.includes("target-trial")
+      ? "Causal claims require a design-level methods commitment before analysis."
+      : prompt.includes("modifier")
+        ? "Effect modification and stratification decisions change analysis and reporting requirements."
+        : "Protocol design needs this field to avoid silent assumptions.",
+  }));
+  if (!items.length) {
+    items.push({
+      id: "confirm-protocol-scope",
+      priority: "recommended",
+      prompt: "Confirm the extracted population, exposure/predictor, outcome, and methods intent before protocol design.",
+      reason: "Human-in-the-loop confirmation catches semantic mismatches before variable selection.",
+    });
+  }
+  return {
+    question: decomposition.question,
+    status: items.some(item => item.priority === "required") ? "needs_clarification" : "ready_for_protocol_design",
+    items,
+    nextAction: items.some(item => item.priority === "required")
+      ? "Resolve required clarifications before protocol design."
+      : "Proceed to protocol design after reviewer confirmation.",
+  };
+}
+
+export function renderResearchClarificationPlan(plan: ResearchClarificationPlan): string {
+  return [
+    "research clarification plan",
+    `  status: ${plan.status}`,
+    `  next: ${plan.nextAction}`,
+    "  items:",
+    ...plan.items.map(item => `    - [${item.priority}] ${item.id}: ${item.prompt} (${item.reason})`),
+  ].join("\n");
+}
+
+export function renderResearchClarificationPlanJson(plan: ResearchClarificationPlan): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    clarificationPlan: plan,
+  }, null, 2)}\n`;
+}
+
+export async function researchDataQualityCommand(fixturePath: string): Promise<ResearchDataQualityProfile> {
+  const resolved = path.resolve(fixturePath);
+  const rows = JSON.parse(await readFile(resolved, "utf-8")) as Array<Record<string, unknown>>;
+  const variables = uniqueStrings(rows.flatMap(row => Object.keys(row)));
+  const profileVariables = variables.map(name => {
+    const values = rows.map(row => row[name]);
+    const missing = values.filter(value => !hasValue(value)).length;
+    const codedUnknown = values.filter(value => Number(value) === 7 || Number(value) === 9 || Number(value) === 77 || Number(value) === 99).length;
+    return {
+      name,
+      missing,
+      missingRate: rows.length ? missing / rows.length : 0,
+      codedUnknown,
+      observed: rows.length - missing,
+    };
+  });
+  const warnings: ResearchCritiqueIssue[] = [];
+  if (!rows.length) {
+    warnings.push({ severity: "blocker", code: "EMPTY_FIXTURE", message: "Fixture contains no rows." });
+  }
+  for (const variable of profileVariables) {
+    if (variable.missingRate > 0.4) {
+      warnings.push({ severity: "warning", code: "HIGH_MISSINGNESS", message: `${variable.name} is missing in ${(variable.missingRate * 100).toFixed(1)}% of rows.` });
+    }
+    if (variable.codedUnknown > 0) {
+      warnings.push({ severity: "warning", code: "CODED_UNKNOWN_VALUES", message: `${variable.name} contains ${variable.codedUnknown} coded unknown/refused values.` });
+    }
+  }
+  if (!warnings.length) {
+    warnings.push({ severity: "note", code: "DATA_QUALITY_READY", message: "No deterministic fixture data-quality warnings found." });
+  }
+  return {
+    fixturePath: resolved,
+    rowCount: rows.length,
+    variableCount: variables.length,
+    variables: profileVariables,
+    warnings,
+  };
+}
+
+export function renderResearchDataQuality(profile: ResearchDataQualityProfile): string {
+  return [
+    `research data quality: ${profile.fixturePath}`,
+    `  rows: ${profile.rowCount}`,
+    `  variables: ${profile.variableCount}`,
+    "  warnings:",
+    ...profile.warnings.map(issue => `    - [${issue.severity}] ${issue.code}: ${issue.message}`),
+  ].join("\n");
+}
+
+export function renderResearchDataQualityJson(profile: ResearchDataQualityProfile): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    dataQuality: profile,
+  }, null, 2)}\n`;
+}
+
+export function researchSelectMethodCommand(question: string): ResearchMethodSelection {
+  const decomposition = researchDecomposeQuestionCommand(question);
+  const recommendedAnalysis = decomposition.intent === "causal"
+    ? "target_trial_emulation_or_causal_contrast"
+    : decomposition.intent === "prediction"
+      ? "prediction_model_development_or_validation"
+      : decomposition.intent === "diagnostic"
+        ? "diagnostic_accuracy_table"
+        : decomposition.intent === "descriptive"
+          ? "descriptive_summary_or_prevalence"
+          : "association_model_or_contingency_summary";
+  const requiredChecks = uniqueStrings([
+    "missingness_profile",
+    "data_quality_profile",
+    "effect_size_and_uncertainty",
+    decomposition.intent === "causal" ? "target_trial_components" : null,
+    decomposition.intent === "prediction" ? "calibration_and_discrimination" : null,
+    decomposition.intent === "diagnostic" ? "sensitivity_specificity_ppv_npv" : null,
+    decomposition.stratifierOrModifier ? "stratified_or_interaction_plan" : null,
+  ]);
+  const cautions = [
+    decomposition.intent === "causal" ? "Do not allow causal language without explicit assumptions and target-trial specification." : null,
+    decomposition.intent === "prediction" ? "Prediction models require validation and calibration; association summaries are not enough." : null,
+    decomposition.intent === "diagnostic" ? "Diagnostic metrics require a clear reference standard and interpretable prevalence context." : null,
+    "Local fixture analyses are not population estimates unless the runner uses valid design-aware methods.",
+  ].filter((caution): caution is string => Boolean(caution));
+  return {
+    question: decomposition.question,
+    intent: decomposition.intent,
+    recommendedAnalysis,
+    requiredChecks,
+    cautions,
+  };
+}
+
+export function renderResearchMethodSelection(selection: ResearchMethodSelection): string {
+  return [
+    "research method selection",
+    `  intent: ${selection.intent}`,
+    `  recommended analysis: ${selection.recommendedAnalysis}`,
+    `  required checks: ${selection.requiredChecks.join(", ")}`,
+    "  cautions:",
+    ...selection.cautions.map(caution => `    - ${caution}`),
+  ].join("\n");
+}
+
+export function renderResearchMethodSelectionJson(selection: ResearchMethodSelection): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    methodSelection: selection,
+  }, null, 2)}\n`;
+}
+
+export async function researchRoCrateCommand(packetDir: string): Promise<ResearchRoCrateMetadata> {
+  const resolved = path.resolve(packetDir);
+  const manifest = await readJsonIfPresent(path.join(resolved, "artifact-manifest.json")) as ResearchArtifactManifest | null;
+  const packet = await readJsonIfPresent(path.join(resolved, "design.json")) as LabMedbreviaNhanesResult | null;
+  const cratePath = path.join(resolved, "ro-crate-metadata.json");
+  const artifacts = manifest?.artifacts ?? [];
+  const graph: Array<Record<string, unknown>> = [
+    {
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "conformsTo": { "@id": "https://w3id.org/ro/crate/1.2" },
+      "about": { "@id": "./" },
+    },
+    {
+      "@id": "./",
+      "@type": "Dataset",
+      "name": packet?.protocol.title ?? "Agenteer research packet",
+      "description": packet?.protocol.clinicalQuestion ?? "Agenteer research packet",
+      "hasPart": artifacts.map(artifact => ({ "@id": artifact.path })),
+    },
+    ...artifacts.map(artifact => ({
+      "@id": artifact.path,
+      "@type": "File",
+      "contentSize": artifact.bytes,
+      "sha256": artifact.sha256,
+    })),
+  ];
+  const metadata: ResearchRoCrateMetadata["metadata"] = {
+    "@context": "https://w3id.org/ro/crate/1.2/context",
+    "@graph": graph,
+  };
+  const result: ResearchRoCrateMetadata = {
+    packetDir: resolved,
+    cratePath,
+    metadata,
+  };
+  await writeFile(cratePath, `${JSON.stringify(metadata, null, 2)}\n`);
+  return result;
+}
+
+export function renderResearchRoCrate(result: ResearchRoCrateMetadata): string {
+  return [
+    `research ro-crate: ${result.packetDir}`,
+    `  metadata: ${result.cratePath}`,
+    `  graph nodes: ${result.metadata["@graph"].length}`,
+  ].join("\n");
+}
+
+export function renderResearchRoCrateJson(result: ResearchRoCrateMetadata): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    roCrate: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchProvenanceCommand(packetDir: string): Promise<ResearchProvenanceGraph> {
+  const resolved = path.resolve(packetDir);
+  const provenancePath = path.join(resolved, "provenance.json");
+  const manifest = await readJsonIfPresent(path.join(resolved, "artifact-manifest.json")) as ResearchArtifactManifest | null;
+  const artifactPaths = manifest?.artifacts.map(artifact => artifact.path) ?? await listResearchArtifactNames(resolved);
+  const artifactSet = new Set(artifactPaths);
+  const entityFor = (artifact: string) => `artifact:${artifact}`;
+  const activities: ResearchProvenanceGraph["graph"]["activities"] = [
+    { id: "activity:design", type: "protocol-design", generated: ["design.json", "design.md", "workflow.yaml"].filter(item => artifactSet.has(item)).map(entityFor), used: [] },
+    { id: "activity:scout", type: "cohort-scout", generated: ["scout-plan.json"].filter(item => artifactSet.has(item)).map(entityFor), used: ["design.json"].filter(item => artifactSet.has(item)).map(entityFor) },
+    { id: "activity:runner-spec", type: "runner-contract", generated: ["runner-spec.json"].filter(item => artifactSet.has(item)).map(entityFor), used: ["design.json", "scout-plan.json"].filter(item => artifactSet.has(item)).map(entityFor) },
+    { id: "activity:approval", type: "human-approval", generated: ["approval.json"].filter(item => artifactSet.has(item)).map(entityFor), used: ["design.json", "scout-plan.json", "runner-spec.json"].filter(item => artifactSet.has(item)).map(entityFor) },
+    { id: "activity:analysis", type: "local-analysis", generated: ["analysis-result.json", "report.md"].filter(item => artifactSet.has(item)).map(entityFor), used: ["design.json", "approval.json", "runner-spec.json"].filter(item => artifactSet.has(item)).map(entityFor) },
+    { id: "activity:qa", type: "report-and-methods-review", generated: ["report-review.json", "methods-validation.json"].filter(item => artifactSet.has(item)).map(entityFor), used: ["design.json", "analysis-result.json", "report.md"].filter(item => artifactSet.has(item)).map(entityFor) },
+    { id: "activity:export", type: "reproducible-export", generated: ["artifact-manifest.json", "export-record.json", "ro-crate-metadata.json", "provenance.json"].filter(item => artifactSet.has(item) || item === "provenance.json").map(entityFor), used: artifactPaths.filter(item => item !== "export-record.json").map(entityFor) },
+  ].filter(activity => activity.generated.length > 0);
+  const graph: ResearchProvenanceGraph["graph"] = {
+    schemaVersion: 1,
+    entities: uniqueStrings([...artifactPaths, "provenance.json"]).map(artifact => ({
+      id: entityFor(artifact),
+      type: "artifact",
+      path: artifact,
+      ...(manifest?.artifacts.find(item => item.path === artifact)?.sha256 ? { sha256: manifest.artifacts.find(item => item.path === artifact)!.sha256 } : {}),
+    })),
+    activities,
+    agents: [
+      { id: "agent:agenteer-orchestrator", type: "software-agent", role: "human-in-the-loop orchestrator" },
+    ],
+  };
+  const result: ResearchProvenanceGraph = {
+    packetDir: resolved,
+    provenancePath,
+    graph,
+  };
+  await writeFile(provenancePath, `${JSON.stringify(graph, null, 2)}\n`);
+  return result;
+}
+
+export function renderResearchProvenance(result: ResearchProvenanceGraph): string {
+  return [
+    `research provenance: ${result.packetDir}`,
+    `  entities: ${result.graph.entities.length}`,
+    `  activities: ${result.graph.activities.length}`,
+    `  agents: ${result.graph.agents.length}`,
+    `  path: ${result.provenancePath}`,
+  ].join("\n");
+}
+
+export function renderResearchProvenanceJson(result: ResearchProvenanceGraph): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    provenance: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchQaDashboardCommand(packetDir: string): Promise<ResearchQaDashboard> {
+  const resolved = path.resolve(packetDir);
+  const checkpoint = await researchCheckpointCommand(resolved);
+  const methods = await readJsonIfPresent(path.join(resolved, "methods-validation.json")) as ResearchMethodsValidationResult | null;
+  const manifest = await readJsonIfPresent(path.join(resolved, "artifact-manifest.json")) as ResearchArtifactManifest | null;
+  const reportReview = await readJsonIfPresent(path.join(resolved, "report-review.json")) as ResearchReportReview | null;
+  const exportRecord = await readJsonIfPresent(path.join(resolved, "export-record.json")) as ResearchPacketExport | null;
+  const roCrate = await exists(path.join(resolved, "ro-crate-metadata.json"));
+  const provenance = await exists(path.join(resolved, "provenance.json"));
+  const checks: ResearchQaDashboard["checks"] = [
+    {
+      id: "checkpoint",
+      status: checkpoint.currentStage === "complete" ? "pass" : "needs_review",
+      detail: checkpoint.currentStage === "complete" ? "Packet lifecycle is complete." : `Current stage is ${checkpoint.currentStage}.`,
+    },
+    {
+      id: "methods-validation",
+      status: methods ? methods.status : "missing",
+      detail: methods ? `${methods.issues.length} methods issue(s).` : "methods-validation.json is missing.",
+    },
+    {
+      id: "report-review",
+      status: reportReview ? reportReview.status : "missing",
+      detail: reportReview ? `${reportReview.issues.length} report review issue(s).` : "report-review.json is missing.",
+    },
+    {
+      id: "manifest",
+      status: manifest ? "pass" : "missing",
+      detail: manifest ? `${manifest.artifacts.length} artifact(s) hashed.` : "artifact-manifest.json is missing.",
+    },
+    {
+      id: "export",
+      status: exportRecord ? "pass" : "missing",
+      detail: exportRecord ? `Exported to ${exportRecord.exportDir}.` : "export-record.json is missing.",
+    },
+    {
+      id: "ro-crate",
+      status: roCrate ? "pass" : "missing",
+      detail: roCrate ? "RO-Crate metadata present." : "ro-crate-metadata.json is missing.",
+    },
+    {
+      id: "provenance",
+      status: provenance ? "pass" : "missing",
+      detail: provenance ? "PROV-style provenance graph present." : "provenance.json is missing.",
+    },
+  ];
+  const status = checks.some(check => check.status === "blocked")
+    ? "blocked"
+    : checks.some(check => check.status === "missing" || check.status === "needs_review")
+      ? "needs_review"
+      : "ready";
+  return {
+    packetDir: resolved,
+    status,
+    checks,
+    nextAction: status === "ready" ? "Packet is ready for durable review or downstream consumption." : "Resolve missing or needs-review checks before calling the packet ready.",
+  };
+}
+
+export function renderResearchQaDashboard(dashboard: ResearchQaDashboard): string {
+  return [
+    `research QA dashboard: ${dashboard.packetDir}`,
+    `  status: ${dashboard.status}`,
+    `  next: ${dashboard.nextAction}`,
+    "  checks:",
+    ...dashboard.checks.map(check => `    - [${check.status}] ${check.id}: ${check.detail}`),
+  ].join("\n");
+}
+
+export function renderResearchQaDashboardJson(dashboard: ResearchQaDashboard): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    qaDashboard: dashboard,
   }, null, 2)}\n`;
 }
 
@@ -534,11 +1334,13 @@ export async function researchReviewReportCommand(packetDir: string): Promise<Re
   const analysis = JSON.parse(await readFile(path.join(resolved, "analysis-result.json"), "utf-8")) as ResearchAnalysisResult;
   const report = await readFile(path.join(resolved, "report.md"), "utf-8");
   const issues = reviewReportText(report, packet, analysis);
-  return {
+  const review: ResearchReportReview = {
     packetDir: resolved,
     status: issues.some(issue => issue.severity !== "note") ? "needs_review" : "pass",
     issues,
   };
+  await writeFile(path.join(resolved, "report-review.json"), `${JSON.stringify(review, null, 2)}\n`);
+  return review;
 }
 
 export function renderResearchReportReview(review: ResearchReportReview): string {
@@ -555,6 +1357,13 @@ export function renderResearchReportReview(review: ResearchReportReview): string
     lines.push(`    - [${issue.severity}] ${issue.code}: ${issue.message}`);
   }
   return lines.join("\n");
+}
+
+export function renderResearchReportReviewJson(review: ResearchReportReview): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    reportReview: review,
+  }, null, 2)}\n`;
 }
 
 export async function researchArtifactManifestCommand(packetDir: string): Promise<ResearchArtifactManifest> {
@@ -585,6 +1394,13 @@ export function renderResearchArtifactManifest(manifest: ResearchArtifactManifes
     `  artifacts: ${manifest.artifacts.length}`,
     ...manifest.artifacts.map(artifact => `  - ${artifact.path} ${artifact.bytes} bytes ${artifact.sha256}`),
   ].join("\n");
+}
+
+export function renderResearchArtifactManifestJson(manifest: ResearchArtifactManifest): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    artifactManifest: manifest,
+  }, null, 2)}\n`;
 }
 
 export async function researchLoopStatusCommand(stateDir = ".agenteer/research-loop"): Promise<ResearchLoopStatus> {
@@ -869,6 +1685,43 @@ export function renderResearchCheckpointJson(checkpoint: ResearchCheckpoint): st
   }, null, 2)}\n`;
 }
 
+export async function researchPacketSummaryCommand(packetDir: string): Promise<ResearchPacketSummary> {
+  const resolved = path.resolve(packetDir);
+  const checkpoint = await researchCheckpointCommand(resolved);
+  const manifest = await readJsonIfPresent(path.join(resolved, "artifact-manifest.json")) as ResearchArtifactManifest | null;
+  const reportReview = await readJsonIfPresent(path.join(resolved, "report-review.json")) as ResearchReportReview | null;
+  const exportRecord = await readJsonIfPresent(path.join(resolved, "export-record.json")) as ResearchPacketExport | null;
+  return {
+    packetDir: resolved,
+    generatedAtIso: new Date().toISOString(),
+    stages: researchPipelineStagesCommand(),
+    checkpoint,
+    manifest,
+    reportReview,
+    exportRecord,
+    nextAction: checkpoint.nextCommand,
+  };
+}
+
+export function renderResearchPacketSummary(summary: ResearchPacketSummary): string {
+  return [
+    `research packet summary: ${summary.packetDir}`,
+    `  stage: ${summary.checkpoint.currentStage}`,
+    `  next: ${summary.nextAction}`,
+    `  stages: ${summary.stages.length}`,
+    `  manifest: ${summary.manifest ? `${summary.manifest.artifacts.length} artifacts` : "missing"}`,
+    `  report review: ${summary.reportReview ? summary.reportReview.status : "missing"}`,
+    `  export: ${summary.exportRecord ? summary.exportRecord.exportDir : "missing"}`,
+  ].join("\n");
+}
+
+export function renderResearchPacketSummaryJson(summary: ResearchPacketSummary): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    packetSummary: summary,
+  }, null, 2)}\n`;
+}
+
 async function loadNhanesRegistry(repoDir: string): Promise<NhanesRegistry> {
   const registryPath = path.join(path.resolve(repoDir), "data", "analytics", "nhanes", "registry.json");
   return JSON.parse(await readFile(registryPath, "utf-8")) as NhanesRegistry;
@@ -892,7 +1745,11 @@ async function listResearchArtifactNames(packetDir: string): Promise<string[]> {
     "runner-spec.json",
     "approval.json",
     "analysis-result.json",
+    "methods-validation.json",
+    "provenance.json",
     "report.md",
+    "report-review.json",
+    "ro-crate-metadata.json",
     "export-record.json",
   ]);
   return (await readdir(packetDir))
@@ -1687,6 +2544,12 @@ function hasValue(value: unknown): boolean {
 
 function extractVariableNames(expression: string): string[] {
   return Array.from(expression.matchAll(/\b[A-Z][A-Z0-9_]{2,}\b/g)).map(match => match[0]);
+}
+
+function extractQuestionPart(question: string, pattern: RegExp): string | null {
+  const match = question.match(pattern);
+  const value = match?.[1]?.trim().replace(/[.,;:]+$/, "");
+  return value || null;
 }
 
 function uniqueStrings(values: Array<string | null | undefined>): string[] {

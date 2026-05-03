@@ -7,11 +7,16 @@ import {
   RESEARCH_PIPELINE_NODE_MANIFESTS,
   registerResearchPipelineNodes,
   researchAnalyzeFactory,
+  researchDataQualityFactory,
   researchExportFactory,
   researchManifestFactory,
+  researchMethodsValidationFactory,
+  researchProvenanceFactory,
   researchProtocolCritiqueFactory,
   researchProtocolDesignFactory,
+  researchQaDashboardFactory,
   researchReportReviewFactory,
+  researchRoCrateFactory,
   researchRunnerSpecFactory,
   researchScoutPlanFactory,
 } from "../nodes.js";
@@ -64,16 +69,41 @@ describe("research pipeline nodes", () => {
       }, null as never);
       expect(analysis.kind).toBe("output");
 
+      const dataQuality = await researchDataQualityFactory().execute({
+        original: { packetDir, fixturePath },
+      }, null as never);
+      expect(dataQuality.kind).toBe("output");
+
       const reportReview = await researchReportReviewFactory().execute({
         original: { packetDir },
       }, null as never);
       expect(reportReview.kind).toBe("output");
       expect(reportReview.evidence?.verdict).toBe("pass");
 
+      const methods = await researchMethodsValidationFactory().execute({
+        original: { packetDir },
+      }, null as never);
+      expect(methods.kind).toBe("output");
+
       const manifest = await researchManifestFactory().execute({
         original: { packetDir },
       }, null as never);
       expect(manifest.kind).toBe("output");
+
+      const roCrate = await researchRoCrateFactory().execute({
+        original: { packetDir },
+      }, null as never);
+      expect(roCrate.kind).toBe("output");
+
+      const provenance = await researchProvenanceFactory().execute({
+        original: { packetDir },
+      }, null as never);
+      expect(provenance.kind).toBe("output");
+
+      const dashboard = await researchQaDashboardFactory().execute({
+        original: { packetDir },
+      }, null as never);
+      expect(dashboard.kind).toBe("output");
 
       const exported = await researchExportFactory().execute({
         original: { packetDir, outDir: exportDir },
@@ -87,7 +117,12 @@ describe("research pipeline nodes", () => {
         "@agenteer/node-research-runner-spec",
         "@agenteer/node-research-analyze-local",
         "@agenteer/node-research-report-review",
+        "@agenteer/node-research-methods-validation",
+        "@agenteer/node-research-data-quality",
         "@agenteer/node-research-artifact-manifest",
+        "@agenteer/node-research-ro-crate",
+        "@agenteer/node-research-provenance",
+        "@agenteer/node-research-qa-dashboard",
         "@agenteer/node-research-export",
       ]);
     } finally {
@@ -105,6 +140,7 @@ describe("research pipeline nodes", () => {
     expect(registry.all().map(entry => entry.manifest.id)).toEqual(
       RESEARCH_PIPELINE_NODE_MANIFESTS.map(manifest => manifest.id),
     );
+    expect(registry.has("@agenteer/node-research-qa-dashboard")).toBe(true);
     expect(registry.has("@agenteer/node-research-export")).toBe(true);
   });
 });

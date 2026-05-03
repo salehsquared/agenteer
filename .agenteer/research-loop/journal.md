@@ -142,3 +142,78 @@ Next: Cycle 30 should run the full suite, inspect the accumulated diff, and writ
 Added machine-readable research loop-status JSON, surfaced stored nextAction from durable state, ran the full test suite, and completed the 30-cycle stabilization checkpoint.
 
 Next: Potential cycle 31: add a machine-readable packet summary command that combines stages, checkpoint, manifest, and latest review into one orchestration document.
+## Cycle 31
+
+Added a source-backed research-methods foundation to guide the next 50-cycle run across reporting guidelines, medical dataset fitness, missingness, survey methods, reproducible packets, and provenance.
+
+Next: Cycle 32 should implement a packet summary command that combines stages, checkpoint, manifest, review, and export state.
+## Cycle 32
+
+Added research packet-summary command with text and JSON renderers, persisted report-review artifacts, and included report-review in manifests.
+
+Next: Cycle 33 should add a methods-framework command exposing research standards as structured output.
+## Cycle 33
+
+Added research methods-framework command with structured standards policy for reporting, prediction, causal design, RWE fitness, survey design, missing data, FAIR metadata, RO-Crate exports, and W3C PROV provenance.
+
+Next: Cycle 34 should add a deterministic methods-validation command that applies this policy to a packet.
+## Cycle 34
+
+Added validate-methods command that applies broader research policy to packets, persists methods-validation.json, includes it in manifests, and blocks causal/prediction language without proper methods plans.
+
+Next: Cycle 35 should add generic dataset registry inspection to move beyond NHANES-specific assumptions.
+## Cycle 35
+
+Added generic registry-inspect command for dataset metadata files, with structured JSON and validation warnings independent of NHANES-specific command paths.
+
+Next: Cycle 36 should add question decomposition so research questions become explicit population/exposure/outcome/design components before protocol design.
+## Cycle 36
+
+Added decompose-question command to expose intent, population, exposure/predictor, outcome, stratifier/modifier, required methods, and clarification prompts before protocol design.
+
+Next: Cycle 37 should add a clarification-plan command that converts decomposition gaps into reviewable human-in-the-loop questions.
+## Cycle 37
+
+Added clarification-plan command that converts question decomposition gaps into prioritized human-in-the-loop review prompts before protocol design.
+
+Next: Cycle 38 should add a data-quality profile command for fixture datasets, including missingness and unknown-code summaries.
+## Cycle 38
+
+Added data-quality command for fixture profiling, including row/variable counts, missingness rates, coded unknown values, and structured warnings.
+
+Next: Cycle 39 should add statistical method selection so protocol intent maps to analysis family and required checks.
+## Cycle 39
+
+Added select-method command to map research question intent to recommended analysis family, required checks, and cautions before code generation.
+
+Next: Cycle 40 should add RO-Crate metadata export to make research packets more standards-aligned.
+## Cycle 40
+
+Added ro-crate command to generate RO-Crate-style metadata for packet artifacts and include ro-crate-metadata.json in manifests.
+
+Next: Cycle 41 should add a PROV-style provenance graph command for packet activities and artifacts.
+## Cycle 41
+
+Added provenance command to generate a PROV-style artifact/activity/agent graph for research packets and include provenance.json in manifests.
+
+Next: Cycle 42 should add a QA dashboard command that summarizes packet readiness across checkpoint, methods, data quality, provenance, and export.
+## Cycle 42
+
+Added qa-dashboard command that summarizes packet readiness across checkpoint, methods validation, report review, manifest, export, RO-Crate metadata, and provenance.
+
+Next: Cycle 43 should add JSON output support for core research commands that still only render text, starting with manifest and review outputs if useful.
+## Cycle 43
+
+Added JSON renderers and CLI --json support for report-review and manifest commands to make older packet commands consistent with the structured orchestration surface.
+
+Next: Cycle 44 should update reusable research nodes to include the newer methods, data-quality, RO-Crate, provenance, and QA dashboard capabilities.
+## Cycle 44
+
+Expanded reusable research node set with methods-validation, data-quality, RO-Crate, provenance, and QA-dashboard nodes and registry coverage.
+
+Next: Cycle 45 should expand the stage manifest to include the new reusable nodes in the canonical pipeline order.
+## Cycle 45
+
+Expanded canonical research stage manifest to include methods-validation, data-quality, RO-Crate, provenance, and QA-dashboard stages in the node-backed pipeline order.
+
+Next: Cycle 46 should add a privacy/reliability suppression policy command for small cells and unstable medical estimates.

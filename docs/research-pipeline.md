@@ -88,10 +88,11 @@ agenteer research critique --packet ./packet
 agenteer research scout --packet ./packet [--fixture ./rows.json]
 agenteer research approve --packet ./packet --note "review note"
 agenteer research analyze --packet ./packet --fixture ./rows.json
-agenteer research review-report --packet ./packet
-agenteer research manifest --packet ./packet
+agenteer research review-report --packet ./packet --json
+agenteer research manifest --packet ./packet --json
 agenteer research runner-spec --packet ./packet
 agenteer research export --packet ./packet --out ./exports/packet
+agenteer research packet-summary --packet ./packet --json
 agenteer research loop-status --state ./.agenteer/research-loop --json
 agenteer research loop-note --state ./.agenteer/research-loop --cycle 6 --summary "..." --next "..."
 agenteer research checkpoint --packet ./packet --json
@@ -101,6 +102,16 @@ The current CLI is intentionally stage-based rather than a single hidden "run ev
 
 ```bash
 agenteer research questions --project medbrevia-nhanes --repo /path/to/medbrevia_v3
+agenteer research methods-framework --json
+agenteer research validate-methods --packet ./packet --json
+agenteer research registry-inspect --registry ./registry.json --json
+agenteer research decompose-question --question "..." --json
+agenteer research clarification-plan --question "..." --json
+agenteer research data-quality --fixture ./rows.json --json
+agenteer research select-method --question "..." --json
+agenteer research ro-crate --packet ./packet --json
+agenteer research provenance --packet ./packet --json
+agenteer research qa-dashboard --packet ./packet --json
 agenteer research stages
 agenteer research stages --json
 agenteer research design --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet

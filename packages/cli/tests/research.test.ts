@@ -10,22 +10,57 @@ import {
   renderResearchApproval,
   renderResearchAnalysisResult,
   renderResearchArtifactManifest,
+  renderResearchArtifactManifestJson,
   renderResearchLoopStatus,
   renderResearchLoopStatusJson,
   renderResearchLoopNote,
   renderResearchRunnerSpec,
   renderResearchPacketExport,
+  renderResearchPacketSummary,
+  renderResearchPacketSummaryJson,
+  renderResearchMethodsFramework,
+  renderResearchMethodsFrameworkJson,
+  renderResearchMethodsValidation,
+  renderResearchMethodsValidationJson,
+  renderResearchRegistryInspect,
+  renderResearchRegistryInspectJson,
+  renderResearchQuestionDecomposition,
+  renderResearchQuestionDecompositionJson,
+  renderResearchClarificationPlan,
+  renderResearchClarificationPlanJson,
+  renderResearchDataQuality,
+  renderResearchDataQualityJson,
+  renderResearchMethodSelection,
+  renderResearchMethodSelectionJson,
+  renderResearchRoCrate,
+  renderResearchRoCrateJson,
+  renderResearchProvenance,
+  renderResearchProvenanceJson,
+  renderResearchQaDashboard,
+  renderResearchQaDashboardJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
   renderResearchCheckpoint,
   renderResearchCheckpointJson,
   renderResearchReportReview,
+  renderResearchReportReviewJson,
   researchAnalyzeLocalCommand,
   researchArtifactManifestCommand,
   researchLoopStatusCommand,
   researchLoopNoteCommand,
   researchRunnerSpecCommand,
   researchExportPacketCommand,
+  researchPacketSummaryCommand,
+  researchMethodsFrameworkCommand,
+  researchValidateMethodsCommand,
+  researchRegistryInspectCommand,
+  researchDecomposeQuestionCommand,
+  researchClarificationPlanCommand,
+  researchDataQualityCommand,
+  researchSelectMethodCommand,
+  researchRoCrateCommand,
+  researchProvenanceCommand,
+  researchQaDashboardCommand,
   researchPipelineStagesCommand,
   researchApprovePacketCommand,
   researchCheckpointCommand,
@@ -70,19 +105,139 @@ describe("researchDesignCommand", () => {
     }
   });
 
+  it("inspects generic dataset registries without NHANES-specific paths", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-generic-registry-"));
+    const registryPath = path.join(dir, "registry.json");
+    try {
+      await writeFile(registryPath, `${JSON.stringify({
+        dataset: "hospital-registry",
+        cycles: [{ id: "2024" }],
+        domains: { demographics: {}, labs: {} },
+        variables: [
+          { name: "AGE", domain: "demographics" },
+          { name: "A1C", domain: "labs" },
+        ],
+        weightRules: [],
+      }, null, 2)}\n`);
+
+      const inspected = await researchRegistryInspectCommand(registryPath);
+      const parsed = JSON.parse(renderResearchRegistryInspectJson(inspected)) as {
+        schemaVersion: number;
+        registry: { dataset: string; variableCount: number };
+      };
+
+      expect(inspected.dataset).toBe("hospital-registry");
+      expect(inspected.variableCount).toBe(2);
+      expect(inspected.warnings.map(issue => issue.code)).toContain("NO_WEIGHT_RULES");
+      expect(renderResearchRegistryInspect(inspected)).toContain("research registry inspect");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.registry.variableCount).toBe(2);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("decomposes research questions before protocol design", () => {
+    const result = researchDecomposeQuestionCommand("Among adults with diabetes, is medication adherence associated with hospitalization differently by sex?");
+    const parsed = JSON.parse(renderResearchQuestionDecompositionJson(result)) as {
+      schemaVersion: number;
+      decomposition: { intent: string; requiredMethods: string[] };
+    };
+
+    expect(result.intent).toBe("association");
+    expect(result.population).toBe("adults with diabetes");
+    expect(result.exposureOrPredictor).toBe("medication adherence");
+    expect(result.outcome).toBe("hospitalization");
+    expect(result.stratifierOrModifier).toBe("sex");
+    expect(result.requiredMethods).toContain("strobe");
+    expect(renderResearchQuestionDecomposition(result)).toContain("research question decomposition");
+    expect(parsed.schemaVersion).toBe(1);
+  });
+
+  it("adds target-trial clarification for causal questions", () => {
+    const result = researchDecomposeQuestionCommand("What is the effect of beta blockers on mortality among adults with heart failure?");
+
+    expect(result.intent).toBe("causal");
+    expect(result.requiredMethods).toContain("target-trial-emulation");
+    expect(result.clarificationPrompts).toContain("Specify target-trial components before using causal language.");
+  });
+
+  it("creates a clarification plan from decomposition gaps", () => {
+    const plan = researchClarificationPlanCommand("Does exposure improve outcomes?");
+    const parsed = JSON.parse(renderResearchClarificationPlanJson(plan)) as {
+      schemaVersion: number;
+      clarificationPlan: { status: string; items: Array<{ priority: string }> };
+    };
+
+    expect(plan.status).toBe("needs_clarification");
+    expect(plan.items.some(item => item.priority === "required")).toBe(true);
+    expect(plan.items.map(item => item.prompt)).toEqual(expect.arrayContaining([
+      "Specify the target population and eligibility criteria.",
+      "Specify target-trial components before using causal language.",
+    ]));
+    expect(renderResearchClarificationPlan(plan)).toContain("research clarification plan");
+    expect(parsed.schemaVersion).toBe(1);
+  });
+
+  it("profiles fixture data quality before analysis", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-data-quality-"));
+    const fixture = path.join(dir, "rows.json");
+    try {
+      await writeFile(fixture, `${JSON.stringify([
+        { AGE: 44, SEX: 1, EXPOSURE: 1, OUTCOME: 0 },
+        { AGE: null, SEX: 2, EXPOSURE: 9, OUTCOME: 1 },
+        { AGE: "", SEX: 9, EXPOSURE: 2, OUTCOME: 1 },
+      ], null, 2)}\n`);
+
+      const profile = await researchDataQualityCommand(fixture);
+      const parsed = JSON.parse(renderResearchDataQualityJson(profile)) as {
+        schemaVersion: number;
+        dataQuality: { rowCount: number; variableCount: number };
+      };
+
+      expect(profile.rowCount).toBe(3);
+      expect(profile.variables.find(variable => variable.name === "AGE")?.missing).toBe(2);
+      expect(profile.variables.find(variable => variable.name === "EXPOSURE")?.codedUnknown).toBe(1);
+      expect(profile.warnings.map(issue => issue.code)).toEqual(expect.arrayContaining(["HIGH_MISSINGNESS", "CODED_UNKNOWN_VALUES"]));
+      expect(renderResearchDataQuality(profile)).toContain("research data quality");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("selects statistical method families from question intent", () => {
+    const selection = researchSelectMethodCommand("Among adults, is self-reported hypertension associated with measured hypertension?");
+    const parsed = JSON.parse(renderResearchMethodSelectionJson(selection)) as {
+      schemaVersion: number;
+      methodSelection: { recommendedAnalysis: string; requiredChecks: string[] };
+    };
+
+    expect(selection.intent).toBe("diagnostic");
+    expect(selection.recommendedAnalysis).toBe("diagnostic_accuracy_table");
+    expect(selection.requiredChecks).toContain("sensitivity_specificity_ppv_npv");
+    expect(renderResearchMethodSelection(selection)).toContain("research method selection");
+    expect(parsed.schemaVersion).toBe(1);
+  });
+
   it("renders reusable research pipeline stages", () => {
     const stages = researchPipelineStagesCommand();
 
     expect(stages.map(stage => stage.id)).toEqual([
       "design",
       "critique",
+      "methods-validation",
       "scout",
+      "data-quality",
       "runner-spec",
       "approval",
       "analysis",
       "report-review",
       "manifest",
+      "ro-crate",
+      "provenance",
       "export",
+      "qa-dashboard",
     ]);
     expect(renderResearchPipelineStages(stages)).toContain("@agenteer/node-research-protocol-design");
     expect(stages.find(stage => stage.id === "approval")?.humanReview).toBe(true);
@@ -98,6 +253,23 @@ describe("researchDesignCommand", () => {
     expect(parsed.schemaVersion).toBe(1);
     expect(parsed.stages.map(stage => stage.id)).toContain("runner-spec");
     expect(parsed.stages.find(stage => stage.id === "approval")?.humanReview).toBe(true);
+  });
+
+  it("renders the research methods framework as structured pipeline policy", () => {
+    const framework = researchMethodsFrameworkCommand();
+    const parsed = JSON.parse(renderResearchMethodsFrameworkJson(framework)) as typeof framework;
+
+    expect(framework.schemaVersion).toBe(1);
+    expect(framework.items.map(item => item.id)).toEqual(expect.arrayContaining([
+      "strobe",
+      "target-trial-emulation",
+      "missing-data",
+      "ro-crate",
+      "w3c-prov",
+    ]));
+    expect(framework.items.find(item => item.id === "survey-design")?.pipelineImplication).toContain("local fixtures");
+    expect(renderResearchMethodsFramework(framework)).toContain("research methods framework");
+    expect(parsed.items.find(item => item.id === "fair")?.sourceUrl).toContain("nature.com");
   });
 
   it("inspects a generated research design packet", async () => {
@@ -263,6 +435,71 @@ describe("researchDesignCommand", () => {
       expect(critique.issues.map(issue => issue.code)).toContain("READY_FOR_SCOUT");
     } finally {
       await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("validates packet methods against broader research policy", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-methods-validation-"));
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+
+      const validation = await researchValidateMethodsCommand(outDir);
+      const parsed = JSON.parse(renderResearchMethodsValidationJson(validation)) as {
+        schemaVersion: number;
+        methodsValidation: { status: string; appliedFrameworkItems: string[] };
+      };
+
+      expect(validation.status).toBe("needs_review");
+      expect(validation.appliedFrameworkItems).toEqual(expect.arrayContaining(["strobe", "missing-data", "survey-design", "fair", "w3c-prov"]));
+      expect(validation.issues.map(issue => issue.code)).toEqual(expect.arrayContaining([
+        "MISSINGNESS_NOT_COMPUTED",
+        "MISSING_REPRODUCIBILITY_MANIFEST",
+      ]));
+      expect(renderResearchMethodsValidation(validation)).toContain("research methods validation");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("blocks causal language until target trial components are specified", async () => {
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-methods-causal-"));
+    try {
+      await writeFile(path.join(outDir, "design.json"), `${JSON.stringify({
+        packetVersion: 0,
+        source: { registrySha256: "a".repeat(64) },
+        protocol: {
+          title: "Treatment and Outcome",
+          clinicalQuestion: "What is the effect of treatment on mortality in adults?",
+          dataset: "registry",
+          cycles: ["2020"],
+          approvedDataInputs: ["demographics", "treatment", "outcomes"],
+          population: { filters: [] },
+          exposure: { variables: ["TRT"] },
+          endpoint: { variables: ["DEATH"] },
+          covariates: ["AGE"],
+          stratifiers: [],
+          derivedDefinitions: [],
+          surveyDesign: { weightVariable: null, strataVariable: null, psuVariable: null },
+          caveats: ["Observational data require careful interpretation."],
+        },
+        diagnostics: { blockers: [], warnings: [] },
+      }, null, 2)}\n`);
+
+      const validation = await researchValidateMethodsCommand(outDir);
+
+      expect(validation.status).toBe("blocked");
+      expect(validation.appliedFrameworkItems).toContain("target-trial-emulation");
+      expect(validation.issues.map(issue => issue.code)).toContain("CAUSAL_LANGUAGE_REQUIRES_TARGET_TRIAL_SPEC");
+    } finally {
       await rm(outDir, { recursive: true, force: true });
     }
   });
@@ -673,6 +910,7 @@ describe("researchDesignCommand", () => {
       expect(review.status).toBe("pass");
       expect(review.issues.map(issue => issue.code)).toContain("REPORT_READY");
       expect(renderResearchReportReview(review)).toContain("REPORT_READY");
+      expect(JSON.parse(renderResearchReportReviewJson(review)).schemaVersion).toBe(1);
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(outDir, { recursive: true, force: true });
@@ -710,12 +948,113 @@ describe("researchDesignCommand", () => {
       ]));
       expect(manifest.artifacts[0]?.sha256).toMatch(/^[a-f0-9]{64}$/);
       expect(renderResearchArtifactManifest(manifest)).toContain("research artifact manifest");
+      expect(JSON.parse(renderResearchArtifactManifestJson(manifest)).schemaVersion).toBe(1);
       const checkpoint = await researchCheckpointCommand(outDir);
       expect(checkpoint.currentStage).toBe("export");
       expect(checkpoint.nextCommand).toContain("research export");
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("writes RO-Crate metadata for packet artifacts", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-ro-crate-"));
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await researchArtifactManifestCommand(outDir);
+
+      const crate = await researchRoCrateCommand(outDir);
+      const parsed = JSON.parse(renderResearchRoCrateJson(crate)) as {
+        schemaVersion: number;
+        roCrate: { metadata: { "@graph": Array<Record<string, unknown>> } };
+      };
+
+      expect(crate.metadata["@context"]).toContain("ro/crate");
+      expect(crate.metadata["@graph"].some(node => node["@id"] === "design.json")).toBe(true);
+      expect(renderResearchRoCrate(crate)).toContain("research ro-crate");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("writes a PROV-style provenance graph for packet artifacts", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-provenance-"));
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await researchArtifactManifestCommand(outDir);
+
+      const provenance = await researchProvenanceCommand(outDir);
+      const parsed = JSON.parse(renderResearchProvenanceJson(provenance)) as {
+        schemaVersion: number;
+        provenance: { graph: { entities: unknown[]; activities: Array<{ id: string }> } };
+      };
+
+      expect(provenance.graph.entities.some(entity => entity.path === "design.json")).toBe(true);
+      expect(provenance.graph.activities.some(activity => activity.id === "activity:design")).toBe(true);
+      expect(renderResearchProvenance(provenance)).toContain("research provenance");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes packet readiness in a QA dashboard", async () => {
+    const repo = await makeRepo();
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-qa-dashboard-"));
+    const exportDir = await mkdtemp(path.join(os.tmpdir(), "research-qa-dashboard-export-"));
+    const fixture = path.join(packetDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir: packetDir,
+      });
+      await writeFile(fixture, `${JSON.stringify([
+        { SEQN: 1, RIDSTATR: 2, RIDAGEYR: 44, RIAGENDR: 1, RIDRETH3: 3, LBXVIDMS: 40, BPXSY1: 140, BPXDI1: 90, WTMEC2YR: 1 },
+      ], null, 2)}\n`);
+      await researchScoutPlanCommand(packetDir, fixture);
+      await researchRunnerSpecCommand(packetDir);
+      await researchApprovePacketCommand(packetDir, "Approved for QA fixture.");
+      await researchAnalyzeLocalCommand(packetDir, fixture);
+      await researchReviewReportCommand(packetDir);
+      await researchValidateMethodsCommand(packetDir);
+      await researchArtifactManifestCommand(packetDir);
+      await researchRoCrateCommand(packetDir);
+      await researchProvenanceCommand(packetDir);
+      await researchArtifactManifestCommand(packetDir);
+      await researchExportPacketCommand(packetDir, exportDir);
+
+      const dashboard = await researchQaDashboardCommand(packetDir);
+      const parsed = JSON.parse(renderResearchQaDashboardJson(dashboard)) as {
+        schemaVersion: number;
+        qaDashboard: { checks: Array<{ id: string; status: string }> };
+      };
+
+      expect(dashboard.checks.map(check => check.id)).toEqual(expect.arrayContaining(["checkpoint", "methods-validation", "ro-crate", "provenance"]));
+      expect(dashboard.checks.find(check => check.id === "provenance")?.status).toBe("pass");
+      expect(renderResearchQaDashboard(dashboard)).toContain("research QA dashboard");
+      expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(packetDir, { recursive: true, force: true });
+      await rm(exportDir, { recursive: true, force: true });
     }
   });
 
@@ -785,6 +1124,50 @@ describe("researchDesignCommand", () => {
       expect(checkpoint.currentStage).toBe("complete");
       expect(checkpoint.artifacts.exportRecord).toBe(true);
       expect(renderResearchPacketExport(exported)).toContain("research packet export");
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(packetDir, { recursive: true, force: true });
+      await rm(exportDir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes packet orchestration state in one structured document", async () => {
+    const repo = await makeRepo();
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-summary-packet-"));
+    const exportDir = await mkdtemp(path.join(os.tmpdir(), "research-summary-export-"));
+    const fixture = path.join(packetDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir: packetDir,
+      });
+      await writeFile(fixture, `${JSON.stringify([
+        { SEQN: 1, RIDSTATR: 2, RIDAGEYR: 44, RIAGENDR: 1, RIDRETH3: 3, LBXVIDMS: 40, BPXSY1: 140, BPXDI1: 90, WTMEC2YR: 1 },
+      ], null, 2)}\n`);
+      await researchScoutPlanCommand(packetDir, fixture);
+      await researchRunnerSpecCommand(packetDir);
+      await researchApprovePacketCommand(packetDir, "Approved for summary fixture.");
+      await researchAnalyzeLocalCommand(packetDir, fixture);
+      await researchReviewReportCommand(packetDir);
+      await researchArtifactManifestCommand(packetDir);
+      await researchExportPacketCommand(packetDir, exportDir);
+
+      const summary = await researchPacketSummaryCommand(packetDir);
+      const parsed = JSON.parse(renderResearchPacketSummaryJson(summary)) as {
+        schemaVersion: number;
+        packetSummary: { checkpoint: { currentStage: string }; stages: unknown[]; manifest: { artifacts: unknown[] }; reportReview: { status: string }; exportRecord: { exportDir: string } };
+      };
+
+      expect(summary.checkpoint.currentStage).toBe("complete");
+      expect(summary.stages.length).toBeGreaterThan(5);
+      expect(summary.manifest?.artifacts.map(artifact => artifact.path)).toContain("export-record.json");
+      expect(summary.reportReview?.status).toBe("pass");
+      expect(summary.exportRecord?.exportDir).toBe(path.resolve(exportDir));
+      expect(renderResearchPacketSummary(summary)).toContain("stage: complete");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.packetSummary.checkpoint.currentStage).toBe("complete");
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(packetDir, { recursive: true, force: true });

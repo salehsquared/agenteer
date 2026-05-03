@@ -14,6 +14,11 @@ import {
   researchDesignCommand,
   researchExportPacketCommand,
   researchReviewReportCommand,
+  researchValidateMethodsCommand,
+  researchRoCrateCommand,
+  researchProvenanceCommand,
+  researchQaDashboardCommand,
+  researchDataQualityCommand,
   researchRunnerSpecCommand,
   researchScoutPlanCommand,
   type ResearchProject,
@@ -128,6 +133,34 @@ export const researchReportReviewManifest: NodeManifest = makeManifest({
   },
 });
 
+export const researchMethodsValidationManifest: NodeManifest = makeManifest({
+  id: "@agenteer/node-research-methods-validation",
+  name: "research_methods_validation",
+  description: "Validate a research packet against broader medical research methods policy.",
+  determinism: "deterministic",
+  required_actions: [],
+  tags: ["research", "methods", "validation"],
+  side_effects: {
+    writes_fs: true,
+    network: false,
+    mutates_ctx: false,
+  },
+});
+
+export const researchDataQualityManifest: NodeManifest = makeManifest({
+  id: "@agenteer/node-research-data-quality",
+  name: "research_data_quality",
+  description: "Profile fixture data quality, missingness, and coded unknown values.",
+  determinism: "deterministic",
+  required_actions: [],
+  tags: ["research", "data-quality", "fixture"],
+  side_effects: {
+    writes_fs: false,
+    network: false,
+    mutates_ctx: false,
+  },
+});
+
 export const researchManifestManifest: NodeManifest = makeManifest({
   id: "@agenteer/node-research-artifact-manifest",
   name: "research_artifact_manifest",
@@ -137,6 +170,48 @@ export const researchManifestManifest: NodeManifest = makeManifest({
   tags: ["research", "reproducibility", "artifacts"],
   side_effects: {
     writes_fs: true,
+    network: false,
+    mutates_ctx: false,
+  },
+});
+
+export const researchRoCrateManifest: NodeManifest = makeManifest({
+  id: "@agenteer/node-research-ro-crate",
+  name: "research_ro_crate",
+  description: "Write RO-Crate-style metadata for research packet artifacts.",
+  determinism: "deterministic",
+  required_actions: [],
+  tags: ["research", "reproducibility", "ro-crate"],
+  side_effects: {
+    writes_fs: true,
+    network: false,
+    mutates_ctx: false,
+  },
+});
+
+export const researchProvenanceManifest: NodeManifest = makeManifest({
+  id: "@agenteer/node-research-provenance",
+  name: "research_provenance",
+  description: "Write a PROV-style graph for packet artifacts and activities.",
+  determinism: "deterministic",
+  required_actions: [],
+  tags: ["research", "provenance", "audit"],
+  side_effects: {
+    writes_fs: true,
+    network: false,
+    mutates_ctx: false,
+  },
+});
+
+export const researchQaDashboardManifest: NodeManifest = makeManifest({
+  id: "@agenteer/node-research-qa-dashboard",
+  name: "research_qa_dashboard",
+  description: "Summarize packet readiness across lifecycle, methods, reproducibility, and export checks.",
+  determinism: "deterministic",
+  required_actions: [],
+  tags: ["research", "qa", "dashboard"],
+  side_effects: {
+    writes_fs: false,
     network: false,
     mutates_ctx: false,
   },
@@ -263,6 +338,40 @@ export function researchReportReviewFactory(): Node<
   };
 }
 
+export function researchMethodsValidationFactory(): Node<
+  z.infer<typeof PacketInput>,
+  unknown
+> {
+  return {
+    manifest: researchMethodsValidationManifest,
+    inputSchema: PacketInput,
+    outputSchema: UnknownOutput,
+    ctx: [],
+    model: null,
+    async execute(input: NodeInput<z.infer<typeof PacketInput>>): Promise<NodeResult<unknown>> {
+      const result = await researchValidateMethodsCommand(input.original.packetDir);
+      return { kind: "output", value: result, evidence: { verdict: result.status === "blocked" ? "fail" : "pass" } };
+    },
+  };
+}
+
+export function researchDataQualityFactory(): Node<
+  z.infer<typeof AnalyzeInput>,
+  unknown
+> {
+  return {
+    manifest: researchDataQualityManifest,
+    inputSchema: AnalyzeInput,
+    outputSchema: UnknownOutput,
+    ctx: [],
+    model: null,
+    async execute(input: NodeInput<z.infer<typeof AnalyzeInput>>): Promise<NodeResult<unknown>> {
+      const result = await researchDataQualityCommand(input.original.fixturePath);
+      return { kind: "output", value: result, evidence: { verdict: result.warnings.some(issue => issue.severity === "blocker") ? "fail" : "pass" } };
+    },
+  };
+}
+
 export function researchManifestFactory(): Node<
   z.infer<typeof PacketInput>,
   unknown
@@ -276,6 +385,57 @@ export function researchManifestFactory(): Node<
     async execute(input: NodeInput<z.infer<typeof PacketInput>>): Promise<NodeResult<unknown>> {
       const result = await researchArtifactManifestCommand(input.original.packetDir);
       return { kind: "output", value: result, evidence: { verdict: "pass" } };
+    },
+  };
+}
+
+export function researchRoCrateFactory(): Node<
+  z.infer<typeof PacketInput>,
+  unknown
+> {
+  return {
+    manifest: researchRoCrateManifest,
+    inputSchema: PacketInput,
+    outputSchema: UnknownOutput,
+    ctx: [],
+    model: null,
+    async execute(input: NodeInput<z.infer<typeof PacketInput>>): Promise<NodeResult<unknown>> {
+      const result = await researchRoCrateCommand(input.original.packetDir);
+      return { kind: "output", value: result, evidence: { verdict: result.metadata["@graph"].length > 0 ? "pass" : "fail" } };
+    },
+  };
+}
+
+export function researchProvenanceFactory(): Node<
+  z.infer<typeof PacketInput>,
+  unknown
+> {
+  return {
+    manifest: researchProvenanceManifest,
+    inputSchema: PacketInput,
+    outputSchema: UnknownOutput,
+    ctx: [],
+    model: null,
+    async execute(input: NodeInput<z.infer<typeof PacketInput>>): Promise<NodeResult<unknown>> {
+      const result = await researchProvenanceCommand(input.original.packetDir);
+      return { kind: "output", value: result, evidence: { verdict: result.graph.activities.length > 0 ? "pass" : "fail" } };
+    },
+  };
+}
+
+export function researchQaDashboardFactory(): Node<
+  z.infer<typeof PacketInput>,
+  unknown
+> {
+  return {
+    manifest: researchQaDashboardManifest,
+    inputSchema: PacketInput,
+    outputSchema: UnknownOutput,
+    ctx: [],
+    model: null,
+    async execute(input: NodeInput<z.infer<typeof PacketInput>>): Promise<NodeResult<unknown>> {
+      const result = await researchQaDashboardCommand(input.original.packetDir);
+      return { kind: "output", value: result, evidence: { verdict: result.status === "blocked" ? "fail" : "pass" } };
     },
   };
 }
@@ -304,7 +464,12 @@ export const RESEARCH_PIPELINE_NODE_MANIFESTS = [
   researchRunnerSpecManifest,
   researchAnalyzeManifest,
   researchReportReviewManifest,
+  researchMethodsValidationManifest,
+  researchDataQualityManifest,
   researchManifestManifest,
+  researchRoCrateManifest,
+  researchProvenanceManifest,
+  researchQaDashboardManifest,
   researchExportManifest,
 ] as const;
 
@@ -315,6 +480,11 @@ export function registerResearchPipelineNodes(registry: NodeRegistry): void {
   registry.register(researchRunnerSpecManifest, researchRunnerSpecFactory);
   registry.register(researchAnalyzeManifest, researchAnalyzeFactory);
   registry.register(researchReportReviewManifest, researchReportReviewFactory);
+  registry.register(researchMethodsValidationManifest, researchMethodsValidationFactory);
+  registry.register(researchDataQualityManifest, researchDataQualityFactory);
   registry.register(researchManifestManifest, researchManifestFactory);
+  registry.register(researchRoCrateManifest, researchRoCrateFactory);
+  registry.register(researchProvenanceManifest, researchProvenanceFactory);
+  registry.register(researchQaDashboardManifest, researchQaDashboardFactory);
   registry.register(researchExportManifest, researchExportFactory);
 }

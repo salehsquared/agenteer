@@ -57,6 +57,17 @@ import {
   researchLoopNoteCommand,
   researchRunnerSpecCommand,
   researchExportPacketCommand,
+  researchPacketSummaryCommand,
+  researchMethodsFrameworkCommand,
+  researchValidateMethodsCommand,
+  researchRegistryInspectCommand,
+  researchDecomposeQuestionCommand,
+  researchClarificationPlanCommand,
+  researchDataQualityCommand,
+  researchSelectMethodCommand,
+  researchRoCrateCommand,
+  researchProvenanceCommand,
+  researchQaDashboardCommand,
   researchPipelineStagesCommand,
   researchReviewReportCommand,
   researchInspectPacketCommand,
@@ -68,14 +79,38 @@ import {
   renderResearchCheckpoint,
   renderResearchCheckpointJson,
   renderResearchArtifactManifest,
+  renderResearchArtifactManifestJson,
   renderResearchLoopStatus,
   renderResearchLoopStatusJson,
   renderResearchLoopNote,
   renderResearchRunnerSpec,
   renderResearchPacketExport,
+  renderResearchPacketSummary,
+  renderResearchPacketSummaryJson,
+  renderResearchMethodsFramework,
+  renderResearchMethodsFrameworkJson,
+  renderResearchMethodsValidation,
+  renderResearchMethodsValidationJson,
+  renderResearchRegistryInspect,
+  renderResearchRegistryInspectJson,
+  renderResearchQuestionDecomposition,
+  renderResearchQuestionDecompositionJson,
+  renderResearchClarificationPlan,
+  renderResearchClarificationPlanJson,
+  renderResearchDataQuality,
+  renderResearchDataQualityJson,
+  renderResearchMethodSelection,
+  renderResearchMethodSelectionJson,
+  renderResearchRoCrate,
+  renderResearchRoCrateJson,
+  renderResearchProvenance,
+  renderResearchProvenanceJson,
+  renderResearchQaDashboard,
+  renderResearchQaDashboardJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
   renderResearchReportReview,
+  renderResearchReportReviewJson,
   renderResearchPacketInspect,
   renderResearchDesignResult,
   renderResearchQuestions,
@@ -132,16 +167,27 @@ Usage:
   agenteer lab     medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
   agenteer research design --project medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
   agenteer research questions --project medbrevia-nhanes --repo <medbrevia_v3> [--limit <n>]
+  agenteer research methods-framework [--json]
+  agenteer research validate-methods --packet <dir> [--json]
+  agenteer research registry-inspect --registry <registry.json> [--json]
+  agenteer research decompose-question --question <text> [--json]
+  agenteer research clarification-plan --question <text> [--json]
+  agenteer research data-quality --fixture <rows.json> [--json]
+  agenteer research select-method --question <text> [--json]
+  agenteer research ro-crate --packet <dir> [--json]
+  agenteer research provenance --packet <dir> [--json]
+  agenteer research qa-dashboard --packet <dir> [--json]
   agenteer research stages [--json]
   agenteer research inspect --packet <dir>
   agenteer research critique --packet <dir>
   agenteer research scout --packet <dir>
   agenteer research approve --packet <dir> [--note <text>]
   agenteer research analyze --packet <dir> --fixture <rows.json>
-  agenteer research review-report --packet <dir>
-  agenteer research manifest --packet <dir>
+  agenteer research review-report --packet <dir> [--json]
+  agenteer research manifest --packet <dir> [--json]
   agenteer research runner-spec --packet <dir>
   agenteer research export --packet <dir> --out <dir>
+  agenteer research packet-summary --packet <dir> [--json]
   agenteer research loop-status [--state <dir>] [--json]
   agenteer research loop-note --cycle <n> --summary <text> [--next <text>] [--state <dir>]
   agenteer research checkpoint --packet <dir> [--json]
@@ -415,6 +461,57 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(renderResearchQuestions(candidates));
       return 0;
     }
+    case "methods-framework": {
+      const result = researchMethodsFrameworkCommand();
+      console.log(flags.json === true ? renderResearchMethodsFrameworkJson(result) : renderResearchMethodsFramework(result));
+      return 0;
+    }
+    case "validate-methods": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchValidateMethodsCommand(packetDir);
+      console.log(flags.json === true ? renderResearchMethodsValidationJson(result) : renderResearchMethodsValidation(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "registry-inspect": {
+      const result = await researchRegistryInspectCommand(requireFlagString(flags, "registry"));
+      console.log(flags.json === true ? renderResearchRegistryInspectJson(result) : renderResearchRegistryInspect(result));
+      return result.warnings.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "decompose-question": {
+      const result = researchDecomposeQuestionCommand(requireFlagString(flags, "question"));
+      console.log(flags.json === true ? renderResearchQuestionDecompositionJson(result) : renderResearchQuestionDecomposition(result));
+      return 0;
+    }
+    case "clarification-plan": {
+      const result = researchClarificationPlanCommand(requireFlagString(flags, "question"));
+      console.log(flags.json === true ? renderResearchClarificationPlanJson(result) : renderResearchClarificationPlan(result));
+      return 0;
+    }
+    case "data-quality": {
+      const result = await researchDataQualityCommand(requireFlagString(flags, "fixture"));
+      console.log(flags.json === true ? renderResearchDataQualityJson(result) : renderResearchDataQuality(result));
+      return result.warnings.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "select-method": {
+      const result = researchSelectMethodCommand(requireFlagString(flags, "question"));
+      console.log(flags.json === true ? renderResearchMethodSelectionJson(result) : renderResearchMethodSelection(result));
+      return 0;
+    }
+    case "ro-crate": {
+      const result = await researchRoCrateCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchRoCrateJson(result) : renderResearchRoCrate(result));
+      return 0;
+    }
+    case "provenance": {
+      const result = await researchProvenanceCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchProvenanceJson(result) : renderResearchProvenance(result));
+      return 0;
+    }
+    case "qa-dashboard": {
+      const result = await researchQaDashboardCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchQaDashboardJson(result) : renderResearchQaDashboard(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
     case "stages": {
       const stages = researchPipelineStagesCommand();
       console.log(flags.json === true ? renderResearchPipelineStagesJson(stages) : renderResearchPipelineStages(stages));
@@ -454,13 +551,13 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
     case "review-report": {
       const packetDir = requireFlagString(flags, "packet");
       const result = await researchReviewReportCommand(packetDir);
-      console.log(renderResearchReportReview(result));
+      console.log(flags.json === true ? renderResearchReportReviewJson(result) : renderResearchReportReview(result));
       return result.status === "pass" ? 0 : 1;
     }
     case "manifest": {
       const packetDir = requireFlagString(flags, "packet");
       const result = await researchArtifactManifestCommand(packetDir);
-      console.log(renderResearchArtifactManifest(result));
+      console.log(flags.json === true ? renderResearchArtifactManifestJson(result) : renderResearchArtifactManifest(result));
       return 0;
     }
     case "runner-spec": {
@@ -475,6 +572,12 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       const result = await researchExportPacketCommand(packetDir, outDir);
       console.log(renderResearchPacketExport(result));
       return 0;
+    }
+    case "packet-summary": {
+      const packetDir = requireFlagString(flags, "packet");
+      const result = await researchPacketSummaryCommand(packetDir);
+      console.log(flags.json === true ? renderResearchPacketSummaryJson(result) : renderResearchPacketSummary(result));
+      return result.checkpoint.currentStage === "complete" ? 0 : 1;
     }
     case "loop-status": {
       const result = await researchLoopStatusCommand(flagString(flags, "state") ?? undefined);

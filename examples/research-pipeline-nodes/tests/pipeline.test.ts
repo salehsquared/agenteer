@@ -14,13 +14,18 @@ describe("research pipeline stage manifest", () => {
     expect(stageIds).toEqual([
       "design",
       "critique",
+      "methods-validation",
       "scout",
+      "data-quality",
       "runner-spec",
       "approval",
       "analysis",
       "report-review",
       "manifest",
+      "ro-crate",
+      "provenance",
       "export",
+      "qa-dashboard",
     ]);
     for (const stage of RESEARCH_PIPELINE_STAGES.filter(stage => stage.manifestId !== "human:approval")) {
       expect(nodeIds.has(stage.manifestId)).toBe(true);
