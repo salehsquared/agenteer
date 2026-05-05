@@ -2210,9 +2210,77 @@ JSON
       expect(lifecycle.task.receiptStatuses).toEqual(["pass", "warning"]);
       expect(lifecycle.capabilities.status).toBe("pass");
       expect(lifecycle.rerunStability.status).toBe("pass");
+      expect(lifecycle.statsRun.status).toBe("missing");
       expect(renderResearchPaperLifecycle(lifecycle)).toContain("research paper lifecycle");
       expect(renderResearchPaperLifecycle(lifecycle)).toContain("rerun stability: pass");
+      expect(renderResearchPaperLifecycle(lifecycle)).toContain("stats-run: missing");
       expect(parsed.paperLifecycle.lifecycleStatus).toBe("ready_for_local_review");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("surfaces stats-run failures in paper lifecycle", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-stats-lifecycle-"));
+    try {
+      const paperDir = path.join(dir, "stats-backed");
+      const interopDir = path.join(paperDir, "interop");
+      await mkdir(interopDir, { recursive: true });
+      await writeFile(path.join(paperDir, "analysis.json"), `${JSON.stringify({ title: "Stats-backed lifecycle" })}\n`);
+      await writeFile(path.join(paperDir, "qa-cli.json"), `${JSON.stringify({ paperQa: { status: "pass", summary: "stats packet QA passed" } })}\n`);
+      await writeFile(path.join(paperDir, "runner-record.json"), `${JSON.stringify({
+        paperRunnerRecord: {
+          recordType: "agenteer.research.paper-runner-record",
+          status: "succeeded",
+          analysisSpec: { binding: "spec-governed" },
+          warnings: [],
+        },
+      })}\n`);
+      await writeFile(path.join(interopDir, "task-succeeded.json"), `${JSON.stringify({ taskEnvelope: { status: "succeeded", evidenceReceipts: [{ status: "pass" }] } })}\n`);
+      await writeFile(path.join(interopDir, "task-validation-with-capabilities.json"), `${JSON.stringify({ interopValidation: { status: "pass", issues: [] } })}\n`);
+      await writeFile(path.join(paperDir, "stats-run.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        runId: "statsrun-test",
+        method: "linear-regression",
+        status: "failed",
+        rowCount: 0,
+        completeCaseN: 0,
+        variables: ["y", "x"],
+        binding: {
+          methodSelectionPath: null,
+          methodSelectionId: null,
+          methodId: null,
+          analysisSpecPath: null,
+          specHash: null,
+          status: "unbound",
+        },
+        parameters: {},
+        estimates: [],
+        diagnostics: {},
+        issues: [{ severity: "blocker", code: "SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER", message: "Use a survey runner.", evidenceRefs: [] }],
+        warnings: [],
+        errors: ["Complex-survey design requires a survey-aware runner."],
+        resultPosture: {
+          status: "blocked_survey_required",
+          label: "Blocked: survey-aware runner required",
+          interpretationBoundary: "This run cannot support inferential research claims because complex-survey variance was declared but not executed.",
+          supports: ["failure attribution", "runner routing decision"],
+          cannotSupport: ["effect estimates", "confidence intervals", "p-values", "paper-ready inference"],
+          nextAction: "Run a survey-aware backend.",
+        },
+        artifacts: [],
+        outDir: paperDir,
+      })}\n`);
+
+      const lifecycle = await researchPaperLifecycleCommand({ paperDir });
+
+      expect(lifecycle.statsRun.status).toBe("failed");
+      expect(lifecycle.statsRun.issueCodes).toContain("SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER");
+      expect(lifecycle.statsRun.posture).toBe("blocked_survey_required");
+      expect(lifecycle.statsRun.interpretationBoundary).toContain("cannot support inferential research claims");
+      expect(lifecycle.lifecycleStatus).toBe("blocked");
+      expect(lifecycle.blockers.join(" ")).toContain("stats-run failed");
+      expect(renderResearchPaperLifecycle(lifecycle)).toContain("stats-run: failed method=linear-regression binding=unbound posture=blocked_survey_required");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

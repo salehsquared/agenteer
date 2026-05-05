@@ -157,14 +157,21 @@ If you patch one package locally for a bugfix PR, bump all six versions together
 
 ## Docs
 
+- [Agent operator guide](docs/agent-operator-guide.md) — start here when an agent needs to run, extend, or dogfood Agenteer without getting lost in the command surface.
+- [Documentation map](docs/documentation-map.md) — choose the right document by task, subsystem, and maintenance responsibility.
+- [Command catalog](docs/command-catalog.md) — modern command map grouped by operator intent across `run`, `ctx`, `agent`, `research`, `specialize`, and registry flows.
 - [Architecture](docs/architecture.md) — top-down tour: runtime loop, context, evidence, kernel, sessions.
 - [Agent improvement layer](docs/agent-improvement-layer.md) — autocontext adapter, planner-v2, repair-run, creativity, critic, and research-market commands.
 - [Capabilities](docs/capabilities.md) — the grammar, intersection rules, and `dynamic_actions` semantics.
 - [Writing a node](docs/nodes.md) — Node contract, intents, ctx patches, evidence deltas.
 - [Evidence records](docs/evidence.md) — verdict semantics, lineage, staleness, reading a trace.
-- [CLI reference](docs/cli.md) — every command, every flag.
+- [CLI reference](docs/cli.md) — base workflow CLI reference and pointers to the full modern command catalog.
 - [Publishing a node](docs/publishing-a-node.md) — scaffold, validate, publish, troubleshoot.
 - [Research pipeline](docs/research-pipeline.md) — CLI-first dogfood loop for dataset-backed research packets.
+- [Research ML modeling](docs/research-ml.md) — tabular ML, classical statistics, modeling-plan, analysis-manifest, and benchmark readiness.
+- [Research machine build tracks](docs/research-machine-build-tracks.md) — execution core, AnalysisSpec, adapters, QA harness, and planner/product tracks.
+- [Research methods foundation](docs/research-methods-foundation.md) — method ontology and analysis selection foundation.
+- [Specializations](docs/specializations.md) — specialization manifests, candidate lifecycle, evaluation, critique, repair, promotion, and reports.
 - [Research pipeline nodes](examples/research-pipeline-nodes/README.md) — reusable deterministic nodes for protocol design, critique, scout, analysis, QA, manifest, and export.
 - [Verdaccio verification](packages/registry/VERDACCIO.md) — real-registry walkthrough for the publish → install story.
 - [Research assistant demo](examples/research-assistant/README.md) — runnable 6-stdlib-node composition.
@@ -184,10 +191,16 @@ examples/
   research-assistant/  — runnable demo
 docs/
   architecture.md      — system tour
+  agent-operator-guide.md — start-here guide for agents operating Agenteer
+  documentation-map.md — guide to the guide set
+  command-catalog.md   — modern command map by operator intent
   capabilities.md      — permission grammar
   nodes.md             — how to write a node
   evidence.md          — evidence records, lineage, staleness
   cli.md               — CLI reference
+  research-pipeline.md — CLI-first research workflow
+  research-ml.md       — statistics and ML research-machine docs
+  specializations.md   — reusable specialization factory
   publishing-a-node.md — node-author publish flow
 CHANGELOG.md
 LICENSE

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "analysisBenchmark": {
+    "schemaVersion": 1,
+    "status": "fail",
+    "manifests": [
+      {
+        "schemaVersion": 1,
+        "manifestId": "analysis_manifest_a0e83649bc403d95",
+        "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare",
+        "runKind": "ml-comparison",
+        "runPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/comparison.json",
+        "runId": "mlcmp_1778013871885",
+        "runStatus": "succeeded",
+        "methodOrModel": "binary_classification",
+        "resultPosture": {
+          "status": "baseline_comparison_ready",
+          "interpretationBoundary": "This comparison supports local model-selection review against at least one transparent baseline, not external validation or deployment.",
+          "nextAction": "Review calibration, subgroup performance, leakage risk, and validation design before promotion."
+        },
+        "readiness": "local_review_ready",
+        "artifactCompleteness": {
+          "status": "pass",
+          "missingRequired": []
+        },
+        "artifacts": [
+          {
+            "kind": "comparison",
+            "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/comparison.json",
+            "required": true,
+            "exists": true,
+            "sha256": "6884fab15b889e3af4746474fe08c5f62537973dfa1fea2e880e458ef41aa730"
+          },
+          {
+            "kind": "model-review-card",
+            "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/model-review-card.md",
+            "required": true,
+            "exists": true,
+            "sha256": "3fb160bfcb8c571d981b1f0c962624b8dbd58119d055b3d7976992386fb92ec7"
+          }
+        ],
+        "issueCodes": [],
+        "nextAction": "Proceed to local methods review; do not promote beyond the declared posture without stronger validation artifacts.",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/analysis-run-manifest.json"
+      }
+    ],
+    "routeCoverage": {
+      "total": 1,
+      "byKind": {
+        "stats": 0,
+        "ml": 0,
+        "ml-comparison": 1
+      },
+      "localReviewReadyByKind": {
+        "stats": 0,
+        "ml": 0,
+        "ml-comparison": 1
+      },
+      "posture": "single_route"
+    },
+    "checks": [
+      {
+        "id": "artifact-completeness",
+        "status": "pass",
+        "detail": "All manifests have required artifacts."
+      },
+      {
+        "id": "readiness-gate",
+        "status": "pass",
+        "detail": "1/1 manifests passed local-review-ready."
+      },
+      {
+        "id": "route-coverage",
+        "status": "fail",
+        "detail": "Coverage posture is single_route; stats=0, ml=0, ml-comparison=1."
+      },
+      {
+        "id": "interpretation-boundaries",
+        "status": "pass",
+        "detail": "Every manifest carries an interpretation boundary."
+      }
+    ],
+    "summary": "1/1 analysis manifests passed local-review-ready checks; coverage=single_route.",
+    "nextAction": "Add at least two local-review-ready route kinds before promotion, such as one bound stats route and one ML comparison route.",
+    "generatedFiles": {
+      "out": null,
+      "report": null
+    }
+  }
+}
+

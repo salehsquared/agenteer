@@ -72,6 +72,41 @@ export {
 } from "./commands/lab.js";
 
 export {
+  renderSpecializationInspect,
+  renderSpecializationPlan,
+  renderSpecializationReport,
+  specializationCritiqueCommand,
+  specializationEvaluateCommand,
+  specializationGenerateCommand,
+  specializationInitCommand,
+  specializationInspectCommand,
+  specializationPlanCommand,
+  specializationPromoteCommand,
+  specializationRunLoopCommand,
+  type SpecializationInspect,
+  type SpecializationInitOptions,
+  type SpecializationPlan,
+} from "./specialize/runtime.js";
+export {
+  specializationManifestSchema,
+  candidateVariantSchema,
+  candidateEvaluationSchema,
+  candidateCritiqueSchema,
+  candidateRepairSchema,
+  promotionDecisionSchema,
+  specializationReportSchema,
+  specializationRunSchema,
+  type SpecializationManifest,
+  type CandidateVariant,
+  type CandidateEvaluation,
+  type CandidateCritique,
+  type CandidateRepair,
+  type PromotionDecision,
+  type SpecializationReport,
+  type SpecializationRun,
+} from "./specialize/schemas.js";
+
+export {
   researchMlCompareCommand,
   researchMlInspectCommand,
   researchMlModelsCommand,
@@ -83,6 +118,12 @@ export {
   renderResearchMlRun,
   renderResearchMlRunJson,
 } from "./research-machine/ml/commands.js";
+export {
+  parseStatsMethod,
+  researchStatsRunCommand,
+  renderResearchStatsRun,
+  renderResearchStatsRunJson,
+} from "./research-machine/stats/commands.js";
 export {
   buildModelingDecisionPlan,
   modelingDecisionRequestSchema,
@@ -112,6 +153,20 @@ export {
   type MlRunResult,
   type MlTaskType,
 } from "./research-machine/ml/schemas.js";
+export {
+  statsArtifactSchema,
+  statsMethodSchema,
+  statsRunRequestSchema,
+  statsRunResultSchema,
+  type StatsArtifact,
+  type StatsMethod,
+  type StatsRunRequest,
+  type StatsRunResult,
+} from "./research-machine/stats/schemas.js";
+export {
+  analysisMethodIdsWithStatsRunner,
+  statsRunMethodForAnalysisMethod,
+} from "./research-machine/stats/method-map.js";
 
 export {
   agentAdversarialProtocolsCommand,
@@ -654,6 +709,9 @@ export {
 } from "./commands/research.js";
 
 export {
+  researchAnalysisManifestCommand,
+  researchAnalysisBenchmarkCommand,
+  researchAnalysisRunCommand,
   researchArchetypesCommand,
   researchDatasetAdapterCommand,
   researchExecutionContractCommand,
@@ -668,6 +726,12 @@ export {
   researchMachinePlanCommand,
   researchMachineStatusCommand,
   researchSpecV2Command,
+  renderResearchAnalysisManifest,
+  renderResearchAnalysisManifestJson,
+  renderResearchAnalysisBenchmark,
+  renderResearchAnalysisBenchmarkJson,
+  renderResearchAnalysisRun,
+  renderResearchAnalysisRunJson,
   renderResearchArchetypes,
   renderResearchArchetypesJson,
   renderResearchDatasetAdapter,

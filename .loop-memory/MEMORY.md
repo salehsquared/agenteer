@@ -15,70 +15,7 @@ Each tick states its axis, produces one deliverable, verifies it, records one re
 
 ## Tick Index
 
-- Tick 001, axis 1 faster/simpler: initialized loop memory and wrote the research pipeline architecture note.
-- Tick 002, axis 2 more robust: added checkpoint `recommendedCommands` so blocked stage gates expose safe next commands.
-- Tick 003, axis 3 remove/merge: made `research pipeline-stages` the canonical visible command while preserving `research stages` as an alias.
-- Tick 004, axis 4 add: added `research next` packet navigator over checkpoint, gate status, and recommended commands.
-- Tick 005, axis 5 challenge: critiqued checkpoint/next navigation and recommended expected artifacts for Tick 006.
-- Tick 006, axis 6 question: made `research next` evidence-centered by adding expected artifacts and success conditions.
-- Tick 007, axis 1 faster/simpler: centralized `research next` stage artifact metadata to avoid a second scattered registry.
-- Tick 008, axis 2 more robust: added artifact presence checks to `research next` expected artifacts.
-- Tick 009, axis 3 remove/merge: shared stage artifact path metadata between checkpoint detection and `research next`.
-- Tick 010, axis 4 add: added opt-in `research next --trace` navigation decision records.
-- Tick 011, axis 5 challenge: critiqued `research next` growth and recommended self-describing trace records.
-- Tick 012, axis 6 question: made `research next` events self-describing with schema version and event type.
-- Tick 013, axis 1 faster/simpler: exposed the `research next` event type and schema in human output.
-- Tick 014, axis 2 more robust: added `research next --exit-zero-on-blocked` for audit-only blocked navigation.
-- Tick 015, axis 3 remove/merge: documented ownership boundaries for `checkpoint`, `stage-gate`, and `next`.
-- Tick 016, axis 4 add: added `research navigation-trace` to inspect `navigation-trace.jsonl`.
-- Tick 017, axis 5 challenge: critiqued trace reader scope and recommended validation over generalization.
-- Tick 018, axis 6 question: added malformed-line and event-type validation to `research navigation-trace`.
-- Tick 019, axis 1 faster/simpler: added compact `status` to `research navigation-trace` summaries.
-- Tick 020, axis 2 more robust: added lightweight SHA-256 hash chaining to navigation trace events.
-- Tick 021, axis 3 remove/merge: decided to keep hash-chain helpers local until a second event type exists.
-- Tick 022, axis 4 add: made approval artifacts event-shaped with schema, event type, decision id, and record hash.
-- Tick 023, axis 5 challenge: critiqued event metadata and recommended only a tiny shared hashing helper.
-- Tick 024, axis 6 question: extracted `hashResearchEventRecord` for approval and navigation event hashes.
-- Tick 025, axis 1 faster/simpler: documented the lightweight research packet event-record pattern.
-- Tick 026, axis 2 more robust: added `research approval-verify` for approval record hash validation.
-- Tick 027, axis 3 remove/merge: decided `approval-verify` stays narrow until a true `packet-verify` aggregator exists.
-- Tick 028, axis 4 add: added `research packet-verify` as a narrow aggregator over existing integrity verifiers.
-- Tick 029, axis 5 challenge: critiqued `packet-verify` scope and recommended explicit mode/scope metadata.
-- Tick 030, axis 6 question: added explicit mode and scope metadata to `research packet-verify`.
-- Tick 031, axis 1 faster/simpler: added new navigation/integrity commands to research pipeline docs command lists.
-- Tick 032, axis 2 more robust: verified build and top-level help include the new verification commands.
-- Tick 033, axis 3 remove/merge: deferred subcommand-scoped help until a broader CLI ergonomics pass.
-- Tick 034, axis 4 add: added `research manifest-verify` and included manifest hash checks in `packet-verify`.
-- Tick 035, axis 5 challenge: critiqued verification stack scope and warned integrity pass is not research validity.
-- Tick 036, axis 6 question: added summary and next-action language to `research packet-verify`.
-- Tick 037, axis 1 faster/simpler: reused stage command helpers for `packet-verify` approval and manifest next actions.
-- Tick 038, axis 2 more robust: smoke-tested `manifest-verify` on a changed `design.json` and confirmed clear drift reporting.
-- Tick 039, axis 3 remove/merge: decided manifest verification belongs to reproducibility/export integrity, not event records.
-- Tick 040, axis 4 add: added `exportIntegrityReady` to `research packet-verify`.
-- Tick 041, axis 5 challenge: critiqued export integrity readiness and recommended adding a reason.
-- Tick 042, axis 6 question: added `exportIntegrityReason` to `research packet-verify`.
-- Tick 043, axis 1 faster/simpler: compressed human `packet-verify` export integrity output into one line.
-- Tick 044, axis 2 more robust: ran full integrity smoke path through design, scout, trace, approval, manifest, and packet verify.
-- Tick 045, axis 3 remove/merge: summarized the 40-tick run and identified research-readiness as the next separate layer.
-- Tick 046, migration: added dual-tick config, cost log, domain-change log, and committed future ticks to `dual_tick.py next` plus 4-digit tick files.
-- Tick 047, challenge: skeptical-statistician critique warned that `research-readiness` must not imply scientific validity.
-- Tick 048, question-the-question: added `research packet-readiness` as a scoped review-readiness component aggregator with explicit scientific limitations.
-- Tick 049, web-search: added source references to `packet-readiness`, grounded in STROBE caution that reporting checklists are not study-quality instruments.
-- Tick 050, challenge: end-user clinician critique said readiness needs a decision posture and human-readable clinical summary, not only component internals.
-- Tick 051, first-principles: added `decisionPosture`, `sharePosture`, and `clinicianSummary` to `packet-readiness`.
-- Tick 052, rejected-revival: revived public stage artifact metadata as `research stage-artifacts` and corrected provenance artifact naming.
-- Tick 053, challenge: reliability critique warned that readiness, QA, checkpoint, and stage artifacts can drift without shared mapping or cross-projection tests.
-- Tick 054, capability-rave: inventoried malleable readiness/metadata surfaces and added provenance drift coverage across stage artifacts, QA, and readiness.
-- Tick 055, challenge: framework-minimalist critique warned the research CLI is accreting too many adjacent status/verification commands.
-- Tick 056, web-search: used CLI design guidance to split research docs into a primary path and audit/debug commands.
-- Tick 057, cross-domain: imported Lean Andon stop-the-line thinking by adding `stopReasons` to packet readiness.
-- Tick 058, add-primitive: added machine-readable `recommendedCommands` to packet readiness.
-- Tick 059, challenge: new-contributor critique warned packet-readiness JSON field stability is unclear.
-- Tick 060, challenge: methodology-archivist critique said readiness and review artifacts need explicit contract/policy provenance.
-- Tick 061, faster/simpler: documented the stable packet-readiness JSON contract versus human-facing prose fields.
-- Tick 062, more-robust: added `packet-readiness.json` to exportable research artifacts and coverage.
-- Tick 063, capability-rave: identified export artifact allowlist derivation as the next remove/merge target.
-- Tick 064, add-primitive: derived export artifact allowlist from stage artifact metadata plus explicit extras.
+- Ticks 012-064 built the early navigation, approval, packet integrity, export-readiness, stage-artifact, and packet-readiness foundations; detailed history lives in `.loop-memory/ticks/`.
 - Tick 065, challenge: adversarial-security critique warned `recommendedCommands` is a trust boundary and should avoid shell-chain ambiguity.
 - Tick 066, tail-sample: hardened readiness `recommendedCommands` to admit only single `agenteer research ...` commands without shell operators.
 - Tick 067, faster/simpler: separated review readiness from export/share readiness so missing export does not block internal scientific review.
@@ -142,7 +79,6 @@ Each tick states its axis, produces one deliverable, verifies it, records one re
 - Tick 125, challenge: reliability-engineer critique warned that generated papers need runner provenance, not only paper/analysis/QA/critique files.
 - Tick 126, capability-rave/web: grounded runner provenance in workflow-run reproducibility sources and added `runner-record.json` for Paper 4 with input/output hashes and runtime/package metadata.
 - Tick 127, maturity reproducibility/UX: made `research paper-index` surface runner status, revealing Papers 1-3 lack runner provenance while Paper 4 has it.
-- Tick 129, maturity architecture/reproducibility: established `/Users/saleh/TechProjects/agenteer/.loop-memory/golden/nhanes-insurance-hba1c/` as the current canonical golden packet target.
 - Tick 130, maturity methods/truth: created a retrospective typed `AnalysisSpec` for the golden packet and critiqued that it is not yet proof of spec-first execution.
 - Tick 131, maturity truth/methods: validated golden source tables against `analysis-spec.json`; required variables, survey fields, missingness, and sparse cells passed.
 - Tick 132, maturity truth/methods: strengthened `cohort-scout-file` typed failures for invalid weights and missing survey design fields, with targeted test coverage.
@@ -194,7 +130,61 @@ Each tick states its axis, produces one deliverable, verifies it, records one re
 - Tick 178, maturity add-primitive/methods/architecture: added `research modeling-plan`, a decision layer that ranks statistical methods, ML adapters, and workflow policies before execution; saved `.loop-memory/modeling/0178-modeling-plan.json`.
 - Tick 179, maturity challenge/methods/architecture: critiqued `modeling-plan`; next implementation must be evidence-aware, split blocking policies from executable candidates, and react to sample size/missingness/class shape.
 - Tick 180, maturity challenge/new-contributor hygiene: fake-progress audit warned `modeling-plan` and ML surfaces need evidence-aware ranking and clearer golden-path docs before more adapter breadth.
+- Tick 181, maturity faster-simpler/methods: `modeling-plan` now ingests `--table`/`--table-summary`/`--target`, derives data-shape risks, splits blocking policies, and adapts ML rankings.
+- Tick 182, maturity web-search/methods/ML: grounded binary clinical prediction output in TRIPOD+AI and calibration literature; ML binary classification now writes `calibration.csv`, reports `calibration_bins`, and exposes a `calibration` artifact.
+- Tick 183, maturity remove-merge/methods: `modeling-plan` now embeds method-selection id/hash/backend evidence and uses shared `stableHash`, reducing drift between method ontology and ML planning.
+- Tick 184, maturity add-primitive/methods-runner: added `research stats-run` for executable standard table statistics with estimates, diagnostics, artifact hashes, and full ML/modeling regression coverage.
+- Tick 185, maturity challenge/methods-safety: skeptical-statistician critique says `stats-run` needs AnalysisSpec/method binding plus typed diagnostics/refusals for survey misuse, sparse cells, separation, convergence, and overdispersion.
+- Tick 186, maturity question/methods-safety: made `stats-run` governed rather than merely convenient, adding typed issues and default refusal for declared survey design without explicit approximation.
+- Tick 187, maturity first-principles/methods: `modeling-plan` now names direct `stats-run` command hints/artifacts for executable standard-table methods while leaving survey-shaped methods survey-aware.
+- Tick 188, maturity robust/reproducibility: `stats-run` now binds to method-selection/spec evidence, records method/spec provenance, and blocks method-selection mismatches before execution.
+- Tick 189, maturity capability-rave/architecture: extracted shared method-to-`stats-run` mapping used by modeling hints and stats binding validation, preventing execution-boundary drift.
+- Tick 190, maturity challenge/hygiene: reliability critique says stats-run must prove packet lifecycle/readiness consumption or it becomes a separate execution island; MEMORY remains 200 lines.
+- Tick 191, maturity challenge/UX: framework-minimalist critique says analysis commands now form a maze; next work should add a route selector/front-door projection.
+- Tick 192, maturity question/UX: `modeling-plan` now includes `routeRecommendation` as the analysis front door for paper-run, stats-run, ml-run, method-select, or stop-for-review.
+- Tick 193, maturity faster/simpler/UX-truth: `paper-lifecycle` now consumes `stats-run.json`, surfaces stats method/binding/issues, and blocks failed stats runs so standard-table execution is visible in reviewer lifecycle state.
+- Tick 194, maturity more-robust/methods-runner: `modeling-plan` now accepts `--backend-status`, downgrades candidates whose backend is missing, and routes survey inference to `python-linearized` when R survey is unavailable but the local survey runner exists.
+- Tick 195, maturity challenge/new-contributor: critiqued the stats route as not packet-grade yet and flagged duplicate JSON printing in the stats bridge success path.
+- Tick 196, maturity web-search/runner-QA: `stats-run` now emits packet-grade `stats-report.md` and `stats-qa.json` artifacts with hashes, safety header, p-value/effect-size cautions, and standard-table boundary checks.
+- Tick 197, maturity challenge/clinician-UX: critiqued artifact growth as still requiring experts to infer result posture; next work should add explicit stats/ML interpretation boundaries before method breadth.
+- Tick 198, maturity capability-rave/UX-QA: `stats-run` now emits typed `resultPosture` with supports/cannot-support boundaries; `paper-lifecycle` surfaces posture and interpretation boundary for stats-backed packets.
+- Tick 199, maturity faster-simpler/ML-UX: `ml-run` now emits typed `resultPosture` and renders it, distinguishing locally validated prediction, exploratory unsupervised output, optional dependency gaps, and failed runs.
+- Tick 200, maturity challenge/web-memory: critiqued result posture as still self-attested; next tick must make prior stats/ML run posture feed a planning gate or route recommendation.
+- Tick 201, maturity remove-merge/planning: `modeling-plan` now accepts `--prior-run` stats/ML artifacts, normalizes posture, and routes survey blockers, exploratory runs, invalid bindings, optional dependency gaps, and local-only ML validation into concrete next actions.
+- Tick 202, maturity add-primitive/reproducibility: added `research analysis-manifest` to create one compact manifest for stats/ML run directories with posture, readiness, artifact completeness, hashes, and next action.
+- Tick 203, maturity web-search/golden-route: ran a saved golden stats route through `modeling-plan -> stats-run -> analysis-manifest -> modeling-plan --prior-run`; prior-run posture routed exploratory output back to method/spec binding.
+- Tick 204, maturity first-principles/UX: added bounded `research analysis-run` for standard-table stats, composing modeling-plan, stats-run, analysis-manifest, and post-run prior evidence while preserving all intermediate artifacts.
+- Tick 205, maturity challenge/methods-safety: critiqued `analysis-run` as too permissive for unbound standard-table stats; next tick must add binding support and strict mode.
+- Tick 206, maturity more-robust/methods-safety: `analysis-run` now accepts `--method-selection`, `--analysis-spec`, and `--require-bound`; strict unbound runs fail and bound runs can reach `local_review_ready`.
+- Tick 207, maturity capability-rave/reproducibility: `analysis-manifest --require-ready` now fails non-`local_review_ready` runs so benchmark/promotion scripts cannot count exploratory packets as success.
+- Tick 208, maturity rejected-revival/ML-QA: binary classification ML manifests now require calibration evidence before `local_review_ready`, reviving ML strictness without a separate lifecycle command.
+- Tick 209, maturity cross-domain/ML-safety: `ml-compare` now emits `comparisonPosture`; baseline comparison is ready only with at least two scored successful models, a transparent baseline, and binary calibration artifacts.
+- Tick 210, maturity challenge/web-ML-review: critiqued ML comparison posture as too metric-centric; next tick should add model-card-style review evidence to `ml-compare`.
+- Tick 211, maturity faster-simpler/ML-review: `ml-compare` now writes `model-review-card.md` and JSON review-card fields covering intended use/non-use, validation boundary, leakage review, missing evidence, and ranked models.
+- Tick 212, maturity more-robust/golden-ML: saved `.loop-memory/golden/0212-ml-comparison-route` proving `modeling-plan -> ml-compare -> model-review-card` with `baseline_comparison_ready` and review-card `local_review_ready`.
+- Tick 213, maturity remove-merge/ML-manifest: `analysis-manifest` now accepts `ml-compare` directories, requiring `comparison.json`, `model-review-card.md`, and `baseline_comparison_ready` for `local_review_ready`.
+- Tick 214, maturity add-primitive/benchmark: added `research analysis-benchmark` to aggregate stats/ML/comparison manifests and enforce artifact or `local_review_ready` gates across run directories.
+- Tick 215, maturity challenge/benchmark-truth: critiqued `analysis-benchmark` as too thin until it proves bound stats plus ML comparison routes together and records coverage/report evidence.
+- Tick 216, maturity capability-rave/golden-benchmark: created `.loop-memory/golden/0216-bound-stats-route`, a bound standard-table stats route with `bound_standard_table` posture and a strict two-route benchmark pass with the golden ML comparison route.
+- Tick 217, maturity web-search/benchmark-reporting: grounded benchmark reporting in current agentic-evaluation/provenance guidance and made `analysis-benchmark` emit route coverage, checks, JSON output, and Markdown reports.
+- Tick 218, maturity more-robust/benchmark-gate: added `analysis-benchmark --require-multi-route`, making narrow one-route benchmark passes fail when promotion scripts need multi-route evidence.
+- Tick 219, maturity remove-or-merge/golden-hygiene: marked `.loop-memory/golden/0203-stats-route` superseded and updated golden tasks so future agents use the bound 0216 stats route plus 0212 ML comparison route.
+- Tick 220, maturity challenge/paper-benchmark-separation: critiqued the split between stats/ML `analysis-benchmark` and survey-paper lifecycle; next target is a composed health summary rather than flattening paper-run into analysis manifests.
+- Tick 221, maturity first-principles/research-health: generated `.loop-memory/golden/research-machine-health-0221.md`, composing strict stats/ML benchmark health with the real 0179 survey-paper machine benchmark.
+- Tick 222, maturity question/diagnostic-paper: selected diagnostic accuracy as the next research stress case and wrote `.loop-memory/modeling/0222-diagnostic-accuracy-paper-idea.md`.
+- Tick 223, maturity faster-simpler/diagnostic-route: added executable `diagnostic-accuracy` to `stats-run`, mapped `diagnostic-accuracy-basic`, documented/tested it, and created `.loop-memory/golden/0223-diagnostic-accuracy-route` with a bound local-review-ready diagnostic packet plus strict three-route benchmark evidence.
+- Tick 224, maturity web-search/diagnostic-semantics: used STARD/STARD-AI pressure to make `modeling-plan` and `analysis-run` natively record diagnostic accuracy as `goal=diagnose`, `studyDesign=diagnostic`, and reference-standard/index-test command language.
+- Tick 225, maturity challenge/diagnostic-claim-firewall: critiqued diagnostic reports as still too easy to overread; next tick must add diagnostic-specific report QA gates before more diagnostic breadth.
+- Tick 226, maturity add-primitive/diagnostic-QA: added diagnostic-specific `stats-report.md` and `stats-qa.json` claim-firewall checks for reference standard, index test, predictive-value prevalence context, screening overclaim, precision caveat, and sparse-cell policy.
+- Tick 227, maturity challenge/diagnostic-study-selection: critiqued the clean diagnostic route as too pre-thresholded; next diagnostic work should add interval estimates, threshold derivation, indeterminate accounting, or a stats-run-to-paper wrapper before another diagnostic paper.
+- Tick 228, maturity cross-domain/diagnostic-intervals: added Wilson binomial intervals for sensitivity, specificity, PPV, and NPV, making diagnostic precision QA pass when intervals are present.
+- Tick 229, maturity faster-simpler/diagnostic-thresholds: added explicit diagnostic threshold derivation via `--outcome-threshold` and `--exposure-threshold`, created `.loop-memory/golden/0229-diagnostic-threshold-route`, and passed a strict four-route benchmark.
+- Tick 230, maturity challenge/diagnostic-packet-gap: critiqued diagnostic stats routes as not yet research products; next tick should bridge stats-run artifacts into a paper packet. Memory hygiene checked `MEMORY.md` at 185 lines.
+- Tick 231, maturity tail-sample/diagnostic-paper-wrapper: `analysis-run --method diagnostic-accuracy` now writes local-review `paper.md` and `paper-qa.json` from stats-run artifacts; threshold diagnostic golden route includes a passing paper QA receipt.
+- Tick 232, maturity add-primitive/diagnostic-manifest: analysis manifests now surface optional diagnostic paper and paper-QA artifacts when present, with hashes, without making them required for ordinary stats routes.
+- Tick 233, maturity challenge/full-suite-pressure: ran the full `research-ml` suite (20/20 pass) and critiqued that green route tests still do not prove actual-data diagnostic packet maturity.
+- Tick 234, maturity capability-rave/diagnostic-stability: reran the threshold-derived diagnostic route and saved `rerun-stability.json`; estimates and diagnostics are stable across baseline/repeat runs.
 
 ## Open Thread
 
-Future ticks must use `python3 ~/.codex/skills/dual-tick/scripts/dual_tick.py next --primary /Users/saleh/TechProjects/agenteer` before selecting work. Use `check-readonly` before suspicious MedBrevia paths. Current run ceiling is `$10`; prefer cached NHANES Parquet or CDC public downloads. Current golden-path packet: `0167-pir-hdl-paper-run`; latest real paper: `0179-bmi-fasting-glucose-r-survey`. Latest reproducibility status: `0179` uses R `survey::svyglm`, passes lifecycle, paper QA, task validation, and 15/15 rerun-stability checks against `0178`. Top blockers: feeding actual table/spec evidence into `modeling-plan`, extracting backend adapters out of generated Python, richer survey-domain semantics, AnalysisSpec V2, and broader study-shape coverage. Recent Agenteer improvements: local analysis runtime, `backend-status`, `paper-run --backend r-survey`, lifecycle, task/capability validation, paper-QA fixes, subsample weight clearance, safety-header gate, paper rerun-stability primitive, and modeling decision planning.
+Future ticks must use `python3 ~/.codex/skills/dual-tick/scripts/dual_tick.py next --primary /Users/saleh/TechProjects/agenteer` before selecting work. Use `check-readonly` before suspicious MedBrevia paths. Current golden stats route: `.loop-memory/golden/0216-bound-stats-route`; diagnostic stats routes: `.loop-memory/golden/0223-diagnostic-accuracy-route` and `.loop-memory/golden/0229-diagnostic-threshold-route`; previous stats route `.loop-memory/golden/0203-stats-route` is exploratory/unbound; current golden ML route: `.loop-memory/golden/0212-ml-comparison-route`; current multi-route benchmark report: `.loop-memory/golden/0229-diagnostic-threshold-route/four-route-analysis-benchmark.md`; current golden paper packet: `0167-pir-hdl-paper-run`; latest real paper: `0179-bmi-fasting-glucose-r-survey`. Latest reproducibility status: `0179` uses R `survey::svyglm`, passes lifecycle, paper QA, task validation, and 15/15 rerun-stability checks against `0178`. Top blockers: extracting backend adapters out of generated Python, richer survey-domain semantics, AnalysisSpec V2, and broader study-shape coverage. Recent Agenteer improvements: local analysis runtime, bounded strict `analysis-run`, unified stats/ML/comparison `analysis-manifest`, coverage-aware `analysis-benchmark` with Markdown reports and `--require-multi-route`, executable diagnostic accuracy with Wilson intervals and threshold derivation, binary ML calibration gate, `ml-compare` posture and model-review card, `backend-status`, prior-run posture gates in `modeling-plan`, `paper-run --backend r-survey`, lifecycle, task/capability validation, stats/ML result posture, and stats-run report/QA/posture artifacts.

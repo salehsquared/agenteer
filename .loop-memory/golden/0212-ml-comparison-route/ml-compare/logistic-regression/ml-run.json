@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "runId": "mlrun_ee34b4b2f7d3",
+  "task": "binary_classification",
+  "modelId": "logistic-regression",
+  "status": "succeeded",
+  "primaryMetric": "auroc",
+  "primaryMetricDirection": "maximize",
+  "metrics": {
+    "accuracy": 1,
+    "confusion_matrix": [
+      [
+        2,
+        0
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "precision": 1,
+    "recall": 1,
+    "sensitivity": 1,
+    "f1": 1,
+    "specificity": 1,
+    "auroc": 1,
+    "auprc": 1,
+    "log_loss": 0.07067561614827107,
+    "brier_score": 0.013898196778840423,
+    "calibration_bins": 2
+  },
+  "warnings": [],
+  "errors": [],
+  "preprocessing": {
+    "rowCount": 16,
+    "featureCount": 3,
+    "numericFeatures": [
+      "age",
+      "bmi"
+    ],
+    "categoricalFeatures": [
+      "sex"
+    ],
+    "excludedColumns": [],
+    "trainRows": 12,
+    "testRows": 4
+  },
+  "evaluation": {
+    "split": "train_test",
+    "crossValidation": null
+  },
+  "explanation": {
+    "shapAvailable": false,
+    "shapStatus": "not_requested",
+    "coefficients": [
+      {
+        "feature": "age",
+        "value": 0.4799753257780618
+      },
+      {
+        "feature": "bmi",
+        "value": 0.45622480869000814
+      },
+      {
+        "feature": "sex_M",
+        "value": 0.07146654660829581
+      },
+      {
+        "feature": "sex_F",
+        "value": 0.07146396643997868
+      }
+    ],
+    "permutationImportance": [
+      {
+        "feature": "age",
+        "value": 0.25,
+        "std": 0.22360679774997896
+      },
+      {
+        "feature": "bmi",
+        "value": 0.05,
+        "std": 0.10000000000000002
+      },
+      {
+        "feature": "sex",
+        "value": 0,
+        "std": 0
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "kind": "predictions",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/logistic-regression/predictions.csv",
+      "sha256": "638221d1b617b0881385b07597ceb9e4a330488ac87e225b76613df860fcb57f"
+    },
+    {
+      "kind": "calibration",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/logistic-regression/calibration.csv",
+      "sha256": "12bcf91307c7505d10163de91cc59783c76ab329b4dcccc9fa6fd461f5a90b5f"
+    },
+    {
+      "kind": "model",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/logistic-regression/model.joblib",
+      "sha256": "958717afd20546f718bb96cd10125754b81748866d3f9956129cac5ed6501990"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/logistic-regression/model-summary.json",
+      "sha256": "395ff5445bc6395b8c5a05a59d3d8c023951a1cc91b370fc802f7fd9487a52f9"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/logistic-regression",
+  "resultPosture": {
+    "status": "locally_validated_prediction",
+    "label": "Locally validated prediction result",
+    "interpretationBoundary": "This run supports local predictive-performance review on the declared split, not external validation or clinical deployment.",
+    "supports": [
+      "local model comparison",
+      "held-out performance review",
+      "leakage-aware preprocessing audit",
+      "basic calibration review"
+    ],
+    "cannotSupport": [
+      "external validity",
+      "clinical deployment",
+      "causal claims",
+      "unmeasured fairness claims"
+    ],
+    "nextAction": "Compare against baselines, review calibration/leakage, and require external or temporal validation before deployment-style claims."
+  }
+}

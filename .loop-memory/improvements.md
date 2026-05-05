@@ -7,6 +7,69 @@
 - Added policy candidates for complex survey design, high missingness, causal stop-for-review, and survival required fields.
 - Added targeted tests proving survey prediction recommends both survey policy and ML baselines, and causal/survival questions force design review.
 
+## Tick 181
+
+- Made `research modeling-plan` evidence-aware through `--table`, `--table-summary`, and `--target`.
+- The modeling plan now derives row count, feature count, target class count, missingness, small-sample status, and high-dimensional status.
+- Split `blockingPolicies` from executable candidates so policies can gate execution without hiding the runnable model path.
+- Added adaptive-ranking tests proving small/high-missingness tables downgrade high-capacity ML relative to large clean tables.
+
+## Tick 182
+
+- Web search grounded clinical prediction ML in TRIPOD+AI calibration/discrimination reporting and scikit-learn calibration curves.
+- Binary probabilistic ML runs now write `calibration.csv` and report `calibration_bins`.
+- Added `calibration` as an ML artifact kind and updated docs/tests accordingly.
+
+## Tick 193
+
+- Made `research paper-lifecycle` consume packet-local `stats-run.json`.
+- Lifecycle now reports stats-run status, method, binding, issue codes, and path.
+- Failed stats runs now block local-review lifecycle status, reducing the risk that standard-table stats execution becomes a hidden island.
+
+## Tick 194
+
+- Made `research modeling-plan` accept `--backend-status <machine-status.json>`.
+- Added backend evidence to modeling plans and downgraded candidates whose backend is missing.
+- Complex-survey route selection now falls back to `paper-run --backend python-linearized` when R survey is unavailable but the local linearized runner is available.
+
+## Tick 196
+
+- Web search:
+  - Query: `statistical analysis reproducible research report artifacts estimates diagnostics machine readable 2024`
+    - Source: https://www.amstat.org/asa/files/pdfs/P-ValueStatement.pdf
+    - Finding: p-values need full reporting/context and are not measures of effect size or practical importance.
+    - Applicability: `stats-report.md` now includes p-value/effect-size cautions and requires estimates/uncertainty context in QA.
+  - Query: `ASA statement p-values statistical significance reporting cautions official`
+    - Source: https://hdsr.mitpress.mit.edu/pub/50vl2b07/release/2
+    - Finding: replicability concerns include inadequate model-choice/procedure descriptions and selective reporting.
+    - Applicability: stats reports now include method, variables, complete-case N, diagnostics, issues, and warnings.
+  - Query: `TRIPOD AI calibration reporting prediction model checklist 2024`
+    - Source: https://www.tripod-statement.org/wp-content/uploads/2024/04/TRIPODAI-Supplement.pdf
+    - Finding: model reports should include performance/uncertainty, calibration for prediction, implementation details, limitations, and avoid overinterpretation.
+    - Applicability: kept calibration work in ML path and mirrored the same limitation/overinterpretation posture in stats report safety headers.
+- `research stats-run` now writes `stats-report.md` and `stats-qa.json` with artifact hashes.
+- `modeling-plan` expected stats artifacts now include `stats-report.md` and `stats-qa.json`.
+
+## Tick 216
+
+- Created a bound standard-table stats golden route at `.loop-memory/golden/0216-bound-stats-route`.
+- Proved `analysis-run --require-bound` can produce `bound_standard_table` and `local_review_ready` from method-selection evidence.
+- Ran `analysis-benchmark --require-ready` across the bound stats route and golden ML comparison route; strict benchmark passed 2/2.
+
+## Tick 217
+
+- Added route coverage to `research analysis-benchmark`: counts by `stats`, `ml`, and `ml-comparison`, plus ready counts and coverage posture.
+- Added benchmark checks for artifact completeness, readiness gate, route coverage, and interpretation boundaries.
+- Added `--out` and `--report` support so benchmark evidence can be saved as JSON and Markdown.
+- Updated `docs/research-ml.md` and targeted tests.
+- Live golden benchmark report: `.loop-memory/golden/0216-bound-stats-route/two-route-analysis-benchmark.md`.
+
+Web grounding:
+
+- Agentic Benchmark Checklist paper: benchmark gates should define tasks/rewards and failure accounting explicitly.
+- PROV-AGENT paper: agentic workflows need provenance that links decisions, artifacts, and workflow outcomes.
+- STROBE/TRIPOD+AI: research reports should preserve design, methods, limitations, intended use, and validation boundaries.
+
 ## Tick 001
 
 - Initialized `.loop-memory/` as the durable operating memory for the dogfood loop.
@@ -722,3 +785,92 @@ Sources:
 - Added a comprehensive analysis-method ontology and selector covering 59 methods across 40 statistical/methodological categories, including classical tests, regression, survey methods, survival, repeated measures, multilevel, causal inference, diagnostics, prediction/ML, validation, latent methods, clustering, time series, meta-analysis, Bayesian methods, missing data, reliability, epidemiology, trials, economics, spatial/network/NLP/qualitative methods, high-dimensional data, image/signal analysis, power, diagnostics, and multiplicity.
 - Added method-layer CLI commands: `methods-catalog`, `method-select`, `method-apply`, and `method-validate`; selections can be persisted and merged into AnalysisSpec V2 before execution-contract creation.
 - Method selection now conservatively distinguishes `executable`, `contract-ready`, `design-only`, and unavailable-backend methods; survival selection correctly chooses Cox/R-survival while requiring human review because no production survival backend is verified.
+- Tick 0182: Binary ML runs now persist calibration evidence (`calibration.csv`, `calibration_bins`, and a `calibration` artifact kind), grounded in TRIPOD+AI and probability calibration guidance.
+- Tick 0183: `research modeling-plan` now embeds `methodSelectionEvidence` with selection id/hash, primary method, backend/archetype recommendation, review flag, issue codes, and a method-apply hint, reducing drift between method selection and modeling decisions.
+- Tick 0184: Added `research stats-run`, a Python-backed executable classical statistics runner covering descriptive summaries, group tests, correlations, linear/logistic/Poisson regression, diagnostics, and hashed artifacts.
+- Tick 0186: `stats-run` now has typed diagnostic issues and refuses declared complex-survey execution unless `--allow-survey-approximation` makes the exploratory posture explicit.
+- Tick 0187: `modeling-plan` now maps executable standard-table method candidates to direct `stats-run` command hints and stats artifact expectations, while leaving survey-shaped methods on the survey-aware path.
+- Tick 0188: `stats-run` can bind to method-selection and AnalysisSpec evidence, records method/spec provenance, and blocks method-selection mismatches before execution.
+- Tick 0189: Extracted a shared method-to-`stats-run` mapping so modeling-plan command hints and stats-run binding validation cannot drift silently.
+- Tick 0192: `modeling-plan` now includes `routeRecommendation`, making it the analysis front door for `paper-run`, `stats-run`, `ml-run`, `method-select`, or stop-for-review.
+- Tick 0198: `stats-run` now declares typed `resultPosture` values (`exploratory_standard_table`, `bound_standard_table`, `exploratory_survey_approximation`, `blocked_survey_required`, `invalid_binding`, `failed`) with supports/cannot-support boundaries; `paper-lifecycle` renders that posture so reviewers can distinguish artifact presence from interpretable research output.
+- Tick 0199: `ml-run` now declares typed `resultPosture` values for locally validated supervised prediction, exploratory unsupervised output, optional dependency gaps, and failed runs; CLI rendering exposes the boundary directly.
+- Tick 0201: `modeling-plan` now consumes `--prior-run` stats/ML artifacts and converts posture into route decisions: survey-aware rerun, method/spec binding, repair review, baseline comparison, or external-validation stop.
+- Tick 0202: Added `research analysis-manifest`, a single compact manifest for stats/ML run directories covering run kind, posture, readiness, artifact completeness, hashes, issue codes, and next action.
+- Tick 0203: Saved a golden stats route at `.loop-memory/golden/0203-stats-route` proving `modeling-plan -> stats-run -> analysis-manifest -> modeling-plan --prior-run` works and routes exploratory output back to method/spec binding.
+- Tick 0204: Added `research analysis-run`, a bounded standard-table stats route command that writes initial `modeling-plan.json`, executes `stats-run`, writes `analysis-run-manifest.json`, and writes `modeling-plan-after-prior.json`.
+- Tick 0206: `analysis-run` now supports `--method-selection`, `--analysis-spec`, and `--require-bound`; strict mode blocks unbound execution and bound method-selection routes produce `bound_standard_table` / `local_review_ready`.
+- Tick 0207: `analysis-manifest --require-ready` now fails exploratory/blocked runs, giving benchmark and promotion scripts a hard local-review-ready gate.
+- Tick 0208: Binary classification ML manifests now require `calibration` artifacts before local-review readiness; `--require-ready` enforces that gate.
+- Tick 0209: `ml-compare` now emits `comparisonPosture`, with `baseline_comparison_ready` requiring at least two successful scored models, a transparent baseline, and binary calibration artifacts.
+- Tick 0211: `ml-compare` now writes `model-review-card.md` plus JSON review-card fields covering intended use, intended non-use, validation boundary, leakage review, missing evidence, and ranked models.
+- Tick 0212: Saved golden ML comparison route `.loop-memory/golden/0212-ml-comparison-route` proving modeling-plan, ml-compare posture, and model-review-card composition.
+- Tick 0213: `analysis-manifest` now supports `ml-comparison` directories, allowing `analysis-manifest --require-ready` to gate `comparison.json` plus `model-review-card.md`.
+- Tick 0214: Added `research analysis-benchmark`, aggregating analysis manifests across stats, ML, and ML-comparison directories with optional `--require-ready` gating.
+
+## Tick 218
+
+- Added `--require-multi-route` to `research analysis-benchmark`.
+- Single-route benchmark suites still pass by default but surface `single_route` coverage as a warning.
+- Promotion scripts can now fail narrow benchmark suites unless at least two local-review-ready route kinds are present.
+- Live smoke: golden ML-only benchmark exits nonzero with `single_route`; stats+ML benchmark passes with `multi_route_ready`.
+
+## Tick 221
+
+- Ran `research machine-benchmark` on the actual R-survey NHANES paper packet `0179-bmi-fasting-glucose-r-survey`.
+- Machine benchmark passed with normalized score `1`.
+- Created `.loop-memory/golden/research-machine-health-0221.md`, a composed health note that keeps analysis-route benchmark and paper-route benchmark distinct but visible together.
+# Tick 0223
+
+- Added executable `diagnostic-accuracy` to `research stats-run`.
+- Mapped method ontology `diagnostic-accuracy-basic` to the runner.
+- Added binary reference/test handling, confusion matrix, sensitivity, specificity, PPV, NPV, accuracy, prevalence, likelihood ratios, and sparse-cell warnings.
+- Added targeted regression coverage and documentation.
+- Created `.loop-memory/golden/0223-diagnostic-accuracy-route` and strict three-route benchmark evidence.
+
+# Tick 0224
+
+- Made diagnostic accuracy route planning explicit in `modeling-plan` and `analysis-run`.
+- `analysis-run --method diagnostic-accuracy` now stores diagnostic goal/study-design semantics in saved planning artifacts.
+- `modeling-plan` now names `<binary-reference-standard>` and `<binary-index-test>` in diagnostic command hints.
+- Refreshed the diagnostic golden route and kept the strict three-route benchmark passing.
+- Added STARD/STARD-AI caveats to research ML documentation.
+
+# Tick 0226
+
+- Added diagnostic-specific report and QA gates to `stats-run`.
+- Diagnostic reports now render a dedicated diagnostic metrics table instead of hiding sensitivity/specificity inside generic estimate columns.
+- Reports now include a `Diagnostic Accuracy Boundary` section with reference standard, index test, PPV/NPV prevalence dependence, precision caveat, and no-screening-recommendation boundary.
+- Diagnostic QA now records role, metric, predictive-value context, overclaim boundary, precision, and sparse-cell checks.
+
+# Tick 0228
+
+- Added Wilson binomial intervals for sensitivity, specificity, PPV, and NPV in `diagnostic-accuracy`.
+- Rendered intervals in diagnostic reports.
+- Made diagnostic precision QA pass when deterministic intervals are present.
+- Refreshed the diagnostic golden route and preserved strict multi-route benchmark readiness.
+
+# Tick 0229
+
+- Added explicit threshold derivation for diagnostic accuracy through `--outcome-threshold` and `--exposure-threshold`.
+- Stored reference/test thresholds in diagnostics.
+- Added targeted coverage for threshold-derived diagnostic metrics.
+- Created `.loop-memory/golden/0229-diagnostic-threshold-route` and passed a strict four-route benchmark.
+
+# Tick 0231
+
+- Added diagnostic paper wrapper artifacts to `analysis-run`.
+- Diagnostic `paper.md` includes thresholds, confusion matrix values, Wilson intervals, PPV/NPV prevalence caveat, and screening-overclaim boundary.
+- Diagnostic `paper-qa.json` verifies safety header, reference/index roles, prevalence caveat, intervals, screening boundary, and manifest readiness.
+- Refreshed the threshold diagnostic golden route and preserved strict benchmark readiness.
+
+# Tick 0232
+
+- Added optional manifest visibility for diagnostic paper artifacts.
+- `analysis-run` now rebuilds the stats manifest after diagnostic paper generation so hashed paper files appear in inspection.
+- Preserved stats-route readiness semantics by keeping paper artifacts optional.
+
+# Tick 0234
+
+- Added a saved rerun-stability receipt for the threshold-derived diagnostic golden route.
+- Proved diagnostic `estimates` and `diagnostics` are stable across baseline and repeat route executions.

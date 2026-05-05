@@ -51,8 +51,22 @@ export type MlMetricDirection = z.infer<typeof mlMetricDirectionSchema>;
 export const mlRunStatusSchema = z.enum(["succeeded", "failed", "partially_succeeded"]);
 export type MlRunStatus = z.infer<typeof mlRunStatusSchema>;
 
+export interface MlResultPosture {
+  status:
+    | "failed"
+    | "optional_dependency_missing"
+    | "locally_validated_prediction"
+    | "exploratory_prediction"
+    | "exploratory_unsupervised";
+  label: string;
+  interpretationBoundary: string;
+  supports: string[];
+  cannotSupport: string[];
+  nextAction: string;
+}
+
 export const mlArtifactSchema = z.object({
-  kind: z.enum(["model", "predictions", "transformed", "summary", "comparison", "config", "log"]),
+  kind: z.enum(["model", "predictions", "transformed", "summary", "comparison", "config", "log", "calibration"]),
   path: z.string().min(1),
   sha256: z.string().length(64).optional(),
 });
@@ -96,6 +110,7 @@ export interface MlRunResult {
   metrics: Record<string, unknown>;
   warnings: string[];
   errors: string[];
+  resultPosture?: MlResultPosture;
   preprocessing: {
     rowCount: number;
     featureCount: number;
@@ -127,6 +142,24 @@ export interface MlComparisonResult {
   task: MlTaskType;
   primaryMetric: string;
   primaryMetricDirection: MlMetricDirection;
+  comparisonPosture?: {
+    status: "baseline_comparison_ready" | "insufficient_comparison";
+    label: string;
+    interpretationBoundary: string;
+    supports: string[];
+    cannotSupport: string[];
+    nextAction: string;
+  };
+  reviewCard?: {
+    path: string;
+    status: "local_review_ready" | "needs_review";
+    intendedUse: string;
+    intendedNonUse: string[];
+    validationBoundary: string;
+    subgroupEvidence: "not_assessed" | "present";
+    leakageReview: string;
+    missingEvidence: string[];
+  };
   ranked: Array<{
     rank: number;
     modelId: string;

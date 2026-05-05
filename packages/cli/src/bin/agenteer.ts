@@ -47,6 +47,19 @@ import {
   renderLabMedbreviaNhanesResult,
 } from "../commands/lab.js";
 import {
+  renderSpecializationInspect,
+  renderSpecializationPlan,
+  renderSpecializationReport,
+  specializationCritiqueCommand,
+  specializationEvaluateCommand,
+  specializationGenerateCommand,
+  specializationInitCommand,
+  specializationInspectCommand,
+  specializationPlanCommand,
+  specializationPromoteCommand,
+  specializationRunLoopCommand,
+} from "../specialize/runtime.js";
+import {
   parseBackendId,
   parseDataStructures,
   parseDatasetAdapterId,
@@ -56,6 +69,9 @@ import {
   parseOutcomeType,
   parseStudyArchetypeId,
   parseStudyDesign,
+  researchAnalysisBenchmarkCommand,
+  researchAnalysisManifestCommand,
+  researchAnalysisRunCommand,
   researchArchetypesCommand,
   researchDatasetAdapterCommand,
   researchExecutionContractFromFileCommand,
@@ -68,6 +84,12 @@ import {
   researchMachinePlanCommand,
   researchMachineStatusCommand,
   researchSpecV2Command,
+  renderResearchAnalysisBenchmark,
+  renderResearchAnalysisBenchmarkJson,
+  renderResearchAnalysisManifest,
+  renderResearchAnalysisManifestJson,
+  renderResearchAnalysisRun,
+  renderResearchAnalysisRunJson,
   renderResearchArchetypes,
   renderResearchArchetypesJson,
   renderResearchDatasetAdapter,
@@ -110,6 +132,12 @@ import {
   renderResearchMlRun,
   renderResearchMlRunJson,
 } from "../research-machine/ml/commands.js";
+import {
+  parseStatsMethod,
+  researchStatsRunCommand,
+  renderResearchStatsRun,
+  renderResearchStatsRunJson,
+} from "../research-machine/stats/commands.js";
 import {
   agentAdversarialProtocolsCommand,
   agentCapabilityFromContractCommand,
@@ -512,6 +540,8 @@ async function main(argv: readonly string[]): Promise<number> {
       return labCmd(rest);
     case "agent":
       return agentCmd(rest);
+    case "specialize":
+      return specializeCmd(rest);
     case "research":
       return researchCmd(rest);
     default:
@@ -534,6 +564,14 @@ Usage:
   agenteer install <spec>  --workflow-dir <dir> [--yes] [--grant <cap>]* [--registry <url>]
   agenteer search  <query> [--registry <url>]
   agenteer lab     medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
+  agenteer specialize init --out <dir> [--builtin research-methods-specialist | --name <text> --domain <text> --purpose <text>] [--json]
+  agenteer specialize plan --dir <dir> [--json]
+  agenteer specialize generate --dir <dir> [--count <n>] [--json]
+  agenteer specialize evaluate --dir <dir> [--candidate <id>] [--json]
+  agenteer specialize critique --dir <dir> [--candidate <id>] [--json]
+  agenteer specialize promote --dir <dir> [--candidate <id>] [--json]
+  agenteer specialize inspect --dir <dir> [--json]
+  agenteer specialize run-loop --dir <dir> [--count <n>] [--json]
   agenteer agent context-preflight --repo <dir> --query <text> [--target <file|symbol>] [--context-bin <path>] [--autocontext-root <dir>] [--json]
   agenteer agent context-pack --repo <dir> (--query <text> | --file <path> | --symbol <name>) [--budget <n>] [--json]
   agenteer agent context-manifest --repo <dir> --query <text> [--target <file|symbol>] [--out <json>] [--json]
@@ -636,7 +674,10 @@ Usage:
   agenteer research method-select --question <text> [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--dataset <id>] [--goal <goal>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--max-candidates <n>] [--out <selection.json>] [--json]
   agenteer research method-apply --spec <analysis-spec.json> --selection <selection.json> [--out <analysis-spec-v2.json>] [--json]
   agenteer research method-validate --spec <analysis-spec.json> --method <id> [--json]
-  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json>] [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
+  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
+  agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--variable <col>]* [--method-selection <json>] [--analysis-spec <json>] [--require-bound] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
+  agenteer research analysis-manifest --run-dir <dir> [--out <analysis-run-manifest.json>] [--require-ready] [--json]
+  agenteer research analysis-benchmark --run-dir <dir>* [--require-ready] [--require-multi-route] [--out <json>] [--report <md>] [--json]
   agenteer research dataset-adapter --dataset <id> [--data-root <dir>] [--json]
   agenteer research machine-plan --question <text> [--dataset <id>] [--archetype <id>] [--backend <id>] [--data-root <dir>] [--json]
   agenteer research machine-benchmark --packet <dir> [--spec <analysis-spec.json>] [--out <benchmark-eval.json>] [--json]
@@ -644,6 +685,7 @@ Usage:
   agenteer research ml-run --task <task> --model <id> --data <rows.csv|json|parquet> [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--test-size <n>] [--seed <n>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-compare --task <task> --data <rows.csv|json|parquet> --model <id>* [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-inspect --run <ml-run.json> [--json]
+  agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--weight <column>] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
   agenteer research backend-status [--python <python>] [--rscript <Rscript>] [--json]
   agenteer research paper-qa --paper <paper.md> [--evidence <analysis.json>] [--json]
   agenteer research paper-index --papers-dir <dir> [--out <INDEX.md>] [--json]
@@ -915,6 +957,68 @@ async function labCmd(argv: readonly string[]): Promise<number> {
     default:
       console.error(`lab: unknown subcommand '${sub ?? ""}'`);
       console.error("usage: agenteer lab medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]");
+      return 2;
+  }
+}
+
+async function specializeCmd(argv: readonly string[]): Promise<number> {
+  const [sub, ...rest] = argv;
+  const { flags } = parseArgs(rest);
+  const json = flags.json === true;
+  switch (sub) {
+    case "init": {
+      const outDir = requireFlagString(flags, "out");
+      const builtin = flagString(flags, "builtin");
+      const result = await specializationInitCommand({
+        outDir,
+        ...(builtin === "research-methods-specialist" ? { builtin } : {}),
+        ...(flagString(flags, "name") ? { name: flagString(flags, "name")! } : {}),
+        ...(flagString(flags, "domain") ? { domain: flagString(flags, "domain")! } : {}),
+        ...(flagString(flags, "purpose") ? { purpose: flagString(flags, "purpose")! } : {}),
+      });
+      console.log(json ? JSON.stringify(result, null, 2) : `initialized specialization ${result.id} at ${result.persistence.rootDir}`);
+      return 0;
+    }
+    case "plan": {
+      const result = await specializationPlanCommand(requireFlagString(flags, "dir"));
+      console.log(json ? JSON.stringify(result, null, 2) : renderSpecializationPlan(result));
+      return result.risks.some((r) => /No fixtures|No evaluators|No candidate/.test(r)) ? 1 : 0;
+    }
+    case "generate": {
+      const result = await specializationGenerateCommand(requireFlagString(flags, "dir"), parsePositiveIntFlag(flags, "count", 3));
+      console.log(json ? JSON.stringify(result, null, 2) : `generated ${result.length} candidate(s): ${result.map((c) => c.id).join(", ")}`);
+      return 0;
+    }
+    case "evaluate": {
+      const result = await specializationEvaluateCommand(requireFlagString(flags, "dir"), flagString(flags, "candidate") ?? undefined);
+      console.log(json ? JSON.stringify(result, null, 2) : `evaluated ${result.length} fixture result(s): ${result.filter((e) => e.result === "pass").length} pass, ${result.filter((e) => e.result === "fail").length} fail`);
+      return result.some((e) => e.result === "fail") ? 1 : 0;
+    }
+    case "critique": {
+      const result = await specializationCritiqueCommand(requireFlagString(flags, "dir"), flagString(flags, "candidate") ?? undefined);
+      console.log(json ? JSON.stringify(result, null, 2) : `critiqued ${result.length} candidate(s): ${result.map((c) => `${c.candidateId}=${c.recommendation}`).join(", ")}`);
+      return result.some((c) => c.recommendation === "reject") ? 1 : 0;
+    }
+    case "promote": {
+      const result = await specializationPromoteCommand(requireFlagString(flags, "dir"), flagString(flags, "candidate") ?? undefined);
+      console.log(json ? JSON.stringify(result, null, 2) : `promotion decisions: ${result.map((d) => `${d.candidateId}=${d.decision}`).join(", ")}`);
+      return result.some((d) => d.decision !== "promoted") ? 1 : 0;
+    }
+    case "inspect": {
+      const result = await specializationInspectCommand(requireFlagString(flags, "dir"));
+      console.log(json ? JSON.stringify(result, null, 2) : renderSpecializationInspect(result));
+      return 0;
+    }
+    case "run-loop": {
+      const result = await specializationRunLoopCommand(requireFlagString(flags, "dir"), {
+        count: parsePositiveIntFlag(flags, "count", 3),
+      });
+      console.log(json ? JSON.stringify(result, null, 2) : renderSpecializationReport(result));
+      return result.cycleAccounting.fullCycle ? 0 : 1;
+    }
+    default:
+      console.error(`specialize: unknown subcommand '${sub ?? ""}'`);
+      console.error("usage: agenteer specialize init|plan|generate|evaluate|critique|promote|inspect|run-loop ...");
       return 2;
   }
 }
@@ -1693,6 +1797,37 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       } else if (flagString(flags, "table")) {
         tableSummary = await researchTableSummaryCommand({ file: requireFlagString(flags, "table"), python: flagString(flags, "python") ?? undefined });
       }
+      let backendStatus: unknown;
+      const backendStatusPath = flagString(flags, "backend-status");
+      if (backendStatusPath) {
+        const rawBackendStatus = JSON.parse(await readFile(backendStatusPath, "utf-8")) as Record<string, unknown>;
+        backendStatus = rawBackendStatus.machineStatus ?? rawBackendStatus;
+      }
+      const priorRuns = await Promise.all(flagList(flags, "prior-run").map(async priorRunPath => {
+        const raw = JSON.parse(await readFile(priorRunPath, "utf-8")) as Record<string, unknown>;
+        const candidate = "statsRun" in raw && raw.statsRun && typeof raw.statsRun === "object"
+          ? raw.statsRun as Record<string, unknown>
+          : "mlRun" in raw && raw.mlRun && typeof raw.mlRun === "object"
+            ? raw.mlRun as Record<string, unknown>
+            : raw;
+        const resultPosture = candidate.resultPosture && typeof candidate.resultPosture === "object"
+          ? candidate.resultPosture as Record<string, unknown>
+          : {};
+        const issues = Array.isArray(candidate.issues) ? candidate.issues : [];
+        return {
+          path: priorRunPath,
+          kind: candidate.method ? "stats" as const : candidate.modelId ? "ml" as const : "unknown" as const,
+          status: typeof candidate.status === "string" ? candidate.status : "unknown",
+          posture: typeof resultPosture.status === "string" ? resultPosture.status : null,
+          methodOrModel: typeof candidate.method === "string"
+            ? candidate.method
+            : typeof candidate.modelId === "string"
+              ? candidate.modelId
+              : null,
+          issueCodes: issues.map(issue => issue && typeof issue === "object" ? String((issue as Record<string, unknown>).code ?? "") : "").filter(Boolean),
+          errors: Array.isArray(candidate.errors) ? candidate.errors.map(error => String(error)) : [],
+        };
+      }));
       const result = researchModelingPlanCommand({
         question: requireFlagString(flags, "question"),
         goal: parseModelingGoal(flagString(flags, "goal") ?? undefined),
@@ -1700,6 +1835,8 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         studyDesign: parseStudyDesign(flagString(flags, "study-design") ?? undefined),
         dataStructures: parseDataStructures(flagList(flags, "data-structure")),
         tableSummary: tableSummary as Parameters<typeof researchModelingPlanCommand>[0]["tableSummary"],
+        backendStatus: backendStatus as Parameters<typeof researchModelingPlanCommand>[0]["backendStatus"],
+        priorRuns,
         target: flagString(flags, "target") ?? undefined,
         surveyDesign: flags.survey === true,
         repeatedMeasures: flags.repeated === true,
@@ -1721,6 +1858,50 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       });
       console.log(flags.json === true ? renderResearchModelingPlanJson(result) : renderResearchModelingPlan(result));
       return result.blocked ? 1 : 0;
+    }
+    case "analysis-run": {
+      const result = await researchAnalysisRunCommand({
+        question: requireFlagString(flags, "question"),
+        method: parseStatsMethod(requireFlagString(flags, "method")),
+        dataPath: requireFlagString(flags, "data"),
+        outDir: requireFlagString(flags, "out-dir"),
+        outcome: flagString(flags, "outcome") ?? undefined,
+        exposure: flagString(flags, "exposure") ?? undefined,
+        group: flagString(flags, "group") ?? undefined,
+        outcomeThreshold: parseOptionalNumberFlag(flags, "outcome-threshold"),
+        exposureThreshold: parseOptionalNumberFlag(flags, "exposure-threshold"),
+        variables: flagList(flags, "variable"),
+        covariates: flagList(flags, "covariate"),
+        weight: flagString(flags, "weight") ?? undefined,
+        surveyDesign: flags.survey === true,
+        allowSurveyApproximation: flags["allow-survey-approximation"] === true,
+        methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
+        analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
+        requireBound: flags["require-bound"] === true,
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchAnalysisRunJson(result) : renderResearchAnalysisRun(result));
+      return result.statsRun.status === "failed" || result.analysisRunManifest.readiness === "blocked" ? 1 : 0;
+    }
+    case "analysis-manifest": {
+      const result = await researchAnalysisManifestCommand({
+        runDir: requireFlagString(flags, "run-dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+        requireReady: flags["require-ready"] === true,
+      });
+      console.log(flags.json === true ? renderResearchAnalysisManifestJson(result) : renderResearchAnalysisManifest(result));
+      return result.readiness === "blocked" ? 1 : 0;
+    }
+    case "analysis-benchmark": {
+      const result = await researchAnalysisBenchmarkCommand({
+        runDirs: flagList(flags, "run-dir"),
+        requireReady: flags["require-ready"] === true,
+        requireMultiRoute: flags["require-multi-route"] === true,
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchAnalysisBenchmarkJson(result) : renderResearchAnalysisBenchmark(result));
+      return result.status === "pass" ? 0 : 1;
     }
     case "dataset-adapter": {
       const result = await researchDatasetAdapterCommand({
@@ -1807,6 +1988,29 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
     case "ml-inspect": {
       const result = await researchMlInspectCommand({ runPath: requireFlagString(flags, "run") });
       console.log(flags.json === true ? renderResearchMlRunJson(result) : renderResearchMlRun(result));
+      return result.status === "failed" ? 1 : 0;
+    }
+    case "stats-run": {
+      const result = await researchStatsRunCommand({
+        method: parseStatsMethod(requireFlagString(flags, "method")),
+        dataPath: requireFlagString(flags, "data"),
+        outcome: flagString(flags, "outcome") ?? undefined,
+        exposure: flagString(flags, "exposure") ?? undefined,
+        group: flagString(flags, "group") ?? undefined,
+        outcomeThreshold: parseOptionalNumberFlag(flags, "outcome-threshold"),
+        exposureThreshold: parseOptionalNumberFlag(flags, "exposure-threshold"),
+        variables: flagList(flags, "variable"),
+        covariates: flagList(flags, "covariate"),
+        weight: flagString(flags, "weight") ?? undefined,
+        surveyDesign: flags.survey === true,
+        allowSurveyApproximation: flags["allow-survey-approximation"] === true,
+        methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
+        analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
+        outDir: requireFlagString(flags, "out-dir"),
+        alpha: parseMlNumber(flagString(flags, "alpha"), 0.05),
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchStatsRunJson(result) : renderResearchStatsRun(result));
       return result.status === "failed" ? 1 : 0;
     }
     case "backend-status": {
@@ -2078,6 +2282,29 @@ function collectStringList(
   key: string,
 ): string[] {
   return flagList(flags, key);
+}
+
+function parsePositiveIntFlag(
+  flags: Parameters<typeof flagString>[0],
+  key: string,
+  fallback: number,
+): number {
+  const raw = flagString(flags, key);
+  if (raw === undefined) return fallback;
+  const value = Number.parseInt(raw, 10);
+  if (!Number.isFinite(value) || value < 1) throw new Error(`--${key} must be a positive integer`);
+  return value;
+}
+
+function parseOptionalNumberFlag(
+  flags: Parameters<typeof flagString>[0],
+  key: string,
+): number | undefined {
+  const raw = flagString(flags, key);
+  if (raw === undefined) return undefined;
+  const value = Number(raw);
+  if (!Number.isFinite(value)) throw new Error(`--${key} must be numeric`);
+  return value;
 }
 
 async function loadSpec(path: string): Promise<unknown> {

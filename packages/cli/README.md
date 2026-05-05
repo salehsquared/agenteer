@@ -1,6 +1,6 @@
 # @agenteer/cli
 
-Command-line interface for [Agenteer](https://github.com/salehsquared/agenteer). It runs workflows, resumes suspended sessions, inspects context and traces, and wraps publish/install/search for node packages.
+Command-line interface for [Agenteer](https://github.com/salehsquared/agenteer). It runs workflows, resumes suspended sessions, inspects context and traces, wraps publish/install/search for node packages, and exposes the newer agent-improvement, research-machine, and specialization command namespaces.
 
 ## Install
 
@@ -49,6 +49,17 @@ agenteer inspect --session ./.session --summary
 | `agenteer publish --dir <pkg>` | Validate and publish a node package. |
 | `agenteer install <spec> --workflow-dir <dir>` | Install a node package into a workflow. |
 | `agenteer search <query>` | Search npm for Agenteer-shaped node packages. |
+| `agenteer agent ...` | Context manifests, planner-v2, plan state, node contracts, repair, critics, creativity, improvement loops, task envelopes, and evidence receipts. |
+| `agenteer research ...` | Research protocols, AnalysisSpec, method selection, stats/ML execution, paper generation, QA, manifests, benchmarks, and packet readiness. |
+| `agenteer specialize ...` | Domain specialization factories with candidate generation, evaluation, critique, repair, promotion, lineage, and reports. |
+
+For the full modern command map, see:
+
+- [Agent operator guide](../../docs/agent-operator-guide.md)
+- [Command catalog](../../docs/command-catalog.md)
+- [Research pipeline](../../docs/research-pipeline.md)
+- [Research ML modeling](../../docs/research-ml.md)
+- [Specializations](../../docs/specializations.md)
 
 ## Programmatic use
 

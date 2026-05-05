@@ -6,11 +6,17 @@ import {
   assertMlModelCompatible,
   getMlModelManifest,
   listMlModels,
+  researchAnalysisBenchmarkCommand,
+  researchAnalysisManifestCommand,
+  researchAnalysisRunCommand,
   researchMlCompareCommand,
   researchMlInspectCommand,
   researchMlModelsCommand,
   researchMlRunCommand,
+  researchMethodSelectCommand,
   researchModelingPlanCommand,
+  researchStatsRunCommand,
+  statsRunMethodForAnalysisMethod,
 } from "../src/index.js";
 
 const python = path.resolve(".research-runtime/python/bin/python");
@@ -37,6 +43,12 @@ describe("research ML modeling layer", () => {
     expect(plan.baselines.map(candidate => candidate.id)).toContain("ml:logistic-regression");
     expect(plan.blockingPolicies.map(candidate => candidate.id)).toContain("policy:complex-survey-design");
     expect(plan.primary?.source).not.toBe("workflow-policy");
+    expect(plan.methodSelectionEvidence.primaryMethodId).toBe("binary-logistic-regression");
+    expect(plan.methodSelectionEvidence.recommendedBackend).toBe("r-survey");
+    expect(plan.methodSelectionEvidence.selectionHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(plan.methodSelectionEvidence.applyCommandHint).toContain("method-apply");
+    expect(plan.routeRecommendation.route).toBe("paper-run");
+    expect(plan.routeRecommendation.commandHint).toContain("--backend r-survey");
     expect(plan.candidates.find(candidate => candidate.id === "policy:complex-survey-design")?.requiredBeforeExecution).toEqual(expect.arrayContaining(["survey weight variable", "strata variable", "PSU variable"]));
     expect(plan.primary?.compatible).toBe(true);
   });
@@ -94,6 +106,109 @@ describe("research ML modeling layer", () => {
     expect(survival.candidates.some(candidate => candidate.id.includes("cox"))).toBe(true);
   });
 
+  it("uses backend status evidence when routing complex survey inference", () => {
+    const fallback = researchModelingPlanCommand({
+      question: "In NHANES adults, is BMI associated with elevated HbA1c?",
+      outcomeType: "binary",
+      studyDesign: "cross_sectional",
+      dataStructures: ["complex_survey"],
+      surveyDesign: true,
+      backendStatus: {
+        backends: [
+          { id: "r-survey", availability: "missing" },
+          { id: "python-linearized", availability: "available" },
+          { id: "sklearn", availability: "available" },
+        ],
+      },
+      maxCandidates: 8,
+    });
+    const blocked = researchModelingPlanCommand({
+      question: "In NHANES adults, is BMI associated with elevated HbA1c?",
+      outcomeType: "binary",
+      studyDesign: "cross_sectional",
+      dataStructures: ["complex_survey"],
+      surveyDesign: true,
+      backendStatus: {
+        backends: [
+          { id: "r-survey", availability: "missing" },
+          { id: "python-linearized", availability: "missing" },
+          { id: "sklearn", availability: "available" },
+        ],
+      },
+      maxCandidates: 8,
+    });
+
+    expect(fallback.backendEvidence.source).toBe("machine-status");
+    expect(fallback.backendEvidence.missing).toContain("r-survey");
+    expect(fallback.routeRecommendation.route).toBe("paper-run");
+    expect(fallback.routeRecommendation.commandHint).toContain("--backend python-linearized");
+    expect(fallback.issues.map(issue => issue.code)).toContain("BACKEND_UNAVAILABLE_FOR_MODELING");
+    expect(blocked.routeRecommendation.route).toBe("stop-for-review");
+    expect(blocked.routeRecommendation.reason).toContain("no available survey-capable local backend");
+  });
+
+  it("uses prior run posture to choose the next modeling route", () => {
+    const surveyRecovery = researchModelingPlanCommand({
+      question: "In NHANES adults, is BMI associated with HbA1c?",
+      outcomeType: "continuous",
+      studyDesign: "cross_sectional",
+      dataStructures: ["complex_survey"],
+      surveyDesign: true,
+      priorRuns: [{
+        kind: "stats",
+        status: "failed",
+        posture: "blocked_survey_required",
+        methodOrModel: "linear-regression",
+        issueCodes: ["SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER"],
+        errors: [],
+      }],
+      backendStatus: {
+        backends: [
+          { id: "r-survey", availability: "available" },
+          { id: "python-linearized", availability: "available" },
+        ],
+      },
+    });
+    const mlValidation = researchModelingPlanCommand({
+      question: "Can clinical variables predict elevated HbA1c?",
+      outcomeType: "binary",
+      requiresPrediction: true,
+      priorRuns: [{
+        kind: "ml",
+        status: "succeeded",
+        posture: "locally_validated_prediction",
+        methodOrModel: "logistic-regression",
+        issueCodes: [],
+        errors: [],
+      }],
+    });
+
+    expect(surveyRecovery.priorRunEvidence.runs[0]?.action).toBe("rerun-survey-aware");
+    expect(surveyRecovery.routeRecommendation.route).toBe("paper-run");
+    expect(surveyRecovery.routeRecommendation.reason).toContain("requires a survey-aware rerun");
+    expect(mlValidation.priorRunEvidence.runs[0]?.action).toBe("stop-for-validation");
+    expect(mlValidation.routeRecommendation.route).toBe("stop-for-review");
+    expect(mlValidation.routeRecommendation.requiredArtifacts).toContain("validation-design-note.md");
+  });
+
+  it("points executable standard-table method candidates to stats-run", () => {
+    const plan = researchModelingPlanCommand({
+      question: "Compare mean HbA1c between two independent insurance groups.",
+      goal: "compare_groups",
+      outcomeType: "continuous",
+      studyDesign: "cross_sectional",
+      dataStructures: ["single_table"],
+      maxCandidates: 8,
+    });
+    const ttest = plan.candidates.find(candidate => candidate.id === "method:two-sample-t-test");
+
+    expect(ttest?.commandHint).toContain("research stats-run --method t-test");
+    expect(ttest?.expectedArtifacts).toEqual(expect.arrayContaining(["stats-run.json", "estimates.csv", "diagnostics.json", "stats-report.md", "stats-qa.json"]));
+    expect(statsRunMethodForAnalysisMethod("two-sample-t-test")).toBe("t-test");
+    expect(plan.routeRecommendation.route).toBe("stats-run");
+    expect(plan.nextAction).toContain("research stats-run --method t-test");
+  });
+
   it("lists registered adapters by task and reports optional dependency requirements", () => {
     const binary = researchMlModelsCommand({ task: "binary_classification", includeUnavailable: true });
     const regression = listMlModels({ task: "regression" });
@@ -125,17 +240,26 @@ describe("research ML modeling layer", () => {
       });
 
       expect(result.status).toBe("succeeded");
+      expect(result.resultPosture?.status).toBe("locally_validated_prediction");
+      expect(result.resultPosture?.supports).toContain("basic calibration review");
       expect(result.preprocessing.excludedColumns).toContain("outcome");
       expect(result.preprocessing.numericFeatures).toEqual(expect.arrayContaining(["age", "bmi"]));
       expect(result.preprocessing.categoricalFeatures).toContain("sex");
       expect(result.metrics.accuracy).toBeGreaterThanOrEqual(0.7);
       expect(result.metrics.auroc).toBeGreaterThanOrEqual(0.7);
+      expect(result.metrics.calibration_bins).toBeGreaterThan(0);
       expect(result.explanation.coefficients?.length).toBeGreaterThan(0);
       expect(result.explanation.permutationImportance?.some(item => item.feature === "bmi")).toBe(true);
-      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["predictions", "model", "summary"]));
+      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["predictions", "calibration", "model", "summary"]));
 
       const inspected = await researchMlInspectCommand({ runPath: path.join(dir, "run", "ml-run.json") });
       expect(inspected.runId).toBe(result.runId);
+      const manifest = await researchAnalysisManifestCommand({ runDir: path.join(dir, "run") });
+      expect(manifest.runKind).toBe("ml");
+      expect(manifest.readiness).toBe("local_review_ready");
+      expect(manifest.artifactCompleteness.status).toBe("pass");
+      expect(manifest.resultPosture.status).toBe("locally_validated_prediction");
+      expect(manifest.artifacts.find(artifact => artifact.kind === "calibration")?.required).toBe(true);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -156,6 +280,7 @@ describe("research ML modeling layer", () => {
       });
 
       expect(result.status).toBe("succeeded");
+      expect(result.resultPosture?.status).toBe("locally_validated_prediction");
       expect(result.metrics.accuracy).toBeGreaterThanOrEqual(0.7);
       expect(result.metrics.macro_f1).toBeGreaterThanOrEqual(0.7);
       expect(Array.isArray(result.metrics.per_class)).toBe(true);
@@ -181,6 +306,7 @@ describe("research ML modeling layer", () => {
       });
 
       expect(result.status).toBe("succeeded");
+      expect(result.resultPosture?.status).toBe("locally_validated_prediction");
       expect(result.metrics.rmse).toBeLessThan(3);
       expect(result.metrics.r2).toBeGreaterThan(0.8);
       expect(result.explanation.coefficients?.length).toBeGreaterThan(0);
@@ -214,9 +340,11 @@ describe("research ML modeling layer", () => {
       });
 
       expect(cluster.status).toBe("succeeded");
+      expect(cluster.resultPosture?.status).toBe("exploratory_unsupervised");
       expect(cluster.metrics.cluster_count).toBe(3);
       expect(cluster.metrics.silhouette).toBeGreaterThan(0.2);
       expect(pca.status).toBe("succeeded");
+      expect(pca.resultPosture?.status).toBe("exploratory_unsupervised");
       expect(pca.metrics.transformed_columns).toBe(2);
       expect(pca.metrics.explained_variance_ratio_sum).toBeGreaterThan(0.5);
       const transformed = await readFile(path.join(dir, "pca", "transformed.csv"), "utf-8");
@@ -242,9 +370,20 @@ describe("research ML modeling layer", () => {
       });
 
       expect(result.primaryMetric).toBe("accuracy");
+      expect(result.comparisonPosture?.status).toBe("baseline_comparison_ready");
+      expect(result.comparisonPosture?.cannotSupport).toContain("external validity");
+      expect(result.reviewCard?.status).toBe("local_review_ready");
+      expect(result.reviewCard?.missingEvidence).toContain("external or temporal validation evidence");
+      expect(await readFile(path.join(dir, "compare", "model-review-card.md"), "utf-8")).toContain("ML Model Review Card");
+      const manifest = await researchAnalysisManifestCommand({ runDir: path.join(dir, "compare"), requireReady: true });
+      expect(manifest.runKind).toBe("ml-comparison");
+      expect(manifest.readiness).toBe("local_review_ready");
+      const benchmark = await researchAnalysisBenchmarkCommand({ runDirs: [path.join(dir, "compare")], requireReady: true });
+      expect(benchmark.status).toBe("pass");
       expect(result.ranked[0]?.score).not.toBeNull();
       expect(result.ranked.map(item => item.modelId)).toContain("xgboost-classifier");
       expect(result.runs.find(run => run.modelId === "xgboost-classifier")?.status).toBe("failed");
+      expect(result.runs.find(run => run.modelId === "xgboost-classifier")?.resultPosture?.status).toBe("optional_dependency_missing");
       expect(result.ranked.filter(item => item.status === "succeeded").length).toBeGreaterThanOrEqual(2);
     } finally {
       await rm(dir, { recursive: true, force: true });
@@ -267,7 +406,438 @@ describe("research ML modeling layer", () => {
       });
 
       expect(result.status).toBe("failed");
+      expect(result.resultPosture?.status).toBe("failed");
       expect(result.errors.join("\n")).toContain("Target column 'missing_target' not found");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("runs classical statistics methods with hashed artifacts", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-"));
+    try {
+      const data = path.join(dir, "stats.csv");
+      await writeFile(data, statsCsv());
+      const ttest = await researchStatsRunCommand({
+        method: "t-test",
+        dataPath: data,
+        outcome: "hba1c",
+        group: "group",
+        variables: [],
+        covariates: [],
+        outDir: path.join(dir, "ttest"),
+        alpha: 0.05,
+        python,
+      });
+      const logistic = await researchStatsRunCommand({
+        method: "logistic-regression",
+        dataPath: data,
+        outcome: "elevated",
+        exposure: "bmi",
+        covariates: ["age", "sex"],
+        variables: [],
+        outDir: path.join(dir, "logistic"),
+        alpha: 0.05,
+        python,
+      });
+
+      expect(ttest.status).toBe("succeeded");
+      expect(ttest.resultPosture?.status).toBe("exploratory_standard_table");
+      expect(ttest.resultPosture?.cannotSupport).toContain("paper-ready conclusions");
+      const manifest = await researchAnalysisManifestCommand({ runDir: path.join(dir, "ttest") });
+      expect(manifest.runKind).toBe("stats");
+      expect(manifest.readiness).toBe("exploratory_only");
+      expect(manifest.artifactCompleteness.status).toBe("pass");
+      await expect(researchAnalysisManifestCommand({ runDir: path.join(dir, "ttest"), requireReady: true })).rejects.toThrow(/not local_review_ready/);
+      expect(ttest.estimates[0]?.mean_difference).toBeGreaterThan(0);
+      expect(ttest.artifacts.every(artifact => artifact.sha256)).toBe(true);
+      expect(ttest.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["report", "qa"]));
+      const report = await readFile(path.join(dir, "ttest", "stats-report.md"), "utf-8");
+      expect(report).toContain("Local Review Safety Header");
+      expect(report).toContain("Result posture: exploratory_standard_table");
+      const qa = JSON.parse(await readFile(path.join(dir, "ttest", "stats-qa.json"), "utf-8")) as { status: string; checks: Array<{ id: string }> };
+      expect(qa.status).toMatch(/pass|warning/);
+      expect(qa.checks.map(check => check.id)).toContain("result-posture");
+      expect(logistic.status).toBe("succeeded");
+      expect(logistic.estimates.find(row => row.term === "bmi")?.odds_ratio).toBeGreaterThan(1);
+      expect(logistic.diagnostics.model_family).toBe("logistic-regression");
+      expect(logistic.issues.map(issue => issue.code)).toContain("POSSIBLE_SEPARATION_OR_EXTREME_LOG_ODDS");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("runs diagnostic accuracy as an executable stats method", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-diagnostic-stats-"));
+    try {
+      const data = path.join(dir, "diagnostic.csv");
+      const selectionPath = path.join(dir, "method-selection.json");
+      await writeFile(data, [
+        "screen_positive,elevated_hba1c",
+        "1,1",
+        "1,1",
+        "1,1",
+        "1,0",
+        "1,0",
+        "0,1",
+        "0,0",
+        "0,0",
+        "0,0",
+        "0,0",
+      ].join("\n"));
+      const selection = await researchMethodSelectCommand({
+        question: "Estimate sensitivity and specificity for a screening threshold against elevated HbA1c.",
+        outcomeType: "binary",
+        studyDesign: "diagnostic",
+        dataStructures: ["single_table"],
+        goal: "diagnose",
+        outPath: selectionPath,
+      });
+      expect(selection.primary?.method.id).toBe("diagnostic-accuracy-basic");
+      const plan = researchModelingPlanCommand({
+        question: "Estimate sensitivity and specificity for a screening threshold against elevated HbA1c.",
+        outcomeType: "binary",
+        studyDesign: "diagnostic",
+        dataStructures: ["single_table"],
+        goal: "diagnose",
+      });
+      expect(plan.routeRecommendation.route).toBe("stats-run");
+      expect(plan.routeRecommendation.commandHint).toContain("--method diagnostic-accuracy");
+      expect(plan.routeRecommendation.commandHint).toContain("<binary-reference-standard>");
+      expect(plan.primary?.id).toBe("method:diagnostic-accuracy-basic");
+      const result = await researchStatsRunCommand({
+        method: "diagnostic-accuracy",
+        dataPath: data,
+        outcome: "elevated_hba1c",
+        exposure: "screen_positive",
+        methodSelectionPath: selectionPath,
+        outDir: path.join(dir, "diagnostic-run"),
+        python,
+      });
+      expect(result.status).toBe("succeeded");
+      expect(result.binding.status).toBe("bound");
+      expect(result.resultPosture?.status).toBe("bound_standard_table");
+      expect(result.estimates[0]?.sensitivity).toBe(0.75);
+      expect(result.estimates[0]?.sensitivity_ci_low).toBeGreaterThanOrEqual(0);
+      expect(result.estimates[0]?.sensitivity_ci_high).toBeLessThanOrEqual(1);
+      expect(result.estimates[0]?.specificity).toBeCloseTo(0.6666, 3);
+      expect(result.estimates[0]?.positive_predictive_value_ci_low).toBeGreaterThanOrEqual(0);
+      expect(result.diagnostics.confusion_matrix).toMatchObject({ tp: 3, fp: 2, tn: 4, fn: 1 });
+      const manifest = await researchAnalysisManifestCommand({ runDir: path.join(dir, "diagnostic-run"), requireReady: true });
+      expect(manifest.readiness).toBe("local_review_ready");
+      const report = await readFile(path.join(dir, "diagnostic-run", "stats-report.md"), "utf-8");
+      expect(report).toContain("diagnostic-accuracy");
+      expect(report).toContain("Diagnostic Accuracy Boundary");
+      expect(report).toContain("Reference standard: elevated_hba1c.");
+      expect(report).toContain("Index test or screening indicator: screen_positive.");
+      expect(report).toContain("PPV and NPV depend on the prevalence");
+      expect(report).toContain("do not justify clinical screening recommendations");
+      const qa = JSON.parse(await readFile(path.join(dir, "diagnostic-run", "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+      expect(qa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
+        "diagnostic-reference-index-roles",
+        "diagnostic-core-metrics",
+        "diagnostic-predictive-value-context",
+        "diagnostic-screening-overclaim-boundary",
+        "diagnostic-precision-caveat",
+      ]));
+      expect(qa.checks.find(check => check.id === "diagnostic-precision-caveat")?.status).toBe("pass");
+      const analysisRun = await researchAnalysisRunCommand({
+        question: "Estimate sensitivity and specificity for a screening threshold against elevated HbA1c.",
+        method: "diagnostic-accuracy",
+        dataPath: data,
+        outcome: "elevated_hba1c",
+        exposure: "screen_positive",
+        methodSelectionPath: selectionPath,
+        requireBound: true,
+        outDir: path.join(dir, "diagnostic-analysis-run"),
+        python,
+      });
+      expect(analysisRun.modelingPlan.inferredGoal).toBe("diagnose");
+      expect(analysisRun.modelingPlan.inferredStudyDesign).toBe("diagnostic");
+      expect(analysisRun.modelingPlan.routeRecommendation.commandHint).toContain("--method diagnostic-accuracy");
+      expect(analysisRun.analysisRunManifest.readiness).toBe("local_review_ready");
+      expect(analysisRun.generatedFiles.diagnosticPaper).toBeTruthy();
+      expect(analysisRun.generatedFiles.diagnosticPaperQa).toBeTruthy();
+      const diagnosticPaper = await readFile(analysisRun.generatedFiles.diagnosticPaper!, "utf-8");
+      expect(diagnosticPaper).toContain("Diagnostic Accuracy Study");
+      expect(diagnosticPaper).toContain("PPV and NPV are prevalence-dependent");
+      const diagnosticPaperQa = JSON.parse(await readFile(analysisRun.generatedFiles.diagnosticPaperQa!, "utf-8")) as { status: string };
+      expect(diagnosticPaperQa.status).toBe("pass");
+      expect(analysisRun.analysisRunManifest.artifacts.find(artifact => artifact.kind === "diagnostic-paper")?.exists).toBe(true);
+      expect(analysisRun.analysisRunManifest.artifacts.find(artifact => artifact.kind === "diagnostic-paper-qa")?.exists).toBe(true);
+      const thresholdData = path.join(dir, "diagnostic-thresholds.csv");
+      await writeFile(thresholdData, [
+        "waist_cm,hba1c_pct",
+        "105,6.8",
+        "102,6.6",
+        "101,6.7",
+        "99,5.7",
+        "100,5.6",
+        "88,6.9",
+        "82,5.4",
+        "84,5.5",
+        "86,5.6",
+        "87,5.7",
+      ].join("\n"));
+      const thresholdRun = await researchStatsRunCommand({
+        method: "diagnostic-accuracy",
+        dataPath: thresholdData,
+        outcome: "hba1c_pct",
+        exposure: "waist_cm",
+        outcomeThreshold: 6.5,
+        exposureThreshold: 100,
+        methodSelectionPath: selectionPath,
+        outDir: path.join(dir, "diagnostic-threshold-run"),
+        python,
+      });
+      expect(thresholdRun.status).toBe("succeeded");
+      expect(thresholdRun.diagnostics.reference_threshold).toBe(6.5);
+      expect(thresholdRun.diagnostics.test_threshold).toBe(100);
+      expect(thresholdRun.estimates[0]?.sensitivity).toBe(0.75);
+      expect(thresholdRun.estimates[0]?.specificity).toBeCloseTo(0.8333, 3);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("runs a bounded stats analysis route with manifest and post-run planning", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-analysis-run-"));
+    try {
+      const data = path.join(dir, "stats.csv");
+      await writeFile(data, statsCsv());
+      const result = await researchAnalysisRunCommand({
+        question: "Do groups differ in HbA1c?",
+        method: "t-test",
+        dataPath: data,
+        outcome: "hba1c",
+        group: "group",
+        outDir: path.join(dir, "analysis-run"),
+        python,
+      });
+      expect(result.statsRun.status).toBe("succeeded");
+      expect(result.analysisRunManifest.artifactCompleteness.status).toBe("pass");
+      expect(result.analysisRunManifest.readiness).toBe("exploratory_only");
+      expect(result.postRunModelingPlan.priorRunEvidence.runs[0]?.action).toBe("rerun-with-binding");
+      expect(await readFile(result.generatedFiles.modelingPlan, "utf-8")).toContain("modelingPlan");
+      expect(await readFile(result.generatedFiles.postRunModelingPlan, "utf-8")).toContain("priorRunEvidence");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("summarizes route coverage and writes a benchmark report for stats and ML comparison routes", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-analysis-benchmark-"));
+    try {
+      const statsCsvPath = path.join(dir, "stats.csv");
+      const methodSelectionPath = path.join(dir, "method-selection.json");
+      await writeFile(statsCsvPath, [
+        "group,outcome",
+        "0,10",
+        "0,11",
+        "0,12",
+        "1,14",
+        "1,15",
+        "1,16",
+        "1,17",
+      ].join("\n"));
+      const methodSelection = await researchMethodSelectCommand({
+        question: "Use a two-sample t-test to compare the difference in means between two groups.",
+        outcomeType: "continuous",
+        studyDesign: "cross_sectional",
+        dataStructures: ["single_table"],
+        goal: "compare_groups",
+        outPath: methodSelectionPath,
+      });
+      expect(methodSelection.primary?.method.id).toBe("two-sample-t-test");
+      const stats = await researchAnalysisRunCommand({
+        question: "Use a two-sample t-test to compare the difference in means between two groups.",
+        method: "t-test",
+        dataPath: statsCsvPath,
+        group: "group",
+        outcome: "outcome",
+        methodSelectionPath,
+        requireBound: true,
+        outDir: path.join(dir, "analysis-run"),
+        python,
+      });
+      const compareCsv = path.join(dir, "binary.csv");
+      await writeFile(compareCsv, binaryCsv());
+      await researchMlCompareCommand({
+        task: "binary_classification",
+        dataPath: compareCsv,
+        target: "outcome",
+        modelIds: ["logistic-regression", "decision-tree-classifier"],
+        outDir: path.join(dir, "ml-compare"),
+        primaryMetric: "auroc",
+        python,
+      });
+
+      const benchmark = await researchAnalysisBenchmarkCommand({
+        runDirs: [path.join(stats.outDir, "stats-run"), path.join(dir, "ml-compare")],
+        requireReady: true,
+        outPath: path.join(dir, "benchmark.json"),
+        reportPath: path.join(dir, "benchmark.md"),
+      });
+
+      expect(benchmark.status).toBe("pass");
+      expect(benchmark.routeCoverage.posture).toBe("multi_route_ready");
+      expect(benchmark.routeCoverage.byKind.stats).toBe(1);
+      expect(benchmark.routeCoverage.byKind["ml-comparison"]).toBe(1);
+      expect(benchmark.checks.find(check => check.id === "route-coverage")?.status).toBe("pass");
+      expect(await readFile(path.join(dir, "benchmark.md"), "utf-8")).toContain("Analysis Benchmark Report");
+      const narrow = await researchAnalysisBenchmarkCommand({
+        runDirs: [path.join(dir, "ml-compare")],
+        requireReady: true,
+      });
+      expect(narrow.status).toBe("pass");
+      expect(narrow.routeCoverage.posture).toBe("single_route");
+      expect(narrow.checks.find(check => check.id === "route-coverage")?.status).toBe("warning");
+      const strictNarrow = await researchAnalysisBenchmarkCommand({
+        runDirs: [path.join(dir, "ml-compare")],
+        requireReady: true,
+        requireMultiRoute: true,
+      });
+      expect(strictNarrow.status).toBe("fail");
+      expect(strictNarrow.nextAction).toContain("two local-review-ready route kinds");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("supports strict bound analysis routes", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-analysis-run-bound-"));
+    try {
+      const data = path.join(dir, "stats.csv");
+      const selectionPath = path.join(dir, "method-selection.json");
+      await writeFile(data, statsCsv());
+      await expect(researchAnalysisRunCommand({
+        question: "Do groups differ in HbA1c?",
+        method: "t-test",
+        dataPath: data,
+        outcome: "hba1c",
+        group: "group",
+        outDir: path.join(dir, "unbound"),
+        requireBound: true,
+        python,
+      })).rejects.toThrow(/requires --method-selection or --analysis-spec/);
+      await researchMethodSelectCommand({
+        question: "Use a t-test to compare mean HbA1c between two independent groups",
+        goal: "compare_groups",
+        outcomeType: "continuous",
+        dataStructures: ["single_table"],
+        outPath: selectionPath,
+      });
+      const bound = await researchAnalysisRunCommand({
+        question: "Do groups differ in HbA1c?",
+        method: "t-test",
+        dataPath: data,
+        outcome: "hba1c",
+        group: "group",
+        methodSelectionPath: selectionPath,
+        requireBound: true,
+        outDir: path.join(dir, "bound"),
+        python,
+      });
+
+      expect(bound.statsRun.binding.status).toBe("bound");
+      expect(bound.statsRun.resultPosture?.status).toBe("bound_standard_table");
+      expect(bound.analysisRunManifest.readiness).toBe("local_review_ready");
+      await expect(researchAnalysisManifestCommand({ runDir: path.join(dir, "bound", "stats-run"), requireReady: true })).resolves.toMatchObject({ readiness: "local_review_ready" });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("refuses standard stats execution for complex survey designs unless explicitly exploratory", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-survey-"));
+    try {
+      const data = path.join(dir, "stats.csv");
+      await writeFile(data, statsCsv());
+      const refused = await researchStatsRunCommand({
+        method: "linear-regression",
+        dataPath: data,
+        outcome: "hba1c",
+        exposure: "bmi",
+        variables: [],
+        covariates: ["age"],
+        surveyDesign: true,
+        outDir: path.join(dir, "refused"),
+        alpha: 0.05,
+        python,
+      });
+      const exploratory = await researchStatsRunCommand({
+        method: "linear-regression",
+        dataPath: data,
+        outcome: "hba1c",
+        exposure: "bmi",
+        variables: [],
+        covariates: ["age"],
+        surveyDesign: true,
+        allowSurveyApproximation: true,
+        outDir: path.join(dir, "exploratory"),
+        alpha: 0.05,
+        python,
+      });
+
+      expect(refused.status).toBe("failed");
+      expect(refused.resultPosture?.status).toBe("blocked_survey_required");
+      expect(refused.issues.map(issue => issue.code)).toContain("SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER");
+      expect(exploratory.status).toBe("succeeded");
+      expect(exploratory.resultPosture?.status).toBe("exploratory_survey_approximation");
+      expect(exploratory.issues.map(issue => issue.code)).toContain("SURVEY_APPROXIMATION_EXPLICIT");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("binds stats-run to method-selection evidence and blocks mismatches", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-binding-"));
+    try {
+      const data = path.join(dir, "stats.csv");
+      const selectionPath = path.join(dir, "selection.json");
+      await writeFile(data, statsCsv());
+      const selection = await researchMethodSelectCommand({
+        question: "Use a t-test to compare mean HbA1c between two independent groups",
+        goal: "compare_groups",
+        outcomeType: "continuous",
+        dataStructures: ["single_table"],
+        outPath: selectionPath,
+      });
+      const bound = await researchStatsRunCommand({
+        method: "t-test",
+        dataPath: data,
+        outcome: "hba1c",
+        group: "group",
+        variables: [],
+        covariates: [],
+        methodSelectionPath: selectionPath,
+        outDir: path.join(dir, "bound"),
+        alpha: 0.05,
+        python,
+      });
+      const mismatch = await researchStatsRunCommand({
+        method: "logistic-regression",
+        dataPath: data,
+        outcome: "elevated",
+        exposure: "bmi",
+        variables: [],
+        covariates: [],
+        methodSelectionPath: selectionPath,
+        outDir: path.join(dir, "mismatch"),
+        alpha: 0.05,
+        python,
+      });
+
+      expect(selection.primary?.method.id).toBe("two-sample-t-test");
+      expect(bound.status).toBe("succeeded");
+      expect(bound.binding.status).toBe("bound");
+      expect(bound.resultPosture?.status).toBe("bound_standard_table");
+      expect(bound.binding.methodSelectionId).toBe(selection.selectionId);
+      expect(bound.binding.methodId).toBe("two-sample-t-test");
+      expect(mismatch.status).toBe("failed");
+      expect(mismatch.binding.status).toBe("mismatch");
+      expect(mismatch.resultPosture?.status).toBe("invalid_binding");
+      expect(mismatch.issues.map(issue => issue.code)).toContain("METHOD_SELECTION_STATS_MISMATCH");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -342,6 +912,20 @@ function clusterCsv(): string {
     const x = center[0] + (i % 5) * 0.2;
     const y = center[1] + (i % 7) * 0.15;
     rows.push(`${x.toFixed(3)},${y.toFixed(3)},c${i % centers.length}`);
+  }
+  return `${rows.join("\n")}\n`;
+}
+
+function statsCsv(): string {
+  const rows = ["age,sex,bmi,group,hba1c,elevated"];
+  for (let i = 0; i < 140; i++) {
+    const age = 30 + (i % 45);
+    const sex = i % 2 === 0 ? "F" : "M";
+    const bmi = 20 + (i % 40) * 0.55;
+    const group = bmi >= 31 ? "high" : "low";
+    const hba1c = 4.8 + bmi * 0.045 + age * 0.006 + (sex === "M" ? 0.08 : 0);
+    const elevated = hba1c >= 6.0 ? 1 : 0;
+    rows.push(`${age},${sex},${bmi.toFixed(2)},${group},${hba1c.toFixed(3)},${elevated}`);
   }
   return `${rows.join("\n")}\n`;
 }

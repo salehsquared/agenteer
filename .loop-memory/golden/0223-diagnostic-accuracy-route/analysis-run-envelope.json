@@ -1,0 +1,1631 @@
+{
+  "schemaVersion": 1,
+  "analysisRun": {
+    "schemaVersion": 1,
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run",
+    "route": "stats-run",
+    "modelingPlan": {
+      "schemaVersion": 1,
+      "decisionId": "modeling_cd41599fd757c9b4",
+      "request": {
+        "question": "Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.",
+        "goal": "diagnose",
+        "outcomeType": "binary",
+        "studyDesign": "diagnostic",
+        "dataStructures": [
+          "single_table"
+        ],
+        "surveyDesign": false,
+        "repeatedMeasures": false,
+        "clustered": false,
+        "timeToEvent": false,
+        "highDimensional": false,
+        "text": false,
+        "image": false,
+        "spatial": false,
+        "network": false,
+        "target": "elevated_hba1c",
+        "priorRuns": [],
+        "highMissingness": false,
+        "smallSample": false,
+        "requiresInference": true,
+        "requiresPrediction": false,
+        "maxCandidates": 12
+      },
+      "inferredGoal": "diagnose",
+      "inferredOutcomeType": "binary",
+      "inferredStudyDesign": "diagnostic",
+      "inferredDataStructures": [
+        "single_table"
+      ],
+      "dataEvidence": {
+        "source": "request",
+        "rowCount": null,
+        "featureCount": null,
+        "target": "elevated_hba1c",
+        "targetClassCount": null,
+        "maxMissingFraction": null,
+        "highMissingness": false,
+        "smallSample": false,
+        "highDimensional": false,
+        "warnings": []
+      },
+      "backendEvidence": {
+        "source": "not-supplied",
+        "available": [],
+        "missing": [],
+        "notChecked": [],
+        "warnings": []
+      },
+      "priorRunEvidence": {
+        "source": "none",
+        "runs": [],
+        "warnings": [],
+        "recommendedAction": "No prior run evidence supplied."
+      },
+      "methodSelectionEvidence": {
+        "selectionId": "method_selection_cbfe9bcc0b6b",
+        "selectionHash": "19b8ac093036315ac541cef9e8a86693aa824932b73804a078651586ccad0cfa",
+        "primaryMethodId": "diagnostic-accuracy-basic",
+        "candidateMethodIds": [
+          "diagnostic-accuracy-basic",
+          "roc-auc-calibration",
+          "binary-logistic-regression",
+          "power-sample-size",
+          "cohens-kappa-icc"
+        ],
+        "recommendedBackend": "python-statsmodels",
+        "recommendedArchetype": "diagnostic-accuracy",
+        "stopForHumanReview": true,
+        "issueCodes": [
+          "HUMAN_REVIEW_GATE"
+        ],
+        "applyCommandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+      },
+      "routeRecommendation": {
+        "route": "stats-run",
+        "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>",
+        "reason": "method:diagnostic-accuracy-basic is executable by the standard-table statistics runner.",
+        "requiredArtifacts": [
+          "stats-run.json",
+          "estimates.csv",
+          "diagnostics.json",
+          "stats-report.md",
+          "stats-qa.json"
+        ]
+      },
+      "primary": {
+        "id": "method:diagnostic-accuracy-basic",
+        "rank": 1,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Diagnostic accuracy metrics",
+        "family": "diagnostic_accuracy",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.75,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: sensitivity, specificity",
+          "supports outcome type binary",
+          "supports study design diagnostic",
+          "supports data structure single_table",
+          "matches goal diagnose"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "screening recommendation is implied",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "index test",
+          "gold standard",
+          "threshold",
+          "confusion matrix",
+          "prevalence",
+          "indeterminate results",
+          "provide index test",
+          "provide gold standard",
+          "provide threshold",
+          "confirm assumption: Reference standard is valid",
+          "confirm assumption: spectrum bias is addressed",
+          "produce diagnostic: confusion matrix"
+        ],
+        "expectedMetrics": [
+          "sensitivity",
+          "specificity",
+          "PPV",
+          "NPV",
+          "LR+",
+          "LR-"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+      },
+      "blockingPolicies": [],
+      "executableCandidates": [
+        {
+          "id": "method:diagnostic-accuracy-basic",
+          "rank": 1,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "Diagnostic accuracy metrics",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.75,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: sensitivity, specificity",
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "screening recommendation is implied",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "index test",
+            "gold standard",
+            "threshold",
+            "confusion matrix",
+            "prevalence",
+            "indeterminate results",
+            "provide index test",
+            "provide gold standard",
+            "provide threshold",
+            "confirm assumption: Reference standard is valid",
+            "confirm assumption: spectrum bias is addressed",
+            "produce diagnostic: confusion matrix"
+          ],
+          "expectedMetrics": [
+            "sensitivity",
+            "specificity",
+            "PPV",
+            "NPV",
+            "LR+",
+            "LR-"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+        },
+        {
+          "id": "method:roc-auc-calibration",
+          "rank": 2,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "ROC/AUC and calibration analysis",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.57,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "clinical deployment or action threshold is proposed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "predicted probabilities",
+            "ROC curve",
+            "calibration plot",
+            "Brier score",
+            "provide binary outcome",
+            "provide predicted probabilities",
+            "confirm assumption: Validation sample is independent or resampling policy is declared",
+            "produce diagnostic: ROC curve",
+            "produce diagnostic: calibration plot",
+            "produce diagnostic: Brier score"
+          ],
+          "expectedMetrics": [
+            "AUC",
+            "C-statistic",
+            "Brier score",
+            "calibration slope"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:binary-logistic-regression",
+          "rank": 3,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Binary logistic regression",
+          "family": "logistic",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.48,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: elevated",
+            "supports outcome type binary",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "diagnostic or causal language is requested",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "exposure",
+            "covariates",
+            "event count",
+            "separation",
+            "calibration if predictive",
+            "influence",
+            "provide binary outcome",
+            "provide exposure",
+            "provide covariates",
+            "confirm assumption: Outcome threshold is justified",
+            "confirm assumption: adequate events per parameter"
+          ],
+          "expectedMetrics": [
+            "odds ratio",
+            "marginal risk difference"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method logistic-regression --data <rows.csv> --out-dir <out> --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>"
+        },
+        {
+          "id": "method:power-sample-size",
+          "rank": 4,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Power and sample size analysis",
+          "family": "power",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.43,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "trial feasibility or funding decision depends on estimate",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "effect size",
+            "alpha",
+            "power target",
+            "allocation ratio",
+            "sensitivity grid",
+            "event count for survival",
+            "provide effect size",
+            "provide alpha",
+            "provide power target",
+            "provide allocation ratio",
+            "confirm assumption: Effect size and variance assumptions are justified",
+            "produce diagnostic: sensitivity grid"
+          ],
+          "expectedMetrics": [
+            "required N",
+            "power",
+            "minimum detectable effect"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:cohens-kappa-icc",
+          "rank": 5,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Agreement and reliability analysis",
+          "family": "agreement",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.35,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "instrument equivalence is claimed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "rater/test id",
+            "subject id",
+            "paired ratings or measurements",
+            "agreement table",
+            "bias plot",
+            "within-subject variance",
+            "provide rater/test id",
+            "provide subject id",
+            "provide paired ratings or measurements",
+            "confirm assumption: Rater design and scale type match statistic",
+            "produce diagnostic: agreement table",
+            "produce diagnostic: bias plot"
+          ],
+          "expectedMetrics": [
+            "Cohen's kappa",
+            "weighted kappa",
+            "ICC",
+            "Bland-Altman limits"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        }
+      ],
+      "baselines": [],
+      "sensitivityAnalyses": [],
+      "candidates": [
+        {
+          "id": "method:diagnostic-accuracy-basic",
+          "rank": 1,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "Diagnostic accuracy metrics",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.75,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: sensitivity, specificity",
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "screening recommendation is implied",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "index test",
+            "gold standard",
+            "threshold",
+            "confusion matrix",
+            "prevalence",
+            "indeterminate results",
+            "provide index test",
+            "provide gold standard",
+            "provide threshold",
+            "confirm assumption: Reference standard is valid",
+            "confirm assumption: spectrum bias is addressed",
+            "produce diagnostic: confusion matrix"
+          ],
+          "expectedMetrics": [
+            "sensitivity",
+            "specificity",
+            "PPV",
+            "NPV",
+            "LR+",
+            "LR-"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+        },
+        {
+          "id": "method:roc-auc-calibration",
+          "rank": 2,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "ROC/AUC and calibration analysis",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.57,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "clinical deployment or action threshold is proposed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "predicted probabilities",
+            "ROC curve",
+            "calibration plot",
+            "Brier score",
+            "provide binary outcome",
+            "provide predicted probabilities",
+            "confirm assumption: Validation sample is independent or resampling policy is declared",
+            "produce diagnostic: ROC curve",
+            "produce diagnostic: calibration plot",
+            "produce diagnostic: Brier score"
+          ],
+          "expectedMetrics": [
+            "AUC",
+            "C-statistic",
+            "Brier score",
+            "calibration slope"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:binary-logistic-regression",
+          "rank": 3,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Binary logistic regression",
+          "family": "logistic",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.48,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: elevated",
+            "supports outcome type binary",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "diagnostic or causal language is requested",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "exposure",
+            "covariates",
+            "event count",
+            "separation",
+            "calibration if predictive",
+            "influence",
+            "provide binary outcome",
+            "provide exposure",
+            "provide covariates",
+            "confirm assumption: Outcome threshold is justified",
+            "confirm assumption: adequate events per parameter"
+          ],
+          "expectedMetrics": [
+            "odds ratio",
+            "marginal risk difference"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method logistic-regression --data <rows.csv> --out-dir <out> --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>"
+        },
+        {
+          "id": "method:power-sample-size",
+          "rank": 4,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Power and sample size analysis",
+          "family": "power",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.43,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "trial feasibility or funding decision depends on estimate",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "effect size",
+            "alpha",
+            "power target",
+            "allocation ratio",
+            "sensitivity grid",
+            "event count for survival",
+            "provide effect size",
+            "provide alpha",
+            "provide power target",
+            "provide allocation ratio",
+            "confirm assumption: Effect size and variance assumptions are justified",
+            "produce diagnostic: sensitivity grid"
+          ],
+          "expectedMetrics": [
+            "required N",
+            "power",
+            "minimum detectable effect"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:cohens-kappa-icc",
+          "rank": 5,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Agreement and reliability analysis",
+          "family": "agreement",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.35,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "instrument equivalence is claimed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "rater/test id",
+            "subject id",
+            "paired ratings or measurements",
+            "agreement table",
+            "bias plot",
+            "within-subject variance",
+            "provide rater/test id",
+            "provide subject id",
+            "provide paired ratings or measurements",
+            "confirm assumption: Rater design and scale type match statistic",
+            "produce diagnostic: agreement table",
+            "produce diagnostic: bias plot"
+          ],
+          "expectedMetrics": [
+            "Cohen's kappa",
+            "weighted kappa",
+            "ICC",
+            "Bland-Altman limits"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        }
+      ],
+      "blocked": false,
+      "issues": [],
+      "nextAction": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+    },
+    "statsRun": {
+      "schemaVersion": 1,
+      "runId": "statsrun_232613390600071153",
+      "method": "diagnostic-accuracy",
+      "status": "succeeded",
+      "rowCount": 160,
+      "completeCaseN": 160,
+      "variables": [
+        "elevated_hba1c",
+        "waist_high"
+      ],
+      "parameters": {
+        "alpha": 0.05
+      },
+      "estimates": [
+        {
+          "term": "waist_high",
+          "reference": "elevated_hba1c",
+          "true_positive": 69,
+          "false_positive": 2,
+          "true_negative": 74,
+          "false_negative": 15,
+          "sensitivity": 0.8214285714285714,
+          "sensitivity_ci_low": 0.7260557754840193,
+          "sensitivity_ci_high": 0.8886881133922706,
+          "specificity": 0.9736842105263158,
+          "specificity_ci_low": 0.9090337890134194,
+          "specificity_ci_high": 0.9927533409248718,
+          "positive_predictive_value": 0.971830985915493,
+          "positive_predictive_value_ci_low": 0.9029849988335054,
+          "positive_predictive_value_ci_high": 0.9922407364173166,
+          "negative_predictive_value": 0.8314606741573034,
+          "negative_predictive_value_ci_low": 0.7403744938895832,
+          "negative_predictive_value_ci_high": 0.8951174592684067,
+          "accuracy": 0.89375,
+          "prevalence": 0.525,
+          "positive_likelihood_ratio": 31.214285714285747,
+          "negative_likelihood_ratio": 0.18339768339768342
+        }
+      ],
+      "diagnostics": {
+        "test": "diagnostic-accuracy",
+        "confusion_matrix": {
+          "tp": 69,
+          "fp": 2,
+          "tn": 74,
+          "fn": 15
+        },
+        "reference_positive_level": 1,
+        "reference_negative_level": 0,
+        "test_positive_level": 1,
+        "test_negative_level": 0
+      },
+      "issues": [
+        {
+          "severity": "warning",
+          "code": "SPARSE_DIAGNOSTIC_CELL",
+          "message": "At least one diagnostic accuracy cell count is below 5.",
+          "evidenceRefs": [
+            "diagnostics.confusion_matrix"
+          ]
+        }
+      ],
+      "warnings": [
+        "At least one diagnostic accuracy cell count is below 5; performance metrics may be unstable."
+      ],
+      "errors": [],
+      "artifacts": [
+        {
+          "kind": "config",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-config.json",
+          "sha256": "1e680486ba3b1e74dd318934e943b828169d190877b47c02182e0fef3b88d72b"
+        },
+        {
+          "kind": "summary",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-summary.json",
+          "sha256": "b7d5f92cfd353503172b00e3b9b2167a9479c5cfd8317d935f46fbdb44288d05"
+        },
+        {
+          "kind": "table",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/estimates.csv",
+          "sha256": "42388d95cb40d43f592fa3b5afdf10e7462546186bbe1f729997fe4fc5c77071"
+        },
+        {
+          "kind": "diagnostics",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/diagnostics.json",
+          "sha256": "7c8aa2641b587d828fde2eb16cc4a5f00dbb8fb605d830a65a3ebeefdc32806a"
+        },
+        {
+          "kind": "report",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-report.md",
+          "sha256": "52bbae6b4c1361a91656dac3f560dd1df7b986a0adb192e55798f4277cf07dc1"
+        },
+        {
+          "kind": "qa",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-qa.json",
+          "sha256": "2108f1ae15594941b68c4dcd9f746f6dd57bd3e03db6e08113973d2aee25fac3"
+        }
+      ],
+      "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run",
+      "binding": {
+        "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/method-selection.json",
+        "methodSelectionId": "method_selection_1080cdbbdfdc",
+        "methodId": "diagnostic-accuracy-basic",
+        "analysisSpecPath": null,
+        "specHash": null,
+        "status": "bound"
+      },
+      "resultPosture": {
+        "status": "bound_standard_table",
+        "label": "Bound standard-table result",
+        "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+        "supports": [
+          "method-bound estimates",
+          "standard-table diagnostics",
+          "local methods review"
+        ],
+        "cannotSupport": [
+          "causal claims without design support",
+          "clinical recommendations"
+        ],
+        "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+      }
+    },
+    "analysisRunManifest": {
+      "schemaVersion": 1,
+      "manifestId": "analysis_manifest_68b45e6f4b0081ac",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run",
+      "runKind": "stats",
+      "runPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json",
+      "runId": "statsrun_232613390600071153",
+      "runStatus": "succeeded",
+      "methodOrModel": "diagnostic-accuracy",
+      "resultPosture": {
+        "status": "bound_standard_table",
+        "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+        "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+      },
+      "readiness": "local_review_ready",
+      "artifactCompleteness": {
+        "status": "pass",
+        "missingRequired": []
+      },
+      "artifacts": [
+        {
+          "kind": "diagnostics",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/diagnostics.json",
+          "required": true,
+          "exists": true,
+          "sha256": "7c8aa2641b587d828fde2eb16cc4a5f00dbb8fb605d830a65a3ebeefdc32806a"
+        },
+        {
+          "kind": "qa",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-qa.json",
+          "required": true,
+          "exists": true,
+          "sha256": "2108f1ae15594941b68c4dcd9f746f6dd57bd3e03db6e08113973d2aee25fac3"
+        },
+        {
+          "kind": "report",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-report.md",
+          "required": true,
+          "exists": true,
+          "sha256": "52bbae6b4c1361a91656dac3f560dd1df7b986a0adb192e55798f4277cf07dc1"
+        },
+        {
+          "kind": "stats-run",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json",
+          "required": true,
+          "exists": true,
+          "sha256": "3a746ae144e9ba04dac40ff40e7ef57fd774efbf61aac0de8867d2fa538a9b6f"
+        },
+        {
+          "kind": "summary",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-summary.json",
+          "required": true,
+          "exists": true,
+          "sha256": "b7d5f92cfd353503172b00e3b9b2167a9479c5cfd8317d935f46fbdb44288d05"
+        },
+        {
+          "kind": "table",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/estimates.csv",
+          "required": true,
+          "exists": true,
+          "sha256": "42388d95cb40d43f592fa3b5afdf10e7462546186bbe1f729997fe4fc5c77071"
+        },
+        {
+          "kind": "config",
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-config.json",
+          "required": false,
+          "exists": true,
+          "sha256": "1e680486ba3b1e74dd318934e943b828169d190877b47c02182e0fef3b88d72b"
+        }
+      ],
+      "issueCodes": [
+        "SPARSE_DIAGNOSTIC_CELL"
+      ],
+      "nextAction": "Proceed to local methods review; do not promote beyond the declared posture without stronger validation artifacts.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/analysis-run-manifest.json"
+    },
+    "postRunModelingPlan": {
+      "schemaVersion": 1,
+      "decisionId": "modeling_da8667e707554c7f",
+      "request": {
+        "question": "Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.",
+        "goal": "diagnose",
+        "outcomeType": "binary",
+        "studyDesign": "diagnostic",
+        "dataStructures": [
+          "single_table"
+        ],
+        "surveyDesign": false,
+        "repeatedMeasures": false,
+        "clustered": false,
+        "timeToEvent": false,
+        "highDimensional": false,
+        "text": false,
+        "image": false,
+        "spatial": false,
+        "network": false,
+        "target": "elevated_hba1c",
+        "priorRuns": [
+          {
+            "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json",
+            "kind": "stats",
+            "status": "succeeded",
+            "posture": "bound_standard_table",
+            "methodOrModel": "diagnostic-accuracy",
+            "issueCodes": [
+              "SPARSE_DIAGNOSTIC_CELL"
+            ],
+            "errors": []
+          }
+        ],
+        "highMissingness": false,
+        "smallSample": false,
+        "requiresInference": true,
+        "requiresPrediction": false,
+        "maxCandidates": 12
+      },
+      "inferredGoal": "diagnose",
+      "inferredOutcomeType": "binary",
+      "inferredStudyDesign": "diagnostic",
+      "inferredDataStructures": [
+        "single_table"
+      ],
+      "dataEvidence": {
+        "source": "request",
+        "rowCount": null,
+        "featureCount": null,
+        "target": "elevated_hba1c",
+        "targetClassCount": null,
+        "maxMissingFraction": null,
+        "highMissingness": false,
+        "smallSample": false,
+        "highDimensional": false,
+        "warnings": []
+      },
+      "backendEvidence": {
+        "source": "not-supplied",
+        "available": [],
+        "missing": [],
+        "notChecked": [],
+        "warnings": []
+      },
+      "priorRunEvidence": {
+        "source": "prior-run-artifacts",
+        "runs": [
+          {
+            "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json",
+            "kind": "stats",
+            "status": "succeeded",
+            "posture": "bound_standard_table",
+            "methodOrModel": "diagnostic-accuracy",
+            "issueCodes": [
+              "SPARSE_DIAGNOSTIC_CELL"
+            ],
+            "action": "promote-local-review",
+            "reason": "Prior run has no blocking posture; use it only for local review unless stronger validation artifacts exist."
+          }
+        ],
+        "warnings": [
+          {
+            "severity": "note",
+            "code": "PRIOR_RUN_POSTURE_REQUIRES_PLANNING_RESPONSE",
+            "message": "stats prior run /Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json posture=bound_standard_table action=promote-local-review.",
+            "evidenceRefs": [
+              "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json"
+            ]
+          }
+        ],
+        "recommendedAction": "Prior run has no blocking posture; use it only for local review unless stronger validation artifacts exist."
+      },
+      "methodSelectionEvidence": {
+        "selectionId": "method_selection_cbfe9bcc0b6b",
+        "selectionHash": "19b8ac093036315ac541cef9e8a86693aa824932b73804a078651586ccad0cfa",
+        "primaryMethodId": "diagnostic-accuracy-basic",
+        "candidateMethodIds": [
+          "diagnostic-accuracy-basic",
+          "roc-auc-calibration",
+          "binary-logistic-regression",
+          "power-sample-size",
+          "cohens-kappa-icc"
+        ],
+        "recommendedBackend": "python-statsmodels",
+        "recommendedArchetype": "diagnostic-accuracy",
+        "stopForHumanReview": true,
+        "issueCodes": [
+          "HUMAN_REVIEW_GATE"
+        ],
+        "applyCommandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+      },
+      "routeRecommendation": {
+        "route": "stats-run",
+        "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>",
+        "reason": "method:diagnostic-accuracy-basic is executable by the standard-table statistics runner.",
+        "requiredArtifacts": [
+          "stats-run.json",
+          "estimates.csv",
+          "diagnostics.json",
+          "stats-report.md",
+          "stats-qa.json"
+        ]
+      },
+      "primary": {
+        "id": "method:diagnostic-accuracy-basic",
+        "rank": 1,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Diagnostic accuracy metrics",
+        "family": "diagnostic_accuracy",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.75,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: sensitivity, specificity",
+          "supports outcome type binary",
+          "supports study design diagnostic",
+          "supports data structure single_table",
+          "matches goal diagnose"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "screening recommendation is implied",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "index test",
+          "gold standard",
+          "threshold",
+          "confusion matrix",
+          "prevalence",
+          "indeterminate results",
+          "provide index test",
+          "provide gold standard",
+          "provide threshold",
+          "confirm assumption: Reference standard is valid",
+          "confirm assumption: spectrum bias is addressed",
+          "produce diagnostic: confusion matrix"
+        ],
+        "expectedMetrics": [
+          "sensitivity",
+          "specificity",
+          "PPV",
+          "NPV",
+          "LR+",
+          "LR-"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+      },
+      "blockingPolicies": [],
+      "executableCandidates": [
+        {
+          "id": "method:diagnostic-accuracy-basic",
+          "rank": 1,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "Diagnostic accuracy metrics",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.75,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: sensitivity, specificity",
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "screening recommendation is implied",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "index test",
+            "gold standard",
+            "threshold",
+            "confusion matrix",
+            "prevalence",
+            "indeterminate results",
+            "provide index test",
+            "provide gold standard",
+            "provide threshold",
+            "confirm assumption: Reference standard is valid",
+            "confirm assumption: spectrum bias is addressed",
+            "produce diagnostic: confusion matrix"
+          ],
+          "expectedMetrics": [
+            "sensitivity",
+            "specificity",
+            "PPV",
+            "NPV",
+            "LR+",
+            "LR-"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+        },
+        {
+          "id": "method:roc-auc-calibration",
+          "rank": 2,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "ROC/AUC and calibration analysis",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.57,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "clinical deployment or action threshold is proposed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "predicted probabilities",
+            "ROC curve",
+            "calibration plot",
+            "Brier score",
+            "provide binary outcome",
+            "provide predicted probabilities",
+            "confirm assumption: Validation sample is independent or resampling policy is declared",
+            "produce diagnostic: ROC curve",
+            "produce diagnostic: calibration plot",
+            "produce diagnostic: Brier score"
+          ],
+          "expectedMetrics": [
+            "AUC",
+            "C-statistic",
+            "Brier score",
+            "calibration slope"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:binary-logistic-regression",
+          "rank": 3,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Binary logistic regression",
+          "family": "logistic",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.48,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: elevated",
+            "supports outcome type binary",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "diagnostic or causal language is requested",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "exposure",
+            "covariates",
+            "event count",
+            "separation",
+            "calibration if predictive",
+            "influence",
+            "provide binary outcome",
+            "provide exposure",
+            "provide covariates",
+            "confirm assumption: Outcome threshold is justified",
+            "confirm assumption: adequate events per parameter"
+          ],
+          "expectedMetrics": [
+            "odds ratio",
+            "marginal risk difference"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method logistic-regression --data <rows.csv> --out-dir <out> --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>"
+        },
+        {
+          "id": "method:power-sample-size",
+          "rank": 4,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Power and sample size analysis",
+          "family": "power",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.43,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "trial feasibility or funding decision depends on estimate",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "effect size",
+            "alpha",
+            "power target",
+            "allocation ratio",
+            "sensitivity grid",
+            "event count for survival",
+            "provide effect size",
+            "provide alpha",
+            "provide power target",
+            "provide allocation ratio",
+            "confirm assumption: Effect size and variance assumptions are justified",
+            "produce diagnostic: sensitivity grid"
+          ],
+          "expectedMetrics": [
+            "required N",
+            "power",
+            "minimum detectable effect"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:cohens-kappa-icc",
+          "rank": 5,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Agreement and reliability analysis",
+          "family": "agreement",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.35,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "instrument equivalence is claimed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "rater/test id",
+            "subject id",
+            "paired ratings or measurements",
+            "agreement table",
+            "bias plot",
+            "within-subject variance",
+            "provide rater/test id",
+            "provide subject id",
+            "provide paired ratings or measurements",
+            "confirm assumption: Rater design and scale type match statistic",
+            "produce diagnostic: agreement table",
+            "produce diagnostic: bias plot"
+          ],
+          "expectedMetrics": [
+            "Cohen's kappa",
+            "weighted kappa",
+            "ICC",
+            "Bland-Altman limits"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        }
+      ],
+      "baselines": [],
+      "sensitivityAnalyses": [],
+      "candidates": [
+        {
+          "id": "method:diagnostic-accuracy-basic",
+          "rank": 1,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "Diagnostic accuracy metrics",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.75,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: sensitivity, specificity",
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "screening recommendation is implied",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "index test",
+            "gold standard",
+            "threshold",
+            "confusion matrix",
+            "prevalence",
+            "indeterminate results",
+            "provide index test",
+            "provide gold standard",
+            "provide threshold",
+            "confirm assumption: Reference standard is valid",
+            "confirm assumption: spectrum bias is addressed",
+            "produce diagnostic: confusion matrix"
+          ],
+          "expectedMetrics": [
+            "sensitivity",
+            "specificity",
+            "PPV",
+            "NPV",
+            "LR+",
+            "LR-"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+        },
+        {
+          "id": "method:roc-auc-calibration",
+          "rank": 2,
+          "tier": "primary",
+          "source": "statistical-method",
+          "label": "ROC/AUC and calibration analysis",
+          "family": "diagnostic_accuracy",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.57,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table",
+            "matches goal diagnose"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "clinical deployment or action threshold is proposed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "predicted probabilities",
+            "ROC curve",
+            "calibration plot",
+            "Brier score",
+            "provide binary outcome",
+            "provide predicted probabilities",
+            "confirm assumption: Validation sample is independent or resampling policy is declared",
+            "produce diagnostic: ROC curve",
+            "produce diagnostic: calibration plot",
+            "produce diagnostic: Brier score"
+          ],
+          "expectedMetrics": [
+            "AUC",
+            "C-statistic",
+            "Brier score",
+            "calibration slope"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:binary-logistic-regression",
+          "rank": 3,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Binary logistic regression",
+          "family": "logistic",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.48,
+          "compatible": true,
+          "reasons": [
+            "question keyword match: elevated",
+            "supports outcome type binary",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "diagnostic or causal language is requested",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "binary outcome",
+            "exposure",
+            "covariates",
+            "event count",
+            "separation",
+            "calibration if predictive",
+            "influence",
+            "provide binary outcome",
+            "provide exposure",
+            "provide covariates",
+            "confirm assumption: Outcome threshold is justified",
+            "confirm assumption: adequate events per parameter"
+          ],
+          "expectedMetrics": [
+            "odds ratio",
+            "marginal risk difference"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json",
+            "stats-run.json",
+            "estimates.csv",
+            "stats-report.md",
+            "stats-qa.json"
+          ],
+          "commandHint": "agenteer research stats-run --method logistic-regression --data <rows.csv> --out-dir <out> --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>"
+        },
+        {
+          "id": "method:power-sample-size",
+          "rank": 4,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Power and sample size analysis",
+          "family": "power",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.43,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic",
+            "supports data structure single_table"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "trial feasibility or funding decision depends on estimate",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "effect size",
+            "alpha",
+            "power target",
+            "allocation ratio",
+            "sensitivity grid",
+            "event count for survival",
+            "provide effect size",
+            "provide alpha",
+            "provide power target",
+            "provide allocation ratio",
+            "confirm assumption: Effect size and variance assumptions are justified",
+            "produce diagnostic: sensitivity grid"
+          ],
+          "expectedMetrics": [
+            "required N",
+            "power",
+            "minimum detectable effect"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        },
+        {
+          "id": "method:cohens-kappa-icc",
+          "rank": 5,
+          "tier": "exploratory",
+          "source": "statistical-method",
+          "label": "Agreement and reliability analysis",
+          "family": "agreement",
+          "backend": "python-statsmodels",
+          "taskType": null,
+          "score": 0.35,
+          "compatible": true,
+          "reasons": [
+            "supports outcome type binary",
+            "supports study design diagnostic"
+          ],
+          "cautions": [
+            {
+              "severity": "note",
+              "code": "HUMAN_REVIEW_GATE",
+              "message": "instrument equivalence is claimed",
+              "evidenceRefs": []
+            }
+          ],
+          "requiredBeforeExecution": [
+            "rater/test id",
+            "subject id",
+            "paired ratings or measurements",
+            "agreement table",
+            "bias plot",
+            "within-subject variance",
+            "provide rater/test id",
+            "provide subject id",
+            "provide paired ratings or measurements",
+            "confirm assumption: Rater design and scale type match statistic",
+            "produce diagnostic: agreement table",
+            "produce diagnostic: bias plot"
+          ],
+          "expectedMetrics": [
+            "Cohen's kappa",
+            "weighted kappa",
+            "ICC",
+            "Bland-Altman limits"
+          ],
+          "expectedArtifacts": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "commandHint": "agenteer research method-select --question \"Estimate sensitivity and specificity for a waist circumference threshold as a screen for elevated HbA1c.\" --json"
+        }
+      ],
+      "blocked": false,
+      "issues": [
+        {
+          "severity": "note",
+          "code": "PRIOR_RUN_POSTURE_REQUIRES_PLANNING_RESPONSE",
+          "message": "stats prior run /Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json posture=bound_standard_table action=promote-local-review.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/stats-run.json"
+          ]
+        }
+      ],
+      "nextAction": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+    },
+    "generatedFiles": {
+      "modelingPlan": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/modeling-plan.json",
+      "statsRunEnvelope": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run-envelope.json",
+      "analysisManifest": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/stats-run/analysis-run-manifest.json",
+      "postRunModelingPlan": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0223-diagnostic-accuracy-route/analysis-run/modeling-plan-after-prior.json"
+    },
+    "nextAction": "agenteer research stats-run --method diagnostic-accuracy --data <rows.csv> --out-dir <out> --outcome <binary-reference-standard> --exposure <binary-index-test>"
+  }
+}
+

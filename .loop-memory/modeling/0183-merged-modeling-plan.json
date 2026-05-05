@@ -1,0 +1,691 @@
+{
+  "schemaVersion": 1,
+  "modelingPlan": {
+    "schemaVersion": 1,
+    "decisionId": "modeling_490c9317c541f763",
+    "request": {
+      "question": "In NHANES adults, can BMI predict elevated HbA1c?",
+      "outcomeType": "binary",
+      "dataStructures": [],
+      "surveyDesign": true,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "highMissingness": false,
+      "smallSample": false,
+      "requiresInference": true,
+      "requiresPrediction": true,
+      "maxCandidates": 6
+    },
+    "inferredGoal": "classify",
+    "inferredOutcomeType": "binary",
+    "inferredStudyDesign": "prediction",
+    "inferredDataStructures": [
+      "complex_survey"
+    ],
+    "dataEvidence": {
+      "source": "request",
+      "rowCount": null,
+      "featureCount": null,
+      "target": null,
+      "targetClassCount": null,
+      "maxMissingFraction": null,
+      "highMissingness": false,
+      "smallSample": false,
+      "highDimensional": false,
+      "warnings": []
+    },
+    "methodSelectionEvidence": {
+      "selectionId": "method_selection_8fa8ac305a6b",
+      "selectionHash": "73b310c0f19ba376548ebe934f563896f78b7387b520abc4ad76f0b9e4cad2ec",
+      "primaryMethodId": "binary-logistic-regression",
+      "candidateMethodIds": [
+        "binary-logistic-regression",
+        "tree-ensemble-prediction",
+        "survey-weighted-descriptive-summary",
+        "cross-validation-bootstrap-validation",
+        "penalized-regression-elastic-net",
+        "roc-auc-calibration"
+      ],
+      "recommendedBackend": "r-survey",
+      "recommendedArchetype": "binary-outcome-model",
+      "stopForHumanReview": true,
+      "issueCodes": [
+        "HUMAN_REVIEW_GATE"
+      ],
+      "applyCommandHint": "agenteer research method-select --question \"In NHANES adults, can BMI predict elevated HbA1c?\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+    },
+    "primary": {
+      "id": "ml:random-forest-classifier",
+      "rank": 2,
+      "tier": "primary",
+      "source": "ml-adapter",
+      "label": "random forest classifier",
+      "family": "ensemble",
+      "backend": "sklearn",
+      "taskType": "binary_classification",
+      "score": 0.7899999999999999,
+      "compatible": true,
+      "reasons": [
+        "random forest classifier supports binary_classification.",
+        "Matches the requested prediction/modeling shape."
+      ],
+      "cautions": [],
+      "requiredBeforeExecution": [
+        "confirm target column and feature exclusions",
+        "run train/test split or cross-validation",
+        "report calibration, Brier score, and threshold policy for clinical prediction",
+        "report calibration for probability models when clinical interpretation is intended"
+      ],
+      "expectedMetrics": [
+        "auroc",
+        "auprc",
+        "accuracy",
+        "sensitivity",
+        "specificity",
+        "f1",
+        "calibration",
+        "brier_score"
+      ],
+      "expectedArtifacts": [
+        "ml-run.json",
+        "predictions.csv or transformed.csv",
+        "model-summary.json",
+        "model.joblib when serializable"
+      ],
+      "commandHint": "agenteer research ml-run --task binary_classification --model random-forest-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+    },
+    "blockingPolicies": [
+      {
+        "id": "policy:complex-survey-design",
+        "rank": 1,
+        "tier": "primary",
+        "source": "workflow-policy",
+        "label": "Complex survey design policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.84,
+        "compatible": true,
+        "reasons": [
+          "Survey data require weight, strata, PSU, domain eligibility, and cross-sectional limitations before inference."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "survey weight variable",
+          "strata variable",
+          "PSU variable",
+          "weight-domain rationale"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      }
+    ],
+    "executableCandidates": [
+      {
+        "id": "ml:random-forest-classifier",
+        "rank": 2,
+        "tier": "primary",
+        "source": "ml-adapter",
+        "label": "random forest classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7899999999999999,
+        "compatible": true,
+        "reasons": [
+          "random forest classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model random-forest-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:gradient-boosting-classifier",
+        "rank": 3,
+        "tier": "primary",
+        "source": "ml-adapter",
+        "label": "gradient boosting classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.76,
+        "compatible": true,
+        "reasons": [
+          "gradient boosting classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model gradient-boosting-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:extra-trees-classifier",
+        "rank": 4,
+        "tier": "primary",
+        "source": "ml-adapter",
+        "label": "extra trees classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.69,
+        "compatible": true,
+        "reasons": [
+          "extra trees classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model extra-trees-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:logistic-regression",
+        "rank": 5,
+        "tier": "baseline",
+        "source": "ml-adapter",
+        "label": "Logistic regression",
+        "family": "linear",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7799999999999999,
+        "compatible": true,
+        "reasons": [
+          "Logistic regression supports binary_classification.",
+          "Useful as a transparent baseline before stronger models."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 6,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.5499999999999999,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: nhanes",
+          "supports outcome type binary",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"In NHANES adults, can BMI predict elevated HbA1c?\" --json"
+      }
+    ],
+    "baselines": [
+      {
+        "id": "ml:logistic-regression",
+        "rank": 5,
+        "tier": "baseline",
+        "source": "ml-adapter",
+        "label": "Logistic regression",
+        "family": "linear",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7799999999999999,
+        "compatible": true,
+        "reasons": [
+          "Logistic regression supports binary_classification.",
+          "Useful as a transparent baseline before stronger models."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 6,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.5499999999999999,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: nhanes",
+          "supports outcome type binary",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"In NHANES adults, can BMI predict elevated HbA1c?\" --json"
+      }
+    ],
+    "sensitivityAnalyses": [],
+    "candidates": [
+      {
+        "id": "policy:complex-survey-design",
+        "rank": 1,
+        "tier": "primary",
+        "source": "workflow-policy",
+        "label": "Complex survey design policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.84,
+        "compatible": true,
+        "reasons": [
+          "Survey data require weight, strata, PSU, domain eligibility, and cross-sectional limitations before inference."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "survey weight variable",
+          "strata variable",
+          "PSU variable",
+          "weight-domain rationale"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "ml:random-forest-classifier",
+        "rank": 2,
+        "tier": "primary",
+        "source": "ml-adapter",
+        "label": "random forest classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7899999999999999,
+        "compatible": true,
+        "reasons": [
+          "random forest classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model random-forest-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:gradient-boosting-classifier",
+        "rank": 3,
+        "tier": "primary",
+        "source": "ml-adapter",
+        "label": "gradient boosting classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.76,
+        "compatible": true,
+        "reasons": [
+          "gradient boosting classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model gradient-boosting-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:extra-trees-classifier",
+        "rank": 4,
+        "tier": "primary",
+        "source": "ml-adapter",
+        "label": "extra trees classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.69,
+        "compatible": true,
+        "reasons": [
+          "extra trees classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model extra-trees-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:logistic-regression",
+        "rank": 5,
+        "tier": "baseline",
+        "source": "ml-adapter",
+        "label": "Logistic regression",
+        "family": "linear",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7799999999999999,
+        "compatible": true,
+        "reasons": [
+          "Logistic regression supports binary_classification.",
+          "Useful as a transparent baseline before stronger models."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 6,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.5499999999999999,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: nhanes",
+          "supports outcome type binary",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"In NHANES adults, can BMI predict elevated HbA1c?\" --json"
+      }
+    ],
+    "blocked": false,
+    "issues": [],
+    "nextAction": "Promote ml:random-forest-classifier; run required feasibility checks, then execute the suggested command or AnalysisSpec-backed runner."
+  }
+}
+

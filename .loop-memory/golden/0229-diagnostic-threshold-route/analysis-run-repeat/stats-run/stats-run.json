@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_5480564652469232833",
+  "method": "diagnostic-accuracy",
+  "status": "succeeded",
+  "rowCount": 180,
+  "completeCaseN": 180,
+  "variables": [
+    "hba1c_pct",
+    "waist_cm"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "waist_cm",
+      "reference": "hba1c_pct",
+      "true_positive": 67,
+      "false_positive": 4,
+      "true_negative": 98,
+      "false_negative": 11,
+      "sensitivity": 0.8589743589743589,
+      "sensitivity_ci_low": 0.7648602182063984,
+      "sensitivity_ci_high": 0.9193895594361288,
+      "specificity": 0.9607843137254902,
+      "specificity_ci_low": 0.9034748613150819,
+      "specificity_ci_high": 0.9846459284715109,
+      "positive_predictive_value": 0.9436619718309859,
+      "positive_predictive_value_ci_low": 0.8639039420002305,
+      "positive_predictive_value_ci_high": 0.9778754806983033,
+      "negative_predictive_value": 0.8990825688073395,
+      "negative_predictive_value_ci_low": 0.8282829513804872,
+      "negative_predictive_value_ci_high": 0.9427102714051525,
+      "accuracy": 0.9166666666666666,
+      "prevalence": 0.43333333333333335,
+      "positive_likelihood_ratio": 21.903846153846168,
+      "negative_likelihood_ratio": 0.14678178963893254
+    }
+  ],
+  "diagnostics": {
+    "test": "diagnostic-accuracy",
+    "confusion_matrix": {
+      "tp": 67,
+      "fp": 4,
+      "tn": 98,
+      "fn": 11
+    },
+    "reference_positive_level": ">=6.5",
+    "reference_negative_level": "<6.5",
+    "test_positive_level": ">=100",
+    "test_negative_level": "<100",
+    "reference_threshold": 6.5,
+    "test_threshold": 100
+  },
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "SPARSE_DIAGNOSTIC_CELL",
+      "message": "At least one diagnostic accuracy cell count is below 5.",
+      "evidenceRefs": [
+        "diagnostics.confusion_matrix"
+      ]
+    }
+  ],
+  "warnings": [
+    "At least one diagnostic accuracy cell count is below 5; performance metrics may be unstable."
+  ],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run/stats-config.json",
+      "sha256": "1738aa6ba9162075faffcad1eda195f64869bffd053d36d02adae836cdeb8462"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run/stats-summary.json",
+      "sha256": "ecc75d2cbd1dc84f70da38477c0ebf6c137a6a16a2e95a1ea02a3bacc0b0fe34"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run/estimates.csv",
+      "sha256": "2657a2d8754080b939c89b540e4c1b2b43e1d353602ee07d3fa9323caebcb21a"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run/diagnostics.json",
+      "sha256": "20b54e9f013a6ccdf3fc6ddeeab98171c7774825e8b535a359de3f8000007e80"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run/stats-report.md",
+      "sha256": "ee00ffe352e7b29199074377e1726d4d2632bad1a9059eac1729a5e1b559e10f"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run/stats-qa.json",
+      "sha256": "2108f1ae15594941b68c4dcd9f746f6dd57bd3e03db6e08113973d2aee25fac3"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/analysis-run-repeat/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0229-diagnostic-threshold-route/method-selection.json",
+    "methodSelectionId": "method_selection_0f9ba49375d0",
+    "methodId": "diagnostic-accuracy-basic",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

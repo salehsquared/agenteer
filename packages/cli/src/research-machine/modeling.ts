@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { listMlModels, defaultPrimaryMetric } from "./ml/catalog.js";
 import type { MlTaskType } from "./ml/schemas.js";
+import { stableHash } from "./runtime.js";
+import { statsRunMethodForAnalysisMethod } from "./stats/method-map.js";
 import {
   dataStructureSchema,
   outcomeTypeSchema,
@@ -58,6 +60,22 @@ export const modelingDecisionRequestSchema = z.object({
       sampleValues: z.array(z.string()).default([]),
     })),
   }).optional(),
+  backendStatus: z.object({
+    backends: z.array(z.object({
+      id: z.string().min(1),
+      availability: z.enum(["available", "missing", "not_checked"]),
+      version: z.string().nullable().optional(),
+    })),
+  }).optional(),
+  priorRuns: z.array(z.object({
+    path: z.string().min(1).optional(),
+    kind: z.enum(["stats", "ml", "unknown"]),
+    status: z.string().min(1),
+    posture: z.string().min(1).nullable().optional(),
+    methodOrModel: z.string().min(1).nullable().optional(),
+    issueCodes: z.array(z.string().min(1)).default([]),
+    errors: z.array(z.string()).default([]),
+  })).default([]),
   highMissingness: z.boolean().default(false),
   smallSample: z.boolean().default(false),
   requiresInference: z.boolean().default(true),
@@ -105,6 +123,45 @@ export interface ModelingDecisionPlan {
     highDimensional: boolean;
     warnings: MachineIssue[];
   };
+  backendEvidence: {
+    source: "not-supplied" | "machine-status";
+    available: string[];
+    missing: string[];
+    notChecked: string[];
+    warnings: MachineIssue[];
+  };
+  priorRunEvidence: {
+    source: "none" | "prior-run-artifacts";
+    runs: Array<{
+      path: string | null;
+      kind: "stats" | "ml" | "unknown";
+      status: string;
+      posture: string | null;
+      methodOrModel: string | null;
+      issueCodes: string[];
+      action: "promote-local-review" | "rerun-with-binding" | "rerun-survey-aware" | "repair-execution" | "compare-baseline" | "stop-for-validation" | "reject-or-redesign";
+      reason: string;
+    }>;
+    warnings: MachineIssue[];
+    recommendedAction: string;
+  };
+  methodSelectionEvidence: {
+    selectionId: string;
+    selectionHash: string;
+    primaryMethodId: string | null;
+    candidateMethodIds: string[];
+    recommendedBackend: BackendId;
+    recommendedArchetype: string;
+    stopForHumanReview: boolean;
+    issueCodes: string[];
+    applyCommandHint: string | null;
+  };
+  routeRecommendation: {
+    route: "paper-run" | "stats-run" | "ml-run" | "method-select" | "stop-for-review";
+    commandHint: string | null;
+    reason: string;
+    requiredArtifacts: string[];
+  };
   primary: ModelingCandidate | null;
   blockingPolicies: ModelingCandidate[];
   executableCandidates: ModelingCandidate[];
@@ -136,6 +193,8 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
     ...raw,
   });
   const dataEvidence = deriveDataEvidence(request);
+  const backendEvidence = deriveBackendEvidence(request);
+  const priorRunEvidence = derivePriorRunEvidence(request);
   const evidenceAdjustedRequest = {
     ...request,
     rowCount: dataEvidence.rowCount ?? request.rowCount,
@@ -149,7 +208,7 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   const inferredOutcomeType = inferOutcomeType(evidenceAdjustedRequest);
   const inferredStudyDesign = inferStudyDesign(evidenceAdjustedRequest);
   const inferredDataStructures = inferDataStructures(evidenceAdjustedRequest);
-  const issues: MachineIssue[] = [...dataEvidence.warnings];
+  const issues: MachineIssue[] = [...dataEvidence.warnings, ...backendEvidence.warnings, ...priorRunEvidence.warnings];
   if (evidenceAdjustedRequest.image) issues.push(issue("warning", "IMAGE_MODELING_NOT_IN_THIS_PASS", "Image modeling requires a separate computer-vision adapter layer; tabular/statistical planning can only emit a stop-for-review candidate.", ["request.image"]));
   if (evidenceAdjustedRequest.text) issues.push(issue("warning", "TEXT_MODELING_NOT_IN_THIS_PASS", "Text/NLP modeling needs a later text adapter layer; current executable ML support is tabular.", ["request.text"]));
   if (evidenceAdjustedRequest.timeToEvent) issues.push(issue("warning", "SURVIVAL_BACKEND_NOT_YET_EXECUTABLE", "Survival methods can be selected as method contracts, but Cox/random-survival-forest execution is not yet production-ready in Agenteer.", ["request.timeToEvent"]));
@@ -172,6 +231,19 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
     maxCandidates: Math.min(evidenceAdjustedRequest.maxCandidates, 12),
   };
   const methodSelection = selectAnalysisMethods(methodRequest);
+  const methodSelectionEvidence = {
+    selectionId: methodSelection.selectionId,
+    selectionHash: stableHash(methodSelection),
+    primaryMethodId: methodSelection.primary?.method.id ?? null,
+    candidateMethodIds: methodSelection.candidates.map(candidate => candidate.method.id),
+    recommendedBackend: methodSelection.recommendedBackend,
+    recommendedArchetype: methodSelection.recommendedArchetype,
+    stopForHumanReview: methodSelection.stopForHumanReview,
+    issueCodes: methodSelection.issues.map(item => item.code),
+    applyCommandHint: methodSelection.primary
+      ? `agenteer research method-select --question "${request.question.replaceAll('"', "'")}" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json`
+      : null,
+  };
   const methodCandidates = methodSelection.candidates.map((candidate, index) => methodToModelingCandidate(candidate.method, {
     rankBase: index + 1,
     score: candidate.score,
@@ -186,6 +258,7 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   const mlCandidates = buildMlCandidates(evidenceAdjustedRequest, inferredGoal, inferredOutcomeType);
   const workflowCandidates = buildWorkflowPolicyCandidates(evidenceAdjustedRequest, inferredGoal, inferredOutcomeType);
   const candidates = [...methodCandidates, ...mlCandidates, ...workflowCandidates]
+    .map(candidate => applyBackendEvidence(candidate, backendEvidence))
     .map(candidate => ({ ...candidate, score: adjustScore(candidate, evidenceAdjustedRequest, inferredGoal) }))
     .sort((a, b) => {
       const tierDelta = tierWeight(b.tier) - tierWeight(a.tier);
@@ -200,15 +273,29 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   const baselines = candidates.filter(candidate => candidate.tier === "baseline");
   const sensitivityAnalyses = candidates.filter(candidate => candidate.tier === "sensitivity");
   const blocked = !primary || issues.some(issue => issue.severity === "blocker");
+  const routeRecommendation = recommendRoute({
+    request: evidenceAdjustedRequest,
+    inferredGoal,
+    inferredOutcomeType,
+    primary,
+    candidates,
+    blocked,
+    backendEvidence,
+    priorRunEvidence,
+  });
   return {
     schemaVersion: 1,
-    decisionId: `modeling_${stableDecisionHash(JSON.stringify({ request, primary: primary?.id ?? null })).slice(0, 16)}`,
+    decisionId: `modeling_${stableHash({ request, primary: primary?.id ?? null, methodSelectionId: methodSelection.selectionId }).slice(0, 16)}`,
     request: evidenceAdjustedRequest,
     inferredGoal,
     inferredOutcomeType,
     inferredStudyDesign,
     inferredDataStructures,
     dataEvidence,
+    backendEvidence,
+    priorRunEvidence,
+    methodSelectionEvidence,
+    routeRecommendation,
     primary,
     blockingPolicies,
     executableCandidates,
@@ -217,11 +304,142 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
     candidates,
     blocked,
     issues,
-    nextAction: blocked
-      ? "Resolve blocking modeling issues before execution."
-      : primary
-        ? `Promote ${primary.id}; run required feasibility checks, then execute the suggested command or AnalysisSpec-backed runner.`
-        : "Add outcome type, study design, and dataset shape details to choose a model.",
+    nextAction: routeRecommendation.commandHint
+      ? routeRecommendation.commandHint
+      : routeRecommendation.reason,
+  };
+}
+
+function recommendRoute(opts: {
+  request: ModelingDecisionRequest;
+  inferredGoal: ModelingGoal;
+  inferredOutcomeType: OutcomeType;
+  primary: ModelingCandidate | null;
+  candidates: ModelingCandidate[];
+  blocked: boolean;
+  backendEvidence: ModelingDecisionPlan["backendEvidence"];
+  priorRunEvidence: ModelingDecisionPlan["priorRunEvidence"];
+}): ModelingDecisionPlan["routeRecommendation"] {
+  const latestPrior = opts.priorRunEvidence.runs.at(-1);
+  if (latestPrior) {
+    if (latestPrior.action === "rerun-survey-aware") {
+      const hasBackendStatus = opts.backendEvidence.source === "machine-status";
+      const rSurveyAvailable = !hasBackendStatus || opts.backendEvidence.available.includes("r-survey");
+      const pythonLinearizedAvailable = !hasBackendStatus || opts.backendEvidence.available.includes("python-linearized");
+      if (!rSurveyAvailable && !pythonLinearizedAvailable) {
+        return {
+          route: "stop-for-review",
+          commandHint: null,
+          reason: `Prior run posture ${latestPrior.posture} requires survey-aware rerun, but no survey-capable backend is available.`,
+          requiredArtifacts: ["prior-run.json", "machine-status.json", "backend-install-note.md"],
+        };
+      }
+      const backend = rSurveyAvailable ? "r-survey" : "python-linearized";
+      return {
+        route: "paper-run",
+        commandHint: `agenteer research paper-run --analysis-spec <analysis-spec.json> --data-root <dir> --out-dir <paper-dir> --backend ${backend} --json`,
+        reason: `Prior run posture ${latestPrior.posture} requires a survey-aware rerun before inference.`,
+        requiredArtifacts: ["prior-run.json", "analysis-spec.json", "runner-record.json", "lifecycle-summary.md"],
+      };
+    }
+    if (latestPrior.action === "rerun-with-binding") {
+      return {
+        route: "method-select",
+        commandHint: `agenteer research method-select --question "${opts.request.question.replaceAll('"', "'")}" --out method-selection.json --json`,
+        reason: `Prior run posture ${latestPrior.posture} is exploratory; bind method-selection/AnalysisSpec evidence before rerun.`,
+        requiredArtifacts: ["prior-run.json", "method-selection.json", "analysis-spec-v2.json"],
+      };
+    }
+    if (latestPrior.action === "repair-execution") {
+      return {
+        route: "stop-for-review",
+        commandHint: null,
+        reason: `Prior run failed or had invalid binding: ${latestPrior.reason}`,
+        requiredArtifacts: ["prior-run.json", "repair-note.md"],
+      };
+    }
+    if (latestPrior.action === "compare-baseline") {
+      return {
+        route: "ml-run",
+        commandHint: "agenteer research ml-compare --task <task> --model <baseline> --model <candidate> --data <rows.csv> --target <target> --out-dir <ml-compare-dir> --json",
+        reason: `Prior run posture ${latestPrior.posture} requires baseline comparison before stronger prediction claims.`,
+        requiredArtifacts: ["prior-run.json", "comparison.json", "calibration.csv when binary classification"],
+      };
+    }
+    if (latestPrior.action === "stop-for-validation" || latestPrior.action === "reject-or-redesign") {
+      return {
+        route: "stop-for-review",
+        commandHint: null,
+        reason: `Prior run posture ${latestPrior.posture} requires design review: ${latestPrior.reason}`,
+        requiredArtifacts: ["prior-run.json", "validation-design-note.md"],
+      };
+    }
+  }
+  if (opts.request.surveyDesign && opts.request.requiresInference) {
+    const hasBackendStatus = opts.backendEvidence.source === "machine-status";
+    const rSurveyAvailable = !hasBackendStatus || opts.backendEvidence.available.includes("r-survey");
+    const pythonLinearizedAvailable = !hasBackendStatus || opts.backendEvidence.available.includes("python-linearized");
+    if (!rSurveyAvailable && !pythonLinearizedAvailable) {
+      return {
+        route: "stop-for-review",
+        commandHint: null,
+        reason: "Complex survey inference is requested, but supplied backend evidence shows no available survey-capable local backend.",
+        requiredArtifacts: ["machine-status.json", "backend-install-note.md", "analysis-spec.json"],
+      };
+    }
+    const backend = rSurveyAvailable ? "r-survey" : "python-linearized";
+    return {
+      route: "paper-run",
+      commandHint: `agenteer research paper-run --analysis-spec <analysis-spec.json> --data-root <dir> --out-dir <paper-dir> --backend ${backend} --json`,
+      reason: backend === "r-survey"
+        ? "Complex survey inference should use the R survey backend when available."
+        : "Complex survey inference should use the local linearized survey paper runner because R survey is unavailable.",
+      requiredArtifacts: ["analysis-spec.json", "paper.md", "analysis.json", "runner-record.json", "lifecycle-summary.md"],
+    };
+  }
+  if (opts.blocked || !opts.primary) {
+    return {
+      route: "stop-for-review",
+      commandHint: null,
+      reason: "Resolve blocking modeling issues or provide enough data-shape evidence before execution.",
+      requiredArtifacts: ["modeling-plan.json", "review-note.md"],
+    };
+  }
+  if (opts.primary.source === "ml-adapter" || opts.request.requiresPrediction || ["predict", "classify", "discover", "reduce_dimensions"].includes(opts.inferredGoal)) {
+    const task = opts.primary.taskType ?? mlTaskFor(opts.inferredGoal, opts.inferredOutcomeType, opts.request);
+    return {
+      route: "ml-run",
+      commandHint: task
+        ? `agenteer research ml-run --task ${task} --model ${opts.primary.id.replace(/^ml:/, "")} --data <rows.csv> ${task === "clustering" || task === "dimensionality_reduction" ? "" : "--target <target> "}--out-dir <ml-run-dir> --json`.replace(/\s+/g, " ").trim()
+        : "agenteer research ml-models --json",
+      reason: "The selected primary candidate is a prediction/ML adapter.",
+      requiredArtifacts: ["ml-run.json", "model-summary.json", "predictions.csv or transformed.csv"],
+    };
+  }
+  const statsCandidate = opts.primary.commandHint?.includes("research stats-run")
+    ? opts.primary
+    : opts.candidates.find(candidate => candidate.compatible && candidate.commandHint?.includes("research stats-run"));
+  if (statsCandidate?.commandHint) {
+    return {
+      route: "stats-run",
+      commandHint: statsCandidate.commandHint,
+      reason: `${statsCandidate.id} is executable by the standard-table statistics runner.`,
+      requiredArtifacts: ["stats-run.json", "estimates.csv", "diagnostics.json", "stats-report.md", "stats-qa.json"],
+    };
+  }
+  if (opts.primary.commandHint) {
+    return {
+      route: "method-select",
+      commandHint: opts.primary.commandHint,
+      reason: "The selected method needs method-selection or AnalysisSpec promotion before execution.",
+      requiredArtifacts: ["method-selection.json", "analysis-spec-v2.json", "execution-contract.json"],
+    };
+  }
+  return {
+    route: "stop-for-review",
+    commandHint: null,
+    reason: "The selected candidate is not executable in the current runner set.",
+    requiredArtifacts: ["review-note.md"],
   };
 }
 
@@ -235,7 +453,8 @@ function buildMlCandidates(request: ModelingDecisionRequest, goal: ModelingGoal,
     const idRank = preferred.indexOf(model.id);
     const isPreferred = idRank >= 0;
     const baseline = baselineMlIds(task).includes(model.id);
-    const tier: ModelingCandidate["tier"] = baseline ? "baseline" : isPreferred ? "primary" : "sensitivity";
+    const capacityDowngraded = isHighCapacityMlId(model.id) && (request.smallSample || request.highMissingness);
+    const tier: ModelingCandidate["tier"] = baseline ? "baseline" : capacityDowngraded ? "sensitivity" : isPreferred ? "primary" : "sensitivity";
     const reasons = [
       `${model.label} supports ${task}.`,
       baseline ? "Useful as a transparent baseline before stronger models." : isPreferred ? "Matches the requested prediction/modeling shape." : "Useful comparator or sensitivity model.",
@@ -361,6 +580,111 @@ function deriveDataEvidence(request: ModelingDecisionRequest): ModelingDecisionP
   };
 }
 
+function deriveBackendEvidence(request: ModelingDecisionRequest): ModelingDecisionPlan["backendEvidence"] {
+  if (!request.backendStatus) {
+    return { source: "not-supplied", available: [], missing: [], notChecked: [], warnings: [] };
+  }
+  const available = request.backendStatus.backends.filter(backend => backend.availability === "available").map(backend => backend.id);
+  const missing = request.backendStatus.backends.filter(backend => backend.availability === "missing").map(backend => backend.id);
+  const notChecked = request.backendStatus.backends.filter(backend => backend.availability === "not_checked").map(backend => backend.id);
+  return {
+    source: "machine-status",
+    available,
+    missing,
+    notChecked,
+    warnings: missing.map(id => issue("warning", "BACKEND_UNAVAILABLE_FOR_MODELING", `${id} is missing in supplied backend status and should not be selected as an executable route.`, [id])),
+  };
+}
+
+function derivePriorRunEvidence(request: ModelingDecisionRequest): ModelingDecisionPlan["priorRunEvidence"] {
+  if (request.priorRuns.length === 0) {
+    return {
+      source: "none",
+      runs: [],
+      warnings: [],
+      recommendedAction: "No prior run evidence supplied.",
+    };
+  }
+  const runs = request.priorRuns.map(run => {
+    const posture = run.posture ?? null;
+    const failed = run.status === "failed" || posture === "failed";
+    const surveyBlocked = posture === "blocked_survey_required" || run.issueCodes.includes("SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER");
+    const invalidBinding = posture === "invalid_binding" || run.issueCodes.some(code => code.includes("BINDING") || code.includes("MISMATCH"));
+    const optionalMissing = posture === "optional_dependency_missing";
+    const exploratoryBound = posture === "exploratory_standard_table" || posture === "exploratory_prediction";
+    const locallyValidated = posture === "locally_validated_prediction";
+    const exploratoryUnsupervised = posture === "exploratory_unsupervised";
+    if (surveyBlocked) {
+      return priorRunAction(run, "rerun-survey-aware", "Prior standard-table run was blocked because complex-survey variance is required.");
+    }
+    if (invalidBinding) {
+      return priorRunAction(run, "repair-execution", "Prior run has invalid or mismatched method/spec binding.");
+    }
+    if (optionalMissing) {
+      return priorRunAction(run, "compare-baseline", "Prior ML candidate requires a missing optional dependency; compare available baselines or install the backend.");
+    }
+    if (failed) {
+      return priorRunAction(run, "repair-execution", "Prior run failed before producing locally reviewable results.");
+    }
+    if (exploratoryBound) {
+      return priorRunAction(run, "rerun-with-binding", "Prior run is exploratory and needs method/spec binding before stronger claims.");
+    }
+    if (locallyValidated) {
+      return priorRunAction(run, "stop-for-validation", "Prior ML run supports local review only; external/temporal validation design is required before stronger claims.");
+    }
+    if (exploratoryUnsupervised) {
+      return priorRunAction(run, "reject-or-redesign", "Prior unsupervised run needs stability and domain-plausibility review before it can be treated as a finding.");
+    }
+    return priorRunAction(run, "promote-local-review", "Prior run has no blocking posture; use it only for local review unless stronger validation artifacts exist.");
+  });
+  const warnings = runs.map(run => issue(
+    run.action === "promote-local-review" ? "note" : "warning",
+    "PRIOR_RUN_POSTURE_REQUIRES_PLANNING_RESPONSE",
+    `${run.kind} prior run ${run.path ?? "(inline)"} posture=${run.posture ?? "(missing)"} action=${run.action}.`,
+    run.path ? [run.path] : ["priorRuns"],
+  ));
+  return {
+    source: "prior-run-artifacts",
+    runs,
+    warnings,
+    recommendedAction: runs.at(-1)?.reason ?? "No prior run action derived.",
+  };
+}
+
+function priorRunAction(
+  run: ModelingDecisionRequest["priorRuns"][number],
+  action: ModelingDecisionPlan["priorRunEvidence"]["runs"][number]["action"],
+  reason: string,
+): ModelingDecisionPlan["priorRunEvidence"]["runs"][number] {
+  return {
+    path: run.path ?? null,
+    kind: run.kind,
+    status: run.status,
+    posture: run.posture ?? null,
+    methodOrModel: run.methodOrModel ?? null,
+    issueCodes: run.issueCodes,
+    action,
+    reason,
+  };
+}
+
+function applyBackendEvidence(candidate: ModelingCandidate, evidence: ModelingDecisionPlan["backendEvidence"]): ModelingCandidate {
+  if (evidence.source !== "machine-status") return candidate;
+  const backend = String(candidate.backend);
+  if (backend === "manual-review") return candidate;
+  if (evidence.available.includes(backend) || evidence.notChecked.includes(backend)) return candidate;
+  if (!evidence.missing.includes(backend)) return candidate;
+  return {
+    ...candidate,
+    compatible: false,
+    tier: candidate.tier === "primary" ? "sensitivity" : candidate.tier,
+    score: Math.min(candidate.score, 0.38),
+    reasons: [...candidate.reasons, `Downgraded because backend ${backend} is missing in supplied machine status.`],
+    cautions: [...candidate.cautions, issue("warning", "CANDIDATE_BACKEND_MISSING", `${candidate.id} requires missing backend ${backend}.`, [backend])],
+    commandHint: null,
+  };
+}
+
 function methodToModelingCandidate(method: AnalysisMethod, opts: {
   rankBase: number;
   score: number;
@@ -375,6 +699,8 @@ function methodToModelingCandidate(method: AnalysisMethod, opts: {
   const compatible = method.implementationStatus === "executable" || method.implementationStatus === "contract-ready";
   const backend = preferredBackend(method, opts.request);
   const tier = inferMethodTier(method, opts.inferredGoal, opts.inferredOutcomeType);
+  const statsMethod = statsRunMethodForAnalysisMethod(method.id);
+  const statsRunAllowed = Boolean(statsMethod) && !opts.request.surveyDesign;
   return {
     id: `method:${method.id}`,
     rank: opts.rankBase,
@@ -395,11 +721,28 @@ function methodToModelingCandidate(method: AnalysisMethod, opts: {
     ],
     requiredBeforeExecution: [...new Set([...method.requiredFields, ...method.diagnostics, ...opts.requiredBeforeExecution])].slice(0, 12),
     expectedMetrics: method.effectMeasures,
-    expectedArtifacts: method.artifactExpectations,
-    commandHint: method.implementationStatus === "executable" || method.implementationStatus === "contract-ready"
-      ? `agenteer research method-select --question "${opts.request.question.replaceAll('"', "'")}" --json`
-      : null,
+    expectedArtifacts: statsRunAllowed
+      ? [...new Set([...method.artifactExpectations, "stats-run.json", "estimates.csv", "diagnostics.json", "stats-report.md", "stats-qa.json"])]
+      : method.artifactExpectations,
+    commandHint: statsRunAllowed
+      ? statsRunCommandHint(statsMethod!, method.id)
+      : method.implementationStatus === "executable" || method.implementationStatus === "contract-ready"
+        ? `agenteer research method-select --question "${opts.request.question.replaceAll('"', "'")}" --json`
+        : null,
   };
+}
+
+function statsRunCommandHint(statsMethod: string, methodId: string): string {
+  const shared = `agenteer research stats-run --method ${statsMethod} --data <rows.csv> --out-dir <out>`;
+  if (statsMethod === "descriptive") return `${shared} --variable <column>`;
+  if (statsMethod === "t-test" || statsMethod === "mann-whitney") return `${shared} --outcome <continuous-outcome> --group <binary-group>`;
+  if (statsMethod === "chi-square" || statsMethod === "fisher-exact") return `${shared} --outcome <categorical-outcome> --exposure <categorical-exposure>`;
+  if (statsMethod === "pearson" || statsMethod === "spearman") return `${shared} --outcome <continuous-outcome> --exposure <continuous-exposure>`;
+  if (statsMethod === "linear-regression") return `${shared} --outcome <continuous-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (statsMethod === "logistic-regression") return `${shared} --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (statsMethod === "poisson-regression") return `${shared} --outcome <count-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (statsMethod === "diagnostic-accuracy") return `${shared} --outcome <binary-reference-standard> --exposure <binary-index-test>`;
+  return `${shared} # selected from ${methodId}`;
 }
 
 function policyCandidate(id: string, label: string, tier: ModelingCandidate["tier"], score: number, reasons: string[], required: string[]): ModelingCandidate {
@@ -564,13 +907,4 @@ function tierWeight(tier: ModelingCandidate["tier"]): number {
 
 function issue(severity: MachineIssue["severity"], code: string, message: string, evidenceRefs: string[]): MachineIssue {
   return { severity, code, message, evidenceRefs };
-}
-
-function stableDecisionHash(value: string): string {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i++) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return Math.abs(hash >>> 0).toString(16).padStart(8, "0");
 }

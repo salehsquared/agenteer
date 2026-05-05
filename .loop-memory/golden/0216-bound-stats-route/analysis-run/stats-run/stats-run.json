@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_835592593248399865",
+  "method": "t-test",
+  "status": "succeeded",
+  "rowCount": 120,
+  "completeCaseN": 120,
+  "variables": [
+    "systolic_bp",
+    "sodium_high"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "sodium_high",
+      "group_a": 1,
+      "group_b": 0,
+      "n_a": 80,
+      "n_b": 40,
+      "mean_a": 151.912375,
+      "mean_b": 145.63575,
+      "mean_difference": -6.276624999999996,
+      "cohen_d": -1.484448264136767,
+      "statistic": -7.622016664679616,
+      "p_value": 5.441476706924364e-11
+    }
+  ],
+  "diagnostics": {
+    "test": "Welch two-sample t-test",
+    "equal_variance_assumed": false
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run/stats-config.json",
+      "sha256": "01fba9d70771dc8bf23f1568767b2d6b5f4ee85cc2e096a4a76da2656dca4bf8"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run/stats-summary.json",
+      "sha256": "64a9f3d4a6938b80d973df2d175bece9f1a694d4eb7ce6ec94f560f911dd0568"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run/estimates.csv",
+      "sha256": "0a81f66cca081da3208bca2ac76eefd852d25b820ac1a2a8adf3e57cde35c502"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run/diagnostics.json",
+      "sha256": "0c4bb18d7270895406064f265fa75f74b2f1d3a539baf7309950e160c51b2392"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run/stats-report.md",
+      "sha256": "db81bb12f2b89eecd2f2ce25192bbcc0366722f87f283b215b0eb7c263179489"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run/stats-qa.json",
+      "sha256": "102d742b6e1b1f72640ece2c840fd07d3f95e392fa7e0668abb1e1ea64695138"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/analysis-run/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0216-bound-stats-route/method-selection.json",
+    "methodSelectionId": "method_selection_a26b5ab15a39",
+    "methodId": "two-sample-t-test",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}
