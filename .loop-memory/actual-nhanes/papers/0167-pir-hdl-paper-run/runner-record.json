@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "paperRunnerRecord": {
+    "schemaVersion": 1,
+    "recordType": "agenteer.research.paper-runner-record",
+    "paperId": "0167-pir-hdl-paper-run",
+    "status": "succeeded",
+    "generatedAtIso": "2026-05-05T06:56:55.949Z",
+    "runner": {
+      "kind": "local-python-complex-survey-linearized",
+      "commandSummary": "Executed AnalysisSpec through research paper-run with local survey-aware linearized variance runner."
+    },
+    "analysisSpec": {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+      "specHash": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae",
+      "artifactHash": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae",
+      "binding": "spec-governed"
+    },
+    "inputs": [
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+        "bytes": 611124,
+        "sha256": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+        "bytes": 1476850,
+        "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/lipids/lipids.parquet",
+        "bytes": 391132,
+        "sha256": "ea1e3417bb06b804c1dd5969806f16761df27b043b16b1b7c1e105a1b23f97d4"
+      }
+    ],
+    "outputs": [
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/paper-runner.py",
+        "bytes": 15120,
+        "sha256": "5786fc8977ccedaaf80b986f0ee8971c227a6c36775e4ae5ef3d5f92c6b4b607"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/runner-config.json",
+        "bytes": 353,
+        "sha256": "e234af721ef61cc53168ef6ac90d1914bf0ce57d4576137f5f5510ac22304420"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+        "bytes": 1682,
+        "sha256": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/analysis.json",
+        "bytes": 3896,
+        "sha256": "db16a252208ebcfd43bafffc87521cd2b14329aa7659b84242196502e72b744f"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/paper.md",
+        "bytes": 3704,
+        "sha256": "c42c3fdfcbd6784f4974e46a4cfde007a511222d2aaf539ab71f323971621996"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/qa-cli.json",
+        "bytes": 4982,
+        "sha256": "812c37c6354c960250b8357098a5a4952c3d07b950f5bcc7eb3a8e5d96e4e7f0"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/critique.md",
+        "bytes": 423,
+        "sha256": "47057ff8e090f02dd8b904e8d6b17c42b03e73c5ec0359070b709910b2cb31b4"
+      }
+    ],
+    "methods": {
+      "weighting": "AnalysisSpec survey weight with strata/PSU linearized sandwich variance",
+      "variance": "strata/PSU linearized sandwich variance for weighted linear regression",
+      "population": "RIDAGEYR >= 20; complete INDFMPIR, LBDHDD, WTMEC2YR, SDMVSTRA, SDMVPSU, RIAGENDR, RIDRETH1"
+    },
+    "warnings": [],
+    "nextAction": "Run paper-qa and include this runner record in the paper index or golden manifest."
+  }
+}

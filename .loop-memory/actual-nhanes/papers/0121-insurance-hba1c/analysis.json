@@ -1,0 +1,94 @@
+{
+  "paperId": "0121-insurance-hba1c",
+  "title": "Health insurance coverage and HbA1c in NHANES adults",
+  "dataRelease": "nhanes-v1-20260430 local cached MedBrevia curated Parquet",
+  "exposure": {
+    "name": "uninsured status",
+    "variable": "HIQ011",
+    "definition": "HIQ011 == 2 versus HIQ011 == 1; refused/don't know/missing excluded"
+  },
+  "outcome": {
+    "name": "HbA1c percent",
+    "variable": "LBXGH",
+    "definition": "continuous HbA1c percent among adults"
+  },
+  "thresholds": {
+    "elevatedA1c": "LBXGH >= 6.5% sensitivity threshold; single NHANES lab value, not a clinical diagnosis by itself"
+  },
+  "rowCounts": {
+    "adultMerged": 33518,
+    "completeCaseEligible": 21653,
+    "insuredCompleteCase": 17428,
+    "uninsuredCompleteCase": 4225,
+    "elevatedA1cCompleteCase": 2644
+  },
+  "missingnessAdultMerged": {
+    "HIQ011": 0.0,
+    "LBXGH": 0.10027447938421147,
+    "DIQ010": 0.0,
+    "WTMEC2YR": 0.2891878990393222
+  },
+  "weights": {
+    "weight": "WTMEC2YR",
+    "strata": "SDMVSTRA",
+    "psu": "SDMVPSU",
+    "implementation": "normalized approximate frequency weight; full NHANES complex survey variance not implemented"
+  },
+  "model": {
+    "type": "weighted approximate linear regression",
+    "covariates": [
+      "uninsured",
+      "age_10",
+      "female",
+      "race_1",
+      "race_2",
+      "race_4",
+      "race_5"
+    ],
+    "uninsuredMeanDifferenceHbA1cPercent": 0.04895141756769798,
+    "ci95": [
+      0.015015471001547327,
+      0.08288736413384865
+    ],
+    "pValue": 0.004699543685999099
+  },
+  "sensitivityModel": {
+    "type": "weighted approximate logistic GLM",
+    "effect": "uninsured odds ratio for LBXGH >= 6.5%",
+    "oddsRatio": 1.0227539223006334,
+    "ci95": [
+      0.8762943208389692,
+      1.1936920743476453
+    ],
+    "pValue": 0.7753938230401385
+  },
+  "groupSummary": [
+    {
+      "group": "insured",
+      "n": 17428,
+      "weightedMeanHbA1c": 5.651002431369965,
+      "weightedElevatedA1cPercent": 9.267233052757733,
+      "selfReportedDiabetesPercent": 11.13197608211729
+    },
+    {
+      "group": "uninsured",
+      "n": 4225,
+      "weightedMeanHbA1c": 5.607991220941554,
+      "weightedElevatedA1cPercent": 6.790939790618548,
+      "selfReportedDiabetesPercent": 6.094026812442551
+    }
+  ],
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Insurance coverage is self-reported and does not directly measure care quality or medication access.",
+    "A single HbA1c value >=6.5% is a threshold finding in this artifact, not an NHANES clinical diagnosis.",
+    "Approximate weighting only; full NHANES complex survey variance not implemented.",
+    "Complete-case analysis may induce selection bias."
+  ],
+  "sources": [
+    "https://diabetes.org/about-diabetes/diagnosis",
+    "https://www.niddk.nih.gov/health-information/professionals/clinical-tools-patient-management/diabetes/diabetes-prediabetes",
+    "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+    "https://pubmed.ncbi.nlm.nih.gov/41040761/"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "capabilityId": "research.runner.provenance",
+  "description": "Create hashed runner provenance for local research paper inputs, outputs, methods, and AnalysisSpec binding.",
+  "inputSchema": {
+    "type": "object",
+    "required": ["paperId", "inputs", "outputs"],
+    "properties": {
+      "paperId": { "type": "string" },
+      "inputs": { "type": "array" },
+      "outputs": { "type": "array" },
+      "analysisSpecBinding": { "type": "string" }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["status", "inputs", "outputs", "analysisSpec"],
+    "properties": {
+      "status": { "type": "string" },
+      "inputs": { "type": "array" },
+      "outputs": { "type": "array" },
+      "analysisSpec": { "type": "object" },
+      "warnings": { "type": "array" }
+    }
+  },
+  "permissionsRequired": ["read-local-nhanes-cache", "write-loop-memory-paper-artifacts"],
+  "failureTypes": ["missing_input_artifact", "missing_output_artifact", "hash_mismatch", "retrospective_spec_binding"],
+  "costProfile": { "maxUsd": 0, "maxRuntimeSeconds": 120, "maxModelCalls": 0 },
+  "source": "/Users/saleh/TechProjects/agenteer/.loop-memory/capabilities/research-paper-v1/research.runner.provenance.json",
+  "interopShape": "local"
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "recordType": "agenteer.research.paper-runner-record",
+  "paperId": "0108-vitamin-d-bp",
+  "status": "retrospective_succeeded",
+  "generatedAtIso": "2026-05-03T18:47:16Z",
+  "runner": {
+    "kind": "retrospective-local-python-run-record",
+    "python": "/Users/saleh/WebstormProjects/medbrevia_v3/.venv-analytics-pilot/bin/python3",
+    "pythonVersion": "3.12.5 (v3.12.5:ff3bc82f7c9, Aug  7 2024, 05:32:06) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "packages": {
+      "pandas": "2.2.3",
+      "numpy": "2.2.1",
+      "statsmodels": "0.14.4"
+    }
+  },
+  "commandSummary": "Retrospective runner provenance backfill for a previously generated actual-NHANES paper; records the local curated Parquet inputs, generated outputs, and approximate survey-variance method.",
+  "inputs": [
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+      "bytes": 1476850,
+      "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/vitamin_d/vitamin_d.parquet",
+      "bytes": 270965,
+      "sha256": "1d3bbc6f5ec757676c85f0cdfc6b63b9d11f72f41f2df6b99833c7ea11ff82f4"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/blood_pressure/blood_pressure.parquet",
+      "bytes": 580100,
+      "sha256": "41f602ad271599b590f0f51b6f27e2eee97b7b2d143db83d8278b801f82c1747"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0108-vitamin-d-bp/analysis.json",
+      "bytes": 2950,
+      "sha256": "9ac1f2e738b9fe51af4cdf1db8a9e91931c221cfffccf4f0ced520aa638d04c4"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0108-vitamin-d-bp/paper.md",
+      "bytes": 6907,
+      "sha256": "f488f427635746fd086bec1a65960f11cf055405636a50362eecc37100836f4d"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0108-vitamin-d-bp/critique.md",
+      "bytes": 1102,
+      "sha256": "a9a81fadb7b932565649ba870aec04df0bb77060f03c906787e9374f3fd498e3"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0108-vitamin-d-bp/qa-cli.json",
+      "bytes": 3483,
+      "sha256": "062ec1c839fae89f553046cedf402073cb5eec8171fae86ba0ed53826eaa5eca"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0108-vitamin-d-bp/qa-numeric-cli.json",
+      "bytes": 5433,
+      "sha256": "32d5143c143f405586c3204da88f32289ae3bee094b13749353e51a899c55298"
+    }
+  ],
+  "methods": {
+    "weighting": "WTMEC2YR used as normalized frequency weights in approximate GLM; strata/PSU variance not fully implemented",
+    "variance": "full NHANES strata/PSU variance not implemented",
+    "dataRelease": "nhanes-v1-20260430 local MedBrevia curated Parquet cache"
+  },
+  "limitations": [
+    "Retrospective record created after the paper run; it binds inputs/outputs but does not preserve the original executable script.",
+    "Full NHANES complex survey variance is not implemented in these paper artifacts."
+  ],
+  "schemaFindings": [
+    "analysis.weights was not consistently shaped across papers; runner-record backfill normalized it to text."
+  ]
+}

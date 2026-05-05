@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "recordType": "agenteer.research.paper-runner-record",
+  "paperId": "0111-smoking-hdl",
+  "status": "retrospective_succeeded",
+  "generatedAtIso": "2026-05-03T18:47:16Z",
+  "runner": {
+    "kind": "retrospective-local-python-run-record",
+    "python": "/Users/saleh/WebstormProjects/medbrevia_v3/.venv-analytics-pilot/bin/python3",
+    "pythonVersion": "3.12.5 (v3.12.5:ff3bc82f7c9, Aug  7 2024, 05:32:06) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "packages": {
+      "pandas": "2.2.3",
+      "numpy": "2.2.1",
+      "statsmodels": "0.14.4"
+    }
+  },
+  "commandSummary": "Retrospective runner provenance backfill for a previously generated actual-NHANES paper; records the local curated Parquet inputs, generated outputs, and approximate survey-variance method.",
+  "inputs": [
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+      "bytes": 1476850,
+      "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/smoking/smoking.parquet",
+      "bytes": 268585,
+      "sha256": "63f566062e7c837e8cf4d47c858a009a46a00a5cd4cc634341faa10197db16e9"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/lipids/lipids.parquet",
+      "bytes": 391132,
+      "sha256": "ea1e3417bb06b804c1dd5969806f16761df27b043b16b1b7c1e105a1b23f97d4"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0111-smoking-hdl/analysis.json",
+      "bytes": 2632,
+      "sha256": "b42b4f7f9a6d837b7aa6dcf00ce9c5be8d936e7c12ba8b422dbf0c11379baeb1"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0111-smoking-hdl/paper.md",
+      "bytes": 6246,
+      "sha256": "3ea5826ef48cd209a00456a2f9f9d8990d6c60b633408998de24136d17eaa240"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0111-smoking-hdl/critique.md",
+      "bytes": 1011,
+      "sha256": "8a6edb338e2d10b141b3a61b8645bfa86e38ce48271cb9715e8a9e39eba6a06b"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0111-smoking-hdl/qa-cli.json",
+      "bytes": 3481,
+      "sha256": "5957a44be40303a596aaa85d94d222a2691782a05dd7a6ff98f50fd17ac4b9a8"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0111-smoking-hdl/qa-numeric-cli.json",
+      "bytes": 4972,
+      "sha256": "cefb09945ceddc1d058e193cabfd09ba59f7ca2432fef7d8f60cdb3568f4874e"
+    }
+  ],
+  "methods": {
+    "weighting": "WTMEC2YR used as normalized WLS weights; strata/PSU variance not fully implemented",
+    "variance": "full NHANES strata/PSU variance not implemented",
+    "dataRelease": null
+  },
+  "limitations": [
+    "Retrospective record created after the paper run; it binds inputs/outputs but does not preserve the original executable script.",
+    "Full NHANES complex survey variance is not implemented in these paper artifacts."
+  ],
+  "schemaFindings": [
+    "analysis.weights was not consistently shaped across papers; runner-record backfill normalized it to text."
+  ]
+}

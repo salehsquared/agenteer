@@ -1,4 +1,5 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -8,16 +9,31 @@ import {
   renderResearchQuestions,
   renderResearchScoutPlan,
   renderResearchApproval,
+  renderResearchApprovalVerification,
+  renderResearchApprovalVerificationJson,
   renderResearchAnalysisResult,
   renderResearchArtifactManifest,
   renderResearchArtifactManifestJson,
+  renderResearchManifestVerification,
+  renderResearchManifestVerificationJson,
   renderResearchLoopStatus,
   renderResearchLoopStatusJson,
   renderResearchLoopNote,
+  renderResearchLoopNoteJson,
+  renderResearchCycleAudit,
+  renderResearchCycleAuditJson,
   renderResearchRunnerSpec,
   renderResearchPacketExport,
   renderResearchPacketSummary,
   renderResearchPacketSummaryJson,
+  renderResearchPacketNext,
+  renderResearchPacketNextJson,
+  renderResearchNavigationTrace,
+  renderResearchNavigationTraceJson,
+  renderResearchPacketVerification,
+  renderResearchPacketVerificationJson,
+  renderResearchPacketReadiness,
+  renderResearchPacketReadinessJson,
   renderResearchMethodsFramework,
   renderResearchMethodsFrameworkJson,
   renderResearchMethodsValidation,
@@ -50,6 +66,8 @@ import {
   renderResearchRealStudyReadinessJson,
   renderResearchDataAccessManifest,
   renderResearchDataAccessManifestJson,
+  renderResearchDataAccessRedaction,
+  renderResearchDataAccessRedactionJson,
   renderResearchRealLocalRunnerSpec,
   renderResearchRealLocalRunnerSpecJson,
   renderResearchRealStudyChecklist,
@@ -78,21 +96,84 @@ import {
   renderResearchQuestionBankJson,
   renderResearchQuestionReadiness,
   renderResearchQuestionReadinessJson,
+  renderResearchProtocolCandidates,
+  renderResearchProtocolCandidatesJson,
+  renderResearchProtocolSteer,
+  renderResearchProtocolSteerJson,
+  renderResearchProtocolPromotion,
+  renderResearchProtocolPromotionJson,
+  renderResearchProtocolEdit,
+  renderResearchProtocolEditJson,
+  renderResearchAnalysisSpec,
+  renderResearchAnalysisSpecJson,
+  renderResearchCohortScoutFile,
+  renderResearchCohortScoutFileJson,
+  renderResearchSemanticQuality,
+  renderResearchSemanticQualityJson,
+  renderResearchProgress,
+  renderResearchProgressJson,
+  renderResearchJobLifecycle,
+  renderResearchJobLifecycleJson,
+  renderResearchRepairPlan,
+  renderResearchRepairPlanJson,
+  renderResearchAgentExecutionRecord,
+  renderResearchAgentExecutionRecordJson,
+  renderResearchWorkflowMemory,
+  renderResearchWorkflowMemoryJson,
+  renderResearchUncertaintyBudget,
+  renderResearchUncertaintyBudgetJson,
+  renderResearchDatasetCandidate,
+  renderResearchDatasetCandidateJson,
+  renderResearchImprovementAgenda,
+  renderResearchImprovementAgendaJson,
+  renderResearchClaimGuard,
+  renderResearchClaimGuardJson,
+  renderResearchBackendStatus,
+  renderResearchBackendStatusJson,
+  renderResearchPaperIndex,
+  renderResearchPaperIndexJson,
+  renderResearchPaperLifecycle,
+  renderResearchPaperLifecycleJson,
+  renderResearchPaperQa,
+  renderResearchPaperQaJson,
+  renderResearchPaperRunnerRecord,
+  renderResearchPaperRunnerRecordJson,
+  renderResearchBenchmark,
+  renderResearchBenchmarkJson,
+  renderResearchBenchmarkRun,
+  renderResearchBenchmarkRunJson,
+  renderResearchBenchmarkScore,
+  renderResearchBenchmarkScoreJson,
+  renderResearchBenchmarkSuite,
+  renderResearchBenchmarkSuiteJson,
+  renderResearchTableSummary,
+  renderResearchTableSummaryJson,
   renderResearchSchemaInference,
   renderResearchSchemaInferenceJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
+  renderResearchStageArtifacts,
+  renderResearchStageArtifactsJson,
+  renderResearchStageGate,
+  renderResearchStageGateJson,
   renderResearchCheckpoint,
   renderResearchCheckpointJson,
   renderResearchReportReview,
   renderResearchReportReviewJson,
   researchAnalyzeLocalCommand,
   researchArtifactManifestCommand,
+  researchManifestVerifyCommand,
+  researchApprovalVerifyCommand,
   researchLoopStatusCommand,
   researchLoopNoteCommand,
+  researchCycleAuditCommand,
   researchRunnerSpecCommand,
   researchExportPacketCommand,
   researchPacketSummaryCommand,
+  researchPacketNextCommand,
+  researchNavigationTraceCommand,
+  researchPacketVerifyCommand,
+  researchPacketReadinessCommand,
   researchMethodsFrameworkCommand,
   researchValidateMethodsCommand,
   researchRegistryInspectCommand,
@@ -109,6 +190,7 @@ import {
   researchSimulateStudyCommand,
   researchRealStudyReadinessCommand,
   researchDataAccessManifestCommand,
+  researchDataAccessRedactCommand,
   researchRealLocalRunnerSpecCommand,
   researchRealStudyChecklistCommand,
   researchAdapterGapReportCommand,
@@ -123,8 +205,37 @@ import {
   researchCostLedgerCommand,
   researchQuestionBankCommand,
   researchQuestionReadinessCommand,
+  researchProtocolCandidatesCommand,
+  researchProtocolSteerCommand,
+  researchProtocolPromoteCommand,
+  researchProtocolEditCommand,
+  researchAnalysisSpecCommand,
+  researchCohortScoutFileCommand,
+  researchSemanticQualityCommand,
+  researchProgressCommand,
+  researchJobLifecycleCommand,
+  researchRepairPlanCommand,
+  researchAgentExecutionRecordCommand,
+  researchWorkflowMemoryCommand,
+  researchUncertaintyBudgetCommand,
+  researchDatasetCandidateCommand,
+  researchImprovementAgendaCommand,
+  researchClaimGuardCommand,
+  researchBackendStatusCommand,
+  researchPaperIndexCommand,
+  researchPaperLifecycleCommand,
+  researchPaperQaCommand,
+  researchPaperRerunStabilityCommand,
+  researchPaperRunnerRecordCommand,
+  researchBenchmarkRegisterCommand,
+  researchBenchmarkRunCommand,
+  researchBenchmarkScoreCommand,
+  researchBenchmarkSuiteCommand,
+  researchTableSummaryCommand,
   researchInferSchemaCommand,
   researchPipelineStagesCommand,
+  researchStageArtifactsCommand,
+  researchStageGateCommand,
   researchApprovePacketCommand,
   researchCheckpointCommand,
   researchCritiquePacketCommand,
@@ -165,6 +276,53 @@ describe("researchDesignCommand", () => {
       expect(renderResearchQuestions(questions)).toContain("Research question candidates");
     } finally {
       await rm(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("reports local analysis backend readiness without requiring real runtimes in tests", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-backend-status-"));
+    try {
+      const fakePython = path.join(dir, "fake-python");
+      const fakeRscript = path.join(dir, "fake-Rscript");
+      await writeFile(fakePython, `#!/bin/sh
+cat <<'JSON'
+{"version":"3.12.0","packages":{"numpy":"2.0.0","pandas":"2.2.0","pyarrow":"16.0.0","statsmodels":"0.14.0","duckdb":"1.0.0","polars":"1.0.0"}}
+JSON
+`);
+      await writeFile(fakeRscript, `#!/bin/sh
+cat <<'JSON'
+{"version":"4.4.0","packages":{"survey":"4.4","srvyr":"1.2","gtsummary":"2.0","arrow":"16.0","jsonlite":"1.8","dplyr":"1.1","broom":"1.0"}}
+JSON
+`);
+      await chmod(fakePython, 0o755);
+      await chmod(fakeRscript, 0o755);
+
+      const status = await researchBackendStatusCommand({ python: fakePython, rscript: fakeRscript });
+      const parsed = JSON.parse(renderResearchBackendStatusJson(status)) as {
+        backendStatus: { backends: Array<{ id: string; status: string }> };
+      };
+
+      expect(status.backends.map(backend => backend.status)).toEqual(["available", "available", "available"]);
+      expect(status.recommendedDefault).toContain("r-survey");
+      expect(renderResearchBackendStatus(status)).toContain("duckdb-polars");
+      expect(parsed.backendStatus.backends.find(backend => backend.id === "r-survey")?.status).toBe("available");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("reports missing optional analysis backends as status instead of throwing", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-backend-missing-"));
+    try {
+      const status = await researchBackendStatusCommand({
+        python: path.join(dir, "missing-python"),
+        rscript: path.join(dir, "missing-Rscript"),
+      });
+
+      expect(status.backends.map(backend => backend.status)).toEqual(["missing", "missing", "missing"]);
+      expect(status.nextAction).toContain("Install");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
     }
   });
 
@@ -233,6 +391,52 @@ describe("researchDesignCommand", () => {
     expect(result.requiredMethods).toContain("strobe");
     expect(renderResearchQuestionDecomposition(result)).toContain("research question decomposition");
     expect(parsed.schemaVersion).toBe(1);
+  });
+
+  it("decomposes plural exposure association questions", () => {
+    const result = researchDecomposeQuestionCommand("Among adults, are self-reported sleep problems associated with measured hypertension in survey data?");
+
+    expect(result.exposureOrPredictor).toBe("self-reported sleep problems");
+    expect(result.outcome).toBe("measured hypertension");
+    expect(result.clarificationPrompts).not.toContain("Specify the primary exposure, predictor, or grouping variable.");
+  });
+
+  it("separates explicit comparators from exposure phrases", () => {
+    const result = researchDecomposeQuestionCommand("Among adults with hypertension, are home blood pressure monitors versus usual care associated with better blood pressure control?");
+    const estimand = researchEstimandSketchCommand("Among adults with hypertension, are home blood pressure monitors versus usual care associated with better blood pressure control?");
+
+    expect(result.exposureOrPredictor).toBe("home blood pressure monitors");
+    expect(result.comparatorOrReference).toBe("usual care");
+    expect(estimand.contrast).toBe("home blood pressure monitors versus usual care");
+    expect(renderResearchQuestionDecomposition(result)).toContain("comparator/reference: usual care");
+  });
+
+  it("extracts temporal constraints from cohort and outcome phrasing", () => {
+    const result = researchDecomposeQuestionCommand("Among adults diagnosed with diabetes before 2010, is baseline A1c associated with kidney disease within five years?");
+    const estimand = researchEstimandSketchCommand("Among adults diagnosed with diabetes before 2010, is baseline A1c associated with kidney disease within five years?");
+
+    expect(result.temporalConstraints).toEqual(expect.arrayContaining(["baseline", "before 2010", "within five years"]));
+    expect(estimand.temporalConstraints).toEqual(expect.arrayContaining(["baseline", "before 2010", "within five years"]));
+    expect(renderResearchEstimandSketch(estimand)).toContain("temporal constraints:");
+  });
+
+  it("separates adjustment covariates from temporal constraints", () => {
+    const result = researchDecomposeQuestionCommand("Among adults, is dietary sodium associated with systolic blood pressure after adjusting for age, sex, and BMI?");
+    const estimand = researchEstimandSketchCommand("Among adults, is dietary sodium associated with systolic blood pressure after adjusting for age, sex, and BMI?");
+
+    expect(result.outcome).toBe("systolic blood pressure");
+    expect(result.temporalConstraints).toEqual([]);
+    expect(result.adjustmentCovariates).toEqual(["age", "sex", "BMI"]);
+    expect(estimand.adjustmentCovariates).toEqual(["age", "sex", "BMI"]);
+    expect(renderResearchQuestionDecomposition(result)).toContain("adjustment covariates: age, sex, BMI");
+  });
+
+  it("keeps modifiers separate from later adjustment clauses", () => {
+    const result = researchDecomposeQuestionCommand("Among adults, is physical activity associated with depressive symptoms differently by sex after adjusting for age and income?");
+
+    expect(result.stratifierOrModifier).toBe("sex");
+    expect(result.adjustmentCovariates).toEqual(["age", "income"]);
+    expect(result.clarificationPrompts).toContain("Clarify whether the modifier is for stratification, interaction testing, or adjustment.");
   });
 
   it("adds target-trial clarification for causal questions", () => {
@@ -322,6 +526,56 @@ describe("researchDesignCommand", () => {
     ]);
     expect(renderResearchPipelineStages(stages)).toContain("@agenteer/node-research-protocol-design");
     expect(stages.find(stage => stage.id === "approval")?.humanReview).toBe(true);
+    expect(stages.find(stage => stage.id === "analysis")?.mode).toBe("executable");
+    expect(stages.find(stage => stage.id === "approval")?.requiredBefore).toContain("analysis");
+    expect(renderResearchPipelineStages(stages)).toContain("mode: executable");
+  });
+
+  it("exposes reusable research stage artifact definitions", () => {
+    const artifacts = researchStageArtifactsCommand();
+    const parsed = JSON.parse(renderResearchStageArtifactsJson(artifacts)) as {
+      schemaVersion: number;
+      stageArtifacts: Array<{ stage: string; fileName: string; required: boolean }>;
+    };
+
+    expect(artifacts.find(artifact => artifact.stage === "design")?.fileName).toBe("design.json");
+    expect(artifacts.find(artifact => artifact.stage === "provenance")?.fileName).toBe("provenance.json");
+    expect(renderResearchStageArtifacts(artifacts)).toContain("research stage artifacts");
+    expect(parsed.schemaVersion).toBe(1);
+    expect(parsed.stageArtifacts.find(artifact => artifact.stage === "approval")?.required).toBe(true);
+  });
+
+  it("keeps provenance naming consistent across stage artifacts, QA, and readiness", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-provenance-drift-"));
+    try {
+      await writeFile(path.join(packetDir, "design.json"), "{}\n");
+      await writeFile(path.join(packetDir, "provenance.json"), "{}\n");
+
+      const stageArtifact = researchStageArtifactsCommand().find(artifact => artifact.stage === "provenance");
+      const qa = await researchQaDashboardCommand(packetDir);
+      const readiness = await researchPacketReadinessCommand(packetDir);
+
+      expect(stageArtifact?.fileName).toBe("provenance.json");
+      expect(qa.checks.find(check => check.id === "provenance")?.status).toBe("pass");
+      expect(readiness.components.find(component => component.id === "provenance")?.status).toBe("pass");
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("gates research stages before executable analysis", () => {
+    const blocked = researchStageGateCommand(["design", "critique"], "analysis");
+    const passed = researchStageGateCommand(["design", "critique", "methods-validation", "scout", "data-quality", "runner-spec", "approval"], "analysis");
+    const parsed = JSON.parse(renderResearchStageGateJson(blocked)) as {
+      schemaVersion: number;
+      stageGate: { status: string; missingRequiredStages: string[] };
+    };
+
+    expect(blocked.status).toBe("blocked");
+    expect(blocked.missingRequiredStages).toEqual(expect.arrayContaining(["methods-validation", "scout", "data-quality", "runner-spec", "approval"]));
+    expect(passed.status).toBe("pass");
+    expect(renderResearchStageGate(blocked)).toContain("research stage gate: blocked");
+    expect(parsed.schemaVersion).toBe(1);
   });
 
   it("evaluates small-count suppression policy", () => {
@@ -456,6 +710,53 @@ describe("researchDesignCommand", () => {
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("writes a share-safe redacted data access view", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-data-access-redact-"));
+    const exportDir = await mkdtemp(path.join(os.tmpdir(), "research-data-access-redact-export-"));
+    const dataFile = path.join(outDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+      await writeFile(dataFile, "[]\n");
+      await researchDataAccessManifestCommand(outDir, [dataFile]);
+
+      const redaction = await researchDataAccessRedactCommand(outDir);
+      const parsed = JSON.parse(renderResearchDataAccessRedactionJson(redaction)) as {
+        schemaVersion: number;
+        dataAccessRedaction: { sourceManifestSha256: string; files: Array<{ sourceRef: string; path?: string }> };
+      };
+
+      expect(redaction.files[0]).toMatchObject({ sourceRef: "rows.json", exists: true });
+      expect(redaction.sourceManifestSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(redaction.generatedAtIso).toMatch(/T/);
+      expect("path" in redaction.files[0]!).toBe(false);
+      expect(redaction.expectedVariables.every(variable => !("files" in variable))).toBe(true);
+      expect(redaction.redactions.map(item => item.field)).toContain("files[].path");
+      expect(renderResearchDataAccessRedaction(redaction)).toContain("research data access redaction");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.dataAccessRedaction.sourceManifestSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(parsed.dataAccessRedaction.files[0]?.path).toBeUndefined();
+
+      const readiness = await researchPacketReadinessCommand(outDir);
+      expect(readiness.components.find(component => component.id === "redacted-data-access")).toMatchObject({
+        status: "pass",
+      });
+
+      const exported = await researchExportPacketCommand(outDir, exportDir);
+      expect(exported.copiedArtifacts).toContain("data-access-redacted.json");
+      expect(exported.copiedArtifacts).not.toContain("data-access.json");
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+      await rm(exportDir, { recursive: true, force: true });
     }
   });
 
@@ -596,6 +897,34 @@ describe("researchDesignCommand", () => {
       expect(schema.columns.find(column => column.name === "SEX")?.inferredType).toBe("string");
       expect(renderResearchSchemaInference(schema)).toContain("research schema inference");
       expect(parsed.schemaVersion).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes local tabular files before real-data execution", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-table-summary-"));
+    const file = path.join(dir, "rows.csv");
+    try {
+      await writeFile(file, [
+        "SEQN,RIDAGEYR,RIAGENDR,LBXGH",
+        "1,44,1,5.6",
+        "2,57,2,",
+        "3,61,2,7.2",
+      ].join("\n"));
+
+      const summary = await researchTableSummaryCommand({ file });
+      const parsed = JSON.parse(renderResearchTableSummaryJson(summary)) as {
+        schemaVersion: number;
+        tableSummary: { rowCount: number; columns: Array<{ name: string; missingFraction: number }> };
+      };
+
+      expect(summary.format).toBe("csv");
+      expect(summary.rowCount).toBe(3);
+      expect(summary.columns.find(column => column.name === "LBXGH")?.missingFraction).toBeCloseTo(1 / 3);
+      expect(renderResearchTableSummary(summary)).toContain("research table summary");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.tableSummary.rowCount).toBe(3);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -868,6 +1197,1119 @@ describe("researchDesignCommand", () => {
     expect(renderResearchQuestionReadiness(readiness)).toContain("research question readiness");
     expect(parsed.schemaVersion).toBe(1);
     expect(parsed.questionReadiness.status).toBe("ready_for_protocol");
+  });
+
+  it("builds and promotes a candidate protocol portfolio into an AnalysisSpec", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-protocol-portfolio-"));
+    try {
+      const portfolio = researchProtocolCandidatesCommand("Among adults, is vitamin D deficiency associated with measured hypertension?");
+      const parsedPortfolio = JSON.parse(renderResearchProtocolCandidatesJson(portfolio)) as {
+        schemaVersion: number;
+        protocolCandidates: { selectedCandidateId: string | null; candidates: Array<{ id: string; rank: number }> };
+      };
+      const portfolioPath = path.join(dir, "protocol-candidates.json");
+      await writeFile(portfolioPath, renderResearchProtocolCandidatesJson(portfolio));
+
+      const promotion = await researchProtocolPromoteCommand(portfolioPath);
+      const parsedPromotion = JSON.parse(renderResearchProtocolPromotionJson(promotion)) as {
+        schemaVersion: number;
+        protocolPromotion: { analysisSpec: { requiredVariables: string[]; specHash: string; inferencePolicy: { varianceEstimator: string } } };
+      };
+
+      expect(portfolio.candidates.length).toBeGreaterThan(1);
+      expect(portfolio.selectedCandidateId).toBeTruthy();
+      expect(parsedPortfolio.schemaVersion).toBe(1);
+      expect(parsedPortfolio.protocolCandidates.candidates[0]?.rank).toBe(1);
+      expect(promotion.analysisSpec.requiredVariables).toEqual(expect.arrayContaining(["LBXVIDMS", "BPXSY1", "WTMEC2YR", "SDMVSTRA", "SDMVPSU"]));
+      expect(promotion.analysisSpec.inferencePolicy.varianceEstimator).toBe("approximate_weighted");
+      expect(promotion.analysisSpec.specHash).toMatch(/^[a-f0-9]{64}$/);
+      expect(renderResearchProtocolCandidates(portfolio)).toContain("research protocol candidates");
+      expect(renderResearchProtocolPromotion(promotion)).toContain("research protocol promotion");
+      expect(parsedPromotion.schemaVersion).toBe(1);
+      expect(parsedPromotion.protocolPromotion.analysisSpec.specHash).toBe(promotion.analysisSpec.specHash);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("steers and edits candidate protocols before promotion", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-protocol-steer-edit-"));
+    try {
+      const portfolio = researchProtocolCandidatesCommand("Among adults, is vitamin D deficiency associated with measured hypertension?");
+      const portfolioPath = path.join(dir, "protocol-candidates.json");
+      await writeFile(portfolioPath, renderResearchProtocolCandidatesJson(portfolio));
+
+      const steered = await researchProtocolSteerCommand(portfolioPath, {
+        prefer: ["vitamin d"],
+        avoid: ["prevalence"],
+        requireVariables: ["LBXVIDMS"],
+      });
+      const steeredPath = path.join(dir, "steered.json");
+      await writeFile(steeredPath, renderResearchProtocolCandidatesJson(steered.updatedPortfolio));
+      const promoted = await researchProtocolPromoteCommand(steeredPath);
+      const promotedPath = path.join(dir, "promoted.json");
+      await writeFile(promotedPath, renderResearchProtocolPromotionJson(promoted));
+
+      const edited = await researchProtocolEditCommand(promotedPath, {
+        title: "Edited vitamin D and measured hypertension protocol",
+        cycles: ["2017-2018"],
+        addCovariate: ["Smoking status:SMQ020:smoking"],
+        addCaveat: ["Edited locally before scout execution."],
+      });
+      const parsedEdit = JSON.parse(renderResearchProtocolEditJson(edited)) as {
+        schemaVersion: number;
+        protocolEdit: { protocol: { covariates: Array<{ variable: string }> }; analysisSpec: { requiredVariables: string[] } };
+      };
+
+      expect(steered.updatedPortfolio.selectedCandidateId).toBe(promoted.candidateId);
+      expect(steered.changes.length).toBeGreaterThan(0);
+      expect(edited.protocol.title).toBe("Edited vitamin D and measured hypertension protocol");
+      expect(edited.analysisSpec.requiredVariables).toContain("SMQ020");
+      expect(renderResearchProtocolSteer(steered)).toContain("research protocol steer");
+      expect(renderResearchProtocolEdit(edited)).toContain("research protocol edit");
+      expect(JSON.parse(renderResearchProtocolSteerJson(steered)).schemaVersion).toBe(1);
+      expect(parsedEdit.schemaVersion).toBe(1);
+      expect(parsedEdit.protocolEdit.protocol.covariates.map(item => item.variable)).toContain("SMQ020");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("derives an AnalysisSpec from an existing packet design", async () => {
+    const repo = await makeRepo();
+    const outDir = await mkdtemp(path.join(os.tmpdir(), "research-analysis-spec-packet-"));
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir,
+      });
+
+      const spec = await researchAnalysisSpecCommand({ packetDir: outDir });
+      const parsed = JSON.parse(renderResearchAnalysisSpecJson(spec)) as {
+        schemaVersion: number;
+        analysisSpec: { requiredVariables: string[]; specHash: string; failurePolicy: { rerunInstability: string } };
+      };
+
+      expect(spec.requiredVariables).toEqual(expect.arrayContaining(["LBXVIDMS", "BPXSY1", "RIDAGEYR", "RIDSTATR", "SEQN"]));
+      expect(spec.releasePolicy).toBe("local_files");
+      expect(spec.failurePolicy.rerunInstability).toBe("block");
+      expect(spec.specHash).toMatch(/^[a-f0-9]{64}$/);
+      expect(renderResearchAnalysisSpec(spec)).toContain("research AnalysisSpec");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.analysisSpec.specHash).toBe(spec.specHash);
+      expect(parsed.analysisSpec.failurePolicy.rerunInstability).toBe("block");
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("scouts local cohort rows and applies semantic quality checks", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-local-scout-"));
+    try {
+      const portfolio = researchProtocolCandidatesCommand("Among adults, is vitamin D deficiency associated with measured hypertension?");
+      const portfolioPath = path.join(dir, "portfolio.json");
+      await writeFile(portfolioPath, renderResearchProtocolCandidatesJson(portfolio));
+      const promotion = await researchProtocolPromoteCommand(portfolioPath);
+      const specPath = path.join(dir, "analysis-spec.json");
+      await writeFile(specPath, renderResearchAnalysisSpecJson(promotion.analysisSpec));
+      const rowsPath = path.join(dir, "rows.csv");
+      await writeFile(rowsPath, [
+        "SEQN,RIDAGEYR,RIDSTATR,LBXVIDMS,BPXSY1,BPXSY2,BPXSY3,BPXDI1,BPXDI2,BPXDI3,RIDRETH3,RIAGENDR,BMXBMI,WTMEC2YR,SDMVSTRA,SDMVPSU",
+        "1,45,2,35,138,134,136,82,84,80,3,1,29.1,3450,101,1",
+        "2,62,2,80,118,120,116,70,72,74,2,2,24.3,2890,101,2",
+        "3,30,2,55,128,130,126,78,76,80,1,1,31.4,3100,102,1",
+        "4,17,2,42,122,120,124,76,78,74,4,2,22.2,2700,102,2",
+      ].join("\n"));
+
+      const scout = await researchCohortScoutFileCommand(specPath, rowsPath);
+      const quality = await researchSemanticQualityCommand(rowsPath);
+      const badRowsPath = path.join(dir, "bad-rows.json");
+      await writeFile(badRowsPath, `${JSON.stringify([{ RIDAGEYR: 45, BPXSY1: 500, BPXDI1: 80, WTMEC2YR: 1 }], null, 2)}\n`);
+      const badQuality = await researchSemanticQualityCommand(badRowsPath);
+
+      expect(scout.status).toBe("passed");
+      expect(scout.eligibleRows).toBe(3);
+      expect(scout.completeCaseRows).toBe(3);
+      expect(scout.positiveWeightRows).toBe(3);
+      expect(quality.status).toBe("passed");
+      expect(badQuality.status).toBe("failed");
+      expect(renderResearchCohortScoutFile(scout)).toContain("research cohort scout file");
+      expect(renderResearchSemanticQuality(quality)).toContain("research semantic quality");
+      expect(JSON.parse(renderResearchCohortScoutFileJson(scout)).schemaVersion).toBe(1);
+      expect(JSON.parse(renderResearchSemanticQualityJson(quality)).schemaVersion).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("blocks cohort scout execution when survey weights are invalid", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-local-scout-weight-"));
+    try {
+      const portfolio = researchProtocolCandidatesCommand("Among adults, is vitamin D deficiency associated with measured hypertension?");
+      const portfolioPath = path.join(dir, "portfolio.json");
+      await writeFile(portfolioPath, renderResearchProtocolCandidatesJson(portfolio));
+      const promotion = await researchProtocolPromoteCommand(portfolioPath);
+      const specPath = path.join(dir, "analysis-spec.json");
+      await writeFile(specPath, renderResearchAnalysisSpecJson(promotion.analysisSpec));
+      const rowsPath = path.join(dir, "rows.csv");
+      await writeFile(rowsPath, [
+        "SEQN,RIDAGEYR,RIDSTATR,LBXVIDMS,BPXSY1,BPXSY2,BPXSY3,BPXDI1,BPXDI2,BPXDI3,RIDRETH3,RIAGENDR,BMXBMI,WTMEC2YR,SDMVSTRA,SDMVPSU",
+        "1,45,2,35,138,134,136,82,84,80,3,1,29.1,0,101,1",
+        "2,62,2,80,118,120,116,70,72,74,2,2,24.3,0,101,2",
+      ].join("\n"));
+
+      const scout = await researchCohortScoutFileCommand(specPath, rowsPath);
+      expect(scout.status).toBe("blocked");
+      expect(scout.warnings.map(issue => issue.code)).toContain("NO_POSITIVE_WEIGHT_ROWS");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("models durable progress, async job lifecycle, and repair plans", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-repair-plan-"));
+    try {
+      const progress = researchProgressCommand({
+        phase: "cohort_scout_complete",
+        label: "Cohort scout complete",
+        detail: "Fixture scout found enough complete cases.",
+        nextStep: "Promote candidate protocol.",
+      });
+      const job = researchJobLifecycleCommand({
+        jobId: "job_123",
+        status: "cancel_requested",
+        phase: "analysis_run",
+        nextStep: "Stop runner and preserve partial artifacts.",
+      });
+      await writeFile(path.join(dir, "workflow-scorecard.json"), renderResearchWorkflowScorecardJson({
+        packetDir: dir,
+        status: "needs_work",
+        score: 70,
+        checks: [
+          { id: "semantic-quality", status: "fail", detail: "Semantic quality artifact is missing." },
+        ],
+        nextAction: "Run semantic quality.",
+      }));
+      await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        localReviewStatus: "ready_for_local_review",
+        checks: {
+          sourceValidation: "passed",
+          rerunDiff: "changed",
+          paperQa: "pass",
+          runnerRecord: "present",
+        },
+        artifacts: [],
+      }, null, 2)}\n`);
+      await writeFile(path.join(dir, "paper-qa.json"), renderResearchPaperQaJson({
+        paperPath: path.join(dir, "paper.md"),
+        evidencePath: path.join(dir, "analysis.json"),
+        status: "fail",
+        checks: [
+          {
+            id: "inference-policy-no-strong-significance",
+            status: "fail",
+            severity: "critical",
+            detail: "Approximate-inference AnalysisSpecs should not use strong statistical-significance language.",
+          },
+        ],
+        summary: "0/1 paper QA checks passed.",
+        nextAction: "Revise the paper.",
+      }));
+
+      const repair = await researchRepairPlanCommand(dir);
+      const parsedRepair = JSON.parse(renderResearchRepairPlanJson(repair)) as {
+        schemaVersion: number;
+        repairPlan: { status: string; issues: Array<{ code: string }>; stoppingReasons: string[] };
+      };
+
+      expect(progress.terminal).toBe(false);
+      expect(job.progress.terminal).toBe(false);
+      expect(repair.status).toBe("repair_recommended");
+      expect(repair.issues.map(issue => issue.code)).toContain("SCORECARD_SEMANTIC_QUALITY");
+      expect(repair.issues.map(issue => issue.code)).toContain("MANIFEST_RERUN_DIFF_UNSTABLE");
+      expect(repair.issues.map(issue => issue.code)).toContain("PAPER_QA_INFERENCE_POLICY_NO_STRONG_SIGNIFICANCE");
+      expect(repair.repairClasses.methodological.map(issue => issue.code)).toContain("PAPER_QA_INFERENCE_POLICY_NO_STRONG_SIGNIFICANCE");
+      expect(repair.stoppingReasons).toContain("methodological uncertainty requires human review before executable repair");
+      expect(repair.proposedActions).toContain("Rerun from the AnalysisSpec, compare deterministic outputs, and stop if instability repeats.");
+      expect(repair.proposedActions).toContain("Stop for methodological review; revise the AnalysisSpec, estimator, or report inference policy before executable repair.");
+      expect(renderResearchProgress(progress)).toContain("research progress");
+      expect(renderResearchJobLifecycle(job)).toContain("research job");
+      expect(renderResearchRepairPlan(repair)).toContain("research repair plan");
+      expect(JSON.parse(renderResearchProgressJson(progress)).schemaVersion).toBe(1);
+      expect(JSON.parse(renderResearchJobLifecycleJson(job)).schemaVersion).toBe(1);
+      expect(parsedRepair.schemaVersion).toBe(1);
+      expect(parsedRepair.repairPlan.status).toBe("repair_recommended");
+      expect(parsedRepair.repairPlan.stoppingReasons.length).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("distills workflow memory and records agent execution provenance", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-workflow-memory-"));
+    try {
+      const journal = path.join(dir, "updates-upgrades.md");
+      await writeFile(journal, [
+        "## Cycle 1",
+        "- Added semantic quality and cohort scout validation.",
+        "- Saved a live sample run with artifact manifest.",
+        "",
+        "## Cycle 2",
+        "- Added protocol candidates and promoted an AnalysisSpec.",
+        "- Verification passed with workflow-scorecard.",
+      ].join("\n"));
+
+      const memory = await researchWorkflowMemoryCommand({ source: journal });
+      const record = researchAgentExecutionRecordCommand({
+        cycle: 2,
+        intent: "Improve reusable loop memory.",
+        observation: "Cycle notes contain repeated validation and artifact patterns.",
+        inference: "The loop needs a machine-readable routine distillation artifact.",
+        action: "Generate workflow memory before selecting the next improvement.",
+        evidence: [journal],
+        confidence: 0.84,
+        tags: ["memory", "provenance"],
+      });
+
+      expect(memory.cyclesObserved).toEqual([1, 2]);
+      expect(memory.routines.map(routine => routine.id)).toContain("deterministic-validation-before-run");
+      expect(record.recordHash).toMatch(/^[a-f0-9]{64}$/);
+      expect(record.confidence).toBe(0.84);
+      expect(renderResearchWorkflowMemory(memory)).toContain("research workflow memory");
+      expect(renderResearchAgentExecutionRecord(record)).toContain("research agent execution record");
+      expect(JSON.parse(renderResearchWorkflowMemoryJson(memory)).schemaVersion).toBe(1);
+      expect(JSON.parse(renderResearchAgentExecutionRecordJson(record)).agentExecutionRecord.tags).toContain("memory");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("audits whether a directory is a real human-reviewed cycle or a batch sweep", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-cycle-audit-"));
+    try {
+      const batch = path.join(dir, "cycle-122");
+      await mkdir(batch);
+      await writeFile(path.join(batch, "summary.md"), [
+        "# Cycle 122: Reliability Gate Stress",
+        "",
+        "Question: Does missingness bias a diabetes quality measure?",
+        "",
+        "Ran repeated-run reliability evaluation.",
+      ].join("\n"));
+      await writeFile(path.join(batch, "reliability-eval.json"), JSON.stringify({ reliabilityEval: { metrics: {} } }, null, 2));
+      await writeFile(path.join(batch, "reliability-eval.meta.json"), JSON.stringify({ status: 0 }, null, 2));
+
+      const full = path.join(dir, "cycle-123");
+      await mkdir(full);
+      await writeFile(path.join(full, "summary.md"), [
+        "# Cycle 123: Cycle Accounting Repair",
+        "",
+        "Question: Can the loop distinguish batch sweeps from full cycles?",
+        "",
+        "Human-in-the-loop diagnosis: friction belongs to loop accounting and evidence quality.",
+        "Implemented new validator: research cycle-audit.",
+        "Verification passed with focused test and rerun.",
+        "Next action: audit generated directories before counting them.",
+      ].join("\n"));
+      await writeFile(path.join(full, "agent-record.json"), JSON.stringify({ intent: "Improve cycle quality", action: "added cycle audit" }, null, 2));
+      await writeFile(path.join(full, "cycle-audit.meta.json"), JSON.stringify({ status: 0 }, null, 2));
+
+      const batchAudit = await researchCycleAuditCommand(batch);
+      const fullAudit = await researchCycleAuditCommand(full);
+
+      expect(batchAudit.status).toBe("batch_sweep");
+      expect(batchAudit.countsAsCycle).toBe(false);
+      expect(batchAudit.correctiveActions[0]).toContain("Relabel");
+      expect(fullAudit.status).toBe("full_cycle");
+      expect(fullAudit.countsAsCycle).toBe(true);
+      expect(renderResearchCycleAudit(batchAudit)).toContain("research cycle audit");
+      expect(JSON.parse(renderResearchCycleAuditJson(fullAudit)).cycleAudit.status).toBe("full_cycle");
+      expect(JSON.parse(renderResearchLoopNoteJson(await researchLoopNoteCommand({
+        stateDir: path.join(dir, "loop-state"),
+        cycle: 1,
+        summary: "Cycle audit added.",
+      }))).schemaVersion).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("computes an uncertainty budget from AnalysisSpec and cohort scout artifacts", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-uncertainty-budget-"));
+    try {
+      const portfolio = researchProtocolCandidatesCommand("Among adults, is vitamin D deficiency associated with measured hypertension?");
+      const portfolioPath = path.join(dir, "portfolio.json");
+      await writeFile(portfolioPath, renderResearchProtocolCandidatesJson(portfolio));
+      const promotion = await researchProtocolPromoteCommand(portfolioPath);
+      const specPath = path.join(dir, "analysis-spec.json");
+      await writeFile(specPath, renderResearchAnalysisSpecJson(promotion.analysisSpec));
+      const rowsPath = path.join(dir, "rows.csv");
+      await writeFile(rowsPath, [
+        "SEQN,RIDAGEYR,RIDSTATR,LBXVIDMS,BPXSY1,BPXSY2,BPXSY3,BPXDI1,BPXDI2,BPXDI3,RIDRETH3,RIAGENDR,BMXBMI,WTMEC2YR,SDMVSTRA,SDMVPSU",
+        "1,45,2,35,138,134,136,82,84,80,3,1,29.1,3450,101,1",
+        "2,62,2,80,118,120,116,70,72,74,2,2,24.3,2890,101,2",
+        "3,30,2,55,128,130,126,78,76,80,1,1,31.4,3100,102,1",
+      ].join("\n"));
+      const scout = await researchCohortScoutFileCommand(specPath, rowsPath);
+      const scoutPath = path.join(dir, "cohort-scout.json");
+      await writeFile(scoutPath, renderResearchCohortScoutFileJson(scout));
+
+      const budget = await researchUncertaintyBudgetCommand({ specPath, scoutPath, comparisons: 6 });
+      const parsed = JSON.parse(renderResearchUncertaintyBudgetJson(budget)) as {
+        schemaVersion: number;
+        uncertaintyBudget: { status: string; adjustedAlphaBonferroni: number };
+      };
+
+      expect(budget.status).toBe("underpowered_or_fragile");
+      expect(budget.adjustedAlphaBonferroni).toBeCloseTo(0.05 / 6);
+      expect(budget.components.map(component => component.id)).toContain("sparse-cells");
+      expect(renderResearchUncertaintyBudget(budget)).toContain("research uncertainty budget");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.uncertaintyBudget.status).toBe("underpowered_or_fragile");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("triages dataset candidates before empirical research use", () => {
+    const synthetic = researchDatasetCandidateCommand({
+      id: "synthetic-preeclampsia",
+      title: "Synthetic maternal health preeclampsia dataset",
+      sourceUrl: "https://example.test/dataset",
+      modality: ["tabular", "text"],
+      rowCount: 50000,
+      license: "cc-by-4.0",
+      synthetic: true,
+      intendedUse: "empirical_analysis",
+    });
+    const empirical = researchDatasetCandidateCommand({
+      id: "curated-survey",
+      title: "Curated health survey",
+      sourceUrl: "https://example.test/survey",
+      modality: ["tabular"],
+      rowCount: 10000,
+      license: "public-domain",
+      intendedUse: "empirical_analysis",
+    });
+
+    expect(synthetic.status).toBe("unsuitable");
+    expect(synthetic.risks.map(risk => risk.code)).toContain("SYNTHETIC_EMPIRICAL_ANALYSIS");
+    expect(empirical.status).toBe("empirical_ready");
+    expect(renderResearchDatasetCandidate(synthetic)).toContain("research dataset candidate");
+    expect(JSON.parse(renderResearchDatasetCandidateJson(empirical)).datasetCandidate.status).toBe("empirical_ready");
+  });
+
+  it("ranks improvement candidates by expected utility under cost and risk", () => {
+    const agenda = researchImprovementAgendaCommand({
+      budgetUsd: 1,
+      candidates: [
+        "expensive-cloud:0.9:0.6:5:0.2:Cloud-backed real data adapter",
+        "local-repair-loop:0.8:0.8:0:0.2:Local repair loop",
+        "risky-refactor:0.7:0.4:0:0.9:Large runtime rewrite",
+      ],
+    });
+    const parsed = JSON.parse(renderResearchImprovementAgendaJson(agenda)) as {
+      schemaVersion: number;
+      improvementAgenda: { selected: string[] };
+    };
+
+    expect(agenda.selected[0]).toBe("local-repair-loop");
+    expect(agenda.candidates.find(candidate => candidate.id === "expensive-cloud")?.decision).toBe("queue");
+    expect(renderResearchImprovementAgenda(agenda)).toContain("research improvement agenda");
+    expect(parsed.schemaVersion).toBe(1);
+    expect(parsed.improvementAgenda.selected).toContain("local-repair-loop");
+  });
+
+  it("guards generated reports against unsupported causal claims", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-claim-guard-"));
+    try {
+      const report = path.join(dir, "report.md");
+      await writeFile(report, [
+        "# Report",
+        "Vitamin D deficiency reduces hypertension in adults.",
+        "This observational cross-sectional fixture cannot infer causality.",
+      ].join("\n"));
+      const guarded = await researchClaimGuardCommand({ reportPath: report });
+      const safeReport = path.join(dir, "safe-report.md");
+      await writeFile(safeReport, [
+        "# Report",
+        "Vitamin D deficiency was associated with measured hypertension in this observational cross-sectional fixture.",
+        "The design cannot infer causality.",
+      ].join("\n"));
+      const safe = await researchClaimGuardCommand({ reportPath: safeReport });
+
+      expect(guarded.status).toBe("blocked");
+      expect(guarded.issues.map(issue => issue.code)).toContain("UNSUPPORTED_CAUSAL_LANGUAGE");
+      expect(safe.status).toBe("pass");
+      expect(renderResearchClaimGuard(guarded)).toContain("research claim guard");
+      expect(JSON.parse(renderResearchClaimGuardJson(safe)).claimGuard.status).toBe("pass");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("checks NHANES paper artifacts for reporting and QA requirements", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-qa-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted approximate logistic GLM estimated an adjusted odds ratio, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 19,770 complete-case eligible rows and the adjusted odds ratio was 0.97.",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality; this is not evidence that exposure caused the outcome.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; approximate variance without full complex survey strata and PSU is a limitation.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://arxiv.org/abs/2004.14066",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 19770 },
+        model: {
+          type: "weighted approximate logistic GLM",
+          covariates: ["vitd_10", "age_10", "female", "race_1"],
+        },
+        limitations: ["Approximate survey weights only"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      const parsed = JSON.parse(renderResearchPaperQaJson(qa)) as {
+        schemaVersion: number;
+        paperQa: { status: string };
+      };
+
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.map(check => check.id)).toContain("survey-design-language");
+      expect(renderResearchPaperQa(qa)).toContain("research paper QA");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.paperQa.status).toBe("pass");
+
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted approximate logistic GLM estimated an adjusted odds ratio, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 19,770 complete-case eligible rows and the adjusted odds ratio was 0.97.",
+        "## Discussion",
+        "The exposure caused the outcome.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; approximate variance without full complex survey strata and PSU is a limitation.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://arxiv.org/abs/2004.14066",
+      ].join("\n"));
+      const unsafe = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(unsafe.status).toBe("fail");
+      expect(unsafe.checks.find(check => check.id === "causal-language")?.status).toBe("fail");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("checks model-family and covariate consistency in NHANES papers", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-model-qa-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      const basePaper = [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted approximate linear regression estimated the adjusted mean difference, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 20,334 complete-case eligible rows and the mean difference was -0.93 mg/dL (95% CI -1.56 to -0.29; p=0.00407).",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; approximate variance without full complex survey strata and PSU is a limitation.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://arxiv.org/abs/2004.14066",
+      ].join("\n");
+      await writeFile(paper, basePaper);
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 20334 },
+        model: {
+          type: "weighted approximate linear regression",
+          covariates: ["ever_smoker", "age_10", "female", "race_1"],
+          everSmokerMeanDifferenceMgDl: -0.9259742029913821,
+          ci95: [-1.557703075185466, -0.2942453307972983],
+          pValue: 0.004066911251292218,
+        },
+        analysisSpec: {
+          inferencePolicy: {
+            estimandType: "associational",
+            varianceEstimator: "approximate_weighted",
+            allowedInference: "exploratory_association",
+            pValueLanguage: "approximate_only",
+            causalClaimsAllowed: false,
+          },
+        },
+        limitations: ["Approximate survey weights only"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.map(check => check.id)).toContain("model-family-linear-effect");
+      expect(qa.checks.map(check => check.id)).toContain("model-covariate-disclosure");
+      expect(qa.checks.find(check => check.id === "inference-policy-approximate-language")?.status).toBe("pass");
+
+      await writeFile(paper, basePaper.replace("The association was exploratory and cannot infer causality.", "The association was statistically significant and cannot infer causality."));
+      const overstrong = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(overstrong.status).toBe("fail");
+      expect(overstrong.checks.find(check => check.id === "inference-policy-no-strong-significance")?.status).toBe("fail");
+
+      await writeFile(paper, basePaper
+        .replace("linear regression estimated the adjusted mean difference", "logistic GLM estimated the adjusted odds ratio")
+        .replace("the mean difference was -0.93 mg/dL", "the odds ratio was 1.50"));
+      const mismatched = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(mismatched.status).toBe("fail");
+      expect(mismatched.checks.find(check => check.id === "model-family-linear-effect")?.status).toBe("fail");
+      expect(mismatched.checks.find(check => check.id === "model-effect-numeric-consistency")?.status).toBe("fail");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("treats survey-logistic linearized models as logistic, not linear, in paper QA", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-logistic-linearized-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted logistic regression estimated an adjusted odds ratio, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 24,836 complete-case eligible rows and the adjusted odds ratio was 1.10 (95% CI 1.09 to 1.11; p=9.36e-93).",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; complex survey strata and PSU linearized variance was used.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 24836 },
+        model: {
+          type: "weighted logistic regression with strata/PSU linearized sandwich variance",
+          covariates: ["BMXBMI", "RIDAGEYR", "RIAGENDR", "RIDRETH1"],
+          logOddsCoefficient: 0.09433598185432909,
+          oddsRatio: 1.0989289040694459,
+          ci95: [1.09, 1.11],
+          pValue: 9.36e-93,
+        },
+        analysisSpec: {
+          inferencePolicy: {
+            varianceEstimator: "complex_survey",
+            allowedInference: "design_corrected_inference",
+            pValueLanguage: "standard",
+            causalClaimsAllowed: false,
+          },
+        },
+        limitations: ["Complex survey linearized variance"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "model-family-logistic-effect")?.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "model-family-linear-effect")).toBeUndefined();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("requires subsample-weight domain evidence and disclosure in paper QA", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-subsample-qa-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis using the fasting subsample analytic population.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTSAF2YR survey weight language with strata and PSU linearized variance.",
+        "The least common denominator was the morning fasting laboratory subsample, an eligible subgroup with a declared weight-domain rationale.",
+        "A weighted linear regression estimated an adjusted mean difference, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 9,000 complete-case eligible rows and the adjusted mean difference was 0.25 (95% CI 0.10 to 0.40; p=0.001).",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; complex survey strata and PSU linearized variance was used.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 9000 },
+        weights: {
+          weight: "WTSAF2YR",
+          strata: "SDMVSTRA",
+          psu: "SDMVPSU",
+          domain: {
+            id: "fasting_subsample",
+            label: "Morning fasting laboratory subsample",
+            isSubsample: true,
+            rationale: "Fasting glucose is measured in the fasting laboratory subsample.",
+            eligibilityNote: "Use the eligible morning fasting laboratory subsample.",
+          },
+        },
+        model: {
+          type: "weighted linear regression with strata/PSU linearized sandwich variance",
+          covariates: ["BMXBMI", "RIDAGEYR", "RIAGENDR", "RIDRETH1"],
+          exposureCoefficient: 0.25,
+          ci95: [0.10, 0.40],
+          pValue: 0.001,
+        },
+        limitations: ["Complex survey linearized variance"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "subsample-weight-disclosure")?.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "subsample-weight-evidence")?.status).toBe("pass");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("requires a local-review safety header for paper-run evidence", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-safety-header-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Local Review Safety Header",
+        "- Analysis type: observational cross-sectional association.",
+        "- Survey method: weighted linear regression with WTMEC2YR survey weights, strata, and PSU.",
+        "- Weight domain: MEC-exam participants.",
+        "- Causal status: not causal; cannot infer causality.",
+        "- Clinical actionability: not clinically actionable.",
+        "- Human review: required before sharing.",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted linear regression estimated an adjusted mean difference, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 9,000 complete-case eligible rows and the adjusted mean difference was 0.25 (95% CI 0.10 to 0.40; p=0.001).",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; complex survey strata and PSU linearized variance was used.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        paperId: "fixture-paper-run",
+        analysisSpecPath: "/tmp/analysis-spec.json",
+        rowCounts: { completeCaseEligible: 9000 },
+        weights: { weight: "WTMEC2YR", strata: "SDMVSTRA", psu: "SDMVPSU" },
+        model: {
+          type: "weighted linear regression with strata/PSU linearized sandwich variance",
+          covariates: ["BMXBMI", "RIDAGEYR", "RIAGENDR", "RIDRETH1"],
+          exposureCoefficient: 0.25,
+          ci95: [0.10, 0.40],
+          pValue: 0.001,
+        },
+        limitations: ["Complex survey linearized variance"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "local-review-safety-header")?.status).toBe("pass");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("checks threshold provenance and diagnostic overclaiming in NHANES papers", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-threshold-qa-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis of threshold-defined measured hypertension and UACR.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "Albuminuria was classified with a UACR threshold of 30 mg/g, and measured hypertension was defined as systolic blood pressure >=130 or diastolic blood pressure >=80.",
+        "This is not a clinical hypertension diagnosis and a single UACR measurement cannot diagnose persistent albuminuria or CKD.",
+        "## Results",
+        "There were 20,461 complete-case eligible rows.",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.kidney.org/kidney-health/kidneydisease/siemens_hcp_acr",
+        "https://professional.heart.org/en/science-news/2017-hypertension-clinical-guidelines/top-things-to-know",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 20461 },
+        thresholds: {
+          uacrAlbuminuria: "URDACT >= 30 mg/g",
+          measuredHypertension: "BPXSY1 >= 130 or BPXDI1 >= 80",
+        },
+        limitations: ["Single-visit thresholds", "Approximate survey weights only"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.map(check => check.id)).toContain("threshold-provenance");
+      expect(qa.checks.map(check => check.id)).toContain("single-measure-kidney-caveat");
+      expect(qa.checks.map(check => check.id)).toContain("single-measure-bp-caveat");
+
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "## Results",
+        "There were 20,461 complete-case eligible rows and participants were diagnosed hypertension.",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.kidney.org/kidney-health/kidneydisease/siemens_hcp_acr",
+        "https://professional.heart.org/en/science-news/2017-hypertension-clinical-guidelines/top-things-to-know",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+      ].join("\n"));
+      const unsafe = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(unsafe.status).toBe("fail");
+      expect(unsafe.checks.find(check => check.id === "diagnosis-overclaiming")?.status).toBe("fail");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("does not require blood-pressure caveats for non-BP papers with numeric eligibility thresholds", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-non-bp-threshold-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted approximate linear regression estimated the adjusted mean difference, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 18,394 complete-case eligible rows and the mean difference was 1.42 mg/dL (95% CI 1.28 to 1.56; p=2.16e-87).",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; approximate variance without full complex survey strata and PSU is a limitation.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 18394 },
+        population: { eligibility: ["RIDAGEYR >= 20"] },
+        model: {
+          type: "weighted approximate linear regression",
+          covariates: ["pir", "age_10", "female", "race_1"],
+          pirMeanDifferenceHdlMgDl: 1.4216180158918028,
+          ci95: [1.2817593542764187, 1.5614766775071869],
+          pValue: 2.1574710295628383e-87,
+        },
+        analysisSpec: {
+          inferencePolicy: {
+            varianceEstimator: "approximate_weighted",
+            allowedInference: "exploratory_association",
+            pValueLanguage: "approximate_only",
+            causalClaimsAllowed: false,
+          },
+        },
+        limitations: ["Approximate survey weights only"],
+      }, null, 2)}\n`);
+
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      expect(qa.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "single-measure-bp-caveat")).toBeUndefined();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("indexes generated NHANES paper directories and latest QA status", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-index-"));
+    try {
+      const first = path.join(dir, "0001-first-paper");
+      const second = path.join(dir, "0002-second-paper");
+      await mkdir(first);
+      await mkdir(second);
+      await writeFile(path.join(first, "analysis.json"), `${JSON.stringify({
+        title: "First paper",
+        rowCounts: { completeCaseEligible: 123 },
+      })}\n`);
+      await writeFile(path.join(first, "qa-cli.json"), `${JSON.stringify({
+        paperQa: { status: "pass", summary: "10/10 paper QA checks passed." },
+      })}\n`);
+      await writeFile(path.join(second, "analysis.json"), `${JSON.stringify({
+        title: "Second paper",
+        rowCounts: { completeCaseEligible: 456 },
+      })}\n`);
+      await writeFile(path.join(second, "qa-old.json"), `${JSON.stringify({
+        paperQa: { status: "warning", summary: "9/10 paper QA checks passed." },
+      })}\n`);
+      await new Promise(resolve => setTimeout(resolve, 5));
+      await writeFile(path.join(second, "qa-new.json"), `${JSON.stringify({
+        paperQa: { status: "pass", summary: "12/12 paper QA checks passed." },
+      })}\n`);
+      await writeFile(path.join(second, "runner-record.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        paperRunnerRecord: {
+          recordType: "agenteer.research.paper-runner-record",
+          status: "succeeded",
+          analysisSpec: { binding: "retrospective" },
+          inputs: [],
+          outputs: [],
+        },
+      })}\n`);
+      const out = path.join(dir, "INDEX.md");
+
+      const index = await researchPaperIndexCommand({ papersDir: dir, outPath: out });
+      const parsed = JSON.parse(renderResearchPaperIndexJson(index)) as {
+        schemaVersion: number;
+        paperIndex: { papers: Array<{ id: string; latestQaStatus: string; latestQaSummary: string; runnerStatus: string }> };
+      };
+
+      expect(index.papers).toHaveLength(2);
+      expect(index.papers[1]?.latestQaPath).toContain("qa-new.json");
+      expect(index.papers[0]?.runnerStatus).toBe("missing");
+      expect(index.papers[1]?.runnerStatus).toBe("retrospective_succeeded");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.paperIndex.papers[1]?.latestQaSummary).toContain("12/12");
+      expect(parsed.paperIndex.papers[1]?.runnerStatus).toBe("retrospective_succeeded");
+      expect(renderResearchPaperIndex(index)).toContain("First paper");
+      expect(renderResearchPaperIndex(index)).toContain("retrospective_succeeded");
+      expect(await readFile(out, "utf-8")).toContain("Second paper");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes paper lifecycle across QA, runner, task, and capabilities", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-lifecycle-"));
+    try {
+      const paperDir = path.join(dir, "0001-paper");
+      const interopDir = path.join(paperDir, "interop");
+      const capabilityDir = path.join(dir, "capabilities");
+      await mkdir(interopDir, { recursive: true });
+      await mkdir(capabilityDir);
+      await writeFile(path.join(paperDir, "analysis.json"), `${JSON.stringify({
+        title: "Lifecycle paper",
+      })}\n`);
+      await writeFile(path.join(paperDir, "qa-cli.json"), `${JSON.stringify({
+        paperQa: { status: "pass", summary: "26/26 paper QA checks passed." },
+      })}\n`);
+      await writeFile(path.join(paperDir, "runner-record.json"), `${JSON.stringify({
+        paperRunnerRecord: {
+          recordType: "agenteer.research.paper-runner-record",
+          status: "succeeded",
+          analysisSpec: { binding: "spec-governed" },
+          warnings: [],
+        },
+      })}\n`);
+      await writeFile(path.join(paperDir, "rerun-stability.json"), `${JSON.stringify({
+        paperRerunStability: { status: "pass", summary: "15/15 rerun stability checks passed." },
+      })}\n`);
+      await writeFile(path.join(interopDir, "task-succeeded.json"), `${JSON.stringify({
+        taskEnvelope: {
+          status: "succeeded",
+          evidenceReceipts: [{ status: "pass" }, { status: "warning" }],
+        },
+      })}\n`);
+      await writeFile(path.join(interopDir, "task-validation-with-capabilities.json"), `${JSON.stringify({
+        interopValidation: { status: "pass", issues: [] },
+      })}\n`);
+      await writeFile(path.join(capabilityDir, "research.paper.qa.validation.json"), `${JSON.stringify({
+        interopValidation: { status: "pass", issues: [] },
+      })}\n`);
+
+      const lifecycle = await researchPaperLifecycleCommand({ paperDir, capabilityDir });
+      const parsed = JSON.parse(renderResearchPaperLifecycleJson(lifecycle)) as {
+        paperLifecycle: { lifecycleStatus: string };
+      };
+
+      expect(lifecycle.lifecycleStatus).toBe("ready_for_local_review");
+      expect(lifecycle.task.receiptStatuses).toEqual(["pass", "warning"]);
+      expect(lifecycle.capabilities.status).toBe("pass");
+      expect(lifecycle.rerunStability.status).toBe("pass");
+      expect(renderResearchPaperLifecycle(lifecycle)).toContain("research paper lifecycle");
+      expect(renderResearchPaperLifecycle(lifecycle)).toContain("rerun stability: pass");
+      expect(parsed.paperLifecycle.lifecycleStatus).toBe("ready_for_local_review");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("detects scientific-field drift between repeated paper runs", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-rerun-stability-"));
+    try {
+      const baseline = path.join(dir, "baseline");
+      const repeat = path.join(dir, "repeat");
+      await mkdir(baseline, { recursive: true });
+      await mkdir(repeat, { recursive: true });
+      const analysis = {
+        rowCounts: { completeCaseEligible: 100 },
+        weights: { weight: "WTMEC2YR", strata: "SDMVSTRA", psu: "SDMVPSU", domain: { id: "mec_exam", isSubsample: false } },
+        model: {
+          type: "weighted linear regression with strata/PSU linearized sandwich variance",
+          exposureCoefficient: 0.5,
+          standardError: 0.1,
+          ci95: [0.3, 0.7],
+          pValue: 0.01,
+        },
+      };
+      const runner = {
+        recordType: "agenteer.research.paper-runner-record",
+        analysisSpec: { specHash: "spec-1" },
+        inputs: [{ path: "/tmp/input.parquet", sha256: "abc" }],
+      };
+      for (const target of [baseline, repeat]) {
+        await writeFile(path.join(target, "analysis.json"), `${JSON.stringify(analysis, null, 2)}\n`);
+        await writeFile(path.join(target, "qa-cli.json"), `${JSON.stringify({ paperQa: { status: "pass" } }, null, 2)}\n`);
+        await writeFile(path.join(target, "lifecycle.json"), `${JSON.stringify({ paperLifecycle: { lifecycleStatus: "ready_for_local_review" } }, null, 2)}\n`);
+        await writeFile(path.join(target, "runner-record.json"), `${JSON.stringify(runner, null, 2)}\n`);
+      }
+
+      const pass = await researchPaperRerunStabilityCommand({ baselineDir: baseline, repeatDir: repeat });
+      expect(pass.status).toBe("pass");
+
+      await writeFile(path.join(repeat, "analysis.json"), `${JSON.stringify({
+        ...analysis,
+        model: { ...analysis.model, exposureCoefficient: 0.55 },
+      }, null, 2)}\n`);
+      const fail = await researchPaperRerunStabilityCommand({ baselineDir: baseline, repeatDir: repeat, tolerance: 1e-8 });
+      expect(fail.status).toBe("fail");
+      expect(fail.comparisons.find(item => item.field === "model.exposureCoefficient")?.status).toBe("fail");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("creates paper runner records with AnalysisSpec binding and hashed file evidence", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-runner-record-"));
+    try {
+      const specPath = path.join(dir, "analysis-spec.json");
+      const inputPath = path.join(dir, "input.json");
+      const paperPath = path.join(dir, "paper.md");
+      const outPath = path.join(dir, "runner-record.json");
+      await writeFile(specPath, `${JSON.stringify({
+        schemaVersion: 1,
+        analysisSpec: {
+          schemaVersion: 1,
+          id: "analysis_fixture",
+          specHash: "fixture-spec-hash",
+        },
+      }, null, 2)}\n`);
+      await writeFile(inputPath, JSON.stringify([{ SEQN: 1, WTMEC2YR: 2 }], null, 2));
+      await writeFile(paperPath, "# Paper\n");
+
+      const record = await researchPaperRunnerRecordCommand({
+        paperId: "fixture-paper",
+        commandSummary: "Ran deterministic fixture paper generation.",
+        analysisSpecPath: specPath,
+        binding: "retrospective",
+        inputFiles: [inputPath],
+        outputFiles: [paperPath],
+        weighting: "WTMEC2YR normalized approximate weights",
+        variance: "approximate weighted variance",
+        population: "fixture adults",
+        outPath,
+      });
+      const parsed = JSON.parse(renderResearchPaperRunnerRecordJson(record)) as {
+        paperRunnerRecord: { analysisSpec: { specHash: string }; inputs: Array<{ sha256: string }> };
+      };
+
+      expect(record.analysisSpec.specHash).toBe("fixture-spec-hash");
+      expect(record.warnings.find(issue => issue.code === "RETROSPECTIVE_ANALYSIS_SPEC_BINDING")?.severity).toBe("warning");
+      expect(record.nextAction).toContain("Do not treat this as spec-governed");
+      expect(record.analysisSpec.artifactHash).toMatch(/^[a-f0-9]{64}$/);
+      expect(record.inputs[0]?.sha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(record.outputs[0]?.path).toBe(paperPath);
+      expect(parsed.paperRunnerRecord.analysisSpec.specHash).toBe("fixture-spec-hash");
+      expect(renderResearchPaperRunnerRecord(record)).toContain("spec binding: retrospective");
+      expect(renderResearchPaperRunnerRecord(record)).toContain("research paper runner record");
+      expect(await readFile(outPath, "utf-8")).toContain("fixture-paper");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 
   it("renders reusable research pipeline stages as machine-readable JSON", () => {
@@ -1224,10 +2666,23 @@ describe("researchDesignCommand", () => {
 
       const approval = await researchApprovePacketCommand(outDir, "Protocol and scout plan reviewed.");
 
+      expect(approval.schemaVersion).toBe(1);
+      expect(approval.eventType).toBe("research.packet.approval");
+      expect(approval.decisionId).toHaveLength(16);
+      expect(approval.recordHash).toHaveLength(64);
       expect(approval.status).toBe("approved");
       expect(approval.critiqueStatus).toBe("pass");
       expect(approval.scoutStatus).toBe("plan_ready");
       expect(renderResearchApproval(approval)).toContain("Protocol and scout plan reviewed.");
+      const verification = await researchApprovalVerifyCommand(outDir);
+      const parsed = JSON.parse(renderResearchApprovalVerificationJson(verification)) as {
+        schemaVersion: number;
+        approvalVerification: { status: string };
+      };
+      expect(verification.status).toBe("valid");
+      expect(renderResearchApprovalVerification(verification)).toContain("status: valid");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.approvalVerification.status).toBe("valid");
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(outDir, { recursive: true, force: true });
@@ -1559,6 +3014,8 @@ describe("researchDesignCommand", () => {
         { SEQN: 1, RIDSTATR: 2, RIDAGEYR: 44, RIAGENDR: 1, RIDRETH3: 3, LBXVIDMS: 40, BPXSY1: 140, BPXDI1: 90, WTMEC2YR: 1 },
       ], null, 2)}\n`);
       await researchScoutPlanCommand(outDir, fixture);
+      await writeFile(path.join(outDir, "methods-validation.json"), "{}\n");
+      await writeFile(path.join(outDir, "data-quality.json"), "{}\n");
       await researchRunnerSpecCommand(outDir);
       await researchApprovePacketCommand(outDir, "Approved for manifest fixture.");
       await researchAnalyzeLocalCommand(outDir, fixture);
@@ -1576,12 +3033,250 @@ describe("researchDesignCommand", () => {
       expect(manifest.artifacts[0]?.sha256).toMatch(/^[a-f0-9]{64}$/);
       expect(renderResearchArtifactManifest(manifest)).toContain("research artifact manifest");
       expect(JSON.parse(renderResearchArtifactManifestJson(manifest)).schemaVersion).toBe(1);
+      const manifestVerification = await researchManifestVerifyCommand(outDir);
+      expect(manifestVerification.status).toBe("valid");
+      expect(manifestVerification.validLocal).toBe(true);
+      expect(manifestVerification.validForShare).toBe(false);
+      expect(renderResearchManifestVerification(manifestVerification)).toContain("status: valid");
+      expect(renderResearchManifestVerification(manifestVerification)).toContain("valid local: true");
+      expect(JSON.parse(renderResearchManifestVerificationJson(manifestVerification)).schemaVersion).toBe(1);
       const checkpoint = await researchCheckpointCommand(outDir);
       expect(checkpoint.currentStage).toBe("export");
       expect(checkpoint.nextCommand).toContain("research export");
     } finally {
       await rm(repo, { recursive: true, force: true });
       await rm(outDir, { recursive: true, force: true });
+    }
+  });
+
+  it("verifies golden manifests independently and catches hash drift", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-golden-manifest-"));
+    try {
+      const artifactPath = path.join(dir, "analysis.json");
+      await writeFile(artifactPath, `${JSON.stringify({ ok: true })}\n`);
+      const bytes = (await readFile(artifactPath)).byteLength;
+      const sha256 = createHash("sha256").update(await readFile(artifactPath)).digest("hex");
+      await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        status: "ready_for_local_review",
+        localReviewStatus: "ready_for_local_review",
+        shareStatus: "local_only_blocked_for_share",
+        checks: {
+          sourceValidation: "passed",
+          rerunDiff: "stable",
+          paperQa: "pass",
+          runnerRecord: "present",
+        },
+        artifacts: [{ path: artifactPath, bytes, sha256 }],
+      }, null, 2)}\n`);
+
+      const valid = await researchManifestVerifyCommand(dir);
+      await writeFile(artifactPath, `${JSON.stringify({ ok: false })}\n`);
+      const invalid = await researchManifestVerifyCommand(dir);
+
+      expect(valid.status).toBe("valid");
+      expect(valid.validLocal).toBe(true);
+      expect(valid.validForShare).toBe(false);
+      expect(valid.shareStatus).toBe("local_only_blocked_for_share");
+      expect(valid.checkedArtifacts).toBe(1);
+      expect(invalid.status).toBe("invalid");
+      expect(invalid.issues.join(" ")).toContain("sha256 changed");
+      expect(invalid.typedIssues.map(issue => issue.code)).toContain("ARTIFACT_SHA256_CHANGED");
+
+      await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        localReviewStatus: "not_ready",
+        checks: {
+          sourceValidation: "passed",
+          rerunDiff: "stable",
+          paperQa: "pass",
+          runnerRecord: "present",
+        },
+        artifacts: [],
+      }, null, 2)}\n`);
+      const notReady = await researchManifestVerifyCommand(dir);
+      expect(notReady.status).toBe("invalid");
+      expect(notReady.issues).toContain("golden local review status is not ready");
+      expect(notReady.typedIssues.map(issue => issue.code)).toContain("LOCAL_REVIEW_NOT_READY");
+
+      await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        localReviewStatus: "ready_for_local_review",
+        checks: {
+          sourceValidation: "passed",
+          rerunDiff: "changed",
+          paperQa: "pass",
+          runnerRecord: "present",
+        },
+        artifacts: [],
+      }, null, 2)}\n`);
+      const unstable = await researchManifestVerifyCommand(dir);
+      expect(unstable.status).toBe("invalid");
+      expect(unstable.typedIssues).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: "RERUN_DIFF_UNSTABLE", severity: "blocker" }),
+      ]));
+
+      const specPath = path.join(dir, "analysis-spec.json");
+      const runnerPath = path.join(dir, "runner-record.json");
+      await writeFile(specPath, `${JSON.stringify({ analysisSpec: { specHash: "spec_current" } })}\n`);
+      await writeFile(runnerPath, `${JSON.stringify({ analysisSpec: { specHash: "spec_old" } })}\n`);
+      const specBytes = (await readFile(specPath)).byteLength;
+      const runnerBytes = (await readFile(runnerPath)).byteLength;
+      await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        localReviewStatus: "ready_for_local_review",
+        checks: {
+          sourceValidation: "passed",
+          rerunDiff: "stable",
+          paperQa: "pass",
+          runnerRecord: "present",
+        },
+        artifacts: [
+          { path: specPath, bytes: specBytes, sha256: createHash("sha256").update(await readFile(specPath)).digest("hex") },
+          { path: runnerPath, bytes: runnerBytes, sha256: createHash("sha256").update(await readFile(runnerPath)).digest("hex") },
+        ],
+      }, null, 2)}\n`);
+      const staleRunner = await researchManifestVerifyCommand(dir);
+      expect(staleRunner.status).toBe("invalid");
+      expect(staleRunner.typedIssues.map(issue => issue.code)).toContain("RUNNER_SPEC_HASH_MISMATCH");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("composes existing primitives for a miniature golden packet", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-golden-composed-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      const evidence = path.join(dir, "analysis.json");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "A cross-sectional observational NHANES analysis.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "We used WTMEC2YR survey weight language and noted strata and PSU limitations.",
+        "A weighted approximate linear regression estimated an adjusted mean difference, adjusting for age, sex, and race.",
+        "## Results",
+        "There were 1,000 complete-case eligible rows and the mean difference was 0.05 (95% CI 0.01 to 0.08; p=0.0047).",
+        "## Discussion",
+        "The association was exploratory and cannot infer causality.",
+        "## Limitations",
+        "Missing data and complete-case handling may bias results; approximate variance without full complex survey strata and PSU is a limitation.",
+        "## Reproducibility",
+        "Evidence is in analysis.json.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://arxiv.org/abs/2004.14066",
+      ].join("\n"));
+      await writeFile(evidence, `${JSON.stringify({
+        rowCounts: { completeCaseEligible: 1000 },
+        model: {
+          type: "weighted approximate linear regression",
+          covariates: ["uninsured", "age_10", "female", "race_1"],
+          uninsuredMeanDifferenceHbA1cPercent: 0.05,
+          ci95: [0.01, 0.08],
+          pValue: 0.0047,
+        },
+        limitations: ["Approximate survey weights only"],
+      }, null, 2)}\n`);
+      const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+      const qaPath = path.join(dir, "qa.json");
+      await writeFile(qaPath, renderResearchPaperQaJson(qa));
+      const manifestArtifact = await readFile(qaPath);
+      await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        localReviewStatus: qa.status === "pass" ? "ready_for_local_review" : "not_ready",
+        checks: {
+          sourceValidation: "passed",
+          rerunDiff: "stable",
+          paperQa: qa.status,
+          runnerRecord: "present",
+        },
+        artifacts: [{
+          path: qaPath,
+          bytes: manifestArtifact.byteLength,
+          sha256: createHash("sha256").update(manifestArtifact).digest("hex"),
+        }],
+      }, null, 2)}\n`);
+
+      const manifest = await researchManifestVerifyCommand(dir);
+      expect(qa.status).toBe("pass");
+      expect(manifest.status).toBe("valid");
+      expect(manifest.checkedArtifacts).toBe(1);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("registers and runs a golden packet benchmark with expected local-only share failure", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-benchmark-golden-"));
+    try {
+      await makeBenchmarkGoldenPacket(dir);
+      const benchmarkPath = path.join(dir, "golden-benchmark.json");
+      const benchmark = await researchBenchmarkRegisterCommand({ packetDir: dir, outPath: benchmarkPath });
+      const run = await researchBenchmarkRunCommand({ benchmarkPath });
+      const score = await researchBenchmarkScoreCommand(run.runPath!);
+      const parsedBenchmark = JSON.parse(renderResearchBenchmarkJson(benchmark)) as { benchmark: { benchmarkId: string } };
+      const parsedRun = JSON.parse(renderResearchBenchmarkRunJson(run)) as { benchmarkRun: { status: string } };
+      const parsedScore = JSON.parse(renderResearchBenchmarkScoreJson(score)) as { benchmarkScore: { normalizedScore: number } };
+
+      expect(benchmark.expectedArtifacts.map(artifact => artifact.id)).toEqual(expect.arrayContaining(["analysis_spec_json", "golden_manifest_json", "paper"]));
+      expect(benchmark.expectedFailures.map(failure => failure.code)).toContain("SHARE_NOT_READY");
+      expect(run.status).toBe("pass");
+      expect(run.checks.find(check => check.id === "share-export-policy")?.status).toBe("expected_failure");
+      expect(score.normalizedScore).toBeGreaterThan(0.95);
+      expect(renderResearchBenchmark(benchmark)).toContain("research benchmark");
+      expect(renderResearchBenchmarkRun(run)).toContain("expected failures");
+      expect(parsedBenchmark.benchmark.benchmarkId).toContain("golden");
+      expect(parsedRun.benchmarkRun.status).toBe("pass");
+      expect(parsedScore.benchmarkScore.normalizedScore).toBeGreaterThan(0.95);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("fails benchmark runs for missing expected artifacts and rerun instability", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-benchmark-failure-"));
+    try {
+      await makeBenchmarkGoldenPacket(dir, { omitLocalReviewNote: true, rerunStatus: "changed" });
+      const benchmarkPath = path.join(dir, "golden-benchmark.json");
+      await researchBenchmarkRegisterCommand({ packetDir: dir, outPath: benchmarkPath });
+      const run = await researchBenchmarkRunCommand({ benchmarkPath });
+
+      expect(run.status).toBe("fail");
+      expect(run.unexpectedFailures.map(issue => issue.code)).toEqual(expect.arrayContaining(["BENCHMARK_ARTIFACT_MISSING", "RERUN_DIFF_UNSTABLE"]));
+      expect(run.checks.find(check => check.id === "rerun-stability")?.status).toBe("fail");
+      expect(run.checks.find(check => check.id === "cold-review")?.status).toBe("fail");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("discovers benchmark suites and scores aggregate runs", async () => {
+    const suiteDir = await mkdtemp(path.join(os.tmpdir(), "research-benchmark-suite-"));
+    try {
+      const first = path.join(suiteDir, "first");
+      const second = path.join(suiteDir, "second");
+      await mkdir(first, { recursive: true });
+      await mkdir(second, { recursive: true });
+      await makeBenchmarkGoldenPacket(first);
+      await makeBenchmarkGoldenPacket(second);
+      await researchBenchmarkRegisterCommand({ packetDir: first });
+      await researchBenchmarkRegisterCommand({ packetDir: second });
+
+      const suite = await researchBenchmarkSuiteCommand({ suiteDir });
+      const parsed = JSON.parse(renderResearchBenchmarkSuiteJson(suite)) as { benchmarkSuite: { runs: unknown[] } };
+
+      expect(suite.benchmarks).toHaveLength(2);
+      expect(suite.runs.every(run => run.status === "pass")).toBe(true);
+      expect(suite.score.status).toBe("pass");
+      expect(renderResearchBenchmarkSuite(suite)).toContain("benchmarks: 2");
+      expect(parsed.benchmarkSuite.runs).toHaveLength(2);
+    } finally {
+      await rm(suiteDir, { recursive: true, force: true });
     }
   });
 
@@ -1734,6 +3429,7 @@ describe("researchDesignCommand", () => {
       await researchRunnerSpecCommand(packetDir);
       await researchApprovePacketCommand(packetDir, "Approved for export fixture.");
       await researchAnalyzeLocalCommand(packetDir, fixture);
+      await researchPacketReadinessCommand(packetDir);
 
       const exported = await researchExportPacketCommand(packetDir, exportDir);
       const manifest = await researchArtifactManifestCommand(packetDir);
@@ -1745,8 +3441,12 @@ describe("researchDesignCommand", () => {
       };
       const checkpoint = await researchCheckpointCommand(packetDir);
 
-      expect(exported.copiedArtifacts).toEqual(expect.arrayContaining(["design.json", "runner-spec.json", "artifact-manifest.json", "export-record.json"]));
+      expect(exported.copiedArtifacts).toEqual(expect.arrayContaining(["design.json", "runner-spec.json", "packet-readiness.json", "artifact-manifest.json", "export-record.json"]));
+      expect(exported.exportReceipt?.policy).toBe("shareable-local-path-scan-v1");
+      expect(exported.exportReceipt?.artifactChecks.map(artifact => artifact.path)).toContain("design.json");
+      expect(["pass", "fail"]).toContain(exported.exportReceipt?.status);
       expect(manifest.artifacts.map(artifact => artifact.path)).toContain("export-record.json");
+      expect(exportedManifest.artifacts.map(artifact => artifact.path)).toContain("packet-readiness.json");
       expect(exportedManifest.artifacts.map(artifact => artifact.path)).toContain("export-record.json");
       expect(exportedRecord.copiedArtifacts).toContain("export-record.json");
       expect(checkpoint.currentStage).toBe("complete");
@@ -1826,6 +3526,7 @@ describe("researchDesignCommand", () => {
 
       expect(checkpoint.currentStage).toBe("manifest");
       expect(checkpoint.artifacts.artifactManifest).toBe(false);
+      expect(checkpoint.stageGate?.status).toBe("pass");
       expect(renderResearchCheckpoint(checkpoint)).toContain("research manifest");
     } finally {
       await rm(repo, { recursive: true, force: true });
@@ -1870,15 +3571,278 @@ describe("researchDesignCommand", () => {
       const checkpoint = await researchCheckpointCommand(packetDir);
       const parsed = JSON.parse(renderResearchCheckpointJson(checkpoint)) as {
         schemaVersion: number;
-        checkpoint: { currentStage: string; artifacts: { design: boolean }; nextCommand: string };
+        checkpoint: { currentStage: string; artifacts: { design: boolean }; nextCommand: string; recommendedCommands: string[] };
       };
 
       expect(parsed.schemaVersion).toBe(1);
       expect(parsed.checkpoint.currentStage).toBe("design");
       expect(parsed.checkpoint.artifacts.design).toBe(false);
       expect(parsed.checkpoint.nextCommand).toContain("agenteer research design");
+      expect(parsed.checkpoint.recommendedCommands[0]).toContain("agenteer research design");
     } finally {
       await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("recommends missing gate commands before executable analysis", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-checkpoint-gates-"));
+    try {
+      await writeFile(path.join(packetDir, "design.json"), "{}\n");
+      await writeFile(path.join(packetDir, "scout-plan.json"), "{}\n");
+      await writeFile(path.join(packetDir, "runner-spec.json"), "{}\n");
+      await writeFile(path.join(packetDir, "approval.json"), "{}\n");
+
+      const checkpoint = await researchCheckpointCommand(packetDir);
+
+      expect(checkpoint.currentStage).toBe("analysis");
+      expect(checkpoint.stageGate?.status).toBe("blocked");
+      expect(checkpoint.recommendedCommands).toEqual(expect.arrayContaining([
+        `agenteer research critique --packet ${packetDir}`,
+        `agenteer research validate-methods --packet ${packetDir} --json`,
+        "agenteer research data-quality --fixture <rows.json> --json",
+      ]));
+      expect(renderResearchCheckpoint(checkpoint)).toContain("recommended:");
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes the next packet action from checkpoint and stage gates", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-next-"));
+    try {
+      await writeFile(path.join(packetDir, "design.json"), "{}\n");
+      await writeFile(path.join(packetDir, "scout-plan.json"), "{}\n");
+      await writeFile(path.join(packetDir, "runner-spec.json"), "{}\n");
+      await writeFile(path.join(packetDir, "approval.json"), "{}\n");
+
+      const next = await researchPacketNextCommand(packetDir);
+      const parsed = JSON.parse(renderResearchPacketNextJson(next)) as {
+        schemaVersion: number;
+        packetNext: { schemaVersion: number; eventType: string; gateStatus: string; decisionId: string; recordHash: string; recommendedCommands: string[]; expectedArtifacts: Array<{ path: string }> };
+      };
+
+      expect(next.currentStage).toBe("analysis");
+      expect(next.decisionId).toHaveLength(16);
+      expect(next.recordHash).toHaveLength(64);
+      expect(next.gateStatus).toBe("blocked");
+      expect(next.recommendedCommands[0]).toContain("research critique");
+      expect(next.expectedArtifacts.map(artifact => path.basename(artifact.path))).toEqual(expect.arrayContaining([
+        "critique.json",
+        "methods-validation.json",
+        "data-quality.json",
+      ]));
+      expect(next.expectedArtifacts.every(artifact => artifact.exists === false)).toBe(true);
+      expect(renderResearchPacketNext(next)).toContain("research next:");
+      expect(renderResearchPacketNext(next)).toContain("event: research.packet.next v1");
+      expect(renderResearchPacketNext(next)).toContain("expected artifacts:");
+      expect(renderResearchPacketNext(next)).toContain("missing");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.packetNext.schemaVersion).toBe(1);
+      expect(parsed.packetNext.eventType).toBe("research.packet.next");
+      expect(parsed.packetNext.decisionId).toHaveLength(16);
+      expect(parsed.packetNext.recordHash).toHaveLength(64);
+      expect(parsed.packetNext.gateStatus).toBe("blocked");
+      expect(parsed.packetNext.expectedArtifacts[0].path).toContain(packetDir);
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("can append a navigation trace without executing the next stage", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-next-trace-"));
+    try {
+      await writeFile(path.join(packetDir, "design.json"), "{}\n");
+      const next = await researchPacketNextCommand(packetDir, { trace: true });
+      const tracePath = path.join(packetDir, "navigation-trace.jsonl");
+      const trace = await readFile(tracePath, "utf-8");
+
+      expect(next.tracePath).toBe(tracePath);
+      expect(trace).toContain(next.decisionId);
+      expect(trace).toContain("\"recordHash\"");
+      expect(trace).toContain("\"eventType\":\"research.packet.next\"");
+      expect(trace).toContain("\"schemaVersion\":1");
+      expect(trace).toContain("\"recommendedCommands\"");
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("summarizes navigation traces without changing packet state", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-navigation-trace-"));
+    try {
+      await writeFile(path.join(packetDir, "design.json"), "{}\n");
+      const next = await researchPacketNextCommand(packetDir, { trace: true });
+      const summary = await researchNavigationTraceCommand(packetDir);
+      const parsed = JSON.parse(renderResearchNavigationTraceJson(summary)) as {
+        schemaVersion: number;
+        navigationTrace: { status: string; events: number; malformedLines: number; hashChainStatus: string; eventTypes: Record<string, number>; lastEvent: { decisionId: string } };
+      };
+
+      expect(summary.status).toBe("valid");
+      expect(summary.hashChainStatus).toBe("valid");
+      expect(summary.exists).toBe(true);
+      expect(summary.events).toBe(1);
+      expect(summary.malformedLines).toBe(0);
+      expect(summary.eventTypes["research.packet.next"]).toBe(1);
+      expect(summary.lastEvent?.decisionId).toBe(next.decisionId);
+      expect(renderResearchNavigationTrace(summary)).toContain(next.decisionId);
+      expect(renderResearchNavigationTrace(summary)).toContain("status: valid");
+      expect(renderResearchNavigationTrace(summary)).toContain("hash chain: valid");
+      expect(renderResearchNavigationTrace(summary)).toContain("event types: research.packet.next=1");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.navigationTrace.status).toBe("valid");
+      expect(parsed.navigationTrace.hashChainStatus).toBe("valid");
+      expect(parsed.navigationTrace.events).toBe(1);
+      expect(parsed.navigationTrace.malformedLines).toBe(0);
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("reports malformed navigation trace lines", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-navigation-trace-bad-"));
+    try {
+      await writeFile(path.join(packetDir, "navigation-trace.jsonl"), "{\"eventType\":\"research.packet.next\"}\nnot-json\n");
+      const summary = await researchNavigationTraceCommand(packetDir);
+
+      expect(summary.status).toBe("invalid");
+      expect(summary.exists).toBe(true);
+      expect(summary.events).toBe(1);
+      expect(summary.malformedLines).toBe(1);
+      expect(summary.hashChainStatus).toBe("broken");
+      expect(summary.eventTypes["research.packet.next"]).toBe(1);
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("aggregates packet integrity verification from existing verifiers", async () => {
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-packet-verify-"));
+    try {
+      await writeFile(path.join(packetDir, "design.json"), "{}\n");
+      await researchPacketNextCommand(packetDir, { trace: true });
+      const approvalWithoutHash = {
+        schemaVersion: 1,
+        eventType: "research.packet.approval",
+        packetDir,
+        approvedAtIso: "2026-01-01T00:00:00.000Z",
+        decisionId: "approval1234567",
+        reviewer: "agent-human-in-the-loop",
+        status: "approved",
+        title: "Fixture approval",
+        note: "ok",
+        critiqueStatus: "pass",
+        scoutStatus: "plan_ready",
+      };
+      const hash = createHash("sha256").update(JSON.stringify(approvalWithoutHash)).digest("hex");
+      await writeFile(path.join(packetDir, "approval.json"), `${JSON.stringify({ ...approvalWithoutHash, recordHash: hash }, null, 2)}\n`);
+      await researchArtifactManifestCommand(packetDir);
+
+      const verification = await researchPacketVerifyCommand(packetDir);
+      const parsed = JSON.parse(renderResearchPacketVerificationJson(verification)) as {
+        schemaVersion: number;
+        packetVerification: { mode: string; scope: string[]; status: string; exportIntegrityReady: boolean; exportIntegrityReason: string; summary: string; nextAction: string };
+      };
+
+      expect(verification.mode).toBe("available-integrity");
+      expect(verification.scope).toEqual(["approval-record-hash", "navigation-trace-jsonl", "artifact-manifest-hashes"]);
+      expect(verification.status).toBe("pass");
+      expect(verification.exportIntegrityReady).toBe(true);
+      expect(verification.exportIntegrityReason).toContain("matches packet artifacts");
+      expect(verification.summary).toContain("does not validate scientific methods");
+      expect(verification.nextAction).toContain("methods validation");
+      expect(renderResearchPacketVerification(verification)).toContain("mode: available-integrity");
+      expect(renderResearchPacketVerification(verification)).toContain("export integrity: ready");
+      expect(renderResearchPacketVerification(verification)).toContain("summary:");
+      expect(renderResearchPacketVerification(verification)).toContain("status: pass");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.packetVerification.mode).toBe("available-integrity");
+      expect(parsed.packetVerification.status).toBe("pass");
+      expect(parsed.packetVerification.exportIntegrityReady).toBe(true);
+      expect(parsed.packetVerification.exportIntegrityReason).toContain("matches packet artifacts");
+      expect(parsed.packetVerification.nextAction).toContain("methods validation");
+    } finally {
+      await rm(packetDir, { recursive: true, force: true });
+    }
+  });
+
+  it("reports scoped packet readiness without certifying scientific validity", async () => {
+    const repo = await makeRepo();
+    const packetDir = await mkdtemp(path.join(os.tmpdir(), "research-packet-readiness-"));
+    const exportDir = await mkdtemp(path.join(os.tmpdir(), "research-packet-readiness-export-"));
+    const fixture = path.join(packetDir, "rows.json");
+    try {
+      await researchDesignCommand({
+        project: "medbrevia-nhanes",
+        repoDir: repo,
+        question: "Vitamin D deficiency and measured hypertension in NHANES adults",
+        outDir: packetDir,
+      });
+      await researchPacketNextCommand(packetDir, { trace: true });
+      await writeFile(fixture, `${JSON.stringify([
+        { SEQN: 1, RIDSTATR: 2, RIDAGEYR: 44, RIAGENDR: 1, RIDRETH3: 3, LBXVIDMS: 40, BPXSY1: 140, BPXDI1: 90, WTMEC2YR: 1 },
+        { SEQN: 2, RIDSTATR: 2, RIDAGEYR: 52, RIAGENDR: 2, RIDRETH3: 4, LBXVIDMS: 20, BPXSY1: 116, BPXDI1: 74, WTMEC2YR: 1 },
+      ], null, 2)}\n`);
+      await researchScoutPlanCommand(packetDir, fixture);
+      await researchRunnerSpecCommand(packetDir);
+      await researchApprovePacketCommand(packetDir, "Approved for readiness fixture.");
+      await researchAnalyzeLocalCommand(packetDir, fixture);
+      await researchReviewReportCommand(packetDir);
+      await researchValidateMethodsCommand(packetDir);
+      await researchRoCrateCommand(packetDir);
+      await researchProvenanceCommand(packetDir);
+      await researchArtifactManifestCommand(packetDir);
+      const readinessBeforeExport = await researchPacketReadinessCommand(packetDir);
+      expect(readinessBeforeExport.status).toBe("review_ready");
+      expect(readinessBeforeExport.sharePosture).toBe("do_not_share");
+      await researchExportPacketCommand(packetDir, exportDir);
+      await researchArtifactManifestCommand(packetDir);
+
+      const readiness = await researchPacketReadinessCommand(packetDir);
+      const parsed = JSON.parse(renderResearchPacketReadinessJson(readiness)) as {
+        schemaVersion: number;
+        packetReadiness: {
+          mode: string;
+          readinessProfile: { id: string; selection: string };
+          scope: string[];
+          status: string;
+          decisionPosture: string;
+          sharePosture: string;
+          stopReasons: string[];
+          recommendedCommands: string[];
+          clinicianSummary: string;
+          limitations: string[];
+          references: Array<{ id: string; url: string }>;
+        };
+      };
+
+      expect(readiness.mode).toBe("review-readiness");
+      expect(readiness.readinessProfile.id).toBe("observational-survey-v1");
+      expect(readiness.scope).toContain("claim-language-guard");
+      expect(["stop", "read_with_caution", "ready_for_scientific_review"]).toContain(readiness.decisionPosture);
+      expect(["do_not_share", "share_with_caution", "ready_to_share"]).toContain(readiness.sharePosture);
+      expect(Array.isArray(readiness.stopReasons)).toBe(true);
+      expect(Array.isArray(readiness.recommendedCommands)).toBe(true);
+      expect(readiness.recommendedCommands.every(command => command.startsWith("agenteer research ") && !command.includes("&&"))).toBe(true);
+      expect(readiness.clinicianSummary).toContain("report");
+      expect(readiness.components.map(component => component.id)).toEqual(expect.arrayContaining(["integrity", "methods-validation", "claim-guard", "provenance"]));
+      expect(readiness.limitations.join(" ")).toContain("not proof of scientific validity");
+      expect(readiness.limitations.join(" ")).toContain("weights");
+      expect(readiness.references.map(reference => reference.id)).toContain("strobe-official");
+      expect(renderResearchPacketReadiness(readiness)).toContain("limitations:");
+      expect(renderResearchPacketReadiness(readiness)).toContain("references:");
+      expect(renderResearchPacketReadiness(readiness)).toContain("profile: observational-survey-v1");
+      expect(renderResearchPacketReadiness(readiness)).toContain("profile caveat:");
+      expect(parsed.schemaVersion).toBe(1);
+      expect(parsed.packetReadiness.mode).toBe("review-readiness");
+      expect(parsed.packetReadiness.readinessProfile.selection).toBe("default");
+      expect(parsed.packetReadiness.clinicianSummary.length).toBeGreaterThan(20);
+      expect(parsed.packetReadiness.references.find(reference => reference.id === "strobe-official")?.url).toContain("strobe-statement");
+      expect(JSON.parse(await readFile(path.join(packetDir, "packet-readiness.json"), "utf-8"))).toMatchObject({ mode: "review-readiness" });
+    } finally {
+      await rm(repo, { recursive: true, force: true });
+      await rm(packetDir, { recursive: true, force: true });
+      await rm(exportDir, { recursive: true, force: true });
     }
   });
 
@@ -2004,6 +3968,131 @@ describe("researchDesignCommand", () => {
     }
   });
 });
+
+async function makeBenchmarkGoldenPacket(dir: string, opts: { omitLocalReviewNote?: boolean; rerunStatus?: "stable" | "changed" } = {}): Promise<void> {
+  const paper = path.join(dir, "paper.md");
+  const evidence = path.join(dir, "analysis.json");
+  const analysisSpecPath = path.join(dir, "analysis-spec.json");
+  const runnerRecordPath = path.join(dir, "runner-record.json");
+  const qaPath = path.join(dir, "paper-qa.json");
+  const sourceValidationPath = path.join(dir, "source-validation.json");
+  const rerunDiffPath = path.join(dir, "rerun-diff.json");
+  const shareSafetyPath = path.join(dir, "share-safety.json");
+  const localReviewPath = path.join(dir, "local-review-note.md");
+  const goldenPacketPath = path.join(dir, "golden-packet.json");
+  await writeFile(paper, [
+    "# Mini Golden Paper",
+    "## Abstract",
+    "This observational cross-sectional NHANES-style paper studies insurance coverage and HbA1c.",
+    "## Introduction",
+    "The question is public-health relevant.",
+    "## Methods",
+    "We used WTMEC2YR survey weight language and disclosed strata and PSU complex survey limitations.",
+    "A weighted approximate linear regression estimated an adjusted mean difference, adjusting for age, sex, and race.",
+    "## Results",
+    "There were 1,000 complete-case eligible rows and the adjusted mean difference was 0.05 (95% CI 0.01 to 0.08; p=0.0047).",
+    "## Discussion",
+    "The result is exploratory and cannot infer causality.",
+    "## Limitations",
+    "Missing data and complete-case handling may bias results; approximate variance without full complex survey strata and PSU is a limitation.",
+    "## Reproducibility",
+    "Evidence is in analysis.json.",
+    "## References",
+    "https://www.strobe-statement.org/",
+    "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+    "https://arxiv.org/abs/2004.14066",
+  ].join("\n"));
+  await writeFile(evidence, `${JSON.stringify({
+    rowCounts: { completeCaseEligible: 1000 },
+    model: {
+      type: "weighted approximate linear regression",
+      covariates: ["uninsured", "age_10", "female", "race_1"],
+      uninsuredMeanDifferenceHbA1cPercent: 0.05,
+      ci95: [0.01, 0.08],
+      pValue: 0.0047,
+    },
+    limitations: ["Approximate survey weights only"],
+  }, null, 2)}\n`);
+  const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
+  await writeFile(qaPath, renderResearchPaperQaJson(qa));
+  await writeFile(analysisSpecPath, `${JSON.stringify({
+    schemaVersion: 1,
+    analysisSpec: {
+      schemaVersion: 1,
+      id: "analysis_test_golden",
+      researchQuestion: "Among adults, is insurance associated with HbA1c?",
+      surveyDesign: {
+        weightVariable: "WTMEC2YR",
+        strataVariable: "SDMVSTRA",
+        psuVariable: "SDMVPSU",
+      },
+      analysisPlan: ["approximate weighted observational association"],
+      inferencePolicy: {
+        varianceEstimator: "approximate_weighted",
+        allowedInference: "exploratory_association",
+        causalClaimsAllowed: false,
+      },
+      failurePolicy: {
+        rerunInstability: "block",
+        missingVariable: "block",
+      },
+      requiredVariables: ["WTMEC2YR", "SDMVSTRA", "SDMVPSU", "LBXGH", "HIQ011"],
+      specHash: "spec_current",
+    },
+  }, null, 2)}\n`);
+  await writeFile(runnerRecordPath, `${JSON.stringify({ status: "succeeded", analysisSpec: { specHash: "spec_current" } }, null, 2)}\n`);
+  await writeFile(sourceValidationPath, `${JSON.stringify({ schemaVersion: 1, status: "passed" }, null, 2)}\n`);
+  await writeFile(rerunDiffPath, `${JSON.stringify({ schemaVersion: 1, status: opts.rerunStatus ?? "stable", diffs: opts.rerunStatus === "changed" ? [{ path: "analysis.json", before: 1, after: 2 }] : [] }, null, 2)}\n`);
+  await writeFile(shareSafetyPath, `${JSON.stringify({ schemaVersion: 1, status: "local_only_blocked_for_share", localPathCount: 1 }, null, 2)}\n`);
+  if (!opts.omitLocalReviewNote) {
+    await writeFile(localReviewPath, "Local review note: packet is suitable for local review with approximate variance limitations.\n");
+  }
+  await writeFile(goldenPacketPath, `${JSON.stringify({
+    schemaVersion: 1,
+    id: "golden_test_packet",
+    artifacts: {
+      paper,
+      analysisEvidence: evidence,
+      paperQa: qaPath,
+      runnerRecord: runnerRecordPath,
+    },
+  }, null, 2)}\n`);
+  const manifestArtifacts = [
+    goldenPacketPath,
+    analysisSpecPath,
+    sourceValidationPath,
+    rerunDiffPath,
+    evidence,
+    paper,
+    qaPath,
+    runnerRecordPath,
+    shareSafetyPath,
+    localReviewPath,
+  ];
+  const artifacts = [];
+  for (const artifactPath of manifestArtifacts) {
+    const bytes = await readFile(artifactPath).catch(() => null);
+    artifacts.push({
+      path: artifactPath,
+      bytes: bytes?.byteLength ?? 0,
+      sha256: bytes ? createHash("sha256").update(bytes).digest("hex") : "missing",
+    });
+  }
+  await writeFile(path.join(dir, "golden-manifest.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    id: "golden_test_packet",
+    localReviewStatus: "ready_for_local_review",
+    shareStatus: "local_only_blocked_for_share",
+    checks: {
+      sourceValidation: "passed",
+      rerunDiff: opts.rerunStatus ?? "stable",
+      paperQa: qa.status,
+      runnerRecord: "present",
+      shareSafety: "local_only_blocked_for_share",
+    },
+    artifacts,
+  }, null, 2)}\n`);
+}
 
 async function makeRepo(): Promise<string> {
   const repo = await mkdtemp(path.join(os.tmpdir(), "research-fixture-"));

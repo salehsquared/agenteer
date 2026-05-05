@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "nodeId": "@agenteer/node-research-cohort-scout",
+  "displayName": "Research cohort scout",
+  "domain": "research",
+  "inputSchema": {
+    "type": "object",
+    "required": ["packetDir", "dataset", "variables", "cycles"],
+    "properties": {
+      "packetDir": { "type": "string", "minLength": 1 },
+      "dataset": { "type": "string", "minLength": 1 },
+      "variables": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+      "cycles": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["status", "eligibleRows", "missingness", "failures"],
+    "properties": {
+      "status": { "type": "string", "enum": ["pass", "fail"] },
+      "eligibleRows": { "type": "number", "minimum": 0 },
+      "missingness": { "type": "object" },
+      "failures": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+  "artifactEffects": [
+    {
+      "id": "cohort-scout-report",
+      "kind": "write",
+      "pathTemplate": "cohort-scout.json",
+      "required": true,
+      "description": "Cohort eligibility, missingness, sparse-cell, and survey-domain scout output."
+    }
+  ],
+  "failureTypes": [
+    {
+      "code": "NODE_INPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": false,
+      "repairAction": "Repair dataset, variables, or cycle selection before scout execution.",
+      "description": "Cohort scout input failed the contract."
+    },
+    {
+      "code": "MISSING_VARIABLE",
+      "severity": "blocker",
+      "category": "research",
+      "retryable": false,
+      "repairAction": "Return to variable mapping or dataset candidate selection.",
+      "description": "A requested variable is not available in the selected dataset/cycle."
+    },
+    {
+      "code": "SPARSE_CELLS",
+      "severity": "blocker",
+      "category": "research",
+      "retryable": false,
+      "repairAction": "Change stratification, combine categories, or select another question before modeling.",
+      "description": "Cohort scout found sparse cells that make the proposed analysis unstable."
+    },
+    {
+      "code": "NODE_OUTPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Repair scout adapter output schema.",
+      "description": "Cohort scout output failed the contract."
+    },
+    {
+      "code": "NODE_ARTIFACT_MISSING",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Regenerate cohort-scout.json before AnalysisSpec promotion.",
+      "description": "Required cohort scout artifact is missing."
+    }
+  ],
+  "verifier": { "kind": "json-schema", "inputRequired": true, "outputRequired": true, "command": null, "evidenceRefs": ["cohort-scout-v1"] },
+  "permissions": { "requiredActions": ["fs.read"], "dynamicActions": false, "dynamicActionSpec": null },
+  "costBoundary": { "maxUsd": 0, "maxRuntimeSeconds": 300, "cloudAllowed": false },
+  "sideEffects": { "writesFs": true, "network": false, "mutatesCtx": false, "emitsCtxVariants": [] },
+  "stability": { "determinism": "deterministic", "maturity": "stable" },
+  "examples": [
+    {
+      "name": "nhanes-insurance-hba1c-scout",
+      "input": { "packetDir": "/tmp/packet", "dataset": "nhanes", "variables": ["LBXGH", "HIQ011"], "cycles": ["2017-2018"] },
+      "output": { "status": "pass", "eligibleRows": 1200, "missingness": { "LBXGH": 0.04 }, "failures": [] }
+    }
+  ]
+}

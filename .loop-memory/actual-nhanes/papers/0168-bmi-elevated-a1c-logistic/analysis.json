@@ -1,0 +1,123 @@
+{
+  "paperId": "0168-bmi-elevated-a1c-logistic",
+  "title": "Body mass index and elevated HbA1c threshold in NHANES adults",
+  "researchQuestion": "Among NHANES adults aged 20 years and older, is body mass index associated with elevated HbA1c threshold status?",
+  "analysisSpecPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/analysis-spec.json",
+  "dataRoot": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430",
+  "inputFiles": [
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet"
+  ],
+  "population": "RIDAGEYR >= 20",
+  "exposure": {
+    "name": "BMXBMI",
+    "variable": "BMXBMI",
+    "definition": "Continuous BMXBMI"
+  },
+  "outcome": {
+    "name": "elevated_hba1c",
+    "variable": "LBXGH",
+    "definition": "Binary threshold elevated_hba1c from LBXGH >= 6.5"
+  },
+  "rowCounts": {
+    "mergedRows": 49681,
+    "eligibleRows": 49681,
+    "completeCaseEligible": 24836
+  },
+  "missingnessEligibleRows": {
+    "LBXGH": 0.2975986795756929,
+    "BMXBMI": 0.04279301946418148,
+    "WTMEC2YR": 0.2772085908093637,
+    "SDMVSTRA": 0.0,
+    "SDMVPSU": 0.0,
+    "RIDAGEYR": 0.0,
+    "RIAGENDR": 0.0,
+    "RIDRETH1": 0.0
+  },
+  "weights": {
+    "weight": "WTMEC2YR",
+    "strata": "SDMVSTRA",
+    "psu": "SDMVPSU",
+    "implementation": "strata/PSU linearized sandwich variance for weighted logistic regression"
+  },
+  "varianceEstimator": "complex_survey_linearized",
+  "model": {
+    "type": "weighted logistic regression with strata/PSU linearized sandwich variance",
+    "covariates": [
+      "intercept",
+      "BMXBMI",
+      "RIDAGEYR",
+      "RIAGENDR_2.0",
+      "RIDRETH1_2.0",
+      "RIDRETH1_3.0",
+      "RIDRETH1_4.0",
+      "RIDRETH1_5.0"
+    ],
+    "logOddsCoefficient": 0.09433598185432909,
+    "oddsRatio": 1.0989289040694459,
+    "standardError": 0.004617890685624404,
+    "ci95": [
+      1.0890273039241762,
+      1.1089205310534216
+    ],
+    "logOddsCi95": [
+      0.08528491611050526,
+      0.10338704759815293
+    ],
+    "pValue": 9.35728275155564e-93,
+    "eventCount": 2604,
+    "eventWeightedPercent": 8.028231273702103,
+    "strataCount": 59,
+    "psuCount": 121,
+    "lonelyStrata": 0
+  },
+  "thresholds": {
+    "binaryOutcome": "Binary threshold elevated_hba1c from LBXGH >= 6.5"
+  },
+  "groupSummary": [
+    {
+      "category": "q1",
+      "n": 6209,
+      "weightedMeanOutcome": 0.02196647129697747,
+      "weightedMeanExposure": 20.804471547010056
+    },
+    {
+      "category": "q2",
+      "n": 6209,
+      "weightedMeanOutcome": 0.046250303054181846,
+      "weightedMeanExposure": 25.383550254260605
+    },
+    {
+      "category": "q3",
+      "n": 6209,
+      "weightedMeanOutcome": 0.0909178316269532,
+      "weightedMeanExposure": 29.579525425649962
+    },
+    {
+      "category": "q4",
+      "n": 6209,
+      "weightedMeanOutcome": 0.15543430784216997,
+      "weightedMeanExposure": 38.12303031758119
+    }
+  ],
+  "analysisSpec": {
+    "inferencePolicy": {
+      "estimandType": "associational",
+      "varianceEstimator": "complex_survey",
+      "allowedInference": "design_corrected_inference",
+      "pValueLanguage": "standard",
+      "causalClaimsAllowed": false
+    }
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Complete-case analysis may induce selection bias.",
+    "Design-based linearized variance is implemented for the primary weighted linear model only."
+  ],
+  "sources": [
+    "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+    "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+    "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0309210"
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "paperRerunStability": {
+    "schemaVersion": 1,
+    "baselineDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0178-bmi-fasting-glucose-r-survey",
+    "repeatDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey",
+    "generatedAtIso": "2026-05-05T17:48:20.183Z",
+    "tolerance": 1e-8,
+    "status": "pass",
+    "comparisons": [
+      {
+        "field": "rowCounts.completeCaseEligible",
+        "baseline": 11918,
+        "repeat": 11918,
+        "tolerance": 1e-8,
+        "diff": 0,
+        "status": "pass"
+      },
+      {
+        "field": "model.type",
+        "baseline": "R survey svyglm weighted linear regression with Taylor linearized variance",
+        "repeat": "R survey svyglm weighted linear regression with Taylor linearized variance",
+        "status": "pass"
+      },
+      {
+        "field": "model.exposureCoefficient",
+        "baseline": 0.837,
+        "repeat": 0.837,
+        "tolerance": 1e-8,
+        "diff": 0,
+        "status": "pass"
+      },
+      {
+        "field": "model.standardError",
+        "baseline": 0.0554,
+        "repeat": 0.0554,
+        "tolerance": 1e-8,
+        "diff": 0,
+        "status": "pass"
+      },
+      {
+        "field": "model.ci95",
+        "baseline": [
+          0.7283,
+          0.9456
+        ],
+        "repeat": [
+          0.7283,
+          0.9456
+        ],
+        "status": "pass"
+      },
+      {
+        "field": "model.pValue",
+        "baseline": 3.2333e-21,
+        "repeat": 3.2333e-21,
+        "tolerance": 1e-8,
+        "diff": 0,
+        "status": "pass"
+      },
+      {
+        "field": "weights.weight",
+        "baseline": "WTSAF2YR",
+        "repeat": "WTSAF2YR",
+        "status": "pass"
+      },
+      {
+        "field": "weights.strata",
+        "baseline": "SDMVSTRA",
+        "repeat": "SDMVSTRA",
+        "status": "pass"
+      },
+      {
+        "field": "weights.psu",
+        "baseline": "SDMVPSU",
+        "repeat": "SDMVPSU",
+        "status": "pass"
+      },
+      {
+        "field": "weights.domain.id",
+        "baseline": "fasting_subsample",
+        "repeat": "fasting_subsample",
+        "status": "pass"
+      },
+      {
+        "field": "weights.domain.isSubsample",
+        "baseline": true,
+        "repeat": true,
+        "status": "pass"
+      },
+      {
+        "field": "qa.status",
+        "baseline": "pass",
+        "repeat": "pass",
+        "status": "pass"
+      },
+      {
+        "field": "lifecycle.status",
+        "baseline": "ready_for_local_review",
+        "repeat": "ready_for_local_review",
+        "status": "pass"
+      },
+      {
+        "field": "runner.analysisSpec.specHash",
+        "baseline": "7088b03c73b5f2e8ba437752a1332d4a8c14ba346cec0675216994816ffe7ce4",
+        "repeat": "7088b03c73b5f2e8ba437752a1332d4a8c14ba346cec0675216994816ffe7ce4",
+        "status": "pass"
+      },
+      {
+        "field": "runner.inputs.sha256",
+        "baseline": {
+          "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319",
+          "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65",
+          "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9"
+        },
+        "repeat": {
+          "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319",
+          "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65",
+          "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9"
+        },
+        "status": "pass"
+      }
+    ],
+    "summary": "15/15 rerun stability checks passed.",
+    "nextAction": "Rerun stability passed for tracked scientific fields; include this artifact in lifecycle or manifest before treating the packet as archive-stable."
+  }
+}

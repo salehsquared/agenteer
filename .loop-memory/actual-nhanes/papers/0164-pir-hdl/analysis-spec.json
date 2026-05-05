@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "analysisSpec": {
+    "schemaVersion": 1,
+    "id": "nhanes_pir_hdl_0164",
+    "researchQuestion": "Among NHANES adults aged 20 years and older, is family poverty-income ratio associated with HDL cholesterol in an exploratory cross-sectional analysis?",
+    "dataset": {
+      "id": "nhanes-v1-20260430-local-cache",
+      "release": "MedBrevia curated NHANES local Parquet cache",
+      "requiredTables": ["demographics", "lipids"]
+    },
+    "population": {
+      "eligibility": ["RIDAGEYR >= 20", "complete INDFMPIR, LBDHDD, WTMEC2YR, SDMVSTRA, SDMVPSU, RIAGENDR, RIDRETH1"]
+    },
+    "variables": {
+      "exposure": { "name": "family poverty-income ratio", "variable": "INDFMPIR", "unit": "ratio" },
+      "outcome": { "name": "HDL cholesterol", "variable": "LBDHDD", "unit": "mg/dL" },
+      "covariates": ["RIDAGEYR", "RIAGENDR", "RIDRETH1"],
+      "surveyDesign": { "weight": "WTMEC2YR", "strata": "SDMVSTRA", "psu": "SDMVPSU" }
+    },
+    "model": {
+      "family": "weighted approximate linear regression",
+      "estimand": "mean difference in HDL cholesterol per 1-unit higher family poverty-income ratio",
+      "sensitivity": "poverty-category weighted HDL means"
+    },
+    "inferencePolicy": {
+      "estimandType": "associational",
+      "varianceEstimator": "approximate_weighted",
+      "allowedInference": "exploratory_association",
+      "pValueLanguage": "approximate_only",
+      "causalClaimsAllowed": false
+    },
+    "failurePolicy": {
+      "stopForMissingSurveyDesign": true,
+      "stopForSparseCells": true,
+      "stopForHighMissingness": true,
+      "methodologicalRepairRequiredForComplexSurveyVariance": true
+    }
+  }
+}

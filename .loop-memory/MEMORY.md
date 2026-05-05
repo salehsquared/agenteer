@@ -1,0 +1,200 @@
+# Agenteer / Research Pipeline Loop Memory
+
+## Operating Mode
+
+This loop dogfoods Agenteer against a CLI-first research pipeline. Agenteer is writable and is the orchestration framework. MedBrevia is read-only by default and supplies NHANES analytics/domain context plus product pressure.
+
+Each tick states its axis, produces one deliverable, verifies it, records one rejected counter-design, updates memory, and proposes the next tick.
+
+## Current State Snapshot
+
+- Agenteer has a broad research CLI under `agenteer research ...`.
+- Agenteer also has an `agenteer agent ...` improvement layer for context, planning, criticism, repair, creativity, and execution memory.
+- The research pipeline is stage-based by design so the orchestrating agent stays involved between steps.
+- MedBrevia remains read-only by default and supplies domain pressure: `ResearchProtocol`, `AnalysisSpec`, cohort scout, semantic quality, jobs, and product workflow.
+
+## Tick Index
+
+- Tick 001, axis 1 faster/simpler: initialized loop memory and wrote the research pipeline architecture note.
+- Tick 002, axis 2 more robust: added checkpoint `recommendedCommands` so blocked stage gates expose safe next commands.
+- Tick 003, axis 3 remove/merge: made `research pipeline-stages` the canonical visible command while preserving `research stages` as an alias.
+- Tick 004, axis 4 add: added `research next` packet navigator over checkpoint, gate status, and recommended commands.
+- Tick 005, axis 5 challenge: critiqued checkpoint/next navigation and recommended expected artifacts for Tick 006.
+- Tick 006, axis 6 question: made `research next` evidence-centered by adding expected artifacts and success conditions.
+- Tick 007, axis 1 faster/simpler: centralized `research next` stage artifact metadata to avoid a second scattered registry.
+- Tick 008, axis 2 more robust: added artifact presence checks to `research next` expected artifacts.
+- Tick 009, axis 3 remove/merge: shared stage artifact path metadata between checkpoint detection and `research next`.
+- Tick 010, axis 4 add: added opt-in `research next --trace` navigation decision records.
+- Tick 011, axis 5 challenge: critiqued `research next` growth and recommended self-describing trace records.
+- Tick 012, axis 6 question: made `research next` events self-describing with schema version and event type.
+- Tick 013, axis 1 faster/simpler: exposed the `research next` event type and schema in human output.
+- Tick 014, axis 2 more robust: added `research next --exit-zero-on-blocked` for audit-only blocked navigation.
+- Tick 015, axis 3 remove/merge: documented ownership boundaries for `checkpoint`, `stage-gate`, and `next`.
+- Tick 016, axis 4 add: added `research navigation-trace` to inspect `navigation-trace.jsonl`.
+- Tick 017, axis 5 challenge: critiqued trace reader scope and recommended validation over generalization.
+- Tick 018, axis 6 question: added malformed-line and event-type validation to `research navigation-trace`.
+- Tick 019, axis 1 faster/simpler: added compact `status` to `research navigation-trace` summaries.
+- Tick 020, axis 2 more robust: added lightweight SHA-256 hash chaining to navigation trace events.
+- Tick 021, axis 3 remove/merge: decided to keep hash-chain helpers local until a second event type exists.
+- Tick 022, axis 4 add: made approval artifacts event-shaped with schema, event type, decision id, and record hash.
+- Tick 023, axis 5 challenge: critiqued event metadata and recommended only a tiny shared hashing helper.
+- Tick 024, axis 6 question: extracted `hashResearchEventRecord` for approval and navigation event hashes.
+- Tick 025, axis 1 faster/simpler: documented the lightweight research packet event-record pattern.
+- Tick 026, axis 2 more robust: added `research approval-verify` for approval record hash validation.
+- Tick 027, axis 3 remove/merge: decided `approval-verify` stays narrow until a true `packet-verify` aggregator exists.
+- Tick 028, axis 4 add: added `research packet-verify` as a narrow aggregator over existing integrity verifiers.
+- Tick 029, axis 5 challenge: critiqued `packet-verify` scope and recommended explicit mode/scope metadata.
+- Tick 030, axis 6 question: added explicit mode and scope metadata to `research packet-verify`.
+- Tick 031, axis 1 faster/simpler: added new navigation/integrity commands to research pipeline docs command lists.
+- Tick 032, axis 2 more robust: verified build and top-level help include the new verification commands.
+- Tick 033, axis 3 remove/merge: deferred subcommand-scoped help until a broader CLI ergonomics pass.
+- Tick 034, axis 4 add: added `research manifest-verify` and included manifest hash checks in `packet-verify`.
+- Tick 035, axis 5 challenge: critiqued verification stack scope and warned integrity pass is not research validity.
+- Tick 036, axis 6 question: added summary and next-action language to `research packet-verify`.
+- Tick 037, axis 1 faster/simpler: reused stage command helpers for `packet-verify` approval and manifest next actions.
+- Tick 038, axis 2 more robust: smoke-tested `manifest-verify` on a changed `design.json` and confirmed clear drift reporting.
+- Tick 039, axis 3 remove/merge: decided manifest verification belongs to reproducibility/export integrity, not event records.
+- Tick 040, axis 4 add: added `exportIntegrityReady` to `research packet-verify`.
+- Tick 041, axis 5 challenge: critiqued export integrity readiness and recommended adding a reason.
+- Tick 042, axis 6 question: added `exportIntegrityReason` to `research packet-verify`.
+- Tick 043, axis 1 faster/simpler: compressed human `packet-verify` export integrity output into one line.
+- Tick 044, axis 2 more robust: ran full integrity smoke path through design, scout, trace, approval, manifest, and packet verify.
+- Tick 045, axis 3 remove/merge: summarized the 40-tick run and identified research-readiness as the next separate layer.
+- Tick 046, migration: added dual-tick config, cost log, domain-change log, and committed future ticks to `dual_tick.py next` plus 4-digit tick files.
+- Tick 047, challenge: skeptical-statistician critique warned that `research-readiness` must not imply scientific validity.
+- Tick 048, question-the-question: added `research packet-readiness` as a scoped review-readiness component aggregator with explicit scientific limitations.
+- Tick 049, web-search: added source references to `packet-readiness`, grounded in STROBE caution that reporting checklists are not study-quality instruments.
+- Tick 050, challenge: end-user clinician critique said readiness needs a decision posture and human-readable clinical summary, not only component internals.
+- Tick 051, first-principles: added `decisionPosture`, `sharePosture`, and `clinicianSummary` to `packet-readiness`.
+- Tick 052, rejected-revival: revived public stage artifact metadata as `research stage-artifacts` and corrected provenance artifact naming.
+- Tick 053, challenge: reliability critique warned that readiness, QA, checkpoint, and stage artifacts can drift without shared mapping or cross-projection tests.
+- Tick 054, capability-rave: inventoried malleable readiness/metadata surfaces and added provenance drift coverage across stage artifacts, QA, and readiness.
+- Tick 055, challenge: framework-minimalist critique warned the research CLI is accreting too many adjacent status/verification commands.
+- Tick 056, web-search: used CLI design guidance to split research docs into a primary path and audit/debug commands.
+- Tick 057, cross-domain: imported Lean Andon stop-the-line thinking by adding `stopReasons` to packet readiness.
+- Tick 058, add-primitive: added machine-readable `recommendedCommands` to packet readiness.
+- Tick 059, challenge: new-contributor critique warned packet-readiness JSON field stability is unclear.
+- Tick 060, challenge: methodology-archivist critique said readiness and review artifacts need explicit contract/policy provenance.
+- Tick 061, faster/simpler: documented the stable packet-readiness JSON contract versus human-facing prose fields.
+- Tick 062, more-robust: added `packet-readiness.json` to exportable research artifacts and coverage.
+- Tick 063, capability-rave: identified export artifact allowlist derivation as the next remove/merge target.
+- Tick 064, add-primitive: derived export artifact allowlist from stage artifact metadata plus explicit extras.
+- Tick 065, challenge: adversarial-security critique warned `recommendedCommands` is a trust boundary and should avoid shell-chain ambiguity.
+- Tick 066, tail-sample: hardened readiness `recommendedCommands` to admit only single `agenteer research ...` commands without shell operators.
+- Tick 067, faster/simpler: separated review readiness from export/share readiness so missing export does not block internal scientific review.
+- Tick 068, first-principles: made checkpoint stage `export` pass review readiness and added coverage for review-ready-before-export behavior.
+- Tick 069, remove-or-merge: removed the resolved open question about internal review versus export/share posture.
+- Tick 070, challenge: scaling-skeptic critique warned readiness may overfit NHANES/observational-survey defaults.
+- Tick 071, challenge: competing-tool critique recommended naming the implicit readiness profile in output.
+- Tick 072, capability-rave: added default `readinessProfile` (`observational-survey-v1`) to packet readiness and docs.
+- Tick 073, faster/simpler: extracted `DEFAULT_RESEARCH_READINESS_PROFILE` to avoid inline profile duplication.
+- Tick 074, more-robust: added renderer coverage for the readiness profile.
+- Tick 075, challenge: skeptical-statistician critique warned profile naming must not imply statistical adequacy.
+- Tick 076, cross-domain: applied cartography legend thinking by adding profile caveat text to human readiness output.
+- Tick 077, tail-sample: ran a zero-GCP real NHANES cohort scout against MedBrevia's local curated Parquet release and recorded the first actual-data loop artifact.
+- Tick 078, rejected-revival: revived richer local-data smoke evidence as `research table-summary`, including optional Parquet summary through an explicit Python runtime.
+- Tick 079, faster/simpler: made `suggest-variable-map` reuse table summaries so actual Parquet files can produce variable-map suggestions directly.
+- Tick 080, challenge: reliability-engineer critique warned the Python-backed Parquet bridge needs runtime/file provenance and a named real-data adapter boundary before it expands further.
+- Tick 081, capability-rave: added runtime and file provenance to `research table-summary`, including Parquet adapter package versions and file SHA-256.
+- Tick 082, add-primitive: added `tableEvidence` to variable-map suggestions so mappings cite adapter kind, file hash, mtime, and row/column counts.
+- Tick 083, challenge: framework-minimalist critique warned `table-summary`, `data-access`, and `real-runner-spec` are overlapping and should collapse toward packet-level real-data evidence.
+- Tick 084, web-search: grounded the real-data evidence design in W3C PROV, RO-Crate, and Workflow Run RO-Crate; next step is PROV-like enrichment of `data-access.json`.
+- Tick 085, challenge: end-user clinician critique warned enriched data-access evidence must include a human decision summary, not only hashes/runtime metadata.
+- Tick 086, more-robust: enriched `data-access.json` with table-summary provenance, file evidence, expected-variable checks, and a human decision summary.
+- Tick 087, remove-or-merge: made `real-study-readiness` consume enriched data-access evidence instead of treating a bare manifest as enough.
+- Tick 088, tail-sample: built a two-domain actual NHANES HbA1c packet with summarized demographics and diabetes Parquet evidence; all real-data requirements passed but fixture-runner semantics still block overall readiness.
+- Tick 089, challenge: new-contributor critique said `real-study-readiness` needs blocking versus advisory requirement semantics so fixture-runner evidence does not block real-data readiness.
+- Tick 090, challenge: adversarial-security critique warned enriched real-data artifacts leak absolute local paths unless export/share redaction policy exists.
+- Tick 091, web-search: confirmed exported research packages should avoid absolute paths, retain size/hash manifests, and record runtime packages.
+- Tick 092, more-robust: added blocking/advisory semantics to real-study readiness; the actual two-domain NHANES packet is now `ready_for_local_real_data`.
+- Tick 093, remove-or-merge: folded absolute-local-path warnings into packet readiness and share posture instead of adding a separate checker.
+- Tick 094, add-primitive: added `research data-access-redact` and produced a share-safer data-access view for the actual two-domain NHANES packet with hashes/runtime evidence but no absolute local paths.
+- Tick 095, challenge: methodology-archivist critique said redaction is not archive-grade until export uses it, derivation hashes exist, and shareable artifacts are scanned for local paths.
+- Tick 096, question-the-question: made `data-access-redacted.json` a derived evidence artifact by adding source manifest SHA-256 and generated timestamp.
+- Tick 097, faster/simpler: folded redacted data-access freshness into packet readiness as a share/export component.
+- Tick 098, web-search: grounded export redaction in BagIt relative-path manifests, reproducibility path guidance, RO-Crate, and Workflow Run RO-Crate; next target is an export receipt/local-path scan.
+- Tick 099, capability-rave: identified export as a policy-mediated boundary with shareable/local-only/derived-redacted artifact classes; scheduled export receipt/local-path scan first.
+- Tick 100, challenge: scaling-skeptic critique warned not to over-optimize archive mechanics before improving actual-data scouting, semantic quality, execution, and report critique across multiple study shapes.
+- Tick 101, challenge-axis response: added export receipts with artifact SHA-256 checks and local-path scanning; actual NHANES export now measurably fails share safety instead of leaking silently.
+- Tick 102, first-principles: re-derived the local/share packet boundary and selected artifact-class export policy as the smallest correction before pivoting back to actual-data research.
+- Tick 103, faster/simpler: made export substitute fresh `data-access-redacted.json` for raw `data-access.json`; actual NHANES export leaks fewer local paths and keeps remaining leaks visible.
+- Tick 104, rejected-revival: revived multi-study actual Parquet pressure by building a second NHANES vitamin-D/blood-pressure packet over demographics, vitamin D, and blood pressure Parquet; it is `ready_for_local_real_data`.
+- Tick 105, challenge: skeptical-statistician critique warned that file readiness is not analytic feasibility; vitamin D/BP packet needs merged cohort and high-missingness checks.
+- Tick 106, add-primitive: added actual merged cohort-feasibility artifact for the vitamin-D/BP packet; complete-case adult eligible N is 19,770 with endpoint preview 8,195 positive / 11,575 negative.
+- Tick 107, challenge: established a paper contract using STROBE, CDC NHANES analytic guidance, ACC/AHA hypertension threshold provenance, and TARMOS missing-data reporting guidance.
+- Tick 108, capability-rave: generated first actual NHANES paper artifact (vitamin D and measured hypertension) with analysis JSON, paper markdown, QA JSON, and critique; QA passed with approximate-survey limitations.
+- Tick 109, faster/simpler: added reusable `research paper-qa` CLI and re-ran it against the first paper; 17/17 deterministic paper QA checks passed.
+- Tick 110, challenge: selected smoking/lipids as the second paper direction to force a different domain shape and continuous endpoint; memory hygiene confirmed `MEMORY.md` is under 200 lines.
+- Tick 111, remove/merge: generated second actual NHANES paper (smoking history and HDL cholesterol), deliberately dropping triglycerides due high missingness/subsample concerns; QA passed 17/17.
+- Tick 112, web-search: selected kidney albuminuria/UACR and blood pressure as the next tail-end paper direction to stress ratio construction and clinical category thresholds.
+- Tick 113, challenge-axis response: generated third actual NHANES paper (albuminuria/UACR and measured hypertension), with kidney threshold caveats and QA pass 17/17.
+- Tick 114, cross-domain: imported legal chain-of-custody thinking into `research paper-qa`; threshold studies now require provenance and single-measure diagnostic caveats, and the UACR paper passes 21/21 checks.
+- Tick 115, challenge: skeptical-statistician critique warned that paper QA is still reporting-focused and needs model-family/effect-measure/evidence consistency checks.
+- Tick 116, more-robust: made `research paper-qa` model-aware for logistic/linear effect language, covariate disclosure, and approximate weighted variance caveats; all three generated papers pass the stronger gate.
+- Tick 117, capability-rave: inventoried malleable paper-QA/paper-generation surfaces and selected numeric result consistency as the next high-leverage improvement.
+- Tick 118, add-primitive: added numeric result consistency checks to `research paper-qa`; generated papers now prove reported effects, CIs, and p values match `analysis.json` within tolerance.
+- Tick 119, first-principles/web-creativity: selected health insurance coverage and HbA1c as Paper 4 after current web review, X weak-signal search, and actual insurance/diabetes table summaries.
+- Tick 120, challenge: end-user-clinician critique warned that the insurance/HbA1c paper must not overclaim care quality or causality; memory hygiene checked `MEMORY.md` at 154 lines.
+- Tick 121, tail-sample: generated Paper 4, insurance coverage and HbA1c in adults, from actual cached NHANES Parquet; QA passed 25/25 after avoiding a negated-causal false positive.
+- Tick 122, more-robust: made `research paper-qa` causal-language detection negation-aware; Paper 4 now passes with explicit "not evidence that insurance caused" language.
+- Tick 123, remove-or-merge: added a single actual-paper index that merges scattered paper paths and latest QA status without deleting QA history.
+- Tick 124, add-primitive: promoted paper indexing into `agenteer research paper-index`, with JSON/Markdown output and optional `--out`.
+- Tick 125, challenge: reliability-engineer critique warned that generated papers need runner provenance, not only paper/analysis/QA/critique files.
+- Tick 126, capability-rave/web: grounded runner provenance in workflow-run reproducibility sources and added `runner-record.json` for Paper 4 with input/output hashes and runtime/package metadata.
+- Tick 127, maturity reproducibility/UX: made `research paper-index` surface runner status, revealing Papers 1-3 lack runner provenance while Paper 4 has it.
+- Tick 129, maturity architecture/reproducibility: established `/Users/saleh/TechProjects/agenteer/.loop-memory/golden/nhanes-insurance-hba1c/` as the current canonical golden packet target.
+- Tick 130, maturity methods/truth: created a retrospective typed `AnalysisSpec` for the golden packet and critiqued that it is not yet proof of spec-first execution.
+- Tick 131, maturity truth/methods: validated golden source tables against `analysis-spec.json`; required variables, survey fields, missingness, and sparse cells passed.
+- Tick 132, maturity truth/methods: strengthened `cohort-scout-file` typed failures for invalid weights and missing survey design fields, with targeted test coverage.
+- Tick 133, maturity runner/reproducibility/truth: reran the golden insurance/HbA1c model from `analysis-spec.json` and produced a stable `rerun-diff.json` with zero numeric diffs.
+- Tick 134, maturity reproducibility/QA: added `golden-manifest.json` hashing 11 artifacts and marking the golden packet `ready_for_local_review`.
+- Tick 135, maturity QA/reproducibility challenge: adversarial-security critique warned the golden manifest is self-attested and needs independent hash/readiness verification.
+- Tick 136, maturity reproducibility/QA: extended `research manifest-verify` to independently verify `golden-manifest.json`; live golden manifest is valid with 11 checked artifacts.
+- Tick 137, maturity reproducibility/QA: added golden `share-safety.json`; packet is local-review ready but blocked for share/export due 11 absolute local paths.
+- Tick 138, maturity reproducibility/QA: split golden manifest readiness into `localReviewStatus` and `shareStatus`; manifest verifies valid with 12 artifacts.
+- Tick 139, maturity QA/reproducibility: `research manifest-verify` now fails golden manifests whose `localReviewStatus` is not `ready_for_local_review`.
+- Tick 140, maturity architecture/QA challenge: framework-minimalist critique warned not to grow a hidden golden framework; add integration tests that compose existing primitives.
+- Tick 141, maturity QA/architecture: added miniature golden-packet integration coverage composing paper QA and manifest verification without a new command namespace.
+- Tick 142, maturity QA/reproducibility/runner: `research manifest-verify` now emits typed failure records such as `RERUN_DIFF_UNSTABLE`, `LOCAL_REVIEW_NOT_READY`, and artifact hash drift codes.
+- Tick 143, maturity runner/QA/reproducibility tail-sample: `research repair-plan` now consumes typed manifest verifier failures, including rerun instability, and proposes deterministic repair actions.
+- Tick 144, maturity reproducibility/UX capability-rave: updated the canonical golden packet status to `ready_for_local_review_spec_governed_rerun` and reverified its manifest as valid.
+- Tick 145, maturity methods/QA challenge: skeptical-statistician critique warned that approximate survey variance must become machine-checkable AnalysisSpec policy, not only report prose.
+- Tick 146, maturity methods/QA/reproducibility: added AnalysisSpec `inferencePolicy`/`failurePolicy`, enforced approximate-inference wording in paper QA, and updated the golden spec/manifest.
+- Tick 147, maturity methods/truth web-search: updated the golden README with CDC-backed NHANES survey-design cautions and approximate-inference boundary; manifest remains valid.
+- Tick 148, maturity runner/methods/QA: `research repair-plan` now separates executable and methodological issues and stops executable repair for methodological blockers.
+- Tick 149, maturity reproducibility/runner/QA challenge: reliability critique warned that AnalysisSpec policy and repair classification need live golden packet artifacts, not only unit tests.
+- Tick 150, maturity UX/methods/QA challenge plus hygiene: clinician critique asked for a manifest-tracked first-read local review note; MEMORY remains under 200 lines.
+- Tick 151, maturity UX/methods/reproducibility: added a manifest-tracked golden `local-review-note.md`; live manifest verifies valid with 13 artifacts.
+- Tick 152, maturity runner/reproducibility cross-domain: manifest verification now detects stale runner receipts through AnalysisSpec hash binding; live golden runner record cites the current spec hash.
+- Tick 153, maturity reproducibility/QA first-principles: generated a live golden `repair-plan.json`; manifest verifies valid with 14 artifacts.
+- Tick 154, maturity reproducibility/QA tail-sample: added a manifest-tracked `verification-repeat.json`; live manifest verifies valid with 15 artifacts.
+- Tick 155, maturity safety/reproducibility challenge: security critique warned that manifest verification must distinguish local validity from share/export validity.
+- Tick 156, maturity safety/reproducibility rejected-revival: manifest verification now reports `validLocal`, `validForShare`, and `shareStatus`; live golden packet is local-valid but not share-valid.
+- Tick 157, maturity reproducibility/UX/architecture: added reusable `research paper-runner-record` so actual generated papers can carry hashed input/output provenance and AnalysisSpec binding without hand-written runner JSON.
+- Tick 158, maturity truth/reproducibility: generated a new actual NHANES paper, BMI and HbA1c in adults, with analysis JSON, paper markdown, critique, paper QA pass, and CLI-generated runner provenance; this exposed that `paper-index` does not yet unwrap the new runner-record JSON envelope.
+- Tick 159, maturity remove-or-merge/reproducibility: made `research paper-index` normalize both raw runner records and wrapped `paperRunnerRecord` CLI envelopes; the actual paper corpus now shows all five papers with runner provenance and QA pass status.
+- Tick 160, maturity challenge: skeptical-statistician critique warned that actual papers are still bespoke Python plus after-the-fact QA, retrospective AnalysisSpec binding is too easy to overread, and complex-survey variance remains the biggest methods blocker.
+- Tick 161, maturity web-search/reproducibility: added explicit retrospective AnalysisSpec binding warnings to runner records and paper index status; regenerated the BMI/HbA1c runner record as `retrospective_succeeded`.
+- Tick 162, maturity capability-rave/architecture: wrapped the BMI/HbA1c paper with evidence receipts, task lifecycle artifacts, and MCP/A2A exports; task validation correctly blocked because required research capabilities lack declarations.
+- Tick 163, maturity faster/simpler/architecture: added local capability declarations for research paper generation, paper QA, and runner provenance; the BMI/HbA1c task now validates cleanly against declared capabilities.
+- Tick 164, maturity more-robust/truth: generated a spec-governed actual NHANES PIR/HDL paper from a pre-run AnalysisSpec, fixed a paper-QA threshold false positive, and recorded clean spec-governed runner provenance.
+- Tick 165, maturity challenge: framework-minimalist critique warned that paper QA, runner records, task envelopes, receipts, capabilities, indexes, and manifests are becoming too manual; the next move should consolidate reviewer-facing lifecycle state.
+- Tick 166, maturity add-primitive/UX: added `research paper-lifecycle`, a compact reviewer-facing summary that joins paper QA, runner binding, task validation, capability validation, blockers, and next action.
+- Tick 167, comprehensive implementation: added `research paper-run`, an AnalysisSpec-to-paper golden-path command with local NHANES execution, strata/PSU linearized survey variance for weighted linear regression, paper QA, runner provenance, evidence receipts, task validation, interop exports, lifecycle summaries, and docs; generated `0167-pir-hdl-paper-run` as the first ready-for-local-review end-to-end packet.
+- Tick 168, maturity web-search/methods/runner: extended `paper-run` to survey-weighted logistic regression with strata/PSU linearized variance, fixed model-family QA/lifecycle edge cases, and generated actual spec-governed BMI/elevated-HbA1c paper `0168-bmi-elevated-a1c-logistic`.
+- Tick 169, maturity rejected-revival/QA: added survey-logistic paper-QA regression coverage and fixed two checker bugs: complex-survey weighted models are no longer treated as approximate weighting, and logistic numeric consistency now prefers odds ratio over log-odds by default.
+- Tick 170, maturity challenge/reliability: critiqued `paper-run` before subsample analyses; next work must make subsample-weight evidence/refusals explicit and add rerun stability pressure.
+- Tick 171, maturity cross-domain/methods: imported ATC-clearance/refinement-contract thinking; `paper-run` now refuses subsample weights without rationale/eligibility notes, generated evidence records weight domain, and `paper-qa` enforces subsample disclosure/evidence.
+- Tick 172, maturity add-primitive/methods: generated real spec-governed fasting-subsample NHANES paper `0172-bmi-fasting-glucose-subsample` with `WTSAF2YR`; lifecycle ready, QA pass, task pass; also fixed threshold-provenance false positive from AnalysisSpec policy fields.
+- Tick 173, maturity challenge/clinician UX: critiqued generated papers as too easy to overread on skim; next work should add a first-read methods/safety header and QA requirement.
+- Tick 174, maturity question/UX-QA: `paper-run` now writes a first-read `Local Review Safety Header`, `paper-qa` requires it for paper-run evidence, and the real fasting-subsample paper passes the new gate.
+- Tick 175, maturity challenge/reproducibility: methodology-archivist critique said fresh `paper-run` packets need scientific-field rerun stability, not only one lifecycle success and hashes.
+- Tick 176, maturity tail-sample/reproducibility: added `research paper-rerun-stability`, generated a repeat fasting-subsample packet, and proved 15/15 scientific fields stable for `0172`.
+- Tick 177, maturity remove-merge/UX: folded rerun-stability status into `research paper-lifecycle`; failed stability blocks, missing stability is advisory, and `0172` lifecycle now surfaces rerun pass.
+- Tick 178, maturity add-primitive/methods/architecture: added `research modeling-plan`, a decision layer that ranks statistical methods, ML adapters, and workflow policies before execution; saved `.loop-memory/modeling/0178-modeling-plan.json`.
+- Tick 179, maturity challenge/methods/architecture: critiqued `modeling-plan`; next implementation must be evidence-aware, split blocking policies from executable candidates, and react to sample size/missingness/class shape.
+- Tick 180, maturity challenge/new-contributor hygiene: fake-progress audit warned `modeling-plan` and ML surfaces need evidence-aware ranking and clearer golden-path docs before more adapter breadth.
+
+## Open Thread
+
+Future ticks must use `python3 ~/.codex/skills/dual-tick/scripts/dual_tick.py next --primary /Users/saleh/TechProjects/agenteer` before selecting work. Use `check-readonly` before suspicious MedBrevia paths. Current run ceiling is `$10`; prefer cached NHANES Parquet or CDC public downloads. Current golden-path packet: `0167-pir-hdl-paper-run`; latest real paper: `0179-bmi-fasting-glucose-r-survey`. Latest reproducibility status: `0179` uses R `survey::svyglm`, passes lifecycle, paper QA, task validation, and 15/15 rerun-stability checks against `0178`. Top blockers: feeding actual table/spec evidence into `modeling-plan`, extracting backend adapters out of generated Python, richer survey-domain semantics, AnalysisSpec V2, and broader study-shape coverage. Recent Agenteer improvements: local analysis runtime, `backend-status`, `paper-run --backend r-survey`, lifecycle, task/capability validation, paper-QA fixes, subsample weight clearance, safety-header gate, paper rerun-stability primitive, and modeling decision planning.

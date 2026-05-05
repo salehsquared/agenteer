@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "packetReadiness": {
+    "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+    "mode": "review-readiness",
+    "readinessProfile": {
+      "id": "observational-survey-v1",
+      "label": "Observational survey readiness",
+      "domain": "observational-survey",
+      "selection": "default",
+      "caveat": "Default profile for observational/survey-style packet review; profile selection is not implemented yet."
+    },
+    "scope": [
+      "available-integrity",
+      "workflow-completeness",
+      "methods-validation-artifact",
+      "report-review-artifact",
+      "claim-language-guard",
+      "provenance-presence",
+      "export-record-presence"
+    ],
+    "status": "needs_work",
+    "decisionPosture": "stop",
+    "sharePosture": "share_with_caution",
+    "stopReasons": [
+      "report.md is missing"
+    ],
+    "recommendedCommands": [
+      "agenteer research provenance --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+      "agenteer research review-report --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+      "agenteer research validate-methods --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet"
+    ],
+    "summary": "5 readiness component(s) need work before human scientific review.",
+    "clinicianSummary": "Stop before report review; no report.md is available to inspect.",
+    "components": [
+      {
+        "id": "integrity",
+        "status": "missing",
+        "detail": "Some integrity artifacts are missing, so available integrity verification is incomplete.",
+        "nextAction": "agenteer research approve --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --note \"<review note>\" && agenteer research next --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --trace --exit-zero-on-blocked && agenteer research manifest --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --json"
+      },
+      {
+        "id": "checkpoint",
+        "status": "warning",
+        "detail": "Packet lifecycle is currently at scout.",
+        "nextAction": "agenteer research critique --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet && agenteer research scout --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet"
+      },
+      {
+        "id": "methods-validation",
+        "status": "missing",
+        "detail": "methods-validation.json is missing.",
+        "nextAction": "agenteer research validate-methods --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet"
+      },
+      {
+        "id": "report-review",
+        "status": "missing",
+        "detail": "report-review.json is missing.",
+        "nextAction": "agenteer research review-report --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet"
+      },
+      {
+        "id": "claim-guard",
+        "status": "missing",
+        "detail": "report.md is missing, so claim language could not be checked.",
+        "nextAction": "Generate report.md, then run agenteer research claim-guard --report /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet/report.md"
+      },
+      {
+        "id": "provenance",
+        "status": "missing",
+        "detail": "provenance.json is missing.",
+        "nextAction": "agenteer research provenance --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet"
+      },
+      {
+        "id": "export",
+        "status": "missing",
+        "detail": "export-record.json is missing.",
+        "nextAction": "Export the packet after review artifacts pass."
+      },
+      {
+        "id": "share-local-paths",
+        "status": "warning",
+        "detail": "4 absolute local path reference(s) appear in data-access evidence; redact or relativize before sharing.",
+        "nextAction": "Redact or relativize local paths before export/share."
+      }
+    ],
+    "limitations": [
+      "Readiness is a scoped review signal, not proof of scientific validity.",
+      "For survey or cross-sectional datasets, independently confirm weights, strata, PSU handling, missingness, subsample eligibility, sparse cells, and reproducibility.",
+      "Treat associations as observational unless the design, estimand, and analysis support causal interpretation.",
+      "Claim support depends on the report text and available artifacts; absence of warnings is not peer review."
+    ],
+    "references": [
+      {
+        "id": "strobe-official",
+        "title": "STROBE Statement",
+        "url": "https://www.strobe-statement.org/",
+        "applicability": "Supports treating observational-study checks as reporting guidance, not as a study-quality instrument."
+      },
+      {
+        "id": "strobe-explanation",
+        "title": "STROBE Explanation and Elaboration",
+        "url": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0040297",
+        "applicability": "Supports explicit reporting of design, eligibility, participant flow, bias, descriptive data, and study-size rationale."
+      }
+    ],
+    "packetVerification": {
+      "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+      "mode": "available-integrity",
+      "scope": [
+        "approval-record-hash",
+        "navigation-trace-jsonl",
+        "artifact-manifest-hashes"
+      ],
+      "status": "incomplete",
+      "exportIntegrityReady": false,
+      "exportIntegrityReason": "artifact manifest status is missing: artifact manifest is missing",
+      "summary": "Some integrity artifacts are missing, so available integrity verification is incomplete.",
+      "nextAction": "agenteer research approve --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --note \"<review note>\" && agenteer research next --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --trace --exit-zero-on-blocked && agenteer research manifest --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --json",
+      "approval": {
+        "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+        "approvalPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet/approval.json",
+        "status": "missing",
+        "expectedHash": null,
+        "actualHash": null,
+        "eventType": null
+      },
+      "navigationTrace": {
+        "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+        "tracePath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet/navigation-trace.jsonl",
+        "status": "missing",
+        "exists": false,
+        "events": 0,
+        "malformedLines": 0,
+        "hashChainStatus": "missing",
+        "eventTypes": {},
+        "lastEvent": null
+      },
+      "manifest": {
+        "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+        "manifestPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet/artifact-manifest.json",
+        "status": "missing",
+        "checkedArtifacts": 0,
+        "issues": [
+          "artifact manifest is missing"
+        ]
+      },
+      "issues": [
+        "approval artifact is missing",
+        "navigation trace is missing",
+        "artifact manifest is missing"
+      ]
+    },
+    "nextAction": "agenteer research approve --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --note \"<review note>\" && agenteer research next --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --trace --exit-zero-on-blocked && agenteer research manifest --packet /Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet --json"
+  }
+}
+

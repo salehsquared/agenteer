@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "taskInteropExport": {
+    "shape": "mcp",
+    "taskId": "task_56f3e141bb15",
+    "payload": {
+      "name": "task_56f3e141bb15",
+      "title": "Run AnalysisSpec and generate 0179-bmi-fasting-glucose-r-survey research paper packet",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "input_1": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "status": "succeeded",
+        "capabilities": [
+          "research.paper.generate",
+          "research.paper.qa",
+          "research.runner.provenance"
+        ],
+        "permissions": {
+          "allowedActions": [
+            "read-local-nhanes-cache",
+            "write-loop-memory-paper-artifacts"
+          ],
+          "deniedActions": [
+            "write-medbrevia",
+            "cloud"
+          ],
+          "humanApprovalRequired": false,
+          "networkAllowed": false,
+          "filesystemWriteRoots": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey"
+          ],
+          "cloudAllowed": false
+        },
+        "artifacts": [
+          {
+            "artifactId": "artifact_f146d6984469",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/analysis-spec.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "7088b03c73b5f2e8ba437752a1332d4a8c14ba346cec0675216994816ffe7ce4",
+            "description": "analysis-spec.json"
+          },
+          {
+            "artifactId": "artifact_dd78d8c15348",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/analysis.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "23885ea2d79264efccb436e38dcdd1d3460dfc801a6c0f2fd78c09e1e1e28edf",
+            "description": "analysis.json"
+          },
+          {
+            "artifactId": "artifact_3f248ec05c36",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/paper.md",
+            "kind": "markdown",
+            "mediaType": "text/markdown",
+            "hash": "7a3048d3e7c6418f4d67dae41341ce4713a1bdaf2b5cd9935b782960ac94ffa3",
+            "description": "paper.md"
+          },
+          {
+            "artifactId": "artifact_36a322283a5d",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/qa-cli.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "660fb8ab0522df54633e5733b0d48b486dfe3c344d615d3b01055839c8f8cd69",
+            "description": "qa-cli.json"
+          },
+          {
+            "artifactId": "artifact_1f67958086f2",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/runner-record.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "8cbdca982232ae9fe0b8773db7595c1eff5af57606d71033df66655196f5e91c",
+            "description": "runner-record.json"
+          }
+        ]
+      }
+    },
+    "evidenceReceipts": [
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_8ec49b36a0bf",
+        "artifactRef": {
+          "artifactId": "artifact_3f248ec05c36",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/paper.md",
+          "kind": "markdown",
+          "mediaType": "text/markdown",
+          "hash": "7a3048d3e7c6418f4d67dae41341ce4713a1bdaf2b5cd9935b782960ac94ffa3",
+          "description": "paper.md"
+        },
+        "hash": "7a3048d3e7c6418f4d67dae41341ce4713a1bdaf2b5cd9935b782960ac94ffa3",
+        "producedBy": "agenteer.research.paper-run",
+        "producedAt": "2026-05-05T17:48:08.795Z",
+        "validator": "paper-authoring",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_3f248ec05c36"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_7348af65ae29",
+        "artifactRef": {
+          "artifactId": "artifact_36a322283a5d",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/qa-cli.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "660fb8ab0522df54633e5733b0d48b486dfe3c344d615d3b01055839c8f8cd69",
+          "description": "qa-cli.json"
+        },
+        "hash": "660fb8ab0522df54633e5733b0d48b486dfe3c344d615d3b01055839c8f8cd69",
+        "producedBy": "agenteer.research.paper-qa",
+        "producedAt": "2026-05-05T17:48:08.796Z",
+        "validator": "paper-qa",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_36a322283a5d"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_0f450b36f72e",
+        "artifactRef": {
+          "artifactId": "artifact_1f67958086f2",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/runner-record.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "8cbdca982232ae9fe0b8773db7595c1eff5af57606d71033df66655196f5e91c",
+          "description": "runner-record.json"
+        },
+        "hash": "8cbdca982232ae9fe0b8773db7595c1eff5af57606d71033df66655196f5e91c",
+        "producedBy": "agenteer.research.paper-runner-record",
+        "producedAt": "2026-05-05T17:48:08.796Z",
+        "validator": "runner-provenance",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_1f67958086f2"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "analysisSpec": {
+    "schemaVersion": 1,
+    "id": "nhanes_bmi_elevated_a1c_0168",
+    "title": "Body mass index and elevated HbA1c threshold in NHANES adults",
+    "dataset": "nhanes-v1-20260430-local-cache",
+    "releasePolicy": "local_files",
+    "researchQuestion": "Among NHANES adults aged 20 years and older, is body mass index associated with elevated HbA1c threshold status?",
+    "population": { "description": ["NHANES adults aged 20 years and older"], "filters": ["RIDAGEYR >= 20"] },
+    "cycles": ["local-curated-cache"],
+    "variables": {
+      "outcome": ["LBXGH"],
+      "exposures": ["BMXBMI"],
+      "covariates": ["RIDAGEYR", "RIAGENDR", "RIDRETH1"],
+      "stratify": [],
+      "filters": []
+    },
+    "derivedDefinitions": { "source": "AnalysisSpec", "definitions": ["elevated_hba1c = LBXGH >= 6.5"] },
+    "surveyDesign": { "weightRule": "MEC exam weight", "weightVariable": "WTMEC2YR", "strataVariable": "SDMVSTRA", "psuVariable": "SDMVPSU" },
+    "model": { "family": "binomial_logistic", "binaryThreshold": { "name": "elevated_hba1c", "variable": "LBXGH", "operator": ">=", "value": 6.5 } },
+    "analysisPlan": ["Survey-weighted logistic regression with strata/PSU linearized sandwich variance."],
+    "inferencePolicy": { "estimandType": "associational", "varianceEstimator": "complex_survey", "allowedInference": "design_corrected_inference", "pValueLanguage": "standard", "causalClaimsAllowed": false },
+    "failurePolicy": { "missingVariable": "block", "invalidWeight": "block", "highMissingnessThreshold": 0.4, "sparseCellThreshold": 30, "rerunInstability": "block", "hashMismatch": "block", "methodologicalUncertainty": "stop_for_review" },
+    "expectedOutputs": ["analysis.json", "paper.md", "qa-cli.json", "runner-record.json", "lifecycle.md"],
+    "execution": { "timeoutSeconds": 900, "memoryMb": 2048, "maxRows": 1000000, "maxOutputBytes": 20000000 },
+    "requiredVariables": ["LBXGH", "BMXBMI", "RIDAGEYR", "RIAGENDR", "RIDRETH1", "WTMEC2YR", "SDMVSTRA", "SDMVPSU"],
+    "specHash": "manual-pre-run-0168"
+  }
+}

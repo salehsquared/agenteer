@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "taskId": "task_db60ff5938d0",
+  "goal": "Generate and QA actual NHANES BMI/HbA1c paper with runner provenance",
+  "requester": "dual-tick-0162",
+  "capabilitiesRequired": [
+    "research.paper.generate",
+    "research.paper.qa",
+    "research.runner.provenance"
+  ],
+  "inputs": [
+    {
+      "inputId": "input_1",
+      "value": "{\"paperId\":\"0158-bmi-hba1c\"",
+      "mediaType": "text/plain",
+      "hash": "1dd7b008e33bee8cfb7868f6e2c31ffeffa63bc1443046f2d0ea3fea4f8c883c"
+    },
+    {
+      "inputId": "input_2",
+      "value": "\"binding\":\"retrospective\"}",
+      "mediaType": "text/plain",
+      "hash": "b23e82e483863a49b4a3db61fd879a5a5cfd07e01067f6db279c699e613fa552"
+    }
+  ],
+  "artifactRefs": [
+    {
+      "artifactId": "artifact_3f054da7c7cc",
+      "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/paper.md",
+      "kind": "markdown",
+      "mediaType": "text/markdown",
+      "hash": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57",
+      "description": "paper.md"
+    },
+    {
+      "artifactId": "artifact_2a517b892e90",
+      "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/analysis.json",
+      "kind": "json",
+      "mediaType": "application/json",
+      "hash": "8eda059af804e8b025a8c8643f0730f2b2482b7cba948091018b8d6d4e7a7e7f",
+      "description": "analysis.json"
+    },
+    {
+      "artifactId": "artifact_596a73a3a3b2",
+      "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/qa-cli.json",
+      "kind": "json",
+      "mediaType": "application/json",
+      "hash": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f",
+      "description": "qa-cli.json"
+    },
+    {
+      "artifactId": "artifact_44333d95787f",
+      "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/runner-record.json",
+      "kind": "json",
+      "mediaType": "application/json",
+      "hash": "62ea7af698d4e7fe8f7233e1aec2579a3885ce72e082e14f6d427b84767b69ed",
+      "description": "runner-record.json"
+    }
+  ],
+  "permissions": {
+    "allowedActions": [
+      "read-local-nhanes-cache",
+      "write-loop-memory-paper-artifacts"
+    ],
+    "deniedActions": [
+      "write-medbrevia"
+    ],
+    "humanApprovalRequired": false,
+    "networkAllowed": false,
+    "filesystemWriteRoots": [
+      "/Users/saleh/TechProjects/agenteer/.loop-memory"
+    ],
+    "cloudAllowed": false
+  },
+  "costBoundary": {
+    "maxUsd": 0,
+    "maxRuntimeSeconds": 900,
+    "maxModelCalls": 0
+  },
+  "status": "queued",
+  "evidenceReceipts": [],
+  "failureRecords": [],
+  "createdAtIso": "2026-05-05T06:33:43.342Z",
+  "updatedAtIso": "2026-05-05T06:33:43.492Z",
+  "nextAction": "Paper artifacts generated; queue provenance review."
+}

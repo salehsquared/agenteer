@@ -158,6 +158,7 @@ If you patch one package locally for a bugfix PR, bump all six versions together
 ## Docs
 
 - [Architecture](docs/architecture.md) — top-down tour: runtime loop, context, evidence, kernel, sessions.
+- [Agent improvement layer](docs/agent-improvement-layer.md) — autocontext adapter, planner-v2, repair-run, creativity, critic, and research-market commands.
 - [Capabilities](docs/capabilities.md) — the grammar, intersection rules, and `dynamic_actions` semantics.
 - [Writing a node](docs/nodes.md) — Node contract, intents, ctx patches, evidence deltas.
 - [Evidence records](docs/evidence.md) — verdict semantics, lineage, staleness, reading a trace.

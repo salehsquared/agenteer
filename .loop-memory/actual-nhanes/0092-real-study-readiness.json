@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "realStudyReadiness": {
+    "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0088-packet",
+    "status": "ready_for_local_real_data",
+    "requirements": [
+      {
+        "id": "design-packet",
+        "blocking": true,
+        "status": "pass",
+        "detail": "design.json is present."
+      },
+      {
+        "id": "fixture-runner-spec",
+        "blocking": false,
+        "status": "missing",
+        "detail": "runner-spec.json is useful for synthetic fixture execution."
+      },
+      {
+        "id": "real-data-runner",
+        "blocking": true,
+        "status": "pass",
+        "detail": "real-runner-spec.json declares real_local_files execution."
+      },
+      {
+        "id": "data-access-manifest",
+        "blocking": true,
+        "status": "pass",
+        "detail": "2/2 declared files are present and 2 summarized; expected variables observed: 9."
+      },
+      {
+        "id": "data-access-summary",
+        "blocking": true,
+        "status": "pass",
+        "detail": "2 declared data file(s) have table-summary provenance."
+      },
+      {
+        "id": "data-access-expected-variables",
+        "blocking": true,
+        "status": "pass",
+        "detail": "All expected packet variables were observed in summarized data."
+      },
+      {
+        "id": "survey-methods",
+        "blocking": true,
+        "status": "pass",
+        "detail": "Survey weight WTMECPRP is specified."
+      }
+    ],
+    "nextAction": "Run with a real-data adapter under cost and permission controls."
+  }
+}
+

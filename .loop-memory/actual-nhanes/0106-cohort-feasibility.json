@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "kind": "actual-nhanes-cohort-feasibility",
+  "question": "Among NHANES adults, is serum 25-hydroxyvitamin D associated with measured hypertension?",
+  "sourceRefs": [
+    "demographics.parquet",
+    "vitamin_d.parquet",
+    "blood_pressure.parquet"
+  ],
+  "joinKey": "SEQN",
+  "filters": [
+    "RIDAGEYR >= 18",
+    "WTMEC2YR > 0",
+    "required variables nonmissing"
+  ],
+  "rowCounts": {
+    "demographicsRows": 54716,
+    "vitaminDRows": 35909,
+    "bloodPressureRows": 50856,
+    "innerMergedRows": 35909,
+    "adultMergedRows": 22807,
+    "positiveWeightAdultRows": 22807,
+    "completeCaseEligibleRows": 19770
+  },
+  "endpointPreview": {
+    "definition": "BPXSY1 >= 130 or BPXDI1 >= 80 among complete-case eligible rows",
+    "positiveRows": 8195,
+    "negativeRows": 11575
+  },
+  "variables": [
+    {
+      "name": "RIDAGEYR",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    },
+    {
+      "name": "RIAGENDR",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    },
+    {
+      "name": "RIDRETH3",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    },
+    {
+      "name": "WTMEC2YR",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    },
+    {
+      "name": "SDMVSTRA",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    },
+    {
+      "name": "SDMVPSU",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    },
+    {
+      "name": "LBXVIDMS",
+      "nonMissingAdultMergedRows": 21550,
+      "missingFractionAdultMergedRows": 0.05511465778050595
+    },
+    {
+      "name": "BPXSY1",
+      "nonMissingAdultMergedRows": 20858,
+      "missingFractionAdultMergedRows": 0.08545621958170735
+    },
+    {
+      "name": "BPXDI1",
+      "nonMissingAdultMergedRows": 20858,
+      "missingFractionAdultMergedRows": 0.08545621958170735
+    },
+    {
+      "name": "BPXSY2",
+      "nonMissingAdultMergedRows": 21538,
+      "missingFractionAdultMergedRows": 0.055640812031393816
+    },
+    {
+      "name": "BPXDI2",
+      "nonMissingAdultMergedRows": 21538,
+      "missingFractionAdultMergedRows": 0.055640812031393816
+    },
+    {
+      "name": "BPXSY3",
+      "nonMissingAdultMergedRows": 21506,
+      "missingFractionAdultMergedRows": 0.057043890033761535
+    },
+    {
+      "name": "BPXDI3",
+      "nonMissingAdultMergedRows": 21506,
+      "missingFractionAdultMergedRows": 0.057043890033761535
+    },
+    {
+      "name": "BPQ020",
+      "nonMissingAdultMergedRows": 22807,
+      "missingFractionAdultMergedRows": 0.0
+    }
+  ],
+  "warnings": [],
+  "interpretation": "This is feasibility evidence only; it does not estimate an association or apply full NHANES survey design."
+}

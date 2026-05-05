@@ -1,0 +1,88 @@
+{
+  "paperId": "0111-smoking-hdl",
+  "title": "Smoking history and HDL cholesterol in NHANES adults: a cross-sectional pipeline dogfood analysis",
+  "sourceRefs": [
+    "demographics.parquet",
+    "smoking.parquet",
+    "lipids.parquet"
+  ],
+  "rowCounts": {
+    "innerMerged": 37082,
+    "adult20MergedWithSmokingCodes": 30169,
+    "completeCaseEligible": 20334
+  },
+  "exposure": "SMQ020 ever smoked at least 100 cigarettes, coded ever vs never among valid responses",
+  "outcome": "LBDHDD HDL cholesterol, mg/dL",
+  "weights": "WTMEC2YR used as normalized WLS weights; strata/PSU variance not fully implemented",
+  "model": {
+    "type": "weighted approximate linear regression",
+    "covariates": [
+      "ever_smoker",
+      "age_10",
+      "female",
+      "race_1",
+      "race_2",
+      "race_4",
+      "race_6",
+      "race_7"
+    ],
+    "everSmokerMeanDifferenceMgDl": -0.9259742029913821,
+    "ci95": [
+      -1.557703075185466,
+      -0.2942453307972983
+    ],
+    "pValue": 0.004066911251292218
+  },
+  "groupSummary": [
+    {
+      "group": "Never smoked 100 cigarettes",
+      "n": 11656,
+      "weightedMeanHdlMgDl": 54.75612066915233,
+      "weightedMeanTotalCholesterolMgDl": 190.8097710643964
+    },
+    {
+      "group": "Ever smoked 100 cigarettes",
+      "n": 8678,
+      "weightedMeanHdlMgDl": 52.65810816965897,
+      "weightedMeanTotalCholesterolMgDl": 192.56351574738963
+    }
+  ],
+  "missingnessAdultMerged": {
+    "RIDAGEYR": 0.0,
+    "RIAGENDR": 0.0,
+    "RIDRETH3": 0.0,
+    "WTMEC2YR": 0.2830720275779774,
+    "SDMVSTRA": 0.0,
+    "SDMVPSU": 0.0,
+    "LBDHDD": 0.06357519307898836,
+    "LBXTC": 0.06357519307898836
+  },
+  "discardedEndpoint": {
+    "variable": "LBXTR",
+    "reason": "triglycerides had high missingness in table summary and may require fasting/subsample-specific handling; deferred for stronger method support"
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Approximate weighting only; full NHANES complex survey variance not implemented.",
+    "SMQ020 captures ever-smoking history, not current smoking intensity or cotinine-verified exposure.",
+    "Complete-case analysis may induce selection bias."
+  ],
+  "sources": [
+    {
+      "id": "strobe",
+      "url": "https://www.strobe-statement.org/"
+    },
+    {
+      "id": "nhanes-guidelines",
+      "url": "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx"
+    },
+    {
+      "id": "smoking-lipids-precedent",
+      "url": "https://journals.sagepub.com/doi/abs/10.1177/1849454418779310"
+    },
+    {
+      "id": "tarmos",
+      "url": "https://arxiv.org/abs/2004.14066"
+    }
+  ]
+}

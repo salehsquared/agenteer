@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "paperRunnerRecord": {
+    "schemaVersion": 1,
+    "recordType": "agenteer.research.paper-runner-record",
+    "paperId": "0172-bmi-fasting-glucose-subsample",
+    "status": "succeeded",
+    "generatedAtIso": "2026-05-05T07:17:11.689Z",
+    "runner": {
+      "kind": "local-python-complex-survey-linearized",
+      "commandSummary": "Executed AnalysisSpec through research paper-run with local survey-aware linearized variance runner."
+    },
+    "analysisSpec": {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/analysis-spec.json",
+      "specHash": "7088b03c73b5f2e8ba437752a1332d4a8c14ba346cec0675216994816ffe7ce4",
+      "artifactHash": "7088b03c73b5f2e8ba437752a1332d4a8c14ba346cec0675216994816ffe7ce4",
+      "binding": "spec-governed"
+    },
+    "inputs": [
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+        "bytes": 611124,
+        "sha256": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+        "bytes": 1476850,
+        "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet",
+        "bytes": 520148,
+        "sha256": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9"
+      }
+    ],
+    "outputs": [
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/paper-runner.py",
+        "bytes": 24080,
+        "sha256": "fd98c57b5d8fa33c2af6d79c9c06407eda7ca5199ee5a34c1c01dbc431f5ff38"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/runner-config.json",
+        "bytes": 387,
+        "sha256": "d2e2b44e46e5efb9554abea48eefb46a4c59d7ac87afd92f2104fdf0ed6948ec"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/analysis-spec.json",
+        "bytes": 2776,
+        "sha256": "7088b03c73b5f2e8ba437752a1332d4a8c14ba346cec0675216994816ffe7ce4"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/analysis.json",
+        "bytes": 4424,
+        "sha256": "6f15b6e4b9009e95b3157cfc658e557de63f2c6147b6327d6547c7ed67196ff0"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/paper.md",
+        "bytes": 5218,
+        "sha256": "57a2870bca5d5bb0fe664758d5f221a5edf4a18078d103441790626c4803f005"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/qa-cli.json",
+        "bytes": 5576,
+        "sha256": "565bd2d7f13782f2340bb0a6f021e07e7f87c7f8ce826b26bff8769788ca6c78"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/critique.md",
+        "bytes": 423,
+        "sha256": "47057ff8e090f02dd8b904e8d6b17c42b03e73c5ec0359070b709910b2cb31b4"
+      }
+    ],
+    "methods": {
+      "weighting": "AnalysisSpec survey weight with strata/PSU linearized sandwich variance",
+      "variance": "strata/PSU linearized sandwich variance for weighted linear regression",
+      "population": "RIDAGEYR >= 20"
+    },
+    "warnings": [],
+    "nextAction": "Run paper-qa and include this runner record in the paper index or golden manifest."
+  }
+}

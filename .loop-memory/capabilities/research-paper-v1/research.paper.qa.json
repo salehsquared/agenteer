@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "capabilityId": "research.paper.qa",
+  "description": "Run deterministic paper QA over a generated research paper and companion evidence JSON.",
+  "inputSchema": {
+    "type": "object",
+    "required": ["paperPath", "evidencePath"],
+    "properties": {
+      "paperPath": { "type": "string" },
+      "evidencePath": { "type": "string" }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["status", "checks"],
+    "properties": {
+      "status": { "type": "string", "enum": ["pass", "fail"] },
+      "checks": { "type": "array" }
+    }
+  },
+  "permissionsRequired": ["write-loop-memory-paper-artifacts"],
+  "failureTypes": ["report_overclaim", "missing_evidence", "numeric_mismatch", "methodological_blocker"],
+  "costProfile": { "maxUsd": 0, "maxRuntimeSeconds": 120, "maxModelCalls": 0 },
+  "source": "/Users/saleh/TechProjects/agenteer/.loop-memory/capabilities/research-paper-v1/research.paper.qa.json",
+  "interopShape": "local"
+}

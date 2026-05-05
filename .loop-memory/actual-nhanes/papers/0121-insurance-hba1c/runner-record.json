@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "recordType": "agenteer.research.paper-runner-record",
+  "paperId": "0121-insurance-hba1c",
+  "status": "succeeded",
+  "generatedAtIso": "2026-05-03T18:25:01Z",
+  "runner": {
+    "kind": "manual-local-python-heredoc",
+    "python": "/Users/saleh/WebstormProjects/medbrevia_v3/.venv-analytics-pilot/bin/python3",
+    "pythonVersion": "3.12.5 (v3.12.5:ff3bc82f7c9, Aug  7 2024, 05:32:06) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "packages": {
+      "pandas": "2.2.3",
+      "numpy": "2.2.1",
+      "statsmodels": "0.14.4"
+    }
+  },
+  "commandSummary": "Merged demographics, insurance_access, and diabetes Parquet by SEQN; fitted weighted approximate linear regression for HbA1c and threshold logistic sensitivity; wrote analysis/paper/critique; ran agenteer research paper-qa.",
+  "analysisSpec": {
+    "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/nhanes-insurance-hba1c/analysis-spec.json",
+    "specHash": "b0b51432dba88c71b7e26e43f2b6d708ea918a4fc302fda7aec6839e3552f489",
+    "binding": "retrospective-spec-governed-rerun"
+  },
+  "inputs": [
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+      "bytes": 1476850,
+      "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/insurance_access/insurance_access.parquet",
+      "bytes": 371953,
+      "sha256": "15c888a84d8cf893021d046bd5395dd0c0efbf569329d8d20336ee5ac2a4f33e"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet",
+      "bytes": 520148,
+      "sha256": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0121-insurance-hba1c/analysis.json",
+      "bytes": 3043,
+      "sha256": "dbd72197ea8f0291969c988fc94de0da785282a0c21d4fdabc84d1c317eac5cb"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0121-insurance-hba1c/paper.md",
+      "bytes": 6788,
+      "sha256": "1fafc2bee0f91e0d3fd388088e9b3478c0e492ca7960daf862d1539d16e3385a"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0121-insurance-hba1c/qa-cli.json",
+      "bytes": 5197,
+      "sha256": "4d90a83a291e95273f3cab578ce62af0a878993273f55d957105852047ed9d26"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0121-insurance-hba1c/qa-negation-cli.json",
+      "bytes": 5197,
+      "sha256": "4d90a83a291e95273f3cab578ce62af0a878993273f55d957105852047ed9d26"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0121-insurance-hba1c/critique.md",
+      "bytes": 1190,
+      "sha256": "cd6611a4598e324b26a44a2c1cffb02fe0aabe73c493731b32e548801e693865"
+    }
+  ],
+  "methods": {
+    "weighting": "WTMEC2YR normalized approximate frequency weights",
+    "variance": "full NHANES strata/PSU variance not implemented",
+    "population": "all adults with valid insurance and HbA1c complete cases"
+  },
+  "sources": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC11386446/",
+    "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003285",
+    "https://www.researchobject.org/workflow-run-crate/profiles/0.3/process_run_crate.html"
+  ]
+}

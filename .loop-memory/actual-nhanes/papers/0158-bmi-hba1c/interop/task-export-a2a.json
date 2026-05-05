@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "taskInteropExport": {
+    "shape": "a2a",
+    "taskId": "task_db60ff5938d0",
+    "payload": {
+      "id": "task_db60ff5938d0",
+      "goal": "Generate and QA actual NHANES BMI/HbA1c paper with runner provenance",
+      "requester": "dual-tick-0162",
+      "status": "succeeded",
+      "capabilities": [
+        "research.paper.generate",
+        "research.paper.qa",
+        "research.runner.provenance"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "artifact_3f054da7c7cc",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/paper.md",
+          "kind": "markdown",
+          "mediaType": "text/markdown",
+          "hash": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57",
+          "description": "paper.md"
+        },
+        {
+          "artifactId": "artifact_2a517b892e90",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/analysis.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "8eda059af804e8b025a8c8643f0730f2b2482b7cba948091018b8d6d4e7a7e7f",
+          "description": "analysis.json"
+        },
+        {
+          "artifactId": "artifact_596a73a3a3b2",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/qa-cli.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f",
+          "description": "qa-cli.json"
+        },
+        {
+          "artifactId": "artifact_44333d95787f",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/runner-record.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "62ea7af698d4e7fe8f7233e1aec2579a3885ce72e082e14f6d427b84767b69ed",
+          "description": "runner-record.json"
+        }
+      ],
+      "permissions": {
+        "allowedActions": [
+          "read-local-nhanes-cache",
+          "write-loop-memory-paper-artifacts"
+        ],
+        "deniedActions": [
+          "write-medbrevia"
+        ],
+        "humanApprovalRequired": false,
+        "networkAllowed": false,
+        "filesystemWriteRoots": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory"
+        ],
+        "cloudAllowed": false
+      },
+      "costBoundary": {
+        "maxUsd": 0,
+        "maxRuntimeSeconds": 900,
+        "maxModelCalls": 0
+      },
+      "evidenceReceipts": [
+        {
+          "schemaVersion": 1,
+          "receiptId": "receipt_a958e350165e",
+          "artifactRef": {
+            "artifactId": "artifact_3f054da7c7cc",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/paper.md",
+            "kind": "markdown",
+            "mediaType": "text/markdown",
+            "hash": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57",
+            "description": "paper.md"
+          },
+          "hash": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57",
+          "producedBy": "tick-0158-local-python-statsmodels",
+          "producedAt": "2026-05-05T06:33:42.891Z",
+          "validator": "paper-authoring",
+          "status": "pass",
+          "evidenceRefs": [
+            "artifact_3f054da7c7cc"
+          ]
+        },
+        {
+          "schemaVersion": 1,
+          "receiptId": "receipt_e2a38ddddd58",
+          "artifactRef": {
+            "artifactId": "artifact_596a73a3a3b2",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/qa-cli.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f",
+            "description": "qa-cli.json"
+          },
+          "hash": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f",
+          "producedBy": "agenteer-research-paper-qa",
+          "producedAt": "2026-05-05T06:33:43.044Z",
+          "validator": "paper-qa",
+          "status": "pass",
+          "evidenceRefs": [
+            "artifact_596a73a3a3b2"
+          ]
+        },
+        {
+          "schemaVersion": 1,
+          "receiptId": "receipt_ec00c899674b",
+          "artifactRef": {
+            "artifactId": "artifact_44333d95787f",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/runner-record.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "62ea7af698d4e7fe8f7233e1aec2579a3885ce72e082e14f6d427b84767b69ed",
+            "description": "runner-record.json"
+          },
+          "hash": "62ea7af698d4e7fe8f7233e1aec2579a3885ce72e082e14f6d427b84767b69ed",
+          "producedBy": "agenteer-research-paper-runner-record",
+          "producedAt": "2026-05-05T06:33:43.192Z",
+          "validator": "runner-provenance",
+          "status": "warning",
+          "evidenceRefs": [
+            "artifact_44333d95787f"
+          ]
+        }
+      ]
+    },
+    "evidenceReceipts": [
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_a958e350165e",
+        "artifactRef": {
+          "artifactId": "artifact_3f054da7c7cc",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/paper.md",
+          "kind": "markdown",
+          "mediaType": "text/markdown",
+          "hash": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57",
+          "description": "paper.md"
+        },
+        "hash": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57",
+        "producedBy": "tick-0158-local-python-statsmodels",
+        "producedAt": "2026-05-05T06:33:42.891Z",
+        "validator": "paper-authoring",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_3f054da7c7cc"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_e2a38ddddd58",
+        "artifactRef": {
+          "artifactId": "artifact_596a73a3a3b2",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/qa-cli.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f",
+          "description": "qa-cli.json"
+        },
+        "hash": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f",
+        "producedBy": "agenteer-research-paper-qa",
+        "producedAt": "2026-05-05T06:33:43.044Z",
+        "validator": "paper-qa",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_596a73a3a3b2"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_ec00c899674b",
+        "artifactRef": {
+          "artifactId": "artifact_44333d95787f",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/runner-record.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "62ea7af698d4e7fe8f7233e1aec2579a3885ce72e082e14f6d427b84767b69ed",
+          "description": "runner-record.json"
+        },
+        "hash": "62ea7af698d4e7fe8f7233e1aec2579a3885ce72e082e14f6d427b84767b69ed",
+        "producedBy": "agenteer-research-paper-runner-record",
+        "producedAt": "2026-05-05T06:33:43.192Z",
+        "validator": "runner-provenance",
+        "status": "warning",
+        "evidenceRefs": [
+          "artifact_44333d95787f"
+        ]
+      }
+    ]
+  }
+}
+

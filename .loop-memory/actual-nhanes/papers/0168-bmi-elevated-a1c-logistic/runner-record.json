@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "paperRunnerRecord": {
+    "schemaVersion": 1,
+    "recordType": "agenteer.research.paper-runner-record",
+    "paperId": "0168-bmi-elevated-a1c-logistic",
+    "status": "succeeded",
+    "generatedAtIso": "2026-05-05T07:04:46.144Z",
+    "runner": {
+      "kind": "local-python-complex-survey-linearized",
+      "commandSummary": "Executed AnalysisSpec through research paper-run with local survey-aware linearized variance runner."
+    },
+    "analysisSpec": {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/analysis-spec.json",
+      "specHash": "manual-pre-run-0168",
+      "artifactHash": "07aec13c535710e99f2131b36f41e49e9462db7a95ea521810cd8fb58abbe9cc",
+      "binding": "spec-governed"
+    },
+    "inputs": [
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+        "bytes": 611124,
+        "sha256": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+        "bytes": 1476850,
+        "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet",
+        "bytes": 520148,
+        "sha256": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9"
+      }
+    ],
+    "outputs": [
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/paper-runner.py",
+        "bytes": 21076,
+        "sha256": "04c1c62f439d2dec2aba7dfaaddf434a8318d7b3c27969763e4821422f874065"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/runner-config.json",
+        "bytes": 379,
+        "sha256": "b2ef59df222372488ebef5972076ba56b389a2728459f71a4d64a6b449b2a5c0"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/analysis-spec.json",
+        "bytes": 2082,
+        "sha256": "07aec13c535710e99f2131b36f41e49e9462db7a95ea521810cd8fb58abbe9cc"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/analysis.json",
+        "bytes": 4067,
+        "sha256": "867093b09b1b18a9267199754fecd94883eb6dc647a8e8b6b582e2ed906650a9"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/paper.md",
+        "bytes": 3587,
+        "sha256": "2ae9714ff932598d1d5e691d04a3fa88824fe875a7cda5ed4d55c16066688a01"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/qa-cli.json",
+        "bytes": 5207,
+        "sha256": "0ed6261055b12b2ed4bba2bd690baec061a077b5ca7bfb78aeab7236a507814e"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/critique.md",
+        "bytes": 423,
+        "sha256": "47057ff8e090f02dd8b904e8d6b17c42b03e73c5ec0359070b709910b2cb31b4"
+      }
+    ],
+    "methods": {
+      "weighting": "AnalysisSpec survey weight with strata/PSU linearized sandwich variance",
+      "variance": "strata/PSU linearized sandwich variance for weighted linear regression",
+      "population": "RIDAGEYR >= 20"
+    },
+    "warnings": [],
+    "nextAction": "Run paper-qa and include this runner record in the paper index or golden manifest."
+  }
+}
