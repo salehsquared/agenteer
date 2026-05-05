@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "realStudyReadiness": {
+    "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/0079-packet",
+    "status": "not_ready",
+    "requirements": [
+      {
+        "id": "design-packet",
+        "status": "missing",
+        "detail": "design.json is required."
+      },
+      {
+        "id": "fixture-runner-spec",
+        "status": "missing",
+        "detail": "runner-spec.json is useful for synthetic fixture execution."
+      },
+      {
+        "id": "real-data-runner",
+        "status": "pass",
+        "detail": "real-runner-spec.json declares real_local_files execution."
+      },
+      {
+        "id": "data-access-manifest",
+        "status": "pass",
+        "detail": "1/1 declared files are present and 1 summarized; expected variables observed: not declared by packet design."
+      },
+      {
+        "id": "data-access-summary",
+        "status": "pass",
+        "detail": "1 declared data file(s) have table-summary provenance."
+      },
+      {
+        "id": "data-access-expected-variables",
+        "status": "pass",
+        "detail": "No packet expected-variable list was available to check."
+      },
+      {
+        "id": "survey-methods",
+        "status": "missing",
+        "detail": "Survey or sampling design requirements must be explicit for population estimates."
+      }
+    ],
+    "nextAction": "Implement the missing real-data adapter requirements before claiming real study execution."
+  }
+}
+

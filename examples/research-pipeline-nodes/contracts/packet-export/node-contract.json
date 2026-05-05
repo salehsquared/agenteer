@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "nodeId": "@agenteer/node-research-packet-export",
+  "displayName": "Research packet export",
+  "domain": "research",
+  "inputSchema": {
+    "type": "object",
+    "required": ["packetDir", "requiredArtifacts", "sharePolicy"],
+    "properties": {
+      "packetDir": { "type": "string", "minLength": 1 },
+      "requiredArtifacts": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+      "sharePolicy": { "type": "string", "enum": ["local-only", "shareable"] }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["status", "manifestPath", "artifactHashes", "failures"],
+    "properties": {
+      "status": { "type": "string", "enum": ["pass", "fail"] },
+      "manifestPath": { "type": "string" },
+      "artifactHashes": { "type": "object" },
+      "failures": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+  "artifactEffects": [
+    {
+      "id": "reproducibility-manifest",
+      "kind": "write",
+      "pathTemplate": "reproducibility-manifest.json",
+      "required": true,
+      "description": "Final reproducibility manifest with artifact hashes and share policy."
+    }
+  ],
+  "failureTypes": [
+    {
+      "code": "NODE_INPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": false,
+      "repairAction": "Repair packet export request before manifesting artifacts.",
+      "description": "Packet export input failed the contract."
+    },
+    {
+      "code": "HASH_MISMATCH",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Rerun artifact manifesting and packet diff before export.",
+      "description": "Artifact hash or rerun stability does not match expected provenance."
+    },
+    {
+      "code": "NODE_OUTPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Repair packet export output schema.",
+      "description": "Packet export output failed the contract."
+    },
+    {
+      "code": "NODE_ARTIFACT_MISSING",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Regenerate reproducibility-manifest.json before publishing or handoff.",
+      "description": "Required reproducibility manifest is missing."
+    }
+  ],
+  "verifier": { "kind": "json-schema", "inputRequired": true, "outputRequired": true, "command": null, "evidenceRefs": ["packet-export-v1"] },
+  "permissions": { "requiredActions": ["fs.read"], "dynamicActions": false, "dynamicActionSpec": null },
+  "costBoundary": { "maxUsd": 0, "maxRuntimeSeconds": 180, "cloudAllowed": false },
+  "sideEffects": { "writesFs": true, "network": false, "mutatesCtx": false, "emitsCtxVariants": [] },
+  "stability": { "determinism": "deterministic", "maturity": "stable" },
+  "examples": [
+    {
+      "name": "local-export",
+      "input": { "packetDir": "/tmp/packet", "requiredArtifacts": ["analysis-spec.validated.json", "semantic-qa.json"], "sharePolicy": "local-only" },
+      "output": { "status": "pass", "manifestPath": "reproducibility-manifest.json", "artifactHashes": { "semantic-qa.json": "abc" }, "failures": [] }
+    }
+  ]
+}

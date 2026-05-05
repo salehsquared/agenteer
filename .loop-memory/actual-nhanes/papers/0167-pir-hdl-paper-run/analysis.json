@@ -1,0 +1,112 @@
+{
+  "paperId": "0167-pir-hdl-paper-run",
+  "title": "Among NHANES adults aged 20 years and older, is family poverty-income ratio associated with HDL cholesterol in an exploratory cross-sectional analysis",
+  "researchQuestion": "Among NHANES adults aged 20 years and older, is family poverty-income ratio associated with HDL cholesterol in an exploratory cross-sectional analysis?",
+  "analysisSpecPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+  "dataRoot": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430",
+  "inputFiles": [
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/lipids/lipids.parquet"
+  ],
+  "population": "RIDAGEYR >= 20; complete INDFMPIR, LBDHDD, WTMEC2YR, SDMVSTRA, SDMVPSU, RIAGENDR, RIDRETH1",
+  "exposure": {
+    "name": "INDFMPIR",
+    "variable": "INDFMPIR",
+    "definition": "Continuous INDFMPIR"
+  },
+  "outcome": {
+    "name": "LBDHDD",
+    "variable": "LBDHDD",
+    "definition": "Continuous LBDHDD"
+  },
+  "rowCounts": {
+    "mergedRows": 43766,
+    "eligibleRows": 43766,
+    "completeCaseEligible": 25967
+  },
+  "missingnessEligibleRows": {
+    "LBDHDD": 0.09895809532513823,
+    "INDFMPIR": 0.1053100580359183,
+    "WTMEC2YR": 0.27870950052552207,
+    "SDMVSTRA": 0.0,
+    "SDMVPSU": 0.0,
+    "RIDAGEYR": 0.0,
+    "RIAGENDR": 0.0,
+    "RIDRETH1": 0.0
+  },
+  "weights": {
+    "weight": "WTMEC2YR",
+    "strata": "SDMVSTRA",
+    "psu": "SDMVPSU",
+    "implementation": "strata/PSU linearized sandwich variance for weighted linear regression"
+  },
+  "varianceEstimator": "complex_survey_linearized",
+  "model": {
+    "type": "weighted linear regression with strata/PSU linearized sandwich variance",
+    "covariates": [
+      "intercept",
+      "INDFMPIR",
+      "RIDAGEYR",
+      "RIAGENDR_2.0",
+      "RIDRETH1_2.0",
+      "RIDRETH1_3.0",
+      "RIDRETH1_4.0",
+      "RIDRETH1_5.0"
+    ],
+    "exposureCoefficient": 1.265031815379409,
+    "standardError": 0.09655796875861705,
+    "ci95": [
+      1.0757781966125195,
+      1.4542854341462983
+    ],
+    "pValue": 3.2380283455414926e-39,
+    "strataCount": 59,
+    "psuCount": 121
+  },
+  "groupSummary": [
+    {
+      "category": "q1",
+      "n": 6492,
+      "weightedMeanOutcome": 51.496530176839286,
+      "weightedMeanExposure": 0.5852168841637474
+    },
+    {
+      "category": "q2",
+      "n": 6492,
+      "weightedMeanOutcome": 51.742835525457245,
+      "weightedMeanExposure": 1.4009105843260097
+    },
+    {
+      "category": "q3",
+      "n": 6491,
+      "weightedMeanOutcome": 53.05334048130209,
+      "weightedMeanExposure": 2.7305651875806936
+    },
+    {
+      "category": "q4",
+      "n": 6492,
+      "weightedMeanOutcome": 56.14772611096738,
+      "weightedMeanExposure": 4.766497766524655
+    }
+  ],
+  "analysisSpec": {
+    "inferencePolicy": {
+      "estimandType": "associational",
+      "varianceEstimator": "complex_survey",
+      "allowedInference": "design_corrected_inference",
+      "pValueLanguage": "standard",
+      "causalClaimsAllowed": false
+    }
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Complete-case analysis may induce selection bias.",
+    "Design-based linearized variance is implemented for the primary weighted linear model only."
+  ],
+  "sources": [
+    "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+    "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+    "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0309210"
+  ]
+}

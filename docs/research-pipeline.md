@@ -87,6 +87,7 @@ agenteer research design \
 agenteer research critique --packet ./packet
 agenteer research scout --packet ./packet [--fixture ./rows.json]
 agenteer research approve --packet ./packet --note "review note"
+agenteer research approval-verify --packet ./packet --json
 agenteer research analyze --packet ./packet --fixture ./rows.json
 agenteer research review-report --packet ./packet --json
 agenteer research manifest --packet ./packet --json
@@ -96,9 +97,193 @@ agenteer research packet-summary --packet ./packet --json
 agenteer research loop-status --state ./.agenteer/research-loop --json
 agenteer research loop-note --state ./.agenteer/research-loop --cycle 6 --summary "..." --next "..."
 agenteer research checkpoint --packet ./packet --json
+agenteer research next --packet ./packet --trace --exit-zero-on-blocked --json
+agenteer research navigation-trace --packet ./packet --json
+agenteer research packet-verify --packet ./packet --json
 ```
 
 The current CLI is intentionally stage-based rather than a single hidden "run everything" command. The orchestrating agent must remain involved between stages as the human-in-the-loop reviewer.
+
+### Primary Path
+
+Use this path when driving a packet forward:
+
+```bash
+agenteer research design --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet
+agenteer research next --packet ./packet --trace --exit-zero-on-blocked --json
+agenteer research validate-methods --packet ./packet --json
+agenteer research scout --packet ./packet
+agenteer research runner-spec --packet ./packet
+agenteer research approve --packet ./packet --note "review note"
+agenteer research analyze --packet ./packet --fixture ./rows.json
+agenteer research review-report --packet ./packet --json
+agenteer research manifest --packet ./packet --json
+agenteer research packet-readiness --packet ./packet --json
+agenteer research export --packet ./packet --out ./exports/packet
+```
+
+### AnalysisSpec-To-Paper Path
+
+For actual public-health paper generation, prefer the spec-first golden path:
+
+```bash
+agenteer research paper-run \
+  --analysis-spec ./analysis-spec.json \
+  --data-root /path/to/public-health-data-root \
+  --out-dir ./papers/my-paper \
+  --backend r-survey \
+  --python /path/to/python \
+  --rscript /path/to/Rscript \
+  --capability-dir ./.loop-memory/capabilities/research-paper-v1 \
+  --json
+```
+
+`paper-run` is intentionally a composed command rather than a hidden shortcut. It performs the full local review path:
+
+1. reads a pre-run `AnalysisSpec`
+2. executes the supported local runner
+3. writes `analysis.json`, `paper.md`, and `critique.md`
+4. runs `paper-qa`
+5. writes hashed runner provenance
+6. creates task envelopes and evidence receipts
+7. validates task/capability envelopes
+8. exports MCP/A2A-shaped task views
+9. writes `lifecycle.md` and `lifecycle.json`
+
+Check local analysis runtime readiness before broadening a study:
+
+```bash
+agenteer research backend-status \
+  --python /path/to/python \
+  --rscript /path/to/Rscript \
+  --json
+```
+
+The supported `paper-run` backends are:
+
+- `r-survey`: the preferred NHANES/public-health survey backend. It uses the Python loader for local Parquet/CSV/JSON preparation, then calls R `survey::svydesign` and `survey::svyglm` for Taylor-linearized survey inference on supported weighted linear and logistic models.
+- `python-linearized`: a local Python fallback that supports weighted linear and logistic models with strata/PSU linearized sandwich variance. It is useful for development and smoke tests, but it is not the reference complex-survey implementation.
+
+Both backends require an AnalysisSpec with one exposure, one outcome, declared covariates, population filters, survey weight, strata, PSU, and explicit subsample-weight rationale when a subsample weight such as `WTSAF2YR` is used. The runner now supports binary endpoints and subsample-specific weights when the AnalysisSpec declares the binary threshold, weight rationale, and eligibility note.
+
+The current path still deliberately does not claim automated support for replicate weights, domain/subpopulation variance semantics beyond prefiltered complete-case execution, or multi-cycle weight construction. Those should remain blocked or marked for methods review until the AnalysisSpec and dataset adapter can prove the required design.
+
+### Research Machine Path
+
+The newer research-machine layer wraps the older paper path with stronger typed contracts. Use it when building new studies or promoting packets into repeatable benchmarks:
+
+```bash
+agenteer research machine-status \
+  --data-root /path/to/public-health-data-root \
+  --python /path/to/python \
+  --rscript /path/to/Rscript \
+  --json
+
+agenteer research spec-v2 \
+  --spec ./analysis-spec.json \
+  --out ./analysis-spec-v2.json \
+  --json
+
+agenteer research method-select \
+  --question "In NHANES adults, is BMI associated with fasting glucose?" \
+  --dataset nhanes \
+  --outcome continuous \
+  --survey \
+  --out ./method-selection.json \
+  --json
+
+agenteer research method-apply \
+  --spec ./analysis-spec-v2.json \
+  --selection ./method-selection.json \
+  --out ./analysis-spec-v2-method.json \
+  --json
+
+agenteer research execution-contract \
+  --spec ./analysis-spec-v2-method.json \
+  --backend r-survey \
+  --data-root /path/to/public-health-data-root \
+  --out-dir ./papers/my-paper \
+  --json
+
+agenteer research machine-benchmark \
+  --packet ./papers/my-paper \
+  --spec ./analysis-spec-v2.json \
+  --out ./papers/my-paper/machine-benchmark.json \
+  --json
+```
+
+`spec-v2` migrates the current AnalysisSpec shape into a richer `AnalysisSpecV2`: estimand, population, variables, survey design, missingness policy, model family, sensitivity analyses, backend requirements, artifact expectations, claim policy, failure policy, execution bounds, and stable hash. `method-select` chooses from the comprehensive method ontology using the research question, outcome type, study design, data structure, dataset, and method flags. `method-apply` merges the selected method's diagnostics, backend requirements, artifacts, QA gates, and sensitivity requirements into the spec. `execution-contract` then joins that spec to the selected backend, dataset adapter, archetype, runner command, typed outputs, policy envelope, and repeatability requirements. `machine-benchmark` evaluates whether the generated packet has the artifacts and review posture needed for trustworthy local review.
+
+Use `paper-lifecycle` when reviewing existing generated papers:
+
+```bash
+agenteer research paper-lifecycle \
+  --paper-dir ./papers/my-paper \
+  --capability-dir ./.loop-memory/capabilities/research-paper-v1
+```
+
+Lifecycle status is stricter than paper QA. A paper can pass QA while still requiring methods review if its AnalysisSpec binding is retrospective, or while still needing task envelopes if provenance has not been integrated.
+
+### Audit And Debug Commands
+
+Use these when inspecting why the primary path is blocked or when validating reproducibility:
+
+```bash
+agenteer research checkpoint --packet ./packet --json
+agenteer research packet-verify --packet ./packet --json
+agenteer research qa-dashboard --packet ./packet --json
+agenteer research navigation-trace --packet ./packet --json
+agenteer research approval-verify --packet ./packet --json
+agenteer research manifest-verify --packet ./packet --json
+agenteer research benchmark-register --packet ./.loop-memory/golden/nhanes-insurance-hba1c --out ./.loop-memory/golden/nhanes-insurance-hba1c/golden-benchmark.json --json
+agenteer research benchmark-run --benchmark ./.loop-memory/golden/nhanes-insurance-hba1c/golden-benchmark.json --json
+agenteer research benchmark-score --run ./.loop-memory/golden/nhanes-insurance-hba1c/benchmark-run.json --json
+agenteer research benchmark-suite --dir ./.loop-memory/golden --json
+agenteer research stage-artifacts --json
+agenteer research ro-crate --packet ./packet --json
+agenteer research provenance --packet ./packet --json
+```
+
+The primary path should stay short enough to remember. Audit/debug commands can be numerous because they are used when the orchestrating agent is diagnosing a specific failure.
+
+### Golden Benchmarks
+
+Golden packets are executable benchmark cases, not only examples. A benchmark captures expected artifacts, expected failures, method requirements, rerun thresholds, QA rubrics, local/share policy, and score weights. `benchmark-run` composes existing packet validators such as manifest verification, AnalysisSpec policy checks, rerun stability, paper QA, claim guard, repair plan, and local review evidence.
+
+Expected failures can count as passing benchmark pressure when they are intentionally declared. For example, the current NHANES insurance/HbA1c golden packet is valid for local review but intentionally blocked for external sharing until absolute local paths are redacted.
+
+### Packet Readiness JSON Contract
+
+`agenteer research packet-readiness --packet ./packet --json` is the script-facing readiness projection. Consumers should treat these fields as stable within schema version 1:
+
+- `packetReadiness.mode`
+- `packetReadiness.readinessProfile.id`
+- `packetReadiness.readinessProfile.domain`
+- `packetReadiness.readinessProfile.selection`
+- `packetReadiness.scope`
+- `packetReadiness.status`
+- `packetReadiness.decisionPosture`
+- `packetReadiness.sharePosture`
+- `packetReadiness.stopReasons`
+- `packetReadiness.recommendedCommands`
+- `packetReadiness.components[].id`
+- `packetReadiness.components[].status`
+- `packetReadiness.references[].id`
+- `packetReadiness.references[].url`
+
+Consumers should treat these fields as human-facing and wording-stable only by convention, not by API contract:
+
+- `packetReadiness.summary`
+- `packetReadiness.clinicianSummary`
+- `packetReadiness.components[].detail`
+- `packetReadiness.components[].nextAction`
+- `packetReadiness.limitations`
+- `packetReadiness.references[].title`
+- `packetReadiness.references[].applicability`
+
+The command may recompute current artifact status when run. Exported packets that need durable audit should preserve `packet-readiness.json` alongside the report, manifest, provenance, and review artifacts.
+
+The current default readiness profile is `observational-survey-v1`. It is intended for observational/survey-style research packets. Future domains should add explicit profiles rather than silently stretching this default profile.
 
 ```bash
 agenteer research questions --project medbrevia-nhanes --repo /path/to/medbrevia_v3
@@ -128,18 +313,38 @@ agenteer research node-registry --dir ./node-proposals --json
 agenteer research cost-ledger --packet ./packet --proposal-dir ./node-proposals --json
 agenteer research question-bank --domain medical --json
 agenteer research question-readiness --question "..." --json
+agenteer research protocol-candidates --question "..." --json
+agenteer research protocol-steer --portfolio ./protocol-candidates.json --prefer "vitamin d" --avoid "descriptive only" --require-variable LBXVIDMS --json
+agenteer research protocol-promote --portfolio ./protocol-candidates.json --json
+agenteer research protocol-edit --protocol ./protocol-promotion.json --add-covariate "Smoking status:SMQ020:smoking" --json
+agenteer research analysis-spec --packet ./packet --json
+agenteer research cohort-scout-file --spec ./analysis-spec.json --file ./rows.csv --json
+agenteer research semantic-quality --file ./rows.csv --json
+agenteer research progress --phase cohort_scout_complete --next-step "Review scout counts" --json
+agenteer research job-lifecycle --job job_123 --status queued --json
+agenteer research repair-plan --packet ./packet --json
+agenteer research agent-record --cycle 72 --intent "Improve loop memory" --observation "Repeated validation patterns" --inference "Distill reusable routines" --action "Generate workflow memory" --json
+agenteer research workflow-memory --source /Users/saleh/Desktop/research/updates-upgrades.md --json
+agenteer research uncertainty-budget --spec ./analysis-spec.json --scout ./cohort-scout.json --comparisons 6 --json
+agenteer research dataset-candidate --id hf:example/health --modality tabular --row-count 10000 --license cc-by-4.0 --intended-use empirical_analysis --json
+agenteer research improvement-agenda --budget-usd 1 --candidate local-repair-loop:0.8:0.8:0:0.2:"Local repair loop" --json
+agenteer research claim-guard --report ./report.md --spec ./analysis-spec.json --json
 agenteer research infer-schema --file ./rows.json --json
 agenteer research ro-crate --packet ./packet --json
 agenteer research provenance --packet ./packet --json
 agenteer research qa-dashboard --packet ./packet --json
 agenteer research suppression-policy --count 12 --json
-agenteer research stages
-agenteer research stages --json
+agenteer research pipeline-stages
+agenteer research pipeline-stages --json
 agenteer research design --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet
 agenteer research inspect --packet ./packet
 agenteer research critique --packet ./packet
 agenteer research scout --packet ./packet [--fixture ./rows.json]
 agenteer research checkpoint --packet ./packet
+agenteer research next --packet ./packet
+agenteer research navigation-trace --packet ./packet
+agenteer research approval-verify --packet ./packet
+agenteer research packet-verify --packet ./packet
 agenteer research approve --packet ./packet --note "review note"
 agenteer research analyze --packet ./packet --fixture ./rows.json
 agenteer research review-report --packet ./packet
@@ -150,7 +355,26 @@ agenteer research loop-status --state ./.agenteer/research-loop
 agenteer research loop-note --state ./.agenteer/research-loop --cycle 6 --summary "..." --next "..."
 ```
 
-`checkpoint` exists to preserve stage-by-stage judgment. It reports the packet's current artifacts and recommends the next command without executing it.
+`checkpoint` exists to preserve stage-by-stage judgment. It is the state projection: current artifact presence, current stage, nominal next command, and stage-gate status.
+
+`next` exists to provide human-facing clearance. It is the action projection: recommended commands, expected artifacts, artifact presence, event identity, and optional navigation tracing. It should remain a projection of checkpoint state, not a second state machine.
+
+`stage-gate` exists for deterministic policy checks. It answers whether a requested target stage is allowed from a supplied list of completed stages.
+
+Ownership rule: when these commands overlap, put durable state inference in `checkpoint`, deterministic policy in `stage-gate`, and human/script ergonomics in `next`.
+
+## Event Records
+
+Research packet artifacts can become event-shaped when they represent a human or agent decision. The current lightweight event pattern is:
+
+- `schemaVersion`: integer schema version for the record shape.
+- `eventType`: stable event type such as `research.packet.next` or `research.packet.approval`.
+- `generatedAtIso` or domain-specific timestamp such as `approvedAtIso`.
+- `decisionId`: short event identity for humans and logs.
+- `recordHash`: SHA-256 hash of the event payload before `recordHash` is attached.
+- optional `previousRecordHash`: only for append-only JSONL traces that should be locally tamper-evident.
+
+Keep this pattern narrow. Do not introduce a generic event bus until multiple packet stages need shared event reading, validation, or replay.
 
 The first implementation can keep `lab medbrevia-nhanes` as a compatibility alias while `research design` remains the intended interface.
 

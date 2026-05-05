@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "id": "analysis_0172_bmi_fasting_glucose_subsample",
+  "dataset": "nhanes",
+  "releasePolicy": "local_files",
+  "title": "BMI and fasting glucose in the NHANES fasting subsample",
+  "researchQuestion": "Among NHANES adults in the morning fasting laboratory subsample, what is the adjusted association between body mass index and fasting plasma glucose?",
+  "population": {
+    "description": [
+      "Adults aged 20 years and older with fasting laboratory subsample eligibility"
+    ],
+    "filters": [
+      "RIDAGEYR >= 20"
+    ]
+  },
+  "cycles": [
+    "pooled_local_cache"
+  ],
+  "variables": {
+    "outcome": [
+      "LBXGLU"
+    ],
+    "exposures": [
+      "BMXBMI"
+    ],
+    "covariates": [
+      "RIDAGEYR",
+      "RIAGENDR",
+      "RIDRETH1"
+    ],
+    "stratify": [],
+    "filters": [
+      "RIDAGEYR"
+    ]
+  },
+  "derivedDefinitions": {
+    "source": "agent_tick_0172",
+    "definitions": [
+      "Continuous fasting plasma glucose from LBXGLU.",
+      "Continuous body mass index from BMXBMI.",
+      "Complete-case survey-weighted association using the fasting laboratory subsample weight."
+    ]
+  },
+  "surveyDesign": {
+    "weightRule": "fasting_subsample_least_common_denominator",
+    "weightVariable": "WTSAF2YR",
+    "strataVariable": "SDMVSTRA",
+    "psuVariable": "SDMVPSU",
+    "weightRationale": "LBXGLU fasting plasma glucose is measured in the morning fasting laboratory subsample, so WTSAF2YR is the least-common-denominator NHANES weight for this AnalysisSpec.",
+    "eligibilityNote": "Interpret estimates for fasting subsample-eligible adults with nonmissing fasting glucose, BMI, covariates, strata, PSU, and positive WTSAF2YR."
+  },
+  "model": {
+    "family": "linear"
+  },
+  "analysisPlan": [
+    "survey_weighted_linear_regression",
+    "complete_case",
+    "subsample_weight_domain_required"
+  ],
+  "inferencePolicy": {
+    "estimandType": "associational",
+    "varianceEstimator": "complex_survey",
+    "allowedInference": "design_corrected_inference",
+    "pValueLanguage": "standard",
+    "causalClaimsAllowed": false
+  },
+  "failurePolicy": {
+    "missingVariable": "block",
+    "invalidWeight": "block",
+    "highMissingnessThreshold": 0.4,
+    "sparseCellThreshold": 16,
+    "rerunInstability": "block",
+    "hashMismatch": "block",
+    "methodologicalUncertainty": "stop_for_review"
+  },
+  "expectedOutputs": [
+    "analysis_json",
+    "paper_markdown",
+    "paper_qa",
+    "runner_record",
+    "task_lifecycle"
+  ],
+  "execution": {
+    "timeoutSeconds": 900,
+    "memoryMb": 2048,
+    "maxRows": 200000,
+    "maxOutputBytes": 25000000
+  },
+  "requiredVariables": [
+    "SEQN",
+    "LBXGLU",
+    "BMXBMI",
+    "RIDAGEYR",
+    "RIAGENDR",
+    "RIDRETH1",
+    "WTSAF2YR",
+    "SDMVSTRA",
+    "SDMVPSU"
+  ]
+}

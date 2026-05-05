@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "nodeId": "@agenteer/node-research-semantic-qa",
+  "displayName": "Research semantic QA",
+  "domain": "research",
+  "inputSchema": {
+    "type": "object",
+    "required": ["packetDir", "registryRules", "artifactPaths"],
+    "properties": {
+      "packetDir": { "type": "string", "minLength": 1 },
+      "registryRules": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+      "artifactPaths": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["status", "checks", "failures"],
+    "properties": {
+      "status": { "type": "string", "enum": ["pass", "fail"] },
+      "checks": { "type": "array", "items": { "type": "string" } },
+      "failures": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+  "artifactEffects": [
+    {
+      "id": "semantic-qa-report",
+      "kind": "write",
+      "pathTemplate": "semantic-qa.json",
+      "required": true,
+      "description": "Semantic plausibility checks over variables, missingness, estimates, p-values, CIs, and claims."
+    }
+  ],
+  "failureTypes": [
+    {
+      "code": "NODE_INPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": false,
+      "repairAction": "Repair QA rule registry or artifact paths before running semantic QA.",
+      "description": "Semantic QA input failed the contract."
+    },
+    {
+      "code": "SEMANTIC_RULE_FAILED",
+      "severity": "blocker",
+      "category": "research",
+      "retryable": false,
+      "repairAction": "Return to analysis/report generation; do not patch executable code until the semantic problem is understood.",
+      "description": "A semantic plausibility rule failed."
+    },
+    {
+      "code": "NODE_OUTPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Repair semantic QA output schema.",
+      "description": "Semantic QA output failed the contract."
+    },
+    {
+      "code": "NODE_ARTIFACT_MISSING",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Regenerate semantic-qa.json before report export.",
+      "description": "Required semantic QA artifact is missing."
+    }
+  ],
+  "verifier": { "kind": "json-schema", "inputRequired": true, "outputRequired": true, "command": null, "evidenceRefs": ["semantic-quality-v1"] },
+  "permissions": { "requiredActions": ["fs.read"], "dynamicActions": false, "dynamicActionSpec": null },
+  "costBoundary": { "maxUsd": 0, "maxRuntimeSeconds": 180, "cloudAllowed": false },
+  "sideEffects": { "writesFs": true, "network": false, "mutatesCtx": false, "emitsCtxVariants": [] },
+  "stability": { "determinism": "deterministic", "maturity": "stable" },
+  "examples": [
+    {
+      "name": "semantic-pass",
+      "input": { "packetDir": "/tmp/packet", "registryRules": ["p_value_bounds", "ci_order"], "artifactPaths": ["results.json"] },
+      "output": { "status": "pass", "checks": ["p_value_bounds", "ci_order"], "failures": [] }
+    }
+  ]
+}

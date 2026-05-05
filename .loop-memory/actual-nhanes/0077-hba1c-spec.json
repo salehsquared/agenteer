@@ -1,0 +1,39 @@
+{
+  "dataset": "nhanes",
+  "releaseVersion": "nhanes-v1-20260430",
+  "researchQuestion": "Among adults aged 20 years and older in NHANES, what is the feasibility of estimating HbA1c availability and diabetes/glycemia outcomes using curated demographics and diabetes domains?",
+  "approvedDataInputs": [
+    "demographics",
+    "diabetes"
+  ],
+  "cycles": [
+    "2011-2012",
+    "2013-2014",
+    "2015-2016",
+    "2017-2018",
+    "2017-2020-prepandemic"
+  ],
+  "population": {
+    "description": "Adults aged 20 years and older with NHANES demographics records."
+  },
+  "variables": {
+    "outcome": [
+      "LBXGH"
+    ],
+    "exposures": [
+      "DIQ010"
+    ],
+    "stratify": [
+      "RIAGENDR",
+      "RIDAGEYR"
+    ],
+    "filters": [
+      "RIDAGEYR"
+    ]
+  },
+  "surveyDesign": {
+    "weightVariable": "WTMEC2YR",
+    "strataVariable": "SDMVSTRA",
+    "psuVariable": "SDMVPSU"
+  }
+}

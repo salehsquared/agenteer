@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "taskInteropExport": {
+    "shape": "mcp",
+    "taskId": "task_aae847cfd082",
+    "payload": {
+      "name": "task_aae847cfd082",
+      "title": "Run AnalysisSpec and generate 0167-pir-hdl-paper-run research paper packet",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "input_1": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "status": "succeeded",
+        "capabilities": [
+          "research.paper.generate",
+          "research.paper.qa",
+          "research.runner.provenance"
+        ],
+        "permissions": {
+          "allowedActions": [
+            "read-local-nhanes-cache",
+            "write-loop-memory-paper-artifacts"
+          ],
+          "deniedActions": [
+            "write-medbrevia",
+            "cloud"
+          ],
+          "humanApprovalRequired": false,
+          "networkAllowed": false,
+          "filesystemWriteRoots": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run"
+          ],
+          "cloudAllowed": false
+        },
+        "artifacts": [
+          {
+            "artifactId": "artifact_012f59fada3d",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae",
+            "description": "analysis-spec.json"
+          },
+          {
+            "artifactId": "artifact_53f5c5443683",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/analysis.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "db16a252208ebcfd43bafffc87521cd2b14329aa7659b84242196502e72b744f",
+            "description": "analysis.json"
+          },
+          {
+            "artifactId": "artifact_bda2a7ba227d",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/paper.md",
+            "kind": "markdown",
+            "mediaType": "text/markdown",
+            "hash": "c42c3fdfcbd6784f4974e46a4cfde007a511222d2aaf539ab71f323971621996",
+            "description": "paper.md"
+          },
+          {
+            "artifactId": "artifact_2659ef3e7e5f",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/qa-cli.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "812c37c6354c960250b8357098a5a4952c3d07b950f5bcc7eb3a8e5d96e4e7f0",
+            "description": "qa-cli.json"
+          },
+          {
+            "artifactId": "artifact_2a1f70af9359",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/runner-record.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "eb5dd183faf8b86c9ee43c420764bbf13500fe5b4d8ecb08e760823449e7a3ce",
+            "description": "runner-record.json"
+          }
+        ]
+      }
+    },
+    "evidenceReceipts": [
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_1cc83fe8c3f2",
+        "artifactRef": {
+          "artifactId": "artifact_bda2a7ba227d",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/paper.md",
+          "kind": "markdown",
+          "mediaType": "text/markdown",
+          "hash": "c42c3fdfcbd6784f4974e46a4cfde007a511222d2aaf539ab71f323971621996",
+          "description": "paper.md"
+        },
+        "hash": "c42c3fdfcbd6784f4974e46a4cfde007a511222d2aaf539ab71f323971621996",
+        "producedBy": "agenteer.research.paper-run",
+        "producedAt": "2026-05-05T06:56:55.956Z",
+        "validator": "paper-authoring",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_bda2a7ba227d"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_d1cd4e0542f2",
+        "artifactRef": {
+          "artifactId": "artifact_2659ef3e7e5f",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/qa-cli.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "812c37c6354c960250b8357098a5a4952c3d07b950f5bcc7eb3a8e5d96e4e7f0",
+          "description": "qa-cli.json"
+        },
+        "hash": "812c37c6354c960250b8357098a5a4952c3d07b950f5bcc7eb3a8e5d96e4e7f0",
+        "producedBy": "agenteer.research.paper-qa",
+        "producedAt": "2026-05-05T06:56:55.957Z",
+        "validator": "paper-qa",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_2659ef3e7e5f"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_75e841de746c",
+        "artifactRef": {
+          "artifactId": "artifact_2a1f70af9359",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0167-pir-hdl-paper-run/runner-record.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "eb5dd183faf8b86c9ee43c420764bbf13500fe5b4d8ecb08e760823449e7a3ce",
+          "description": "runner-record.json"
+        },
+        "hash": "eb5dd183faf8b86c9ee43c420764bbf13500fe5b4d8ecb08e760823449e7a3ce",
+        "producedBy": "agenteer.research.paper-runner-record",
+        "producedAt": "2026-05-05T06:56:55.957Z",
+        "validator": "runner-provenance",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_2a1f70af9359"
+        ]
+      }
+    ]
+  }
+}

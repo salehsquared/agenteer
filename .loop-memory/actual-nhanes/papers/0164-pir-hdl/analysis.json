@@ -1,0 +1,97 @@
+{
+  "paperId": "0164-pir-hdl",
+  "title": "Family poverty-income ratio and HDL cholesterol in NHANES adults",
+  "dataRelease": "nhanes-v1-20260430 local cached MedBrevia curated Parquet",
+  "analysisSpecPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+  "exposure": {
+    "name": "family poverty-income ratio",
+    "variable": "INDFMPIR",
+    "definition": "continuous family poverty-income ratio, primary model per 1-unit higher ratio"
+  },
+  "outcome": {
+    "name": "HDL cholesterol",
+    "variable": "LBDHDD",
+    "definition": "HDL cholesterol in mg/dL"
+  },
+  "rowCounts": {
+    "adultMerged": 30190,
+    "completeCaseEligible": 18394
+  },
+  "missingnessAdultMerged": {
+    "INDFMPIR": 0.11056641271944352,
+    "LBDHDD": 0.06359721762172905,
+    "WTMEC2YR": 0.28300761841669425,
+    "SDMVSTRA": 0.0,
+    "SDMVPSU": 0.0,
+    "RIDAGEYR": 0.0,
+    "RIAGENDR": 0.0,
+    "RIDRETH1": 0.0
+  },
+  "weights": {
+    "weight": "WTMEC2YR",
+    "strata": "SDMVSTRA",
+    "psu": "SDMVPSU",
+    "implementation": "normalized approximate frequency weight; full NHANES complex survey variance not implemented"
+  },
+  "model": {
+    "type": "weighted approximate linear regression",
+    "covariates": [
+      "const",
+      "pir",
+      "age_10",
+      "female",
+      "race_2",
+      "race_3",
+      "race_4",
+      "race_5"
+    ],
+    "pirMeanDifferenceHdlMgDl": 1.4216180158918028,
+    "ci95": [
+      1.2817593542764187,
+      1.5614766775071869
+    ],
+    "pValue": 2.1574710295628383e-87
+  },
+  "groupSummary": [
+    {
+      "category": "<=1.0",
+      "n": 4079,
+      "weightedMeanHdlMgDl": 51.11097449096804
+    },
+    {
+      "category": "1.01-2.0",
+      "n": 4937,
+      "weightedMeanHdlMgDl": 51.85039696440372
+    },
+    {
+      "category": "2.01-4.0",
+      "n": 4762,
+      "weightedMeanHdlMgDl": 53.16625711231934
+    },
+    {
+      "category": ">4.0",
+      "n": 4616,
+      "weightedMeanHdlMgDl": 56.60008531168625
+    }
+  ],
+  "analysisSpec": {
+    "inferencePolicy": {
+      "estimandType": "associational",
+      "varianceEstimator": "approximate_weighted",
+      "allowedInference": "exploratory_association",
+      "pValueLanguage": "approximate_only",
+      "causalClaimsAllowed": false
+    }
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Approximate weighting only; full NHANES complex survey variance not implemented.",
+    "Complete-case analysis may induce selection bias.",
+    "Poverty-income ratio is self-reported household economic context and can be missing or top-coded."
+  ],
+  "sources": [
+    "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+    "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+    "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/1999/DataFiles/DEMO.htm"
+  ]
+}

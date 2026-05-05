@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "runType": "spec-governed-golden-rerun",
+  "specHash": "e27b0d4ac94822f692bb4f29cd938de602e24d27a0038034ed23e1baed4b943a",
+  "status": "succeeded",
+  "rowCounts": {
+    "adultRows": 33518,
+    "completeCaseRows": 21653
+  },
+  "model": {
+    "type": "weighted approximate linear regression",
+    "uninsuredMeanDifferenceHbA1cPercent": 0.04895141756769798,
+    "ci95": [
+      0.015015471001547327,
+      0.08288736413384865
+    ],
+    "pValue": 0.004699543685999099,
+    "covariates": [
+      "uninsured",
+      "age_10",
+      "female",
+      "race_1",
+      "race_2",
+      "race_4",
+      "race_5"
+    ]
+  },
+  "sensitivityModel": {
+    "type": "weighted approximate logistic GLM",
+    "oddsRatio": 1.0227539223006334,
+    "ci95": [
+      0.8762943208389692,
+      1.1936920743476453
+    ],
+    "pValue": 0.7753938230401385
+  },
+  "limitations": [
+    "Spec-governed local rerun still uses approximate frequency weights; full NHANES complex survey variance not implemented."
+  ]
+}

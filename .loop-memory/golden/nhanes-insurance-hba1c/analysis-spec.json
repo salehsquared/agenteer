@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "analysisSpec": {
+    "schemaVersion": 1,
+    "id": "analysis_golden_nhanes_insurance_hba1c",
+    "dataset": "NHANES public-health local cached MedBrevia curated Parquet",
+    "releasePolicy": "local_files",
+    "researchQuestion": "Among NHANES adults, is health insurance coverage associated with HbA1c level and threshold-defined A1c >=6.5%?",
+    "population": {
+      "description": [
+        "Adults aged 18 years or older with valid insurance coverage response and HbA1c measurement."
+      ],
+      "filters": [
+        "RIDAGEYR >= 18",
+        "HIQ011 in (1,2)",
+        "LBXGH nonmissing",
+        "WTMEC2YR > 0"
+      ]
+    },
+    "cycles": [
+      "2011-2012",
+      "2013-2014",
+      "2015-2016",
+      "2017-2018",
+      "2017-2020-prepandemic"
+    ],
+    "variables": {
+      "outcome": [
+        "LBXGH"
+      ],
+      "exposures": [
+        "HIQ011"
+      ],
+      "covariates": [
+        "RIDAGEYR",
+        "RIAGENDR",
+        "RIDRETH1"
+      ],
+      "stratify": [],
+      "filters": [
+        "RIDAGEYR",
+        "WTMEC2YR",
+        "SDMVSTRA",
+        "SDMVPSU",
+        "SEQN"
+      ]
+    },
+    "derivedDefinitions": {
+      "source": "golden_packet_manual_from_paper_0121",
+      "definitions": [
+        "uninsured = HIQ011 == 2 versus insured = HIQ011 == 1; exclude refused, don't know, missing",
+        "a1c_elevated_65 = LBXGH >= 6.5% sensitivity threshold; not a clinical diagnosis by itself",
+        "age_10 = RIDAGEYR / 10",
+        "female = RIAGENDR == 2",
+        "race/ethnicity indicators from RIDRETH1 with one reference group"
+      ]
+    },
+    "surveyDesign": {
+      "weightRule": "mec",
+      "weightVariable": "WTMEC2YR",
+      "strataVariable": "SDMVSTRA",
+      "psuVariable": "SDMVPSU"
+    },
+    "analysisPlan": [
+      "primary: weighted approximate linear regression of LBXGH on uninsured adjusted for age, sex, race/ethnicity",
+      "sensitivity: weighted approximate logistic GLM for LBXGH >= 6.5% on uninsured adjusted for age, sex, race/ethnicity",
+      "report cross-sectional limitations and approximate variance limitation"
+    ],
+    "inferencePolicy": {
+      "estimandType": "associational",
+      "varianceEstimator": "approximate_weighted",
+      "allowedInference": "exploratory_association",
+      "pValueLanguage": "approximate_only",
+      "causalClaimsAllowed": false
+    },
+    "failurePolicy": {
+      "missingVariable": "block",
+      "invalidWeight": "block",
+      "highMissingnessThreshold": 0.4,
+      "sparseCellThreshold": 16,
+      "rerunInstability": "block",
+      "hashMismatch": "block",
+      "methodologicalUncertainty": "stop_for_review"
+    },
+    "expectedOutputs": [
+      "analysis.json",
+      "paper.md",
+      "critique.md",
+      "paper QA JSON",
+      "runner-record.json",
+      "artifact manifest",
+      "rerun diff report"
+    ],
+    "execution": {
+      "timeoutSeconds": 600,
+      "memoryMb": 2048,
+      "maxRows": 250000,
+      "maxOutputBytes": 25000000
+    },
+    "requiredVariables": [
+      "HIQ011",
+      "LBXGH",
+      "RIAGENDR",
+      "RIDAGEYR",
+      "RIDRETH1",
+      "SDMVPSU",
+      "SDMVSTRA",
+      "SEQN",
+      "WTMEC2YR"
+    ],
+    "specHash": "b0b51432dba88c71b7e26e43f2b6d708ea918a4fc302fda7aec6839e3552f489"
+  }
+}

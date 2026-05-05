@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "paperRunnerRecord": {
+    "schemaVersion": 1,
+    "recordType": "agenteer.research.paper-runner-record",
+    "paperId": "0158-bmi-hba1c",
+    "status": "succeeded",
+    "generatedAtIso": "2026-05-05T06:32:06.970Z",
+    "runner": {
+      "kind": "local-python-statsmodels",
+      "commandSummary": "Merged demographics, anthropometrics, and diabetes Parquet by SEQN; fitted weighted approximate linear and logistic models; wrote analysis, paper, critique; ran paper-qa."
+    },
+    "analysisSpec": {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/nhanes-insurance-hba1c/analysis-spec.json",
+      "specHash": "b0b51432dba88c71b7e26e43f2b6d708ea918a4fc302fda7aec6839e3552f489",
+      "artifactHash": "6afeee85b46a86499fe9f10fa53f345feb02bc9d977e61f1856c222082062a12",
+      "binding": "retrospective"
+    },
+    "inputs": [
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+        "bytes": 1476850,
+        "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+        "bytes": 611124,
+        "sha256": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet",
+        "bytes": 520148,
+        "sha256": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9"
+      }
+    ],
+    "outputs": [
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/analysis.json",
+        "bytes": 3806,
+        "sha256": "8eda059af804e8b025a8c8643f0730f2b2482b7cba948091018b8d6d4e7a7e7f"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/paper.md",
+        "bytes": 4393,
+        "sha256": "a47ba55fb11d2d9b0a8b44ffe6ea49b25934d4083972ebe1fa0bab0c9d932a57"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/qa-cli.json",
+        "bytes": 5954,
+        "sha256": "61ce72389bbb01d625da05792fb7e2bae4f2c814fb9035471709afd1cb13ff6f"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0158-bmi-hba1c/critique.md",
+        "bytes": 443,
+        "sha256": "c9cadca030f2e2ca9fa7f02de9f0fec8001b7b5de3908c46a5be1a4f35521f8b"
+      }
+    ],
+    "methods": {
+      "weighting": "WTMEC2YR normalized approximate weights",
+      "variance": "approximate weighted model variance, not full NHANES complex survey variance",
+      "population": "NHANES adults aged >=20 with complete BMI, HbA1c, weight, age, sex, and race/ethnicity"
+    },
+    "warnings": [
+      {
+        "severity": "warning",
+        "code": "RETROSPECTIVE_ANALYSIS_SPEC_BINDING",
+        "message": "AnalysisSpec was attached after execution; treat this as provenance migration evidence, not proof of spec-governed execution."
+      }
+    ],
+    "nextAction": "Do not treat this as spec-governed execution; create a pre-run AnalysisSpec before the next paper."
+  }
+}

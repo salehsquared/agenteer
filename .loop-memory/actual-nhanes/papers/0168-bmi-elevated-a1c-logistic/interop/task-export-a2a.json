@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "taskInteropExport": {
+    "shape": "a2a",
+    "taskId": "task_a0272166eb64",
+    "payload": {
+      "id": "task_a0272166eb64",
+      "goal": "Run AnalysisSpec and generate 0168-bmi-elevated-a1c-logistic research paper packet",
+      "requester": "agenteer.research.paper-run",
+      "status": "succeeded",
+      "capabilities": [
+        "research.paper.generate",
+        "research.paper.qa",
+        "research.runner.provenance"
+      ],
+      "artifacts": [
+        {
+          "artifactId": "artifact_5fb30b4920bb",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/analysis-spec.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "07aec13c535710e99f2131b36f41e49e9462db7a95ea521810cd8fb58abbe9cc",
+          "description": "analysis-spec.json"
+        },
+        {
+          "artifactId": "artifact_df8677aa481c",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/analysis.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "867093b09b1b18a9267199754fecd94883eb6dc647a8e8b6b582e2ed906650a9",
+          "description": "analysis.json"
+        },
+        {
+          "artifactId": "artifact_c65504ad537f",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/paper.md",
+          "kind": "markdown",
+          "mediaType": "text/markdown",
+          "hash": "2ae9714ff932598d1d5e691d04a3fa88824fe875a7cda5ed4d55c16066688a01",
+          "description": "paper.md"
+        },
+        {
+          "artifactId": "artifact_66051b39c823",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/qa-cli.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "0ed6261055b12b2ed4bba2bd690baec061a077b5ca7bfb78aeab7236a507814e",
+          "description": "qa-cli.json"
+        },
+        {
+          "artifactId": "artifact_837a30f41148",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/runner-record.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "8885f2b332014cfc877bf16286d89aabe50bc00ae92dc944232b23eb39ccfd25",
+          "description": "runner-record.json"
+        }
+      ],
+      "permissions": {
+        "allowedActions": [
+          "read-local-nhanes-cache",
+          "write-loop-memory-paper-artifacts"
+        ],
+        "deniedActions": [
+          "write-medbrevia",
+          "cloud"
+        ],
+        "humanApprovalRequired": false,
+        "networkAllowed": false,
+        "filesystemWriteRoots": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic"
+        ],
+        "cloudAllowed": false
+      },
+      "costBoundary": {
+        "maxUsd": 0,
+        "maxRuntimeSeconds": 900,
+        "maxModelCalls": 0
+      },
+      "evidenceReceipts": [
+        {
+          "schemaVersion": 1,
+          "receiptId": "receipt_634e260739a6",
+          "artifactRef": {
+            "artifactId": "artifact_c65504ad537f",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/paper.md",
+            "kind": "markdown",
+            "mediaType": "text/markdown",
+            "hash": "2ae9714ff932598d1d5e691d04a3fa88824fe875a7cda5ed4d55c16066688a01",
+            "description": "paper.md"
+          },
+          "hash": "2ae9714ff932598d1d5e691d04a3fa88824fe875a7cda5ed4d55c16066688a01",
+          "producedBy": "agenteer.research.paper-run",
+          "producedAt": "2026-05-05T07:04:46.149Z",
+          "validator": "paper-authoring",
+          "status": "pass",
+          "evidenceRefs": [
+            "artifact_c65504ad537f"
+          ]
+        },
+        {
+          "schemaVersion": 1,
+          "receiptId": "receipt_9557ef667c69",
+          "artifactRef": {
+            "artifactId": "artifact_66051b39c823",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/qa-cli.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "0ed6261055b12b2ed4bba2bd690baec061a077b5ca7bfb78aeab7236a507814e",
+            "description": "qa-cli.json"
+          },
+          "hash": "0ed6261055b12b2ed4bba2bd690baec061a077b5ca7bfb78aeab7236a507814e",
+          "producedBy": "agenteer.research.paper-qa",
+          "producedAt": "2026-05-05T07:04:46.150Z",
+          "validator": "paper-qa",
+          "status": "pass",
+          "evidenceRefs": [
+            "artifact_66051b39c823"
+          ]
+        },
+        {
+          "schemaVersion": 1,
+          "receiptId": "receipt_1654da8222e1",
+          "artifactRef": {
+            "artifactId": "artifact_837a30f41148",
+            "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/runner-record.json",
+            "kind": "json",
+            "mediaType": "application/json",
+            "hash": "8885f2b332014cfc877bf16286d89aabe50bc00ae92dc944232b23eb39ccfd25",
+            "description": "runner-record.json"
+          },
+          "hash": "8885f2b332014cfc877bf16286d89aabe50bc00ae92dc944232b23eb39ccfd25",
+          "producedBy": "agenteer.research.paper-runner-record",
+          "producedAt": "2026-05-05T07:04:46.150Z",
+          "validator": "runner-provenance",
+          "status": "pass",
+          "evidenceRefs": [
+            "artifact_837a30f41148"
+          ]
+        }
+      ]
+    },
+    "evidenceReceipts": [
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_634e260739a6",
+        "artifactRef": {
+          "artifactId": "artifact_c65504ad537f",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/paper.md",
+          "kind": "markdown",
+          "mediaType": "text/markdown",
+          "hash": "2ae9714ff932598d1d5e691d04a3fa88824fe875a7cda5ed4d55c16066688a01",
+          "description": "paper.md"
+        },
+        "hash": "2ae9714ff932598d1d5e691d04a3fa88824fe875a7cda5ed4d55c16066688a01",
+        "producedBy": "agenteer.research.paper-run",
+        "producedAt": "2026-05-05T07:04:46.149Z",
+        "validator": "paper-authoring",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_c65504ad537f"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_9557ef667c69",
+        "artifactRef": {
+          "artifactId": "artifact_66051b39c823",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/qa-cli.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "0ed6261055b12b2ed4bba2bd690baec061a077b5ca7bfb78aeab7236a507814e",
+          "description": "qa-cli.json"
+        },
+        "hash": "0ed6261055b12b2ed4bba2bd690baec061a077b5ca7bfb78aeab7236a507814e",
+        "producedBy": "agenteer.research.paper-qa",
+        "producedAt": "2026-05-05T07:04:46.150Z",
+        "validator": "paper-qa",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_66051b39c823"
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "receiptId": "receipt_1654da8222e1",
+        "artifactRef": {
+          "artifactId": "artifact_837a30f41148",
+          "uri": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0168-bmi-elevated-a1c-logistic/runner-record.json",
+          "kind": "json",
+          "mediaType": "application/json",
+          "hash": "8885f2b332014cfc877bf16286d89aabe50bc00ae92dc944232b23eb39ccfd25",
+          "description": "runner-record.json"
+        },
+        "hash": "8885f2b332014cfc877bf16286d89aabe50bc00ae92dc944232b23eb39ccfd25",
+        "producedBy": "agenteer.research.paper-runner-record",
+        "producedAt": "2026-05-05T07:04:46.150Z",
+        "validator": "runner-provenance",
+        "status": "pass",
+        "evidenceRefs": [
+          "artifact_837a30f41148"
+        ]
+      }
+    ]
+  }
+}

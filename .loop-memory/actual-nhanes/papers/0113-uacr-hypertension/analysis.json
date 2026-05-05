@@ -1,0 +1,87 @@
+{
+  "paperId": "0113-uacr-hypertension",
+  "title": "Albuminuria and measured hypertension in NHANES adults: a cross-sectional pipeline dogfood analysis",
+  "sourceRefs": [
+    "demographics.parquet",
+    "kidney.parquet",
+    "blood_pressure.parquet"
+  ],
+  "rowCounts": {
+    "innerMerged": 44312,
+    "adultMerged": 31772,
+    "completeCaseEligible": 20461
+  },
+  "exposure": "URDACT urine albumin-to-creatinine ratio category >=30 mg/g",
+  "outcome": "BPXSY1 >= 130 or BPXDI1 >= 80 measured hypertension threshold",
+  "weights": "WTMEC2YR used as normalized frequency weights; full strata/PSU variance not implemented",
+  "model": {
+    "type": "weighted approximate logistic GLM",
+    "covariates": [
+      "albuminuria_30",
+      "age_10",
+      "female",
+      "race_1",
+      "race_2",
+      "race_4",
+      "race_6",
+      "race_7"
+    ],
+    "albuminuriaOR": 1.834208395866267,
+    "ci95": [
+      1.65611656300473,
+      2.031451477885313
+    ],
+    "pValue": 2.5564705446826355e-31
+  },
+  "groupSummary": [
+    {
+      "group": "UACR <30 mg/g",
+      "n": 17930,
+      "weightedHypertensionPrevalence": 0.36008717867952883,
+      "medianUacr": 6.47
+    },
+    {
+      "group": "UACR >=30 mg/g",
+      "n": 2531,
+      "weightedHypertensionPrevalence": 0.5782408735995834,
+      "medianUacr": 72.73
+    }
+  ],
+  "missingnessAdultMerged": {
+    "URDACT": 0.02410927861009694,
+    "URXUMA": 0.02407780435603676,
+    "URXUCR": 0.02410927861009694,
+    "LBXSCR": 0.06908598766209241,
+    "BPXSY1": 0.34351000881279115,
+    "BPXDI1": 0.34351000881279115,
+    "WTMEC2YR": 0.2821666876495027
+  },
+  "thresholds": {
+    "albuminuria": "UACR >=30 mg/g",
+    "hypertension": "BPXSY1 >=130 or BPXDI1 >=80"
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Single urine ACR measure cannot diagnose chronic kidney disease or persistent albuminuria.",
+    "Single-exam BP threshold is not a clinical hypertension diagnosis.",
+    "Approximate weighting only; full NHANES complex survey variance not implemented."
+  ],
+  "sources": [
+    {
+      "id": "nkf-acr",
+      "url": "https://www.kidney.org/kidney-health/kidneydisease/siemens_hcp_acr"
+    },
+    {
+      "id": "nkf-classify-ckd",
+      "url": "https://www.kidney.org/professionals/explore-your-knowledge/how-to-classify-ckd"
+    },
+    {
+      "id": "nhanes-uacr-hypertension",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37016928/"
+    },
+    {
+      "id": "nhanes-guidelines",
+      "url": "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx"
+    }
+  ]
+}

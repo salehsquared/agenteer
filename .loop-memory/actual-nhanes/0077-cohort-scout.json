@@ -1,0 +1,371 @@
+{
+  "availableEndpointVariables": [
+    "LBXGH"
+  ],
+  "checkedAt": "2026-05-03T16:54:33Z",
+  "dataset": "nhanes",
+  "endpointVariables": [
+    "LBXGH"
+  ],
+  "failures": [],
+  "loadedDomains": [
+    "demographics",
+    "diabetes"
+  ],
+  "metrics": {
+    "baseRows": 54716,
+    "eligibleRows": 4566,
+    "endpointNonMissingRows": 4173,
+    "minCellN": 182,
+    "positiveWeightRows": 3146
+  },
+  "missingEndpointVariables": [],
+  "missingness": {
+    "DIQ010": {
+      "available": true,
+      "missingFraction": 0.0,
+      "missingRows": 0
+    },
+    "LBXGH": {
+      "available": true,
+      "missingFraction": 0.08607095926412615,
+      "missingRows": 393
+    },
+    "RIAGENDR": {
+      "available": true,
+      "missingFraction": 0.0,
+      "missingRows": 0
+    },
+    "RIDAGEYR": {
+      "available": true,
+      "missingFraction": 0.0,
+      "missingRows": 0
+    },
+    "SEQN": {
+      "available": true,
+      "missingFraction": 0.0,
+      "missingRows": 0
+    }
+  },
+  "releaseVersion": "nhanes-v1-20260430",
+  "semanticQuality": {
+    "checks": [
+      {
+        "failures": [],
+        "label": "merged_scout_frame",
+        "stage": "cohort_scout_base",
+        "stats": {
+          "columns": 25,
+          "label": "merged_scout_frame",
+          "rows": 54716,
+          "seqn": {
+            "distinctRows": 54716,
+            "duplicateRows": 0
+          },
+          "stage": "cohort_scout_base",
+          "variables": {
+            "DIQ010": {
+              "max": 9.0,
+              "mean": 1.9330290929834568,
+              "min": 1.0,
+              "nonMissingRows": 52590
+            },
+            "DMDEDUC2": {
+              "max": 9.0,
+              "mean": 3.506326729253666,
+              "min": 1.0,
+              "nonMissingRows": 31849
+            },
+            "DMDMARTL": {
+              "max": 99.0,
+              "mean": 2.6643232966352746,
+              "min": 1.0,
+              "nonMissingRows": 22617
+            },
+            "INDFMPIR": {
+              "max": 5.0,
+              "mean": 2.3338513836621826,
+              "min": 0.01,
+              "nonMissingRows": 48097
+            },
+            "LBXGH": {
+              "max": 17.8,
+              "mean": 5.728301237964238,
+              "min": 2.8,
+              "nonMissingRows": 34896
+            },
+            "LBXGLU": {
+              "max": 524.0,
+              "mean": 109.05775636450154,
+              "min": 21.0,
+              "nonMissingRows": 16812
+            },
+            "RIAGENDR": {
+              "max": 2.0,
+              "mean": 1.5060128664376051,
+              "min": 1.0,
+              "nonMissingRows": 54716
+            },
+            "RIDAGEYR": {
+              "max": 80.0,
+              "mean": 33.98893367812595,
+              "min": 1.0,
+              "nonMissingRows": 52592
+            },
+            "RIDRETH1": {
+              "max": 5.0,
+              "mean": 3.1698954601944584,
+              "min": 1.0,
+              "nonMissingRows": 54716
+            },
+            "RIDRETH3": {
+              "max": 7.0,
+              "mean": 3.393486365962424,
+              "min": 1.0,
+              "nonMissingRows": 54716
+            },
+            "RIDSTATR": {
+              "max": 2.0,
+              "mean": 1.9448607354338767,
+              "min": 1.0,
+              "nonMissingRows": 54716
+            },
+            "SDMVPSU": {
+              "max": 3.0,
+              "mean": 1.5344871701147744,
+              "min": 1.0,
+              "nonMissingRows": 54716
+            },
+            "SEQN": {
+              "max": 124822.0,
+              "mean": 92659.36848453834,
+              "min": 62161.0,
+              "nonMissingRows": 54716
+            },
+            "WTINT2YR": {
+              "max": 433085.0052624958,
+              "mean": 32054.312544308283,
+              "min": 2571.068712346633,
+              "nonMissingRows": 39156
+            },
+            "WTINTPRP": {
+              "max": 338363.600192,
+              "mean": 20714.921079187534,
+              "min": 1017.784203,
+              "nonMissingRows": 15560
+            },
+            "WTMEC2YR": {
+              "max": 419762.836487576,
+              "mean": 33560.21984506805,
+              "min": 2566.183854483138,
+              "nonMissingRows": 37399
+            },
+            "WTMECPRP": {
+              "max": 367555.742979,
+              "mean": 22540.151887615662,
+              "min": 1116.245058,
+              "nonMissingRows": 14300
+            }
+          }
+        },
+        "status": "warning",
+        "warnings": [
+          {
+            "code": "VALUE_BELOW_SOFT_RANGE",
+            "expectedSoftMin": 3.0,
+            "message": "LBXGH has rare values below the usual clinical range (2.8 < 3); verify missing-value handling and denominators.",
+            "observedMin": 2.8,
+            "severity": "warning",
+            "variable": "LBXGH"
+          }
+        ]
+      },
+      {
+        "failures": [],
+        "label": "eligible_scout_frame",
+        "stage": "cohort_scout_eligible",
+        "stats": {
+          "columns": 27,
+          "label": "eligible_scout_frame",
+          "rows": 4566,
+          "seqn": {
+            "distinctRows": 4566,
+            "duplicateRows": 0
+          },
+          "stage": "cohort_scout_eligible",
+          "variables": {
+            "DIQ010": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "DMDEDUC2": {
+              "max": 9.0,
+              "mean": 3.187910643889619,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "DMDMARTL": {
+              "max": 77.0,
+              "mean": 2.1827717736808645,
+              "min": 1.0,
+              "nonMissingRows": 3146
+            },
+            "INDFMPIR": {
+              "max": 5.0,
+              "mean": 2.2999469160768453,
+              "min": 0.02,
+              "nonMissingRows": 3956
+            },
+            "LBXGH": {
+              "max": 17.8,
+              "mean": 7.482530553558591,
+              "min": 3.5,
+              "nonMissingRows": 4173
+            },
+            "LBXGLU": {
+              "max": 479.0,
+              "mean": 161.10177628420547,
+              "min": 21.0,
+              "nonMissingRows": 2083
+            },
+            "RIAGENDR": {
+              "max": 2.0,
+              "mean": 1.4739378011388524,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "RIDAGEYR": {
+              "max": 80.0,
+              "mean": 62.3491020586947,
+              "min": 20.0,
+              "nonMissingRows": 4566
+            },
+            "RIDRETH1": {
+              "max": 5.0,
+              "mean": 3.1563731931668855,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "RIDRETH3": {
+              "max": 7.0,
+              "mean": 3.3451598773543583,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "RIDSTATR": {
+              "max": 2.0,
+              "mean": 1.9529128339903636,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "SDMVPSU": {
+              "max": 3.0,
+              "mean": 1.5188348664038547,
+              "min": 1.0,
+              "nonMissingRows": 4566
+            },
+            "SEQN": {
+              "max": 124817.0,
+              "mean": 94371.51752080595,
+              "min": 62211.0,
+              "nonMissingRows": 4566
+            },
+            "WTINT2YR": {
+              "max": 304313.95003870904,
+              "mean": 30637.166327707033,
+              "min": 4587.173043801203,
+              "nonMissingRows": 3146
+            },
+            "WTINTPRP": {
+              "max": 276745.084711,
+              "mean": 19627.798654211972,
+              "min": 1876.867755,
+              "nonMissingRows": 1420
+            },
+            "WTMEC2YR": {
+              "max": 337044.2469498807,
+              "mean": 32172.000243821734,
+              "min": 4942.3732120612685,
+              "nonMissingRows": 3027
+            },
+            "WTMECPRP": {
+              "max": 281954.629734,
+              "mean": 21112.05916400982,
+              "min": 2005.688855,
+              "nonMissingRows": 1324
+            }
+          }
+        },
+        "status": "passed",
+        "warnings": []
+      },
+      {
+        "failures": [],
+        "stage": "cohort_scout_invariants",
+        "status": "passed",
+        "warnings": []
+      }
+    ],
+    "failures": [],
+    "status": "warning",
+    "warnings": [
+      {
+        "code": "VALUE_BELOW_SOFT_RANGE",
+        "expectedSoftMin": 3.0,
+        "message": "LBXGH has rare values below the usual clinical range (2.8 < 3); verify missing-value handling and denominators.",
+        "observedMin": 2.8,
+        "severity": "warning",
+        "variable": "LBXGH"
+      }
+    ]
+  },
+  "status": "warning",
+  "subgroupCellSizes": [
+    {
+      "age_group_scout": "20-44",
+      "n": 182,
+      "sex_scout": "Male"
+    },
+    {
+      "age_group_scout": "20-44",
+      "n": 252,
+      "sex_scout": "Female"
+    },
+    {
+      "age_group_scout": "65+",
+      "n": 828,
+      "sex_scout": "Female"
+    },
+    {
+      "age_group_scout": "45-64",
+      "n": 870,
+      "sex_scout": "Female"
+    },
+    {
+      "age_group_scout": "45-64",
+      "n": 952,
+      "sex_scout": "Male"
+    },
+    {
+      "age_group_scout": "65+",
+      "n": 1089,
+      "sex_scout": "Male"
+    }
+  ],
+  "survey": {
+    "weightAvailable": true,
+    "weightVariable": "WTMEC2YR"
+  },
+  "warnings": [
+    {
+      "code": "VALUE_BELOW_SOFT_RANGE",
+      "expectedSoftMin": 3.0,
+      "message": "LBXGH has rare values below the usual clinical range (2.8 < 3); verify missing-value handling and denominators.",
+      "observedMin": 2.8,
+      "severity": "warning",
+      "variable": "LBXGH"
+    }
+  ]
+}

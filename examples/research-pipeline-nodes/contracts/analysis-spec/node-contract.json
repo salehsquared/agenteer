@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "nodeId": "@agenteer/node-research-analysis-spec",
+  "displayName": "Research AnalysisSpec validation",
+  "domain": "research",
+  "inputSchema": {
+    "type": "object",
+    "required": ["packetDir", "analysisSpec"],
+    "properties": {
+      "packetDir": { "type": "string", "minLength": 1 },
+      "analysisSpec": {
+        "type": "object",
+        "required": ["dataset", "variables", "surveyDesign", "outputs"],
+        "properties": {
+          "dataset": { "type": "string", "minLength": 1 },
+          "variables": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "surveyDesign": { "type": "object" },
+          "outputs": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["status", "validatedSpecPath", "failures"],
+    "properties": {
+      "status": { "type": "string", "enum": ["pass", "fail"] },
+      "validatedSpecPath": { "type": "string" },
+      "failures": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+  "artifactEffects": [
+    {
+      "id": "validated-analysis-spec",
+      "kind": "write",
+      "pathTemplate": "analysis-spec.validated.json",
+      "required": true,
+      "description": "Validated executable AnalysisSpec consumed by runner/code generation."
+    }
+  ],
+  "failureTypes": [
+    {
+      "code": "NODE_INPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": false,
+      "repairAction": "Repair the upstream protocol-to-AnalysisSpec conversion before execution.",
+      "description": "AnalysisSpec input does not match the executable contract."
+    },
+    {
+      "code": "ANALYSIS_SPEC_METHODS_INVALID",
+      "severity": "blocker",
+      "category": "research",
+      "retryable": false,
+      "repairAction": "Return to protocol design; this is a methodological blocker, not executable repair.",
+      "description": "AnalysisSpec violates survey, variable, eligibility, or estimand requirements."
+    },
+    {
+      "code": "NODE_OUTPUT_INVALID",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Repair the validator adapter so it emits status, validatedSpecPath, and failures.",
+      "description": "AnalysisSpec validation output failed the output schema."
+    },
+    {
+      "code": "NODE_ARTIFACT_MISSING",
+      "severity": "blocker",
+      "category": "execution",
+      "retryable": true,
+      "repairAction": "Regenerate analysis-spec.validated.json before runner planning.",
+      "description": "The validated AnalysisSpec artifact was not found."
+    }
+  ],
+  "verifier": { "kind": "json-schema", "inputRequired": true, "outputRequired": true, "command": null, "evidenceRefs": ["analysis-spec-v1"] },
+  "permissions": { "requiredActions": [], "dynamicActions": false, "dynamicActionSpec": null },
+  "costBoundary": { "maxUsd": 0, "maxRuntimeSeconds": 120, "cloudAllowed": false },
+  "sideEffects": { "writesFs": true, "network": false, "mutatesCtx": false, "emitsCtxVariants": [] },
+  "stability": { "determinism": "deterministic", "maturity": "stable" },
+  "examples": [
+    {
+      "name": "nhanes-local-analysis-spec",
+      "input": {
+        "packetDir": "/tmp/packet",
+        "analysisSpec": {
+          "dataset": "nhanes",
+          "variables": ["LBXGH", "HIQ011"],
+          "surveyDesign": { "weight": "WTMEC2YR", "strata": "SDMVSTRA", "psu": "SDMVPSU" },
+          "outputs": ["table1", "model"]
+        }
+      },
+      "output": { "status": "pass", "validatedSpecPath": "analysis-spec.validated.json", "failures": [] }
+    }
+  ]
+}

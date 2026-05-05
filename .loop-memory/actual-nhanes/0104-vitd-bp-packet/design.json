@@ -1,0 +1,251 @@
+{
+  "packetVersion": 0,
+  "generatedAtIso": "2026-05-03T17:43:41.316Z",
+  "source": {
+    "medbreviaRepo": "/Users/saleh/WebstormProjects/medbrevia_v3",
+    "branch": "codex/grandrounds-edition-redesign-4",
+    "registryPath": "/Users/saleh/WebstormProjects/medbrevia_v3/data/analytics/nhanes/registry.json",
+    "registryVersion": null,
+    "registrySha256": "a7656b85d8b7ad62f1efe51f003e97c40d8761bab460b4ee89ce8b3615bb759e"
+  },
+  "protocol": {
+    "title": "Vitamin D and Blood Pressure",
+    "clinicalQuestion": "Among NHANES adults, is serum 25-hydroxyvitamin D associated with measured hypertension?",
+    "dataset": "nhanes",
+    "population": {
+      "label": "Adults, age 20+ when clinically appropriate",
+      "filters": [
+        "RIDSTATR == 2",
+        "RIDAGEYR >= 20 when adult population is intended"
+      ]
+    },
+    "exposure": {
+      "label": "Vitamin D",
+      "variables": [
+        "LBXVIDMS"
+      ],
+      "domain": "vitamin_d"
+    },
+    "endpoint": {
+      "label": "Blood Pressure",
+      "variables": [
+        "BPXDI1",
+        "BPXDI2",
+        "BPXDI3",
+        "BPXSY1",
+        "BPXSY2",
+        "BPXSY3"
+      ],
+      "domain": "blood_pressure"
+    },
+    "covariates": [
+      "RIDAGEYR",
+      "RIAGENDR",
+      "RIDRETH3"
+    ],
+    "stratifiers": [],
+    "cycles": [
+      "2017-2018"
+    ],
+    "approvedDataInputs": [
+      "demographics",
+      "vitamin_d",
+      "blood_pressure"
+    ],
+    "surveyDesign": {
+      "weightRule": "mec",
+      "weightVariable": "WTMEC2YR",
+      "strataVariable": "SDMVSTRA",
+      "psuVariable": "SDMVPSU"
+    },
+    "requestedOutputs": [
+      "cohort_flow_table",
+      "weighted_descriptive_table",
+      "primary_model_table",
+      "methods_and_limitations_report"
+    ],
+    "derivedDefinitions": [
+      {
+        "id": "measured_hypertension",
+        "label": "Measured hypertension",
+        "expression": "mean available systolic BP >= 130 mmHg or mean available diastolic BP >= 80 mmHg",
+        "variables": [
+          "BPXDI1",
+          "BPXDI2",
+          "BPXDI3",
+          "BPXSY1",
+          "BPXSY2",
+          "BPXSY3"
+        ],
+        "role": "endpoint"
+      }
+    ],
+    "caveats": [
+      "NHANES analyses are observational and cross-sectional unless a specific longitudinal design is introduced.",
+      "Use survey weights, strata, and PSU variables for population estimates.",
+      "Generated execution code should not run until the protocol and cohort scout pass deterministic validation."
+    ]
+  },
+  "diagnostics": {
+    "matchedVariables": [
+      {
+        "name": "LBXVIDMS",
+        "domain": "vitamin_d",
+        "table": "VID",
+        "label": "25-hydroxyvitamin D",
+        "unit": "nmol/L",
+        "role": "measure"
+      },
+      {
+        "name": "BPXDI1",
+        "domain": "blood_pressure",
+        "table": "BPX",
+        "label": "Diastolic BP - reading 1",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXDI2",
+        "domain": "blood_pressure",
+        "table": "BPX",
+        "label": "Diastolic BP - reading 2",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXDI3",
+        "domain": "blood_pressure",
+        "table": "BPX",
+        "label": "Diastolic BP - reading 3",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXSY1",
+        "domain": "blood_pressure",
+        "table": "BPX",
+        "label": "Systolic BP - reading 1",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXSY2",
+        "domain": "blood_pressure",
+        "table": "BPX",
+        "label": "Systolic BP - reading 2",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXSY3",
+        "domain": "blood_pressure",
+        "table": "BPX",
+        "label": "Systolic BP - reading 3",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPQ020",
+        "domain": "blood_pressure",
+        "table": "BPQ",
+        "label": "Ever told you had high blood pressure",
+        "role": "questionnaire"
+      },
+      {
+        "name": "BPXODI1",
+        "domain": "blood_pressure",
+        "table": "BPXO",
+        "label": "Oscillometric diastolic BP - reading 1",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXODI2",
+        "domain": "blood_pressure",
+        "table": "BPXO",
+        "label": "Oscillometric diastolic BP - reading 2",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXODI3",
+        "domain": "blood_pressure",
+        "table": "BPXO",
+        "label": "Oscillometric diastolic BP - reading 3",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXOSY1",
+        "domain": "blood_pressure",
+        "table": "BPXO",
+        "label": "Oscillometric systolic BP - reading 1",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXOSY2",
+        "domain": "blood_pressure",
+        "table": "BPXO",
+        "label": "Oscillometric systolic BP - reading 2",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "BPXOSY3",
+        "domain": "blood_pressure",
+        "table": "BPXO",
+        "label": "Oscillometric systolic BP - reading 3",
+        "unit": "mmHg",
+        "role": "measure"
+      },
+      {
+        "name": "RIDAGEYR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Age in years at screening",
+        "role": "covariate",
+        "unit": "years"
+      }
+    ],
+    "blockers": [],
+    "warnings": []
+  },
+  "commandLineProduct": {
+    "purpose": "A CLI-only research design loop where Agenteer reads dataset metadata, proposes bounded analytic protocols, and returns traceable design packets without mutating the source project.",
+    "proposedCommands": [
+      "agenteer research design --project medbrevia-nhanes --repo <medbrevia_v3> --question '<clinical question>' --out <packet-dir>",
+      "agenteer run --spec <packet-dir>/workflow.yaml --session <session-dir>",
+      "agenteer inspect --session <session-dir> --evidence"
+    ],
+    "medbreviaInputs": [
+      "NHANES registry JSON",
+      "analytics runner contract",
+      "current analytics tests and fixtures"
+    ],
+    "agenteerOutputs": [
+      "candidate protocol JSON",
+      "workflow spec skeleton",
+      "evidence-backed design report",
+      "framework backlog discovered by the use case"
+    ]
+  },
+  "improvementLoop": {
+    "agenteerShouldOwn": [
+      "workflow state, session replay, permission envelopes, evidence records, node composition, and inspectable traces",
+      "deterministic protocol validation before any model-generated code can run",
+      "human approval and resume boundaries between design, scout, and execution"
+    ],
+    "medbreviaShouldOwn": [
+      "auth, UI, Firestore/GCS/Cloud Run integration, dataset hosting, and product-specific presentation",
+      "curated dataset registries and medical domain constraints",
+      "final clinical UX and staff review policy"
+    ],
+    "firstAgenteerBacklog": [
+      "promote this lab command into a real workflow example with nodes for registry_load, protocol_design, protocol_validate, cohort_scout, and report_packet",
+      "teach inspect to group failures by product concept: question, protocol, data, execution, artifact, report",
+      "add artifact evidence records for generated code, tables, plots, runner logs, and validation reports",
+      "add a fixture-driven long-running workflow test with human approval and resume"
+    ]
+  }
+}

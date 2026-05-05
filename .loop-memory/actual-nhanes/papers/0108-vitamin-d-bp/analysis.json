@@ -1,0 +1,111 @@
+{
+  "paperId": "0108-vitamin-d-bp",
+  "title": "Serum 25-hydroxyvitamin D and measured hypertension in NHANES adults: a cross-sectional pipeline dogfood analysis",
+  "dataRelease": "nhanes-v1-20260430 local MedBrevia curated Parquet cache",
+  "sourceRefs": [
+    "demographics.parquet",
+    "vitamin_d.parquet",
+    "blood_pressure.parquet"
+  ],
+  "rowCounts": {
+    "innerMerged": 35909,
+    "adultMerged": 22807,
+    "completeCaseEligible": 19770
+  },
+  "outcome": "BPXSY1 >= 130 or BPXDI1 >= 80 using first available reading fields required in complete case",
+  "exposure": "LBXVIDMS serum 25-hydroxyvitamin D, nmol/L",
+  "weights": "WTMEC2YR used as normalized frequency weights in approximate GLM; strata/PSU variance not fully implemented",
+  "model": {
+    "type": "weighted approximate logistic GLM",
+    "covariates": [
+      "vitd_10",
+      "age_10",
+      "female",
+      "race_1",
+      "race_2",
+      "race_4",
+      "race_6",
+      "race_7"
+    ],
+    "vitaminDPer10NmollOR": 0.9651402658259081,
+    "ci95": [
+      0.9538336056182996,
+      0.9765809541955537
+    ],
+    "pValue": 3.602282985930906e-09
+  },
+  "quartiles": [
+    {
+      "quartile": "Q1 lowest",
+      "n": 4945,
+      "vitdRangeNmoll": [
+        7.04,
+        44.9
+      ],
+      "weightedHypertensionPrevalence": 0.3959332555121876
+    },
+    {
+      "quartile": "Q2",
+      "n": 4964,
+      "vitdRangeNmoll": [
+        45.0,
+        62.1
+      ],
+      "weightedHypertensionPrevalence": 0.3626260894117955
+    },
+    {
+      "quartile": "Q3",
+      "n": 4926,
+      "vitdRangeNmoll": [
+        62.2,
+        81.1
+      ],
+      "weightedHypertensionPrevalence": 0.3630533594850307
+    },
+    {
+      "quartile": "Q4 highest",
+      "n": 4935,
+      "vitdRangeNmoll": [
+        81.2,
+        422.0
+      ],
+      "weightedHypertensionPrevalence": 0.4014928154157327
+    }
+  ],
+  "missingnessAdultMerged": {
+    "RIDAGEYR": 0.0,
+    "RIAGENDR": 0.0,
+    "RIDRETH3": 0.0,
+    "WTMEC2YR": 0.0,
+    "SDMVSTRA": 0.0,
+    "SDMVPSU": 0.0,
+    "LBXVIDMS": 0.055114657780505984,
+    "BPXSY1": 0.08545621958170738,
+    "BPXDI1": 0.08545621958170738,
+    "hypertension_130_80": 0.0
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Approximate weighting only; full NHANES complex survey variance not implemented in this artifact.",
+    "Single-exam blood pressure fields used; this is not a clinical diagnosis.",
+    "Complete-case analysis may induce selection bias."
+  ],
+  "sources": [
+    {
+      "id": "strobe",
+      "url": "https://www.strobe-statement.org/"
+    },
+    {
+      "id": "nhanes-guidelines",
+      "url": "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx"
+    },
+    {
+      "id": "aha-2017",
+      "url": "https://professional.heart.org/en/science-news/2017-hypertension-clinical-guidelines/top-things-to-know"
+    },
+    {
+      "id": "tarmos",
+      "url": "https://arxiv.org/abs/2004.14066"
+    }
+  ]
+}

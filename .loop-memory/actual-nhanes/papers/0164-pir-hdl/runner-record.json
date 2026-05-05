@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "paperRunnerRecord": {
+    "schemaVersion": 1,
+    "recordType": "agenteer.research.paper-runner-record",
+    "paperId": "0164-pir-hdl",
+    "status": "succeeded",
+    "generatedAtIso": "2026-05-05T06:38:51.155Z",
+    "runner": {
+      "kind": "local-python-statsmodels",
+      "commandSummary": "Executed pre-run AnalysisSpec for PIR and HDL using demographics and lipids Parquet; fitted weighted approximate linear model; wrote analysis, paper, critique; ran paper-qa."
+    },
+    "analysisSpec": {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+      "specHash": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae",
+      "artifactHash": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae",
+      "binding": "spec-governed"
+    },
+    "inputs": [
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+        "bytes": 1476850,
+        "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+      },
+      {
+        "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/lipids/lipids.parquet",
+        "bytes": 391132,
+        "sha256": "ea1e3417bb06b804c1dd5969806f16761df27b043b16b1b7c1e105a1b23f97d4"
+      }
+    ],
+    "outputs": [
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis-spec.json",
+        "bytes": 1682,
+        "sha256": "9a6a7d48c11da13770d959c17e6a6d87de77b70f472f3e143c205e4d49960fae"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/analysis.json",
+        "bytes": 2832,
+        "sha256": "1aa0fbbd932843846c603d97872cffad71813bde0f3f20145775bf7e65d50e1b"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/paper.md",
+        "bytes": 4284,
+        "sha256": "0ef4ce5d0cb8cccbabfb8fd34fdd78cafd8d2db4c9849956eb3dbb15c72e10b6"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/qa-cli.json",
+        "bytes": 5481,
+        "sha256": "1141f7e74d4b882449d303b60d6501a52af698560a115a0f3f164244fc0458e6"
+      },
+      {
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0164-pir-hdl/critique.md",
+        "bytes": 464,
+        "sha256": "3ae331715b306966fbc2546088b18b7e8799ac01be389f7644119dca98f3ec3d"
+      }
+    ],
+    "methods": {
+      "weighting": "WTMEC2YR normalized approximate weights",
+      "variance": "approximate weighted model variance, not full NHANES complex survey variance",
+      "population": "NHANES adults aged >=20 with complete PIR, HDL, survey design fields, age, sex, and race/ethnicity"
+    },
+    "warnings": [],
+    "nextAction": "Run paper-qa and include this runner record in the paper index or golden manifest."
+  }
+}

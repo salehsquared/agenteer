@@ -47,17 +47,213 @@ import {
   renderLabMedbreviaNhanesResult,
 } from "../commands/lab.js";
 import {
+  parseBackendId,
+  parseDataStructures,
+  parseDatasetAdapterId,
+  parseMethodCategory,
+  parseMethodGoal,
+  parseModelingGoal,
+  parseOutcomeType,
+  parseStudyArchetypeId,
+  parseStudyDesign,
+  researchArchetypesCommand,
+  researchDatasetAdapterCommand,
+  researchExecutionContractFromFileCommand,
+  researchMethodApplyCommand,
+  researchMethodSelectCommand,
+  researchMethodValidateCommand,
+  researchMethodsCatalogCommand,
+  researchModelingPlanCommand,
+  researchMachineBenchmarkCommand,
+  researchMachinePlanCommand,
+  researchMachineStatusCommand,
+  researchSpecV2Command,
+  renderResearchArchetypes,
+  renderResearchArchetypesJson,
+  renderResearchDatasetAdapter,
+  renderResearchDatasetAdapterJson,
+  renderResearchExecutionContract,
+  renderResearchExecutionContractJson,
+  renderResearchMachineBenchmark,
+  renderResearchMachineBenchmarkJson,
+  renderResearchMachinePlan,
+  renderResearchMachinePlanJson,
+  renderResearchMachineStatus,
+  renderResearchMachineStatusJson,
+  renderResearchMethodApply,
+  renderResearchMethodApplyJson,
+  renderResearchMachineMethodSelection,
+  renderResearchMachineMethodSelectionJson,
+  renderResearchMethodValidation,
+  renderResearchMethodValidationJson,
+  renderResearchMethodsCatalog,
+  renderResearchMethodsCatalogJson,
+  renderResearchModelingPlan,
+  renderResearchModelingPlanJson,
+  renderResearchSpecV2,
+  renderResearchSpecV2Json,
+  resolveMachineOutPath,
+} from "../research-machine/commands.js";
+import {
+  parseMlInteger,
+  parseMlNumber,
+  parseMlTask,
+  parseMlTaskRequired,
+  researchMlCompareCommand,
+  researchMlInspectCommand,
+  researchMlModelsCommand,
+  researchMlRunCommand,
+  renderResearchMlComparison,
+  renderResearchMlComparisonJson,
+  renderResearchMlModels,
+  renderResearchMlModelsJson,
+  renderResearchMlRun,
+  renderResearchMlRunJson,
+} from "../research-machine/ml/commands.js";
+import {
+  agentAdversarialProtocolsCommand,
+  agentCapabilityFromContractCommand,
+  agentCapabilityValidateCommand,
+  agentCognitivePoolCommand,
+  agentContextImpactCommand,
+  agentContextDenoiseCommand,
+  agentContextImmuneCheckCommand,
+  agentContextManifestCommand,
+  agentContextPackCommand,
+  agentContextPreflightCommand,
+  agentContextOutcomeCommand,
+  agentContextScoreCommand,
+  agentContextVerifyCommand,
+  agentCreativitySynthCommand,
+  agentCriticCommand,
+  agentDreamCommand,
+  agentEvidenceReceiptCommand,
+  agentExecutionMemoryCommand,
+  agentIdeaEvolveCommand,
+  agentImprovementCandidatesCommand,
+  agentImprovementRunCommand,
+  agentNodeContractCommand,
+  agentNodeContractsCommand,
+  agentNodeContractValidateCommand,
+  agentNodeIoValidateCommand,
+  agentNodeOutputRecordCommand,
+  agentPlanCriticCommand,
+  agentPlanDiffCommand,
+  agentPlanStateCreateCommand,
+  agentPlanStateEventCommand,
+  agentPlanStateReplanCommand,
+  agentPlanStateResumeCommand,
+  agentPlanV2Command,
+  agentReplanCommand,
+  agentRepairProvenanceCommand,
+  agentRepairRunCommand,
+  agentResearchIntakeCommand,
+  agentResearchMarketCommand,
+  agentReliabilityEvalCommand,
+  agentSourceRankCommand,
+  agentTaskCreateCommand,
+  agentTaskExportCommand,
+  agentTaskTransitionCommand,
+  agentTaskValidateCommand,
+  agentTrajectoryPolicyCommand,
+  renderAgentAdversarialProtocols,
+  renderAgentAdversarialProtocolsJson,
+  renderAgentCapabilityDeclaration,
+  renderAgentCapabilityDeclarationJson,
+  renderAgentCognitivePool,
+  renderAgentCognitivePoolJson,
+  renderAgentContextImpact,
+  renderAgentContextDenoise,
+  renderAgentContextDenoiseJson,
+  renderAgentContextImpactJson,
+  renderAgentContextImmuneCheck,
+  renderAgentContextImmuneCheckJson,
+  renderAgentContextManifest,
+  renderAgentContextManifestJson,
+  renderAgentContextPack,
+  renderAgentContextPackJson,
+  renderAgentContextPreflight,
+  renderAgentContextPreflightJson,
+  renderAgentContextScore,
+  renderAgentContextScoreJson,
+  renderAgentContextVerify,
+  renderAgentContextVerifyJson,
+  renderAgentCreativitySynthesis,
+  renderAgentCreativitySynthesisJson,
+  renderAgentCritique,
+  renderAgentCritiqueJson,
+  renderAgentDream,
+  renderAgentDreamJson,
+  renderAgentEvidenceReceipt,
+  renderAgentEvidenceReceiptJson,
+  renderAgentExecutionMemory,
+  renderAgentExecutionMemoryJson,
+  renderAgentIdeaEvolution,
+  renderAgentIdeaEvolutionJson,
+  renderAgentImprovementCandidates,
+  renderAgentImprovementCandidatesJson,
+  renderAgentImprovementRun,
+  renderAgentImprovementRunJson,
+  renderAgentInteropValidation,
+  renderAgentInteropValidationJson,
+  renderAgentNodeContractRegistry,
+  renderAgentNodeContractRegistryJson,
+  renderAgentNodeContractValidation,
+  renderAgentNodeContractValidationJson,
+  renderAgentNodeExecutionRecord,
+  renderAgentNodeExecutionRecordJson,
+  renderAgentNodeIoValidation,
+  renderAgentNodeIoValidationJson,
+  renderAgentPlanCritique,
+  renderAgentPlanCritiqueJson,
+  renderAgentPlanDiff,
+  renderAgentPlanDiffJson,
+  renderAgentPlanPortfolio,
+  renderAgentPlanPortfolioJson,
+  renderAgentPlanState,
+  renderAgentPlanStateJson,
+  renderAgentReplan,
+  renderAgentReplanJson,
+  renderAgentRepairProvenance,
+  renderAgentRepairProvenanceJson,
+  renderAgentRepairRun,
+  renderAgentRepairRunJson,
+  renderAgentResearchIntake,
+  renderAgentResearchIntakeJson,
+  renderAgentResearchMarket,
+  renderAgentResearchMarketJson,
+  renderAgentReliabilityEval,
+  renderAgentReliabilityEvalJson,
+  renderAgentSourceRank,
+  renderAgentSourceRankJson,
+  renderAgentTaskEnvelope,
+  renderAgentTaskEnvelopeJson,
+  renderAgentTaskInteropExport,
+  renderAgentTaskInteropExportJson,
+  renderAgentTaskTransition,
+  renderAgentTaskTransitionJson,
+  renderAgentTrajectoryPolicy,
+  renderAgentTrajectoryPolicyJson,
+} from "../commands/agent.js";
+import {
   researchDesignCommand,
   researchCritiquePacketCommand,
   researchApprovePacketCommand,
+  researchApprovalVerifyCommand,
+  researchManifestVerifyCommand,
   researchAnalyzeLocalCommand,
   researchCheckpointCommand,
   researchArtifactManifestCommand,
   researchLoopStatusCommand,
   researchLoopNoteCommand,
+  researchCycleAuditCommand,
   researchRunnerSpecCommand,
   researchExportPacketCommand,
   researchPacketSummaryCommand,
+  researchPacketNextCommand,
+  researchNavigationTraceCommand,
+  researchPacketVerifyCommand,
+  researchPacketReadinessCommand,
   researchMethodsFrameworkCommand,
   researchValidateMethodsCommand,
   researchRegistryInspectCommand,
@@ -74,6 +270,7 @@ import {
   researchSimulateStudyCommand,
   researchRealStudyReadinessCommand,
   researchDataAccessManifestCommand,
+  researchDataAccessRedactCommand,
   researchRealLocalRunnerSpecCommand,
   researchRealStudyChecklistCommand,
   researchAdapterGapReportCommand,
@@ -88,26 +285,71 @@ import {
   researchCostLedgerCommand,
   researchQuestionBankCommand,
   researchQuestionReadinessCommand,
+  researchProtocolCandidatesCommand,
+  researchProtocolSteerCommand,
+  researchProtocolPromoteCommand,
+  researchProtocolEditCommand,
+  researchAnalysisSpecCommand,
+  researchCohortScoutFileCommand,
+  researchSemanticQualityCommand,
+  researchProgressCommand,
+  researchJobLifecycleCommand,
+  researchRepairPlanCommand,
+  researchAgentExecutionRecordCommand,
+  researchWorkflowMemoryCommand,
+  researchUncertaintyBudgetCommand,
+  researchDatasetCandidateCommand,
+  researchImprovementAgendaCommand,
+  researchClaimGuardCommand,
+  researchBackendStatusCommand,
+  researchPaperIndexCommand,
+  researchPaperLifecycleCommand,
+  researchPaperRerunStabilityCommand,
+  researchPaperRunCommand,
+  researchPaperQaCommand,
+  researchPaperRunnerRecordCommand,
+  researchBenchmarkRegisterCommand,
+  researchBenchmarkRunCommand,
+  researchBenchmarkScoreCommand,
+  researchBenchmarkSuiteCommand,
+  researchTableSummaryCommand,
   researchInferSchemaCommand,
   researchPipelineStagesCommand,
+  researchStageArtifactsCommand,
+  researchStageGateCommand,
   researchReviewReportCommand,
   researchInspectPacketCommand,
   researchQuestionsCommand,
   researchScoutPlanCommand,
   renderResearchPacketCritique,
   renderResearchApproval,
+  renderResearchApprovalVerification,
+  renderResearchApprovalVerificationJson,
   renderResearchAnalysisResult,
   renderResearchCheckpoint,
   renderResearchCheckpointJson,
   renderResearchArtifactManifest,
   renderResearchArtifactManifestJson,
+  renderResearchManifestVerification,
+  renderResearchManifestVerificationJson,
   renderResearchLoopStatus,
   renderResearchLoopStatusJson,
   renderResearchLoopNote,
+  renderResearchLoopNoteJson,
+  renderResearchCycleAudit,
+  renderResearchCycleAuditJson,
   renderResearchRunnerSpec,
   renderResearchPacketExport,
   renderResearchPacketSummary,
   renderResearchPacketSummaryJson,
+  renderResearchPacketNext,
+  renderResearchPacketNextJson,
+  renderResearchNavigationTrace,
+  renderResearchNavigationTraceJson,
+  renderResearchPacketVerification,
+  renderResearchPacketVerificationJson,
+  renderResearchPacketReadiness,
+  renderResearchPacketReadinessJson,
   renderResearchMethodsFramework,
   renderResearchMethodsFrameworkJson,
   renderResearchMethodsValidation,
@@ -140,6 +382,8 @@ import {
   renderResearchRealStudyReadinessJson,
   renderResearchDataAccessManifest,
   renderResearchDataAccessManifestJson,
+  renderResearchDataAccessRedaction,
+  renderResearchDataAccessRedactionJson,
   renderResearchRealLocalRunnerSpec,
   renderResearchRealLocalRunnerSpecJson,
   renderResearchRealStudyChecklist,
@@ -168,10 +412,70 @@ import {
   renderResearchQuestionBankJson,
   renderResearchQuestionReadiness,
   renderResearchQuestionReadinessJson,
+  renderResearchProtocolCandidates,
+  renderResearchProtocolCandidatesJson,
+  renderResearchProtocolSteer,
+  renderResearchProtocolSteerJson,
+  renderResearchProtocolPromotion,
+  renderResearchProtocolPromotionJson,
+  renderResearchProtocolEdit,
+  renderResearchProtocolEditJson,
+  renderResearchAnalysisSpec,
+  renderResearchAnalysisSpecJson,
+  renderResearchCohortScoutFile,
+  renderResearchCohortScoutFileJson,
+  renderResearchSemanticQuality,
+  renderResearchSemanticQualityJson,
+  renderResearchProgress,
+  renderResearchProgressJson,
+  renderResearchJobLifecycle,
+  renderResearchJobLifecycleJson,
+  renderResearchRepairPlan,
+  renderResearchRepairPlanJson,
+  renderResearchAgentExecutionRecord,
+  renderResearchAgentExecutionRecordJson,
+  renderResearchWorkflowMemory,
+  renderResearchWorkflowMemoryJson,
+  renderResearchUncertaintyBudget,
+  renderResearchUncertaintyBudgetJson,
+  renderResearchDatasetCandidate,
+  renderResearchDatasetCandidateJson,
+  renderResearchImprovementAgenda,
+  renderResearchImprovementAgendaJson,
+  renderResearchClaimGuard,
+  renderResearchClaimGuardJson,
+  renderResearchBackendStatus,
+  renderResearchBackendStatusJson,
+  renderResearchPaperIndex,
+  renderResearchPaperIndexJson,
+  renderResearchPaperLifecycle,
+  renderResearchPaperLifecycleJson,
+  renderResearchPaperRerunStability,
+  renderResearchPaperRerunStabilityJson,
+  renderResearchPaperRun,
+  renderResearchPaperRunJson,
+  renderResearchPaperQa,
+  renderResearchPaperQaJson,
+  renderResearchPaperRunnerRecord,
+  renderResearchPaperRunnerRecordJson,
+  renderResearchBenchmark,
+  renderResearchBenchmarkJson,
+  renderResearchBenchmarkRun,
+  renderResearchBenchmarkRunJson,
+  renderResearchBenchmarkScore,
+  renderResearchBenchmarkScoreJson,
+  renderResearchBenchmarkSuite,
+  renderResearchBenchmarkSuiteJson,
+  renderResearchTableSummary,
+  renderResearchTableSummaryJson,
   renderResearchSchemaInference,
   renderResearchSchemaInferenceJson,
   renderResearchPipelineStages,
   renderResearchPipelineStagesJson,
+  renderResearchStageArtifacts,
+  renderResearchStageArtifactsJson,
+  renderResearchStageGate,
+  renderResearchStageGateJson,
   renderResearchReportReview,
   renderResearchReportReviewJson,
   renderResearchPacketInspect,
@@ -206,6 +510,8 @@ async function main(argv: readonly string[]): Promise<number> {
       return searchCmd(rest);
     case "lab":
       return labCmd(rest);
+    case "agent":
+      return agentCmd(rest);
     case "research":
       return researchCmd(rest);
     default:
@@ -228,6 +534,51 @@ Usage:
   agenteer install <spec>  --workflow-dir <dir> [--yes] [--grant <cap>]* [--registry <url>]
   agenteer search  <query> [--registry <url>]
   agenteer lab     medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
+  agenteer agent context-preflight --repo <dir> --query <text> [--target <file|symbol>] [--context-bin <path>] [--autocontext-root <dir>] [--json]
+  agenteer agent context-pack --repo <dir> (--query <text> | --file <path> | --symbol <name>) [--budget <n>] [--json]
+  agenteer agent context-manifest --repo <dir> --query <text> [--target <file|symbol>] [--out <json>] [--json]
+  agenteer agent context-score --manifest <context-manifest.json> [--json]
+  agenteer agent context-outcome --manifest <context-manifest.json> --result <result.json|txt> [--out <json>] [--json]
+  agenteer agent context-impact --repo <dir> --target <file|symbol> [--json]
+  agenteer agent context-verify --repo <dir> [--json]
+  agenteer agent node-contract --manifest <framework-or-contract.json> [--out <node-contract.json>] [--json]
+  agenteer agent node-contracts --dir <dir> [--json]
+  agenteer agent node-contract-validate --contract <node-contract.json> [--json]
+  agenteer agent node-io-validate --contract <node-contract.json> --kind input|output --value <json> [--json]
+  agenteer agent node-output-record --contract <node-contract.json> --input <json> --output <json> [--artifact-base <dir>] [--out <json>] [--json]
+  agenteer agent plan-v2 --goal <text> [--context-pack <json>] [--context-manifest <json>] [--repo <dir>] [--node-contracts <dir>] [--json]
+  agenteer agent plan-state-create --plan <plan.json> [--out <state.json>] [--json]
+  agenteer agent plan-state-event --state <state.json> --event <event-json-or-text> [--out <state.json>] [--json]
+  agenteer agent plan-state-replan --state <state.json> --event <event-json-or-text> [--out <state.json>] [--json]
+  agenteer agent plan-state-resume --state <state.json> [--json]
+  agenteer agent replan --plan <plan.json> --event <event-json-or-text> [--json]
+  agenteer agent plan-critic --plan <plan.json> [--rubric <json>] [--node-contracts <dir>] [--repo <dir>] [--json]
+  agenteer agent plan-diff --before <plan.json> --after <plan.json> [--json]
+  agenteer agent repair-run --bundle <dir> --qa <command|artifact> [--repair-command <cmd>] [--max-attempts <n>] [--max-cost-usd <n>] [--max-risk-score <n>] [--allow-file <path-or-glob>]* [--analysis-spec <json>] [--json]
+  agenteer agent repair-provenance --repair-run <json> [--json]
+  agenteer agent research-intake --topic <text> [--web] [--x] [--papers] [--live] [--json]
+  agenteer agent source-rank --sources <json> [--json]
+  agenteer agent creativity-synth --sources <json> --goal <text> [--json]
+  agenteer agent idea-evolve --ideas <json> [--generations <n>] [--json]
+  agenteer agent adversarial-protocols --domain <text> [--json]
+  agenteer agent critic --artifact <path> --rubric <json> [--mode cold|same-context] [--json]
+  agenteer agent cognitive-pool --artifact <path> [--json]
+  agenteer agent context-immune-check --context <json|dir> [--json]
+  agenteer agent context-denoise --context <json|dir> [--json]
+  agenteer agent dream --history <dir> [--json]
+  agenteer agent research-market --candidates <json> [--budget-usd <n>] [--json]
+  agenteer agent improvement-candidates --goal <text> [--ideas <json>] [--plan-state <json>] [--repair-provenance <json>] [--benchmark-target <json>] [--history <dir>] [--rejected-history <dir>] [--out <json>] [--json]
+  agenteer agent improvement-run --candidates <json> --benchmark-before <json> --benchmark-after <json> [--budget-usd <n>] [--tests-failed] [--override-neutral] [--override-reason <text>] [--rejected-dir <dir>] [--out <json>] [--json]
+  agenteer agent reliability-eval --runs <json> [--json]
+  agenteer agent trajectory-policy --trajectory <json> --state <text> [--valid-action <action>]* [--json]
+  agenteer agent execution-memory --history <dir> [--json]
+  agenteer agent capability-from-contract --contract <node-contract.json> [--out <capability.json>] [--json]
+  agenteer agent capability-validate --capability <capability.json> [--json]
+  agenteer agent evidence-receipt --artifact <path> --produced-by <id> --validator <name> [--status pass|fail|warning|unverified] [--out <receipt.json>] [--json]
+  agenteer agent task-create --goal <text> --requester <id> [--capability <id>]* [--input <json-or-text>]* [--artifact <path>]* [--allow-action <action>]* [--deny-action <action>]* [--write-root <dir>]* [--max-usd <n>] [--max-runtime-seconds <n>] [--max-model-calls <n>] [--network] [--cloud] [--human-approval] [--out <task.json>] [--json]
+  agenteer agent task-validate --task <task.json> [--capability <capability.json>]* [--json]
+  agenteer agent task-transition --task <task.json> --status <status> [--evidence <receipt.json>]* [--reason <text>] [--out <task.json>] [--json]
+  agenteer agent task-export --task <task.json> [--shape local|mcp|a2a] [--json]
   agenteer research design --project medbrevia-nhanes --repo <medbrevia_v3> --question <text> [--out <dir>]
   agenteer research questions --project medbrevia-nhanes --repo <medbrevia_v3> [--limit <n>]
   agenteer research methods-framework [--json]
@@ -245,12 +596,13 @@ Usage:
   agenteer research estimand-sketch --question <text> [--json]
   agenteer research simulate-study --project medbrevia-nhanes --repo <medbrevia_v3> --question <text> --out <dir> [--json]
   agenteer research real-study-readiness --packet <dir> [--json]
-  agenteer research data-access --packet <dir> --file <path>* [--json]
+  agenteer research data-access --packet <dir> --file <path>* [--python <path>] [--json]
+  agenteer research data-access-redact --packet <dir> [--json]
   agenteer research real-runner-spec --packet <dir> [--json]
   agenteer research real-study-checklist --packet <dir> [--json]
   agenteer research adapter-gap-report --packet <dir> [--json]
   agenteer research variable-map --packet <dir> --file <path> --map <VAR:COLUMN>* [--json]
-  agenteer research suggest-variable-map --packet <dir> --file <rows.json> [--json]
+  agenteer research suggest-variable-map --packet <dir> --file <rows.json|rows.csv|rows.parquet> [--python <path>] [--json]
   agenteer research apply-variable-map-suggestions --packet <dir> --file <rows.json> [--json]
   agenteer research workflow-scorecard --packet <dir> [--json]
   agenteer research evidence-gap --packet <dir> [--json]
@@ -260,20 +612,73 @@ Usage:
   agenteer research cost-ledger [--packet <dir>] [--proposal-dir <dir>] [--hard-stop-usd <n>] [--json]
   agenteer research question-bank [--domain <medical|public-health>] [--json]
   agenteer research question-readiness --question <text> [--json]
+  agenteer research protocol-candidates --question <text> [--json]
+  agenteer research protocol-steer --portfolio <candidates.json> [--prefer <text>] [--avoid <text>] [--require-variable <name>] [--json]
+  agenteer research protocol-promote --portfolio <candidates.json> [--candidate <id>] [--json]
+  agenteer research protocol-edit --protocol <protocol.json> [--set-title <text>] [--set-question <text>] [--cycles <csv>] [--add-covariate <LABEL:VARIABLE:DOMAIN>] [--json]
+  agenteer research analysis-spec [--packet <dir> | --protocol <protocol.json>] [--json]
+  agenteer research cohort-scout-file --spec <analysis-spec.json> --file <rows.json|rows.csv> [--json]
+  agenteer research semantic-quality --file <rows.json|rows.csv> [--json]
+  agenteer research progress --phase <phase> [--label <text>] [--detail <text>] [--next-step <text>] [--terminal] [--json]
+  agenteer research job-lifecycle --job <id> --status <status> [--phase <phase>] [--json]
+  agenteer research repair-plan --packet <dir> [--json]
+  agenteer research agent-record --intent <text> --observation <text> --inference <text> --action <text> [--cycle <n>] [--evidence <path>] [--tag <text>] [--confidence <0..1>] [--json]
+  agenteer research workflow-memory --source <updates-upgrades.md> [--json]
+  agenteer research uncertainty-budget --spec <analysis-spec.json> [--scout <cohort-scout.json>] [--comparisons <n>] [--alpha <n>] [--json]
+  agenteer research dataset-candidate --id <id> [--title <text>] [--source-url <url>] [--modality <name>] [--row-count <n>] [--license <id>] [--synthetic] [--intended-use <use>] [--json]
+  agenteer research improvement-agenda --candidate <ID:IMPACT:CONFIDENCE:COST_USD:RISK[:TITLE]> [--budget-usd <n>] [--json]
+  agenteer research claim-guard --report <report.md> [--spec <analysis-spec.json>] [--json]
+  agenteer research machine-status [--data-root <dir>] [--python <python>] [--rscript <Rscript>] [--json]
+  agenteer research spec-v2 --spec <analysis-spec.json> [--out <analysis-spec-v2.json>] [--json]
+  agenteer research execution-contract --spec <analysis-spec-v2.json> [--backend <id>] [--data-root <dir>] [--out-dir <dir>] [--json]
+  agenteer research archetypes [--id <archetype-id>] [--json]
+  agenteer research methods-catalog [--category <category>] [--method <id>] [--json]
+  agenteer research method-select --question <text> [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--dataset <id>] [--goal <goal>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--max-candidates <n>] [--out <selection.json>] [--json]
+  agenteer research method-apply --spec <analysis-spec.json> --selection <selection.json> [--out <analysis-spec-v2.json>] [--json]
+  agenteer research method-validate --spec <analysis-spec.json> --method <id> [--json]
+  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json>] [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
+  agenteer research dataset-adapter --dataset <id> [--data-root <dir>] [--json]
+  agenteer research machine-plan --question <text> [--dataset <id>] [--archetype <id>] [--backend <id>] [--data-root <dir>] [--json]
+  agenteer research machine-benchmark --packet <dir> [--spec <analysis-spec.json>] [--out <benchmark-eval.json>] [--json]
+  agenteer research ml-models [--task <task>] [--include-unavailable] [--json]
+  agenteer research ml-run --task <task> --model <id> --data <rows.csv|json|parquet> [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--test-size <n>] [--seed <n>] [--scale] [--cv <folds>] [--python <path>] [--json]
+  agenteer research ml-compare --task <task> --data <rows.csv|json|parquet> --model <id>* [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--scale] [--cv <folds>] [--python <path>] [--json]
+  agenteer research ml-inspect --run <ml-run.json> [--json]
+  agenteer research backend-status [--python <python>] [--rscript <Rscript>] [--json]
+  agenteer research paper-qa --paper <paper.md> [--evidence <analysis.json>] [--json]
+  agenteer research paper-index --papers-dir <dir> [--out <INDEX.md>] [--json]
+  agenteer research paper-lifecycle --paper-dir <dir> [--capability-dir <dir>] [--out <SUMMARY.md>] [--json]
+  agenteer research paper-rerun-stability --baseline <paper-dir> --repeat <paper-dir> [--tolerance <n>] [--out <json>] [--json]
+  agenteer research paper-run --analysis-spec <json> --data-root <dir> --out-dir <dir> [--backend python-linearized|r-survey] [--python <python>] [--rscript <Rscript>] [--capability-dir <dir>] [--json]
+  agenteer research paper-runner-record --paper-id <id> --command-summary <text> [--status succeeded|failed|stopped] [--runner-kind <kind>] [--analysis-spec <json>] [--binding spec-governed|retrospective|none] [--input <file>]* [--output <file>]* [--weighting <text>] [--variance <text>] [--population <text>] [--out <json>] [--json]
+  agenteer research benchmark-register --packet <dir> [--out <benchmark.json>] [--id <id>] [--domain <text>] [--json]
+  agenteer research benchmark-run --benchmark <benchmark.json> [--out <run.json>] [--json]
+  agenteer research benchmark-score --run <benchmark-run.json> [--json]
+  agenteer research benchmark-suite --dir <golden-dir> [--out <suite.json>] [--json]
+  agenteer research table-summary --file <rows.json|rows.csv|rows.parquet> [--python <path>] [--json]
   agenteer research infer-schema --file <rows.json> [--json]
-  agenteer research stages [--json]
+  agenteer research pipeline-stages [--json]
+  agenteer research stage-artifacts [--json]
+  agenteer research stage-gate --completed <stage,csv> --target <stage> [--json]
   agenteer research inspect --packet <dir>
   agenteer research critique --packet <dir>
   agenteer research scout --packet <dir>
   agenteer research approve --packet <dir> [--note <text>]
+  agenteer research approval-verify --packet <dir> [--json]
   agenteer research analyze --packet <dir> --fixture <rows.json>
   agenteer research review-report --packet <dir> [--json]
   agenteer research manifest --packet <dir> [--json]
+  agenteer research manifest-verify --packet <dir> [--json]
   agenteer research runner-spec --packet <dir>
   agenteer research export --packet <dir> --out <dir>
+  agenteer research next --packet <dir> [--trace] [--exit-zero-on-blocked] [--json]
+  agenteer research navigation-trace --packet <dir> [--json]
+  agenteer research packet-verify --packet <dir> [--json]
+  agenteer research packet-readiness --packet <dir> [--json]
   agenteer research packet-summary --packet <dir> [--json]
   agenteer research loop-status [--state <dir>] [--json]
   agenteer research loop-note --cycle <n> --summary <text> [--next <text>] [--state <dir>]
+  agenteer research cycle-audit --cycle-dir <dir> [--json]
   agenteer research checkpoint --packet <dir> [--json]
 
 Common flags:
@@ -514,6 +919,334 @@ async function labCmd(argv: readonly string[]): Promise<number> {
   }
 }
 
+async function agentCmd(argv: readonly string[]): Promise<number> {
+  const [sub, ...rest] = argv;
+  const { flags } = parseArgs(rest);
+  const contextOpts = {
+    contextBin: flagString(flags, "context-bin") ?? undefined,
+    autocontextRoot: flagString(flags, "autocontext-root") ?? undefined,
+  };
+  switch (sub) {
+    case "context-preflight": {
+      const result = await agentContextPreflightCommand(requireFlagString(flags, "repo"), requireFlagString(flags, "query"), {
+        ...contextOpts,
+        target: flagString(flags, "target") ?? undefined,
+        budget: flagString(flags, "budget") ? Number(flagString(flags, "budget")) : undefined,
+      });
+      console.log(flags.json === true ? renderAgentContextPreflightJson(result) : renderAgentContextPreflight(result));
+      return result.status.ok && result.pack.ok && !result.staleOrMissing ? 0 : 1;
+    }
+    case "context-pack": {
+      const query = flagString(flags, "query");
+      const file = flagString(flags, "file");
+      const symbol = flagString(flags, "symbol");
+      const seed = query ? { kind: "query" as const, value: query } : file ? { kind: "file" as const, value: file } : symbol ? { kind: "symbol" as const, value: symbol } : null;
+      if (!seed) throw new Error("context-pack requires --query, --file, or --symbol");
+      const result = await agentContextPackCommand(requireFlagString(flags, "repo"), seed, {
+        ...contextOpts,
+        budget: flagString(flags, "budget") ? Number(flagString(flags, "budget")) : undefined,
+      });
+      console.log(flags.json === true ? renderAgentContextPackJson(result) : renderAgentContextPack(result));
+      return result.result.ok ? 0 : 1;
+    }
+    case "context-manifest": {
+      const result = await agentContextManifestCommand(requireFlagString(flags, "repo"), requireFlagString(flags, "query"), {
+        ...contextOpts,
+        target: flagString(flags, "target") ?? undefined,
+        budget: flagString(flags, "budget") ? Number(flagString(flags, "budget")) : undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentContextManifestJson(result) : renderAgentContextManifest(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "context-score": {
+      const result = await agentContextScoreCommand(requireFlagString(flags, "manifest"));
+      console.log(flags.json === true ? renderAgentContextScoreJson(result) : renderAgentContextScore(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "context-outcome": {
+      const result = await agentContextOutcomeCommand(requireFlagString(flags, "manifest"), requireFlagString(flags, "result"), {
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentContextManifestJson(result) : renderAgentContextManifest(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "context-impact": {
+      const result = await agentContextImpactCommand(requireFlagString(flags, "repo"), requireFlagString(flags, "target"), contextOpts);
+      console.log(flags.json === true ? renderAgentContextImpactJson(result) : renderAgentContextImpact(result));
+      return result.result.ok ? 0 : 1;
+    }
+    case "context-verify": {
+      const result = await agentContextVerifyCommand(requireFlagString(flags, "repo"), contextOpts);
+      console.log(flags.json === true ? renderAgentContextVerifyJson(result) : renderAgentContextVerify(result));
+      return result.result.ok ? 0 : 1;
+    }
+    case "node-contract": {
+      const result = await agentNodeContractCommand(requireFlagString(flags, "manifest"), { outPath: flagString(flags, "out") ?? undefined });
+      console.log(flags.json === true ? renderAgentNodeContractValidationJson(result) : renderAgentNodeContractValidation(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "node-contracts": {
+      const result = await agentNodeContractsCommand(requireFlagString(flags, "dir"));
+      console.log(flags.json === true ? renderAgentNodeContractRegistryJson(result) : renderAgentNodeContractRegistry(result));
+      return result.issues.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "node-contract-validate": {
+      const result = await agentNodeContractValidateCommand(requireFlagString(flags, "contract"));
+      console.log(flags.json === true ? renderAgentNodeContractValidationJson(result) : renderAgentNodeContractValidation(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "node-io-validate": {
+      const rawKind = requireFlagString(flags, "kind");
+      if (rawKind !== "input" && rawKind !== "output") {
+        console.error("node-io-validate: --kind must be input or output");
+        return 2;
+      }
+      const result = await agentNodeIoValidateCommand(requireFlagString(flags, "contract"), rawKind, requireFlagString(flags, "value"));
+      console.log(flags.json === true ? renderAgentNodeIoValidationJson(result) : renderAgentNodeIoValidation(result));
+      return result.status === "pass" ? 0 : 1;
+    }
+    case "node-output-record": {
+      const result = await agentNodeOutputRecordCommand(requireFlagString(flags, "contract"), requireFlagString(flags, "input"), requireFlagString(flags, "output"), {
+        artifactBaseDir: flagString(flags, "artifact-base") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentNodeExecutionRecordJson(result) : renderAgentNodeExecutionRecord(result));
+      return result.status === "passed" ? 0 : 1;
+    }
+    case "plan-v2": {
+      const result = await agentPlanV2Command(requireFlagString(flags, "goal"), { contextPackPath: flagString(flags, "context-pack") ?? undefined, contextManifestPath: flagString(flags, "context-manifest") ?? undefined, repo: flagString(flags, "repo") ?? undefined, nodeContractDir: flagString(flags, "node-contracts") ?? undefined });
+      console.log(flags.json === true ? renderAgentPlanPortfolioJson(result) : renderAgentPlanPortfolio(result));
+      return result.selectedCandidateId ? 0 : 1;
+    }
+    case "plan-state-create": {
+      const result = await agentPlanStateCreateCommand(requireFlagString(flags, "plan"), { outPath: flagString(flags, "out") ?? undefined });
+      console.log(flags.json === true ? renderAgentPlanStateJson(result) : renderAgentPlanState(result));
+      return 0;
+    }
+    case "plan-state-event": {
+      const result = await agentPlanStateEventCommand(requireFlagString(flags, "state"), await readArgOrFile(requireFlagString(flags, "event")), { outPath: flagString(flags, "out") ?? undefined });
+      console.log(flags.json === true ? renderAgentPlanStateJson(result) : renderAgentPlanState(result));
+      return result.currentStatus === "blocked" ? 1 : 0;
+    }
+    case "plan-state-replan": {
+      const result = await agentPlanStateReplanCommand(requireFlagString(flags, "state"), await readArgOrFile(requireFlagString(flags, "event")), { outPath: flagString(flags, "out") ?? undefined });
+      console.log(flags.json === true ? renderAgentPlanStateJson(result) : renderAgentPlanState(result));
+      return 0;
+    }
+    case "plan-state-resume": {
+      const result = await agentPlanStateResumeCommand(requireFlagString(flags, "state"));
+      console.log(flags.json === true ? renderAgentPlanStateJson(result) : renderAgentPlanState(result));
+      return 0;
+    }
+    case "replan": {
+      const result = await agentReplanCommand(requireFlagString(flags, "plan"), await readArgOrFile(requireFlagString(flags, "event")));
+      console.log(flags.json === true ? renderAgentReplanJson(result) : renderAgentReplan(result));
+      return 0;
+    }
+    case "plan-critic": {
+      const result = await agentPlanCriticCommand(requireFlagString(flags, "plan"), flagString(flags, "rubric") ?? undefined, {
+        nodeContractDir: flagString(flags, "node-contracts") ?? undefined,
+        repo: flagString(flags, "repo") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentPlanCritiqueJson(result) : renderAgentPlanCritique(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "plan-diff": {
+      const result = await agentPlanDiffCommand(requireFlagString(flags, "before"), requireFlagString(flags, "after"));
+      console.log(flags.json === true ? renderAgentPlanDiffJson(result) : renderAgentPlanDiff(result));
+      return 0;
+    }
+    case "repair-run": {
+      const result = await agentRepairRunCommand(requireFlagString(flags, "bundle"), requireFlagString(flags, "qa"), {
+        maxAttempts: flagString(flags, "max-attempts") ? Number(flagString(flags, "max-attempts")) : undefined,
+        repairCommand: flagString(flags, "repair-command") ?? undefined,
+        maxCostUsd: flagString(flags, "max-cost-usd") ? Number(flagString(flags, "max-cost-usd")) : undefined,
+        maxRiskScore: flagString(flags, "max-risk-score") ? Number(flagString(flags, "max-risk-score")) : undefined,
+        allowedFiles: flagList(flags, "allow-file"),
+        analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentRepairRunJson(result) : renderAgentRepairRun(result));
+      return result.finalStatus === "passed" ? 0 : 1;
+    }
+    case "repair-provenance": {
+      const result = await agentRepairProvenanceCommand(requireFlagString(flags, "repair-run"));
+      console.log(flags.json === true ? renderAgentRepairProvenanceJson(result) : renderAgentRepairProvenance(result));
+      return 0;
+    }
+    case "research-intake": {
+      const result = await agentResearchIntakeCommand(requireFlagString(flags, "topic"), {
+        web: flags.web === true,
+        x: flags.x === true,
+        papers: flags.papers === true,
+        live: flags.live === true,
+      });
+      console.log(flags.json === true ? renderAgentResearchIntakeJson(result) : renderAgentResearchIntake(result));
+      return 0;
+    }
+    case "source-rank": {
+      const result = await agentSourceRankCommand(requireFlagString(flags, "sources"));
+      console.log(flags.json === true ? renderAgentSourceRankJson(result) : renderAgentSourceRank(result));
+      return 0;
+    }
+    case "creativity-synth": {
+      const result = await agentCreativitySynthCommand(requireFlagString(flags, "sources"), requireFlagString(flags, "goal"));
+      console.log(flags.json === true ? renderAgentCreativitySynthesisJson(result) : renderAgentCreativitySynthesis(result));
+      return 0;
+    }
+    case "idea-evolve": {
+      const result = await agentIdeaEvolveCommand(requireFlagString(flags, "ideas"), flagString(flags, "generations") ? Number(flagString(flags, "generations")) : undefined);
+      console.log(flags.json === true ? renderAgentIdeaEvolutionJson(result) : renderAgentIdeaEvolution(result));
+      return 0;
+    }
+    case "adversarial-protocols": {
+      const result = agentAdversarialProtocolsCommand(requireFlagString(flags, "domain"));
+      console.log(flags.json === true ? renderAgentAdversarialProtocolsJson(result) : renderAgentAdversarialProtocols(result));
+      return 0;
+    }
+    case "critic": {
+      const mode = flagString(flags, "mode") === "same-context" ? "same-context" : "cold";
+      const result = await agentCriticCommand(requireFlagString(flags, "artifact"), requireFlagString(flags, "rubric"), mode);
+      console.log(flags.json === true ? renderAgentCritiqueJson(result) : renderAgentCritique(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "cognitive-pool": {
+      const result = await agentCognitivePoolCommand(requireFlagString(flags, "artifact"));
+      console.log(flags.json === true ? renderAgentCognitivePoolJson(result) : renderAgentCognitivePool(result));
+      return result.consensus === "blocked" ? 1 : 0;
+    }
+    case "context-immune-check": {
+      const result = await agentContextImmuneCheckCommand(requireFlagString(flags, "context"));
+      console.log(flags.json === true ? renderAgentContextImmuneCheckJson(result) : renderAgentContextImmuneCheck(result));
+      return result.items.some(item => item.action === "quarantine") ? 1 : 0;
+    }
+    case "context-denoise": {
+      const result = await agentContextDenoiseCommand(requireFlagString(flags, "context"));
+      console.log(flags.json === true ? renderAgentContextDenoiseJson(result) : renderAgentContextDenoise(result));
+      return result.quarantined ? 1 : 0;
+    }
+    case "dream": {
+      const result = await agentDreamCommand(requireFlagString(flags, "history"));
+      console.log(flags.json === true ? renderAgentDreamJson(result) : renderAgentDream(result));
+      return 0;
+    }
+    case "research-market": {
+      const result = await agentResearchMarketCommand(requireFlagString(flags, "candidates"), flagString(flags, "budget-usd") ? Number(flagString(flags, "budget-usd")) : undefined);
+      console.log(flags.json === true ? renderAgentResearchMarketJson(result) : renderAgentResearchMarket(result));
+      return result.funded.length ? 0 : 1;
+    }
+    case "improvement-candidates": {
+      const result = await agentImprovementCandidatesCommand({
+        goal: requireFlagString(flags, "goal"),
+        ideasPath: flagString(flags, "ideas") ?? undefined,
+        planStatePath: flagString(flags, "plan-state") ?? undefined,
+        repairProvenancePath: flagString(flags, "repair-provenance") ?? undefined,
+        benchmarkTarget: flagString(flags, "benchmark-target") ?? undefined,
+        historyDir: flagString(flags, "history") ?? undefined,
+        rejectedHistoryDir: flagString(flags, "rejected-history") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentImprovementCandidatesJson(result) : renderAgentImprovementCandidates(result));
+      return result.length ? 0 : 1;
+    }
+    case "improvement-run": {
+      const result = await agentImprovementRunCommand({
+        candidatesPath: requireFlagString(flags, "candidates"),
+        benchmarkBeforePath: requireFlagString(flags, "benchmark-before"),
+        benchmarkAfterPath: requireFlagString(flags, "benchmark-after"),
+        budgetUsd: flagString(flags, "budget-usd") ? Number(flagString(flags, "budget-usd")) : undefined,
+        testsPassed: flags["tests-failed"] === true ? false : true,
+        overrideNeutral: flags["override-neutral"] === true,
+        overrideReason: flagString(flags, "override-reason") ?? undefined,
+        rejectedDir: flagString(flags, "rejected-dir") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentImprovementRunJson(result) : renderAgentImprovementRun(result));
+      return result.promoted.length ? 0 : 1;
+    }
+    case "reliability-eval": {
+      const result = await agentReliabilityEvalCommand(requireFlagString(flags, "runs"));
+      console.log(flags.json === true ? renderAgentReliabilityEvalJson(result) : renderAgentReliabilityEval(result));
+      return result.issues.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "trajectory-policy": {
+      const result = await agentTrajectoryPolicyCommand(requireFlagString(flags, "trajectory"), requireFlagString(flags, "state"), flagList(flags, "valid-action"));
+      console.log(flags.json === true ? renderAgentTrajectoryPolicyJson(result) : renderAgentTrajectoryPolicy(result));
+      return result.recommendedAction ? 0 : 1;
+    }
+    case "execution-memory": {
+      const result = await agentExecutionMemoryCommand(requireFlagString(flags, "history"));
+      console.log(flags.json === true ? renderAgentExecutionMemoryJson(result) : renderAgentExecutionMemory(result));
+      return 0;
+    }
+    case "capability-from-contract": {
+      const result = await agentCapabilityFromContractCommand(requireFlagString(flags, "contract"), { outPath: flagString(flags, "out") ?? undefined });
+      console.log(flags.json === true ? renderAgentCapabilityDeclarationJson(result) : renderAgentCapabilityDeclaration(result));
+      return 0;
+    }
+    case "capability-validate": {
+      const result = await agentCapabilityValidateCommand(requireFlagString(flags, "capability"));
+      console.log(flags.json === true ? renderAgentInteropValidationJson(result) : renderAgentInteropValidation(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "evidence-receipt": {
+      const result = await agentEvidenceReceiptCommand({
+        artifact: requireFlagString(flags, "artifact"),
+        producedBy: requireFlagString(flags, "produced-by"),
+        validator: requireFlagString(flags, "validator"),
+        status: flagString(flags, "status") as Parameters<typeof agentEvidenceReceiptCommand>[0]["status"],
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentEvidenceReceiptJson(result) : renderAgentEvidenceReceipt(result));
+      return 0;
+    }
+    case "task-create": {
+      const result = await agentTaskCreateCommand({
+        goal: requireFlagString(flags, "goal"),
+        requester: requireFlagString(flags, "requester"),
+        capabilities: flagList(flags, "capability"),
+        inputs: flagList(flags, "input"),
+        artifacts: flagList(flags, "artifact"),
+        allowedActions: flagList(flags, "allow-action"),
+        deniedActions: flagList(flags, "deny-action"),
+        writeRoots: flagList(flags, "write-root"),
+        maxUsd: flagString(flags, "max-usd") ? Number(flagString(flags, "max-usd")) : undefined,
+        maxRuntimeSeconds: flagString(flags, "max-runtime-seconds") ? Number(flagString(flags, "max-runtime-seconds")) : undefined,
+        maxModelCalls: flagString(flags, "max-model-calls") ? Number(flagString(flags, "max-model-calls")) : undefined,
+        networkAllowed: flags.network === true,
+        cloudAllowed: flags.cloud === true,
+        humanApprovalRequired: flags["human-approval"] === true,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentTaskEnvelopeJson(result) : renderAgentTaskEnvelope(result));
+      return 0;
+    }
+    case "task-validate": {
+      const result = await agentTaskValidateCommand(requireFlagString(flags, "task"), { capabilityPaths: flagList(flags, "capability") });
+      console.log(flags.json === true ? renderAgentInteropValidationJson(result) : renderAgentInteropValidation(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "task-transition": {
+      const result = await agentTaskTransitionCommand(requireFlagString(flags, "task"), requireFlagString(flags, "status") as Parameters<typeof agentTaskTransitionCommand>[1], {
+        evidencePaths: flagList(flags, "evidence"),
+        reason: flagString(flags, "reason") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderAgentTaskTransitionJson(result) : renderAgentTaskTransition(result));
+      return result.allowed ? 0 : 1;
+    }
+    case "task-export": {
+      const shape = flagString(flags, "shape");
+      const result = await agentTaskExportCommand(requireFlagString(flags, "task"), shape === "mcp" || shape === "a2a" ? shape : "local");
+      console.log(flags.json === true ? renderAgentTaskInteropExportJson(result) : renderAgentTaskInteropExport(result));
+      return 0;
+    }
+    default:
+      console.error(`agent: unknown subcommand '${sub ?? ""}'`);
+      return 2;
+  }
+}
+
 async function researchCmd(argv: readonly string[]): Promise<number> {
   const [sub, ...rest] = argv;
   const { flags } = parseArgs(rest);
@@ -634,9 +1367,16 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       return result.status === "ready_for_local_real_data" ? 0 : 1;
     }
     case "data-access": {
-      const result = await researchDataAccessManifestCommand(requireFlagString(flags, "packet"), flagList(flags, "file"));
+      const result = await researchDataAccessManifestCommand(requireFlagString(flags, "packet"), flagList(flags, "file"), {
+        python: flagString(flags, "python") ?? undefined,
+      });
       console.log(flags.json === true ? renderResearchDataAccessManifestJson(result) : renderResearchDataAccessManifest(result));
       return result.files.every(file => file.exists) ? 0 : 1;
+    }
+    case "data-access-redact": {
+      const result = await researchDataAccessRedactCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchDataAccessRedactionJson(result) : renderResearchDataAccessRedaction(result));
+      return 0;
     }
     case "real-runner-spec": {
       const result = await researchRealLocalRunnerSpecCommand(requireFlagString(flags, "packet"));
@@ -659,7 +1399,9 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       return 0;
     }
     case "suggest-variable-map": {
-      const result = await researchSuggestVariableMapCommand(requireFlagString(flags, "packet"), requireFlagString(flags, "file"));
+      const result = await researchSuggestVariableMapCommand(requireFlagString(flags, "packet"), requireFlagString(flags, "file"), {
+        python: flagString(flags, "python") ?? undefined,
+      });
       console.log(flags.json === true ? renderResearchVariableMapSuggestionJson(result) : renderResearchVariableMapSuggestion(result));
       return result.unmatchedVariables.length ? 1 : 0;
     }
@@ -719,15 +1461,488 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchQuestionReadinessJson(result) : renderResearchQuestionReadiness(result));
       return result.status === "ready_for_protocol" ? 0 : 1;
     }
+    case "protocol-candidates": {
+      const result = researchProtocolCandidatesCommand(requireFlagString(flags, "question"));
+      console.log(flags.json === true ? renderResearchProtocolCandidatesJson(result) : renderResearchProtocolCandidates(result));
+      return result.selectedCandidateId ? 0 : 1;
+    }
+    case "protocol-steer": {
+      const result = await researchProtocolSteerCommand(requireFlagString(flags, "portfolio"), {
+        prefer: flagList(flags, "prefer"),
+        avoid: flagList(flags, "avoid"),
+        requireVariables: flagList(flags, "require-variable"),
+      });
+      console.log(flags.json === true ? renderResearchProtocolSteerJson(result) : renderResearchProtocolSteer(result));
+      return result.updatedPortfolio.selectedCandidateId ? 0 : 1;
+    }
+    case "protocol-promote": {
+      const result = await researchProtocolPromoteCommand(requireFlagString(flags, "portfolio"), flagString(flags, "candidate") ?? undefined);
+      console.log(flags.json === true ? renderResearchProtocolPromotionJson(result) : renderResearchProtocolPromotion(result));
+      return 0;
+    }
+    case "protocol-edit": {
+      const result = await researchProtocolEditCommand(requireFlagString(flags, "protocol"), {
+        title: flagString(flags, "set-title") ?? undefined,
+        question: flagString(flags, "set-question") ?? undefined,
+        cycles: flagString(flags, "cycles")?.split(",").map(item => item.trim()).filter(Boolean),
+        addCovariate: flagList(flags, "add-covariate"),
+        addCaveat: flagList(flags, "add-caveat"),
+        addAssumption: flagList(flags, "add-assumption"),
+      });
+      console.log(flags.json === true ? renderResearchProtocolEditJson(result) : renderResearchProtocolEdit(result));
+      return 0;
+    }
+    case "analysis-spec": {
+      const result = await researchAnalysisSpecCommand({
+        packetDir: flagString(flags, "packet") ?? undefined,
+        protocolPath: flagString(flags, "protocol") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchAnalysisSpecJson(result) : renderResearchAnalysisSpec(result));
+      return 0;
+    }
+    case "cohort-scout-file": {
+      const result = await researchCohortScoutFileCommand(requireFlagString(flags, "spec"), requireFlagString(flags, "file"));
+      console.log(flags.json === true ? renderResearchCohortScoutFileJson(result) : renderResearchCohortScoutFile(result));
+      return result.status === "passed" ? 0 : 1;
+    }
+    case "semantic-quality": {
+      const result = await researchSemanticQualityCommand(requireFlagString(flags, "file"));
+      console.log(flags.json === true ? renderResearchSemanticQualityJson(result) : renderResearchSemanticQuality(result));
+      return result.status === "failed" ? 1 : 0;
+    }
+    case "progress": {
+      const result = researchProgressCommand({
+        phase: requireFlagString(flags, "phase"),
+        label: flagString(flags, "label") ?? undefined,
+        detail: flagString(flags, "detail") ?? undefined,
+        nextStep: flagString(flags, "next-step") ?? undefined,
+        terminal: flags.terminal === true,
+      });
+      console.log(flags.json === true ? renderResearchProgressJson(result) : renderResearchProgress(result));
+      return 0;
+    }
+    case "job-lifecycle": {
+      const result = researchJobLifecycleCommand({
+        jobId: requireFlagString(flags, "job"),
+        status: requireFlagString(flags, "status") as Parameters<typeof researchJobLifecycleCommand>[0]["status"],
+        phase: flagString(flags, "phase") ?? undefined,
+        label: flagString(flags, "label") ?? undefined,
+        detail: flagString(flags, "detail") ?? undefined,
+        nextStep: flagString(flags, "next-step") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchJobLifecycleJson(result) : renderResearchJobLifecycle(result));
+      return 0;
+    }
+    case "repair-plan": {
+      const result = await researchRepairPlanCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchRepairPlanJson(result) : renderResearchRepairPlan(result));
+      return result.status === "repair_recommended" ? 1 : 0;
+    }
+    case "agent-record": {
+      const cycleValue = flagString(flags, "cycle");
+      const result = researchAgentExecutionRecordCommand({
+        cycle: cycleValue ? Number.parseInt(cycleValue, 10) : undefined,
+        intent: requireFlagString(flags, "intent"),
+        observation: requireFlagString(flags, "observation"),
+        inference: requireFlagString(flags, "inference"),
+        action: requireFlagString(flags, "action"),
+        evidence: flagList(flags, "evidence"),
+        confidence: flagString(flags, "confidence") ? Number(flagString(flags, "confidence")) : undefined,
+        tags: flagList(flags, "tag"),
+      });
+      console.log(flags.json === true ? renderResearchAgentExecutionRecordJson(result) : renderResearchAgentExecutionRecord(result));
+      return 0;
+    }
+    case "workflow-memory": {
+      const result = await researchWorkflowMemoryCommand({ source: requireFlagString(flags, "source") });
+      console.log(flags.json === true ? renderResearchWorkflowMemoryJson(result) : renderResearchWorkflowMemory(result));
+      return 0;
+    }
+    case "uncertainty-budget": {
+      const result = await researchUncertaintyBudgetCommand({
+        specPath: requireFlagString(flags, "spec"),
+        scoutPath: flagString(flags, "scout") ?? undefined,
+        comparisons: flagString(flags, "comparisons") ? Number(flagString(flags, "comparisons")) : undefined,
+        alpha: flagString(flags, "alpha") ? Number(flagString(flags, "alpha")) : undefined,
+      });
+      console.log(flags.json === true ? renderResearchUncertaintyBudgetJson(result) : renderResearchUncertaintyBudget(result));
+      return result.status === "underpowered_or_fragile" ? 1 : 0;
+    }
+    case "dataset-candidate": {
+      const rowCountValue = flagString(flags, "row-count");
+      const result = researchDatasetCandidateCommand({
+        id: requireFlagString(flags, "id"),
+        title: flagString(flags, "title") ?? undefined,
+        sourceUrl: flagString(flags, "source-url") ?? undefined,
+        modality: flagList(flags, "modality"),
+        rowCount: rowCountValue ? Number(rowCountValue) : undefined,
+        license: flagString(flags, "license") ?? undefined,
+        synthetic: flags.synthetic === true,
+        containsHumanSubjects: flags["human-subjects"] === true ? true : undefined,
+        intendedUse: flagString(flags, "intended-use") as Parameters<typeof researchDatasetCandidateCommand>[0]["intendedUse"],
+      });
+      console.log(flags.json === true ? renderResearchDatasetCandidateJson(result) : renderResearchDatasetCandidate(result));
+      return result.status === "unsuitable" ? 1 : 0;
+    }
+    case "improvement-agenda": {
+      const result = researchImprovementAgendaCommand({
+        budgetUsd: flagString(flags, "budget-usd") ? Number(flagString(flags, "budget-usd")) : undefined,
+        candidates: flagList(flags, "candidate"),
+      });
+      console.log(flags.json === true ? renderResearchImprovementAgendaJson(result) : renderResearchImprovementAgenda(result));
+      return result.selected.length ? 0 : 1;
+    }
+    case "claim-guard": {
+      const result = await researchClaimGuardCommand({
+        reportPath: requireFlagString(flags, "report"),
+        specPath: flagString(flags, "spec") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchClaimGuardJson(result) : renderResearchClaimGuard(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "machine-status": {
+      const result = await researchMachineStatusCommand({
+        dataRoot: flagString(flags, "data-root") ?? undefined,
+        python: flagString(flags, "python") ?? undefined,
+        rscript: flagString(flags, "rscript") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMachineStatusJson(result) : renderResearchMachineStatus(result));
+      return result.issues.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "spec-v2": {
+      const result = await researchSpecV2Command({
+        specPath: requireFlagString(flags, "spec"),
+        outPath: resolveMachineOutPath(flagString(flags, "out") ?? undefined),
+      });
+      console.log(flags.json === true ? renderResearchSpecV2Json(result) : renderResearchSpecV2(result));
+      return result.validation.status === "blocked" ? 1 : 0;
+    }
+    case "execution-contract": {
+      const result = await researchExecutionContractFromFileCommand({
+        specPath: requireFlagString(flags, "spec"),
+        backend: parseBackendId(flagString(flags, "backend") ?? undefined),
+        dataRoot: flagString(flags, "data-root") ?? undefined,
+        outDir: flagString(flags, "out-dir") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchExecutionContractJson(result) : renderResearchExecutionContract(result));
+      return result.validation.status === "blocked" ? 1 : 0;
+    }
+    case "archetypes": {
+      const result = researchArchetypesCommand({
+        id: parseStudyArchetypeId(flagString(flags, "id") ?? undefined),
+      });
+      console.log(flags.json === true ? renderResearchArchetypesJson(result) : renderResearchArchetypes(result));
+      return result.archetypes.length ? 0 : 1;
+    }
+    case "methods-catalog": {
+      const result = researchMethodsCatalogCommand({
+        category: parseMethodCategory(flagString(flags, "category") ?? undefined),
+        methodId: flagString(flags, "method") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMethodsCatalogJson(result) : renderResearchMethodsCatalog(result));
+      return result.methods.length ? 0 : 1;
+    }
+    case "method-select": {
+      const maxCandidatesRaw = flagString(flags, "max-candidates");
+      const result = await researchMethodSelectCommand({
+        question: requireFlagString(flags, "question"),
+        outcomeType: parseOutcomeType(flagString(flags, "outcome") ?? undefined),
+        studyDesign: parseStudyDesign(flagString(flags, "study-design") ?? undefined),
+        dataStructures: parseDataStructures(flagList(flags, "data-structure")),
+        dataset: flagString(flags, "dataset") ? parseDatasetAdapterId(flagString(flags, "dataset") ?? undefined, "nhanes") : undefined,
+        goal: parseMethodGoal(flagString(flags, "goal") ?? undefined),
+        surveyDesign: flags.survey === true,
+        repeatedMeasures: flags.repeated === true,
+        clustered: flags.clustered === true,
+        timeToEvent: flags["time-to-event"] === true,
+        highDimensional: flags["high-dimensional"] === true,
+        text: flags.text === true,
+        image: flags.image === true,
+        spatial: flags.spatial === true,
+        network: flags.network === true,
+        maxCandidates: maxCandidatesRaw ? Number(maxCandidatesRaw) : undefined,
+        outPath: resolveMachineOutPath(flagString(flags, "out") ?? undefined),
+      });
+      console.log(flags.json === true ? renderResearchMachineMethodSelectionJson(result) : renderResearchMachineMethodSelection(result));
+      return result.primary ? 0 : 1;
+    }
+    case "method-apply": {
+      const result = await researchMethodApplyCommand({
+        specPath: requireFlagString(flags, "spec"),
+        selectionPath: requireFlagString(flags, "selection"),
+        outPath: resolveMachineOutPath(flagString(flags, "out") ?? undefined),
+      });
+      console.log(flags.json === true ? renderResearchMethodApplyJson(result) : renderResearchMethodApply(result));
+      return result.validation.status === "blocked" ? 1 : 0;
+    }
+    case "method-validate": {
+      const result = await researchMethodValidateCommand({
+        specPath: requireFlagString(flags, "spec"),
+        methodId: requireFlagString(flags, "method"),
+      });
+      console.log(flags.json === true ? renderResearchMethodValidationJson(result) : renderResearchMethodValidation(result));
+      return result.validation.status === "blocked" ? 1 : 0;
+    }
+    case "modeling-plan": {
+      const maxCandidatesRaw = flagString(flags, "max-candidates");
+      let tableSummary: unknown;
+      const tableSummaryPath = flagString(flags, "table-summary");
+      if (tableSummaryPath) {
+        const rawSummary = JSON.parse(await readFile(tableSummaryPath, "utf-8")) as Record<string, unknown>;
+        tableSummary = rawSummary.tableSummary ?? rawSummary;
+      } else if (flagString(flags, "table")) {
+        tableSummary = await researchTableSummaryCommand({ file: requireFlagString(flags, "table"), python: flagString(flags, "python") ?? undefined });
+      }
+      const result = researchModelingPlanCommand({
+        question: requireFlagString(flags, "question"),
+        goal: parseModelingGoal(flagString(flags, "goal") ?? undefined),
+        outcomeType: parseOutcomeType(flagString(flags, "outcome") ?? undefined),
+        studyDesign: parseStudyDesign(flagString(flags, "study-design") ?? undefined),
+        dataStructures: parseDataStructures(flagList(flags, "data-structure")),
+        tableSummary: tableSummary as Parameters<typeof researchModelingPlanCommand>[0]["tableSummary"],
+        target: flagString(flags, "target") ?? undefined,
+        surveyDesign: flags.survey === true,
+        repeatedMeasures: flags.repeated === true,
+        clustered: flags.clustered === true,
+        timeToEvent: flags["time-to-event"] === true,
+        highDimensional: flags["high-dimensional"] === true,
+        text: flags.text === true,
+        image: flags.image === true,
+        spatial: flags.spatial === true,
+        network: flags.network === true,
+        rowCount: flagString(flags, "row-count") ? Number(flagString(flags, "row-count")) : undefined,
+        featureCount: flagString(flags, "feature-count") ? Number(flagString(flags, "feature-count")) : undefined,
+        classCount: flagString(flags, "class-count") ? Number(flagString(flags, "class-count")) : undefined,
+        highMissingness: flags["high-missingness"] === true,
+        smallSample: flags["small-sample"] === true,
+        requiresPrediction: flags.predict === true,
+        requiresInference: flags["no-inference"] === true ? false : true,
+        maxCandidates: maxCandidatesRaw ? Number(maxCandidatesRaw) : undefined,
+      });
+      console.log(flags.json === true ? renderResearchModelingPlanJson(result) : renderResearchModelingPlan(result));
+      return result.blocked ? 1 : 0;
+    }
+    case "dataset-adapter": {
+      const result = await researchDatasetAdapterCommand({
+        dataset: parseDatasetAdapterId(flagString(flags, "dataset") ?? undefined, "nhanes"),
+        dataRoot: flagString(flags, "data-root") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchDatasetAdapterJson(result) : renderResearchDatasetAdapter(result));
+      return result.issues.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "machine-plan": {
+      const result = researchMachinePlanCommand({
+        question: requireFlagString(flags, "question"),
+        dataset: flagString(flags, "dataset") ? parseDatasetAdapterId(flagString(flags, "dataset") ?? undefined, "nhanes") : undefined,
+        archetype: parseStudyArchetypeId(flagString(flags, "archetype") ?? undefined),
+        backend: parseBackendId(flagString(flags, "backend") ?? undefined),
+        dataRoot: flagString(flags, "data-root") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMachinePlanJson(result) : renderResearchMachinePlan(result));
+      return result.risks.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "machine-benchmark": {
+      const result = await researchMachineBenchmarkCommand({
+        packetDir: requireFlagString(flags, "packet"),
+        specPath: flagString(flags, "spec") ?? undefined,
+        outPath: resolveMachineOutPath(flagString(flags, "out") ?? undefined),
+      });
+      console.log(flags.json === true ? renderResearchMachineBenchmarkJson(result) : renderResearchMachineBenchmark(result));
+      return result.evaluation.status === "fail" ? 1 : 0;
+    }
+    case "ml-models": {
+      const result = researchMlModelsCommand({
+        task: parseMlTask(flagString(flags, "task") ?? undefined),
+        includeUnavailable: flags["include-unavailable"] === true,
+      });
+      console.log(flags.json === true ? renderResearchMlModelsJson(result) : renderResearchMlModels(result));
+      return result.models.length ? 0 : 1;
+    }
+    case "ml-run": {
+      const result = await researchMlRunCommand({
+        task: parseMlTaskRequired(requireFlagString(flags, "task")),
+        modelId: requireFlagString(flags, "model"),
+        dataPath: requireFlagString(flags, "data"),
+        target: flagString(flags, "target") ?? undefined,
+        features: flagList(flags, "feature"),
+        outDir: requireFlagString(flags, "out-dir"),
+        primaryMetric: flagString(flags, "primary-metric") ?? undefined,
+        testSize: parseMlNumber(flagString(flags, "test-size"), 0.25),
+        validationSize: parseMlNumber(flagString(flags, "validation-size"), 0),
+        seed: parseMlInteger(flagString(flags, "seed"), 17),
+        scale: flags.scale === true,
+        cvFolds: parseMlInteger(flagString(flags, "cv"), 0),
+        saveModel: flags["no-save-model"] === true ? false : true,
+        permutationImportance: flags["no-permutation-importance"] === true ? false : true,
+        maxPermutationRows: parseMlInteger(flagString(flags, "max-permutation-rows"), 500),
+        params: flagString(flags, "params") ? JSON.parse(flagString(flags, "params")!) as Record<string, unknown> : {},
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMlRunJson(result) : renderResearchMlRun(result));
+      return result.status === "failed" ? 1 : 0;
+    }
+    case "ml-compare": {
+      const result = await researchMlCompareCommand({
+        task: parseMlTaskRequired(requireFlagString(flags, "task")),
+        modelIds: flagList(flags, "model"),
+        dataPath: requireFlagString(flags, "data"),
+        target: flagString(flags, "target") ?? undefined,
+        features: flagList(flags, "feature"),
+        outDir: requireFlagString(flags, "out-dir"),
+        primaryMetric: flagString(flags, "primary-metric") ?? undefined,
+        testSize: parseMlNumber(flagString(flags, "test-size"), 0.25),
+        validationSize: parseMlNumber(flagString(flags, "validation-size"), 0),
+        seed: parseMlInteger(flagString(flags, "seed"), 17),
+        scale: flags.scale === true,
+        cvFolds: parseMlInteger(flagString(flags, "cv"), 0),
+        saveModel: flags["no-save-model"] === true ? false : true,
+        permutationImportance: flags["no-permutation-importance"] === true ? false : true,
+        maxPermutationRows: parseMlInteger(flagString(flags, "max-permutation-rows"), 500),
+        params: flagString(flags, "params") ? JSON.parse(flagString(flags, "params")!) as Record<string, unknown> : {},
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMlComparisonJson(result) : renderResearchMlComparison(result));
+      return result.ranked.some(item => item.status === "succeeded") ? 0 : 1;
+    }
+    case "ml-inspect": {
+      const result = await researchMlInspectCommand({ runPath: requireFlagString(flags, "run") });
+      console.log(flags.json === true ? renderResearchMlRunJson(result) : renderResearchMlRun(result));
+      return result.status === "failed" ? 1 : 0;
+    }
+    case "backend-status": {
+      const result = await researchBackendStatusCommand({
+        python: flagString(flags, "python") ?? undefined,
+        rscript: flagString(flags, "rscript") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchBackendStatusJson(result) : renderResearchBackendStatus(result));
+      return 0;
+    }
+    case "paper-qa": {
+      const result = await researchPaperQaCommand({
+        paperPath: requireFlagString(flags, "paper"),
+        evidencePath: flagString(flags, "evidence") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchPaperQaJson(result) : renderResearchPaperQa(result));
+      return result.status === "fail" ? 1 : 0;
+    }
+    case "paper-index": {
+      const result = await researchPaperIndexCommand({
+        papersDir: requireFlagString(flags, "papers-dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchPaperIndexJson(result) : renderResearchPaperIndex(result));
+      return result.papers.length ? 0 : 1;
+    }
+    case "paper-lifecycle": {
+      const result = await researchPaperLifecycleCommand({
+        paperDir: requireFlagString(flags, "paper-dir"),
+        capabilityDir: flagString(flags, "capability-dir") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchPaperLifecycleJson(result) : renderResearchPaperLifecycle(result));
+      return result.lifecycleStatus === "blocked" ? 1 : 0;
+    }
+    case "paper-rerun-stability": {
+      const toleranceRaw = flagString(flags, "tolerance");
+      const result = await researchPaperRerunStabilityCommand({
+        baselineDir: requireFlagString(flags, "baseline"),
+        repeatDir: requireFlagString(flags, "repeat"),
+        tolerance: toleranceRaw ? Number(toleranceRaw) : undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchPaperRerunStabilityJson(result) : renderResearchPaperRerunStability(result));
+      return result.status === "pass" ? 0 : 1;
+    }
+    case "paper-run": {
+      const result = await researchPaperRunCommand({
+        analysisSpecPath: requireFlagString(flags, "analysis-spec"),
+        dataRoot: requireFlagString(flags, "data-root"),
+        outDir: requireFlagString(flags, "out-dir"),
+        backend: flagString(flags, "backend") as Parameters<typeof researchPaperRunCommand>[0]["backend"],
+        python: flagString(flags, "python") ?? undefined,
+        rscript: flagString(flags, "rscript") ?? undefined,
+        capabilityDir: flagString(flags, "capability-dir") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchPaperRunJson(result) : renderResearchPaperRun(result));
+      return result.lifecycleStatus === "ready_for_local_review" ? 0 : 1;
+    }
+    case "paper-runner-record": {
+      const result = await researchPaperRunnerRecordCommand({
+        paperId: requireFlagString(flags, "paper-id"),
+        commandSummary: requireFlagString(flags, "command-summary"),
+        status: flagString(flags, "status") as Parameters<typeof researchPaperRunnerRecordCommand>[0]["status"],
+        runnerKind: flagString(flags, "runner-kind") ?? undefined,
+        analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
+        binding: flagString(flags, "binding") as Parameters<typeof researchPaperRunnerRecordCommand>[0]["binding"],
+        inputFiles: flagList(flags, "input"),
+        outputFiles: flagList(flags, "output"),
+        weighting: flagString(flags, "weighting") ?? undefined,
+        variance: flagString(flags, "variance") ?? undefined,
+        population: flagString(flags, "population") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchPaperRunnerRecordJson(result) : renderResearchPaperRunnerRecord(result));
+      return result.status === "succeeded" ? 0 : 1;
+    }
+    case "benchmark-register": {
+      const result = await researchBenchmarkRegisterCommand({
+        packetDir: requireFlagString(flags, "packet"),
+        outPath: flagString(flags, "out") ?? undefined,
+        benchmarkId: flagString(flags, "id") ?? undefined,
+        domain: flagString(flags, "domain") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchBenchmarkJson(result) : renderResearchBenchmark(result));
+      return result.expectedArtifacts.length ? 0 : 1;
+    }
+    case "benchmark-run": {
+      const result = await researchBenchmarkRunCommand({
+        benchmarkPath: requireFlagString(flags, "benchmark"),
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchBenchmarkRunJson(result) : renderResearchBenchmarkRun(result));
+      return result.status === "fail" ? 1 : 0;
+    }
+    case "benchmark-score": {
+      const result = await researchBenchmarkScoreCommand(requireFlagString(flags, "run"));
+      console.log(flags.json === true ? renderResearchBenchmarkScoreJson(result) : renderResearchBenchmarkScore(result));
+      return result.status === "fail" ? 1 : 0;
+    }
+    case "benchmark-suite": {
+      const result = await researchBenchmarkSuiteCommand({
+        suiteDir: requireFlagString(flags, "dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchBenchmarkSuiteJson(result) : renderResearchBenchmarkSuite(result));
+      return result.score.status === "fail" ? 1 : 0;
+    }
+    case "table-summary": {
+      const result = await researchTableSummaryCommand({
+        file: requireFlagString(flags, "file"),
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchTableSummaryJson(result) : renderResearchTableSummary(result));
+      return result.warnings.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
     case "infer-schema": {
       const result = await researchInferSchemaCommand(requireFlagString(flags, "file"));
       console.log(flags.json === true ? renderResearchSchemaInferenceJson(result) : renderResearchSchemaInference(result));
       return 0;
     }
-    case "stages": {
+    case "stages":
+    case "pipeline-stages": {
       const stages = researchPipelineStagesCommand();
       console.log(flags.json === true ? renderResearchPipelineStagesJson(stages) : renderResearchPipelineStages(stages));
       return 0;
+    }
+    case "stage-artifacts": {
+      const artifacts = researchStageArtifactsCommand();
+      console.log(flags.json === true ? renderResearchStageArtifactsJson(artifacts) : renderResearchStageArtifacts(artifacts));
+      return 0;
+    }
+    case "stage-gate": {
+      const result = researchStageGateCommand(flagList(flags, "completed"), requireFlagString(flags, "target"));
+      console.log(flags.json === true ? renderResearchStageGateJson(result) : renderResearchStageGate(result));
+      return result.status === "blocked" ? 1 : 0;
     }
     case "inspect": {
       const packetDir = requireFlagString(flags, "packet");
@@ -753,6 +1968,11 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(renderResearchApproval(result));
       return 0;
     }
+    case "approval-verify": {
+      const result = await researchApprovalVerifyCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchApprovalVerificationJson(result) : renderResearchApprovalVerification(result));
+      return result.status === "valid" ? 0 : 1;
+    }
     case "analyze": {
       const packetDir = requireFlagString(flags, "packet");
       const fixture = requireFlagString(flags, "fixture");
@@ -771,6 +1991,11 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       const result = await researchArtifactManifestCommand(packetDir);
       console.log(flags.json === true ? renderResearchArtifactManifestJson(result) : renderResearchArtifactManifest(result));
       return 0;
+    }
+    case "manifest-verify": {
+      const result = await researchManifestVerifyCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchManifestVerificationJson(result) : renderResearchManifestVerification(result));
+      return result.status === "valid" ? 0 : 1;
     }
     case "runner-spec": {
       const packetDir = requireFlagString(flags, "packet");
@@ -791,6 +2016,27 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchPacketSummaryJson(result) : renderResearchPacketSummary(result));
       return result.checkpoint.currentStage === "complete" ? 0 : 1;
     }
+    case "next": {
+      const result = await researchPacketNextCommand(requireFlagString(flags, "packet"), { trace: flags.trace === true });
+      console.log(flags.json === true ? renderResearchPacketNextJson(result) : renderResearchPacketNext(result));
+      if (flags["exit-zero-on-blocked"] === true) return 0;
+      return result.gateStatus === "blocked" ? 1 : 0;
+    }
+    case "navigation-trace": {
+      const result = await researchNavigationTraceCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchNavigationTraceJson(result) : renderResearchNavigationTrace(result));
+      return result.status === "valid" ? 0 : 1;
+    }
+    case "packet-verify": {
+      const result = await researchPacketVerifyCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchPacketVerificationJson(result) : renderResearchPacketVerification(result));
+      return result.status === "pass" ? 0 : 1;
+    }
+    case "packet-readiness": {
+      const result = await researchPacketReadinessCommand(requireFlagString(flags, "packet"));
+      console.log(flags.json === true ? renderResearchPacketReadinessJson(result) : renderResearchPacketReadiness(result));
+      return result.status === "review_ready" ? 0 : 1;
+    }
     case "loop-status": {
       const result = await researchLoopStatusCommand(flagString(flags, "state") ?? undefined);
       console.log(flags.json === true ? renderResearchLoopStatusJson(result) : renderResearchLoopStatus(result));
@@ -806,8 +2052,13 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         ...(flagString(flags, "next") ? { nextAction: flagString(flags, "next")! } : {}),
         ...(flagString(flags, "state") ? { stateDir: flagString(flags, "state")! } : {}),
       });
-      console.log(renderResearchLoopNote(result));
+      console.log(flags.json === true ? renderResearchLoopNoteJson(result) : renderResearchLoopNote(result));
       return 0;
+    }
+    case "cycle-audit": {
+      const result = await researchCycleAuditCommand(requireFlagString(flags, "cycle-dir"));
+      console.log(flags.json === true ? renderResearchCycleAuditJson(result) : renderResearchCycleAudit(result));
+      return result.countsAsCycle ? 0 : 1;
     }
     case "checkpoint": {
       const packetDir = requireFlagString(flags, "packet");
@@ -833,6 +2084,14 @@ async function loadSpec(path: string): Promise<unknown> {
   const raw = await readFile(path, "utf-8");
   if (path.endsWith(".json")) return JSON.parse(raw);
   return parseYaml(raw);
+}
+
+async function readArgOrFile(value: string): Promise<string> {
+  try {
+    return await readFile(value, "utf-8");
+  } catch {
+    return value;
+  }
 }
 
 function collectModelIds(

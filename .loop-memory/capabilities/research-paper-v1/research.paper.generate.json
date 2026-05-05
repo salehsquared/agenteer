@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "capabilityId": "research.paper.generate",
+  "description": "Generate a local research paper artifact from already-available public-health analysis evidence without network or cloud access.",
+  "inputSchema": {
+    "type": "object",
+    "required": ["paperId"],
+    "properties": {
+      "paperId": { "type": "string" },
+      "binding": { "type": "string", "enum": ["spec-governed", "retrospective", "none"] }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["paperPath", "analysisPath"],
+    "properties": {
+      "paperPath": { "type": "string" },
+      "analysisPath": { "type": "string" },
+      "critiquePath": { "type": "string" }
+    }
+  },
+  "permissionsRequired": ["read-local-nhanes-cache", "write-loop-memory-paper-artifacts"],
+  "failureTypes": ["missing_input_artifact", "methodological_blocker", "report_overclaim", "write_boundary_violation"],
+  "costProfile": { "maxUsd": 0, "maxRuntimeSeconds": 900, "maxModelCalls": 0 },
+  "source": "/Users/saleh/TechProjects/agenteer/.loop-memory/capabilities/research-paper-v1/research.paper.generate.json",
+  "interopShape": "local"
+}

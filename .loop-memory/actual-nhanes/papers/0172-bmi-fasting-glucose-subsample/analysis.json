@@ -1,0 +1,122 @@
+{
+  "paperId": "0172-bmi-fasting-glucose-subsample",
+  "title": "BMI and fasting glucose in the NHANES fasting subsample",
+  "researchQuestion": "Among NHANES adults in the morning fasting laboratory subsample, what is the adjusted association between body mass index and fasting plasma glucose?",
+  "analysisSpecPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0172-bmi-fasting-glucose-subsample/analysis-spec.json",
+  "dataRoot": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430",
+  "inputFiles": [
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+    "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet"
+  ],
+  "population": "RIDAGEYR >= 20",
+  "exposure": {
+    "name": "BMXBMI",
+    "variable": "BMXBMI",
+    "definition": "Continuous BMXBMI"
+  },
+  "outcome": {
+    "name": "LBXGLU",
+    "variable": "LBXGLU",
+    "definition": "Continuous LBXGLU"
+  },
+  "rowCounts": {
+    "mergedRows": 49681,
+    "eligibleRows": 49681,
+    "completeCaseEligible": 11918
+  },
+  "missingnessEligibleRows": {
+    "LBXGLU": 0.6616010144723334,
+    "BMXBMI": 0.04279301946418148,
+    "WTSAF2YR": 0.7424568748616172,
+    "SDMVSTRA": 0.0,
+    "SDMVPSU": 0.0,
+    "RIDAGEYR": 0.0,
+    "RIAGENDR": 0.0,
+    "RIDRETH1": 0.0
+  },
+  "weights": {
+    "weight": "WTSAF2YR",
+    "strata": "SDMVSTRA",
+    "psu": "SDMVPSU",
+    "implementation": "strata/PSU linearized sandwich variance for weighted linear regression",
+    "domain": {
+      "id": "fasting_subsample",
+      "label": "Morning fasting laboratory subsample",
+      "isSubsample": true,
+      "rationale": "LBXGLU fasting plasma glucose is measured in the morning fasting laboratory subsample, so WTSAF2YR is the least-common-denominator NHANES weight for this AnalysisSpec.",
+      "eligibilityNote": "Interpret estimates for fasting subsample-eligible adults with nonmissing fasting glucose, BMI, covariates, strata, PSU, and positive WTSAF2YR."
+    }
+  },
+  "varianceEstimator": "complex_survey_linearized",
+  "model": {
+    "type": "weighted linear regression with strata/PSU linearized sandwich variance",
+    "covariates": [
+      "intercept",
+      "BMXBMI",
+      "RIDAGEYR",
+      "RIAGENDR_2.0",
+      "RIDRETH1_2.0",
+      "RIDRETH1_3.0",
+      "RIDRETH1_4.0",
+      "RIDRETH1_5.0"
+    ],
+    "exposureCoefficient": 0.8369756383117846,
+    "standardError": 0.055426940093212695,
+    "ci95": [
+      0.7283388357290876,
+      0.9456124408944815
+    ],
+    "pValue": 1.6066045206646713e-51,
+    "strataCount": 59,
+    "psuCount": 121,
+    "lonelyStrata": 0
+  },
+  "thresholds": {},
+  "groupSummary": [
+    {
+      "category": "q1",
+      "n": 2980,
+      "weightedMeanOutcome": 96.94979491374596,
+      "weightedMeanExposure": 20.715115225545617
+    },
+    {
+      "category": "q2",
+      "n": 2979,
+      "weightedMeanOutcome": 102.40920100111585,
+      "weightedMeanExposure": 25.29640003173189
+    },
+    {
+      "category": "q3",
+      "n": 2979,
+      "weightedMeanOutcome": 108.26355174839648,
+      "weightedMeanExposure": 29.460823000856386
+    },
+    {
+      "category": "q4",
+      "n": 2980,
+      "weightedMeanOutcome": 115.33743056279356,
+      "weightedMeanExposure": 38.1663085737246
+    }
+  ],
+  "analysisSpec": {
+    "inferencePolicy": {
+      "estimandType": "associational",
+      "varianceEstimator": "complex_survey",
+      "allowedInference": "design_corrected_inference",
+      "pValueLanguage": "standard",
+      "causalClaimsAllowed": false
+    }
+  },
+  "limitations": [
+    "Cross-sectional analysis; no temporality or causality.",
+    "Complete-case analysis may induce selection bias.",
+    "Design-based linearized variance is implemented for primary weighted linear and logistic models.",
+    "Subsample weights change the analytic population and must be interpreted using the declared weight-domain eligibility."
+  ],
+  "sources": [
+    "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+    "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+    "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0309210"
+  ]
+}

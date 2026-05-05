@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "recordType": "agenteer.research.paper-runner-record",
+  "paperId": "0113-uacr-hypertension",
+  "status": "retrospective_succeeded",
+  "generatedAtIso": "2026-05-03T18:47:16Z",
+  "runner": {
+    "kind": "retrospective-local-python-run-record",
+    "python": "/Users/saleh/WebstormProjects/medbrevia_v3/.venv-analytics-pilot/bin/python3",
+    "pythonVersion": "3.12.5 (v3.12.5:ff3bc82f7c9, Aug  7 2024, 05:32:06) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.3-arm64-arm-64bit",
+    "packages": {
+      "pandas": "2.2.3",
+      "numpy": "2.2.1",
+      "statsmodels": "0.14.4"
+    }
+  },
+  "commandSummary": "Retrospective runner provenance backfill for a previously generated actual-NHANES paper; records the local curated Parquet inputs, generated outputs, and approximate survey-variance method.",
+  "inputs": [
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+      "bytes": 1476850,
+      "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/kidney/kidney.parquet",
+      "bytes": 564752,
+      "sha256": "4753eff5e91574e0c90a202446313e85027023dfa469fb62ad1e199324cf766a"
+    },
+    {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/blood_pressure/blood_pressure.parquet",
+      "bytes": 580100,
+      "sha256": "41f602ad271599b590f0f51b6f27e2eee97b7b2d143db83d8278b801f82c1747"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0113-uacr-hypertension/analysis.json",
+      "bytes": 2562,
+      "sha256": "0c0550e40c70868f8d434b0abd543b7aa9aa435cf20b6f6396aa8bbae2dd6009"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0113-uacr-hypertension/paper.md",
+      "bytes": 5946,
+      "sha256": "ce7b79241d087d92e2148c89c4be5bb0976345a199fb3606844badee193e0fb2"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0113-uacr-hypertension/critique.md",
+      "bytes": 957,
+      "sha256": "7c38fdeb2e7649d41ef741ce23396649ec326a735a39cabde627bf0e1eb1f01d"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0113-uacr-hypertension/qa-cli.json",
+      "bytes": 3493,
+      "sha256": "3e461d8bd6a3d1368a56582ac29237e65e838583f5be942b0bcc42bd09ec5833"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0113-uacr-hypertension/qa-numeric-cli.json",
+      "bytes": 5700,
+      "sha256": "5bd474ee7070b25919b19800f62ea50f6739bcbba2953c897547a8be92c7486a"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0113-uacr-hypertension/qa-threshold-cli.json",
+      "bytes": 4399,
+      "sha256": "2387d244f89e0c4b81315a89fd6fd35b3b9298edb00936a3a497713c346907f9"
+    }
+  ],
+  "methods": {
+    "weighting": "WTMEC2YR used as normalized frequency weights; full strata/PSU variance not implemented",
+    "variance": "full NHANES strata/PSU variance not implemented",
+    "dataRelease": null
+  },
+  "limitations": [
+    "Retrospective record created after the paper run; it binds inputs/outputs but does not preserve the original executable script.",
+    "Full NHANES complex survey variance is not implemented in these paper artifacts."
+  ],
+  "schemaFindings": [
+    "analysis.weights was not consistently shaped across papers; runner-record backfill normalized it to text."
+  ]
+}

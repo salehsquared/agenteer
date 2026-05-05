@@ -1,0 +1,289 @@
+{
+  "packetVersion": 0,
+  "generatedAtIso": "2026-05-03T17:15:04.472Z",
+  "source": {
+    "medbreviaRepo": "/Users/saleh/WebstormProjects/medbrevia_v3",
+    "branch": "codex/grandrounds-edition-redesign-4",
+    "registryPath": "/Users/saleh/WebstormProjects/medbrevia_v3/data/analytics/nhanes/registry.json",
+    "registryVersion": null,
+    "registrySha256": "a7656b85d8b7ad62f1efe51f003e97c40d8761bab460b4ee89ce8b3615bb759e"
+  },
+  "protocol": {
+    "title": "HbA1c and HbA1c",
+    "clinicalQuestion": "Among NHANES adults with doctor-diagnosed diabetes, what is the feasibility of estimating HbA1c distribution by sex and age group using curated demographics and diabetes domains?",
+    "dataset": "nhanes",
+    "population": {
+      "label": "Adults, age 20+ when clinically appropriate",
+      "filters": [
+        "RIDSTATR == 2",
+        "RIDAGEYR >= 20 when adult population is intended"
+      ]
+    },
+    "exposure": {
+      "label": "HbA1c",
+      "variables": [
+        "LBXGH",
+        "LBXGLU"
+      ],
+      "domain": "diabetes"
+    },
+    "endpoint": {
+      "label": "HbA1c",
+      "variables": [
+        "LBXGH"
+      ],
+      "domain": "diabetes"
+    },
+    "covariates": [
+      "RIDAGEYR",
+      "RIDRETH3",
+      "INDFMPIR"
+    ],
+    "stratifiers": [
+      "RIAGENDR"
+    ],
+    "cycles": [
+      "2017-2020-prepandemic"
+    ],
+    "approvedDataInputs": [
+      "demographics",
+      "diabetes"
+    ],
+    "surveyDesign": {
+      "weightRule": "prepandemic_mec",
+      "weightVariable": "WTMECPRP",
+      "strataVariable": "SDMVSTRA",
+      "psuVariable": "SDMVPSU"
+    },
+    "requestedOutputs": [
+      "cohort_flow_table",
+      "weighted_descriptive_table",
+      "primary_model_table",
+      "methods_and_limitations_report"
+    ],
+    "derivedDefinitions": [
+      {
+        "id": "hba1c_defined_diabetes",
+        "label": "HbA1c-defined diabetes",
+        "expression": "LBXGH >= 6.5%",
+        "variables": [
+          "LBXGH"
+        ],
+        "role": "endpoint"
+      }
+    ],
+    "caveats": [
+      "NHANES analyses are observational and cross-sectional unless a specific longitudinal design is introduced.",
+      "Use survey weights, strata, and PSU variables for population estimates.",
+      "Generated execution code should not run until the protocol and cohort scout pass deterministic validation."
+    ]
+  },
+  "diagnostics": {
+    "matchedVariables": [
+      {
+        "name": "DID040",
+        "domain": "diabetes",
+        "table": "DIQ",
+        "label": "Age when first told you had diabetes",
+        "unit": "years",
+        "role": "questionnaire"
+      },
+      {
+        "name": "DIQ010",
+        "domain": "diabetes",
+        "table": "DIQ",
+        "label": "Doctor told you have diabetes",
+        "role": "outcome"
+      },
+      {
+        "name": "DIQ050",
+        "domain": "diabetes",
+        "table": "DIQ",
+        "label": "Taking insulin now",
+        "role": "questionnaire"
+      },
+      {
+        "name": "LBXGH",
+        "domain": "diabetes",
+        "table": "GHB",
+        "label": "Glycohemoglobin/HbA1c",
+        "unit": "%",
+        "role": "measure"
+      },
+      {
+        "name": "LBXGLU",
+        "domain": "diabetes",
+        "table": "GLU",
+        "label": "Fasting glucose",
+        "unit": "mg/dL",
+        "role": "measure",
+        "weightHint": "fasting"
+      },
+      {
+        "name": "RIDAGEYR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Age in years at screening",
+        "role": "covariate",
+        "unit": "years"
+      },
+      {
+        "name": "WTSAF2YR",
+        "domain": "diabetes",
+        "table": "GLU",
+        "label": "Fasting subsample 2-year weight",
+        "role": "survey_weight"
+      },
+      {
+        "name": "RIAGENDR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Gender",
+        "role": "covariate"
+      },
+      {
+        "name": "DMDEDUC2",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Education level - adults 20+",
+        "role": "covariate"
+      },
+      {
+        "name": "DMDMARTL",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Marital status",
+        "role": "covariate"
+      },
+      {
+        "name": "INDFMPIR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Family income to poverty ratio",
+        "role": "covariate"
+      },
+      {
+        "name": "RIDRETH1",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Race/Hispanic origin",
+        "role": "covariate"
+      },
+      {
+        "name": "RIDRETH3",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Race/Hispanic origin with Asian category",
+        "role": "covariate"
+      },
+      {
+        "name": "RIDSTATR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Interview/examination status",
+        "role": "eligibility"
+      },
+      {
+        "name": "SDDSRVYR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Data release cycle",
+        "role": "cycle",
+        "required": true
+      },
+      {
+        "name": "SDMVPSU",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Masked variance pseudo-PSU",
+        "role": "survey_design",
+        "required": true
+      },
+      {
+        "name": "SDMVSTRA",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Masked variance pseudo-stratum",
+        "role": "survey_design",
+        "required": true
+      },
+      {
+        "name": "SEQN",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Respondent sequence number",
+        "role": "id",
+        "required": true
+      },
+      {
+        "name": "WTINT2YR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Full sample 2-year interview weight",
+        "role": "survey_weight",
+        "required": true
+      },
+      {
+        "name": "WTINTPRP",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Full sample pre-pandemic interview weight",
+        "role": "survey_weight"
+      },
+      {
+        "name": "WTMEC2YR",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Full sample 2-year MEC exam weight",
+        "role": "survey_weight",
+        "required": true
+      },
+      {
+        "name": "WTMECPRP",
+        "domain": "demographics",
+        "table": "DEMO",
+        "label": "Full sample pre-pandemic MEC exam weight",
+        "role": "survey_weight"
+      }
+    ],
+    "blockers": [],
+    "warnings": []
+  },
+  "commandLineProduct": {
+    "purpose": "A CLI-only research design loop where Agenteer reads dataset metadata, proposes bounded analytic protocols, and returns traceable design packets without mutating the source project.",
+    "proposedCommands": [
+      "agenteer research design --project medbrevia-nhanes --repo <medbrevia_v3> --question '<clinical question>' --out <packet-dir>",
+      "agenteer run --spec <packet-dir>/workflow.yaml --session <session-dir>",
+      "agenteer inspect --session <session-dir> --evidence"
+    ],
+    "medbreviaInputs": [
+      "NHANES registry JSON",
+      "analytics runner contract",
+      "current analytics tests and fixtures"
+    ],
+    "agenteerOutputs": [
+      "candidate protocol JSON",
+      "workflow spec skeleton",
+      "evidence-backed design report",
+      "framework backlog discovered by the use case"
+    ]
+  },
+  "improvementLoop": {
+    "agenteerShouldOwn": [
+      "workflow state, session replay, permission envelopes, evidence records, node composition, and inspectable traces",
+      "deterministic protocol validation before any model-generated code can run",
+      "human approval and resume boundaries between design, scout, and execution"
+    ],
+    "medbreviaShouldOwn": [
+      "auth, UI, Firestore/GCS/Cloud Run integration, dataset hosting, and product-specific presentation",
+      "curated dataset registries and medical domain constraints",
+      "final clinical UX and staff review policy"
+    ],
+    "firstAgenteerBacklog": [
+      "promote this lab command into a real workflow example with nodes for registry_load, protocol_design, protocol_validate, cohort_scout, and report_packet",
+      "teach inspect to group failures by product concept: question, protocol, data, execution, artifact, report",
+      "add artifact evidence records for generated code, tables, plots, runner logs, and validation reports",
+      "add a fixture-driven long-running workflow test with human approval and resume"
+    ]
+  }
+}
