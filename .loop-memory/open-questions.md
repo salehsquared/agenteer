@@ -5,6 +5,23 @@
 - Tick 178 added a deterministic modeling-plan command. It should next consume table summaries, AnalysisSpec V2, and backend availability so recommendations are driven by actual data evidence rather than flags alone.
 - The planner currently treats survival and text/image modeling as stop-for-review/contract areas. Future ticks need executable adapters only when backed by mature libraries and tests.
 - Tick 179 challenge: `modeling-plan` should split blocking policies from executable candidates and show different recommendations for small/high-missingness versus large/clean tables.
+- Resolved partly: Tick 181 added table/table-summary evidence ingestion and split blocking policies. Remaining gap: consume AnalysisSpec V2, backend status, and prior run outcomes.
+- Tick 182 added binary ML calibration artifacts. Remaining gap: `modeling-plan` and paper QA should eventually require calibration/decision-threshold evidence for clinical prediction tasks rather than treating AUROC as enough.
+- Resolved partly: Tick 183 embedded method-selection evidence in `modeling-plan`. Remaining gap: use backend-status/prior-run evidence to hide or downgrade candidates unavailable in the local runtime.
+- Tick 184 added `stats-run` for standard table methods. Remaining gap: bind `stats-run` to AnalysisSpec V2/method-selection evidence so it cannot silently run a method that the planner did not approve.
+- Tick 185 challenge target: `stats-run` needs typed diagnostics/refusals for survey misuse, low complete-case N, sparse cells, separation, convergence, and overdispersion before it should feed generated papers.
+- Resolved partly: Tick 186 added typed stats issues and survey refusal/explicit-approximation behavior. Remaining gap: feed these issues into paper lifecycle/readiness and make `stats-run` consume method-selection/spec hashes.
+- Resolved partly: Tick 187 connected executable standard-table method candidates to `stats-run` command hints. Remaining gap: execute a real stats-run-backed paper packet and bind the run to method-selection/spec hashes.
+- Resolved partly: Tick 188 added method-selection/spec binding to `stats-run`. Remaining gap: share the method-to-stats mapping so modeling and binding validation cannot drift.
+- Resolved: Tick 189 extracted the shared method-to-`stats-run` mapping. Remaining gap: make execution contracts consume the same mapping.
+- Tick 190 challenge target: prove the stats path through packet lifecycle/readiness, not only command tests; otherwise `stats-run` becomes a separate execution island.
+- Tick 191 challenge target: add an analysis front-door projection so users/agents know whether to use `paper-run`, `stats-run`, `ml-run`, or stop for review.
+- Resolved partly: Tick 192 added `routeRecommendation` to `modeling-plan`. Remaining gap: prove the route by generating a stats-backed packet and making lifecycle consume stats artifacts.
+- Resolved partly: Tick 193 made `paper-lifecycle` consume `stats-run.json` and block failed stats runs. Remaining gap: generate a complete stats-backed packet wrapper with report/QA/task artifacts from `StatsRunResult`, not only lifecycle visibility.
+- Resolved partly: Tick 194 made `modeling-plan` consume backend-status evidence. Remaining gap: feed prior run outcomes and lifecycle status into route recommendations, not only runtime availability.
+- Tick 195 challenge target: fix duplicate stats bridge JSON output and make standard-table stats execution produce packet-grade report/QA artifacts before adding method breadth.
+- Resolved partly: Tick 196 made stats execution produce report/QA artifacts. Remaining gap: generate task/evidence envelopes and lifecycle summaries automatically for stats packets.
+- Tick 197 challenge target: add explicit result posture and interpretation boundary for stats/ML runs before expanding method families.
 
 ## Research Pipeline
 
@@ -114,3 +131,69 @@
 - How should fresh `paper-run` packets prove rerun stability without doubling every routine run cost?
 - Should the local-review safety header be exported into lifecycle/task metadata so downstream UI can display the same interpretation boundary without parsing Markdown?
 - Should future `paper-run` optionally create the repeat run and rerun-stability artifact automatically when `--archive-check` or a benchmark mode is requested?
+- Tick 0198 resolved the stats-run posture gap for lifecycle; remaining analogous gap is ML run posture and a smoother packet command that joins modeling-plan -> stats/ml/paper-run -> lifecycle.
+- Tick 0199 resolved ML run posture. Remaining gap: make `modeling-plan` consume prior stats/ML run posture and route failures into repair/replan instead of requiring the operator to inspect each run manually.
+- Tick 0201 resolved prior-run posture routing in `modeling-plan`. Remaining gap: generate a single stats/ML packet manifest that records route -> execution -> prior-run response -> lifecycle without adding a maze of commands.
+- Resolved: Tick 0219 updated the active golden-task record to point at the bound stats route and strict two-route benchmark rather than the old exploratory stats route.
+- Tick 0206 added strict binding to stats `analysis-run`. Remaining gap: define the equivalent strictness rule for ML, likely baseline comparison + calibration + validation-design note rather than method-selection binding.
+- Tick 0207 added manifest readiness gating. Remaining gap: create an ML-ready gate that requires baseline comparison and calibration, not just a single `ml-run` manifest.
+- Tick 0208 added binary ML calibration readiness. Remaining gap: require model comparison/baseline evidence before counting prediction routes as benchmark-successful.
+- Tick 0209 added comparison posture. Remaining gap: connect comparison posture to a prediction-route manifest or bounded ML route.
+- Tick 0211 added model-review cards. Remaining gap: make claim generation/report QA cite model-review-card fields as a claim firewall.
+- Tick 0212 saved a golden ML route. Remaining gap: create a benchmark checker for golden stats/ML routes that validates posture/card/readiness without manual JSON inspection.
+- Tick 0213 unified ML comparison readiness into `analysis-manifest`. Remaining gap: use both golden stats and ML routes in one benchmark summary.
+- Tick 0214 added `analysis-benchmark`. Remaining gap: create a bound golden stats route so strict benchmark can pass both stats and ML routes together.
+- Tick 0215 challenge: `analysis-benchmark` should not be treated as mature until it proves at least one bound stats route and one ML comparison route together, ideally with coverage/report artifacts rather than ad hoc JSON inspection.
+- Resolved partly: Tick 0216 created a bound stats route and strict two-route benchmark. Remaining gap: benchmark output should include route coverage and a durable report artifact rather than requiring manual JSON capture.
+- Resolved: Tick 0217 added benchmark route coverage and durable JSON/Markdown output.
+- Resolved partly: Tick 0218 added an explicit multi-route benchmark gate. Remaining gap: decide whether paper-run routes should join the same suite or remain separate under paper lifecycle/packet benchmarks.
+- Tick 0220 answer: do not flatten paper-run into `analysis-benchmark` yet; add a thin composed health summary that references analysis benchmark and paper lifecycle artifacts.
+- Resolved partly: Tick 0221 created a composed health summary artifact. Remaining gap: automate this summary through an existing command or a small health command if it proves repeatedly useful.
+# Tick 0223
+
+- Resolved partly: executable diagnostic accuracy and a golden route now exist. Remaining gap: `modeling-plan` and `analysis-run` should natively understand diagnostic route semantics instead of relying on older inference defaults.
+
+# Tick 0224
+
+- Resolved: diagnostic route semantics now flow through `modeling-plan` and `analysis-run`.
+- New diagnostic QA gap: `stats-report.md` and `stats-qa.json` should explicitly enforce reference-standard/index-test language, predictive-value prevalence caveats, and screening recommendation overclaim checks.
+
+# Tick 0225
+
+- Challenge response target: add diagnostic report/QA gates for reference-standard/index-test wording, predictive-value prevalence caveats, precision caveats, screening overclaim detection, and sparse-cell escalation.
+
+# Tick 0226
+
+- Resolved partly: diagnostic report/QA gates exist for `stats-run`. Remaining gap: generate an actual diagnostic paper packet and decide whether intervals should be Wilson/exact/binomial or bootstrap by default.
+
+# Tick 0227
+
+- Challenge response target: avoid another clean 2x2 synthetic diagnostic example; add interval estimates, threshold derivation, or indeterminate-result accounting before a diagnostic paper.
+
+# Tick 0228
+
+- Resolved partly: Wilson intervals now exist. Remaining gap: threshold derivation and indeterminate-result accounting before a real diagnostic paper.
+
+# Tick 0229
+
+- Resolved partly: explicit threshold derivation exists. Remaining gap: indeterminate-result accounting and diagnostic paper packet generation from stats-run artifacts.
+
+# Tick 0230
+
+- Challenge response target: add a narrow diagnostic stats-run-to-paper packet path with paper prose, paper QA/receipt, thresholds, intervals, and analysis-manifest compatibility.
+
+# Tick 0231
+
+- Resolved partly: diagnostic stats-run-to-paper artifacts now exist inside `analysis-run`. Remaining gap: decide whether `analysis-manifest` should include root-level paper artifacts or leave them to route-specific packet manifests.
+
+# Tick 0232
+
+- Resolved: `analysis-manifest` includes diagnostic paper artifacts as optional inspection evidence. Remaining gap: real/public-data diagnostic paper packet.
+
+# Tick 0233
+
+- Challenge response target: add diagnostic rerun stability, lifecycle/index visibility, or actual NHANES-shaped diagnostic packet pressure.
+
+# Tick 0234
+
+- Resolved partly: diagnostic rerun stability exists as a saved golden artifact. Remaining gap: make rerun stability a reusable analysis-route command if the pattern repeats.

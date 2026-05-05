@@ -1,6 +1,15 @@
-# CLI reference
+# CLI Reference
 
-Full reference for `agenteer`.
+This page documents the base workflow CLI in detail: run, resume, context inspection, session inspection, publish, install, and search.
+
+Agenteer now has a much larger modern command surface under `agenteer agent ...`, `agenteer research ...`, and `agenteer specialize ...`. Use [Documentation Map](documentation-map.md) to choose a guide, [Command Catalog](command-catalog.md) for the full command map grouped by operator intent, and [Agent Operator Guide](agent-operator-guide.md) for the recommended command sequences.
+
+The executable dispatcher remains the source of truth for exact flags:
+
+```bash
+npm run build
+node packages/cli/dist/bin/agenteer.js --help
+```
 
 ## Install
 
@@ -197,6 +206,27 @@ console.log((await inspectSession("./.session")).event_count);
 |---|---|
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude-family model ids. |
 | `OPENAI_API_KEY` | OpenAI API key for GPT/OpenAI-family model ids. |
+
+## Modern Namespaces
+
+Use these docs for the newer surfaces:
+
+| Namespace | Docs | Use for |
+|---|---|---|
+| `agenteer agent ...` | [Agent improvement layer](agent-improvement-layer.md), [Command catalog](command-catalog.md) | Context manifests, planner-v2, plan state, node contracts, repair-run, critics, creativity, improvement loops, task envelopes, evidence receipts. |
+| `agenteer research ...` | [Research pipeline](research-pipeline.md), [Research ML modeling](research-ml.md), [Research methods foundation](research-methods-foundation.md), [Command catalog](command-catalog.md) | Protocols, AnalysisSpec, method selection, stats/ML execution, paper generation, QA, manifests, benchmarks, packet readiness. |
+| `agenteer specialize ...` | [Specializations](specializations.md), [Command catalog](command-catalog.md) | Reusable specialization factories with candidate generation, evaluation, critique, repair, promotion, lineage, and reports. |
+| `agenteer lab ...` | [Research pipeline](research-pipeline.md) | Prototype lab flows. Prefer durable `research ...` commands for new work. |
+
+## Agent Defaults
+
+When another agent asks “how do I use Agenteer?”, point it to:
+
+1. [Documentation Map](documentation-map.md) to choose the right subsystem doc.
+2. [Agent Operator Guide](agent-operator-guide.md) for decision flow and golden paths.
+3. [Command Catalog](command-catalog.md) for command discovery.
+4. `node packages/cli/dist/bin/agenteer.js --help` for exact flags.
+5. The relevant domain doc for deeper semantics.
 
 ## Exit codes
 

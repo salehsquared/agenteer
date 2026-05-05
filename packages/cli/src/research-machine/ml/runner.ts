@@ -13,6 +13,7 @@ import {
   type MlComparisonRequest,
   type MlComparisonResult,
   type MlMetricDirection,
+  type MlResultPosture,
   type MlRunRequest,
   type MlRunResult,
   type MlTaskType,
@@ -37,7 +38,7 @@ export async function runMlModel(rawRequest: MlRunRequest): Promise<MlRunResult>
       env: { ...process.env, PYTHONWARNINGS: "ignore" },
     });
     const parsed = JSON.parse(stdout) as MlRunResult;
-    const withArtifacts = await attachHashes({ ...parsed, warnings: stderr.trim() ? [...parsed.warnings, stderr.trim()] : parsed.warnings });
+    const withArtifacts = await attachHashes(withMlPosture({ ...parsed, warnings: stderr.trim() ? [...parsed.warnings, stderr.trim()] : parsed.warnings }, request));
     await writeFile(path.join(outDir, "ml-run.json"), `${JSON.stringify(withArtifacts, null, 2)}\n`);
     return withArtifacts;
   } catch (error) {
@@ -54,6 +55,29 @@ export async function runMlModel(rawRequest: MlRunRequest): Promise<MlRunResult>
       metrics: {},
       warnings: [],
       errors: [stderr.trim() || message],
+      resultPosture: deriveMlResultPosture({
+        schemaVersion: 1,
+        runId: `mlrun_${Date.now()}`,
+        task: request.task,
+        modelId: request.modelId,
+        status: "failed",
+        primaryMetric: request.primaryMetric ?? defaultPrimaryMetric(request.task).metric,
+        primaryMetricDirection: defaultPrimaryMetric(request.task).direction,
+        metrics: {},
+        warnings: [],
+        errors: [stderr.trim() || message],
+        preprocessing: {
+          rowCount: 0,
+          featureCount: 0,
+          numericFeatures: [],
+          categoricalFeatures: [],
+          excludedColumns: [],
+        },
+        evaluation: { split: "full_data" },
+        explanation: { shapAvailable: false, shapStatus: "not_supported" },
+        artifacts: [{ kind: "config", path: configPath }],
+        outDir,
+      }, request),
       preprocessing: {
         rowCount: 0,
         featureCount: 0,
@@ -100,6 +124,8 @@ export async function compareMlModels(rawRequest: MlComparisonRequest): Promise<
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      const manifest = getMlModelManifest(modelId);
+      const optionalMissing = manifest.availability === "optional_missing" || message.includes("requires optional package");
       runs.push({
         schemaVersion: 1,
         runId: `mlrun_${Date.now()}_${modelId}`,
@@ -111,6 +137,14 @@ export async function compareMlModels(rawRequest: MlComparisonRequest): Promise<
         metrics: {},
         warnings: [],
         errors: [message],
+        resultPosture: {
+          status: optionalMissing ? "optional_dependency_missing" : "failed",
+          label: optionalMissing ? "Optional dependency missing" : "Failed ML candidate",
+          interpretationBoundary: "This candidate did not produce a usable local ML result.",
+          supports: ["adapter availability diagnosis", "candidate rejection"],
+          cannotSupport: ["prediction performance comparison", "model promotion"],
+          nextAction: optionalMissing ? "Install the optional backend or remove this candidate from the comparison." : "Repair the candidate configuration and rerun before comparison.",
+        },
         preprocessing: {
           rowCount: 0,
           featureCount: 0,
@@ -141,17 +175,23 @@ export async function compareMlModels(rawRequest: MlComparisonRequest): Promise<
       return primary.direction === "maximize" ? b.score - a.score : a.score - b.score;
     })
     .map((item, index) => ({ rank: index + 1, ...item }));
+  const comparisonPosture = deriveMlComparisonPosture(request.task, ranked, runs);
+  const reviewCardPath = path.join(outDir, "model-review-card.md");
+  const reviewCard = deriveMlReviewCard(request.task, comparisonPosture, reviewCardPath, runs);
   const result: MlComparisonResult = {
     schemaVersion: 1,
     comparisonId: `mlcmp_${Date.now()}`,
     task: request.task,
     primaryMetric: primary.metric,
     primaryMetricDirection: primary.direction,
+    comparisonPosture,
+    reviewCard,
     ranked,
     runs,
     warnings,
     outDir,
   };
+  await writeFile(reviewCardPath, renderMlReviewCard(result), "utf-8");
   await writeFile(path.join(outDir, "comparison.json"), `${JSON.stringify(result, null, 2)}\n`);
   return result;
 }
@@ -207,6 +247,107 @@ function numericMetric(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function deriveMlComparisonPosture(
+  task: MlTaskType,
+  ranked: MlComparisonResult["ranked"],
+  runs: MlRunResult[],
+): NonNullable<MlComparisonResult["comparisonPosture"]> {
+  const succeededWithScores = ranked.filter(item => item.status === "succeeded" && item.score !== null);
+  const hasBaseline = runs.some(run => run.status === "succeeded" && baselineModelIds(task).has(run.modelId));
+  const binaryCalibrationReady = task !== "binary_classification" || runs
+    .filter(run => run.status === "succeeded")
+    .every(run => run.artifacts.some(artifact => artifact.kind === "calibration"));
+  if (succeededWithScores.length >= 2 && hasBaseline && binaryCalibrationReady) {
+    return {
+      status: "baseline_comparison_ready",
+      label: "Baseline comparison ready",
+      interpretationBoundary: "This comparison supports local model-selection review against at least one transparent baseline, not external validation or deployment.",
+      supports: ["local model ranking", "baseline comparison", task === "binary_classification" ? "calibration artifact review" : "primary metric review"],
+      cannotSupport: ["external validity", "clinical deployment", "causal claims", "fairness claims without subgroup evidence"],
+      nextAction: "Review calibration, subgroup performance, leakage risk, and validation design before promotion.",
+    };
+  }
+  return {
+    status: "insufficient_comparison",
+    label: "Insufficient model comparison",
+    interpretationBoundary: "This comparison does not yet provide enough successful baseline evidence for model-selection review.",
+    supports: ["debugging adapter availability", "identifying failed candidates"],
+    cannotSupport: ["model promotion", "strong model ranking claims", "deployment-style claims"],
+    nextAction: "Include at least one transparent baseline and at least two successful scored models; require calibration artifacts for binary classification.",
+  };
+}
+
+function baselineModelIds(task: MlTaskType): Set<string> {
+  if (task === "binary_classification" || task === "multiclass_classification") return new Set(["logistic-regression", "decision-tree-classifier"]);
+  if (task === "regression") return new Set(["linear-regression", "ridge-regression"]);
+  if (task === "clustering") return new Set(["k-means"]);
+  if (task === "dimensionality_reduction") return new Set(["pca"]);
+  return new Set();
+}
+
+function deriveMlReviewCard(
+  task: MlTaskType,
+  comparisonPosture: NonNullable<MlComparisonResult["comparisonPosture"]>,
+  reviewCardPath: string,
+  runs: MlRunResult[],
+): NonNullable<MlComparisonResult["reviewCard"]> {
+  const missingEvidence: string[] = [];
+  if (comparisonPosture.status !== "baseline_comparison_ready") missingEvidence.push("baseline comparison readiness");
+  if (task === "binary_classification" && !runs.some(run => run.artifacts.some(artifact => artifact.kind === "calibration"))) missingEvidence.push("binary calibration artifact");
+  missingEvidence.push("subgroup performance evidence");
+  missingEvidence.push("external or temporal validation evidence");
+  return {
+    path: reviewCardPath,
+    status: missingEvidence.length <= 2 && comparisonPosture.status === "baseline_comparison_ready" ? "local_review_ready" : "needs_review",
+    intendedUse: "Local model-selection review for tabular research analysis using the declared split and metrics.",
+    intendedNonUse: ["clinical deployment", "causal inference", "external-validity claims", "fairness claims without subgroup evidence"],
+    validationBoundary: "Internal split/CV evidence only; external or temporal validation is not established.",
+    subgroupEvidence: "not_assessed",
+    leakageReview: "Pipeline excludes the target column from features and fits preprocessing on training data; temporal, site, patient-level, and label-leakage risks still require study-specific review.",
+    missingEvidence,
+  };
+}
+
+function renderMlReviewCard(result: MlComparisonResult): string {
+  const card = result.reviewCard;
+  return [
+    "# ML Model Review Card",
+    "",
+    `- Comparison: ${result.comparisonId}`,
+    `- Task: ${result.task}`,
+    `- Primary metric: ${result.primaryMetric} (${result.primaryMetricDirection})`,
+    `- Comparison posture: ${result.comparisonPosture?.status ?? "missing"}`,
+    `- Review status: ${card?.status ?? "missing"}`,
+    "",
+    "## Intended Use",
+    "",
+    card?.intendedUse ?? "Not declared.",
+    "",
+    "## Intended Non-Use",
+    "",
+    ...(card?.intendedNonUse.map(item => `- ${item}`) ?? ["- Not declared."]),
+    "",
+    "## Validation Boundary",
+    "",
+    card?.validationBoundary ?? "Not declared.",
+    "",
+    "## Leakage Review",
+    "",
+    card?.leakageReview ?? "Not declared.",
+    "",
+    "## Missing Evidence",
+    "",
+    ...(card?.missingEvidence.map(item => `- ${item}`) ?? ["- Not declared."]),
+    "",
+    "## Ranked Models",
+    "",
+    "| rank | model | status | score |",
+    "|---:|---|---|---:|",
+    ...result.ranked.map(item => `| ${item.rank} | ${item.modelId} | ${item.status} | ${item.score ?? ""} |`),
+    "",
+  ].join("\n");
+}
+
 async function attachHashes(result: MlRunResult): Promise<MlRunResult> {
   const artifacts: MlArtifact[] = [];
   for (const artifact of result.artifacts) {
@@ -218,6 +359,61 @@ async function attachHashes(result: MlRunResult): Promise<MlRunResult> {
     }
   }
   return { ...result, artifacts };
+}
+
+function withMlPosture(result: MlRunResult, request: MlRunRequest): MlRunResult {
+  return { ...result, resultPosture: deriveMlResultPosture(result, request) };
+}
+
+function deriveMlResultPosture(result: MlRunResult, request: MlRunRequest): MlResultPosture {
+  const errors = result.errors.join("\n");
+  if (result.status === "failed") {
+    const optionalMissing = errors.includes("requires optional package") || errors.includes("Optional dependency") || errors.includes("No module named");
+    return {
+      status: optionalMissing ? "optional_dependency_missing" : "failed",
+      label: optionalMissing ? "Optional dependency missing" : "Failed ML execution",
+      interpretationBoundary: optionalMissing
+        ? "This adapter was requested but its optional package is unavailable in the selected Python environment."
+        : "This run failed before producing a locally reviewable model result.",
+      supports: optionalMissing ? ["backend availability diagnosis", "candidate rejection"] : ["failure attribution", "repair planning"],
+      cannotSupport: ["model performance", "prediction use", "research conclusions"],
+      nextAction: optionalMissing ? "Install the optional package or choose an available baseline model." : "Resolve errors and rerun the model.",
+    };
+  }
+  if (request.task === "clustering" || request.task === "dimensionality_reduction") {
+    return {
+      status: "exploratory_unsupervised",
+      label: "Exploratory unsupervised result",
+      interpretationBoundary: "This run may support subgroup or representation exploration, but it does not validate an outcome prediction or inferential claim.",
+      supports: ["exploratory subgrouping", "representation inspection", "feature-space diagnostics"],
+      cannotSupport: ["outcome prediction performance", "causal claims", "clinical deployment"],
+      nextAction: "Review stability, domain plausibility, and downstream validation before treating clusters/components as study findings.",
+    };
+  }
+  const hasPrimaryMetric = Boolean(result.primaryMetric && typeof result.metrics[result.primaryMetric] === "number");
+  const hasHeldOutRows = typeof result.preprocessing.testRows === "number" && result.preprocessing.testRows > 0;
+  const hasCrossValidation = Boolean(result.evaluation.crossValidation);
+  const locallyValidated = result.status === "succeeded" && hasPrimaryMetric && (hasHeldOutRows || hasCrossValidation);
+  if (locallyValidated) {
+    const supports = ["local model comparison", "held-out performance review", "leakage-aware preprocessing audit"];
+    if (request.task === "binary_classification" && typeof result.metrics.calibration_bins === "number") supports.push("basic calibration review");
+    return {
+      status: "locally_validated_prediction",
+      label: "Locally validated prediction result",
+      interpretationBoundary: "This run supports local predictive-performance review on the declared split, not external validation or clinical deployment.",
+      supports,
+      cannotSupport: ["external validity", "clinical deployment", "causal claims", "unmeasured fairness claims"],
+      nextAction: "Compare against baselines, review calibration/leakage, and require external or temporal validation before deployment-style claims.",
+    };
+  }
+  return {
+    status: "exploratory_prediction",
+    label: "Exploratory prediction result",
+    interpretationBoundary: "This run produced a predictive model but lacks enough validation evidence for local performance review.",
+    supports: ["debugging model configuration", "rough feasibility exploration"],
+    cannotSupport: ["model promotion", "performance claims", "clinical deployment"],
+    nextAction: "Add held-out evaluation, cross-validation, calibration where applicable, and baseline comparison before promotion.",
+  };
 }
 
 function sklearnBridgeSource(): string {
@@ -236,6 +432,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.compose import ColumnTransformer
+from sklearn.calibration import calibration_curve
 from sklearn.impute import SimpleImputer
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import (
@@ -603,15 +800,30 @@ def run_supervised(config, df):
             warnings.append(f"Permutation importance failed: {exc}")
     predictions_path = out_dir / "predictions.csv"
     pred_frame = pd.DataFrame({"y_true": y_test, "y_pred": y_pred})
+    calibration_path = None
     if proba is not None:
         if len(proba.shape) == 2:
             for idx in range(proba.shape[1]):
                 col = classes[idx] if classes and idx < len(classes) else str(idx)
                 pred_frame[f"proba_{col}"] = proba[:, idx]
+            if task == "binary_classification" and proba.shape[1] > 1:
+                try:
+                    score = proba[:, 1]
+                    fraction_positive, mean_predicted = calibration_curve(y_test, score, n_bins=min(10, max(2, len(y_test) // 10)), strategy="uniform")
+                    calibration_path = out_dir / "calibration.csv"
+                    pd.DataFrame({
+                        "mean_predicted_probability": mean_predicted,
+                        "fraction_positive": fraction_positive,
+                    }).to_csv(calibration_path, index=False)
+                    metrics["calibration_bins"] = int(len(fraction_positive))
+                except Exception as exc:
+                    warnings.append(f"Calibration curve failed: {exc}")
         else:
             pred_frame["score"] = proba
     write_csv(predictions_path, pred_frame)
     artifacts = [artifact("predictions", predictions_path)]
+    if calibration_path is not None:
+        artifacts.append(artifact("calibration", calibration_path))
     if config.get("saveModel", True):
         model_path = out_dir / "model.joblib"
         joblib.dump(pipeline, model_path)

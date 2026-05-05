@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1778008376038",
+    "method": "linear-regression",
+    "status": "failed",
+    "rowCount": 0,
+    "completeCaseN": 0,
+    "variables": [
+      "hba1c",
+      "bmi",
+      "age"
+    ],
+    "parameters": {
+      "surveyDesign": true,
+      "allowSurveyApproximation": false
+    },
+    "estimates": [],
+    "diagnostics": {},
+    "issues": [
+      {
+        "severity": "blocker",
+        "code": "SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER",
+        "message": "stats-run does not provide complex-survey variance; use paper-run --backend r-survey or pass --allow-survey-approximation for an explicitly exploratory run.",
+        "evidenceRefs": [
+          "request.surveyDesign"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [
+      "Complex-survey design requires a survey-aware runner."
+    ],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0186-stats-safety/refused/stats-config.json",
+        "sha256": "e8f2876be88f6777c37e9392c975c5849ac5d13c43b5c5ca716c876163e50463"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0186-stats-safety/refused"
+  }
+}
+

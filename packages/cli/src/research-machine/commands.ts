@@ -35,6 +35,9 @@ import {
   type ModelingGoal,
   type ModelingDecisionRequest,
 } from "./modeling.js";
+import { buildAnalysisRunManifest, type AnalysisRunManifest } from "./analysis-manifest.js";
+import { runStatsMethod } from "./stats/runner.js";
+import type { StatsMethod, StatsRunRequest, StatsRunResult } from "./stats/schemas.js";
 import {
   analysisMethodCategorySchema,
   type BackendId,
@@ -165,6 +168,8 @@ export function researchModelingPlanCommand(opts: {
   classCount?: number;
   target?: string;
   tableSummary?: ModelingDecisionRequest["tableSummary"];
+  backendStatus?: ModelingDecisionRequest["backendStatus"];
+  priorRuns?: ModelingDecisionRequest["priorRuns"];
   highMissingness?: boolean;
   smallSample?: boolean;
   requiresInference?: boolean;
@@ -172,6 +177,457 @@ export function researchModelingPlanCommand(opts: {
   maxCandidates?: number;
 }): ModelingDecisionPlan {
   return buildModelingDecisionPlan(opts);
+}
+
+export async function researchAnalysisManifestCommand(opts: { runDir: string; outPath?: string; requireReady?: boolean }): Promise<AnalysisRunManifest> {
+  const manifest = await buildAnalysisRunManifest(opts);
+  if (opts.requireReady && manifest.readiness !== "local_review_ready") {
+    throw new Error(`analysis manifest is ${manifest.readiness}, not local_review_ready; next action: ${manifest.nextAction}`);
+  }
+  return manifest;
+}
+
+export function renderResearchAnalysisManifest(result: AnalysisRunManifest): string {
+  return [
+    `research analysis manifest: ${result.manifestId}`,
+    `  kind: ${result.runKind}`,
+    `  run: ${result.runId} status=${result.runStatus}`,
+    `  posture: ${result.resultPosture.status ?? "(missing)"}`,
+    `  readiness: ${result.readiness}`,
+    `  artifacts: ${result.artifactCompleteness.status}; missing=${result.artifactCompleteness.missingRequired.join(",") || "(none)"}`,
+    `  out: ${result.outPath}`,
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchAnalysisManifestJson(result: AnalysisRunManifest): string {
+  return `${JSON.stringify({ schemaVersion: 1, analysisRunManifest: result }, null, 2)}\n`;
+}
+
+export interface ResearchAnalysisRunResult {
+  schemaVersion: 1;
+  outDir: string;
+  route: "stats-run";
+  modelingPlan: ModelingDecisionPlan;
+  statsRun: StatsRunResult;
+  analysisRunManifest: AnalysisRunManifest;
+  postRunModelingPlan: ModelingDecisionPlan;
+  generatedFiles: {
+    modelingPlan: string;
+    statsRunEnvelope: string;
+    analysisManifest: string;
+    postRunModelingPlan: string;
+    diagnosticPaper?: string;
+    diagnosticPaperQa?: string;
+  };
+  nextAction: string;
+}
+
+export async function researchAnalysisRunCommand(opts: {
+  question: string;
+  method: StatsMethod;
+  dataPath: string;
+  outDir: string;
+  outcome?: string;
+  exposure?: string;
+  group?: string;
+  outcomeThreshold?: number;
+  exposureThreshold?: number;
+  variables?: string[];
+  covariates?: string[];
+  weight?: string;
+  surveyDesign?: boolean;
+  allowSurveyApproximation?: boolean;
+  methodSelectionPath?: string;
+  analysisSpecPath?: string;
+  requireBound?: boolean;
+  alpha?: number;
+  python?: string;
+}): Promise<ResearchAnalysisRunResult> {
+  const outDir = path.resolve(opts.outDir);
+  await mkdir(outDir, { recursive: true });
+  if (opts.requireBound && !opts.methodSelectionPath && !opts.analysisSpecPath) {
+    throw new Error("analysis-run --require-bound requires --method-selection or --analysis-spec so execution is tied to upstream method/spec evidence.");
+  }
+  const initialGoal = goalForStatsAnalysisRun(opts.method, opts.group, opts.exposure);
+  const initialOutcomeType = outcomeTypeForStatsAnalysisRun(opts.method);
+  const initialStudyDesign = opts.method === "diagnostic-accuracy" ? "diagnostic" : undefined;
+  const modelingPlan = buildModelingDecisionPlan({
+    question: opts.question,
+    goal: initialGoal,
+    outcomeType: initialOutcomeType,
+    studyDesign: initialStudyDesign,
+    dataStructures: ["single_table"],
+    surveyDesign: opts.surveyDesign ?? false,
+    target: opts.outcome,
+    requiresInference: true,
+    priorRuns: [],
+  });
+  const modelingPlanPath = path.join(outDir, "modeling-plan.json");
+  await writeFile(modelingPlanPath, `${JSON.stringify({ schemaVersion: 1, modelingPlan }, null, 2)}\n`);
+  const statsOutDir = path.join(outDir, "stats-run");
+  const statsRun = await runStatsMethod({
+    schemaVersion: 1,
+    method: opts.method,
+    dataPath: opts.dataPath,
+    outcome: opts.outcome,
+    exposure: opts.exposure,
+    group: opts.group,
+    outcomeThreshold: opts.outcomeThreshold,
+    exposureThreshold: opts.exposureThreshold,
+    variables: opts.variables ?? [],
+    covariates: opts.covariates ?? [],
+    weight: opts.weight,
+    surveyDesign: opts.surveyDesign ?? false,
+    allowSurveyApproximation: opts.allowSurveyApproximation ?? false,
+    methodSelectionPath: opts.methodSelectionPath,
+    analysisSpecPath: opts.analysisSpecPath,
+    outDir: statsOutDir,
+    alpha: opts.alpha ?? 0.05,
+    python: opts.python,
+  } satisfies StatsRunRequest);
+  const statsEnvelopePath = path.join(outDir, "stats-run-envelope.json");
+  await writeFile(statsEnvelopePath, `${JSON.stringify({ schemaVersion: 1, statsRun }, null, 2)}\n`);
+  const analysisRunManifest = await buildAnalysisRunManifest({ runDir: statsOutDir });
+  const diagnosticPaperFiles = opts.method === "diagnostic-accuracy"
+    ? await writeDiagnosticAnalysisPaper({ outDir, question: opts.question, statsRun, analysisRunManifest })
+    : {};
+  const finalAnalysisRunManifest = opts.method === "diagnostic-accuracy"
+    ? await buildAnalysisRunManifest({ runDir: statsOutDir })
+    : analysisRunManifest;
+  const postRunModelingPlan = buildModelingDecisionPlan({
+    question: opts.question,
+    goal: initialGoal,
+    outcomeType: initialOutcomeType,
+    studyDesign: initialStudyDesign,
+    dataStructures: ["single_table"],
+    surveyDesign: opts.surveyDesign ?? false,
+    target: opts.outcome,
+    requiresInference: true,
+    priorRuns: [{
+      path: path.join(statsOutDir, "stats-run.json"),
+      kind: "stats",
+      status: statsRun.status,
+      posture: statsRun.resultPosture?.status ?? null,
+      methodOrModel: statsRun.method,
+      issueCodes: statsRun.issues.map(issue => issue.code),
+      errors: statsRun.errors,
+    }],
+  });
+  const postRunPath = path.join(outDir, "modeling-plan-after-prior.json");
+  await writeFile(postRunPath, `${JSON.stringify({ schemaVersion: 1, modelingPlan: postRunModelingPlan }, null, 2)}\n`);
+  return {
+    schemaVersion: 1,
+    outDir,
+    route: "stats-run",
+    modelingPlan,
+    statsRun,
+    analysisRunManifest: finalAnalysisRunManifest,
+    postRunModelingPlan,
+    generatedFiles: {
+      modelingPlan: modelingPlanPath,
+      statsRunEnvelope: statsEnvelopePath,
+      analysisManifest: finalAnalysisRunManifest.outPath,
+      postRunModelingPlan: postRunPath,
+      ...diagnosticPaperFiles,
+    },
+    nextAction: postRunModelingPlan.nextAction,
+  };
+}
+
+async function writeDiagnosticAnalysisPaper(opts: {
+  outDir: string;
+  question: string;
+  statsRun: StatsRunResult;
+  analysisRunManifest: AnalysisRunManifest;
+}): Promise<{ diagnosticPaper: string; diagnosticPaperQa: string }> {
+  const paperPath = path.join(opts.outDir, "paper.md");
+  const qaPath = path.join(opts.outDir, "paper-qa.json");
+  const first = opts.statsRun.estimates[0] ?? {};
+  const diagnostics = opts.statsRun.diagnostics as Record<string, unknown>;
+  const paper = [
+    `# Diagnostic Accuracy Study`,
+    "",
+    "## Local Review Safety Header",
+    "",
+    "- This is a local diagnostic accuracy report generated from a standard-table stats route.",
+    "- It is not a clinical screening recommendation, deployment validation, or diagnostic replacement claim.",
+    "- PPV and NPV are prevalence-dependent and local to the analyzed table.",
+    "- Sensitivity, specificity, PPV, and NPV include Wilson binomial intervals when available.",
+    "",
+    "## Research Question",
+    "",
+    opts.question,
+    "",
+    "## Methods",
+    "",
+    `- Reference standard: ${first.reference ?? opts.statsRun.variables[0] ?? "(missing)"}.`,
+    `- Index test: ${first.term ?? opts.statsRun.variables[1] ?? "(missing)"}.`,
+    `- Reference positive level: ${diagnostics.reference_positive_level ?? "(missing)"}.`,
+    `- Index-test positive level: ${diagnostics.test_positive_level ?? "(missing)"}.`,
+    `- Reference threshold: ${diagnostics.reference_threshold ?? "(not threshold-derived)"}.`,
+    `- Index-test threshold: ${diagnostics.test_threshold ?? "(not threshold-derived)"}.`,
+    `- Complete-case N: ${opts.statsRun.completeCaseN}.`,
+    `- Result posture: ${opts.statsRun.resultPosture?.status ?? "(missing)"}.`,
+    "",
+    "## Results",
+    "",
+    `- True positives: ${first.true_positive ?? "(missing)"}.`,
+    `- False positives: ${first.false_positive ?? "(missing)"}.`,
+    `- True negatives: ${first.true_negative ?? "(missing)"}.`,
+    `- False negatives: ${first.false_negative ?? "(missing)"}.`,
+    `- Sensitivity: ${formatEstimateWithCi(first.sensitivity, first.sensitivity_ci_low, first.sensitivity_ci_high)}.`,
+    `- Specificity: ${formatEstimateWithCi(first.specificity, first.specificity_ci_low, first.specificity_ci_high)}.`,
+    `- Positive predictive value: ${formatEstimateWithCi(first.positive_predictive_value, first.positive_predictive_value_ci_low, first.positive_predictive_value_ci_high)}.`,
+    `- Negative predictive value: ${formatEstimateWithCi(first.negative_predictive_value, first.negative_predictive_value_ci_low, first.negative_predictive_value_ci_high)}.`,
+    `- Positive likelihood ratio: ${formatValue(first.positive_likelihood_ratio)}.`,
+    `- Negative likelihood ratio: ${formatValue(first.negative_likelihood_ratio)}.`,
+    `- Prevalence in analyzed table: ${formatValue(first.prevalence)}.`,
+    "",
+    "## Interpretation",
+    "",
+    "These results summarize local agreement between an index test and a reference standard in the analyzed table. They do not establish external validity, clinical utility, causal interpretation, or a recommendation to screen.",
+    opts.statsRun.issues.some(issue => issue.code === "SPARSE_DIAGNOSTIC_CELL")
+      ? "Sparse diagnostic cells were detected, so the accuracy estimates may be unstable and should be reviewed before promotion."
+      : "No sparse diagnostic cell warning was emitted.",
+    "",
+    "## Artifact Posture",
+    "",
+    `- Analysis manifest readiness: ${opts.analysisRunManifest.readiness}.`,
+    `- Stats QA status: ${statsQaStatus(opts.statsRun)}.`,
+    `- Issues: ${opts.statsRun.issues.map(issue => issue.code).join(", ") || "(none)"}.`,
+    "",
+  ].join("\n");
+  await writeFile(paperPath, paper, "utf-8");
+  const checks = [
+    { id: "local-review-safety-header", status: paper.includes("Local Review Safety Header") ? "pass" : "fail" },
+    { id: "reference-standard", status: paper.includes("Reference standard:") ? "pass" : "fail" },
+    { id: "index-test", status: paper.includes("Index test:") ? "pass" : "fail" },
+    { id: "predictive-value-prevalence", status: /PPV and NPV are prevalence-dependent/i.test(paper) ? "pass" : "fail" },
+    { id: "intervals", status: /Wilson binomial intervals/i.test(paper) && typeof first.sensitivity_ci_low === "number" ? "pass" : "warning" },
+    { id: "screening-overclaim-boundary", status: /not a clinical screening recommendation/i.test(paper) ? "pass" : "fail" },
+    { id: "manifest-readiness", status: opts.analysisRunManifest.readiness === "local_review_ready" ? "pass" : "warning" },
+  ] as Array<{ id: string; status: "pass" | "warning" | "fail" }>;
+  const qa = {
+    schemaVersion: 1,
+    status: checks.some(check => check.status === "fail") ? "fail" : checks.some(check => check.status === "warning") ? "warning" : "pass",
+    checks,
+  };
+  await writeFile(qaPath, `${JSON.stringify(qa, null, 2)}\n`, "utf-8");
+  return { diagnosticPaper: paperPath, diagnosticPaperQa: qaPath };
+}
+
+function formatEstimateWithCi(value: unknown, low: unknown, high: unknown): string {
+  if (typeof value === "number" && typeof low === "number" && typeof high === "number") {
+    return `${formatValue(value)} (${formatValue(low)}, ${formatValue(high)})`;
+  }
+  return formatValue(value);
+}
+
+function formatValue(value: unknown): string {
+  if (typeof value === "number") return Number.isInteger(value) ? String(value) : value.toPrecision(4);
+  if (value === null || typeof value === "undefined") return "(missing)";
+  return String(value);
+}
+
+function statsQaStatus(statsRun: StatsRunResult): string {
+  const qa = statsRun.artifacts.find(artifact => artifact.kind === "qa");
+  return qa ? "see stats-qa.json" : "(missing)";
+}
+
+export function renderResearchAnalysisRun(result: ResearchAnalysisRunResult): string {
+  return [
+    `research analysis run: ${result.route}`,
+    `  out: ${result.outDir}`,
+    `  stats: ${result.statsRun.status} posture=${result.statsRun.resultPosture?.status ?? "(missing)"}`,
+    `  manifest: ${result.analysisRunManifest.readiness} artifacts=${result.analysisRunManifest.artifactCompleteness.status}`,
+    `  post-run route: ${result.postRunModelingPlan.routeRecommendation.route}`,
+    `  next: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchAnalysisRunJson(result: ResearchAnalysisRunResult): string {
+  return `${JSON.stringify({ schemaVersion: 1, analysisRun: result }, null, 2)}\n`;
+}
+
+function goalForStatsAnalysisRun(method: StatsRunRequest["method"], group?: string, exposure?: string): ModelingGoal {
+  if (method === "diagnostic-accuracy") return "diagnose";
+  if (method === "descriptive") return "describe";
+  if (method === "t-test" || method === "mann-whitney" || group) return "compare_groups";
+  if (exposure) return "associate";
+  return "describe";
+}
+
+function outcomeTypeForStatsAnalysisRun(method: StatsRunRequest["method"]): OutcomeType {
+  if (method === "logistic-regression" || method === "diagnostic-accuracy") return "binary";
+  if (method === "chi-square" || method === "fisher-exact") return "categorical";
+  if (method === "poisson-regression") return "count";
+  return "continuous";
+}
+
+export interface ResearchAnalysisBenchmarkResult {
+  schemaVersion: 1;
+  status: "pass" | "fail";
+  manifests: AnalysisRunManifest[];
+  routeCoverage: {
+    total: number;
+    byKind: Record<AnalysisRunManifest["runKind"], number>;
+    localReviewReadyByKind: Record<AnalysisRunManifest["runKind"], number>;
+    posture: "empty" | "single_route" | "multi_route_ready" | "multi_route_incomplete";
+  };
+  checks: Array<{
+    id: string;
+    status: "pass" | "warning" | "fail";
+    detail: string;
+  }>;
+  summary: string;
+  nextAction: string;
+  generatedFiles: {
+    out: string | null;
+    report: string | null;
+  };
+}
+
+export async function researchAnalysisBenchmarkCommand(opts: { runDirs: string[]; requireReady?: boolean; requireMultiRoute?: boolean; outPath?: string; reportPath?: string }): Promise<ResearchAnalysisBenchmarkResult> {
+  if (opts.runDirs.length === 0) throw new Error("analysis-benchmark requires at least one --run-dir.");
+  const manifests = await Promise.all(opts.runDirs.map(runDir => buildAnalysisRunManifest({ runDir })));
+  const routeCoverage = buildAnalysisRouteCoverage(manifests);
+  const manifestFailures = manifests.filter(manifest => manifest.artifactCompleteness.status === "fail" || (opts.requireReady && manifest.readiness !== "local_review_ready"));
+  const checks = buildAnalysisBenchmarkChecks(manifests, manifestFailures, routeCoverage, opts.requireReady ?? false, opts.requireMultiRoute ?? false);
+  const hardFailures = checks.filter(check => check.status === "fail" && (check.id !== "route-coverage" || opts.requireMultiRoute));
+  const result: ResearchAnalysisBenchmarkResult = {
+    schemaVersion: 1,
+    status: manifestFailures.length === 0 && hardFailures.length === 0 ? "pass" : "fail",
+    manifests,
+    routeCoverage,
+    checks,
+    summary: `${manifests.length - manifestFailures.length}/${manifests.length} analysis manifests passed${opts.requireReady ? " local-review-ready" : " artifact"} checks; coverage=${routeCoverage.posture}.`,
+    nextAction: manifestFailures.length === 0 && hardFailures.length === 0
+      ? routeCoverage.posture === "multi_route_ready"
+        ? "Golden analysis routes satisfy the requested benchmark gate across multiple route kinds."
+        : "Golden analysis routes satisfy the requested benchmark gate, but route coverage is narrow."
+      : opts.requireMultiRoute && routeCoverage.posture !== "multi_route_ready"
+        ? "Add at least two local-review-ready route kinds before promotion, such as one bound stats route and one ML comparison route."
+      : "Inspect failing manifests and repair missing artifacts, posture, or readiness before promotion.",
+    generatedFiles: {
+      out: opts.outPath ? path.resolve(opts.outPath) : null,
+      report: opts.reportPath ? path.resolve(opts.reportPath) : null,
+    },
+  };
+  if (result.generatedFiles.out) {
+    await mkdir(path.dirname(result.generatedFiles.out), { recursive: true });
+    await writeFile(result.generatedFiles.out, renderResearchAnalysisBenchmarkJson(result));
+  }
+  if (result.generatedFiles.report) {
+    await mkdir(path.dirname(result.generatedFiles.report), { recursive: true });
+    await writeFile(result.generatedFiles.report, renderAnalysisBenchmarkMarkdown(result));
+  }
+  return result;
+}
+
+export function renderResearchAnalysisBenchmark(result: ResearchAnalysisBenchmarkResult): string {
+  return [
+    `research analysis benchmark: ${result.status}`,
+    `  ${result.summary}`,
+    `  coverage: ${result.routeCoverage.posture} stats=${result.routeCoverage.byKind.stats} ml=${result.routeCoverage.byKind.ml} ml-comparison=${result.routeCoverage.byKind["ml-comparison"]}`,
+    `  checks: ${result.checks.map(check => `${check.id}=${check.status}`).join(", ")}`,
+    ...result.manifests.map(manifest => `  ${manifest.runKind}: ${manifest.readiness} artifacts=${manifest.artifactCompleteness.status} dir=${manifest.runDir}`),
+    result.generatedFiles.out ? `  out: ${result.generatedFiles.out}` : null,
+    result.generatedFiles.report ? `  report: ${result.generatedFiles.report}` : null,
+    `  next: ${result.nextAction}`,
+  ].filter((line): line is string => Boolean(line)).join("\n");
+}
+
+export function renderResearchAnalysisBenchmarkJson(result: ResearchAnalysisBenchmarkResult): string {
+  return `${JSON.stringify({ schemaVersion: 1, analysisBenchmark: result }, null, 2)}\n`;
+}
+
+function buildAnalysisRouteCoverage(manifests: AnalysisRunManifest[]): ResearchAnalysisBenchmarkResult["routeCoverage"] {
+  const byKind: Record<AnalysisRunManifest["runKind"], number> = { stats: 0, ml: 0, "ml-comparison": 0 };
+  const localReviewReadyByKind: Record<AnalysisRunManifest["runKind"], number> = { stats: 0, ml: 0, "ml-comparison": 0 };
+  for (const manifest of manifests) {
+    byKind[manifest.runKind] += 1;
+    if (manifest.readiness === "local_review_ready") localReviewReadyByKind[manifest.runKind] += 1;
+  }
+  const kindsPresent = Object.values(byKind).filter(count => count > 0).length;
+  const readyKindsPresent = Object.values(localReviewReadyByKind).filter(count => count > 0).length;
+  return {
+    total: manifests.length,
+    byKind,
+    localReviewReadyByKind,
+    posture: manifests.length === 0
+      ? "empty"
+      : kindsPresent === 1
+        ? "single_route"
+        : readyKindsPresent >= 2
+          ? "multi_route_ready"
+          : "multi_route_incomplete",
+  };
+}
+
+function buildAnalysisBenchmarkChecks(
+  manifests: AnalysisRunManifest[],
+  failures: AnalysisRunManifest[],
+  coverage: ResearchAnalysisBenchmarkResult["routeCoverage"],
+  requireReady: boolean,
+  requireMultiRoute: boolean,
+): ResearchAnalysisBenchmarkResult["checks"] {
+  const allComplete = manifests.every(manifest => manifest.artifactCompleteness.status === "pass");
+  const allHaveBoundaries = manifests.every(manifest => Boolean(manifest.resultPosture.interpretationBoundary));
+  return [
+    {
+      id: "artifact-completeness",
+      status: allComplete ? "pass" : "fail",
+      detail: allComplete ? "All manifests have required artifacts." : "At least one manifest is missing required artifacts.",
+    },
+    {
+      id: "readiness-gate",
+      status: failures.length === 0 ? "pass" : "fail",
+      detail: requireReady
+        ? `${manifests.length - failures.length}/${manifests.length} manifests passed local-review-ready.`
+        : `${manifests.length - failures.length}/${manifests.length} manifests passed artifact checks.`,
+    },
+    {
+      id: "route-coverage",
+      status: coverage.posture === "multi_route_ready" ? "pass" : requireMultiRoute ? "fail" : coverage.posture === "single_route" ? "warning" : "fail",
+      detail: `Coverage posture is ${coverage.posture}; stats=${coverage.byKind.stats}, ml=${coverage.byKind.ml}, ml-comparison=${coverage.byKind["ml-comparison"]}.`,
+    },
+    {
+      id: "interpretation-boundaries",
+      status: allHaveBoundaries ? "pass" : "warning",
+      detail: allHaveBoundaries ? "Every manifest carries an interpretation boundary." : "At least one manifest lacks an explicit interpretation boundary.",
+    },
+  ];
+}
+
+function renderAnalysisBenchmarkMarkdown(result: ResearchAnalysisBenchmarkResult): string {
+  const rows = result.manifests.map(manifest => `| ${manifest.runKind} | ${manifest.readiness} | ${manifest.resultPosture.status ?? "(missing)"} | ${manifest.artifactCompleteness.status} | ${manifest.runDir} |`);
+  return [
+    "# Analysis Benchmark Report",
+    "",
+    "## Summary",
+    "",
+    `- Status: ${result.status}`,
+    `- Summary: ${result.summary}`,
+    `- Route coverage: ${result.routeCoverage.posture}`,
+    `- Next action: ${result.nextAction}`,
+    "",
+    "## Checks",
+    "",
+    "| check | status | detail |",
+    "|---|---|---|",
+    ...result.checks.map(check => `| ${check.id} | ${check.status} | ${check.detail.replaceAll("|", "\\|")} |`),
+    "",
+    "## Manifests",
+    "",
+    "| kind | readiness | posture | artifacts | run dir |",
+    "|---|---|---|---|---|",
+    ...rows,
+    "",
+    "## Interpretation",
+    "",
+    "This benchmark is a local readiness gate over analysis manifests. It does not certify external validity, clinical utility, causal inference, or deployment readiness.",
+  ].join("\n");
 }
 
 export function parseBackendId(value: string | undefined): BackendId | undefined {
@@ -396,6 +852,10 @@ export function renderResearchModelingPlan(result: ModelingDecisionPlan): string
     `  design: ${result.inferredStudyDesign}`,
     `  data: ${result.inferredDataStructures.join(", ")}`,
     `  evidence: ${result.dataEvidence.source}; rows=${result.dataEvidence.rowCount ?? "?"}; features=${result.dataEvidence.featureCount ?? "?"}; target classes=${result.dataEvidence.targetClassCount ?? "?"}; max missing=${result.dataEvidence.maxMissingFraction === null ? "?" : `${(result.dataEvidence.maxMissingFraction * 100).toFixed(1)}%`}`,
+    `  backend evidence: ${result.backendEvidence.source}; available=${result.backendEvidence.available.join(",") || "(none)"}; missing=${result.backendEvidence.missing.join(",") || "(none)"}`,
+    `  prior runs: ${result.priorRunEvidence.source}; actions=${result.priorRunEvidence.runs.map(run => run.action).join(",") || "(none)"}`,
+    `  method selection: ${result.methodSelectionEvidence.selectionId}; primary=${result.methodSelectionEvidence.primaryMethodId ?? "(none)"}; backend=${result.methodSelectionEvidence.recommendedBackend}; review=${result.methodSelectionEvidence.stopForHumanReview ? "required" : "not-required"}`,
+    `  route: ${result.routeRecommendation.route}; ${result.routeRecommendation.reason}`,
     `  blocking policies: ${result.blockingPolicies.map(candidate => candidate.id).join(", ") || "(none)"}`,
     `  primary: ${result.primary ? `${result.primary.id} [${result.primary.backend}]` : "(none)"}`,
     `  executable candidates: ${result.executableCandidates.length}`,

@@ -216,6 +216,72 @@ Rejected: rename `pass` to `integrity_pass` throughout the API.
 
 Reason: `mode`, `scope`, and `summary` now disambiguate the status without awkward status strings.
 
+## Tick 0182
+
+Rejected: add calibration as only prose in generated paper QA.
+
+Reason: calibration is a model artifact, not just a reporting phrase. Binary probabilistic ML runs should produce machine-readable calibration evidence so papers, benchmarks, and future decision-curve checks can inspect the same object.
+
+## Tick 0183
+
+Rejected: keep `method-select` and `modeling-plan` as separate, unlinked front doors.
+
+Reason: `modeling-plan` already calls method selection internally. Exposing the selection id/hash and recommended backend makes the artifact auditable and reduces duplicate operator decisions.
+
+## Tick 0184
+
+Rejected: add more method-catalog breadth before execution support.
+
+Reason: the catalog already names many methods. The immediate research-platform gap was runnable estimates, diagnostics, and artifact provenance for standard table statistics.
+
+## Tick 0185
+
+Rejected: treat documentation warnings as sufficient protection for `stats-run`.
+
+Reason: survey misuse, sparse cells, overdispersion, and separation are predictable failure modes. They need typed diagnostics or refusal paths, not only prose.
+
+## Tick 0186
+
+Rejected: treat `--survey` as a harmless annotation in `stats-run`.
+
+Reason: survey design changes variance and interpretation. A standard runner should refuse by default or require an explicit exploratory approximation flag.
+
+## Tick 0187
+
+Rejected: make users infer executable runners from method names.
+
+Reason: a modeling candidate that is executable should name the runner and artifacts directly; otherwise planning remains a descriptive catalog rather than an operational decision.
+
+## Tick 0188
+
+Rejected: treat stats-run provenance as only file hashes.
+
+Reason: for research execution, the selected method id and AnalysisSpec hash are also provenance boundaries. A run can be perfectly hashed and still be the wrong method.
+
+## Tick 0189
+
+Rejected: leave the method-to-stats-run mapping duplicated in modeling and binding code.
+
+Reason: duplicated mappings would eventually disagree, causing the planner to recommend one executable path while binding validation enforces another.
+
+## Tick 0190
+
+Rejected: declare the stats path paper-ready from command-level tests alone.
+
+Reason: paper-grade reliability needs packet lifecycle evidence that consumes stats binding and typed issues.
+
+## Tick 0191
+
+Rejected: answer analysis surface sprawl by adding another broad runner.
+
+Reason: the current problem is route ambiguity among existing planning and runner commands, not missing surface area.
+
+## Tick 0192
+
+Rejected: add a separate `analysis-route` command immediately.
+
+Reason: `modeling-plan` already owns the decision context; routing belongs inside that artifact before creating another command.
+
 ## Tick 037
 
 ## Tick 048
@@ -867,3 +933,173 @@ Reason: local path leakage changes packet share posture, so the warning belongs 
 # Tick 180
 
 - Rejected treating the expanded command list as self-documenting. New contributors need encoded golden-path sequence, not just many commands.
+
+# Tick 181
+
+- Rejected requiring manual `--small-sample`, `--high-missingness`, and `--feature-count` flags when a table file or table-summary artifact is available.
+
+# Tick 193
+
+- Rejected adding a separate `research stats-lifecycle` command. It would make the command maze worse. The existing lifecycle summary should absorb stats-run evidence when a packet carries it.
+
+# Tick 194
+
+- Rejected making `modeling-plan` probe local backends automatically on every run. Accepting a `machine-status` artifact keeps planning deterministic and lets callers decide when runtime probing is worth the cost/noise.
+
+# Tick 195
+
+- Rejected expanding the stats method list during a challenge tick. The immediate weakness is not method breadth; it is that stats execution still lacks a complete packet-grade artifact path.
+
+# Tick 196
+
+- Rejected adding a separate `research stats-report` command. Report and QA artifacts should be emitted during stats execution so they are hashed against the exact runner result.
+
+# Tick 197
+
+- Rejected expanding into survival, causal ML, or advanced modeling families before standard stats/ML outputs have explicit run-level interpretation posture.
+
+# Tick 198
+
+- Rejected making posture a Markdown-only report section. The next planner/lifecycle gates need typed machine-readable posture, not prose that downstream code has to parse.
+
+# Tick 199
+
+- Rejected adding a new `ml-lifecycle` command. The simpler move was to make the existing `ml-run` artifact self-describing enough for current and future lifecycle surfaces.
+
+# Tick 200
+
+- Rejected treating stats/ML posture as complete just because it is typed and tested. Posture must feed planning gates; otherwise it remains a polished label.
+
+# Tick 201
+
+- Rejected adding a separate prior-run review command. The existing analysis front door, `modeling-plan`, should absorb prior execution evidence and decide the next route.
+
+# Tick 202
+
+- Rejected expanding `paper-lifecycle` to pretend every stats/ML run is a paper. A compact analysis-run manifest is the smaller primitive for non-paper routes.
+
+# Tick 203
+
+- Rejected calling the new manifest sufficient without a route smoke. Provenance primitives need at least one saved golden route showing how they compose.
+
+# Tick 204
+
+- Rejected a fully autonomous all-method runner. First principles favor one bounded, inspectable stats route before allowing the command to pick arbitrary modeling families.
+
+# Tick 205
+
+- Rejected removing `analysis-run` after the critique. The command is useful, but it needs strict binding support rather than deletion.
+
+# Tick 206
+
+- Rejected making `--require-bound` a documentation-only convention. Strict mode must fail before execution when no method-selection or AnalysisSpec evidence is supplied.
+
+# Tick 207
+
+- Rejected treating exploratory manifest completion as enough for benchmark success. Artifact completeness and local-review readiness are separate gates.
+
+# Tick 208
+
+- Rejected reviving a separate `ml-lifecycle` command. The useful part of that rejected idea is stricter ML readiness, which belongs in `analysis-manifest`.
+
+# Tick 209
+
+- Rejected treating a ranked ML table as enough. A safety-case-shaped comparison must state whether baseline comparison evidence is actually ready.
+
+# Tick 210
+
+- Rejected adding more estimators before model-card-style review evidence exists for prediction comparisons.
+
+# Tick 211
+
+- Rejected creating a separate `ml-review-card` command. The faster, safer path is for every `ml-compare` run to emit review-card evidence by default.
+
+# Tick 212
+
+- Rejected calling ML review-card support complete without a saved route fixture. Future benchmark work needs durable artifacts to inspect.
+
+# Tick 213
+
+- Rejected adding a separate ML comparison manifest command. The existing `analysis-manifest` should absorb comparison readiness instead of fragmenting the surface.
+
+# Tick 214
+
+- Rejected writing benchmark checks as ad hoc loop-memory scripts. A reusable CLI benchmark gate keeps golden route pressure available outside this tick history.
+# Tick 0215
+
+- Rejected counting the ML comparison golden route alone as benchmark maturity; standard-table stats and ML prediction fail through different readiness mechanisms and need a suite-level gate.
+
+# Tick 0216
+
+- Rejected regenerating the old exploratory stats route in place. Keeping the old route visible preserves the failure contrast; the new route proves the corrected bound path.
+
+# Tick 0217
+
+- Rejected making `analysis-benchmark` fail every single-route suite by default. Narrow suite coverage should be visible as a warning/posture first so existing focused tests and one-route workflows remain usable.
+
+# Tick 0218
+
+- Rejected silently upgrading the default benchmark semantics to require route diversity. A narrow single-route benchmark is still useful for development; promotion scripts should opt into `--require-multi-route`.
+
+# Tick 0219
+
+- Rejected deleting the old exploratory 0203 stats route. Preserving it as superseded keeps a useful regression contrast for readiness gating.
+
+# Tick 0220
+
+- Rejected forcing paper-run directories into `analysis-benchmark`; paper lifecycle has richer task/rerun semantics and needs a composed summary, not flattening.
+
+# Tick 0221
+
+- Rejected rerunning the expensive survey paper just to refresh a health note; the existing machine benchmark and lifecycle artifacts are sufficient for this tick's proof.
+
+# Tick 0222
+
+- Rejected adding another regression-style paper idea. Diagnostic accuracy has a different artifact shape and better exposes whether the pipeline can handle non-regression clinical methods.
+# Tick 0223
+
+- Rejected implementing diagnostic accuracy only inside generated paper code. The reusable primitive belongs in `stats-run` so method binding, QA, manifests, and benchmark gates can all see it.
+
+# Tick 0224
+
+- Rejected keeping diagnostic semantics implicit in the runner output only. Planning artifacts must carry the diagnostic study shape before execution.
+
+# Tick 0225
+
+- Rejected treating correct diagnostic metric arithmetic as sufficient. Diagnostic reports need their own claim firewall.
+
+# Tick 0226
+
+- Rejected a generic caution-only diagnostic report. The report now carries method-specific role, prevalence, precision, and screening-claim safeguards.
+
+# Tick 0227
+
+- Rejected a second pre-thresholded synthetic diagnostic paper. The next diagnostic paper must pressure a harder real-world study shape.
+
+# Tick 0228
+
+- Rejected bootstrap intervals as the first diagnostic precision method. Wilson intervals are deterministic and easier to keep stable in golden-route tests.
+
+# Tick 0229
+
+- Rejected automatic optimal cutoff search. Explicit thresholds are auditable; cutoff search needs validation policy before promotion.
+
+# Tick 0230
+
+- Rejected jumping to a UI or broad new paper subsystem before a narrow diagnostic stats-run-to-paper packet bridge exists.
+
+# Tick 0231
+
+- Rejected adding a separate diagnostic-paper command. The bounded `analysis-run` route can generate the narrow diagnostic paper packet without expanding CLI surface.
+
+# Tick 0232
+
+- Rejected making diagnostic papers required for all stats manifests. Optional visibility gives inspection value without blocking ordinary standard-table routes.
+
+# Tick 0233
+
+- Rejected treating a green research-ML suite as diagnostic track completion. It proves regression health, not actual-data scientific maturity.
+
+# Tick 0234
+
+- Rejected adding a new rerun-stability CLI command before proving the route-specific receipt is useful.

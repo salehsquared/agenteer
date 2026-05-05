@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "runId": "mlrun_53d4d4065afa",
+  "task": "binary_classification",
+  "modelId": "decision-tree-classifier",
+  "status": "succeeded",
+  "primaryMetric": "auroc",
+  "primaryMetricDirection": "maximize",
+  "metrics": {
+    "accuracy": 1,
+    "confusion_matrix": [
+      [
+        2,
+        0
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "precision": 1,
+    "recall": 1,
+    "sensitivity": 1,
+    "f1": 1,
+    "specificity": 1,
+    "auroc": 1,
+    "auprc": 1,
+    "log_loss": 2.2204460492503136e-16,
+    "brier_score": 0,
+    "calibration_bins": 2
+  },
+  "warnings": [],
+  "errors": [],
+  "preprocessing": {
+    "rowCount": 16,
+    "featureCount": 3,
+    "numericFeatures": [
+      "age",
+      "bmi"
+    ],
+    "categoricalFeatures": [
+      "sex"
+    ],
+    "excludedColumns": [],
+    "trainRows": 12,
+    "testRows": 4
+  },
+  "evaluation": {
+    "split": "train_test",
+    "crossValidation": null
+  },
+  "explanation": {
+    "shapAvailable": false,
+    "shapStatus": "not_requested",
+    "featureImportances": [
+      {
+        "feature": "age",
+        "value": 1
+      },
+      {
+        "feature": "bmi",
+        "value": 0
+      },
+      {
+        "feature": "sex_F",
+        "value": 0
+      },
+      {
+        "feature": "sex_M",
+        "value": 0
+      }
+    ],
+    "permutationImportance": [
+      {
+        "feature": "age",
+        "value": 0.4,
+        "std": 0.2
+      },
+      {
+        "feature": "sex",
+        "value": 0,
+        "std": 0
+      },
+      {
+        "feature": "bmi",
+        "value": 0,
+        "std": 0
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "kind": "predictions",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/decision-tree-classifier/predictions.csv",
+      "sha256": "c62553d124af2ca747f69ce75812256cd2967a5c03e85118105f2ff756042fde"
+    },
+    {
+      "kind": "calibration",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/decision-tree-classifier/calibration.csv",
+      "sha256": "37643d2f2097d4c370433f2b298181ad7a86d4a62cb85015b7dd2d9fdc69826a"
+    },
+    {
+      "kind": "model",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/decision-tree-classifier/model.joblib",
+      "sha256": "7cf63a0d9ed0656a9a8aace7e5f2040c3dc2ee8cc364af2dadd2a72df0859031"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/decision-tree-classifier/model-summary.json",
+      "sha256": "2d1f6ca1570ac77d7d5ac8675a0ab22eb74c6126169b03de5f2584750487f305"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0212-ml-comparison-route/ml-compare/decision-tree-classifier",
+  "resultPosture": {
+    "status": "locally_validated_prediction",
+    "label": "Locally validated prediction result",
+    "interpretationBoundary": "This run supports local predictive-performance review on the declared split, not external validation or clinical deployment.",
+    "supports": [
+      "local model comparison",
+      "held-out performance review",
+      "leakage-aware preprocessing audit",
+      "basic calibration review"
+    ],
+    "cannotSupport": [
+      "external validity",
+      "clinical deployment",
+      "causal claims",
+      "unmeasured fairness claims"
+    ],
+    "nextAction": "Compare against baselines, review calibration/leakage, and require external or temporal validation before deployment-style claims."
+  }
+}

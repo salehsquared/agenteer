@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_160245570882871219",
+    "method": "logistic-regression",
+    "status": "succeeded",
+    "rowCount": 140,
+    "completeCaseN": 140,
+    "variables": [
+      "elevated",
+      "bmi",
+      "age",
+      "sex"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": -801.0617911302015,
+        "std_error": 583536.2032962258,
+        "p_value": 0.9989046872652741,
+        "ci_low": -1144511.0039269757,
+        "ci_high": 1142908.8803447154,
+        "odds_ratio": 0,
+        "or_ci_low": 0,
+        "or_ci_high": 1e+308
+      },
+      {
+        "term": "bmi",
+        "estimate": 25.164446714934712,
+        "std_error": 63438.72089759373,
+        "p_value": 0.9996835005071926,
+        "ci_low": -124312.44373785728,
+        "ci_high": 124362.77263128714,
+        "odds_ratio": 84875109667.85965,
+        "or_ci_low": 0,
+        "or_ci_high": 1e+308
+      },
+      {
+        "term": "age",
+        "estimate": 7.75915145256336,
+        "std_error": 35262.12303207172,
+        "p_value": 0.9998244318104913,
+        "ci_low": -69104.73200982834,
+        "ci_high": 69120.25031273348,
+        "odds_ratio": 2342.9156864492484,
+        "or_ci_low": 0,
+        "or_ci_high": 1e+308
+      },
+      {
+        "term": "sex_M",
+        "estimate": 21.60645908743856,
+        "std_error": 33029.28941464781,
+        "p_value": 0.9994780554109558,
+        "ci_low": -64714.61122857231,
+        "ci_high": 64757.82414674718,
+        "odds_ratio": 2418610617.9750595,
+        "or_ci_low": 0,
+        "or_ci_high": 1e+308
+      }
+    ],
+    "diagnostics": {
+      "outcome_levels": [
+        0,
+        1
+      ],
+      "model_family": "logistic-regression",
+      "aic": 8.000000003419505,
+      "df_resid": 136,
+      "weighted": false
+    },
+    "warnings": [
+      "/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/generalized_linear_model.py:1342: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified\n  warnings.warn(msg, category=PerfectSeparationWarning)\n/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/generalized_linear_model.py:1342: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified\n  warnings.warn(msg, category=PerfectSeparationWarning)\n/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/generalized_linear_model.py:1342: PerfectSeparationWarning: Perfect separation or prediction detected, parameter may not be identified\n  warnings.warn(msg, category=PerfectSeparationWarning)"
+    ],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0184-stats-smoke/logistic/stats-config.json",
+        "sha256": "d54314e32edbf8f0ce4440824b0ff7358cb163d9a042af9ce92484210d839312"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0184-stats-smoke/logistic/stats-summary.json",
+        "sha256": "2d6c8244fe8e33fafa8ee5796b0a67cf0fb36a8a3b9a0f98c5ef28c00323527b"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0184-stats-smoke/logistic/estimates.csv",
+        "sha256": "29e229d6468cd9c22d125457111f7e9e78662db772734dffadf1955f05bbfc5c"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0184-stats-smoke/logistic/diagnostics.json",
+        "sha256": "7bac69c62fbe778f09c1fc141c3c0fb7bc92b13754220c489b305e448e4c0a62"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0184-stats-smoke/logistic"
+  }
+}
+

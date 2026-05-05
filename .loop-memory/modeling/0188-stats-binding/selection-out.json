@@ -1,0 +1,1432 @@
+{
+  "schemaVersion": 1,
+  "methodSelection": {
+    "schemaVersion": 1,
+    "selectionId": "method_selection_f150677628ba",
+    "request": {
+      "question": "Use a t-test to compare mean HbA1c between two independent groups",
+      "outcomeType": "continuous",
+      "dataStructures": [
+        "single_table"
+      ],
+      "goal": "compare_groups",
+      "surveyDesign": false,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "maxCandidates": 10
+    },
+    "primary": {
+      "method": {
+        "schemaVersion": 1,
+        "id": "two-sample-t-test",
+        "label": "Independent two-sample t-test",
+        "category": "group_comparison",
+        "modelFamily": "hypothesis_test",
+        "purpose": "Compare the mean of a continuous outcome between two independent groups.",
+        "aliases": [],
+        "outcomeTypes": [
+          "continuous"
+        ],
+        "exposureTypes": [
+          "continuous",
+          "binary",
+          "categorical"
+        ],
+        "studyDesigns": [
+          "cross_sectional",
+          "randomized_trial",
+          "cohort"
+        ],
+        "dataStructures": [
+          "single_table"
+        ],
+        "compatibleBackends": [
+          "python-scipy",
+          "python-statsmodels"
+        ],
+        "implementationStatus": "contract-ready",
+        "requiredFields": [
+          "continuous outcome",
+          "binary group"
+        ],
+        "assumptions": [
+          "Independent observations",
+          "approximately normal residuals or adequate sample size",
+          "variance policy declared"
+        ],
+        "diagnostics": [
+          "group sizes",
+          "variance ratio",
+          "histogram",
+          "outlier check"
+        ],
+        "effectMeasures": [
+          "mean difference",
+          "Cohen's d",
+          "confidence interval"
+        ],
+        "artifactExpectations": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "qaGates": [
+          "normality-review",
+          "variance-review",
+          "claim-safety",
+          "effect-size-reporting",
+          "methods-disclosure"
+        ],
+        "missingDataRequirements": [
+          "missingness summary",
+          "complete-case count"
+        ],
+        "multiplicityRequirements": [],
+        "commonFailureModes": [
+          "non-independent groups",
+          "extreme skew",
+          "unequal variance without Welch correction"
+        ],
+        "stopForHumanReviewWhen": [
+          "paired design detected"
+        ],
+        "selection": {
+          "keywords": [
+            "t-test",
+            "compare two groups",
+            "difference in means",
+            "mean difference"
+          ],
+          "antiKeywords": [],
+          "minScore": 0.35
+        }
+      },
+      "score": 0.66,
+      "rank": 1,
+      "fitReasons": [
+        "question keyword match: t-test",
+        "supports outcome type continuous",
+        "supports study design cross_sectional",
+        "supports data structure single_table",
+        "matches goal compare_groups"
+      ],
+      "cautions": [
+        {
+          "severity": "note",
+          "code": "HUMAN_REVIEW_GATE",
+          "message": "paired design detected",
+          "evidenceRefs": []
+        }
+      ],
+      "requiredBeforeExecution": [
+        "provide continuous outcome",
+        "provide binary group",
+        "confirm assumption: Independent observations",
+        "confirm assumption: approximately normal residuals or adequate sample size",
+        "confirm assumption: variance policy declared",
+        "produce diagnostic: group sizes",
+        "produce diagnostic: variance ratio",
+        "produce diagnostic: histogram",
+        "produce diagnostic: outlier check"
+      ]
+    },
+    "candidates": [
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "two-sample-t-test",
+          "label": "Independent two-sample t-test",
+          "category": "group_comparison",
+          "modelFamily": "hypothesis_test",
+          "purpose": "Compare the mean of a continuous outcome between two independent groups.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "randomized_trial",
+            "cohort"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "python-scipy",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "continuous outcome",
+            "binary group"
+          ],
+          "assumptions": [
+            "Independent observations",
+            "approximately normal residuals or adequate sample size",
+            "variance policy declared"
+          ],
+          "diagnostics": [
+            "group sizes",
+            "variance ratio",
+            "histogram",
+            "outlier check"
+          ],
+          "effectMeasures": [
+            "mean difference",
+            "Cohen's d",
+            "confidence interval"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "normality-review",
+            "variance-review",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "non-independent groups",
+            "extreme skew",
+            "unequal variance without Welch correction"
+          ],
+          "stopForHumanReviewWhen": [
+            "paired design detected"
+          ],
+          "selection": {
+            "keywords": [
+              "t-test",
+              "compare two groups",
+              "difference in means",
+              "mean difference"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.66,
+        "rank": 1,
+        "fitReasons": [
+          "question keyword match: t-test",
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "paired design detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide continuous outcome",
+          "provide binary group",
+          "confirm assumption: Independent observations",
+          "confirm assumption: approximately normal residuals or adequate sample size",
+          "confirm assumption: variance policy declared",
+          "produce diagnostic: group sizes",
+          "produce diagnostic: variance ratio",
+          "produce diagnostic: histogram",
+          "produce diagnostic: outlier check"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "anova-one-way",
+          "label": "One-way ANOVA",
+          "category": "group_comparison",
+          "modelFamily": "hypothesis_test",
+          "purpose": "Compare a continuous outcome across more than two independent groups.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "randomized_trial",
+            "cohort"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "python-scipy"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "continuous outcome",
+            "categorical group with >2 levels"
+          ],
+          "assumptions": [
+            "Independent observations",
+            "within-group variance policy",
+            "post-hoc correction policy"
+          ],
+          "diagnostics": [
+            "group counts",
+            "residual diagnostics",
+            "variance homogeneity"
+          ],
+          "effectMeasures": [
+            "eta-squared",
+            "partial eta-squared",
+            "mean differences"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "posthoc-multiplicity",
+            "variance-review",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [
+            "Tukey, Dunnett, Holm, or explicit contrast correction"
+          ],
+          "commonFailureModes": [
+            "sparse groups",
+            "multiple comparisons without correction"
+          ],
+          "stopForHumanReviewWhen": [
+            "repeated-measures design detected"
+          ],
+          "selection": {
+            "keywords": [
+              "anova",
+              "more than two groups",
+              "three groups",
+              "multiple groups"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 2,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "repeated-measures design detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide continuous outcome",
+          "provide categorical group with >2 levels",
+          "confirm assumption: Independent observations",
+          "confirm assumption: within-group variance policy",
+          "confirm assumption: post-hoc correction policy",
+          "produce diagnostic: group counts",
+          "produce diagnostic: residual diagnostics",
+          "produce diagnostic: variance homogeneity"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "bootstrap-uncertainty",
+          "label": "Bootstrap uncertainty estimation",
+          "category": "nonparametric_resampling",
+          "modelFamily": "nonparametric",
+          "purpose": "Estimate uncertainty through resampling when analytic variance is weak or complex.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "count"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "cohort",
+            "prediction"
+          ],
+          "dataStructures": [
+            "single_table",
+            "clustered"
+          ],
+          "compatibleBackends": [
+            "python-scipy",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "statistic",
+            "resampling unit",
+            "number of replicates"
+          ],
+          "assumptions": [
+            "Resampling respects clustering and design",
+            "sample is representative"
+          ],
+          "diagnostics": [
+            "bootstrap distribution",
+            "replicate failures",
+            "CI method"
+          ],
+          "effectMeasures": [
+            "bootstrap confidence interval",
+            "standard error"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "resampling-unit",
+            "replicate-count",
+            "stability"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "wrong resampling unit",
+            "unstable replicates"
+          ],
+          "stopForHumanReviewWhen": [
+            "complex survey bootstrap is requested without replicate design"
+          ],
+          "selection": {
+            "keywords": [
+              "bootstrap",
+              "resampling",
+              "permutation",
+              "uncertainty"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 3,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "complex survey bootstrap is requested without replicate design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide statistic",
+          "provide resampling unit",
+          "provide number of replicates",
+          "confirm assumption: Resampling respects clustering and design",
+          "confirm assumption: sample is representative",
+          "produce diagnostic: bootstrap distribution",
+          "produce diagnostic: replicate failures",
+          "produce diagnostic: CI method"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "mann-whitney-u",
+          "label": "Mann-Whitney U test",
+          "category": "nonparametric_resampling",
+          "modelFamily": "nonparametric",
+          "purpose": "Compare independent groups on ordinal or non-normal continuous outcomes.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "ordinal"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "randomized_trial",
+            "cohort"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "python-scipy"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "outcome",
+            "binary group"
+          ],
+          "assumptions": [
+            "Independent samples",
+            "distribution-shape interpretation is declared"
+          ],
+          "diagnostics": [
+            "group sizes",
+            "tie frequency",
+            "distribution plots"
+          ],
+          "effectMeasures": [
+            "rank-biserial correlation",
+            "median difference"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "rank-method-disclosure",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "interpreting as median test when shapes differ"
+          ],
+          "stopForHumanReviewWhen": [
+            "paired measurements are detected"
+          ],
+          "selection": {
+            "keywords": [
+              "mann-whitney",
+              "wilcoxon rank sum",
+              "non-normal",
+              "rank"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 4,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "paired measurements are detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide outcome",
+          "provide binary group",
+          "confirm assumption: Independent samples",
+          "confirm assumption: distribution-shape interpretation is declared",
+          "produce diagnostic: group sizes",
+          "produce diagnostic: tie frequency",
+          "produce diagnostic: distribution plots"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "multiple-linear-regression",
+          "label": "Multiple linear regression",
+          "category": "linear_regression",
+          "modelFamily": "linear",
+          "purpose": "Model a continuous outcome as a function of exposure and covariates.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "cohort",
+            "randomized_trial"
+          ],
+          "dataStructures": [
+            "single_table",
+            "complex_survey"
+          ],
+          "compatibleBackends": [
+            "r-survey",
+            "python-linearized",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "executable",
+          "requiredFields": [
+            "continuous outcome",
+            "exposure",
+            "covariates"
+          ],
+          "assumptions": [
+            "Linearity",
+            "model residual policy",
+            "confounder set declared"
+          ],
+          "diagnostics": [
+            "residual plots",
+            "influence",
+            "VIF",
+            "heteroscedasticity"
+          ],
+          "effectMeasures": [
+            "beta coefficient",
+            "mean difference",
+            "standardized beta"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "numeric-consistency",
+            "diagnostics",
+            "confounder-disclosure",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "multicollinearity",
+            "nonlinearity",
+            "outlier influence"
+          ],
+          "stopForHumanReviewWhen": [
+            "causal interpretation requested without causal design"
+          ],
+          "selection": {
+            "keywords": [
+              "linear regression",
+              "continuous outcome",
+              "adjusted mean",
+              "slope",
+              "biomarker"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.51,
+        "rank": 5,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation requested without causal design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide continuous outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Linearity",
+          "confirm assumption: model residual policy",
+          "confirm assumption: confounder set declared",
+          "produce diagnostic: residual plots",
+          "produce diagnostic: influence",
+          "produce diagnostic: VIF",
+          "produce diagnostic: heteroscedasticity"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "clinical-trial-itt-analysis",
+          "label": "Clinical trial ITT/superiority analysis",
+          "category": "clinical_trial",
+          "modelFamily": "glm",
+          "purpose": "Analyze randomized trials by assigned group with superiority, safety, or repeated-measure endpoints.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "time_to_event",
+            "repeated_continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "randomized_trial"
+          ],
+          "dataStructures": [
+            "single_table",
+            "repeated_measures",
+            "survival"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "r-survival",
+            "r-lme4"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "randomization group",
+            "analysis population",
+            "endpoint",
+            "protocol deviations"
+          ],
+          "assumptions": [
+            "Randomization is preserved",
+            "ITT population is defined"
+          ],
+          "diagnostics": [
+            "CONSORT flow",
+            "baseline balance",
+            "missing endpoints",
+            "adverse events"
+          ],
+          "effectMeasures": [
+            "mean difference",
+            "risk difference",
+            "hazard ratio"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "itt-definition",
+            "protocol-deviation",
+            "safety-reporting"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "post-randomization exclusions",
+            "unblinded interim analysis"
+          ],
+          "stopForHumanReviewWhen": [
+            "noninferiority/equivalence margin is involved"
+          ],
+          "selection": {
+            "keywords": [
+              "trial",
+              "randomized",
+              "itt",
+              "per protocol",
+              "noninferiority",
+              "safety"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.45,
+        "rank": 6,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "clinical-trial-itt-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "noninferiority/equivalence margin is involved",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide randomization group",
+          "provide analysis population",
+          "provide endpoint",
+          "provide protocol deviations",
+          "confirm assumption: Randomization is preserved",
+          "confirm assumption: ITT population is defined",
+          "produce diagnostic: CONSORT flow",
+          "produce diagnostic: baseline balance",
+          "produce diagnostic: missing endpoints",
+          "produce diagnostic: adverse events"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "survey-weighted-descriptive-summary",
+          "label": "Survey-weighted descriptive summary",
+          "category": "descriptive",
+          "modelFamily": "descriptive",
+          "purpose": "Estimate weighted means, proportions, and missingness for complex survey data.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional"
+          ],
+          "dataStructures": [
+            "complex_survey"
+          ],
+          "compatibleBackends": [
+            "r-survey"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "weight",
+            "strata",
+            "psu",
+            "analysis population"
+          ],
+          "assumptions": [
+            "Correct survey design variables and weight domain are declared."
+          ],
+          "diagnostics": [
+            "unweighted N",
+            "weighted estimate",
+            "standard error",
+            "design degrees of freedom"
+          ],
+          "effectMeasures": [
+            "weighted mean",
+            "weighted proportion",
+            "standard error",
+            "confidence interval"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "survey-design",
+            "weight-domain",
+            "small-cell-suppression",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "invalid weight",
+            "wrong subsample weight",
+            "lonely PSU",
+            "domain analysis ambiguity"
+          ],
+          "stopForHumanReviewWhen": [
+            "multi-cycle weight construction is requested without evidence"
+          ],
+          "selection": {
+            "keywords": [
+              "survey",
+              "weighted",
+              "nhanes",
+              "prevalence",
+              "proportion",
+              "mean"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.44,
+        "rank": 7,
+        "fitReasons": [
+          "question keyword match: mean",
+          "supports outcome type continuous",
+          "supports study design cross_sectional"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population",
+          "confirm assumption: Correct survey design variables and weight domain are declared.",
+          "produce diagnostic: unweighted N",
+          "produce diagnostic: weighted estimate",
+          "produce diagnostic: standard error",
+          "produce diagnostic: design degrees of freedom"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "cronbach-alpha-scale",
+          "label": "Cronbach alpha and scale reliability",
+          "category": "survey_questionnaire",
+          "modelFamily": "reliability",
+          "purpose": "Evaluate internal consistency of questionnaire or scale items.",
+          "aliases": [],
+          "outcomeTypes": [
+            "ordinal",
+            "continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "measurement",
+            "cross_sectional"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "r-lavaan"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "item responses",
+            "scale definition"
+          ],
+          "assumptions": [
+            "Items measure a common construct",
+            "reverse coding is handled"
+          ],
+          "diagnostics": [
+            "item-total correlations",
+            "alpha-if-deleted",
+            "missing item pattern"
+          ],
+          "effectMeasures": [
+            "Cronbach's alpha",
+            "omega"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "scale-definition",
+            "reverse-coding",
+            "item-missingness"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "mixing constructs",
+            "uncoded reverse items"
+          ],
+          "stopForHumanReviewWhen": [
+            "clinical scale validity is claimed"
+          ],
+          "selection": {
+            "keywords": [
+              "cronbach",
+              "scale",
+              "questionnaire",
+              "likert",
+              "omega"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.43,
+        "rank": 8,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical scale validity is claimed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide item responses",
+          "provide scale definition",
+          "confirm assumption: Items measure a common construct",
+          "confirm assumption: reverse coding is handled",
+          "produce diagnostic: item-total correlations",
+          "produce diagnostic: alpha-if-deleted",
+          "produce diagnostic: missing item pattern"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "effect-size-suite",
+          "label": "Effect size estimation suite",
+          "category": "effect_size",
+          "modelFamily": "descriptive",
+          "purpose": "Report magnitude of findings in interpretable effect-size units.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "time_to_event",
+            "count"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "cohort",
+            "randomized_trial",
+            "case_control"
+          ],
+          "dataStructures": [
+            "single_table",
+            "complex_survey",
+            "survival"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "r-survey",
+            "r-survival"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "primary effect estimate",
+            "uncertainty interval"
+          ],
+          "assumptions": [
+            "Effect measure matches design and sampling scheme"
+          ],
+          "diagnostics": [
+            "scale interpretation",
+            "absolute vs relative effect"
+          ],
+          "effectMeasures": [
+            "mean difference",
+            "standardized mean difference",
+            "odds ratio",
+            "risk ratio",
+            "hazard ratio",
+            "NNT"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "effect-measure-match",
+            "clinical-interpretability",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "odds ratio interpreted as risk ratio",
+            "p-values without magnitude"
+          ],
+          "stopForHumanReviewWhen": [
+            "number-needed-to-treat is derived from observational data"
+          ],
+          "selection": {
+            "keywords": [
+              "effect size",
+              "cohen",
+              "odds ratio",
+              "risk ratio",
+              "hazard ratio",
+              "nnt"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.43,
+        "rank": 9,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "factor-analysis",
+          "label": "Exploratory/confirmatory factor analysis",
+          "category": "dimensionality_latent",
+          "modelFamily": "dimension_reduction",
+          "purpose": "Identify or test latent constructs underlying observed items.",
+          "aliases": [],
+          "outcomeTypes": [
+            "high_dimensional",
+            "ordinal",
+            "continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "measurement",
+            "cross_sectional"
+          ],
+          "dataStructures": [
+            "single_table",
+            "high_dimensional"
+          ],
+          "compatibleBackends": [
+            "r-lavaan",
+            "sklearn"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "item matrix",
+            "factor count or model",
+            "rotation policy"
+          ],
+          "assumptions": [
+            "Measurement level and sample size are adequate",
+            "factor model is theoretically justified"
+          ],
+          "diagnostics": [
+            "factor loadings",
+            "fit indices",
+            "residual correlations"
+          ],
+          "effectMeasures": [
+            "factor loadings",
+            "fit indices"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "sample-size",
+            "measurement-validity",
+            "factor-interpretability"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "underidentified model",
+            "poor fit",
+            "ordinal items treated incorrectly"
+          ],
+          "stopForHumanReviewWhen": [
+            "clinical scale validity is claimed"
+          ],
+          "selection": {
+            "keywords": [
+              "factor analysis",
+              "latent construct",
+              "confirmatory factor",
+              "efa",
+              "cfa"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.43,
+        "rank": 10,
+        "fitReasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "factor-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "blocker",
+            "code": "METHOD_NO_PRODUCTION_BACKEND",
+            "message": "factor-analysis has no production-ready backend yet.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical scale validity is claimed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide item matrix",
+          "provide factor count or model",
+          "provide rotation policy",
+          "confirm assumption: Measurement level and sample size are adequate",
+          "confirm assumption: factor model is theoretically justified",
+          "produce diagnostic: factor loadings",
+          "produce diagnostic: fit indices",
+          "produce diagnostic: residual correlations"
+        ]
+      }
+    ],
+    "excluded": [
+      {
+        "methodId": "binary-logistic-regression",
+        "reason": "score 0.33 below threshold 0.35"
+      },
+      {
+        "methodId": "ordinal-logistic-regression",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "poisson-regression",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "negative-binomial-regression",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "kaplan-meier-log-rank",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "cox-proportional-hazards",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "fine-gray-competing-risks",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "linear-mixed-effects-model",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "generalized-estimating-equations",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "multilevel-logistic-model",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "propensity-score-weighting",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "difference-in-differences",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "regression-discontinuity",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "tmle-doubly-robust",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "diagnostic-accuracy-basic",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "roc-auc-calibration",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "tree-ensemble-prediction",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "cross-validation-bootstrap-validation",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "arima-time-series",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "interrupted-time-series",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "random-effects-meta-analysis",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "cohens-kappa-icc",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "epidemiologic-2x2-measures",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "cost-effectiveness-icer",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "network-centrality-community",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "topic-modeling-text",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "qualitative-thematic-analysis",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "mixed-methods-triangulation",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "omics-differential-expression",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "image-signal-feature-analysis",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "power-sample-size",
+        "reason": "score 0.31 below threshold 0.35"
+      }
+    ],
+    "recommendedArchetype": "continuous-biomarker-model",
+    "recommendedBackend": "python-scipy",
+    "stopForHumanReview": true,
+    "issues": [
+      {
+        "severity": "note",
+        "code": "HUMAN_REVIEW_GATE",
+        "message": "paired design detected",
+        "evidenceRefs": []
+      }
+    ],
+    "nextAction": "Promote two-sample-t-test into AnalysisSpec V2, then build an execution contract with python-scipy."
+  },
+  "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/selection.json"
+}
+

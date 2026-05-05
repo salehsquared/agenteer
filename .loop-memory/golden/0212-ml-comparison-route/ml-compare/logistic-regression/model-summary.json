@@ -1,0 +1,66 @@
+{
+  "model": "logistic-regression",
+  "task": "binary_classification",
+  "metrics": {
+    "accuracy": 1.0,
+    "confusion_matrix": [
+      [
+        2,
+        0
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "sensitivity": 1.0,
+    "f1": 1.0,
+    "specificity": 1.0,
+    "auroc": 1.0,
+    "auprc": 1.0,
+    "log_loss": 0.07067561614827107,
+    "brier_score": 0.013898196778840423,
+    "calibration_bins": 2
+  },
+  "explanation": {
+    "shapAvailable": false,
+    "shapStatus": "not_requested",
+    "coefficients": [
+      {
+        "feature": "age",
+        "value": 0.4799753257780618
+      },
+      {
+        "feature": "bmi",
+        "value": 0.45622480869000814
+      },
+      {
+        "feature": "sex_M",
+        "value": 0.07146654660829581
+      },
+      {
+        "feature": "sex_F",
+        "value": 0.07146396643997868
+      }
+    ],
+    "permutationImportance": [
+      {
+        "feature": "age",
+        "value": 0.25,
+        "std": 0.22360679774997896
+      },
+      {
+        "feature": "bmi",
+        "value": 0.05,
+        "std": 0.10000000000000002
+      },
+      {
+        "feature": "sex",
+        "value": 0.0,
+        "std": 0.0
+      }
+    ]
+  }
+}

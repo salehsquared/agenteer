@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "benchmark": {
+    "schemaVersion": 1,
+    "benchmarkId": "bench_0179-bmi-fasting-glucose-r-survey_b73d619e",
+    "packetDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey",
+    "specHash": "b73d619e306f22541a2ab99133d39043b68c18d13f737e2dcec7e18f579c8dc3",
+    "archetype": "subsample-high-missingness",
+    "dataset": "nhanes",
+    "expectedArtifacts": [
+      "analysis.json",
+      "paper.md",
+      "qa-cli.json",
+      "runner-record.json",
+      "lifecycle.json"
+    ],
+    "requiredQaGates": [
+      "subsample-clearance",
+      "missingness",
+      "claim-safety",
+      "rerun-stability"
+    ],
+    "requiredFailurePolicies": [
+      "missingVariable",
+      "invalidWeight",
+      "hashMismatch",
+      "rerunInstability",
+      "methodologicalUncertainty",
+      "unsupportedBackend"
+    ],
+    "rerunStability": {
+      "required": true,
+      "maxDiffCount": 0,
+      "maxAbsoluteNumericDiff": 1e-9
+    },
+    "reviewerRubric": [
+      "claim-safety",
+      "methods-disclosure",
+      "survey-design",
+      "artifact-provenance",
+      "rerun-stability"
+    ]
+  },
+  "evaluation": {
+    "schemaVersion": 1,
+    "benchmarkId": "bench_0179-bmi-fasting-glucose-r-survey_b73d619e",
+    "status": "pass",
+    "normalizedScore": 1,
+    "checks": [
+      {
+        "id": "artifact:analysis.json",
+        "status": "pass",
+        "weight": 1.4,
+        "detail": "Required artifact analysis.json exists.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/analysis.json"
+        ]
+      },
+      {
+        "id": "artifact:paper.md",
+        "status": "pass",
+        "weight": 1.4,
+        "detail": "Required artifact paper.md exists.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/paper.md"
+        ]
+      },
+      {
+        "id": "artifact:qa-cli.json",
+        "status": "pass",
+        "weight": 1.4,
+        "detail": "Required artifact qa-cli.json exists.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/qa-cli.json"
+        ]
+      },
+      {
+        "id": "artifact:runner-record.json",
+        "status": "pass",
+        "weight": 1.4,
+        "detail": "Required artifact runner-record.json exists.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/runner-record.json"
+        ]
+      },
+      {
+        "id": "artifact:lifecycle.json",
+        "status": "pass",
+        "weight": 1.4,
+        "detail": "Required artifact lifecycle.json exists.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/lifecycle.json"
+        ]
+      },
+      {
+        "id": "paper-qa-pass",
+        "status": "pass",
+        "weight": 1.6,
+        "detail": "Paper QA must pass.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/qa-cli.json"
+        ]
+      },
+      {
+        "id": "lifecycle-ready",
+        "status": "pass",
+        "weight": 1.4,
+        "detail": "Lifecycle must be ready for local review.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/lifecycle.json"
+        ]
+      },
+      {
+        "id": "runner-spec-governed",
+        "status": "pass",
+        "weight": 1.5,
+        "detail": "Runner record must be spec-governed.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/runner-record.json"
+        ]
+      },
+      {
+        "id": "rerun-stability",
+        "status": "pass",
+        "weight": 1.5,
+        "detail": "Rerun stability must pass.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey/rerun-stability.json"
+        ]
+      }
+    ],
+    "issues": [],
+    "nextAction": "Packet passes machine benchmark; promote into the golden suite or add a harder archetype."
+  }
+}

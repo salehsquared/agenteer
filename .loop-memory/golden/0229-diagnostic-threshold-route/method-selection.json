@@ -1,0 +1,943 @@
+{
+  "schemaVersion": 1,
+  "methodSelection": {
+    "schemaVersion": 1,
+    "selectionId": "method_selection_0f9ba49375d0",
+    "request": {
+      "question": "How accurately does a waist circumference threshold identify elevated HbA1c from continuous values?",
+      "outcomeType": "binary",
+      "studyDesign": "diagnostic",
+      "dataStructures": [
+        "single_table"
+      ],
+      "goal": "diagnose",
+      "surveyDesign": false,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "maxCandidates": 10
+    },
+    "primary": {
+      "method": {
+        "schemaVersion": 1,
+        "id": "diagnostic-accuracy-basic",
+        "label": "Diagnostic accuracy metrics",
+        "category": "diagnostic_prognostic",
+        "modelFamily": "diagnostic_accuracy",
+        "purpose": "Estimate sensitivity, specificity, predictive values, likelihood ratios, and confusion matrix metrics.",
+        "aliases": [],
+        "outcomeTypes": [
+          "binary"
+        ],
+        "exposureTypes": [
+          "continuous",
+          "binary",
+          "categorical"
+        ],
+        "studyDesigns": [
+          "diagnostic"
+        ],
+        "dataStructures": [
+          "single_table"
+        ],
+        "compatibleBackends": [
+          "python-statsmodels"
+        ],
+        "implementationStatus": "contract-ready",
+        "requiredFields": [
+          "index test",
+          "gold standard",
+          "threshold"
+        ],
+        "assumptions": [
+          "Reference standard is valid",
+          "spectrum bias is addressed"
+        ],
+        "diagnostics": [
+          "confusion matrix",
+          "prevalence",
+          "indeterminate results"
+        ],
+        "effectMeasures": [
+          "sensitivity",
+          "specificity",
+          "PPV",
+          "NPV",
+          "LR+",
+          "LR-"
+        ],
+        "artifactExpectations": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "qaGates": [
+          "gold-standard",
+          "threshold-provenance",
+          "spectrum-bias",
+          "claim-safety",
+          "effect-size-reporting",
+          "methods-disclosure"
+        ],
+        "missingDataRequirements": [
+          "missingness summary",
+          "complete-case count"
+        ],
+        "multiplicityRequirements": [],
+        "commonFailureModes": [
+          "no gold standard",
+          "case-control sampling affects predictive values"
+        ],
+        "stopForHumanReviewWhen": [
+          "screening recommendation is implied"
+        ],
+        "selection": {
+          "keywords": [
+            "sensitivity",
+            "specificity",
+            "ppv",
+            "npv",
+            "diagnostic",
+            "confusion matrix"
+          ],
+          "antiKeywords": [],
+          "minScore": 0.35
+        }
+      },
+      "score": 0.57,
+      "rank": 1,
+      "fitReasons": [
+        "supports outcome type binary",
+        "supports study design diagnostic",
+        "supports data structure single_table",
+        "matches goal diagnose"
+      ],
+      "cautions": [
+        {
+          "severity": "note",
+          "code": "HUMAN_REVIEW_GATE",
+          "message": "screening recommendation is implied",
+          "evidenceRefs": []
+        }
+      ],
+      "requiredBeforeExecution": [
+        "provide index test",
+        "provide gold standard",
+        "provide threshold",
+        "confirm assumption: Reference standard is valid",
+        "confirm assumption: spectrum bias is addressed",
+        "produce diagnostic: confusion matrix",
+        "produce diagnostic: prevalence",
+        "produce diagnostic: indeterminate results"
+      ]
+    },
+    "candidates": [
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "diagnostic-accuracy-basic",
+          "label": "Diagnostic accuracy metrics",
+          "category": "diagnostic_prognostic",
+          "modelFamily": "diagnostic_accuracy",
+          "purpose": "Estimate sensitivity, specificity, predictive values, likelihood ratios, and confusion matrix metrics.",
+          "aliases": [],
+          "outcomeTypes": [
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "diagnostic"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "index test",
+            "gold standard",
+            "threshold"
+          ],
+          "assumptions": [
+            "Reference standard is valid",
+            "spectrum bias is addressed"
+          ],
+          "diagnostics": [
+            "confusion matrix",
+            "prevalence",
+            "indeterminate results"
+          ],
+          "effectMeasures": [
+            "sensitivity",
+            "specificity",
+            "PPV",
+            "NPV",
+            "LR+",
+            "LR-"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "gold-standard",
+            "threshold-provenance",
+            "spectrum-bias",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "no gold standard",
+            "case-control sampling affects predictive values"
+          ],
+          "stopForHumanReviewWhen": [
+            "screening recommendation is implied"
+          ],
+          "selection": {
+            "keywords": [
+              "sensitivity",
+              "specificity",
+              "ppv",
+              "npv",
+              "diagnostic",
+              "confusion matrix"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 1,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design diagnostic",
+          "supports data structure single_table",
+          "matches goal diagnose"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "screening recommendation is implied",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide index test",
+          "provide gold standard",
+          "provide threshold",
+          "confirm assumption: Reference standard is valid",
+          "confirm assumption: spectrum bias is addressed",
+          "produce diagnostic: confusion matrix",
+          "produce diagnostic: prevalence",
+          "produce diagnostic: indeterminate results"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "roc-auc-calibration",
+          "label": "ROC/AUC and calibration analysis",
+          "category": "diagnostic_prognostic",
+          "modelFamily": "diagnostic_accuracy",
+          "purpose": "Evaluate discrimination and calibration for diagnostic or prognostic predictions.",
+          "aliases": [],
+          "outcomeTypes": [
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "diagnostic",
+            "prediction",
+            "cohort"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "sklearn",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "binary outcome",
+            "predicted probabilities"
+          ],
+          "assumptions": [
+            "Validation sample is independent or resampling policy is declared"
+          ],
+          "diagnostics": [
+            "ROC curve",
+            "calibration plot",
+            "Brier score"
+          ],
+          "effectMeasures": [
+            "AUC",
+            "C-statistic",
+            "Brier score",
+            "calibration slope"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "validation-split",
+            "calibration",
+            "class-imbalance",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "optimism bias",
+            "rare outcome precision-recall mismatch"
+          ],
+          "stopForHumanReviewWhen": [
+            "clinical deployment or action threshold is proposed"
+          ],
+          "selection": {
+            "keywords": [
+              "roc",
+              "auc",
+              "c-statistic",
+              "calibration",
+              "brier",
+              "decision curve"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 2,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design diagnostic",
+          "supports data structure single_table",
+          "matches goal diagnose"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical deployment or action threshold is proposed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide binary outcome",
+          "provide predicted probabilities",
+          "confirm assumption: Validation sample is independent or resampling policy is declared",
+          "produce diagnostic: ROC curve",
+          "produce diagnostic: calibration plot",
+          "produce diagnostic: Brier score"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "binary-logistic-regression",
+          "label": "Binary logistic regression",
+          "category": "logistic_regression",
+          "modelFamily": "logistic",
+          "purpose": "Model a binary outcome using exposure and covariates.",
+          "aliases": [],
+          "outcomeTypes": [
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "case_control",
+            "cohort",
+            "randomized_trial"
+          ],
+          "dataStructures": [
+            "single_table",
+            "complex_survey"
+          ],
+          "compatibleBackends": [
+            "r-survey",
+            "python-linearized",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "executable",
+          "requiredFields": [
+            "binary outcome",
+            "exposure",
+            "covariates"
+          ],
+          "assumptions": [
+            "Outcome threshold is justified",
+            "adequate events per parameter",
+            "linearity in logit for continuous predictors"
+          ],
+          "diagnostics": [
+            "event count",
+            "separation",
+            "calibration if predictive",
+            "influence"
+          ],
+          "effectMeasures": [
+            "odds ratio",
+            "marginal risk difference"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "threshold-provenance",
+            "sparse-cells",
+            "odds-ratio-consistency",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "complete separation",
+            "rare outcome bias",
+            "threshold without provenance"
+          ],
+          "stopForHumanReviewWhen": [
+            "diagnostic or causal language is requested"
+          ],
+          "selection": {
+            "keywords": [
+              "logistic",
+              "odds",
+              "binary",
+              "yes no",
+              "elevated",
+              "disease status"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.48,
+        "rank": 3,
+        "fitReasons": [
+          "question keyword match: elevated",
+          "supports outcome type binary",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic or causal language is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide binary outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Outcome threshold is justified",
+          "confirm assumption: adequate events per parameter",
+          "confirm assumption: linearity in logit for continuous predictors",
+          "produce diagnostic: event count",
+          "produce diagnostic: separation",
+          "produce diagnostic: calibration if predictive",
+          "produce diagnostic: influence"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "power-sample-size",
+          "label": "Power and sample size analysis",
+          "category": "power_sample_size",
+          "modelFamily": "power",
+          "purpose": "Estimate required sample size, power, or minimum detectable effect.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "time_to_event",
+            "count"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "randomized_trial",
+            "cohort",
+            "diagnostic",
+            "measurement"
+          ],
+          "dataStructures": [
+            "single_table",
+            "clustered",
+            "survival"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "python-scipy"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "effect size",
+            "alpha",
+            "power target",
+            "allocation ratio"
+          ],
+          "assumptions": [
+            "Effect size and variance assumptions are justified"
+          ],
+          "diagnostics": [
+            "sensitivity grid",
+            "event count for survival"
+          ],
+          "effectMeasures": [
+            "required N",
+            "power",
+            "minimum detectable effect"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "assumption-source",
+            "sensitivity-grid",
+            "design-effect"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "optimistic effect size",
+            "ignoring clustering",
+            "event count ignored"
+          ],
+          "stopForHumanReviewWhen": [
+            "trial feasibility or funding decision depends on estimate"
+          ],
+          "selection": {
+            "keywords": [
+              "power",
+              "sample size",
+              "minimum detectable",
+              "precision",
+              "event based"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.43,
+        "rank": 4,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design diagnostic",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "trial feasibility or funding decision depends on estimate",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide effect size",
+          "provide alpha",
+          "provide power target",
+          "provide allocation ratio",
+          "confirm assumption: Effect size and variance assumptions are justified",
+          "produce diagnostic: sensitivity grid",
+          "produce diagnostic: event count for survival"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "cohens-kappa-icc",
+          "label": "Agreement and reliability analysis",
+          "category": "agreement_reliability",
+          "modelFamily": "agreement",
+          "purpose": "Assess agreement between raters, instruments, or repeated measurements.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "ordinal",
+            "categorical"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "measurement",
+            "diagnostic"
+          ],
+          "dataStructures": [
+            "paired",
+            "repeated_measures"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "python-scipy"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "rater/test id",
+            "subject id",
+            "paired ratings or measurements"
+          ],
+          "assumptions": [
+            "Rater design and scale type match statistic"
+          ],
+          "diagnostics": [
+            "agreement table",
+            "bias plot",
+            "within-subject variance"
+          ],
+          "effectMeasures": [
+            "Cohen's kappa",
+            "weighted kappa",
+            "ICC",
+            "Bland-Altman limits"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "scale-type",
+            "rater-design",
+            "agreement-not-correlation"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "using correlation as agreement",
+            "wrong ICC form"
+          ],
+          "stopForHumanReviewWhen": [
+            "instrument equivalence is claimed"
+          ],
+          "selection": {
+            "keywords": [
+              "kappa",
+              "icc",
+              "reliability",
+              "agreement",
+              "bland-altman",
+              "cronbach"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.35,
+        "rank": 5,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design diagnostic"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "instrument equivalence is claimed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide rater/test id",
+          "provide subject id",
+          "provide paired ratings or measurements",
+          "confirm assumption: Rater design and scale type match statistic",
+          "produce diagnostic: agreement table",
+          "produce diagnostic: bias plot",
+          "produce diagnostic: within-subject variance"
+        ]
+      }
+    ],
+    "excluded": [
+      {
+        "methodId": "table-one-descriptive-summary",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "survey-weighted-descriptive-summary",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "two-sample-t-test",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "paired-t-test",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "anova-one-way",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "chi-square-independence",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "fisher-exact-test",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "mann-whitney-u",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "pearson-correlation",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "spearman-correlation",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "multiple-linear-regression",
+        "reason": "score 0.21 below threshold 0.35"
+      },
+      {
+        "methodId": "interaction-regression",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "ordinal-logistic-regression",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "poisson-regression",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "negative-binomial-regression",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "kaplan-meier-log-rank",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "cox-proportional-hazards",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "fine-gray-competing-risks",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "linear-mixed-effects-model",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "generalized-estimating-equations",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "multilevel-logistic-model",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "gamma-glm",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "propensity-score-weighting",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "difference-in-differences",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "regression-discontinuity",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "tmle-doubly-robust",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "penalized-regression-elastic-net",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "tree-ensemble-prediction",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "cross-validation-bootstrap-validation",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "pca-dimensionality-reduction",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "factor-analysis",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "kmeans-clustering",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "arima-time-series",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "interrupted-time-series",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "random-effects-meta-analysis",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "bayesian-hierarchical-model",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "multiple-imputation-mice",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "bootstrap-uncertainty",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "multiple-comparison-fdr",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "effect-size-suite",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "cronbach-alpha-scale",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "epidemiologic-2x2-measures",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "clinical-trial-itt-analysis",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "cost-effectiveness-icer",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "spatial-autocorrelation-moran",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "network-centrality-community",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "topic-modeling-text",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "qualitative-thematic-analysis",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "mixed-methods-triangulation",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "mediation-analysis",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "structural-equation-model",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "omics-differential-expression",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "image-signal-feature-analysis",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "model-diagnostics-linear-logistic",
+        "reason": "score 0.31 below threshold 0.35"
+      }
+    ],
+    "recommendedArchetype": "diagnostic-accuracy",
+    "recommendedBackend": "python-statsmodels",
+    "stopForHumanReview": true,
+    "issues": [
+      {
+        "severity": "note",
+        "code": "HUMAN_REVIEW_GATE",
+        "message": "screening recommendation is implied",
+        "evidenceRefs": []
+      }
+    ],
+    "nextAction": "Promote diagnostic-accuracy-basic into AnalysisSpec V2, then build an execution contract with python-statsmodels."
+  },
+  "outPath": null
+}

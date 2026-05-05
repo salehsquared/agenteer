@@ -18,6 +18,7 @@ import {
   type LabMedbreviaNhanesResult,
   type NhanesRegistry,
 } from "./lab.js";
+import type { StatsRunResult } from "../research-machine/stats/schemas.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -1281,6 +1282,15 @@ export interface ResearchPaperLifecycle {
   rerunStability: {
     status: "pass" | "fail" | "not_checked";
     summary: string;
+    path: string | null;
+  };
+  statsRun: {
+    status: "succeeded" | "failed" | "missing";
+    method: string | null;
+    binding: string;
+    posture: string | null;
+    interpretationBoundary: string | null;
+    issueCodes: string[];
     path: string | null;
   };
   lifecycleStatus: "ready_for_local_review" | "needs_task_envelope" | "needs_methods_review" | "blocked";
@@ -5022,6 +5032,14 @@ export async function researchPaperLifecycleCommand(opts: { paperDir: string; ca
     : rerunStabilityRecord && rerunStabilityRecord.status === "fail"
       ? "fail"
       : "not_checked";
+  const statsRunPath = path.join(paperDir, "stats-run.json");
+  const statsRun = unwrapResearchArtifact<StatsRunResult>(await readJsonIfPresent(statsRunPath), "statsRun");
+  const statsRunStatus = statsRun?.status ?? "missing";
+  const statsRunIssueCodes = Array.isArray(statsRun?.issues)
+    ? statsRun.issues.map(issue => issue.code).filter(Boolean)
+    : [];
+  const statsRunPosture = statsRun?.resultPosture?.status ?? null;
+  const statsRunInterpretationBoundary = statsRun?.resultPosture?.interpretationBoundary ?? null;
 
   const blockers: string[] = [];
   const qaStatus = typeof paperQa?.status === "string" ? paperQa.status : "missing";
@@ -5036,6 +5054,7 @@ export async function researchPaperLifecycleCommand(opts: { paperDir: string; ca
   if (taskPath && taskValidationStatus !== "pass") blockers.push(`task validation is ${taskValidationStatus}`);
   if (capabilityDir && capabilityStatus !== "pass") blockers.push(`capability validation is ${capabilityStatus}`);
   if (rerunStabilityStatus === "fail") blockers.push("rerun stability failed");
+  if (statsRunStatus === "failed") blockers.push(`stats-run failed${statsRunIssueCodes.length ? `: ${statsRunIssueCodes.join(",")}` : ""}`);
   const lifecycleStatus: ResearchPaperLifecycle["lifecycleStatus"] = runnerBinding === "retrospective"
     ? "needs_methods_review"
     : !taskPath
@@ -5076,6 +5095,15 @@ export async function researchPaperLifecycleCommand(opts: { paperDir: string; ca
       summary: typeof rerunStabilityRecord?.summary === "string" ? rerunStabilityRecord.summary : "",
       path: rerunStabilityRecord ? rerunStabilityPath : null,
     },
+    statsRun: {
+      status: statsRunStatus,
+      method: statsRun?.method ?? null,
+      binding: statsRun?.binding.status ?? "missing",
+      posture: statsRunPosture,
+      interpretationBoundary: statsRunInterpretationBoundary,
+      issueCodes: statsRunIssueCodes,
+      path: statsRun ? statsRunPath : null,
+    },
     lifecycleStatus,
     blockers,
     nextAction: lifecycleStatus === "ready_for_local_review"
@@ -5102,6 +5130,8 @@ export function renderResearchPaperLifecycle(result: ResearchPaperLifecycle): st
     `  task: ${result.task.status} validation=${result.task.validationStatus} receipts=${result.task.receiptStatuses.join(",") || "(none)"}`,
     `  capabilities: ${result.capabilities.status} count=${result.capabilities.count}`,
     `  rerun stability: ${result.rerunStability.status}${result.rerunStability.summary ? ` (${result.rerunStability.summary})` : ""}`,
+    `  stats-run: ${result.statsRun.status}${result.statsRun.method ? ` method=${result.statsRun.method}` : ""} binding=${result.statsRun.binding}${result.statsRun.posture ? ` posture=${result.statsRun.posture}` : ""}${result.statsRun.issueCodes.length ? ` issues=${result.statsRun.issueCodes.join(",")}` : ""}`,
+    result.statsRun.interpretationBoundary ? `  stats-boundary: ${result.statsRun.interpretationBoundary}` : "",
     ...result.blockers.map(blocker => `  - blocker: ${blocker}`),
     `  next: ${result.nextAction}`,
   ].join("\n");

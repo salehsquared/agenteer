@@ -1,0 +1,1663 @@
+{
+  "schemaVersion": 1,
+  "modelingPlan": {
+    "schemaVersion": 1,
+    "decisionId": "modeling_60fd8a26db0334cb",
+    "request": {
+      "question": "Can age, sex, and BMI predict elevated HbA1c in this fixture?",
+      "goal": "classify",
+      "outcomeType": "binary",
+      "dataStructures": [
+        "single_table"
+      ],
+      "surveyDesign": false,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "rowCount": 16,
+      "featureCount": 3,
+      "classCount": 2,
+      "target": "outcome",
+      "tableSummary": {
+        "rowCount": 16,
+        "columnCount": 4,
+        "columns": [
+          {
+            "name": "age",
+            "inferredType": "number",
+            "nonMissingRows": 16,
+            "missingFraction": 0,
+            "sampleValues": [
+              "25",
+              "28",
+              "30",
+              "35",
+              "40"
+            ]
+          },
+          {
+            "name": "bmi",
+            "inferredType": "number",
+            "nonMissingRows": 16,
+            "missingFraction": 0,
+            "sampleValues": [
+              "20",
+              "21",
+              "22",
+              "23",
+              "30"
+            ]
+          },
+          {
+            "name": "outcome",
+            "inferredType": "number",
+            "nonMissingRows": 16,
+            "missingFraction": 0,
+            "sampleValues": [
+              "0",
+              "1"
+            ]
+          },
+          {
+            "name": "sex",
+            "inferredType": "string",
+            "nonMissingRows": 16,
+            "missingFraction": 0,
+            "sampleValues": [
+              "F",
+              "M"
+            ]
+          }
+        ]
+      },
+      "priorRuns": [],
+      "highMissingness": false,
+      "smallSample": true,
+      "requiresInference": true,
+      "requiresPrediction": true,
+      "maxCandidates": 12
+    },
+    "inferredGoal": "classify",
+    "inferredOutcomeType": "binary",
+    "inferredStudyDesign": "prediction",
+    "inferredDataStructures": [
+      "single_table"
+    ],
+    "dataEvidence": {
+      "source": "table-summary",
+      "rowCount": 16,
+      "featureCount": 3,
+      "target": "outcome",
+      "targetClassCount": 2,
+      "maxMissingFraction": 0,
+      "highMissingness": false,
+      "smallSample": true,
+      "highDimensional": false,
+      "warnings": [
+        {
+          "severity": "warning",
+          "code": "TABLE_SMALL_SAMPLE",
+          "message": "Table has 16 rows; high-capacity ML should be downgraded and uncertainty emphasized.",
+          "evidenceRefs": [
+            "tableSummary.rowCount"
+          ]
+        }
+      ]
+    },
+    "backendEvidence": {
+      "source": "not-supplied",
+      "available": [],
+      "missing": [],
+      "notChecked": [],
+      "warnings": []
+    },
+    "priorRunEvidence": {
+      "source": "none",
+      "runs": [],
+      "warnings": [],
+      "recommendedAction": "No prior run evidence supplied."
+    },
+    "methodSelectionEvidence": {
+      "selectionId": "method_selection_84dd90df89bd",
+      "selectionHash": "740c09386b4936b03e4dbffae91dd7038b3ffb1e1133820746046c1b94fdc7e2",
+      "primaryMethodId": "tree-ensemble-prediction",
+      "candidateMethodIds": [
+        "tree-ensemble-prediction",
+        "cross-validation-bootstrap-validation",
+        "penalized-regression-elastic-net",
+        "roc-auc-calibration",
+        "binary-logistic-regression",
+        "diagnostic-accuracy-basic",
+        "bootstrap-uncertainty",
+        "multiple-comparison-fdr"
+      ],
+      "recommendedBackend": "sklearn",
+      "recommendedArchetype": "prediction-model",
+      "stopForHumanReview": true,
+      "issueCodes": [
+        "METHOD_NO_PRODUCTION_BACKEND",
+        "HUMAN_REVIEW_GATE"
+      ],
+      "applyCommandHint": "agenteer research method-select --question \"Can age, sex, and BMI predict elevated HbA1c in this fixture?\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+    },
+    "routeRecommendation": {
+      "route": "ml-run",
+      "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <ml-run-dir> --json",
+      "reason": "The selected primary candidate is a prediction/ML adapter.",
+      "requiredArtifacts": [
+        "ml-run.json",
+        "model-summary.json",
+        "predictions.csv or transformed.csv"
+      ]
+    },
+    "primary": {
+      "id": "ml:logistic-regression",
+      "rank": 1,
+      "tier": "baseline",
+      "source": "ml-adapter",
+      "label": "Logistic regression",
+      "family": "linear",
+      "backend": "sklearn",
+      "taskType": "binary_classification",
+      "score": 0.8999999999999999,
+      "compatible": true,
+      "reasons": [
+        "Logistic regression supports binary_classification.",
+        "Useful as a transparent baseline before stronger models."
+      ],
+      "cautions": [],
+      "requiredBeforeExecution": [
+        "confirm target column and feature exclusions",
+        "run train/test split or cross-validation",
+        "report calibration, Brier score, and threshold policy for clinical prediction",
+        "report calibration for probability models when clinical interpretation is intended"
+      ],
+      "expectedMetrics": [
+        "auroc",
+        "auprc",
+        "accuracy",
+        "sensitivity",
+        "specificity",
+        "f1",
+        "calibration",
+        "brier_score"
+      ],
+      "expectedArtifacts": [
+        "ml-run.json",
+        "predictions.csv or transformed.csv",
+        "model-summary.json",
+        "model.joblib when serializable"
+      ],
+      "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+    },
+    "blockingPolicies": [],
+    "executableCandidates": [
+      {
+        "id": "ml:logistic-regression",
+        "rank": 1,
+        "tier": "baseline",
+        "source": "ml-adapter",
+        "label": "Logistic regression",
+        "family": "linear",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.8999999999999999,
+        "compatible": true,
+        "reasons": [
+          "Logistic regression supports binary_classification.",
+          "Useful as a transparent baseline before stronger models."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:random-forest-classifier",
+        "rank": 2,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "random forest classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.72,
+        "compatible": true,
+        "reasons": [
+          "random forest classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model random-forest-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:svm-classifier",
+        "rank": 3,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "support vector classifier",
+        "family": "kernel",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7099999999999999,
+        "compatible": true,
+        "reasons": [
+          "support vector classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model svm-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:knn-classifier",
+        "rank": 4,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "k-nearest neighbors classifier",
+        "family": "neighbors",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7,
+        "compatible": true,
+        "reasons": [
+          "k-nearest neighbors classifier supports binary_classification.",
+          "Useful comparator or sensitivity model."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model knn-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:decision-tree-classifier",
+        "rank": 5,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "decision tree classifier",
+        "family": "tree",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7,
+        "compatible": true,
+        "reasons": [
+          "decision tree classifier supports binary_classification.",
+          "Useful comparator or sensitivity model."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model decision-tree-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:gradient-boosting-classifier",
+        "rank": 6,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "gradient boosting classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "gradient boosting classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model gradient-boosting-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:extra-trees-classifier",
+        "rank": 7,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "extra trees classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "extra trees classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model extra-trees-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:adaboost-classifier",
+        "rank": 8,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "AdaBoost classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "AdaBoost classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model adaboost-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:mlp-classifier",
+        "rank": 9,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "multilayer perceptron classifier",
+        "family": "neural_network",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "multilayer perceptron classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model mlp-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "method:multiple-comparison-fdr",
+        "rank": 10,
+        "tier": "sensitivity",
+        "source": "statistical-method",
+        "label": "False discovery rate correction",
+        "family": "multiple_comparison",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design prediction",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "confirmatory claim after exploratory multiplicity",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "family of tests",
+          "raw p-values",
+          "correction method",
+          "number of tests",
+          "adjusted p-values",
+          "provide family of tests",
+          "provide raw p-values",
+          "provide correction method",
+          "confirm assumption: Hypothesis family is defined before correction",
+          "produce diagnostic: number of tests",
+          "produce diagnostic: adjusted p-values"
+        ],
+        "expectedMetrics": [
+          "q-value",
+          "adjusted p-value"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Can age, sex, and BMI predict elevated HbA1c in this fixture?\" --json"
+      }
+    ],
+    "baselines": [
+      {
+        "id": "ml:logistic-regression",
+        "rank": 1,
+        "tier": "baseline",
+        "source": "ml-adapter",
+        "label": "Logistic regression",
+        "family": "linear",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.8999999999999999,
+        "compatible": true,
+        "reasons": [
+          "Logistic regression supports binary_classification.",
+          "Useful as a transparent baseline before stronger models."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+      }
+    ],
+    "sensitivityAnalyses": [
+      {
+        "id": "ml:random-forest-classifier",
+        "rank": 2,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "random forest classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.72,
+        "compatible": true,
+        "reasons": [
+          "random forest classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model random-forest-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:svm-classifier",
+        "rank": 3,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "support vector classifier",
+        "family": "kernel",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7099999999999999,
+        "compatible": true,
+        "reasons": [
+          "support vector classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model svm-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:knn-classifier",
+        "rank": 4,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "k-nearest neighbors classifier",
+        "family": "neighbors",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7,
+        "compatible": true,
+        "reasons": [
+          "k-nearest neighbors classifier supports binary_classification.",
+          "Useful comparator or sensitivity model."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model knn-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:decision-tree-classifier",
+        "rank": 5,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "decision tree classifier",
+        "family": "tree",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7,
+        "compatible": true,
+        "reasons": [
+          "decision tree classifier supports binary_classification.",
+          "Useful comparator or sensitivity model."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model decision-tree-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:gradient-boosting-classifier",
+        "rank": 6,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "gradient boosting classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "gradient boosting classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model gradient-boosting-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:extra-trees-classifier",
+        "rank": 7,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "extra trees classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "extra trees classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model extra-trees-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:adaboost-classifier",
+        "rank": 8,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "AdaBoost classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "AdaBoost classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model adaboost-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:mlp-classifier",
+        "rank": 9,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "multilayer perceptron classifier",
+        "family": "neural_network",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "multilayer perceptron classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model mlp-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "method:multiple-comparison-fdr",
+        "rank": 10,
+        "tier": "sensitivity",
+        "source": "statistical-method",
+        "label": "False discovery rate correction",
+        "family": "multiple_comparison",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design prediction",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "confirmatory claim after exploratory multiplicity",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "family of tests",
+          "raw p-values",
+          "correction method",
+          "number of tests",
+          "adjusted p-values",
+          "provide family of tests",
+          "provide raw p-values",
+          "provide correction method",
+          "confirm assumption: Hypothesis family is defined before correction",
+          "produce diagnostic: number of tests",
+          "produce diagnostic: adjusted p-values"
+        ],
+        "expectedMetrics": [
+          "q-value",
+          "adjusted p-value"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Can age, sex, and BMI predict elevated HbA1c in this fixture?\" --json"
+      },
+      {
+        "id": "ml:xgboost-classifier",
+        "rank": 11,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "XGBoost classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.37,
+        "compatible": false,
+        "reasons": [
+          "XGBoost classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [
+          {
+            "severity": "warning",
+            "code": "OPTIONAL_DEPENDENCY_MISSING",
+            "message": "xgboost-classifier requires xgboost; keep as candidate only if that package is installed.",
+            "evidenceRefs": [
+              "xgboost-classifier"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model xgboost-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:lightgbm-classifier",
+        "rank": 12,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "LightGBM classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.37,
+        "compatible": false,
+        "reasons": [
+          "LightGBM classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [
+          {
+            "severity": "warning",
+            "code": "OPTIONAL_DEPENDENCY_MISSING",
+            "message": "lightgbm-classifier requires lightgbm; keep as candidate only if that package is installed.",
+            "evidenceRefs": [
+              "lightgbm-classifier"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model lightgbm-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      }
+    ],
+    "candidates": [
+      {
+        "id": "ml:logistic-regression",
+        "rank": 1,
+        "tier": "baseline",
+        "source": "ml-adapter",
+        "label": "Logistic regression",
+        "family": "linear",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.8999999999999999,
+        "compatible": true,
+        "reasons": [
+          "Logistic regression supports binary_classification.",
+          "Useful as a transparent baseline before stronger models."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:random-forest-classifier",
+        "rank": 2,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "random forest classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.72,
+        "compatible": true,
+        "reasons": [
+          "random forest classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model random-forest-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:svm-classifier",
+        "rank": 3,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "support vector classifier",
+        "family": "kernel",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7099999999999999,
+        "compatible": true,
+        "reasons": [
+          "support vector classifier supports binary_classification.",
+          "Matches the requested prediction/modeling shape.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model svm-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:knn-classifier",
+        "rank": 4,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "k-nearest neighbors classifier",
+        "family": "neighbors",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7,
+        "compatible": true,
+        "reasons": [
+          "k-nearest neighbors classifier supports binary_classification.",
+          "Useful comparator or sensitivity model."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model knn-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:decision-tree-classifier",
+        "rank": 5,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "decision tree classifier",
+        "family": "tree",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.7,
+        "compatible": true,
+        "reasons": [
+          "decision tree classifier supports binary_classification.",
+          "Useful comparator or sensitivity model."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model decision-tree-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:gradient-boosting-classifier",
+        "rank": 6,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "gradient boosting classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "gradient boosting classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model gradient-boosting-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:extra-trees-classifier",
+        "rank": 7,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "extra trees classifier",
+        "family": "ensemble",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "extra trees classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model extra-trees-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:adaboost-classifier",
+        "rank": 8,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "AdaBoost classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "AdaBoost classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model adaboost-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:mlp-classifier",
+        "rank": 9,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "multilayer perceptron classifier",
+        "family": "neural_network",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.5399999999999999,
+        "compatible": true,
+        "reasons": [
+          "multilayer perceptron classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model mlp-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "method:multiple-comparison-fdr",
+        "rank": 10,
+        "tier": "sensitivity",
+        "source": "statistical-method",
+        "label": "False discovery rate correction",
+        "family": "multiple_comparison",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design prediction",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "confirmatory claim after exploratory multiplicity",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "family of tests",
+          "raw p-values",
+          "correction method",
+          "number of tests",
+          "adjusted p-values",
+          "provide family of tests",
+          "provide raw p-values",
+          "provide correction method",
+          "confirm assumption: Hypothesis family is defined before correction",
+          "produce diagnostic: number of tests",
+          "produce diagnostic: adjusted p-values"
+        ],
+        "expectedMetrics": [
+          "q-value",
+          "adjusted p-value"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Can age, sex, and BMI predict elevated HbA1c in this fixture?\" --json"
+      },
+      {
+        "id": "ml:xgboost-classifier",
+        "rank": 11,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "XGBoost classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.37,
+        "compatible": false,
+        "reasons": [
+          "XGBoost classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [
+          {
+            "severity": "warning",
+            "code": "OPTIONAL_DEPENDENCY_MISSING",
+            "message": "xgboost-classifier requires xgboost; keep as candidate only if that package is installed.",
+            "evidenceRefs": [
+              "xgboost-classifier"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model xgboost-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      },
+      {
+        "id": "ml:lightgbm-classifier",
+        "rank": 12,
+        "tier": "sensitivity",
+        "source": "ml-adapter",
+        "label": "LightGBM classifier",
+        "family": "boosting",
+        "backend": "sklearn",
+        "taskType": "binary_classification",
+        "score": 0.37,
+        "compatible": false,
+        "reasons": [
+          "LightGBM classifier supports binary_classification.",
+          "Useful comparator or sensitivity model.",
+          "Downgraded because the table appears small for high-capacity ML."
+        ],
+        "cautions": [
+          {
+            "severity": "warning",
+            "code": "OPTIONAL_DEPENDENCY_MISSING",
+            "message": "lightgbm-classifier requires lightgbm; keep as candidate only if that package is installed.",
+            "evidenceRefs": [
+              "lightgbm-classifier"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "confirm target column and feature exclusions",
+          "run train/test split or cross-validation",
+          "report calibration, Brier score, and threshold policy for clinical prediction",
+          "report calibration for probability models when clinical interpretation is intended"
+        ],
+        "expectedMetrics": [
+          "auroc",
+          "auprc",
+          "accuracy",
+          "sensitivity",
+          "specificity",
+          "f1",
+          "calibration",
+          "brier_score"
+        ],
+        "expectedArtifacts": [
+          "ml-run.json",
+          "predictions.csv or transformed.csv",
+          "model-summary.json",
+          "model.joblib when serializable"
+        ],
+        "commandHint": "agenteer research ml-run --task binary_classification --model lightgbm-classifier --data <rows.csv> --target <target> --out-dir <out> --json"
+      }
+    ],
+    "blocked": false,
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "TABLE_SMALL_SAMPLE",
+        "message": "Table has 16 rows; high-capacity ML should be downgraded and uncertainty emphasized.",
+        "evidenceRefs": [
+          "tableSummary.rowCount"
+        ]
+      }
+    ],
+    "nextAction": "agenteer research ml-run --task binary_classification --model logistic-regression --data <rows.csv> --target <target> --out-dir <ml-run-dir> --json"
+  }
+}
+

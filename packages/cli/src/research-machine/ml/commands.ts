@@ -65,13 +65,15 @@ export function renderResearchMlRun(result: MlRunResult): string {
     `  task: ${result.task}`,
     `  model: ${result.modelId}`,
     `  status: ${result.status}`,
+    `  posture: ${result.resultPosture?.status ?? "missing"}`,
+    result.resultPosture?.interpretationBoundary ? `  boundary: ${result.resultPosture.interpretationBoundary}` : "",
     `  primary metric: ${result.primaryMetric ?? "(none)"}${typeof metric === "number" ? `=${metric}` : ""}`,
     `  rows: ${result.preprocessing.rowCount}`,
     `  features: ${result.preprocessing.featureCount}`,
     `  warnings: ${result.warnings.length}`,
     `  errors: ${result.errors.length}`,
     `  out: ${path.resolve(result.outDir)}`,
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 export function renderResearchMlRunJson(result: MlRunResult): string {
@@ -83,6 +85,8 @@ export function renderResearchMlComparison(result: MlComparisonResult): string {
     `research ML comparison: ${result.comparisonId}`,
     `  task: ${result.task}`,
     `  primary metric: ${result.primaryMetric} (${result.primaryMetricDirection})`,
+    `  posture: ${result.comparisonPosture?.status ?? "missing"}`,
+    `  review card: ${result.reviewCard?.status ?? "missing"}${result.reviewCard?.path ? ` (${result.reviewCard.path})` : ""}`,
     `  models: ${result.ranked.length}`,
     ...result.ranked.map(item => `  ${item.rank}. ${item.modelId}: ${item.score ?? "(unavailable)"} [${item.status}]`),
     `  warnings: ${result.warnings.length}`,

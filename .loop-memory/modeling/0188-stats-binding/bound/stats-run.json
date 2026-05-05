@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_1492200273982948135",
+  "method": "t-test",
+  "status": "succeeded",
+  "rowCount": 90,
+  "completeCaseN": 90,
+  "variables": [
+    "hba1c",
+    "group"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "group",
+      "group_a": "low",
+      "group_b": "high",
+      "n_a": 57,
+      "n_b": 33,
+      "mean_a": 6.070842105263157,
+      "mean_b": 6.4239999999999995,
+      "mean_difference": 0.35315789473684234,
+      "cohen_d": 3.3443802118597086,
+      "statistic": 16.56804252787381,
+      "p_value": 4.978168323386118e-28
+    }
+  ],
+  "diagnostics": {
+    "test": "Welch two-sample t-test",
+    "equal_variance_assumed": false
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/bound/stats-config.json",
+      "sha256": "b2a17a3916a85d691baea6e22a22a80d743902f28243900effd4280f6590dcc0"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/bound/stats-summary.json",
+      "sha256": "4109824b7c6e4b37f216e8cc57f5c861fe0d55c1af3433d9cda55eaa092f33cc"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/bound/estimates.csv",
+      "sha256": "3e6574f1a09d4ed0caac1f51761d252691fa919307f4a3abdd83b271936a8b4e"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/bound/diagnostics.json",
+      "sha256": "0c4bb18d7270895406064f265fa75f74b2f1d3a539baf7309950e160c51b2392"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/bound",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/modeling/0188-stats-binding/selection.json",
+    "methodSelectionId": "method_selection_f150677628ba",
+    "methodId": "two-sample-t-test",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  }
+}

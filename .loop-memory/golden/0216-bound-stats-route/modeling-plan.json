@@ -1,0 +1,1461 @@
+{
+  "schemaVersion": 1,
+  "modelingPlan": {
+    "schemaVersion": 1,
+    "decisionId": "modeling_2307c99b387cf20f",
+    "request": {
+      "question": "Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.",
+      "goal": "compare_groups",
+      "outcomeType": "continuous",
+      "studyDesign": "cross_sectional",
+      "dataStructures": [
+        "single_table"
+      ],
+      "surveyDesign": false,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "rowCount": 120,
+      "featureCount": 4,
+      "classCount": 5,
+      "target": "systolic_bp",
+      "tableSummary": {
+        "rowCount": 120,
+        "columnCount": 5,
+        "columns": [
+          {
+            "name": "age",
+            "inferredType": "number",
+            "nonMissingRows": 120,
+            "missingFraction": 0,
+            "sampleValues": [
+              "36",
+              "37",
+              "38",
+              "39",
+              "40"
+            ]
+          },
+          {
+            "name": "bmi",
+            "inferredType": "number",
+            "nonMissingRows": 120,
+            "missingFraction": 0,
+            "sampleValues": [
+              "22.7",
+              "23.4",
+              "24.1",
+              "24.8",
+              "25.5"
+            ]
+          },
+          {
+            "name": "id",
+            "inferredType": "number",
+            "nonMissingRows": 120,
+            "missingFraction": 0,
+            "sampleValues": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          {
+            "name": "sodium_high",
+            "inferredType": "number",
+            "nonMissingRows": 120,
+            "missingFraction": 0,
+            "sampleValues": [
+              "0",
+              "1"
+            ]
+          },
+          {
+            "name": "systolic_bp",
+            "inferredType": "number",
+            "nonMissingRows": 120,
+            "missingFraction": 0,
+            "sampleValues": [
+              "139.69",
+              "142.17",
+              "143.83",
+              "144.69",
+              "145.86"
+            ]
+          }
+        ]
+      },
+      "priorRuns": [],
+      "highMissingness": false,
+      "smallSample": true,
+      "requiresInference": true,
+      "requiresPrediction": false,
+      "maxCandidates": 12
+    },
+    "inferredGoal": "compare_groups",
+    "inferredOutcomeType": "continuous",
+    "inferredStudyDesign": "cross_sectional",
+    "inferredDataStructures": [
+      "single_table"
+    ],
+    "dataEvidence": {
+      "source": "table-summary",
+      "rowCount": 120,
+      "featureCount": 4,
+      "target": "systolic_bp",
+      "targetClassCount": 5,
+      "maxMissingFraction": 0,
+      "highMissingness": false,
+      "smallSample": true,
+      "highDimensional": false,
+      "warnings": [
+        {
+          "severity": "warning",
+          "code": "TABLE_SMALL_SAMPLE",
+          "message": "Table has 120 rows; high-capacity ML should be downgraded and uncertainty emphasized.",
+          "evidenceRefs": [
+            "tableSummary.rowCount"
+          ]
+        }
+      ]
+    },
+    "backendEvidence": {
+      "source": "not-supplied",
+      "available": [],
+      "missing": [],
+      "notChecked": [],
+      "warnings": []
+    },
+    "priorRunEvidence": {
+      "source": "none",
+      "runs": [],
+      "warnings": [],
+      "recommendedAction": "No prior run evidence supplied."
+    },
+    "methodSelectionEvidence": {
+      "selectionId": "method_selection_511db34ce60c",
+      "selectionHash": "54e2cab6bb0b9dfa4a6e7cb480188bcb3187cf5bbaa802eeb716587748aca22c",
+      "primaryMethodId": "anova-one-way",
+      "candidateMethodIds": [
+        "anova-one-way",
+        "bootstrap-uncertainty",
+        "mann-whitney-u",
+        "two-sample-t-test",
+        "multiple-linear-regression",
+        "clinical-trial-itt-analysis",
+        "survey-weighted-descriptive-summary",
+        "cronbach-alpha-scale",
+        "effect-size-suite",
+        "factor-analysis",
+        "gamma-glm",
+        "interaction-regression"
+      ],
+      "recommendedBackend": "python-statsmodels",
+      "recommendedArchetype": "continuous-biomarker-model",
+      "stopForHumanReview": true,
+      "issueCodes": [
+        "HUMAN_REVIEW_GATE"
+      ],
+      "applyCommandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+    },
+    "routeRecommendation": {
+      "route": "stats-run",
+      "commandHint": "agenteer research stats-run --method t-test --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --group <binary-group>",
+      "reason": "method:two-sample-t-test is executable by the standard-table statistics runner.",
+      "requiredArtifacts": [
+        "stats-run.json",
+        "estimates.csv",
+        "diagnostics.json",
+        "stats-report.md",
+        "stats-qa.json"
+      ]
+    },
+    "primary": {
+      "id": "method:anova-one-way",
+      "rank": 1,
+      "tier": "primary",
+      "source": "statistical-method",
+      "label": "One-way ANOVA",
+      "family": "hypothesis_test",
+      "backend": "python-statsmodels",
+      "taskType": null,
+      "score": 0.57,
+      "compatible": true,
+      "reasons": [
+        "supports outcome type continuous",
+        "supports study design cross_sectional",
+        "supports data structure single_table",
+        "matches goal compare_groups"
+      ],
+      "cautions": [
+        {
+          "severity": "note",
+          "code": "HUMAN_REVIEW_GATE",
+          "message": "repeated-measures design detected",
+          "evidenceRefs": []
+        }
+      ],
+      "requiredBeforeExecution": [
+        "continuous outcome",
+        "categorical group with >2 levels",
+        "group counts",
+        "residual diagnostics",
+        "variance homogeneity",
+        "provide continuous outcome",
+        "provide categorical group with >2 levels",
+        "confirm assumption: Independent observations",
+        "confirm assumption: within-group variance policy",
+        "confirm assumption: post-hoc correction policy",
+        "produce diagnostic: group counts",
+        "produce diagnostic: residual diagnostics"
+      ],
+      "expectedMetrics": [
+        "eta-squared",
+        "partial eta-squared",
+        "mean differences"
+      ],
+      "expectedArtifacts": [
+        "analysis.json",
+        "method-report.md",
+        "diagnostics.json"
+      ],
+      "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+    },
+    "blockingPolicies": [],
+    "executableCandidates": [
+      {
+        "id": "method:anova-one-way",
+        "rank": 1,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "One-way ANOVA",
+        "family": "hypothesis_test",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "repeated-measures design detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "categorical group with >2 levels",
+          "group counts",
+          "residual diagnostics",
+          "variance homogeneity",
+          "provide continuous outcome",
+          "provide categorical group with >2 levels",
+          "confirm assumption: Independent observations",
+          "confirm assumption: within-group variance policy",
+          "confirm assumption: post-hoc correction policy",
+          "produce diagnostic: group counts",
+          "produce diagnostic: residual diagnostics"
+        ],
+        "expectedMetrics": [
+          "eta-squared",
+          "partial eta-squared",
+          "mean differences"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:two-sample-t-test",
+        "rank": 2,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Independent two-sample t-test",
+        "family": "hypothesis_test",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "paired design detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "binary group",
+          "group sizes",
+          "variance ratio",
+          "histogram",
+          "outlier check",
+          "provide continuous outcome",
+          "provide binary group",
+          "confirm assumption: Independent observations",
+          "confirm assumption: approximately normal residuals or adequate sample size",
+          "confirm assumption: variance policy declared",
+          "produce diagnostic: group sizes"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "Cohen's d",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method t-test --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --group <binary-group>"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 3,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.44,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: mean",
+          "supports outcome type continuous",
+          "supports study design cross_sectional"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:bootstrap-uncertainty",
+        "rank": 4,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Bootstrap uncertainty estimation",
+        "family": "nonparametric",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "complex survey bootstrap is requested without replicate design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "statistic",
+          "resampling unit",
+          "number of replicates",
+          "bootstrap distribution",
+          "replicate failures",
+          "CI method",
+          "provide statistic",
+          "provide resampling unit",
+          "provide number of replicates",
+          "confirm assumption: Resampling respects clustering and design",
+          "confirm assumption: sample is representative",
+          "produce diagnostic: bootstrap distribution"
+        ],
+        "expectedMetrics": [
+          "bootstrap confidence interval",
+          "standard error"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:mann-whitney-u",
+        "rank": 5,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Mann-Whitney U test",
+        "family": "nonparametric",
+        "backend": "python-scipy",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "paired measurements are detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "binary group",
+          "group sizes",
+          "tie frequency",
+          "distribution plots",
+          "provide outcome",
+          "provide binary group",
+          "confirm assumption: Independent samples",
+          "confirm assumption: distribution-shape interpretation is declared",
+          "produce diagnostic: group sizes",
+          "produce diagnostic: tie frequency",
+          "produce diagnostic: distribution plots"
+        ],
+        "expectedMetrics": [
+          "rank-biserial correlation",
+          "median difference"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method mann-whitney --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --group <binary-group>"
+      },
+      {
+        "id": "method:multiple-linear-regression",
+        "rank": 6,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Multiple linear regression",
+        "family": "linear",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.51,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation requested without causal design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "exposure",
+          "covariates",
+          "residual plots",
+          "influence",
+          "VIF",
+          "heteroscedasticity",
+          "provide continuous outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Linearity",
+          "confirm assumption: model residual policy"
+        ],
+        "expectedMetrics": [
+          "beta coefficient",
+          "mean difference",
+          "standardized beta"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method linear-regression --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --exposure <exposure> --covariate <covariate>"
+      },
+      {
+        "id": "method:cronbach-alpha-scale",
+        "rank": 8,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Cronbach alpha and scale reliability",
+        "family": "reliability",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical scale validity is claimed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "item responses",
+          "scale definition",
+          "item-total correlations",
+          "alpha-if-deleted",
+          "missing item pattern",
+          "provide item responses",
+          "provide scale definition",
+          "confirm assumption: Items measure a common construct",
+          "confirm assumption: reverse coding is handled",
+          "produce diagnostic: item-total correlations",
+          "produce diagnostic: alpha-if-deleted",
+          "produce diagnostic: missing item pattern"
+        ],
+        "expectedMetrics": [
+          "Cronbach's alpha",
+          "omega"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:effect-size-suite",
+        "rank": 9,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Effect size estimation suite",
+        "family": "descriptive",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "primary effect estimate",
+          "uncertainty interval",
+          "scale interpretation",
+          "absolute vs relative effect",
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "standardized mean difference",
+          "odds ratio",
+          "risk ratio",
+          "hazard ratio",
+          "NNT"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:gamma-glm",
+        "rank": 11,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Gamma GLM",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "many zero costs require two-part model",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "positive continuous outcome",
+          "link function",
+          "covariates",
+          "zero values",
+          "skewness",
+          "deviance residuals",
+          "provide positive continuous outcome",
+          "provide link function",
+          "provide covariates",
+          "confirm assumption: Outcome is strictly positive",
+          "confirm assumption: link and variance family are justified",
+          "produce diagnostic: zero values"
+        ],
+        "expectedMetrics": [
+          "mean ratio",
+          "marginal mean"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:interaction-regression",
+        "rank": 12,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Interaction/effect-modification regression",
+        "family": "linear",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical subgroup conclusion requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "exposure",
+          "moderator",
+          "interaction term",
+          "cell counts by subgroup",
+          "interaction contrast",
+          "multiplicity review",
+          "provide outcome",
+          "provide exposure",
+          "provide moderator",
+          "provide interaction term",
+          "confirm assumption: Interaction scale is prespecified"
+        ],
+        "expectedMetrics": [
+          "interaction coefficient",
+          "stratum-specific effects"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      }
+    ],
+    "baselines": [
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 3,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.44,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: mean",
+          "supports outcome type continuous",
+          "supports study design cross_sectional"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      }
+    ],
+    "sensitivityAnalyses": [],
+    "candidates": [
+      {
+        "id": "method:anova-one-way",
+        "rank": 1,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "One-way ANOVA",
+        "family": "hypothesis_test",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "repeated-measures design detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "categorical group with >2 levels",
+          "group counts",
+          "residual diagnostics",
+          "variance homogeneity",
+          "provide continuous outcome",
+          "provide categorical group with >2 levels",
+          "confirm assumption: Independent observations",
+          "confirm assumption: within-group variance policy",
+          "confirm assumption: post-hoc correction policy",
+          "produce diagnostic: group counts",
+          "produce diagnostic: residual diagnostics"
+        ],
+        "expectedMetrics": [
+          "eta-squared",
+          "partial eta-squared",
+          "mean differences"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:two-sample-t-test",
+        "rank": 2,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Independent two-sample t-test",
+        "family": "hypothesis_test",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "paired design detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "binary group",
+          "group sizes",
+          "variance ratio",
+          "histogram",
+          "outlier check",
+          "provide continuous outcome",
+          "provide binary group",
+          "confirm assumption: Independent observations",
+          "confirm assumption: approximately normal residuals or adequate sample size",
+          "confirm assumption: variance policy declared",
+          "produce diagnostic: group sizes"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "Cohen's d",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method t-test --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --group <binary-group>"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 3,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.44,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: mean",
+          "supports outcome type continuous",
+          "supports study design cross_sectional"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:bootstrap-uncertainty",
+        "rank": 4,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Bootstrap uncertainty estimation",
+        "family": "nonparametric",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "complex survey bootstrap is requested without replicate design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "statistic",
+          "resampling unit",
+          "number of replicates",
+          "bootstrap distribution",
+          "replicate failures",
+          "CI method",
+          "provide statistic",
+          "provide resampling unit",
+          "provide number of replicates",
+          "confirm assumption: Resampling respects clustering and design",
+          "confirm assumption: sample is representative",
+          "produce diagnostic: bootstrap distribution"
+        ],
+        "expectedMetrics": [
+          "bootstrap confidence interval",
+          "standard error"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:mann-whitney-u",
+        "rank": 5,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Mann-Whitney U test",
+        "family": "nonparametric",
+        "backend": "python-scipy",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "paired measurements are detected",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "binary group",
+          "group sizes",
+          "tie frequency",
+          "distribution plots",
+          "provide outcome",
+          "provide binary group",
+          "confirm assumption: Independent samples",
+          "confirm assumption: distribution-shape interpretation is declared",
+          "produce diagnostic: group sizes",
+          "produce diagnostic: tie frequency",
+          "produce diagnostic: distribution plots"
+        ],
+        "expectedMetrics": [
+          "rank-biserial correlation",
+          "median difference"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method mann-whitney --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --group <binary-group>"
+      },
+      {
+        "id": "method:multiple-linear-regression",
+        "rank": 6,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Multiple linear regression",
+        "family": "linear",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.51,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation requested without causal design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "exposure",
+          "covariates",
+          "residual plots",
+          "influence",
+          "VIF",
+          "heteroscedasticity",
+          "provide continuous outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Linearity",
+          "confirm assumption: model residual policy"
+        ],
+        "expectedMetrics": [
+          "beta coefficient",
+          "mean difference",
+          "standardized beta"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method linear-regression --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --exposure <exposure> --covariate <covariate>"
+      },
+      {
+        "id": "method:clinical-trial-itt-analysis",
+        "rank": 7,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Clinical trial ITT/superiority analysis",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.45,
+        "compatible": false,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports data structure single_table",
+          "matches goal compare_groups"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "clinical-trial-itt-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "noninferiority/equivalence margin is involved",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "METHOD_NOT_EXECUTABLE",
+            "message": "clinical-trial-itt-analysis is design-only; use as design contract only.",
+            "evidenceRefs": [
+              "clinical-trial-itt-analysis"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "randomization group",
+          "analysis population",
+          "endpoint",
+          "protocol deviations",
+          "CONSORT flow",
+          "baseline balance",
+          "missing endpoints",
+          "adverse events",
+          "provide randomization group",
+          "provide analysis population",
+          "provide endpoint",
+          "provide protocol deviations"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "risk difference",
+          "hazard ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:cronbach-alpha-scale",
+        "rank": 8,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Cronbach alpha and scale reliability",
+        "family": "reliability",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical scale validity is claimed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "item responses",
+          "scale definition",
+          "item-total correlations",
+          "alpha-if-deleted",
+          "missing item pattern",
+          "provide item responses",
+          "provide scale definition",
+          "confirm assumption: Items measure a common construct",
+          "confirm assumption: reverse coding is handled",
+          "produce diagnostic: item-total correlations",
+          "produce diagnostic: alpha-if-deleted",
+          "produce diagnostic: missing item pattern"
+        ],
+        "expectedMetrics": [
+          "Cronbach's alpha",
+          "omega"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:effect-size-suite",
+        "rank": 9,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Effect size estimation suite",
+        "family": "descriptive",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "primary effect estimate",
+          "uncertainty interval",
+          "scale interpretation",
+          "absolute vs relative effect",
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "standardized mean difference",
+          "odds ratio",
+          "risk ratio",
+          "hazard ratio",
+          "NNT"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:factor-analysis",
+        "rank": 10,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Exploratory/confirmatory factor analysis",
+        "family": "dimension_reduction",
+        "backend": "r-lavaan",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": false,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "factor-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "blocker",
+            "code": "METHOD_NO_PRODUCTION_BACKEND",
+            "message": "factor-analysis has no production-ready backend yet.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical scale validity is claimed",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "METHOD_NOT_EXECUTABLE",
+            "message": "factor-analysis is design-only; use as design contract only.",
+            "evidenceRefs": [
+              "factor-analysis"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "item matrix",
+          "factor count or model",
+          "rotation policy",
+          "factor loadings",
+          "fit indices",
+          "residual correlations",
+          "provide item matrix",
+          "provide factor count or model",
+          "provide rotation policy",
+          "confirm assumption: Measurement level and sample size are adequate",
+          "confirm assumption: factor model is theoretically justified",
+          "produce diagnostic: factor loadings"
+        ],
+        "expectedMetrics": [
+          "factor loadings",
+          "fit indices"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:gamma-glm",
+        "rank": 11,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Gamma GLM",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "many zero costs require two-part model",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "positive continuous outcome",
+          "link function",
+          "covariates",
+          "zero values",
+          "skewness",
+          "deviance residuals",
+          "provide positive continuous outcome",
+          "provide link function",
+          "provide covariates",
+          "confirm assumption: Outcome is strictly positive",
+          "confirm assumption: link and variance family are justified",
+          "produce diagnostic: zero values"
+        ],
+        "expectedMetrics": [
+          "mean ratio",
+          "marginal mean"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      },
+      {
+        "id": "method:interaction-regression",
+        "rank": 12,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Interaction/effect-modification regression",
+        "family": "linear",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical subgroup conclusion requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "exposure",
+          "moderator",
+          "interaction term",
+          "cell counts by subgroup",
+          "interaction contrast",
+          "multiplicity review",
+          "provide outcome",
+          "provide exposure",
+          "provide moderator",
+          "provide interaction term",
+          "confirm assumption: Interaction scale is prespecified"
+        ],
+        "expectedMetrics": [
+          "interaction coefficient",
+          "stratum-specific effects"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Compare mean systolic blood pressure between high and lower sodium intake groups in a local adult screening table.\" --json"
+      }
+    ],
+    "blocked": false,
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "TABLE_SMALL_SAMPLE",
+        "message": "Table has 120 rows; high-capacity ML should be downgraded and uncertainty emphasized.",
+        "evidenceRefs": [
+          "tableSummary.rowCount"
+        ]
+      }
+    ],
+    "nextAction": "agenteer research stats-run --method t-test --data <rows.csv> --out-dir <out> --outcome <continuous-outcome> --group <binary-group>"
+  }
+}
+
