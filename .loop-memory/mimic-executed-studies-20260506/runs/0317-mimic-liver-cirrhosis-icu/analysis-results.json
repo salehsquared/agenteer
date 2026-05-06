@@ -1,0 +1,467 @@
+{
+  "study": {
+    "id": "mimic-liver-cirrhosis-icu",
+    "title": "Cirrhosis And ICU Outcomes",
+    "domain": "hepatology",
+    "question": "Among ICU admissions with cirrhosis codes, how do MELD-like derived variables and first-day labs relate to mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-meld",
+      "derived-first-day-lab",
+      "derived-coagulation"
+    ],
+    "outcomes": [
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "cirrhosis phenotype",
+      "MELD/severity model",
+      "bilirubin/coagulation missingness audit"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "K74",
+        "expectedTerms": [
+          "fibrosis",
+          "cirrhosis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "K74",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "K74",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=K74&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 10,
+            "sampleRows": [
+              {
+                "code": "K74.00",
+                "name": "Hepatic fibrosis, unspecified"
+              },
+              {
+                "code": "K74.01",
+                "name": "Hepatic fibrosis, early fibrosis"
+              },
+              {
+                "code": "K74.02",
+                "name": "Hepatic fibrosis, advanced fibrosis"
+              },
+              {
+                "code": "K74.1",
+                "name": "Hepatic sclerosis"
+              },
+              {
+                "code": "K74.2",
+                "name": "Hepatic fibrosis with hepatic sclerosis"
+              },
+              {
+                "code": "K74.3",
+                "name": "Primary biliary cirrhosis"
+              },
+              {
+                "code": "K74.4",
+                "name": "Secondary biliary cirrhosis"
+              },
+              {
+                "code": "K74.5",
+                "name": "Biliary cirrhosis, unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:50.125401+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "571.5",
+        "expectedTerms": [
+          "cirrhosis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "5715",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "5715",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=5715&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "571.5",
+                "name": "Cirrhosis of liver without mention of alcohol"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:50.610606+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 13,
+    "matchedDiagnosisRows": 12959,
+    "matchedAdmissions": 12849,
+    "firstIcuStayRows": 2662,
+    "uniquePatients": 2094
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 2662,
+        "missing": 0,
+        "mean": 63.27573253193088,
+        "sd": 11.942893246872245,
+        "median": 63.0,
+        "iqr": [
+          56.0,
+          71.0
+        ],
+        "min": 20.0,
+        "max": 96.0
+      },
+      "los_icu": {
+        "n": 2662,
+        "missing": 0,
+        "mean": 3.8589744552967695,
+        "sd": 4.8546665834355505,
+        "median": 2.17,
+        "iqr": [
+          1.17,
+          4.33
+        ],
+        "min": 0.0,
+        "max": 59.0
+      },
+      "los_hospital": {
+        "n": 2662,
+        "missing": 0,
+        "mean": 13.572501878287003,
+        "sd": 15.053100388893645,
+        "median": 9.0,
+        "iqr": [
+          5.0,
+          17.0
+        ],
+        "min": 0.0,
+        "max": 193.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 2662,
+        "positive": 565,
+        "proportion": 0.21224643125469572
+      },
+      "male": {
+        "n": 2662,
+        "positive": 1623,
+        "proportion": 0.6096919609316304
+      },
+      "prolonged_icu_los": {
+        "n": 2662,
+        "positive": 664,
+        "proportion": 0.2494365138993238
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 20,
+      "missingFraction": 0.007513148009015778
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 14,
+      "missingFraction": 0.005259203606311044
+    },
+    {
+      "column": "bun_max",
+      "missing": 14,
+      "missingFraction": 0.005259203606311044
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 12,
+      "missingFraction": 0.004507888805409466
+    },
+    {
+      "column": "wbc_max",
+      "missing": 12,
+      "missingFraction": 0.004507888805409466
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 2641,
+      "events": 556,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 63.26050738356683,
+          "sd": 11.967012280610502
+        },
+        "hemoglobin_min": {
+          "mean": 9.083604695191216,
+          "sd": 2.246719838242789
+        },
+        "wbc_max": {
+          "mean": 12.704475577432792,
+          "sd": 10.085333551271724
+        },
+        "creatinine_max": {
+          "mean": 1.973381294964029,
+          "sd": 1.8190780533085371
+        },
+        "bun_max": {
+          "mean": 37.750473305566075,
+          "sd": 28.575647623221123
+        },
+        "glucose_max": {
+          "mean": 182.58917076864824,
+          "sd": 114.90160357408179
+        }
+      },
+      "metrics": {
+        "auroc": 0.7010084019115643,
+        "averagePrecision": 0.3764426105564303
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.1105198663897802,
+          "ci95": [
+            1.0049706251024404,
+            1.2271546479487048
+          ],
+          "pValue": 0.039660100151641724,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9635561793893263,
+          "ci95": [
+            0.7874755700452657,
+            1.1790086526569794
+          ],
+          "pValue": 0.7184202212614786,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 0.8837200893016602,
+          "ci95": [
+            0.7974782177456723,
+            0.9792884355424419
+          ],
+          "pValue": 0.01830270169410746,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.4573261855158965,
+          "ci95": [
+            1.3113857122228063,
+            1.6195079687046925
+          ],
+          "pValue": 2.648356024505328e-12,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 1.1083839565986817,
+          "ci95": [
+            0.9956243585916376,
+            1.2339141611432112
+          ],
+          "pValue": 0.060128046212571375,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.4330793295970796,
+          "ci95": [
+            1.2831771290523664,
+            1.6004932744048335
+          ],
+          "pValue": 1.7354390355277747e-10,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 0.8958232926552672,
+          "ci95": [
+            0.8062364358935644,
+            0.9953648035942483
+          ],
+          "pValue": 0.04071842253358701,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 2640,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 63.260984848484846,
+          "sd": 11.9692542438531
+        },
+        "hemoglobin_min": {
+          "mean": 9.082992424242423,
+          "sd": 2.2469250901365827
+        },
+        "wbc_max": {
+          "mean": 12.703,
+          "sd": 10.086959053554564
+        },
+        "creatinine_max": {
+          "mean": 1.9739015151515154,
+          "sd": 1.819226171474043
+        },
+        "bun_max": {
+          "mean": 37.76022727272727,
+          "sd": 28.576663566492698
+        },
+        "glucose_max": {
+          "mean": 182.5625,
+          "sd": 114.91519466853245
+        }
+      },
+      "rSquared": 0.045455755074519266,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -2.593056292614926,
+          "ci95PercentChange": [
+            -5.033867755410537,
+            -0.08951130096956916
+          ],
+          "pValue": 0.04244530398693112,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": -6.582735938504369,
+          "ci95PercentChange": [
+            -11.392353344528027,
+            -1.5120528066041472
+          ],
+          "pValue": 0.011572725617140085,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -0.3339671310391812,
+          "ci95PercentChange": [
+            -2.960717771472632,
+            2.363886868452192
+          ],
+          "pValue": 0.8060833264270324,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 9.552401773270969,
+          "ci95PercentChange": [
+            3.7618495593207513,
+            15.666102572996099
+          ],
+          "pValue": 0.0009920318297766376,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": 6.16314502161488,
+          "ci95PercentChange": [
+            2.5292239317586285,
+            9.925862390043294
+          ],
+          "pValue": 0.000763912182670536,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 5.110767559487295,
+          "ci95PercentChange": [
+            1.4219523670238043,
+            8.93374855340281
+          ],
+          "pValue": 0.00624589474298591,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 1.2865661712844867,
+          "ci95PercentChange": [
+            -1.2616728573138336,
+            3.9005701600029807
+          ],
+          "pValue": 0.3254534705697637,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

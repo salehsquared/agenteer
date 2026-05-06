@@ -1,0 +1,51 @@
+{
+  "status": "pass",
+  "checks": [
+    {
+      "code": "COST_UNDER_CEILING",
+      "passed": true,
+      "detail": "Estimated transfer cost $0.0099."
+    },
+    {
+      "code": "COHORT_NONEMPTY",
+      "passed": true,
+      "detail": "Cohort rows: 920."
+    },
+    {
+      "code": "MORTALITY_BOTH_CLASSES",
+      "passed": true,
+      "detail": "Mortality values: [0, 1]."
+    },
+    {
+      "code": "LOS_POSITIVE",
+      "passed": true,
+      "detail": "All non-missing ICU LOS values are positive."
+    },
+    {
+      "code": "NO_ROW_LEVEL_EXPORT",
+      "passed": true,
+      "detail": "Temporary row-level cache is absent after the run."
+    },
+    {
+      "code": "MODEL_MORTALITY_FIT",
+      "passed": true,
+      "detail": "Model n=909."
+    },
+    {
+      "code": "MODEL_LOS_FIT",
+      "passed": true,
+      "detail": "Model n=909."
+    },
+    {
+      "code": "MODEL_PROLONGED_LOS_FIT",
+      "passed": true,
+      "detail": "Model n=909."
+    }
+  ],
+  "limitations": [
+    "This is an observational ICU cohort analysis and does not estimate causal effects.",
+    "The hip/femur fracture phenotype is ICD-code based and should be clinician-reviewed before publication use.",
+    "Only first ICU stay per fracture hospitalization is used for the primary cohort.",
+    "Administrative and derived variables may encode care processes as well as disease severity."
+  ]
+}

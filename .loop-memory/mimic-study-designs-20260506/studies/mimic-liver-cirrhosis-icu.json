@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:50.610685+00:00",
+  "study": {
+    "id": "mimic-liver-cirrhosis-icu",
+    "title": "Cirrhosis And ICU Outcomes",
+    "domain": "hepatology",
+    "question": "Among ICU admissions with cirrhosis codes, how do MELD-like derived variables and first-day labs relate to mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-meld",
+      "derived-first-day-lab",
+      "derived-coagulation"
+    ],
+    "outcomes": [
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "cirrhosis phenotype",
+      "MELD/severity model",
+      "bilirubin/coagulation missingness audit"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "K74",
+      "expectedTerms": [
+        "fibrosis",
+        "cirrhosis"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "K74",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "K74",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=K74&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 10,
+          "sampleRows": [
+            {
+              "code": "K74.00",
+              "name": "Hepatic fibrosis, unspecified"
+            },
+            {
+              "code": "K74.01",
+              "name": "Hepatic fibrosis, early fibrosis"
+            },
+            {
+              "code": "K74.02",
+              "name": "Hepatic fibrosis, advanced fibrosis"
+            },
+            {
+              "code": "K74.1",
+              "name": "Hepatic sclerosis"
+            },
+            {
+              "code": "K74.2",
+              "name": "Hepatic fibrosis with hepatic sclerosis"
+            },
+            {
+              "code": "K74.3",
+              "name": "Primary biliary cirrhosis"
+            },
+            {
+              "code": "K74.4",
+              "name": "Secondary biliary cirrhosis"
+            },
+            {
+              "code": "K74.5",
+              "name": "Biliary cirrhosis, unspecified"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:50.125401+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "571.5",
+      "expectedTerms": [
+        "cirrhosis"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "5715",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "5715",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=5715&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "571.5",
+              "name": "Cirrhosis of liver without mention of alcohol"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:50.610606+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-meld",
+      "derived-first-day-lab",
+      "derived-coagulation"
+    ],
+    "missingTables": [],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-meld",
+      "derived-first-day-lab"
+    ],
+    "unprofiledTables": [
+      "derived-coagulation"
+    ],
+    "estimatedBytesForNaiveFullRequiredTableRead": 123798705,
+    "estimatedTransferUsdAt012PerGb": 0.013835583440959453,
+    "status": "ready_for_bounded_design",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [],
+    "warnings": [
+      "Unprofiled required tables: derived-coagulation.",
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "promote_to_candidate_queue",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "64dab167511745aa3754e7c549102eb9eadb848255a9edd0eda6a16e4eda44f0"
+}

@@ -9,6 +9,8 @@ import {
   researchAnalysisBenchmarkCommand,
   researchAnalysisManifestCommand,
   researchAnalysisRunCommand,
+  researchExploreCommand,
+  researchExplorePromoteCommand,
   researchMlCompareCommand,
   researchMlInspectCommand,
   researchMlModelsCommand,
@@ -207,6 +209,148 @@ describe("research ML modeling layer", () => {
     expect(statsRunMethodForAnalysisMethod("two-sample-t-test")).toBe("t-test");
     expect(plan.routeRecommendation.route).toBe("stats-run");
     expect(plan.nextAction).toContain("research stats-run --method t-test");
+  });
+
+  it("explores a dataset and generates bounded candidate research questions", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-explore-"));
+    try {
+      const data = path.join(dir, "explore.csv");
+      await writeFile(data, statsCsv());
+      const result = await researchExploreCommand({
+        dataPath: data,
+        target: "hba1c",
+        outDir: path.join(dir, "exploration"),
+        maxPairs: 8,
+      });
+
+      expect(result.posture).toBe("exploratory_hypothesis_generation");
+      expect(result.tableSummary.rowCount).toBe(140);
+      expect(result.variableMap.find(item => item.name === "hba1c")?.role).toBe("candidate_outcome");
+      expect(result.associations.length).toBeGreaterThan(0);
+      expect(result.targetAssociations.length).toBeGreaterThan(0);
+      expect(result.targetAssociations.every(item => item.left === "hba1c" || item.right === "hba1c")).toBe(true);
+      expect(result.associations[0]?.left + result.associations[0]?.right).toContain("hba1c");
+      expect(result.backgroundAssociations.every(item => item.left !== "hba1c" && item.right !== "hba1c")).toBe(true);
+      expect(result.explorationBurden.testedPairCount).toBeGreaterThanOrEqual(result.associations.length);
+      expect(result.explorationBurden.targetPairCount).toBe(result.targetAssociations.length);
+      expect(result.explorationBurden.possibleLeakagePairs.length).toBeGreaterThan(0);
+      expect(result.explorationBurden.promotionClearance.level).toBe("hold_for_methods_review");
+      expect(result.candidateQuestions[0]?.outcome).toBe("hba1c");
+      expect(result.candidateQuestions[0]?.taxonomy).toBe("surprising_cross_domain_signal");
+      expect(result.candidateQuestions[0]?.routeIntent).toBe("explanatory_association");
+      expect(result.recommendedQuestion?.questionId).toBe(result.candidateQuestions[0]?.id);
+      expect(result.recommendedQuestion?.routeIntent).toBe("explanatory_association");
+      expect(result.candidateQuestions[0]?.researchInterestScore).toBeGreaterThan(0);
+      expect(result.candidateQuestions[0]?.primaryQuestionUse).toBe("recommended");
+      expect(result.candidateQuestions[0]?.taxonomyEvidence.taxonomyVersion).toBe("exploration-taxonomy-v1");
+      expect(result.candidateQuestions[0]?.taxonomyEvidence.matchedRuleIds.length).toBeGreaterThan(0);
+      expect(result.candidateQuestions[0]?.whyThisQuestion).toContain("association");
+      expect(result.candidateQuestions.find(question => question.exposure === "elevated")?.avoidAsPrimaryQuestion).toContain("proxy");
+      expect(result.candidateQuestions.some(question => question.outcome === "hba1c")).toBe(true);
+      expect(result.qa.checks.find(check => check.id === "target-association-scan")?.status).toBe("pass");
+      expect(result.qa.checks.find(check => check.id === "taxonomy-evidence")?.status).toBe("pass");
+      expect(result.qa.checks.find(check => check.id === "route-intent")?.status).toBe("pass");
+      expect(result.qa.checks.find(check => check.id === "promotion-gate")?.status).toBe("warning");
+      expect(result.qa.checks.find(check => check.id === "promotion-clearance")?.status).toBe("warning");
+      expect(result.qa.checks.find(check => check.id === "exploratory-only")?.status).toBe("warning");
+      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["exploration", "exploration-report", "candidate-questions"]));
+      const report = await readFile(path.join(dir, "exploration", "exploration-report.md"), "utf-8");
+      expect(report).toContain("Dataset Exploration Report");
+      expect(report).toContain("Recommended Next Question");
+      expect(report).toContain("Route intent");
+      expect(report).toContain("Target-Centered Associations");
+      expect(report).toContain("Background Correlation Map");
+      expect(report).toContain("Exploration Burden");
+      expect(report).toContain("Candidate promotion summary");
+      expect(report).toContain("Promotion clearance");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("requires methods review before handing off held exploration questions", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-explore-promote-"));
+    try {
+      const data = path.join(dir, "explore.csv");
+      await writeFile(data, statsCsv());
+      const exploration = await researchExploreCommand({
+        dataPath: data,
+        target: "hba1c",
+        outDir: path.join(dir, "exploration"),
+        maxPairs: 8,
+      });
+      const explorationPath = path.join(dir, "exploration", "exploration.json");
+      const questionId = exploration.candidateQuestions[0]!.id;
+
+      await expect(researchExplorePromoteCommand({
+        explorationPath,
+        questionId,
+      })).rejects.toThrow(/methods review note is required/);
+
+      const handoff = await researchExplorePromoteCommand({
+        explorationPath,
+        questionId,
+        methodsReviewNote: "Reviewed low-N and proxy risk; use only as modeling-plan seed.",
+        outPath: path.join(dir, "exploration", "handoff.json"),
+      });
+
+      expect(handoff.status).toBe("needs_methods_review");
+      expect(handoff.clearanceLevel).toBe("hold_for_methods_review");
+      expect(handoff.modelingPlanSeed.outcome).toBe("hba1c");
+      expect(handoff.modelingPlanSeed.routeIntent).toBe("explanatory_association");
+      expect(handoff.modelingPlanSeed.taxonomy).toBe("surprising_cross_domain_signal");
+      expect(handoff.modelingPlanSeed.researchInterestScore).toBeGreaterThan(0);
+      expect(handoff.modelingPlanSeed.primaryQuestionUse).toBe("recommended");
+      expect(handoff.modelingPlanSeed.taxonomyEvidence.taxonomyVersion).toBe("exploration-taxonomy-v1");
+      expect(handoff.modelingPlanSeed.whyThisQuestion).toContain("association");
+      expect(handoff.analysisSpecCandidate.routeIntent).toBe("explanatory_association");
+      expect(handoff.analysisSpecCandidate.status).toBe("needs_methods_review");
+      expect(handoff.analysisSpecCandidate.variables.outcome).toBe("hba1c");
+      expect(handoff.analysisSpecCandidate.requiredBeforeExecution).toEqual(expect.arrayContaining(["Write or approve an AnalysisSpec before execution."]));
+      expect(handoff.analysisSpecCandidate.provenance.taxonomyVersion).toBe("exploration-taxonomy-v1");
+      expect(handoff.recommendedCommand).toContain("agenteer research modeling-plan");
+      expect(handoff.artifacts.map(artifact => artifact.kind)).toContain("exploration-handoff");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("carries exploration handoff review posture into modeling-plan decisions", () => {
+    const reviewed = researchModelingPlanCommand({
+      question: "Among adults, is BMI associated with HbA1c?",
+      outcomeType: "continuous",
+      target: "hba1c",
+      explorationHandoff: {
+        path: "exploration/handoff.json",
+        status: "needs_methods_review",
+        clearanceLevel: "hold_for_methods_review",
+        sourceExplorationSha256: "abc123",
+        questionId: "question_01",
+        blockers: ["multiplicity review required"],
+        methodsReviewNote: "Reviewed as hypothesis-generation only before modeling.",
+      },
+      maxCandidates: 8,
+    });
+    const unreviewed = researchModelingPlanCommand({
+      question: "Among adults, is BMI associated with HbA1c?",
+      outcomeType: "continuous",
+      target: "hba1c",
+      explorationHandoff: {
+        path: "exploration/handoff.json",
+        status: "needs_methods_review",
+        clearanceLevel: "hold_for_methods_review",
+        sourceExplorationSha256: "abc123",
+        questionId: "question_01",
+        blockers: ["multiplicity review required"],
+      },
+      maxCandidates: 8,
+    });
+
+    expect(reviewed.request.explorationHandoff?.questionId).toBe("question_01");
+    expect(reviewed.issues.map(issue => issue.code)).toContain("EXPLORATION_HANDOFF_METHODS_REVIEW");
+    expect(reviewed.issues.map(issue => issue.code)).not.toContain("EXPLORATION_HANDOFF_MISSING_REVIEW_NOTE");
+    expect(unreviewed.blocked).toBe(true);
+    expect(unreviewed.issues.map(issue => issue.code)).toContain("EXPLORATION_HANDOFF_MISSING_REVIEW_NOTE");
   });
 
   it("lists registered adapters by task and reports optional dependency requirements", () => {
@@ -559,8 +703,10 @@ describe("research ML modeling layer", () => {
       expect(analysisRun.generatedFiles.diagnosticPaper).toBeTruthy();
       expect(analysisRun.generatedFiles.diagnosticPaperQa).toBeTruthy();
       const diagnosticPaper = await readFile(analysisRun.generatedFiles.diagnosticPaper!, "utf-8");
-      expect(diagnosticPaper).toContain("Diagnostic Accuracy Study");
-      expect(diagnosticPaper).toContain("PPV and NPV are prevalence-dependent");
+      expect(diagnosticPaper).toContain("Diagnostic Accuracy of screen_positive Against elevated_hba1c");
+      expect(diagnosticPaper).toContain("## Summary");
+      expect(diagnosticPaper).toContain("Positive and negative predictive values depend on the prevalence");
+      expect(diagnosticPaper).not.toMatch(/Agenteer|AnalysisSpec|result posture|local_review_ready|Artifact Posture|paper-run/i);
       const diagnosticPaperQa = JSON.parse(await readFile(analysisRun.generatedFiles.diagnosticPaperQa!, "utf-8")) as { status: string };
       expect(diagnosticPaperQa.status).toBe("pass");
       expect(analysisRun.analysisRunManifest.artifacts.find(artifact => artifact.kind === "diagnostic-paper")?.exists).toBe(true);

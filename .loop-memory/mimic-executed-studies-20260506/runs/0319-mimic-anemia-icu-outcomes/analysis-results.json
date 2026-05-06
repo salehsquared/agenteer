@@ -1,0 +1,543 @@
+{
+  "study": {
+    "id": "mimic-anemia-icu-outcomes",
+    "title": "Anemia Diagnosis And ICU Outcomes",
+    "domain": "hematology",
+    "question": "Among ICU admissions with anemia codes, do first-day hemoglobin values and comorbidity burden predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab",
+      "derived-charlson"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "diagnosis-lab concordance audit",
+      "mortality model",
+      "transfusion data deferred"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "D64",
+        "expectedTerms": [
+          "anemia"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "D64",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "D64",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=D64&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 8,
+            "sampleRows": [
+              {
+                "code": "D64.0",
+                "name": "Hereditary sideroblastic anemia"
+              },
+              {
+                "code": "D64.1",
+                "name": "Secondary sideroblastic anemia due to disease"
+              },
+              {
+                "code": "D64.2",
+                "name": "Secondary sideroblastic anemia due to drugs and toxins"
+              },
+              {
+                "code": "D64.3",
+                "name": "Other sideroblastic anemias"
+              },
+              {
+                "code": "D64.4",
+                "name": "Congenital dyserythropoietic anemia"
+              },
+              {
+                "code": "D64.81",
+                "name": "Anemia due to antineoplastic chemotherapy"
+              },
+              {
+                "code": "D64.89",
+                "name": "Other specified anemias"
+              },
+              {
+                "code": "D64.9",
+                "name": "Anemia, unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:54.169806+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "285",
+        "expectedTerms": [
+          "anemia"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "285",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "285",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=285&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 8,
+            "sampleRows": [
+              {
+                "code": "285.0",
+                "name": "Sideroblastic anemia"
+              },
+              {
+                "code": "285.1",
+                "name": "Acute posthemorrhagic anemia"
+              },
+              {
+                "code": "285.21",
+                "name": "Anemia in chronic kidney disease"
+              },
+              {
+                "code": "285.22",
+                "name": "Anemia in neoplastic disease"
+              },
+              {
+                "code": "285.29",
+                "name": "Anemia of other chronic disease"
+              },
+              {
+                "code": "285.3",
+                "name": "Antineoplastic chemotherapy induced anemia"
+              },
+              {
+                "code": "285.8",
+                "name": "Other specified anemias"
+              },
+              {
+                "code": "285.9",
+                "name": "Anemia, unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:54.639935+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 18,
+    "matchedDiagnosisRows": 71800,
+    "matchedAdmissions": 70638,
+    "firstIcuStayRows": 18946,
+    "uniquePatients": 16140
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 18946,
+        "missing": 0,
+        "mean": 65.99419402512403,
+        "sd": 16.48822826213343,
+        "median": 68.0,
+        "iqr": [
+          56.0,
+          79.0
+        ],
+        "min": 18.0,
+        "max": 100.0
+      },
+      "los_icu": {
+        "n": 18943,
+        "missing": 3,
+        "mean": 3.9720139365464817,
+        "sd": 5.5321191920605095,
+        "median": 2.17,
+        "iqr": [
+          1.21,
+          4.17
+        ],
+        "min": 0.0,
+        "max": 94.04
+      },
+      "los_hospital": {
+        "n": 18946,
+        "missing": 0,
+        "mean": 11.266758154755621,
+        "sd": 11.252109398525347,
+        "median": 8.0,
+        "iqr": [
+          5.0,
+          14.0
+        ],
+        "min": 0.0,
+        "max": 193.0
+      },
+      "charlson_comorbidity_index": {
+        "n": 18946,
+        "missing": 0,
+        "mean": 5.364931911749182,
+        "sd": 3.035227852442048,
+        "median": 5.0,
+        "iqr": [
+          3.0,
+          7.0
+        ],
+        "min": 0.0,
+        "max": 20.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 18946,
+        "positive": 2104,
+        "proportion": 0.1110524649002428
+      },
+      "male": {
+        "n": 18946,
+        "positive": 10262,
+        "proportion": 0.541644674337591
+      },
+      "prolonged_icu_los": {
+        "n": 18946,
+        "positive": 4714,
+        "proportion": 0.2488124142299166
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "charlson_comorbidity_index",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 136,
+      "missingFraction": 0.007178296210281853
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 101,
+      "missingFraction": 0.005330940567929906
+    },
+    {
+      "column": "wbc_max",
+      "missing": 100,
+      "missingFraction": 0.0052781589781484214
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 91,
+      "missingFraction": 0.004803124670115064
+    },
+    {
+      "column": "bun_max",
+      "missing": 90,
+      "missingFraction": 0.00475034308033358
+    },
+    {
+      "column": "los_icu",
+      "missing": 3,
+      "missingFraction": 0.00015834476934445266
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "charlson_comorbidity_index",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 18772,
+      "events": 2074,
+      "predictors": [
+        "admission_age",
+        "male",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 66.00186447901129,
+          "sd": 16.479621029054844
+        },
+        "charlson_comorbidity_index": {
+          "mean": 5.36868740677605,
+          "sd": 3.0362408383236756
+        },
+        "hemoglobin_min": {
+          "mean": 9.264735243980397,
+          "sd": 1.8981407251195832
+        },
+        "wbc_max": {
+          "mean": 13.889558384828469,
+          "sd": 12.111347865643879
+        },
+        "creatinine_max": {
+          "mean": 1.9566322181973153,
+          "sd": 2.2930239382895996
+        },
+        "bun_max": {
+          "mean": 33.22858512678457,
+          "sd": 26.553057104143143
+        },
+        "glucose_max": {
+          "mean": 173.61746217771147,
+          "sd": 119.20570232604149
+        }
+      },
+      "metrics": {
+        "auroc": 0.6884195417533071,
+        "averagePrecision": 0.2056338879076928
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 0.9791237579845661,
+          "ci95": [
+            0.9211959899323812,
+            1.0406942104906358
+          ],
+          "pValue": 0.4977526990911483,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9735519000969141,
+          "ci95": [
+            0.8851708137061106,
+            1.0707575165226766
+          ],
+          "pValue": 0.5809408785640653,
+          "scale": "per unit"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "oddsRatio": 1.5379604421776125,
+          "ci95": [
+            1.4548650686796765,
+            1.6258018510608288
+          ],
+          "pValue": 4.156361022702084e-52,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 0.8998792001518432,
+          "ci95": [
+            0.8564666873777803,
+            0.9454922027909916
+          ],
+          "pValue": 2.8930434263983134e-05,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.1833640604962,
+          "ci95": [
+            1.1337974140875617,
+            1.2350976305595163
+          ],
+          "pValue": 1.2396797711577608e-14,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 0.8651238911118715,
+          "ci95": [
+            0.8130653690641221,
+            0.9205155888437795
+          ],
+          "pValue": 4.749554862339194e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.3509287174960363,
+          "ci95": [
+            1.2817646764472115,
+            1.423824851230909
+          ],
+          "pValue": 3.3374638107893657e-29,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.090908403123066,
+          "ci95": [
+            1.0481277361093906,
+            1.1354352174879496
+          ],
+          "pValue": 2.0180414069439455e-05,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 18764,
+      "predictors": [
+        "admission_age",
+        "male",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 66.00463653805159,
+          "sd": 16.47742217036511
+        },
+        "charlson_comorbidity_index": {
+          "mean": 5.368897889575783,
+          "sd": 3.035599407734131
+        },
+        "hemoglobin_min": {
+          "mean": 9.26478416115967,
+          "sd": 1.8982184741414112
+        },
+        "wbc_max": {
+          "mean": 13.89010818588787,
+          "sd": 12.113774711216601
+        },
+        "creatinine_max": {
+          "mean": 1.9570027712641227,
+          "sd": 2.2933963654085976
+        },
+        "bun_max": {
+          "mean": 33.233638882967384,
+          "sd": 26.555590131258082
+        },
+        "glucose_max": {
+          "mean": 173.62843743338308,
+          "sd": 119.22650421105814
+        }
+      },
+      "rSquared": 0.022166576489362155,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -3.407351109019885,
+          "ci95PercentChange": [
+            -4.578624241205542,
+            -2.221700896863721
+          ],
+          "pValue": 2.5557723632938316e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 1.741010109189589,
+          "ci95PercentChange": [
+            -0.22753091782636847,
+            3.7483910467609682
+          ],
+          "pValue": 0.08337023126016181,
+          "scale": "per unit"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "percentChangeInLos": 1.490155027120621,
+          "ci95PercentChange": [
+            0.26725746392055605,
+            2.727967513575824
+          ],
+          "pValue": 0.01678035184508079,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": 4.254637752852641,
+          "ci95PercentChange": [
+            3.1373375537075088,
+            5.384041810451179
+          ],
+          "pValue": 3.4787549263925995e-14,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 6.9744844033770015,
+          "ci95PercentChange": [
+            3.9722117875548024,
+            10.063449806673352
+          ],
+          "pValue": 3.451244205981025e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -5.2669341454398495,
+          "ci95PercentChange": [
+            -6.410785766011595,
+            -4.109102318488622
+          ],
+          "pValue": 2.5536881114874964e-18,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 7.43812877108565,
+          "ci95PercentChange": [
+            5.993084064408594,
+            8.902874331103527
+          ],
+          "pValue": 2.9214339265589826e-25,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 2.2280144584482686,
+          "ci95PercentChange": [
+            1.212470256213738,
+            3.2537484132308947
+          ],
+          "pValue": 1.5190471325968306e-05,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

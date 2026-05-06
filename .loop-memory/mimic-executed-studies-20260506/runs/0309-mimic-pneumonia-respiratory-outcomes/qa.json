@@ -1,0 +1,48 @@
+{
+  "status": "review",
+  "checks": [
+    {
+      "code": "cost-under-session-ceiling",
+      "passed": true
+    },
+    {
+      "code": "cohort-nonempty",
+      "passed": true
+    },
+    {
+      "code": "icd-codes-matched",
+      "passed": true
+    },
+    {
+      "code": "row-cache-removed",
+      "passed": true
+    },
+    {
+      "code": "mortality-model-fit-or-justified",
+      "passed": true
+    },
+    {
+      "code": "los-model-fit-or-justified",
+      "passed": true
+    },
+    {
+      "code": "methods-review-typed-issues-recorded",
+      "passed": true
+    }
+  ],
+  "typedIssues": [
+    {
+      "code": "NONFINITE_LOS_EFFECT_REVIEW",
+      "severity": "warning",
+      "message": "At least one ICU LOS effect estimate was too large or unstable to render as a finite percent change.",
+      "terms": [
+        "any_antibiotic_record"
+      ]
+    }
+  ],
+  "warnings": [
+    "Antibiotic exposure is time-dependent and confounded by indication.",
+    "Mortality models are associational unless a causal design is specified."
+  ],
+  "blockers": []
+}

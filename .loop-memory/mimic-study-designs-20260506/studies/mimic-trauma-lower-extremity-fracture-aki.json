@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:38.337615+00:00",
+  "study": {
+    "id": "mimic-trauma-lower-extremity-fracture-aki",
+    "title": "Lower-Extremity Fracture And Early AKI Signal",
+    "domain": "trauma-renal",
+    "question": "Among ICU admissions with lower-extremity fracture diagnoses, how common is early renal dysfunction and is it associated with mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-kdigo-stages",
+      "derived-first-day-lab"
+    ],
+    "outcomes": [
+      "aki_stage",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "phenotype + KDIGO stage",
+      "missingness audit",
+      "ordinal/binary AKI simplification"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "S72",
+      "expectedTerms": [
+        "femur",
+        "fracture"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "S72",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "S72",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S72&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 2466,
+          "sampleRows": [
+            {
+              "code": "S72.001A",
+              "name": "Fracture of unspecified part of neck of right femur, initial encounter for closed fracture"
+            },
+            {
+              "code": "S72.001B",
+              "name": "Fracture of unspecified part of neck of right femur, initial encounter for open fracture type I or II"
+            },
+            {
+              "code": "S72.001C",
+              "name": "Fracture of unspecified part of neck of right femur, initial encounter for open fracture type IIIA, IIIB, or IIIC"
+            },
+            {
+              "code": "S72.001D",
+              "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for closed fracture with routine healing"
+            },
+            {
+              "code": "S72.001E",
+              "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type I or II with routine healing"
+            },
+            {
+              "code": "S72.001F",
+              "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type IIIA, IIIB, or IIIC with routine healing"
+            },
+            {
+              "code": "S72.001G",
+              "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for closed fracture with delayed healing"
+            },
+            {
+              "code": "S72.001H",
+              "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type I or II with delayed healing"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:29.147809+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd10cm",
+      "query": "S82",
+      "expectedTerms": [
+        "lower leg",
+        "fracture"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "S82",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "S82",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S82&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 3096,
+          "sampleRows": [
+            {
+              "code": "S82.001A",
+              "name": "Unspecified fracture of right patella, initial encounter for closed fracture"
+            },
+            {
+              "code": "S82.001B",
+              "name": "Unspecified fracture of right patella, initial encounter for open fracture type I or II"
+            },
+            {
+              "code": "S82.001C",
+              "name": "Unspecified fracture of right patella, initial encounter for open fracture type IIIA, IIIB, or IIIC"
+            },
+            {
+              "code": "S82.001D",
+              "name": "Unspecified fracture of right patella, subsequent encounter for closed fracture with routine healing"
+            },
+            {
+              "code": "S82.001E",
+              "name": "Unspecified fracture of right patella, subsequent encounter for open fracture type I or II with routine healing"
+            },
+            {
+              "code": "S82.001F",
+              "name": "Unspecified fracture of right patella, subsequent encounter for open fracture type IIIA, IIIB, or IIIC with routine healing"
+            },
+            {
+              "code": "S82.001G",
+              "name": "Unspecified fracture of right patella, subsequent encounter for closed fracture with delayed healing"
+            },
+            {
+              "code": "S82.001H",
+              "name": "Unspecified fracture of right patella, subsequent encounter for open fracture type I or II with delayed healing"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:37.863523+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "820",
+      "expectedTerms": [
+        "femur",
+        "fracture"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "820",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "820",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=820&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 18,
+          "sampleRows": [
+            {
+              "code": "820.00",
+              "name": "Closed fracture of intracapsular section of neck of femur, unspecified"
+            },
+            {
+              "code": "820.01",
+              "name": "Closed fracture of epiphysis (separation) (upper) of neck of femur"
+            },
+            {
+              "code": "820.02",
+              "name": "Closed fracture of midcervical section of neck of femur"
+            },
+            {
+              "code": "820.03",
+              "name": "Closed fracture of base of neck of femur"
+            },
+            {
+              "code": "820.09",
+              "name": "Other closed transcervical fracture of neck of femur"
+            },
+            {
+              "code": "820.10",
+              "name": "Open fracture of intracapsular section of neck of femur, unspecified"
+            },
+            {
+              "code": "820.11",
+              "name": "Open fracture of epiphysis (separation) (upper) of neck of femur"
+            },
+            {
+              "code": "820.12",
+              "name": "Open fracture of midcervical section of neck of femur"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:30.119940+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "821",
+      "expectedTerms": [
+        "femur",
+        "fracture"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "821",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "821",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=821&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 14,
+          "sampleRows": [
+            {
+              "code": "821.00",
+              "name": "Closed fracture of unspecified part of femur"
+            },
+            {
+              "code": "821.01",
+              "name": "Closed fracture of shaft of femur"
+            },
+            {
+              "code": "821.10",
+              "name": "Open fracture of unspecified part of femur"
+            },
+            {
+              "code": "821.11",
+              "name": "Open fracture of shaft of femur"
+            },
+            {
+              "code": "821.20",
+              "name": "Closed fracture of lower end of femur, unspecified part"
+            },
+            {
+              "code": "821.21",
+              "name": "Closed fracture of condyle, femoral"
+            },
+            {
+              "code": "821.22",
+              "name": "Closed fracture of epiphysis, lower (separation) of femur"
+            },
+            {
+              "code": "821.23",
+              "name": "Closed supracondylar fracture of femur"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:30.617748+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "823",
+      "expectedTerms": [
+        "tibia",
+        "fibula"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "823",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "823",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=823&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 21,
+          "sampleRows": [
+            {
+              "code": "823.00",
+              "name": "Closed fracture of upper end of tibia alone"
+            },
+            {
+              "code": "823.01",
+              "name": "Closed fracture of upper end of fibula alone"
+            },
+            {
+              "code": "823.02",
+              "name": "Closed fracture of upper end of fibula with tibia"
+            },
+            {
+              "code": "823.10",
+              "name": "Open fracture of upper end of tibia alone"
+            },
+            {
+              "code": "823.11",
+              "name": "Open fracture of upper end of fibula alone"
+            },
+            {
+              "code": "823.12",
+              "name": "Open fracture of upper end of fibula with tibia"
+            },
+            {
+              "code": "823.20",
+              "name": "Closed fracture of shaft of tibia alone"
+            },
+            {
+              "code": "823.21",
+              "name": "Closed fracture of shaft of fibula alone"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:38.337567+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-kdigo-stages",
+      "derived-first-day-lab"
+    ],
+    "missingTables": [],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab"
+    ],
+    "unprofiledTables": [
+      "derived-kdigo-stages"
+    ],
+    "estimatedBytesForNaiveFullRequiredTableRead": 208177176,
+    "estimatedTransferUsdAt012PerGb": 0.02326561242341995,
+    "status": "ready_for_bounded_design",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [],
+    "warnings": [
+      "Unprofiled required tables: derived-kdigo-stages.",
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "promote_to_candidate_queue",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "49202aa871ea33fa5b24a724a7897154e7cae16d4dc5eab042d198c0b507e72a"
+}

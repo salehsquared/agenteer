@@ -2,6 +2,10 @@
 
 ## Modeling Decision Layer
 
+- MIMIC execution runner gap after ticks 293-322: should the loop-memory runner become `agenteer research mimic-run` or a more general `research dataset-run --dataset <manifest> --study <json>` command?
+- MIMIC phenotype gap: how should AnalysisSpec V2 express broad/narrow ICD phenotype sensitivity, primary diagnosis restrictions, present-on-admission uncertainty, and coding-review status?
+- MIMIC methods gap: current executed packets are local-review observational summaries with simple complete-case models. Publication-grade packets need design-specific covariate sets, train/test or validation for prediction claims, survival/time-to-event support when appropriate, and phenotype-specific sensitivity analysis.
+
 - Tick 178 added a deterministic modeling-plan command. It should next consume table summaries, AnalysisSpec V2, and backend availability so recommendations are driven by actual data evidence rather than flags alone.
 - The planner currently treats survival and text/image modeling as stop-for-review/contract areas. Future ticks need executable adapters only when backed by mature libraries and tests.
 - Tick 179 challenge: `modeling-plan` should split blocking policies from executable candidates and show different recommendations for small/high-missingness versus large/clean tables.
@@ -193,6 +197,130 @@
 # Tick 0233
 
 - Challenge response target: add diagnostic rerun stability, lifecycle/index visibility, or actual NHANES-shaped diagnostic packet pressure.
+
+# Tick 0235
+
+- Challenge response target: implement a reader-facing paper contract and QA gate that blocks Agenteer-specific jargon in generated `paper.md` files.
+
+# Tick 0236
+
+- Resolved partly: diagnostic and future paper-run generated papers now have a reader-facing template plus QA gate. Remaining gap: regenerate or clearly mark older saved `paper.md` files that were created before this contract.
+
+# Tick 0237
+
+- Resolved partly: the latest actual NHANES paper has been regenerated and passes reader-facing paper QA. Remaining gap: legacy historical papers still contain pre-contract wording and need an archive label or audit index.
+
+# Tick 0238
+
+- Resolved: `paper-index` now labels reader-facing language status and generated `.loop-memory/actual-nhanes/PAPER_INDEX.md`. Remaining gap: readability QA should catch awkward prose even when forbidden terms are absent.
+
+# Tick 0239
+
+- Challenge response target: add variable-label substitution, main-finding/readability QA, awkward phrase detection, and regenerate the latest real paper through the generator.
+
+# Tick 0240
+
+- Challenge response target refined: implement deterministic checks for human variable labels, main-finding sentence, raw-code density, awkward generator phrases, and plain-language subsample-weight rationale.
+
+# Tick 0243
+
+- Resolved partly: `research explore` now exists as a bounded hypothesis-generation mode with table summary, variable-role mapping, association ranking, candidate questions, artifacts, docs, tests, and a golden smoke run.
+- Remaining gap: when `--target` is supplied, the exploration report should foreground target-centered associations/questions and treat unrelated high correlations as secondary map evidence.
+- Remaining gap: exploration should surface survey design fields, missingness/sparse-cell burden, and multiple-comparison pressure more explicitly before feeding modeling-plan or paper-run.
+
+# Tick 0244
+
+- Resolved: target-supplied exploration now foregrounds target-centered associations/questions and separates unrelated associations into `backgroundAssociations`.
+- Remaining gap: exploration needs a promotion/handoff artifact that converts one candidate question into method-selection/modeling-plan input with explicit design limits.
+- Remaining gap: exploration should detect survey design columns and warn about unweighted/unclustered scans before NHANES/public-health use.
+
+# Tick 0245
+
+- Challenge response target: add an exploration burden/promotion gate that records tested-pair count, target-pair count, survey-design columns, proxy/leakage risks, high missingness, sparse categories, and whether candidate questions are eligible for promotion or require review first.
+
+# Tick 0246
+
+- Resolved: exploration burden and question-level promotion gates now exist.
+- Remaining gap: build an exploration-to-modeling handoff that refuses `blocked` questions and requires explicit acknowledgement for `needs_methods_review`.
+- Remaining gap: run exploration on actual NHANES/public-health data to see whether survey/design detection and proxy warnings behave correctly outside a tiny fixture.
+
+# Tick 0247
+
+- Resolved partly: exploration now has a run-level clearance state on top of question-level blockers.
+- Remaining gap: the handoff command should consume `promotionClearance` and refuse `hold_for_methods_review` unless a methods-review note is supplied.
+
+# Tick 0248
+
+- Resolved: `research explore-promote` now consumes `promotionClearance` and requires a methods-review note for held questions.
+- Remaining gap: feed the handoff artifact directly into `modeling-plan` or `method-select` so the question/outcome/exposure/design warnings do not need to be copied by humans.
+
+# Tick 0250
+
+- Challenge response target: prove exploration on actual cached NHANES/public data before adding more exploration commands, or merge the handoff into `modeling-plan --exploration-handoff` so the new surface earns its keep.
+
+# Tick 0251
+
+- Challenge response target refined: actual-data exploration proof should use a deterministic local extract under `.loop-memory`, record source hashes, run `research explore`, show survey/design detection and burden gates, prove `explore-promote` refusal/held handoff, and avoid MedBrevia writes.
+
+# Tick 0252
+
+- Resolved: actual-data exploration proof exists and satisfied the acceptance criteria.
+- Remaining gap: derived-variable/proxy detection should flag `elevated_hba1c` as target-derived from `LBXGH`.
+- Remaining gap: `modeling-plan` should consume `exploration-handoff` directly.
+
+# Tick 0253
+
+- Resolved partly: target alias/proxy detection now flags `elevated_hba1c` for `LBXGH`.
+- Remaining gap: aliases are hardcoded; dataset adapters/codebooks should eventually supply variable labels and derivation lineage.
+
+# Tick 0254
+
+- Resolved: exploration handoffs can now feed `modeling-plan` directly.
+- Remaining gap: exploration handoffs should generate or validate an AnalysisSpec candidate so the question/outcome/exposure transition becomes executable, not only planned.
+
+# Tick 0255
+
+- Challenge target: exploration must distinguish the strongest association from the best research question. Add candidate taxonomy, research-interest scoring, reader-facing rationale, and reasons to avoid tautologic/proxy candidates as primary questions.
+
+# Tick 0256
+
+- Resolved partly: candidate taxonomy and research-interest scoring now exist.
+- Remaining gap: taxonomy terms and variable domains are still heuristic; dataset adapters/codebooks should eventually supply richer labels, clinical domains, and derived-variable lineage.
+
+# Tick 0257
+
+- Challenge target: taxonomy must become versioned and auditable. Add rule ids, matched evidence, score adjustments, rejected category candidates, and a primary-use recommendation per question.
+
+# Tick 0258
+
+- Resolved: taxonomy now includes version, matched rule ids, matched terms, score adjustments, rejected categories, and primary-use recommendation.
+- Remaining gap: the taxonomy is still implemented in code; move variable domains, aliases, and derivation lineage into dataset adapter metadata.
+
+# Tick 0259
+
+- Web-search target: exploration should split `signalMap`, `questionAgenda`, and `routeIntent`. Next implementation should add candidate-level route intent before AnalysisSpec handoff.
+
+# Tick 0260
+
+- Challenge target: exploration metadata is useful but verbose. Add `routeIntent` and a compact run-level recommended next question before adding more evidence fields.
+
+# Tick 0261
+
+- Resolved: exploration candidates now carry route intent and the report has a concise recommended next question.
+- Remaining gap: route intent should compile into an AnalysisSpec candidate rather than only steering modeling-plan defaults.
+
+# Tick 0262
+
+- Resolved partly: exploration handoffs now contain an `analysisSpecCandidate`.
+- Remaining gap: convert `analysisSpecCandidate` into a full AnalysisSpec V2 artifact with validation.
+
+# Tick 0241
+
+- Resolved partly: generated R-survey papers now use common NHANES labels, main-finding text, and readability QA. Remaining gap: variable labels are a small hardcoded map; they should eventually come from dataset adapters/codebooks.
+
+# Tick 0242
+
+- Resolved: docs now state that `paper.md` is reader-facing and provenance terms belong in companion artifacts. Remaining gap: add a formal packet schema field that declares artifact audience.
 
 # Tick 0234
 

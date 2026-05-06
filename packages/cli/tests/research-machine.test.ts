@@ -5,6 +5,9 @@ import { describe, expect, it } from "vitest";
 import {
   researchArchetypesCommand,
   researchDatasetAdapterCommand,
+  researchDatasetRunCommand,
+  researchDatasetRunIndexCommand,
+  researchDatasetSpecCommand,
   researchExecutionContractCommand,
   researchMachineBenchmarkCommand,
   researchMachinePlanCommand,
@@ -14,6 +17,9 @@ import {
   researchMethodValidateCommand,
   researchMethodsCatalogCommand,
   researchSpecV2Command,
+  renderDatasetRun,
+  renderDatasetRunIndex,
+  renderDatasetSpec,
   renderResearchExecutionContractJson,
   renderResearchMachineBenchmarkJson,
   renderResearchMachinePlan,
@@ -122,6 +128,11 @@ JSON
 
       expect(adapter.availability).toBe("available");
       expect(adapter.discoveredFiles[0]?.role).toBe("demographics/survey-design");
+      expect(adapter.variableMetadataCount).toBeGreaterThan(10);
+      expect(adapter.adapter.variableMetadata?.BMXBMI?.label).toBe("body mass index");
+      expect(adapter.adapter.variableMetadata?.LBXGLU?.unit).toBe("mg/dL");
+      expect(adapter.surveyWeightDomains.map(domain => domain.weight)).toEqual(expect.arrayContaining(["WTMEC2YR", "WTSAF2YR"]));
+      expect(adapter.surveyWeightDomains.find(domain => domain.weight === "WTSAF2YR")?.isSubsample).toBe(true);
       expect(archetypes.archetypes.map(archetype => archetype.id)).toContain("target-trial-emulation-sketch");
       expect(archetypes.archetypes.find(archetype => archetype.id === "subgroup-domain-analysis")?.allowedBackends).toEqual(["r-survey"]);
     } finally {
@@ -253,6 +264,74 @@ JSON
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  it("creates an AnalysisSpec V2 from a MIMIC-style study and executes a manifest-backed dataset run", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-dataset-run-"));
+    try {
+      const datasetDir = await writeMimicFixtureDataset(dir, 140, 60);
+      const studyPath = path.join(dir, "hip-fracture-study.json");
+      await writeFile(studyPath, `${JSON.stringify(mimicStudyArtifact(), null, 2)}\n`);
+      const specPath = path.join(dir, "analysis-spec-v2.json");
+
+      const spec = await researchDatasetSpecCommand({ studyPath, datasetDir, outPath: specPath });
+      const run = await researchDatasetRunCommand({
+        analysisSpecPath: specPath,
+        datasetDir,
+        outDir: path.join(dir, "runs", "hip-fracture"),
+        python: path.resolve(".research-runtime/python/bin/python"),
+        maxUsd: 1,
+      });
+      const index = await researchDatasetRunIndexCommand({
+        runRoot: path.join(dir, "runs"),
+        outPath: path.join(dir, "runs", "index.json"),
+        reportPath: path.join(dir, "runs", "index.md"),
+      });
+
+      expect(spec.spec.archetype).toBe("ehr-diagnosis-cohort-outcome");
+      expect(spec.spec.datasetAccess?.requiredTables).toEqual(expect.arrayContaining(["hosp-diagnoses-icd", "hosp-d-icd-diagnoses", "derived-icustay-detail"]));
+      expect(spec.spec.phenotype?.codingReviewStatus).toBe("verified_online");
+      expect(run.status).toBe("succeeded");
+      expect(run.readiness).toBe("local_review_ready");
+      expect(run.cohortSummary.firstCohortRows).toBe(140);
+      expect(run.cohortSummary.matchedDiagnosisCodes).toBe(1);
+      expect(run.modelStatus.mortality).toBe("fit");
+      expect(run.modelStatus.los).toBe("fit");
+      expect(run.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["dataset-run", "analysis", "paper", "qa", "manifest", "cost", "matched-codes", "lifecycle"]));
+      expect(index.totalRuns).toBe(1);
+      expect(index.readinessCounts.local_review_ready).toBe(1);
+      expect(renderDatasetSpec(spec)).toContain("research dataset spec");
+      expect(renderDatasetRun(run)).toContain("local_review_ready");
+      expect(renderDatasetRunIndex(index)).toContain("Dataset Run Index");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("downgrades sparse EHR outcome runs instead of promoting fitted models", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-dataset-run-sparse-"));
+    try {
+      const datasetDir = await writeMimicFixtureDataset(dir, 55, 8);
+      const studyPath = path.join(dir, "sparse-study.json");
+      await writeFile(studyPath, `${JSON.stringify(mimicStudyArtifact(), null, 2)}\n`);
+      const specPath = path.join(dir, "analysis-spec-v2.json");
+      await researchDatasetSpecCommand({ studyPath, datasetDir, outPath: specPath });
+
+      const run = await researchDatasetRunCommand({
+        analysisSpecPath: specPath,
+        datasetDir,
+        outDir: path.join(dir, "runs", "sparse"),
+        python: path.resolve(".research-runtime/python/bin/python"),
+        maxUsd: 1,
+      });
+
+      expect(run.status).toBe("succeeded");
+      expect(run.readiness).toBe("needs_methods_review");
+      expect(run.qaStatus).toBe("review");
+      expect(run.typedIssues.map(issue => issue.code)).toEqual(expect.arrayContaining(["SMALL_COHORT_REVIEW", "SPARSE_BINARY_OUTCOME_REVIEW", "LOW_EVENTS_PER_PREDICTOR"]));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
 });
 
 function wrappedV1Spec(): unknown {
@@ -302,5 +381,71 @@ function wrappedV1Spec(): unknown {
       expectedOutputs: ["analysis.json", "paper.md"],
       specHash: "legacy_hash",
     },
+  };
+}
+
+async function writeMimicFixtureDataset(root: string, rows: number, deaths: number): Promise<string> {
+  const datasetDir = path.join(root, "dataset");
+  const sourceDir = path.join(root, "source");
+  await mkdir(datasetDir, { recursive: true });
+  await mkdir(sourceDir, { recursive: true });
+  const diagnosesPath = path.join(sourceDir, "hosp-diagnoses-icd.csv");
+  const dictionaryPath = path.join(sourceDir, "hosp-d-icd-diagnoses.csv");
+  const detailPath = path.join(sourceDir, "derived-icustay-detail.csv");
+  await writeFile(dictionaryPath, "icd_code,icd_version,long_title\nS72001,10,Fracture of unspecified part of neck of femur\n");
+  const dx = ["subject_id,hadm_id,icd_code,icd_version"];
+  const detail = ["subject_id,hadm_id,stay_id,icu_intime,gender,admission_age,hospital_expire_flag,los_icu,apsiii,oasis,sofa"];
+  for (let i = 1; i <= rows; i += 1) {
+    dx.push(`${i},${1000 + i},S72001,10`);
+    const died = i <= deaths ? 1 : 0;
+    const age = 55 + (i % 35);
+    const apsiii = 35 + (i % 45) + (died ? 4 : 0);
+    const los = died ? 6 + (i % 5) : 2 + (i % 4);
+    detail.push(`${i},${1000 + i},${2000 + i},2024-01-${String((i % 27) + 1).padStart(2, "0")},${i % 2 ? "M" : "F"},${age},${died},${los},${apsiii},${20 + (i % 10)},${2 + (i % 7)}`);
+  }
+  await writeFile(diagnosesPath, `${dx.join("\n")}\n`);
+  await writeFile(detailPath, `${detail.join("\n")}\n`);
+  const tables = [
+    { tableId: "hosp-diagnoses-icd", sourcePath: diagnosesPath },
+    { tableId: "hosp-d-icd-diagnoses", sourcePath: dictionaryPath },
+    { tableId: "derived-icustay-detail", sourcePath: detailPath },
+  ];
+  const manifest = {
+    schemaVersion: 1,
+    datasetId: "mimic-fixture",
+    title: "MIMIC fixture",
+    description: "Local deterministic MIMIC-style fixture.",
+    domain: "ehr",
+    generatedAtIso: "2026-05-06T00:00:00.000Z",
+    source: { kind: "local-directory", uri: sourceDir, manifestPath: null },
+    storage: { totalBytes: 3072, tableCount: tables.length, profiledTableCount: tables.length, rowCountTotalKnown: null, supportedFormats: ["csv"] },
+    access: { local: true, cloud: false, piiPhiRisk: "high", license: "fixture", restrictions: ["no row-level export"] },
+    standardLayout: { root: datasetDir, manifest: path.join(datasetDir, "dataset-manifest.json"), variableRegistry: "", relationshipGraph: "", profile: "", watchouts: "", questions: "", summary: "", context: "" },
+    tables: tables.map(table => ({ ...table, format: "csv", bytes: 1024, rowCount: null, columnCount: null, profileStatus: "profiled" })),
+    hash: "fixture",
+  };
+  await writeFile(path.join(datasetDir, "dataset-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  return datasetDir;
+}
+
+function mimicStudyArtifact(): unknown {
+  return {
+    schemaVersion: 1,
+    study: {
+      id: "mimic-fixture-hip-fracture",
+      title: "Hip Fracture ICU Outcomes",
+      question: "Among ICU stays with hip fracture diagnosis codes, what predicts mortality and ICU length of stay?",
+      population: "First ICU stays for hospitalizations with matching hip fracture diagnosis codes.",
+      tables: ["hosp-diagnoses-icd", "hosp-d-icd-diagnoses", "derived-icustay-detail"],
+    },
+    icdFamilies: [
+      {
+        system: "icd10cm",
+        query: "S72.0",
+        expectedTerms: ["fracture"],
+        verifiedOnline: true,
+        verificationRefs: ["https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html"],
+      },
+    ],
   };
 }

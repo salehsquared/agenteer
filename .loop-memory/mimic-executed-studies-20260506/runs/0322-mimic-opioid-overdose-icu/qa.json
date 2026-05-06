@@ -1,0 +1,44 @@
+{
+  "status": "review",
+  "checks": [
+    {
+      "code": "cost-under-session-ceiling",
+      "passed": true
+    },
+    {
+      "code": "cohort-nonempty",
+      "passed": true
+    },
+    {
+      "code": "icd-codes-matched",
+      "passed": true
+    },
+    {
+      "code": "row-cache-removed",
+      "passed": true
+    },
+    {
+      "code": "mortality-model-fit-or-justified",
+      "passed": true
+    },
+    {
+      "code": "los-model-fit-or-justified",
+      "passed": true
+    },
+    {
+      "code": "methods-review-typed-issues-recorded",
+      "passed": true
+    }
+  ],
+  "typedIssues": [
+    {
+      "code": "LOW_EVENTS_PER_PREDICTOR",
+      "severity": "warning",
+      "message": "Mortality model has 20 events across 7 predictors."
+    }
+  ],
+  "warnings": [
+    "Mortality models are associational unless a causal design is specified."
+  ],
+  "blockers": []
+}

@@ -1,0 +1,393 @@
+{
+  "study": {
+    "id": "mimic-delirium-icu-los",
+    "title": "Delirium/Encephalopathy And ICU Length Of Stay",
+    "domain": "neurocritical-care",
+    "question": "Are delirium or encephalopathy diagnosis codes associated with prolonged ICU stay after severity adjustment?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "outcomes": [
+      "los_icu",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "neurocognitive phenotype",
+      "diagnosis timing caveat",
+      "LOS model"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "F05",
+        "expectedTerms": [
+          "delirium"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "F05",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "F05",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=F05&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "F05",
+                "name": "Delirium due to known physiological condition"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:55.173028+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "G93.4",
+        "expectedTerms": [
+          "encephalopathy"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "G93.4",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "G93.4",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=G93.4&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 7,
+            "sampleRows": [
+              {
+                "code": "G93.40",
+                "name": "Encephalopathy, unspecified"
+              },
+              {
+                "code": "G93.41",
+                "name": "Metabolic encephalopathy"
+              },
+              {
+                "code": "G93.42",
+                "name": "Megalencephalic leukoencephalopathy with subcortical cysts"
+              },
+              {
+                "code": "G93.43",
+                "name": "Leukoencephalopathy with calcifications and cysts"
+              },
+              {
+                "code": "G93.44",
+                "name": "Adult-onset leukodystrophy with axonal spheroids"
+              },
+              {
+                "code": "G93.45",
+                "name": "Developmental and epileptic encephalopathy"
+              },
+              {
+                "code": "G93.49",
+                "name": "Other encephalopathy"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:55.742573+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "293.0",
+        "expectedTerms": [
+          "delirium"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "2930",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "2930",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=2930&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "293.0",
+                "name": "Delirium due to conditions classified elsewhere"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:56.286636+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "348.3",
+        "expectedTerms": [
+          "encephalopathy"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "3483",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "3483",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=3483&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 3,
+            "sampleRows": [
+              {
+                "code": "348.30",
+                "name": "Encephalopathy, unspecified"
+              },
+              {
+                "code": "348.31",
+                "name": "Metabolic encephalopathy"
+              },
+              {
+                "code": "348.39",
+                "name": "Other encephalopathy"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:56.810467+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 9,
+    "matchedDiagnosisRows": 21381,
+    "matchedAdmissions": 20105,
+    "firstIcuStayRows": 9361,
+    "uniquePatients": 8669
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 9361,
+        "missing": 0,
+        "mean": 69.61328917850658,
+        "sd": 15.622777130177871,
+        "median": 72.0,
+        "iqr": [
+          60.0,
+          82.0
+        ],
+        "min": 18.0,
+        "max": 103.0
+      },
+      "los_icu": {
+        "n": 9359,
+        "missing": 2,
+        "mean": 5.982228870605833,
+        "sd": 7.747152134859504,
+        "median": 3.21,
+        "iqr": [
+          1.63,
+          7.04
+        ],
+        "min": 0.0,
+        "max": 140.04
+      },
+      "los_hospital": {
+        "n": 9361,
+        "missing": 0,
+        "mean": 16.9079158209593,
+        "sd": 17.079673227165657,
+        "median": 12.0,
+        "iqr": [
+          7.0,
+          21.0
+        ],
+        "min": 0.0,
+        "max": 238.0
+      },
+      "apsiii": {
+        "n": 9361,
+        "missing": 0,
+        "mean": 51.094113876722574,
+        "sd": 21.11905124271889,
+        "median": 48.0,
+        "iqr": [
+          36.0,
+          62.0
+        ],
+        "min": 5.0,
+        "max": 178.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 9361,
+        "positive": 1589,
+        "proportion": 0.16974682192073495
+      },
+      "male": {
+        "n": 9361,
+        "positive": 5239,
+        "proportion": 0.5596624292276466
+      },
+      "prolonged_icu_los": {
+        "n": 9361,
+        "positive": 2334,
+        "proportion": 0.24933233628885804
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "apsiii"
+  ],
+  "missingness": [
+    {
+      "column": "los_icu",
+      "missing": 2,
+      "missingFraction": 0.00021365238756543105
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "apsiii",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 9361,
+      "events": 1589,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 69.61328917850658,
+          "sd": 15.622777130177871
+        },
+        "apsiii": {
+          "mean": 51.094113876722574,
+          "sd": 21.11905124271889
+        }
+      },
+      "metrics": {
+        "auroc": 0.7101771151188352,
+        "averagePrecision": 0.3582720717343496
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.2641577716643537,
+          "ci95": [
+            1.1895928623546907,
+            1.3433964865055603
+          ],
+          "pValue": 4.124834559728955e-14,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.0010852538311663,
+          "ci95": [
+            0.8928129068795575,
+            1.122487900562358
+          ],
+          "pValue": 0.9851818417510602,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "oddsRatio": 2.064081359343567,
+          "ci95": [
+            1.9550323548006887,
+            2.1792129667459803
+          ],
+          "pValue": 6.159949273423974e-151,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 9354,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 69.61652768868933,
+          "sd": 15.619730963855545
+        },
+        "apsiii": {
+          "mean": 51.109471883686126,
+          "sd": 21.109789479961247
+        }
+      },
+      "rSquared": 0.05734126566466746,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -12.207833894057618,
+          "ci95PercentChange": [
+            -13.607258140030009,
+            -10.78574121346848
+          ],
+          "pValue": 8.599688363446115e-57,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 9.46328326813779,
+          "ci95PercentChange": [
+            6.064894825467504,
+            12.97055829412368
+          ],
+          "pValue": 1.9186777894548948e-08,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "percentChangeInLos": 14.617144701163598,
+          "ci95PercentChange": [
+            12.703243228997518,
+            16.563547623511667
+          ],
+          "pValue": 8.834730555981903e-57,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

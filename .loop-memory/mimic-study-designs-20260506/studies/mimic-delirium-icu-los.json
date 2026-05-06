@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:56.810503+00:00",
+  "study": {
+    "id": "mimic-delirium-icu-los",
+    "title": "Delirium/Encephalopathy And ICU Length Of Stay",
+    "domain": "neurocritical-care",
+    "question": "Are delirium or encephalopathy diagnosis codes associated with prolonged ICU stay after severity adjustment?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "outcomes": [
+      "los_icu",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "neurocognitive phenotype",
+      "diagnosis timing caveat",
+      "LOS model"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "F05",
+      "expectedTerms": [
+        "delirium"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "F05",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "F05",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=F05&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "F05",
+              "name": "Delirium due to known physiological condition"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:55.173028+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd10cm",
+      "query": "G93.4",
+      "expectedTerms": [
+        "encephalopathy"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "G93.4",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "G93.4",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=G93.4&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 7,
+          "sampleRows": [
+            {
+              "code": "G93.40",
+              "name": "Encephalopathy, unspecified"
+            },
+            {
+              "code": "G93.41",
+              "name": "Metabolic encephalopathy"
+            },
+            {
+              "code": "G93.42",
+              "name": "Megalencephalic leukoencephalopathy with subcortical cysts"
+            },
+            {
+              "code": "G93.43",
+              "name": "Leukoencephalopathy with calcifications and cysts"
+            },
+            {
+              "code": "G93.44",
+              "name": "Adult-onset leukodystrophy with axonal spheroids"
+            },
+            {
+              "code": "G93.45",
+              "name": "Developmental and epileptic encephalopathy"
+            },
+            {
+              "code": "G93.49",
+              "name": "Other encephalopathy"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:55.742573+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "293.0",
+      "expectedTerms": [
+        "delirium"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "2930",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "2930",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=2930&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "293.0",
+              "name": "Delirium due to conditions classified elsewhere"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:56.286636+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "348.3",
+      "expectedTerms": [
+        "encephalopathy"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "3483",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "3483",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=3483&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 3,
+          "sampleRows": [
+            {
+              "code": "348.30",
+              "name": "Encephalopathy, unspecified"
+            },
+            {
+              "code": "348.31",
+              "name": "Metabolic encephalopathy"
+            },
+            {
+              "code": "348.39",
+              "name": "Other encephalopathy"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:56.810467+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "missingTables": [],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "unprofiledTables": [],
+    "estimatedBytesForNaiveFullRequiredTableRead": 72020696,
+    "estimatedTransferUsdAt012PerGb": 0.008048940002918243,
+    "status": "ready_for_bounded_design",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [],
+    "warnings": [
+      "Diagnosis-code timing may not equal clinical onset timing.",
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "promote_to_candidate_queue",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "7426d440f7cffb6eb7065593092b308e1cc7808c48a3a65f657c7acd9c453fe0"
+}

@@ -11,14 +11,14 @@
   ],
   "population": "RIDAGEYR >= 20",
   "exposure": {
-    "name": "BMXBMI",
+    "name": "body mass index",
     "variable": "BMXBMI",
-    "definition": "Continuous BMXBMI"
+    "definition": "Continuous body mass index (BMXBMI)"
   },
   "outcome": {
-    "name": "LBXGLU",
+    "name": "fasting plasma glucose",
     "variable": "LBXGLU",
-    "definition": "Continuous LBXGLU"
+    "definition": "Continuous fasting plasma glucose (LBXGLU)"
   },
   "rowCounts": {
     "mergedRows": 49681,
@@ -41,11 +41,13 @@
     "psu": "SDMVPSU",
     "implementation": "R survey Taylor linearized variance via svyglm for weighted linear regression",
     "domain": {
-      "id": "fasting_subsample",
+      "id": "wtsaf2yr",
       "label": "Morning fasting laboratory subsample",
       "isSubsample": true,
-      "rationale": "LBXGLU fasting plasma glucose is measured in the morning fasting laboratory subsample, so WTSAF2YR is the least-common-denominator NHANES weight for this AnalysisSpec.",
-      "eligibilityNote": "Interpret estimates for fasting subsample-eligible adults with nonmissing fasting glucose, BMI, covariates, strata, PSU, and positive WTSAF2YR."
+      "rationale": "LBXGLU fasting plasma glucose is measured in the morning fasting laboratory subsample, so WTSAF2YR is the least-common-denominator NHANES weight for this analysis.",
+      "eligibilityNote": "fasting subsample-eligible adults with nonmissing fasting glucose, BMI, covariates, strata, PSU, and positive WTSAF2YR.",
+      "cycleYears": 2,
+      "multiCycleConstruction": "Divide each 2-year fasting subsample weight by the number of combined 2-year cycles when pooling comparable cycles; do not mix with full-sample MEC weights."
     }
   },
   "varianceEstimator": "r_survey_taylor_linearized",
@@ -99,6 +101,12 @@
       "weightedMeanExposure": 38.1663085737246
     }
   ],
+  "datasetAdapter": {
+    "id": "nhanes",
+    "label": "NHANES local/public-cache adapter",
+    "variableMetadataSource": "dataset-adapter-manifest",
+    "variableMetadataCount": 23
+  },
   "analysisSpec": {
     "inferencePolicy": {
       "estimandType": "associational",

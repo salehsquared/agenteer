@@ -6,6 +6,24 @@
     "status": "pass",
     "checks": [
       {
+        "id": "reader-facing-language",
+        "status": "pass",
+        "severity": "critical",
+        "detail": "Paper avoids internal platform terminology and speaks to scientific readers."
+      },
+      {
+        "id": "reader-code-density",
+        "status": "pass",
+        "severity": "major",
+        "detail": "Paper exposes 3 raw variable-like codes: BMXBMI, LBXGLU, WTSAF2YR."
+      },
+      {
+        "id": "reader-awkward-generator-phrases",
+        "status": "pass",
+        "severity": "major",
+        "detail": "Paper avoids known awkward generator phrases."
+      },
+      {
         "id": "section-abstract",
         "status": "pass",
         "severity": "major",
@@ -102,10 +120,16 @@
         "detail": "Companion evidence JSON should be readable."
       },
       {
-        "id": "local-review-safety-header",
+        "id": "reader-main-finding",
+        "status": "pass",
+        "severity": "major",
+        "detail": "Generated paper packets should include a short plain-language main finding in the summary or abstract."
+      },
+      {
+        "id": "reader-safety-summary",
         "status": "pass",
         "severity": "critical",
-        "detail": "Generated paper-run papers should start with a local-review safety header covering survey method, weight domain, causal status, actionability, and human review."
+        "detail": "Reader-facing papers should start with a plain-language study summary covering survey method, weight domain, causal status, actionability, and human review."
       },
       {
         "id": "evidence-row-counts",
@@ -162,7 +186,7 @@
         "detail": "Paper should disclose covariate adjustment groups present in evidence JSON."
       }
     ],
-    "summary": "26/26 paper QA checks passed.",
+    "summary": "30/30 paper QA checks passed.",
     "nextAction": "Paper passes deterministic QA; proceed to human scientific critique."
   }
 }

@@ -1,0 +1,826 @@
+{
+  "schemaVersion": 1,
+  "exploration": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-05T23:59:14.798Z",
+    "dataPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/explore-fixture.csv",
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/exploration",
+    "target": "hba1c",
+    "posture": "exploratory_hypothesis_generation",
+    "tableSummary": {
+      "file": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/explore-fixture.csv",
+      "format": "csv",
+      "adapter": {
+        "kind": "node-tabular",
+        "executable": "node",
+        "version": "v24.14.0",
+        "packages": {}
+      },
+      "fileSizeBytes": 404,
+      "fileMtimeMs": 1778024269078.1123,
+      "fileSha256": "ff3833234cd327ce6a83c561ad0bbd81d3980890131782c2f1bb01c6a4370661",
+      "rowCount": 16,
+      "columnCount": 7,
+      "columns": [
+        {
+          "name": "age",
+          "inferredType": "number",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "30",
+            "37",
+            "41",
+            "48",
+            "52"
+          ],
+          "min": 30,
+          "max": 72,
+          "mean": 51.25
+        },
+        {
+          "name": "bmi",
+          "inferredType": "number",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "22.1",
+            "24.3",
+            "28.5",
+            "29.8",
+            "31.2"
+          ],
+          "min": 22.1,
+          "max": 37,
+          "mean": 30.287499999999998
+        },
+        {
+          "name": "hba1c",
+          "inferredType": "number",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "5.1",
+            "5.3",
+            "5.8",
+            "5.9",
+            "6.2"
+          ],
+          "min": 5.1,
+          "max": 7.1,
+          "mean": 6.106249999999999
+        },
+        {
+          "name": "hdl",
+          "inferredType": "number",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "36",
+            "39",
+            "42",
+            "44",
+            "47"
+          ],
+          "min": 35,
+          "max": 62,
+          "mean": 46.4375
+        },
+        {
+          "name": "income",
+          "inferredType": "number",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "1.1",
+            "1.2",
+            "1.5",
+            "1.8",
+            "2.1"
+          ],
+          "min": 1,
+          "max": 4.2,
+          "mean": 2.24375
+        },
+        {
+          "name": "sex",
+          "inferredType": "string",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "F",
+            "M"
+          ]
+        },
+        {
+          "name": "smoker",
+          "inferredType": "number",
+          "nonMissingRows": 16,
+          "missingFraction": 0,
+          "sampleValues": [
+            "0",
+            "1"
+          ],
+          "min": 0,
+          "max": 1,
+          "mean": 0.5
+        }
+      ],
+      "warnings": []
+    },
+    "variableMap": [
+      {
+        "name": "age",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 16,
+        "notes": []
+      },
+      {
+        "name": "bmi",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 16,
+        "notes": []
+      },
+      {
+        "name": "hba1c",
+        "role": "candidate_outcome",
+        "inferredType": "number",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 16,
+        "notes": [
+          "User-declared target variable."
+        ]
+      },
+      {
+        "name": "hdl",
+        "role": "candidate_outcome",
+        "inferredType": "number",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 16,
+        "notes": []
+      },
+      {
+        "name": "income",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 16,
+        "notes": []
+      },
+      {
+        "name": "sex",
+        "role": "candidate_exposure",
+        "inferredType": "string",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 2,
+        "notes": []
+      },
+      {
+        "name": "smoker",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 16,
+        "missingFraction": 0,
+        "cardinality": 2,
+        "notes": []
+      }
+    ],
+    "associations": [
+      {
+        "id": "288de2dac7",
+        "left": "bmi",
+        "right": "hba1c",
+        "method": "pearson",
+        "strength": 0.9939382543177528,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "6f88dbae23",
+        "left": "age",
+        "right": "hba1c",
+        "method": "pearson",
+        "strength": 0.9936468159504164,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "0e0d6b8031",
+        "left": "hba1c",
+        "right": "hdl",
+        "method": "pearson",
+        "strength": 0.9840762261831689,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "ec193ca1a9",
+        "left": "hba1c",
+        "right": "income",
+        "method": "pearson",
+        "strength": 0.9674936517877631,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "119fe97781",
+        "left": "hba1c",
+        "right": "smoker",
+        "method": "pearson",
+        "strength": 0.43707222677554686,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "8bc0fd06fd",
+        "left": "hba1c",
+        "right": "sex",
+        "method": "eta_squared",
+        "strength": 0.19103213141853473,
+        "direction": "unsigned",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "e06e3fd57a",
+        "left": "sex",
+        "right": "smoker",
+        "method": "eta_squared",
+        "strength": 1,
+        "direction": "unsigned",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "7ecbc607b3",
+        "left": "bmi",
+        "right": "hdl",
+        "method": "pearson",
+        "strength": 0.9946883192574768,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "6f009d1f10",
+        "left": "hdl",
+        "right": "income",
+        "method": "pearson",
+        "strength": 0.9895763890447782,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "bdd69f16b1",
+        "left": "age",
+        "right": "bmi",
+        "method": "pearson",
+        "strength": 0.9859100144723655,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      }
+    ],
+    "targetAssociations": [
+      {
+        "id": "288de2dac7",
+        "left": "bmi",
+        "right": "hba1c",
+        "method": "pearson",
+        "strength": 0.9939382543177528,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "6f88dbae23",
+        "left": "age",
+        "right": "hba1c",
+        "method": "pearson",
+        "strength": 0.9936468159504164,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "0e0d6b8031",
+        "left": "hba1c",
+        "right": "hdl",
+        "method": "pearson",
+        "strength": 0.9840762261831689,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "ec193ca1a9",
+        "left": "hba1c",
+        "right": "income",
+        "method": "pearson",
+        "strength": 0.9674936517877631,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "119fe97781",
+        "left": "hba1c",
+        "right": "smoker",
+        "method": "pearson",
+        "strength": 0.43707222677554686,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "8bc0fd06fd",
+        "left": "hba1c",
+        "right": "sex",
+        "method": "eta_squared",
+        "strength": 0.19103213141853473,
+        "direction": "unsigned",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      }
+    ],
+    "backgroundAssociations": [
+      {
+        "id": "e06e3fd57a",
+        "left": "sex",
+        "right": "smoker",
+        "method": "eta_squared",
+        "strength": 1,
+        "direction": "unsigned",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "7ecbc607b3",
+        "left": "bmi",
+        "right": "hdl",
+        "method": "pearson",
+        "strength": 0.9946883192574768,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "6f009d1f10",
+        "left": "hdl",
+        "right": "income",
+        "method": "pearson",
+        "strength": 0.9895763890447782,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "bdd69f16b1",
+        "left": "age",
+        "right": "bmi",
+        "method": "pearson",
+        "strength": 0.9859100144723655,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "e5be1ac27b",
+        "left": "bmi",
+        "right": "income",
+        "method": "pearson",
+        "strength": 0.9822899227759108,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "7fd1411476",
+        "left": "age",
+        "right": "hdl",
+        "method": "pearson",
+        "strength": 0.9710511259226297,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "1b492a7c22",
+        "left": "age",
+        "right": "income",
+        "method": "pearson",
+        "strength": 0.9416908469060384,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "ff99990932",
+        "left": "hdl",
+        "right": "smoker",
+        "method": "pearson",
+        "strength": 0.4996245045016571,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "40f61854c9",
+        "left": "bmi",
+        "right": "smoker",
+        "method": "pearson",
+        "strength": 0.47031885522129424,
+        "direction": "positive",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "79ebddd8b5",
+        "left": "income",
+        "right": "smoker",
+        "method": "pearson",
+        "strength": 0.46603817248667595,
+        "direction": "negative",
+        "n": 16,
+        "missingFractionMax": 0,
+        "caveats": []
+      }
+    ],
+    "explorationBurden": {
+      "eligiblePairCount": 21,
+      "testedPairCount": 21,
+      "targetPairCount": 6,
+      "multiplicityRisk": "low",
+      "highMissingnessVariables": [],
+      "sparseCategoricalVariables": [],
+      "surveyDesignCandidates": [],
+      "possibleLeakagePairs": [
+        {
+          "associationId": "288de2dac7",
+          "left": "bmi",
+          "right": "hba1c",
+          "reason": "near-perfect target association; may be duplicate, derived, or target leakage"
+        },
+        {
+          "associationId": "6f88dbae23",
+          "left": "age",
+          "right": "hba1c",
+          "reason": "near-perfect target association; may be duplicate, derived, or target leakage"
+        },
+        {
+          "associationId": "0e0d6b8031",
+          "left": "hba1c",
+          "right": "hdl",
+          "reason": "near-perfect target association; may be duplicate, derived, or target leakage"
+        },
+        {
+          "associationId": "ec193ca1a9",
+          "left": "hba1c",
+          "right": "income",
+          "reason": "very strong target association; review proxy/leakage risk"
+        }
+      ],
+      "promotionSummary": {
+        "promotable": 0,
+        "needsMethodsReview": 10,
+        "blocked": 0
+      },
+      "promotionClearance": {
+        "level": "hold_for_methods_review",
+        "reasons": [
+          "10 candidate questions need methods review",
+          "no candidate questions are currently promotable",
+          "possible target leakage/proxy pairs detected"
+        ]
+      }
+    },
+    "candidateQuestions": [
+      {
+        "id": "question_01_288de2dac7",
+        "question": "Is bmi associated with hba1c in this dataset?",
+        "outcome": "hba1c",
+        "exposure": "bmi",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.994 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion",
+          "near-perfect target association; may be duplicate, derived, or target leakage"
+        ]
+      },
+      {
+        "id": "question_02_6f88dbae23",
+        "question": "Is age associated with hba1c in this dataset?",
+        "outcome": "hba1c",
+        "exposure": "age",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.994 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion",
+          "near-perfect target association; may be duplicate, derived, or target leakage"
+        ]
+      },
+      {
+        "id": "question_03_0e0d6b8031",
+        "question": "Is hdl associated with hba1c in this dataset?",
+        "outcome": "hba1c",
+        "exposure": "hdl",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.984 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion",
+          "near-perfect target association; may be duplicate, derived, or target leakage"
+        ]
+      },
+      {
+        "id": "question_04_ec193ca1a9",
+        "question": "Is income associated with hba1c in this dataset?",
+        "outcome": "hba1c",
+        "exposure": "income",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.967 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion",
+          "very strong target association; review proxy/leakage risk"
+        ]
+      },
+      {
+        "id": "question_05_119fe97781",
+        "question": "Is smoker associated with hba1c in this dataset?",
+        "outcome": "hba1c",
+        "exposure": "smoker",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.437 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion"
+        ]
+      },
+      {
+        "id": "question_06_8bc0fd06fd",
+        "question": "Is sex associated with hba1c in this dataset?",
+        "outcome": "hba1c",
+        "exposure": "sex",
+        "suggestedMethod": "group comparison followed by adjusted regression",
+        "rationale": "eta_squared exploratory strength 0.191 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "low",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion"
+        ]
+      },
+      {
+        "id": "question_07_e06e3fd57a",
+        "question": "Is sex associated with smoker in this dataset?",
+        "outcome": "smoker",
+        "exposure": "sex",
+        "suggestedMethod": "group comparison followed by adjusted regression",
+        "rationale": "eta_squared exploratory strength 1.000 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion"
+        ]
+      },
+      {
+        "id": "question_08_7ecbc607b3",
+        "question": "Is bmi associated with hdl in this dataset?",
+        "outcome": "hdl",
+        "exposure": "bmi",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.995 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion"
+        ]
+      },
+      {
+        "id": "question_09_6f009d1f10",
+        "question": "Is income associated with hdl in this dataset?",
+        "outcome": "hdl",
+        "exposure": "income",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.990 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion"
+        ]
+      },
+      {
+        "id": "question_10_bdd69f16b1",
+        "question": "Is age associated with bmi in this dataset?",
+        "outcome": "bmi",
+        "exposure": "age",
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.986 across 16 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "high",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "low complete-pair count for promotion"
+        ]
+      }
+    ],
+    "qa": {
+      "status": "warning",
+      "checks": [
+        {
+          "id": "non-empty-table",
+          "status": "pass",
+          "message": "16 rows found."
+        },
+        {
+          "id": "enough-columns",
+          "status": "pass",
+          "message": "7 columns found."
+        },
+        {
+          "id": "association-scan",
+          "status": "pass",
+          "message": "10 candidate associations ranked; 21 pairs tested."
+        },
+        {
+          "id": "candidate-questions",
+          "status": "pass",
+          "message": "10 candidate questions generated."
+        },
+        {
+          "id": "target-present",
+          "status": "pass",
+          "message": "target=hba1c"
+        },
+        {
+          "id": "target-association-scan",
+          "status": "pass",
+          "message": "6 associations involve the target."
+        },
+        {
+          "id": "promotion-gate",
+          "status": "warning",
+          "message": "0 promotable; 10 need methods review; 0 blocked."
+        },
+        {
+          "id": "promotion-clearance",
+          "status": "warning",
+          "message": "clearance=hold_for_methods_review."
+        },
+        {
+          "id": "multiplicity-review",
+          "status": "pass",
+          "message": "21 tested pairs; multiplicity risk low."
+        },
+        {
+          "id": "survey-design-review",
+          "status": "pass",
+          "message": "0 survey/design candidate variables detected."
+        },
+        {
+          "id": "high-missingness-review",
+          "status": "pass",
+          "message": "0 variables exceed 50% missingness."
+        },
+        {
+          "id": "exploratory-only",
+          "status": "warning",
+          "message": "This mode generates hypotheses only; confirmatory analysis requires a promoted plan."
+        }
+      ]
+    },
+    "artifacts": [
+      {
+        "kind": "exploration",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/exploration/exploration.json",
+        "sha256": "e1f98bf0eb6a1416726855ee07d9cbbc9937a780c6493f6e8ac14ef550fd6e08",
+        "bytes": 25012
+      },
+      {
+        "kind": "exploration-report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/exploration/exploration-report.md",
+        "sha256": "bf7772cd469d2da6ca2a3bc5a986041f7d0fe012618924830dfbd36d4df323ae",
+        "bytes": 6737
+      },
+      {
+        "kind": "candidate-questions",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/exploration/candidate-questions.json",
+        "sha256": "424b59f94cd084bcb4d5ec730dfa1ebbd3c4222b62a8728b3a9132bcbb511f62",
+        "bytes": 8498
+      }
+    ],
+    "limitations": [
+      "Exploration is hypothesis generation, not confirmation.",
+      "Reported associations are unadjusted and should not be interpreted causally.",
+      "Multiple comparisons, missingness, sparse categories, survey design, clustering, and temporal ordering must be handled before inferential claims.",
+      "Candidate questions must be promoted into an explicit analysis plan before execution or paper generation."
+    ],
+    "nextAction": "Resolve promotion blockers or perform methods review before turning an exploratory question into an analysis plan."
+  }
+}
+

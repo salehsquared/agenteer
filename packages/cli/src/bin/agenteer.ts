@@ -74,6 +74,9 @@ import {
   researchAnalysisRunCommand,
   researchArchetypesCommand,
   researchDatasetAdapterCommand,
+  researchDatasetRunCommand,
+  researchDatasetRunIndexCommand,
+  researchDatasetSpecCommand,
   researchExecutionContractFromFileCommand,
   researchMethodApplyCommand,
   researchMethodSelectCommand,
@@ -94,6 +97,12 @@ import {
   renderResearchArchetypesJson,
   renderResearchDatasetAdapter,
   renderResearchDatasetAdapterJson,
+  renderDatasetRun,
+  renderDatasetRunIndex,
+  renderDatasetRunIndexJson,
+  renderDatasetRunJson,
+  renderDatasetSpec,
+  renderDatasetSpecJson,
   renderResearchExecutionContract,
   renderResearchExecutionContractJson,
   renderResearchMachineBenchmark,
@@ -138,6 +147,25 @@ import {
   renderResearchStatsRun,
   renderResearchStatsRunJson,
 } from "../research-machine/stats/commands.js";
+import {
+  renderDatasetManifest,
+  renderDatasetManifestJson,
+  renderDatasetProfile,
+  renderDatasetProfileJson,
+  renderDatasetQuestions,
+  renderDatasetQuestionsJson,
+  renderDatasetRegistration,
+  renderDatasetRegistrationJson,
+  renderDatasetRelationships,
+  renderDatasetRelationshipsJson,
+  researchDatasetDescribeCommand,
+  researchDatasetInspectCommand,
+  researchDatasetProfileCommand,
+  researchDatasetQuestionsCommand,
+  researchDatasetRegisterCommand,
+  researchDatasetRelationshipsCommand,
+  type DatasetDomain,
+} from "../research-machine/datasets.js";
 import {
   agentAdversarialProtocolsCommand,
   agentCapabilityFromContractCommand,
@@ -330,6 +358,8 @@ import {
   researchImprovementAgendaCommand,
   researchClaimGuardCommand,
   researchBackendStatusCommand,
+  researchExploreCommand,
+  researchExplorePromoteCommand,
   researchPaperIndexCommand,
   researchPaperLifecycleCommand,
   researchPaperRerunStabilityCommand,
@@ -474,6 +504,10 @@ import {
   renderResearchClaimGuardJson,
   renderResearchBackendStatus,
   renderResearchBackendStatusJson,
+  renderResearchExplore,
+  renderResearchExploreJson,
+  renderResearchExplorePromote,
+  renderResearchExplorePromoteJson,
   renderResearchPaperIndex,
   renderResearchPaperIndexJson,
   renderResearchPaperLifecycle,
@@ -667,6 +701,15 @@ Usage:
   agenteer research improvement-agenda --candidate <ID:IMPACT:CONFIDENCE:COST_USD:RISK[:TITLE]> [--budget-usd <n>] [--json]
   agenteer research claim-guard --report <report.md> [--spec <analysis-spec.json>] [--json]
   agenteer research machine-status [--data-root <dir>] [--python <python>] [--rscript <Rscript>] [--json]
+  agenteer research dataset-register --id <id> (--source <file|dir|gs://prefix> | --from-manifest <json>) --out-dir <dir> [--title <text>] [--description <text>] [--domain <domain>] [--license <text>] [--max-tables <n>] [--max-rows <n>] [--python <path>] [--json]
+  agenteer research dataset-inspect --dataset-dir <dir> [--json]
+  agenteer research dataset-profile --dataset-dir <dir> [--json]
+  agenteer research dataset-relationships --dataset-dir <dir> [--json]
+  agenteer research dataset-questions --dataset-dir <dir> [--json]
+  agenteer research dataset-describe --dataset-dir <dir> [--json]
+  agenteer research dataset-spec --study <study.json> --dataset-dir <dir> [--out <analysis-spec-v2.json>] [--json]
+  agenteer research dataset-run --analysis-spec <analysis-spec-v2.json> --dataset-dir <dir> --out-dir <dir> [--max-usd <n>] [--allow-gcs] [--python <path>] [--json]
+  agenteer research dataset-run-index --run-root <dir> [--out <index.json>] [--report <index.md>] [--json]
   agenteer research spec-v2 --spec <analysis-spec.json> [--out <analysis-spec-v2.json>] [--json]
   agenteer research execution-contract --spec <analysis-spec-v2.json> [--backend <id>] [--data-root <dir>] [--out-dir <dir>] [--json]
   agenteer research archetypes [--id <archetype-id>] [--json]
@@ -674,7 +717,7 @@ Usage:
   agenteer research method-select --question <text> [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--dataset <id>] [--goal <goal>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--max-candidates <n>] [--out <selection.json>] [--json]
   agenteer research method-apply --spec <analysis-spec.json> --selection <selection.json> [--out <analysis-spec-v2.json>] [--json]
   agenteer research method-validate --spec <analysis-spec.json> --method <id> [--json]
-  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
+  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json> | --exploration-handoff <handoff.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
   agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--variable <col>]* [--method-selection <json>] [--analysis-spec <json>] [--require-bound] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
   agenteer research analysis-manifest --run-dir <dir> [--out <analysis-run-manifest.json>] [--require-ready] [--json]
   agenteer research analysis-benchmark --run-dir <dir>* [--require-ready] [--require-multi-route] [--out <json>] [--report <md>] [--json]
@@ -686,6 +729,8 @@ Usage:
   agenteer research ml-compare --task <task> --data <rows.csv|json|parquet> --model <id>* [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-inspect --run <ml-run.json> [--json]
   agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--weight <column>] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
+  agenteer research explore --data <rows.csv|json|parquet> [--out-dir <dir>] [--target <column>] [--max-pairs <n>] [--python <path>] [--json]
+  agenteer research explore-promote --exploration <exploration.json> --question <id> [--methods-review-note <text>] [--out <handoff.json>] [--json]
   agenteer research backend-status [--python <python>] [--rscript <Rscript>] [--json]
   agenteer research paper-qa --paper <paper.md> [--evidence <analysis.json>] [--json]
   agenteer research paper-index --papers-dir <dir> [--out <INDEX.md>] [--json]
@@ -1713,6 +1758,79 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchMachineStatusJson(result) : renderResearchMachineStatus(result));
       return result.issues.some(issue => issue.severity === "blocker") ? 1 : 0;
     }
+    case "dataset-register": {
+      const result = await researchDatasetRegisterCommand({
+        datasetId: requireFlagString(flags, "id"),
+        source: flagString(flags, "source") ?? undefined,
+        fromManifest: flagString(flags, "from-manifest") ?? undefined,
+        outDir: requireFlagString(flags, "out-dir"),
+        title: flagString(flags, "title") ?? undefined,
+        description: flagString(flags, "description") ?? undefined,
+        domain: parseDatasetDomain(flagString(flags, "domain") ?? undefined),
+        license: flagString(flags, "license") ?? undefined,
+        maxTables: parseOptionalIntegerFlag(flags, "max-tables"),
+        maxRows: parseOptionalIntegerFlag(flags, "max-rows"),
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderDatasetRegistrationJson(result) : renderDatasetRegistration(result));
+      return result.profile.watchouts.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "dataset-inspect": {
+      const result = await researchDatasetInspectCommand({ datasetDir: requireFlagString(flags, "dataset-dir") });
+      console.log(flags.json === true ? renderDatasetManifestJson(result) : renderDatasetManifest(result));
+      return 0;
+    }
+    case "dataset-profile": {
+      const result = await researchDatasetProfileCommand({ datasetDir: requireFlagString(flags, "dataset-dir") });
+      console.log(flags.json === true ? renderDatasetProfileJson(result) : renderDatasetProfile(result));
+      return result.watchouts.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "dataset-relationships": {
+      const result = await researchDatasetRelationshipsCommand({ datasetDir: requireFlagString(flags, "dataset-dir") });
+      console.log(flags.json === true ? renderDatasetRelationshipsJson(result) : renderDatasetRelationships(result));
+      return result.warnings.some(issue => issue.severity === "blocker") ? 1 : 0;
+    }
+    case "dataset-questions": {
+      const result = await researchDatasetQuestionsCommand({ datasetDir: requireFlagString(flags, "dataset-dir") });
+      console.log(flags.json === true ? renderDatasetQuestionsJson(result) : renderDatasetQuestions(result));
+      return result.seeds.length ? 0 : 1;
+    }
+    case "dataset-describe": {
+      const result = await researchDatasetDescribeCommand({ datasetDir: requireFlagString(flags, "dataset-dir") });
+      console.log(flags.json === true ? JSON.stringify({ schemaVersion: 1, datasetSummaryMarkdown: result }, null, 2) : result);
+      return 0;
+    }
+    case "dataset-spec": {
+      const result = await researchDatasetSpecCommand({
+        studyPath: requireFlagString(flags, "study"),
+        datasetDir: requireFlagString(flags, "dataset-dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderDatasetSpecJson(result) : renderDatasetSpec(result));
+      return result.validation.status === "blocked" ? 1 : 0;
+    }
+    case "dataset-run": {
+      const result = await researchDatasetRunCommand({
+        analysisSpecPath: requireFlagString(flags, "analysis-spec"),
+        datasetDir: requireFlagString(flags, "dataset-dir"),
+        outDir: requireFlagString(flags, "out-dir"),
+        python: flagString(flags, "python") ?? undefined,
+        maxUsd: parseOptionalNumberFlag(flags, "max-usd") ?? 1,
+        usdPerGbRead: parseOptionalNumberFlag(flags, "usd-per-gb-read") ?? 0.12,
+        allowGcs: flags["allow-gcs"] === true,
+      });
+      console.log(flags.json === true ? renderDatasetRunJson(result) : renderDatasetRun(result));
+      return result.status === "failed" || result.readiness === "blocked" ? 1 : 0;
+    }
+    case "dataset-run-index": {
+      const result = await researchDatasetRunIndexCommand({
+        runRoot: requireFlagString(flags, "run-root"),
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderDatasetRunIndexJson(result) : renderDatasetRunIndex(result));
+      return result.totalRuns > 0 ? 0 : 1;
+    }
     case "spec-v2": {
       const result = await researchSpecV2Command({
         specPath: requireFlagString(flags, "spec"),
@@ -1789,13 +1907,56 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
     }
     case "modeling-plan": {
       const maxCandidatesRaw = flagString(flags, "max-candidates");
+      let explorationHandoff: Parameters<typeof researchModelingPlanCommand>[0]["explorationHandoff"];
+      let explorationSeed: Record<string, unknown> = {};
+      const explorationHandoffPath = flagString(flags, "exploration-handoff");
+      if (explorationHandoffPath) {
+        const rawHandoff = JSON.parse(await readFile(explorationHandoffPath, "utf-8")) as Record<string, unknown>;
+        const handoff = rawHandoff.explorationHandoff && typeof rawHandoff.explorationHandoff === "object"
+          ? rawHandoff.explorationHandoff as Record<string, unknown>
+          : rawHandoff;
+        explorationSeed = handoff.modelingPlanSeed && typeof handoff.modelingPlanSeed === "object"
+          ? handoff.modelingPlanSeed as Record<string, unknown>
+          : {};
+        const status = handoff.status === "ready_for_modeling_plan" || handoff.status === "needs_methods_review" || handoff.status === "blocked"
+          ? handoff.status
+          : "blocked";
+        const clearanceLevel = handoff.clearanceLevel === "clear_for_handoff" || handoff.clearanceLevel === "hold_for_methods_review" || handoff.clearanceLevel === "stop"
+          ? handoff.clearanceLevel
+          : "stop";
+        explorationHandoff = {
+          path: explorationHandoffPath,
+          status,
+          clearanceLevel,
+          sourceExplorationSha256: typeof handoff.sourceExplorationSha256 === "string" ? handoff.sourceExplorationSha256 : null,
+          questionId: typeof handoff.questionId === "string" ? handoff.questionId : null,
+          blockers: Array.isArray(handoff.blockers) ? handoff.blockers.map(item => String(item)) : [],
+          methodsReviewNote: typeof handoff.methodsReviewNote === "string" ? handoff.methodsReviewNote : null,
+        };
+      }
+      const seededQuestion = typeof explorationSeed.question === "string" ? explorationSeed.question : undefined;
+      const seededOutcome = typeof explorationSeed.outcome === "string" ? explorationSeed.outcome : undefined;
+      const seededTablePath = typeof explorationSeed.tablePath === "string" ? explorationSeed.tablePath : undefined;
+      const seededRouteIntent = typeof explorationSeed.routeIntent === "string" ? explorationSeed.routeIntent : undefined;
+      const seededGoal = seededRouteIntent === "prediction_modeling" ? "predict"
+        : seededRouteIntent === "diagnostic_accuracy" ? "diagnose"
+          : seededRouteIntent === "data_quality_review" ? "discover"
+            : seededRouteIntent === "descriptive_profile" ? "describe"
+              : seededRouteIntent === "causal_design_review" ? "causal"
+                : seededRouteIntent === "explanatory_association" ? "associate"
+                  : undefined;
+      const question = flagString(flags, "question") ?? seededQuestion;
+      if (!question) throw new Error("--question is required unless --exploration-handoff contains modelingPlanSeed.question");
       let tableSummary: unknown;
       const tableSummaryPath = flagString(flags, "table-summary");
       if (tableSummaryPath) {
         const rawSummary = JSON.parse(await readFile(tableSummaryPath, "utf-8")) as Record<string, unknown>;
         tableSummary = rawSummary.tableSummary ?? rawSummary;
-      } else if (flagString(flags, "table")) {
-        tableSummary = await researchTableSummaryCommand({ file: requireFlagString(flags, "table"), python: flagString(flags, "python") ?? undefined });
+      } else {
+        const tablePath = flagString(flags, "table") ?? seededTablePath;
+        if (tablePath) {
+          tableSummary = await researchTableSummaryCommand({ file: tablePath, python: flagString(flags, "python") ?? undefined });
+        }
       }
       let backendStatus: unknown;
       const backendStatusPath = flagString(flags, "backend-status");
@@ -1829,15 +1990,16 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         };
       }));
       const result = researchModelingPlanCommand({
-        question: requireFlagString(flags, "question"),
-        goal: parseModelingGoal(flagString(flags, "goal") ?? undefined),
+        question,
+        goal: parseModelingGoal(flagString(flags, "goal") ?? seededGoal),
         outcomeType: parseOutcomeType(flagString(flags, "outcome") ?? undefined),
         studyDesign: parseStudyDesign(flagString(flags, "study-design") ?? undefined),
         dataStructures: parseDataStructures(flagList(flags, "data-structure")),
         tableSummary: tableSummary as Parameters<typeof researchModelingPlanCommand>[0]["tableSummary"],
         backendStatus: backendStatus as Parameters<typeof researchModelingPlanCommand>[0]["backendStatus"],
         priorRuns,
-        target: flagString(flags, "target") ?? undefined,
+        explorationHandoff,
+        target: flagString(flags, "target") ?? seededOutcome,
         surveyDesign: flags.survey === true,
         repeatedMeasures: flags.repeated === true,
         clustered: flags.clustered === true,
@@ -2012,6 +2174,28 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       });
       console.log(flags.json === true ? renderResearchStatsRunJson(result) : renderResearchStatsRun(result));
       return result.status === "failed" ? 1 : 0;
+    }
+    case "explore": {
+      const maxPairsRaw = flagString(flags, "max-pairs");
+      const result = await researchExploreCommand({
+        dataPath: requireFlagString(flags, "data"),
+        outDir: flagString(flags, "out-dir") ?? undefined,
+        target: flagString(flags, "target") ?? undefined,
+        maxPairs: maxPairsRaw ? Number(maxPairsRaw) : undefined,
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchExploreJson(result) : renderResearchExplore(result));
+      return result.qa.status === "blocked" ? 1 : 0;
+    }
+    case "explore-promote": {
+      const result = await researchExplorePromoteCommand({
+        explorationPath: requireFlagString(flags, "exploration"),
+        questionId: requireFlagString(flags, "question"),
+        methodsReviewNote: flagString(flags, "methods-review-note") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchExplorePromoteJson(result) : renderResearchExplorePromote(result));
+      return result.status === "blocked" ? 1 : 0;
     }
     case "backend-status": {
       const result = await researchBackendStatusCommand({
@@ -2305,6 +2489,24 @@ function parseOptionalNumberFlag(
   const value = Number(raw);
   if (!Number.isFinite(value)) throw new Error(`--${key} must be numeric`);
   return value;
+}
+
+function parseOptionalIntegerFlag(
+  flags: Parameters<typeof flagString>[0],
+  key: string,
+): number | undefined {
+  const raw = flagString(flags, key);
+  if (raw === undefined) return undefined;
+  const value = Number.parseInt(raw, 10);
+  if (!Number.isFinite(value) || value < 1) throw new Error(`--${key} must be a positive integer`);
+  return value;
+}
+
+function parseDatasetDomain(raw: string | undefined): DatasetDomain | undefined {
+  if (raw === undefined) return undefined;
+  const allowed = new Set<DatasetDomain>(["public-health-survey", "ehr", "registry", "claims", "user-upload", "synthetic", "unknown"]);
+  if (!allowed.has(raw as DatasetDomain)) throw new Error(`--domain must be one of ${Array.from(allowed).join(", ")}`);
+  return raw as DatasetDomain;
 }
 
 async function loadSpec(path: string): Promise<unknown> {

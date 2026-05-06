@@ -1,0 +1,830 @@
+{
+  "schemaVersion": 1,
+  "candidateQuestions": [
+    {
+      "id": "question_01_929694bdfd",
+      "question": "Is RIDAGEYR associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "RIDAGEYR",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "social_demographic_determinant",
+      "researchInterestScore": 44,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.social-demographic"
+        ],
+        "matchedTerms": [
+          "glycemic",
+          "LBXGH",
+          "RIDAGEYR",
+          "social_demographic"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 15,
+            "reason": "Unadjusted association strength 0.281."
+          },
+          {
+            "id": "score.category.social_demographic_determinant",
+            "delta": 20,
+            "reason": "Taxonomy category social_demographic_determinant."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28712 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -3,
+            "reason": "Maximum pair missingness 9.8%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "RIDAGEYR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.281 across 28712 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_02_6fac7dc92b",
+      "question": "Is BMXWAIST associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "BMXWAIST",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 40,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "BMXWAIST",
+          "glycemic",
+          "LBXGH"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 14,
+            "reason": "Unadjusted association strength 0.249."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "27229 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.0%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "BMXWAIST is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.249 across 27229 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_03_c13157628f",
+      "question": "Is BMXBMI associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "BMXBMI",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 37,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "BMXBMI",
+          "glycemic",
+          "LBXGH"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 10,
+            "reason": "Unadjusted association strength 0.191."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28316 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -3,
+            "reason": "Maximum pair missingness 9.8%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "BMXBMI is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.191 across 28316 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_04_166d4f73ff",
+      "question": "Is high_waist_cm associated with elevated_hba1c in this dataset?",
+      "outcome": "elevated_hba1c",
+      "exposure": "high_waist_cm",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 37,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "elevated_hba1c",
+          "glycemic",
+          "high_waist_cm"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 11,
+            "reason": "Unadjusted association strength 0.197."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "27229 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.0%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "high_waist_cm is a plausible risk marker for elevated_hba1c; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "cross-tabulation with chi-square/Fisher review and adjusted logistic/multinomial model if appropriate",
+      "rationale": "cramers_v exploratory strength 0.197 across 27229 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_05_2e750e12ed",
+      "question": "Is high_waist_cm associated with low_hdl in this dataset?",
+      "outcome": "low_hdl",
+      "exposure": "high_waist_cm",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 37,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "high_waist_cm",
+          "lipid",
+          "low_hdl"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 11,
+            "reason": "Unadjusted association strength 0.196."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "26831 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.2%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "high_waist_cm is a plausible risk marker for low_hdl; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "cross-tabulation with chi-square/Fisher review and adjusted logistic/multinomial model if appropriate",
+      "rationale": "cramers_v exploratory strength 0.196 across 26831 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_06_5e1fd205a8",
+      "question": "Is BMXWAIST associated with LBDHDD in this dataset?",
+      "outcome": "LBDHDD",
+      "exposure": "BMXWAIST",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 36,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "BMXWAIST",
+          "LBDHDD",
+          "lipid"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 18,
+            "reason": "Unadjusted association strength 0.333."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "26831 complete pairs."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.2%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "BMXWAIST is a plausible risk marker for LBDHDD; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.333 across 26831 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_07_4eff326c1e",
+      "question": "Is LBDHDD associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "LBDHDD",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 35,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "glycemic",
+          "LBDHDD",
+          "LBXGH",
+          "lipid"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 9,
+            "reason": "Unadjusted association strength 0.167."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28237 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.2%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "LBDHDD is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.167 across 28237 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_08_48b52d5bec",
+      "question": "Is LBDHDD associated with RIAGENDR in this dataset?",
+      "outcome": "RIAGENDR",
+      "exposure": "LBDHDD",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 34,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "LBDHDD",
+          "lipid",
+          "RIAGENDR",
+          "social_demographic"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 16,
+            "reason": "Unadjusted association strength 0.296."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28270 complete pairs."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.2%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "LBDHDD is a plausible risk marker for RIAGENDR; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.296 across 28270 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_09_4cf90cc0e9",
+      "question": "Is BMXBMI associated with LBDHDD in this dataset?",
+      "outcome": "LBDHDD",
+      "exposure": "BMXBMI",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 33,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "BMXBMI",
+          "LBDHDD",
+          "lipid"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 15,
+            "reason": "Unadjusted association strength 0.269."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "27884 complete pairs."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.2%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "BMXBMI is a plausible risk marker for LBDHDD; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.269 across 27884 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_10_688b664e4f",
+      "question": "Is INDFMPIR associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "INDFMPIR",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "social_demographic_determinant",
+      "researchInterestScore": 32,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.social-demographic"
+        ],
+        "matchedTerms": [
+          "glycemic",
+          "INDFMPIR",
+          "LBXGH",
+          "social_demographic"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 4,
+            "reason": "Unadjusted association strength 0.072."
+          },
+          {
+            "id": "score.category.social_demographic_determinant",
+            "delta": 20,
+            "reason": "Taxonomy category social_demographic_determinant."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "25615 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.9%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "INDFMPIR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.072 across 25615 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_11_5fd08fe81a",
+      "question": "Is RIAGENDR associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "RIAGENDR",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "social_demographic_determinant",
+      "researchInterestScore": 31,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.social-demographic"
+        ],
+        "matchedTerms": [
+          "glycemic",
+          "LBXGH",
+          "RIAGENDR",
+          "social_demographic"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 2,
+            "reason": "Unadjusted association strength 0.034."
+          },
+          {
+            "id": "score.category.social_demographic_determinant",
+            "delta": 20,
+            "reason": "Taxonomy category social_demographic_determinant."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28712 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -3,
+            "reason": "Maximum pair missingness 9.8%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "RIAGENDR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.034 across 28712 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    {
+      "id": "question_12_1268825d6a",
+      "question": "Is high_waist_cm associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "high_waist_cm",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "plausible_risk_factor",
+      "researchInterestScore": 29,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.plausible-risk-factor"
+        ],
+        "matchedTerms": [
+          "anthropometric",
+          "glycemic",
+          "high_waist_cm",
+          "LBXGH"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 3,
+            "reason": "Unadjusted association strength 0.046."
+          },
+          {
+            "id": "score.category.plausible_risk_factor",
+            "delta": 18,
+            "reason": "Taxonomy category plausible_risk_factor."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "27229 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -4,
+            "reason": "Maximum pair missingness 11.0%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "high_waist_cm is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "group comparison followed by adjusted regression",
+      "rationale": "eta_squared exploratory strength 0.046 across 27229 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "low",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    }
+  ]
+}

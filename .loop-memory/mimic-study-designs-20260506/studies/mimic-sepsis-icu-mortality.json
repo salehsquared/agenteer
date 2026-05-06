@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:52.675394+00:00",
+  "study": {
+    "id": "mimic-sepsis-icu-mortality",
+    "title": "Sepsis ICU Mortality",
+    "domain": "critical-care",
+    "question": "Among ICU admissions with sepsis diagnosis codes, which first-day severity scores and labs predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-sepsis3",
+      "derived-first-day-lab",
+      "derived-first-day-sofa"
+    ],
+    "outcomes": [
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "ICD sepsis vs derived sepsis comparison",
+      "SOFA/lab model",
+      "definition mismatch audit"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "A40",
+      "expectedTerms": [
+        "streptococcal sepsis"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "A40",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "A40",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=A40&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 5,
+          "sampleRows": [
+            {
+              "code": "A40.0",
+              "name": "Sepsis due to streptococcus, group A"
+            },
+            {
+              "code": "A40.1",
+              "name": "Sepsis due to streptococcus, group B"
+            },
+            {
+              "code": "A40.3",
+              "name": "Sepsis due to Streptococcus pneumoniae"
+            },
+            {
+              "code": "A40.8",
+              "name": "Other streptococcal sepsis"
+            },
+            {
+              "code": "A40.9",
+              "name": "Streptococcal sepsis, unspecified"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:51.104613+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd10cm",
+      "query": "A41",
+      "expectedTerms": [
+        "sepsis"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "A41",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "A41",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=A41&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 15,
+          "sampleRows": [
+            {
+              "code": "A41.01",
+              "name": "Sepsis due to Methicillin susceptible Staphylococcus aureus"
+            },
+            {
+              "code": "A41.02",
+              "name": "Sepsis due to Methicillin resistant Staphylococcus aureus"
+            },
+            {
+              "code": "A41.1",
+              "name": "Sepsis due to other specified staphylococcus"
+            },
+            {
+              "code": "A41.2",
+              "name": "Sepsis due to unspecified staphylococcus"
+            },
+            {
+              "code": "A41.3",
+              "name": "Sepsis due to Hemophilus influenzae"
+            },
+            {
+              "code": "A41.4",
+              "name": "Sepsis due to anaerobes"
+            },
+            {
+              "code": "A41.50",
+              "name": "Gram-negative sepsis, unspecified"
+            },
+            {
+              "code": "A41.51",
+              "name": "Sepsis due to Escherichia coli [E. coli]"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:51.553760+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "995.91",
+      "expectedTerms": [
+        "sepsis"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "99591",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "99591",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=99591&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "995.91",
+              "name": "Sepsis"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:52.113150+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "995.92",
+      "expectedTerms": [
+        "severe sepsis"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "99592",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "99592",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=99592&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "995.92",
+              "name": "Severe sepsis"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:52.675344+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-sepsis3",
+      "derived-first-day-lab",
+      "derived-first-day-sofa"
+    ],
+    "missingTables": [
+      "derived-sepsis3"
+    ],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab",
+      "derived-first-day-sofa"
+    ],
+    "unprofiledTables": [],
+    "estimatedBytesForNaiveFullRequiredTableRead": 77569368,
+    "estimatedTransferUsdAt012PerGb": 0.008669052422046662,
+    "status": "needs_table_or_profile_review",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [
+      "Missing tables: derived-sepsis3."
+    ],
+    "warnings": [
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "hold_for_review",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "d199253c99d4f51031c3ca25bea132b92c0ba75cd3c51f46a1291709b5bd9182"
+}

@@ -11,6 +11,7 @@ import {
   agentTaskTransitionCommand,
   agentTaskValidateCommand,
 } from "./agent.js";
+import { getDatasetManifest } from "../research-machine/catalog.js";
 import {
   labMedbreviaNhanesCommand,
   renderLabMedbreviaNhanesResult,
@@ -983,6 +984,156 @@ export interface ResearchTableSummary {
   warnings: ResearchCritiqueIssue[];
 }
 
+export interface ResearchExplorationResult {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  dataPath: string;
+  outDir: string | null;
+  target: string | null;
+  posture: "exploratory_hypothesis_generation" | "blocked";
+  tableSummary: ResearchTableSummary;
+  variableMap: Array<{
+    name: string;
+    role: "candidate_outcome" | "candidate_exposure" | "identifier_or_index" | "metadata_or_weight" | "low_information" | "feature";
+    inferredType: ResearchTableSummary["columns"][number]["inferredType"];
+    nonMissingRows: number;
+    missingFraction: number;
+    cardinality: number | null;
+    notes: string[];
+  }>;
+  associations: Array<{
+    id: string;
+    left: string;
+    right: string;
+    method: "pearson" | "cramers_v" | "eta_squared";
+    strength: number;
+    direction: "positive" | "negative" | "unsigned";
+    n: number;
+    missingFractionMax: number;
+    caveats: string[];
+  }>;
+  targetAssociations: Array<ResearchExplorationResult["associations"][number]>;
+  backgroundAssociations: Array<ResearchExplorationResult["associations"][number]>;
+  explorationBurden: {
+    eligiblePairCount: number;
+    testedPairCount: number;
+    targetPairCount: number;
+    multiplicityRisk: "low" | "medium" | "high";
+    highMissingnessVariables: Array<{ name: string; missingFraction: number }>;
+    sparseCategoricalVariables: Array<{ name: string; cardinality: number; minCellCount: number }>;
+    surveyDesignCandidates: Array<{ name: string; reason: string }>;
+    possibleLeakagePairs: Array<{ associationId: string; left: string; right: string; reason: string }>;
+    promotionSummary: { promotable: number; needsMethodsReview: number; blocked: number };
+    promotionClearance: {
+      level: "clear_for_handoff" | "hold_for_methods_review" | "stop";
+      reasons: string[];
+    };
+  };
+  candidateQuestions: Array<{
+    id: string;
+    question: string;
+    outcome: string;
+    exposure: string;
+    routeIntent: "data_quality_review" | "descriptive_profile" | "explanatory_association" | "prediction_modeling" | "diagnostic_accuracy" | "causal_design_review" | "methods_review";
+    routeIntentRationale: string;
+    taxonomy: "likely_duplicate_or_proxy" | "expected_same_domain_biomarker" | "plausible_risk_factor" | "social_demographic_determinant" | "clinical_utilization_or_outcome_signal" | "surprising_cross_domain_signal" | "design_or_metadata_artifact" | "general_association";
+    researchInterestScore: number;
+    primaryQuestionUse: "recommended" | "review_before_primary" | "avoid_primary";
+    taxonomyEvidence: {
+      taxonomyVersion: string;
+      matchedRuleIds: string[];
+      matchedTerms: string[];
+      scoreAdjustments: Array<{ id: string; delta: number; reason: string }>;
+      rejectedCategories: Array<{ taxonomy: ResearchExplorationResult["candidateQuestions"][number]["taxonomy"]; reason: string }>;
+    };
+    whyThisQuestion: string;
+    avoidAsPrimaryQuestion: string | null;
+    suggestedMethod: string;
+    rationale: string;
+    requiredNextChecks: string[];
+    priority: "high" | "medium" | "low";
+    promotionStatus: "promotable_hypothesis" | "needs_methods_review" | "blocked";
+    promotionBlockers: string[];
+  }>;
+  recommendedQuestion: {
+    questionId: string;
+    question: string;
+    routeIntent: ResearchExplorationResult["candidateQuestions"][number]["routeIntent"];
+    primaryQuestionUse: ResearchExplorationResult["candidateQuestions"][number]["primaryQuestionUse"];
+    reason: string;
+    nextCommand: string;
+  } | null;
+  qa: {
+    status: "pass" | "warning" | "blocked";
+    checks: Array<{ id: string; status: "pass" | "warning" | "fail"; message: string }>;
+  };
+  artifacts: Array<{ kind: string; path: string; sha256?: string; bytes?: number }>;
+  limitations: string[];
+  nextAction: string;
+}
+
+export interface ResearchExplorationHandoff {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  sourceExplorationPath: string;
+  sourceExplorationSha256: string;
+  questionId: string;
+  status: "ready_for_modeling_plan" | "needs_methods_review" | "blocked";
+  clearanceLevel: ResearchExplorationResult["explorationBurden"]["promotionClearance"]["level"];
+  methodsReviewNote: string | null;
+  question: ResearchExplorationResult["candidateQuestions"][number];
+  blockers: string[];
+  modelingPlanSeed: {
+    question: string;
+    target: string | null;
+    outcome: string;
+    exposure: string;
+    routeIntent: ResearchExplorationResult["candidateQuestions"][number]["routeIntent"];
+    routeIntentRationale: string;
+    taxonomy: ResearchExplorationResult["candidateQuestions"][number]["taxonomy"];
+    researchInterestScore: number;
+    primaryQuestionUse: ResearchExplorationResult["candidateQuestions"][number]["primaryQuestionUse"];
+    taxonomyEvidence: ResearchExplorationResult["candidateQuestions"][number]["taxonomyEvidence"];
+    whyThisQuestion: string;
+    avoidAsPrimaryQuestion: string | null;
+    suggestedMethod: string;
+    tablePath: string;
+    rowCount: number;
+    columnCount: number;
+    designWarnings: string[];
+    requiredNextChecks: string[];
+  };
+  analysisSpecCandidate: {
+    status: "ready_for_spec_authoring" | "needs_methods_review" | "blocked";
+    routeIntent: ResearchExplorationResult["candidateQuestions"][number]["routeIntent"];
+    researchQuestion: string;
+    estimandBoundary: string;
+    population: {
+      sourceTable: string;
+      rowCount: number;
+      description: string;
+    };
+    variables: {
+      outcome: string;
+      exposure: string;
+      covariates: string[];
+      excludedUntilReviewed: string[];
+    };
+    designRequirements: string[];
+    suggestedModelFamily: string;
+    requiredBeforeExecution: string[];
+    provenance: {
+      sourceExplorationPath: string;
+      sourceExplorationSha256: string;
+      questionId: string;
+      taxonomyVersion: string;
+      routeIntent: ResearchExplorationResult["candidateQuestions"][number]["routeIntent"];
+    };
+  };
+  recommendedCommand: string;
+  artifacts: Array<{ kind: string; path: string; sha256?: string; bytes?: number }>;
+}
+
 export interface ResearchRuntimeProgress {
   phase: string;
   label: string;
@@ -1246,6 +1397,8 @@ export interface ResearchPaperIndex {
     latestQaPath: string | null;
     latestQaStatus: string;
     latestQaSummary: string;
+    readerFacingLanguageStatus: "pass" | "legacy_or_fail" | "missing";
+    readerFacingLanguageHits: string[];
     runnerRecordPath: string | null;
     runnerStatus: string;
   }>;
@@ -4740,11 +4893,41 @@ function hasUnsupportedCausalTerm(text: string, term: string): boolean {
   }
 }
 
+function readerFacingPaperJargonHits(text: string): string[] {
+  const forbidden = [
+    /\bAgenteer\b/i,
+    /\bAnalysisSpec\b/i,
+    /\bresult posture\b/i,
+    /\blocal_review_ready\b/i,
+    /\bartifact posture\b/i,
+    /\brunner record\b/i,
+    /\btask envelope\b/i,
+    /\bevidence receipt\b/i,
+    /\binterop\b/i,
+    /\bspec-governed\b/i,
+    /\bpaper-run\b/i,
+  ];
+  return uniqueStrings(forbidden
+    .map(pattern => text.match(pattern)?.[0])
+    .filter((match): match is string => Boolean(match))
+    .map(match => match.trim()));
+}
+
+function rawVariableCodeHits(text: string): string[] {
+  const allowedAcronyms = new Set(["CDC", "CI", "HDL", "NHANES", "PPV", "NPV", "PSU", "QA", "R"]);
+  return uniqueStrings(Array.from(text.matchAll(/\b[A-Z]{2,}[A-Z0-9]{2,}\b/g))
+    .map(match => match[0])
+    .filter(token => !allowedAcronyms.has(token))
+    .filter(token => !/^HTTP/.test(token)));
+}
+
 export async function researchPaperQaCommand(opts: { paperPath: string; evidencePath?: string }): Promise<ResearchPaperQa> {
   const paperPath = path.resolve(opts.paperPath);
   const evidencePath = opts.evidencePath ? path.resolve(opts.evidencePath) : null;
   const paper = await readFile(paperPath, "utf-8");
   const lower = paper.toLowerCase();
+  const readerFacingJargonHits = readerFacingPaperJargonHits(paper);
+  const rawCodeHits = rawVariableCodeHits(paper);
   const paperNumbers = numbersMentionedInText(paper);
   const evidence = evidencePath ? await readJsonIfPresent(evidencePath) : null;
   const evidenceText = evidence && typeof evidence === "object" ? JSON.stringify(evidence).toLowerCase() : "";
@@ -4752,6 +4935,24 @@ export async function researchPaperQaCommand(opts: { paperPath: string; evidence
   const add = (id: string, ok: boolean, severity: "minor" | "major" | "critical", detail: string, warning = false) => {
     checks.push({ id, status: ok ? "pass" : warning ? "warning" : "fail", severity, detail });
   };
+  add(
+    "reader-facing-language",
+    readerFacingJargonHits.length === 0,
+    "critical",
+    readerFacingJargonHits.length
+      ? `Paper contains internal platform language that belongs in provenance artifacts, not reader-facing prose: ${readerFacingJargonHits.join(", ")}.`
+      : "Paper avoids internal platform terminology and speaks to scientific readers.",
+  );
+  add("reader-code-density", rawCodeHits.length <= 8, "major", rawCodeHits.length ? `Paper exposes ${rawCodeHits.length} raw variable-like codes: ${rawCodeHits.join(", ")}.` : "Paper keeps raw variable-code exposure low.");
+  const awkwardPhrases = [
+    /whether,\s+among/i,
+    /this the analysis/i,
+    /outcome units/i,
+    /Eligibility note:/i,
+    /based on this rationale/i,
+    /Results apply to Interpret/i,
+  ].map(pattern => paper.match(pattern)?.[0]).filter((match): match is string => Boolean(match));
+  add("reader-awkward-generator-phrases", awkwardPhrases.length === 0, "major", awkwardPhrases.length ? `Paper contains awkward generator phrases: ${uniqueStrings(awkwardPhrases).join(", ")}.` : "Paper avoids known awkward generator phrases.");
   for (const section of ["abstract", "introduction", "methods", "results", "discussion", "limitations", "reproducibility", "references"]) {
     add(`section-${section}`, lower.includes(`## ${section}`), "major", `${section} section should be present.`);
   }
@@ -4779,14 +4980,15 @@ export async function researchPaperQaCommand(opts: { paperPath: string; evidence
       && typeof evidenceRecord.analysisSpecPath === "string"
       && isRecord(evidenceRecord.weights);
     if (paperRunEvidence) {
+      add("reader-main-finding", /(^|\n)Main finding:/i.test(paper), "major", "Generated paper packets should include a short plain-language main finding in the summary or abstract.");
       add(
-        "local-review-safety-header",
-        /## local review safety header/.test(lower)
+        "reader-safety-summary",
+        /## study summary/.test(lower)
           && /not clinically actionable|not clinical action/.test(lower)
           && /not causal|cannot infer caus|causal status/.test(lower)
           && /survey method|weight domain|human review/.test(lower),
         "critical",
-        "Generated paper-run papers should start with a local-review safety header covering survey method, weight domain, causal status, actionability, and human review.",
+        "Reader-facing papers should start with a plain-language study summary covering survey method, weight domain, causal status, actionability, and human review.",
       );
     }
     add("evidence-row-counts", /rowcounts|row_counts|completecase|complete-case|eligible/.test(evidenceText), "major", "Evidence should include row counts or eligible cohort evidence.");
@@ -4951,6 +5153,13 @@ export async function researchPaperIndexCommand(opts: { papersDir: string; outPa
     const runnerStatus = runnerBinding === "retrospective" && rawRunnerStatus !== "missing"
       ? `retrospective_${rawRunnerStatus}`
       : rawRunnerStatus;
+    const paperMarkdown = await readTextIfPresent(path.join(dir, "paper.md"));
+    const readerFacingLanguageHits = paperMarkdown ? readerFacingPaperJargonHits(paperMarkdown) : [];
+    const readerFacingLanguageStatus = !paperMarkdown
+      ? "missing"
+      : readerFacingLanguageHits.length
+        ? "legacy_or_fail"
+        : "pass";
     papers.push({
       id: entry.name,
       title: typeof analysis?.title === "string" ? analysis.title : entry.name,
@@ -4958,6 +5167,8 @@ export async function researchPaperIndexCommand(opts: { papersDir: string; outPa
       latestQaPath: latestQa ? path.join(dir, latestQa.file) : null,
       latestQaStatus,
       latestQaSummary,
+      readerFacingLanguageStatus,
+      readerFacingLanguageHits,
       runnerRecordPath: runnerRecord ? runnerRecordPath : null,
       runnerStatus,
     });
@@ -5157,8 +5368,9 @@ export async function researchPaperRunCommand(opts: { analysisSpecPath: string; 
   await mkdir(outDir, { recursive: true });
   const runnerScript = path.join(outDir, "paper-runner.py");
   const runnerConfig = path.join(outDir, "runner-config.json");
+  const datasetAdapter = getDatasetManifest("nhanes");
   await writeFile(runnerScript, researchPaperRunPythonScript());
-  await writeFile(runnerConfig, `${JSON.stringify({ analysisSpecPath, dataRoot, outDir, backend, rscript }, null, 2)}\n`);
+  await writeFile(runnerConfig, `${JSON.stringify({ analysisSpecPath, dataRoot, outDir, backend, rscript, datasetAdapter }, null, 2)}\n`);
   await execFileAsync(python, [runnerScript, runnerConfig], { maxBuffer: 20 * 1024 * 1024 });
 
   const analysisPath = path.join(outDir, "analysis.json");
@@ -5514,13 +5726,16 @@ export function renderResearchPaperIndex(result: ResearchPaperIndex): string {
     "",
     `Root: \`${result.papersDir}\``,
     "",
-    "| Paper | Title | Complete-case N | Latest QA | Runner | QA file |",
-    "|---|---|---:|---|---|---|",
+    "| Paper | Title | Complete-case N | Latest QA | Reader Language | Runner | QA file |",
+    "|---|---|---:|---|---|---|---|",
   ];
   for (const paper of result.papers) {
-    lines.push(`| \`${paper.id}\` | ${paper.title} | ${paper.completeCaseN ?? ""} | ${paper.latestQaStatus} (${paper.latestQaSummary}) | ${paper.runnerStatus} | \`${paper.latestQaPath ? path.basename(paper.latestQaPath) : ""}\` |`);
+    const language = paper.readerFacingLanguageStatus === "legacy_or_fail"
+      ? `legacy/fail: ${paper.readerFacingLanguageHits.join(", ")}`
+      : paper.readerFacingLanguageStatus;
+    lines.push(`| \`${paper.id}\` | ${paper.title} | ${paper.completeCaseN ?? ""} | ${paper.latestQaStatus} (${paper.latestQaSummary}) | ${language} | ${paper.runnerStatus} | \`${paper.latestQaPath ? path.basename(paper.latestQaPath) : ""}\` |`);
   }
-  lines.push("", "Use each paper directory for paper.md, analysis.json, `critique.md`, QA history, and runner-record.json when available. The `qa*.json` files preserve progression as QA got stricter across ticks.");
+  lines.push("", "Use each paper directory for paper.md, analysis.json, `critique.md`, QA history, and runner-record.json when available. `Reader Language` separates current reader-facing papers from legacy outputs that still contain platform terminology.");
   return `${lines.join("\n")}\n`;
 }
 
@@ -5675,6 +5890,345 @@ export function renderResearchTableSummaryJson(result: ResearchTableSummary): st
   return `${JSON.stringify({
     schemaVersion: 1,
     tableSummary: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchExploreCommand(opts: { dataPath: string; outDir?: string; target?: string; maxPairs?: number; python?: string }): Promise<ResearchExplorationResult> {
+  const dataPath = path.resolve(opts.dataPath);
+  const outDir = opts.outDir ? path.resolve(opts.outDir) : null;
+  const maxPairs = opts.maxPairs ?? 25;
+  const tableSummary = await researchTableSummaryCommand({ file: dataPath, python: opts.python });
+  const rows = tableSummary.format === "parquet"
+    ? await readTabularRowsWithPython(dataPath, opts.python)
+    : await readTabularRows(dataPath);
+  const variableMap = buildExplorationVariableMap(tableSummary, rows, opts.target ?? null);
+  const associationScan = scanExploratoryAssociations(rows, tableSummary);
+  const rankedAssociations = associationScan.associations.slice(0, Math.max(maxPairs * 8, 100));
+  const target = opts.target ?? null;
+  const targetAssociations = target
+    ? rankedAssociations.filter(item => item.left === target || item.right === target).slice(0, maxPairs)
+    : [];
+  const backgroundAssociations = (target
+    ? rankedAssociations.filter(item => item.left !== target && item.right !== target)
+    : rankedAssociations).slice(0, maxPairs);
+  const associations = target
+    ? [...targetAssociations, ...backgroundAssociations].slice(0, maxPairs)
+    : backgroundAssociations;
+  const questionSource = target && targetAssociations.length
+    ? [...targetAssociations, ...backgroundAssociations]
+    : associations;
+  const explorationBurdenBase = buildExplorationBurden(rows, tableSummary, variableMap, associationScan, target, targetAssociations);
+  const allCandidateQuestions = buildExplorationQuestions(questionSource, variableMap, target, explorationBurdenBase);
+  const candidateLimit = Math.min(12, maxPairs);
+  let candidateQuestions = allCandidateQuestions.slice(0, candidateLimit);
+  const avoidedQuestions = allCandidateQuestions.filter(question => question.avoidAsPrimaryQuestion).slice(0, 3);
+  for (const avoidedQuestion of avoidedQuestions) {
+    if (candidateQuestions.some(question => question.id === avoidedQuestion.id) || !candidateQuestions.length) continue;
+    const replaceIndex = Math.max(0, candidateQuestions.map(question => Boolean(question.avoidAsPrimaryQuestion)).lastIndexOf(false));
+    candidateQuestions = candidateQuestions.map((question, index) => index === replaceIndex ? avoidedQuestion : question);
+  }
+  const promotionSummary = {
+    promotable: candidateQuestions.filter(question => question.promotionStatus === "promotable_hypothesis").length,
+    needsMethodsReview: candidateQuestions.filter(question => question.promotionStatus === "needs_methods_review").length,
+    blocked: candidateQuestions.filter(question => question.promotionStatus === "blocked").length,
+  };
+  const explorationBurden = {
+    ...explorationBurdenBase,
+    promotionSummary,
+    promotionClearance: explorationPromotionClearance(explorationBurdenBase, promotionSummary, candidateQuestions.length),
+  };
+  const recommendedQuestion = recommendedExplorationQuestion(candidateQuestions, outDir);
+  const qaChecks = explorationQaChecks(tableSummary, variableMap, associations, candidateQuestions, target, targetAssociations, explorationBurden);
+  const qaStatus = qaChecks.some(check => check.status === "fail")
+    ? "blocked"
+    : qaChecks.some(check => check.status === "warning")
+      ? "warning"
+      : "pass";
+  const artifacts: ResearchExplorationResult["artifacts"] = [];
+  const result: ResearchExplorationResult = {
+    schemaVersion: 1,
+    generatedAtIso: new Date().toISOString(),
+    dataPath,
+    outDir,
+    target,
+    posture: qaStatus === "blocked" ? "blocked" : "exploratory_hypothesis_generation",
+    tableSummary,
+    variableMap,
+    associations,
+    targetAssociations,
+    backgroundAssociations,
+    explorationBurden,
+    candidateQuestions,
+    recommendedQuestion,
+    qa: { status: qaStatus, checks: qaChecks },
+    artifacts,
+    limitations: [
+      "Exploration is hypothesis generation, not confirmation.",
+      "Reported associations are unadjusted and should not be interpreted causally.",
+      "Multiple comparisons, missingness, sparse categories, survey design, clustering, and temporal ordering must be handled before inferential claims.",
+      "Candidate questions must be promoted into an explicit analysis plan before execution or paper generation.",
+    ],
+    nextAction: candidateQuestions.some(question => question.promotionStatus === "promotable_hypothesis")
+      ? "Promote one candidate question into method-select/modeling-plan with explicit outcome, exposure, covariates, design limits, and validation checks."
+      : candidateQuestions.length
+        ? "Resolve promotion blockers or perform methods review before turning an exploratory question into an analysis plan."
+        : "Improve dataset quality or provide a target variable before promoting research questions.",
+  };
+  if (outDir) {
+    await mkdir(outDir, { recursive: true });
+    const jsonPath = path.join(outDir, "exploration.json");
+    const reportPath = path.join(outDir, "exploration-report.md");
+    const questionsPath = path.join(outDir, "candidate-questions.json");
+    await writeFile(jsonPath, renderResearchExploreJson(result));
+    await writeFile(reportPath, renderResearchExplore(result));
+    await writeFile(questionsPath, `${JSON.stringify({ schemaVersion: 1, candidateQuestions }, null, 2)}\n`);
+    for (const artifact of [
+      { kind: "exploration", path: jsonPath },
+      { kind: "exploration-report", path: reportPath },
+      { kind: "candidate-questions", path: questionsPath },
+    ]) {
+      const record = await fileRecord(artifact.path);
+      artifacts.push({ kind: artifact.kind, path: artifact.path, sha256: record.sha256, bytes: record.bytes });
+    }
+    await writeFile(jsonPath, renderResearchExploreJson(result));
+  }
+  return result;
+}
+
+export function renderResearchExplore(result: ResearchExplorationResult): string {
+  const associationLines = (items: ResearchExplorationResult["associations"]) => items.length
+    ? items.slice(0, 12).map(item => `- ${item.left} vs ${item.right}: ${item.method}=${item.strength.toFixed(3)} (${item.direction}, n=${item.n})${item.caveats.length ? `; caveats: ${item.caveats.join("; ")}` : ""}`)
+    : ["- No eligible associations found."];
+  return [
+    "# Dataset Exploration Report",
+    "",
+    `Data: \`${result.dataPath}\``,
+    `Rows: ${result.tableSummary.rowCount}`,
+    `Columns: ${result.tableSummary.columnCount}`,
+    `Posture: ${result.posture}`,
+    `QA: ${result.qa.status}`,
+    "",
+    "## Recommended Next Question",
+    "",
+    ...(result.recommendedQuestion ? [
+      `Question: ${result.recommendedQuestion.question}`,
+      `Route intent: ${result.recommendedQuestion.routeIntent}`,
+      `Primary use: ${result.recommendedQuestion.primaryQuestionUse}`,
+      `Reason: ${result.recommendedQuestion.reason}`,
+      `Next command: \`${result.recommendedQuestion.nextCommand}\``,
+    ] : [
+      "No recommended question is available.",
+    ]),
+    "",
+    ...(result.target ? [
+      "## Target-Centered Associations",
+      "",
+      ...associationLines(result.targetAssociations),
+      "",
+      "## Background Correlation Map",
+      "",
+      ...associationLines(result.backgroundAssociations),
+    ] : [
+      "## Strongest Exploratory Associations",
+      "",
+      ...associationLines(result.associations),
+    ]),
+    "",
+    "## Exploration Burden",
+    "",
+    `- Eligible pairs: ${result.explorationBurden.eligiblePairCount}`,
+    `- Tested pairs: ${result.explorationBurden.testedPairCount}`,
+    `- Target-centered tested pairs: ${result.explorationBurden.targetPairCount}`,
+    `- Multiplicity risk: ${result.explorationBurden.multiplicityRisk}`,
+    `- Survey/design candidates: ${result.explorationBurden.surveyDesignCandidates.length ? result.explorationBurden.surveyDesignCandidates.map(item => `${item.name} (${item.reason})`).join("; ") : "none detected"}`,
+    `- High-missingness variables: ${result.explorationBurden.highMissingnessVariables.length ? result.explorationBurden.highMissingnessVariables.map(item => `${item.name} ${(item.missingFraction * 100).toFixed(1)}%`).join("; ") : "none over 50%"}`,
+    `- Sparse categorical variables: ${result.explorationBurden.sparseCategoricalVariables.length ? result.explorationBurden.sparseCategoricalVariables.map(item => `${item.name} min cell ${item.minCellCount}`).join("; ") : "none detected"}`,
+    `- Possible leakage/proxy pairs: ${result.explorationBurden.possibleLeakagePairs.length ? result.explorationBurden.possibleLeakagePairs.map(item => `${item.left} vs ${item.right} (${item.reason})`).join("; ") : "none detected"}`,
+    `- Candidate promotion summary: ${result.explorationBurden.promotionSummary.promotable} promotable, ${result.explorationBurden.promotionSummary.needsMethodsReview} need methods review, ${result.explorationBurden.promotionSummary.blocked} blocked`,
+    `- Promotion clearance: ${result.explorationBurden.promotionClearance.level}${result.explorationBurden.promotionClearance.reasons.length ? ` (${result.explorationBurden.promotionClearance.reasons.join("; ")})` : ""}`,
+    "",
+    "## Candidate Research Questions",
+    "",
+    ...result.candidateQuestions.map(question => `- [${question.priority}; ${question.promotionStatus}; ${question.primaryQuestionUse}; ${question.routeIntent}; interest ${question.researchInterestScore}/100; ${question.taxonomy}] ${question.question} Why: ${question.whyThisQuestion} Taxonomy evidence: ${question.taxonomyEvidence.matchedRuleIds.join(", ")}. Suggested method: ${question.suggestedMethod}. Rationale: ${question.rationale}${question.avoidAsPrimaryQuestion ? ` Avoid as primary: ${question.avoidAsPrimaryQuestion}` : ""}${question.promotionBlockers.length ? ` Promotion blockers: ${question.promotionBlockers.join("; ")}` : ""}`),
+    result.candidateQuestions.length ? "" : "- No candidate questions were generated.",
+    "## QA Checks",
+    "",
+    ...result.qa.checks.map(check => `- [${check.status}] ${check.id}: ${check.message}`),
+    "## Limitations",
+    "",
+    ...result.limitations.map(item => `- ${item}`),
+    "",
+    `Next action: ${result.nextAction}`,
+  ].join("\n");
+}
+
+export function renderResearchExploreJson(result: ResearchExplorationResult): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    exploration: result,
+  }, null, 2)}\n`;
+}
+
+export async function researchExplorePromoteCommand(opts: {
+  explorationPath: string;
+  questionId: string;
+  outPath?: string;
+  methodsReviewNote?: string;
+}): Promise<ResearchExplorationHandoff> {
+  const sourceExplorationPath = path.resolve(opts.explorationPath);
+  const raw = JSON.parse(await readFile(sourceExplorationPath, "utf-8")) as Record<string, unknown>;
+  const exploration = (raw.exploration && typeof raw.exploration === "object" ? raw.exploration : raw) as ResearchExplorationResult;
+  if (!Array.isArray(exploration.candidateQuestions)) throw new Error("exploration artifact does not contain candidateQuestions");
+  const question = exploration.candidateQuestions.find(candidate => candidate.id === opts.questionId);
+  if (!question) throw new Error(`candidate question not found: ${opts.questionId}`);
+  const clearance = exploration.explorationBurden?.promotionClearance;
+  if (!clearance) throw new Error("exploration artifact is missing explorationBurden.promotionClearance");
+  const methodsReviewNote = opts.methodsReviewNote?.trim() || null;
+  const blockers = uniqueStrings([
+    ...question.promotionBlockers,
+    ...clearance.reasons,
+  ]);
+  if (clearance.level === "stop" || question.promotionStatus === "blocked") {
+    throw new Error(`cannot promote blocked exploration question: ${blockers.join("; ") || "blocked"}`);
+  }
+  if ((clearance.level === "hold_for_methods_review" || question.promotionStatus === "needs_methods_review") && !methodsReviewNote) {
+    throw new Error("methods review note is required to hand off this exploratory question");
+  }
+  const status: ResearchExplorationHandoff["status"] =
+    question.promotionStatus === "promotable_hypothesis" && clearance.level === "clear_for_handoff"
+      ? "ready_for_modeling_plan"
+      : "needs_methods_review";
+  const designWarnings = uniqueStrings([
+    ...blockers,
+    ...exploration.limitations,
+  ]);
+  const recommendedCommand = [
+    "agenteer research modeling-plan",
+    `--question ${JSON.stringify(question.question)}`,
+    `--target ${JSON.stringify(question.outcome)}`,
+    `--table ${JSON.stringify(exploration.dataPath)}`,
+    "--json",
+  ].join(" ");
+  const sourceExplorationSha256 = await hashFile(sourceExplorationPath);
+  const suggestedModelFamily = question.routeIntent === "data_quality_review"
+    ? "data-quality review; do not fit an inferential model until leakage/design concerns are resolved"
+    : question.routeIntent === "prediction_modeling"
+      ? "prediction model with train/test validation and calibration as applicable"
+      : question.routeIntent === "diagnostic_accuracy"
+        ? "diagnostic accuracy table or model with reference-standard review"
+        : question.routeIntent === "causal_design_review"
+          ? "causal design review before any effect estimate"
+          : question.suggestedMethod;
+  const analysisSpecCandidate: ResearchExplorationHandoff["analysisSpecCandidate"] = {
+    status: status === "ready_for_modeling_plan" ? "ready_for_spec_authoring" : "needs_methods_review",
+    routeIntent: question.routeIntent,
+    researchQuestion: question.question,
+    estimandBoundary: question.routeIntent === "explanatory_association"
+      ? "Exploratory explanatory association only; not causal and not a prediction-model development claim."
+      : question.routeIntent === "data_quality_review"
+        ? "Data-quality or leakage review; not a substantive association estimand."
+        : "Exploratory candidate; specify estimand and reporting boundary before execution.",
+    population: {
+      sourceTable: exploration.dataPath,
+      rowCount: exploration.tableSummary.rowCount,
+      description: "Rows available in the exploration source table; refine eligibility and survey domains before execution.",
+    },
+    variables: {
+      outcome: question.outcome,
+      exposure: question.exposure,
+      covariates: [],
+      excludedUntilReviewed: uniqueStrings([
+        ...exploration.explorationBurden.possibleLeakagePairs.flatMap(item => [item.left, item.right]),
+        ...exploration.explorationBurden.surveyDesignCandidates.map(item => item.name),
+      ]).filter(name => name !== question.outcome && name !== question.exposure),
+    },
+    designRequirements: designWarnings,
+    suggestedModelFamily,
+    requiredBeforeExecution: uniqueStrings([
+      ...question.requiredNextChecks,
+      "Write or approve an AnalysisSpec before execution.",
+      "Confirm survey weights, strata, PSU, cycle handling, missingness policy, and sparse-cell policy when applicable.",
+      "Declare whether the study is explanatory, predictive, diagnostic, causal, descriptive, or data-quality review.",
+    ]),
+    provenance: {
+      sourceExplorationPath,
+      sourceExplorationSha256,
+      questionId: opts.questionId,
+      taxonomyVersion: question.taxonomyEvidence.taxonomyVersion,
+      routeIntent: question.routeIntent,
+    },
+  };
+  const handoff: ResearchExplorationHandoff = {
+    schemaVersion: 1,
+    generatedAtIso: new Date().toISOString(),
+    sourceExplorationPath,
+    sourceExplorationSha256,
+    questionId: opts.questionId,
+    status,
+    clearanceLevel: clearance.level,
+    methodsReviewNote,
+    question,
+    blockers,
+    modelingPlanSeed: {
+      question: question.question,
+      target: exploration.target,
+      outcome: question.outcome,
+      exposure: question.exposure,
+      routeIntent: question.routeIntent,
+      routeIntentRationale: question.routeIntentRationale,
+      taxonomy: question.taxonomy,
+      researchInterestScore: question.researchInterestScore,
+      primaryQuestionUse: question.primaryQuestionUse,
+      taxonomyEvidence: question.taxonomyEvidence,
+      whyThisQuestion: question.whyThisQuestion,
+      avoidAsPrimaryQuestion: question.avoidAsPrimaryQuestion,
+      suggestedMethod: question.suggestedMethod,
+      tablePath: exploration.dataPath,
+      rowCount: exploration.tableSummary.rowCount,
+      columnCount: exploration.tableSummary.columnCount,
+      designWarnings,
+      requiredNextChecks: question.requiredNextChecks,
+    },
+    analysisSpecCandidate,
+    recommendedCommand,
+    artifacts: [],
+  };
+  if (opts.outPath) {
+    const outPath = path.resolve(opts.outPath);
+    await mkdir(path.dirname(outPath), { recursive: true });
+    await writeFile(outPath, renderResearchExplorePromoteJson(handoff));
+    const record = await fileRecord(outPath);
+    handoff.artifacts.push({ kind: "exploration-handoff", path: outPath, sha256: record.sha256, bytes: record.bytes });
+    await writeFile(outPath, renderResearchExplorePromoteJson(handoff));
+  }
+  return handoff;
+}
+
+export function renderResearchExplorePromote(result: ResearchExplorationHandoff): string {
+  return [
+    "research exploration handoff",
+    `  status: ${result.status}`,
+    `  clearance: ${result.clearanceLevel}`,
+    `  question: ${result.question.question}`,
+    `  outcome: ${result.modelingPlanSeed.outcome}`,
+    `  exposure: ${result.modelingPlanSeed.exposure}`,
+    `  route intent: ${result.question.routeIntent}`,
+    `  route rationale: ${result.question.routeIntentRationale}`,
+    `  taxonomy: ${result.question.taxonomy}; use=${result.question.primaryQuestionUse}; interest=${result.question.researchInterestScore}/100`,
+    `  taxonomy evidence: ${result.question.taxonomyEvidence.matchedRuleIds.join(", ")}`,
+    `  why: ${result.question.whyThisQuestion}`,
+    `  avoid primary: ${result.question.avoidAsPrimaryQuestion ?? "(none)"}`,
+    `  spec candidate: ${result.analysisSpecCandidate.status}; model=${result.analysisSpecCandidate.suggestedModelFamily}`,
+    `  methods review: ${result.methodsReviewNote ?? "(none)"}`,
+    `  blockers: ${result.blockers.length ? result.blockers.join("; ") : "none"}`,
+    `  recommended: ${result.recommendedCommand}`,
+  ].join("\n");
+}
+
+export function renderResearchExplorePromoteJson(result: ResearchExplorationHandoff): string {
+  return `${JSON.stringify({
+    schemaVersion: 1,
+    explorationHandoff: result,
   }, null, 2)}\n`;
 }
 
@@ -7936,6 +8490,540 @@ function readAnalysisSpecHash(value: unknown): string | null {
   return typeof spec?.specHash === "string" ? spec.specHash : null;
 }
 
+function buildExplorationVariableMap(summary: ResearchTableSummary, rows: Array<Record<string, unknown>>, target: string | null): ResearchExplorationResult["variableMap"] {
+  return summary.columns.map(column => {
+    const values = rows.map(row => row[column.name]).filter(hasValue).map(value => String(value));
+    const cardinality = column.inferredType === "empty" ? 0 : uniqueStrings(values).length;
+    const lower = column.name.toLowerCase();
+    const notes: string[] = [];
+    let role: ResearchExplorationResult["variableMap"][number]["role"] = "feature";
+    if (target && column.name === target) {
+      role = "candidate_outcome";
+      notes.push("User-declared target variable.");
+    } else if (/^(id|seqn|index|row|person|participant)/i.test(column.name) || /id$/.test(lower)) {
+      role = "identifier_or_index";
+      notes.push("Looks like an identifier or row index.");
+    } else if (looksLikeDesignOrMetadataColumn(column.name)) {
+      role = "metadata_or_weight";
+      notes.push("Looks like design, time, or metadata rather than a substantive exposure.");
+    } else if (column.missingFraction > 0.8 || cardinality <= 1) {
+      role = "low_information";
+      notes.push(column.missingFraction > 0.8 ? "Very high missingness." : "Near-constant variable.");
+    } else if (/outcome|case|disease|diagnosis|death|mortality|event|score|hba1c|glucose|bp|hdl|ldl/i.test(column.name)) {
+      role = "candidate_outcome";
+    } else if (/exposure|treat|risk|bmi|age|sex|race|smok|income|poverty|education|insurance/i.test(column.name)) {
+      role = "candidate_exposure";
+    }
+    if (column.missingFraction > 0.2 && column.missingFraction <= 0.8) notes.push("Moderate/high missingness; require missing-data review.");
+    if (cardinality > 100 && column.inferredType !== "number") notes.push("High-cardinality nonnumeric column; avoid naive categorical tests.");
+    return { name: column.name, role, inferredType: column.inferredType, nonMissingRows: column.nonMissingRows, missingFraction: column.missingFraction, cardinality, notes };
+  });
+}
+
+function explorationEligibleColumns(summary: ResearchTableSummary): ResearchTableSummary["columns"] {
+  return summary.columns.filter(column =>
+    column.inferredType !== "empty"
+    && column.nonMissingRows >= Math.max(8, Math.min(30, summary.rowCount * 0.2))
+    && !/^(id|seqn|index|row)$/i.test(column.name)
+    && !looksLikeDesignOrMetadataColumn(column.name));
+}
+
+function scanExploratoryAssociations(rows: Array<Record<string, unknown>>, summary: ResearchTableSummary): {
+  associations: ResearchExplorationResult["associations"];
+  eligiblePairCount: number;
+  testedPairCount: number;
+} {
+  const eligibleColumns = explorationEligibleColumns(summary);
+  const eligiblePairCount = eligibleColumns.length * (eligibleColumns.length - 1) / 2;
+  let testedPairCount = 0;
+  const results: ResearchExplorationResult["associations"] = [];
+  for (let leftIndex = 0; leftIndex < eligibleColumns.length; leftIndex += 1) {
+    for (let rightIndex = leftIndex + 1; rightIndex < eligibleColumns.length; rightIndex += 1) {
+      const left = eligibleColumns[leftIndex]!;
+      const right = eligibleColumns[rightIndex]!;
+      const paired = rows.map(row => [row[left.name], row[right.name]] as [unknown, unknown]).filter(([a, b]) => hasValue(a) && hasValue(b));
+      if (paired.length < 8) continue;
+      testedPairCount += 1;
+      const missingFractionMax = Math.max(left.missingFraction, right.missingFraction);
+      const caveats = missingFractionMax > 0.2 ? ["high missingness"] : [];
+      if (left.inferredType === "number" && right.inferredType === "number") {
+        const r = pearson(paired.map(([value]) => Number(value)), paired.map(([, value]) => Number(value)));
+        if (r === null) continue;
+        results.push({ id: stableAssociationId(left.name, right.name, "pearson"), left: left.name, right: right.name, method: "pearson", strength: Math.abs(r), direction: r >= 0 ? "positive" : "negative", n: paired.length, missingFractionMax, caveats });
+      } else if (left.inferredType === "number" || right.inferredType === "number") {
+        const numericIsLeft = left.inferredType === "number";
+        const eta = etaSquared(paired.map(pair => ({ group: String(pair[numericIsLeft ? 1 : 0]), value: Number(pair[numericIsLeft ? 0 : 1]) })));
+        if (eta === null) continue;
+        results.push({ id: stableAssociationId(left.name, right.name, "eta_squared"), left: left.name, right: right.name, method: "eta_squared", strength: eta, direction: "unsigned", n: paired.length, missingFractionMax, caveats: [...caveats, "unadjusted group mean separation"] });
+      } else {
+        const v = cramersV(paired.map(([a, b]) => [String(a), String(b)]));
+        if (v === null) continue;
+        results.push({ id: stableAssociationId(left.name, right.name, "cramers_v"), left: left.name, right: right.name, method: "cramers_v", strength: v, direction: "unsigned", n: paired.length, missingFractionMax, caveats: [...caveats, "unadjusted categorical association"] });
+      }
+    }
+  }
+  return {
+    associations: results.filter(item => Number.isFinite(item.strength) && item.strength > 0).sort((a, b) => b.strength - a.strength || b.n - a.n),
+    eligiblePairCount,
+    testedPairCount,
+  };
+}
+
+function buildExplorationBurden(
+  rows: Array<Record<string, unknown>>,
+  summary: ResearchTableSummary,
+  variableMap: ResearchExplorationResult["variableMap"],
+  associationScan: { associations: ResearchExplorationResult["associations"]; eligiblePairCount: number; testedPairCount: number },
+  target: string | null,
+  targetAssociations: ResearchExplorationResult["associations"],
+): Omit<ResearchExplorationResult["explorationBurden"], "promotionSummary" | "promotionClearance"> {
+  const highMissingnessVariables = variableMap
+    .filter(item => item.missingFraction > 0.5)
+    .map(item => ({ name: item.name, missingFraction: item.missingFraction }));
+  const sparseCategoricalVariables = summary.columns
+    .filter(column => column.inferredType !== "empty" && column.inferredType !== "number")
+    .map(column => {
+      const counts = new Map<string, number>();
+      for (const row of rows) {
+        const value = row[column.name];
+        if (hasValue(value)) counts.set(String(value), (counts.get(String(value)) ?? 0) + 1);
+      }
+      return { name: column.name, cardinality: counts.size, minCellCount: counts.size ? Math.min(...counts.values()) : 0 };
+    })
+    .filter(item => item.cardinality > 1 && item.cardinality <= 20 && item.minCellCount < 5);
+  const surveyDesignCandidates = variableMap
+    .filter(item => item.role === "metadata_or_weight" || looksLikeDesignOrMetadataColumn(item.name))
+    .map(item => ({ name: item.name, reason: designMetadataReason(item.name) }));
+  const possibleLeakagePairs = targetAssociations
+    .filter(item => item.strength >= 0.95 || namesSuggestLeakage(target, item.left, item.right))
+    .map(item => ({
+      associationId: item.id,
+      left: item.left,
+      right: item.right,
+      reason: item.strength >= 0.98
+        ? "near-perfect target association; may be duplicate, derived, or target leakage"
+        : namesSuggestLeakage(target, item.left, item.right)
+          ? "variable name suggests target proxy or derived measure"
+          : "very strong target association; review proxy/leakage risk",
+    }));
+  const multiplicityRisk: ResearchExplorationResult["explorationBurden"]["multiplicityRisk"] =
+    associationScan.testedPairCount >= 200 ? "high"
+      : associationScan.testedPairCount >= 40 ? "medium"
+        : "low";
+  return {
+    eligiblePairCount: associationScan.eligiblePairCount,
+    testedPairCount: associationScan.testedPairCount,
+    targetPairCount: target ? targetAssociations.length : 0,
+    multiplicityRisk,
+    highMissingnessVariables,
+    sparseCategoricalVariables,
+    surveyDesignCandidates,
+    possibleLeakagePairs,
+  };
+}
+
+function namesSuggestLeakage(target: string | null, left: string, right: string): boolean {
+  if (!target) return false;
+  const targetLower = target.toLowerCase();
+  const other = (left === target ? right : left).toLowerCase();
+  if (other === targetLower) return false;
+  const normalizedTarget = targetLower.replace(/[^a-z0-9]/g, "");
+  const normalizedOther = other.replace(/[^a-z0-9]/g, "");
+  if (normalizedOther.includes(normalizedTarget) || normalizedTarget.includes(normalizedOther)) return true;
+  if (["elevated", "high", "low", "abnormal", "positive", "case", "flag", "threshold"].includes(normalizedOther)) {
+    return targetAliasTerms(target).some(term => term.replace(/[^a-z0-9]/g, "").length >= 3);
+  }
+  return targetAliasTerms(target).some(term => {
+    const normalizedTerm = term.replace(/[^a-z0-9]/g, "");
+    return normalizedTerm.length >= 3 && (normalizedOther.includes(normalizedTerm) || normalizedTerm.includes(normalizedOther));
+  });
+}
+
+function targetAliasTerms(target: string): string[] {
+  const normalized = target.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const groups = [
+    ["lbxgh", "hba1c", "a1c", "glycohemoglobin", "glycatedhemoglobin"],
+    ["lbxglu", "glucose", "fastingglucose", "plasmaglucose"],
+    ["bmxbmi", "bmi", "bodymassindex"],
+    ["bmxwaist", "waist", "waistcircumference"],
+    ["lbdhdd", "hdl", "hdlcholesterol"],
+    ["lbxtc", "totalcholesterol", "cholesterol"],
+    ["lbxtr", "triglyceride", "triglycerides"],
+  ];
+  return groups.find(group => group.includes(normalized)) ?? [normalized];
+}
+
+function looksLikeDesignOrMetadataColumn(name: string): boolean {
+  return /weight|strata|psu|cluster|wave|cycle|year|date/i.test(name)
+    || /^WT[A-Z0-9_]*$/i.test(name)
+    || /^SDMV(PSU|STRA)$/i.test(name)
+    || /^SDDSRVYR$/i.test(name)
+    || /release|version/i.test(name);
+}
+
+function designMetadataReason(name: string): string {
+  if (/weight/i.test(name) || /^WT[A-Z0-9_]*$/i.test(name)) return "possible analysis weight";
+  if (/strata|psu|cluster/i.test(name) || /^SDMV(PSU|STRA)$/i.test(name)) return "possible complex-design field";
+  return "possible cycle/time/design metadata";
+}
+
+function questionPromotionGate(
+  association: ResearchExplorationResult["associations"][number],
+  outcome: string,
+  exposure: string,
+  variableMap: Map<string, ResearchExplorationResult["variableMap"][number]>,
+  burden: Omit<ResearchExplorationResult["explorationBurden"], "promotionSummary" | "promotionClearance">,
+): { status: ResearchExplorationResult["candidateQuestions"][number]["promotionStatus"]; blockers: string[] } {
+  const blockers: string[] = [];
+  const leftRole = variableMap.get(association.left)?.role;
+  const rightRole = variableMap.get(association.right)?.role;
+  if (leftRole === "identifier_or_index" || rightRole === "identifier_or_index") blockers.push("identifier/index variable is not a valid research exposure or outcome");
+  if (leftRole === "metadata_or_weight" || rightRole === "metadata_or_weight") blockers.push("design/metadata variable should not be promoted as a substantive association without review");
+  if (association.n < 30) blockers.push("low complete-pair count for promotion");
+  if (association.missingFractionMax > 0.3) blockers.push("high missingness in at least one paired variable");
+  if (burden.surveyDesignCandidates.length) blockers.push("survey/design fields detected; promotion needs survey-aware plan");
+  if (burden.multiplicityRisk === "high") blockers.push("high multiplicity burden from broad pair scan");
+  const leakage = burden.possibleLeakagePairs.find(item => item.associationId === association.id);
+  if (leakage) blockers.push(leakage.reason);
+  const exposureInfo = variableMap.get(exposure);
+  const outcomeInfo = variableMap.get(outcome);
+  if (exposureInfo?.role === "low_information" || outcomeInfo?.role === "low_information") blockers.push("low-information variable in candidate question");
+  if (blockers.some(item => item.includes("identifier/index") || item.includes("low-information"))) return { status: "blocked", blockers };
+  if (blockers.length) return { status: "needs_methods_review", blockers };
+  return { status: "promotable_hypothesis", blockers };
+}
+
+function explorationPromotionClearance(
+  burden: Omit<ResearchExplorationResult["explorationBurden"], "promotionSummary" | "promotionClearance">,
+  summary: ResearchExplorationResult["explorationBurden"]["promotionSummary"],
+  questionCount: number,
+): ResearchExplorationResult["explorationBurden"]["promotionClearance"] {
+  const reasons: string[] = [];
+  if (!questionCount) reasons.push("no candidate questions were generated");
+  if (summary.blocked) reasons.push(`${summary.blocked} candidate questions are blocked`);
+  if (summary.needsMethodsReview) reasons.push(`${summary.needsMethodsReview} candidate questions need methods review`);
+  if (!summary.promotable) reasons.push("no candidate questions are currently promotable");
+  if (burden.surveyDesignCandidates.length) reasons.push("survey/design candidate variables detected");
+  if (burden.possibleLeakagePairs.length) reasons.push("possible target leakage/proxy pairs detected");
+  if (burden.multiplicityRisk === "high") reasons.push("high multiplicity burden");
+  if (!questionCount || summary.blocked) return { level: "stop", reasons };
+  if (reasons.length) return { level: "hold_for_methods_review", reasons };
+  return { level: "clear_for_handoff", reasons };
+}
+
+function explorationVariableDomain(name: string): "glycemic" | "anthropometric" | "lipid" | "social_demographic" | "survey_design" | "clinical_status" | "general" {
+  const normalized = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (looksLikeDesignOrMetadataColumn(name)) return "survey_design";
+  if (/(hba1c|a1c|glycohemoglobin|glucose|diabetes|diq|lbxgh|lbxglu|elevatedhba1c)/i.test(normalized)) return "glycemic";
+  if (/(bmi|bodymass|waist|weight|height|bmx)/i.test(normalized)) return "anthropometric";
+  if (/(hdl|ldl|cholesterol|triglyceride|lbdhdd|lbxtc|lbxtr)/i.test(normalized)) return "lipid";
+  if (/(pir|income|poverty|education|race|ethnic|sex|gender|age|ridageyr|riagendr|indfmpir)/i.test(normalized)) return "social_demographic";
+  if (/(disease|diagnosis|mortality|death|hospital|visit|admission|outcome|elevated)/i.test(normalized)) return "clinical_status";
+  return "general";
+}
+
+function classifyExplorationQuestion(
+  association: ResearchExplorationResult["associations"][number],
+  outcome: string,
+  exposure: string,
+  variableMap: Map<string, ResearchExplorationResult["variableMap"][number]>,
+  burden: Omit<ResearchExplorationResult["explorationBurden"], "promotionSummary" | "promotionClearance">,
+): Pick<ResearchExplorationResult["candidateQuestions"][number], "taxonomy" | "researchInterestScore" | "primaryQuestionUse" | "taxonomyEvidence" | "whyThisQuestion" | "avoidAsPrimaryQuestion"> {
+  const exposureDomain = explorationVariableDomain(exposure);
+  const outcomeDomain = explorationVariableDomain(outcome);
+  const leakage = burden.possibleLeakagePairs.find(item => item.associationId === association.id);
+  const exposureRole = variableMap.get(exposure)?.role;
+  const outcomeRole = variableMap.get(outcome)?.role;
+  const sameDomain = exposureDomain !== "general" && exposureDomain === outcomeDomain;
+  const hasTarget = variableMap.get(outcome)?.role === "candidate_outcome";
+  const matchedRuleIds: string[] = [];
+  const matchedTerms = uniqueStrings([exposure, outcome, exposureDomain, outcomeDomain, leakage?.reason].filter((item): item is string => Boolean(item)));
+  const category: ResearchExplorationResult["candidateQuestions"][number]["taxonomy"] =
+    exposureDomain === "survey_design" || outcomeDomain === "survey_design" || exposureRole === "metadata_or_weight" || outcomeRole === "metadata_or_weight"
+      ? (matchedRuleIds.push("taxonomy.design-metadata"), "design_or_metadata_artifact")
+      : leakage || namesSuggestLeakage(outcome, outcome, exposure)
+        ? (matchedRuleIds.push("taxonomy.target-proxy"), "likely_duplicate_or_proxy")
+        : sameDomain && ["glycemic", "lipid", "anthropometric"].includes(exposureDomain)
+          ? (matchedRuleIds.push("taxonomy.expected-same-domain"), "expected_same_domain_biomarker")
+          : exposureDomain === "social_demographic"
+            ? (matchedRuleIds.push("taxonomy.social-demographic"), "social_demographic_determinant")
+            : ["anthropometric", "lipid", "clinical_status"].includes(exposureDomain)
+              ? (matchedRuleIds.push("taxonomy.plausible-risk-factor"), "plausible_risk_factor")
+              : hasTarget && exposureDomain !== outcomeDomain && association.strength >= 0.2
+                ? (matchedRuleIds.push("taxonomy.surprising-cross-domain"), "surprising_cross_domain_signal")
+                : "general_association";
+  if (category === "general_association") matchedRuleIds.push("taxonomy.general");
+  const categoryBonus: Record<ResearchExplorationResult["candidateQuestions"][number]["taxonomy"], number> = {
+    likely_duplicate_or_proxy: -45,
+    expected_same_domain_biomarker: -18,
+    plausible_risk_factor: 18,
+    social_demographic_determinant: 20,
+    clinical_utilization_or_outcome_signal: 12,
+    surprising_cross_domain_signal: 16,
+    design_or_metadata_artifact: -55,
+    general_association: 0,
+  };
+  const missingPenalty = Math.round(association.missingFractionMax * 35);
+  const multiplicityPenalty = burden.multiplicityRisk === "high" ? 8 : burden.multiplicityRisk === "medium" ? 4 : 0;
+  const sampleBonus = association.n >= 1000 ? 8 : association.n >= 100 ? 5 : association.n >= 30 ? 2 : -8;
+  const targetBonus = hasTarget ? 8 : 0;
+  const strengthBonus = Math.round(association.strength * 55);
+  const scoreAdjustments = [
+    { id: "score.association-strength", delta: strengthBonus, reason: `Unadjusted association strength ${association.strength.toFixed(3)}.` },
+    { id: `score.category.${category}`, delta: categoryBonus[category], reason: `Taxonomy category ${category}.` },
+    { id: "score.sample-size", delta: sampleBonus, reason: `${association.n} complete pairs.` },
+    { id: "score.target-centered", delta: targetBonus, reason: hasTarget ? "Candidate is target-centered." : "Candidate is not target-centered." },
+    { id: "score.missingness", delta: -missingPenalty, reason: `Maximum pair missingness ${(association.missingFractionMax * 100).toFixed(1)}%.` },
+    { id: "score.multiplicity", delta: -multiplicityPenalty, reason: `Multiplicity risk ${burden.multiplicityRisk}.` },
+  ].filter(item => item.delta !== 0);
+  const rawScore = scoreAdjustments.reduce((sum, item) => sum + item.delta, 0);
+  const researchInterestScore = Math.max(0, Math.min(100, rawScore));
+  const whyThisQuestion = (() => {
+    if (category === "likely_duplicate_or_proxy") return `${exposure} may duplicate, derive from, or proxy ${outcome}; this is useful for data-quality review but weak as a primary research question.`;
+    if (category === "expected_same_domain_biomarker") return `${exposure} and ${outcome} appear to be related measures in the same clinical domain; model only if the scientific question requires this expected relationship.`;
+    if (category === "social_demographic_determinant") return `${exposure} may capture social or demographic patterning in ${outcome}, which can generate public-health questions if survey design and confounding are handled carefully.`;
+    if (category === "plausible_risk_factor") return `${exposure} is a plausible risk marker for ${outcome}; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.`;
+    if (category === "surprising_cross_domain_signal") return `${exposure} is outside the apparent domain of ${outcome}, so the association may be worth investigating after checking coding, missingness, and confounding.`;
+    if (category === "design_or_metadata_artifact") return `${exposure} or ${outcome} appears to be a design or metadata field, so the association should inform weighting/design setup rather than a substantive study question.`;
+    return `${exposure} and ${outcome} show an unadjusted association that may be worth triage after domain review.`;
+  })();
+  const avoidAsPrimaryQuestion =
+    category === "likely_duplicate_or_proxy" ? "Likely duplicate/proxy/derived measure; use for leakage review, not as the primary study question."
+      : category === "expected_same_domain_biomarker" && association.strength >= 0.45 ? "Expected same-domain biomarker relationship; consider a more clinically meaningful exposure first."
+        : category === "design_or_metadata_artifact" ? "Design or metadata field should not be treated as a substantive exposure or outcome."
+          : null;
+  const primaryQuestionUse: ResearchExplorationResult["candidateQuestions"][number]["primaryQuestionUse"] =
+    avoidAsPrimaryQuestion ? "avoid_primary"
+      : category === "expected_same_domain_biomarker" || category === "general_association" ? "review_before_primary"
+        : "recommended";
+  const rejectedCategories: ResearchExplorationResult["candidateQuestions"][number]["taxonomyEvidence"]["rejectedCategories"] = [];
+  if (category !== "likely_duplicate_or_proxy" && leakage) rejectedCategories.push({ taxonomy: "likely_duplicate_or_proxy", reason: "Leakage rule did not determine final taxonomy." });
+  if (category !== "expected_same_domain_biomarker" && sameDomain) rejectedCategories.push({ taxonomy: "expected_same_domain_biomarker", reason: "Same-domain rule was not selected after higher-priority checks." });
+  if (category !== "social_demographic_determinant" && exposureDomain === "social_demographic") rejectedCategories.push({ taxonomy: "social_demographic_determinant", reason: "Social/demographic rule was not selected after higher-priority checks." });
+  return {
+    taxonomy: category,
+    researchInterestScore,
+    primaryQuestionUse,
+    taxonomyEvidence: {
+      taxonomyVersion: "exploration-taxonomy-v1",
+      matchedRuleIds,
+      matchedTerms,
+      scoreAdjustments,
+      rejectedCategories,
+    },
+    whyThisQuestion,
+    avoidAsPrimaryQuestion,
+  };
+}
+
+function routeIntentForExplorationCandidate(
+  classification: Pick<ResearchExplorationResult["candidateQuestions"][number], "taxonomy" | "primaryQuestionUse">,
+): Pick<ResearchExplorationResult["candidateQuestions"][number], "routeIntent" | "routeIntentRationale"> {
+  if (classification.taxonomy === "likely_duplicate_or_proxy" || classification.taxonomy === "design_or_metadata_artifact") {
+    return {
+      routeIntent: "data_quality_review",
+      routeIntentRationale: "This candidate is primarily useful for leakage, derivation, coding, or design-metadata review before substantive modeling.",
+    };
+  }
+  if (classification.primaryQuestionUse === "review_before_primary") {
+    return {
+      routeIntent: "methods_review",
+      routeIntentRationale: "This candidate may be legitimate, but it needs methods review before becoming the primary analysis route.",
+    };
+  }
+  return {
+    routeIntent: "explanatory_association",
+    routeIntentRationale: "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+  };
+}
+
+function buildExplorationQuestions(
+  associations: ResearchExplorationResult["associations"],
+  variableMap: ResearchExplorationResult["variableMap"],
+  target: string | null,
+  burden: Omit<ResearchExplorationResult["explorationBurden"], "promotionSummary" | "promotionClearance">,
+): ResearchExplorationResult["candidateQuestions"] {
+  const map = new Map(variableMap.map(item => [item.name, item]));
+  const questions = associations.map((association, index) => {
+    const left = map.get(association.left);
+    const right = map.get(association.right);
+    const outcome = target && (association.left === target || association.right === target)
+      ? target
+      : left?.role === "candidate_outcome" ? association.left
+        : right?.role === "candidate_outcome" ? association.right
+          : association.right;
+    const exposure = outcome === association.left ? association.right : association.left;
+    const suggestedMethod = association.method === "pearson"
+      ? "correlation followed by adjusted linear regression if scientifically justified"
+      : association.method === "eta_squared"
+        ? "group comparison followed by adjusted regression"
+        : "cross-tabulation with chi-square/Fisher review and adjusted logistic/multinomial model if appropriate";
+    const promotion = questionPromotionGate(association, outcome, exposure, map, burden);
+    const classification = classifyExplorationQuestion(association, outcome, exposure, map, burden);
+    const routeIntent = routeIntentForExplorationCandidate(classification);
+    const priority: ResearchExplorationResult["candidateQuestions"][number]["priority"] =
+      classification.researchInterestScore >= 55 ? "high"
+        : classification.researchInterestScore >= 30 ? "medium" : "low";
+    const requiredNextChecks = [
+      "Confirm temporal/design plausibility; do not infer causality from exploration.",
+      "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+      "Select covariates from domain knowledge before confirmatory modeling.",
+    ];
+    if (classification.avoidAsPrimaryQuestion) requiredNextChecks.unshift("Do not use as the primary research question until the avoid-primary reason is resolved.");
+    return {
+      id: `question_unranked_${String(index + 1).padStart(2, "0")}_${association.id}`,
+      question: `Is ${exposure} associated with ${outcome} in this dataset?`,
+      outcome,
+      exposure,
+      ...routeIntent,
+      ...classification,
+      suggestedMethod,
+      rationale: `${association.method} exploratory strength ${association.strength.toFixed(3)} across ${association.n} complete pairs.`,
+      requiredNextChecks,
+      priority,
+      promotionStatus: promotion.status,
+      promotionBlockers: promotion.blockers,
+    };
+  });
+  return questions
+    .sort((a, b) => {
+      const avoidDelta = Number(Boolean(a.avoidAsPrimaryQuestion)) - Number(Boolean(b.avoidAsPrimaryQuestion));
+      if (avoidDelta !== 0) return avoidDelta;
+      return b.researchInterestScore - a.researchInterestScore || a.id.localeCompare(b.id);
+    })
+    .map((question, index) => ({
+      ...question,
+      id: question.id.replace(/^question_unranked_\d+_/, `question_${String(index + 1).padStart(2, "0")}_`),
+    }));
+}
+
+function recommendedExplorationQuestion(
+  questions: ResearchExplorationResult["candidateQuestions"],
+  outDir: string | null,
+): ResearchExplorationResult["recommendedQuestion"] {
+  const question = questions.find(item => item.primaryQuestionUse === "recommended")
+    ?? questions.find(item => item.primaryQuestionUse === "review_before_primary")
+    ?? questions[0]
+    ?? null;
+  if (!question) return null;
+  const explorationPath = outDir ? path.join(outDir, "exploration.json") : "<exploration.json>";
+  const needsReview = question.promotionStatus !== "promotable_hypothesis";
+  const nextCommand = [
+    "agenteer research explore-promote",
+    `--exploration ${JSON.stringify(explorationPath)}`,
+    `--question ${question.id}`,
+    needsReview ? "--methods-review-note <review-note>" : "",
+    "--out <handoff.json>",
+    "--json",
+  ].filter(Boolean).join(" ");
+  return {
+    questionId: question.id,
+    question: question.question,
+    routeIntent: question.routeIntent,
+    primaryQuestionUse: question.primaryQuestionUse,
+    reason: `${question.whyThisQuestion} Route intent: ${question.routeIntent}. ${question.routeIntentRationale}`,
+    nextCommand,
+  };
+}
+
+function explorationQaChecks(
+  summary: ResearchTableSummary,
+  variableMap: ResearchExplorationResult["variableMap"],
+  associations: ResearchExplorationResult["associations"],
+  questions: ResearchExplorationResult["candidateQuestions"],
+  target: string | null,
+  targetAssociations: ResearchExplorationResult["associations"] = [],
+  burden?: ResearchExplorationResult["explorationBurden"],
+): ResearchExplorationResult["qa"]["checks"] {
+  const highMissing = variableMap.filter(item => item.missingFraction > 0.5).length;
+  const needsReview = questions.filter(question => question.promotionStatus === "needs_methods_review").length;
+  const blocked = questions.filter(question => question.promotionStatus === "blocked").length;
+  const missingTaxonomyEvidence = questions.filter(question =>
+    !question.taxonomyEvidence?.taxonomyVersion
+    || !question.taxonomyEvidence.matchedRuleIds.length
+    || !question.whyThisQuestion
+    || !question.primaryQuestionUse).length;
+  const missingRouteIntent = questions.filter(question => !question.routeIntent || !question.routeIntentRationale).length;
+  return [
+    { id: "non-empty-table", status: summary.rowCount > 0 ? "pass" : "fail", message: `${summary.rowCount} rows found.` },
+    { id: "enough-columns", status: summary.columnCount >= 2 ? "pass" : "fail", message: `${summary.columnCount} columns found.` },
+    { id: "association-scan", status: associations.length ? "pass" : "warning", message: `${associations.length} candidate associations ranked; ${burden?.testedPairCount ?? associations.length} pairs tested.` },
+    { id: "candidate-questions", status: questions.length ? "pass" : "warning", message: `${questions.length} candidate questions generated.` },
+    { id: "taxonomy-evidence", status: missingTaxonomyEvidence ? "fail" : "pass", message: `${questions.length - missingTaxonomyEvidence}/${questions.length} candidate questions include taxonomy evidence and primary-use recommendations.` },
+    { id: "route-intent", status: missingRouteIntent ? "fail" : "pass", message: `${questions.length - missingRouteIntent}/${questions.length} candidate questions include route intent.` },
+    { id: "target-present", status: !target || variableMap.some(item => item.name === target) ? "pass" : "fail", message: target ? `target=${target}` : "No target supplied; broad exploratory scan." },
+    { id: "target-association-scan", status: !target || targetAssociations.length ? "pass" : "warning", message: target ? `${targetAssociations.length} associations involve the target.` : "No target supplied; not applicable." },
+    { id: "promotion-gate", status: blocked ? "fail" : needsReview ? "warning" : "pass", message: `${questions.length - needsReview - blocked} promotable; ${needsReview} need methods review; ${blocked} blocked.` },
+    { id: "promotion-clearance", status: burden?.promotionClearance.level === "stop" ? "fail" : burden?.promotionClearance.level === "hold_for_methods_review" ? "warning" : "pass", message: `clearance=${burden?.promotionClearance.level ?? "unknown"}.` },
+    { id: "multiplicity-review", status: burden?.multiplicityRisk === "high" ? "warning" : "pass", message: `${burden?.testedPairCount ?? associations.length} tested pairs; multiplicity risk ${burden?.multiplicityRisk ?? "unknown"}.` },
+    { id: "survey-design-review", status: burden?.surveyDesignCandidates.length ? "warning" : "pass", message: `${burden?.surveyDesignCandidates.length ?? 0} survey/design candidate variables detected.` },
+    { id: "high-missingness-review", status: highMissing ? "warning" : "pass", message: `${highMissing} variables exceed 50% missingness.` },
+    { id: "exploratory-only", status: "warning", message: "This mode generates hypotheses only; confirmatory analysis requires a promoted plan." },
+  ];
+}
+
+function stableAssociationId(left: string, right: string, method: string): string {
+  return createHash("sha1").update(`${method}:${left}:${right}`).digest("hex").slice(0, 10);
+}
+
+function pearson(xs: number[], ys: number[]): number | null {
+  if (xs.length !== ys.length || xs.length < 3) return null;
+  const mx = xs.reduce((sum, value) => sum + value, 0) / xs.length;
+  const my = ys.reduce((sum, value) => sum + value, 0) / ys.length;
+  let numerator = 0;
+  let sx = 0;
+  let sy = 0;
+  for (let index = 0; index < xs.length; index += 1) {
+    const dx = xs[index]! - mx;
+    const dy = ys[index]! - my;
+    numerator += dx * dy;
+    sx += dx * dx;
+    sy += dy * dy;
+  }
+  const denominator = Math.sqrt(sx * sy);
+  return denominator > 0 ? numerator / denominator : null;
+}
+
+function etaSquared(items: Array<{ group: string; value: number }>): number | null {
+  const filtered = items.filter(item => Number.isFinite(item.value));
+  if (filtered.length < 3) return null;
+  const groups = new Map<string, number[]>();
+  for (const item of filtered) groups.set(item.group, [...(groups.get(item.group) ?? []), item.value]);
+  if (groups.size < 2 || groups.size > 30) return null;
+  const grandMean = filtered.reduce((sum, item) => sum + item.value, 0) / filtered.length;
+  const ssBetween = Array.from(groups.values()).reduce((sum, values) => {
+    const mean = values.reduce((inner, value) => inner + value, 0) / values.length;
+    return sum + values.length * (mean - grandMean) ** 2;
+  }, 0);
+  const ssTotal = filtered.reduce((sum, item) => sum + (item.value - grandMean) ** 2, 0);
+  return ssTotal > 0 ? ssBetween / ssTotal : null;
+}
+
+function cramersV(pairs: Array<[string, string]>): number | null {
+  if (pairs.length < 3) return null;
+  const leftValues = uniqueStrings(pairs.map(pair => pair[0]));
+  const rightValues = uniqueStrings(pairs.map(pair => pair[1]));
+  if (leftValues.length < 2 || rightValues.length < 2 || leftValues.length > 30 || rightValues.length > 30) return null;
+  const table = leftValues.map(() => rightValues.map(() => 0));
+  const leftIndex = new Map(leftValues.map((value, index) => [value, index]));
+  const rightIndex = new Map(rightValues.map((value, index) => [value, index]));
+  for (const [left, right] of pairs) {
+    const row = table[leftIndex.get(left)!]!;
+    row[rightIndex.get(right)!] = (row[rightIndex.get(right)!] ?? 0) + 1;
+  }
+  const rowTotals = table.map(row => row.reduce((sum, value) => sum + value, 0));
+  const colTotals = rightValues.map((_, index) => table.reduce((sum, row) => sum + row[index]!, 0));
+  let chi2 = 0;
+  for (let i = 0; i < table.length; i += 1) {
+    for (let j = 0; j < table[i]!.length; j += 1) {
+      const expected = (rowTotals[i]! * colTotals[j]!) / pairs.length;
+      if (expected > 0) chi2 += (table[i]![j]! - expected) ** 2 / expected;
+    }
+  }
+  const minDim = Math.min(leftValues.length - 1, rightValues.length - 1);
+  return minDim > 0 ? Math.sqrt(chi2 / (pairs.length * minDim)) : null;
+}
+
 async function readParquetTableSummary(file: string, fileSizeBytes: number, fileMtimeMs: number, fileSha256: string, python?: string): Promise<ResearchTableSummary> {
   const runtime = python ?? process.env.AGENTEER_RESEARCH_PYTHON ?? process.env.PYTHON ?? "python3";
   const script = `
@@ -8030,6 +9118,33 @@ function parseCsvRows(text: string): Array<Record<string, unknown>> {
     const cells = splitCsvLine(line);
     return Object.fromEntries(headers.map((header, index) => [header, coerceScalar(cells[index] ?? "")]));
   });
+}
+
+async function readTabularRowsWithPython(file: string, python?: string): Promise<Array<Record<string, unknown>>> {
+  const runtime = python ?? process.env.AGENTEER_RESEARCH_PYTHON ?? process.env.PYTHON ?? "python3";
+  const script = `
+import json
+import sys
+try:
+    import pandas as pd
+except Exception as exc:
+    print(json.dumps({"error": "PYTHON_PANDAS_UNAVAILABLE", "message": str(exc)}))
+    sys.exit(2)
+path = sys.argv[1]
+if path.endswith(".parquet"):
+    df = pd.read_parquet(path)
+elif path.endswith(".csv"):
+    df = pd.read_csv(path)
+elif path.endswith(".json"):
+    df = pd.read_json(path)
+else:
+    raise SystemExit("unsupported table format")
+print(df.where(pd.notnull(df), None).to_json(orient="records"))
+`;
+  const { stdout } = await execFileAsync(runtime, ["-c", script, file], { maxBuffer: 1024 * 1024 * 64 });
+  const parsed = JSON.parse(stdout) as Array<Record<string, unknown>> | { error: string; message: string };
+  if (!Array.isArray(parsed)) throw new Error(`${parsed.error}: ${parsed.message}`);
+  return parsed;
 }
 
 function splitCsvLine(line: string): string[] {
@@ -8590,22 +9705,26 @@ def model_family(spec):
     return "linear"
 
 
-def weight_domain_info(spec, weight):
+def weight_domain_info(spec, weight, adapter):
     survey = spec.get("surveyDesign", {}) or {}
     upper = str(weight).upper()
-    known = {
-        "WTMEC2YR": ("mec_exam", "MEC-exam participants", False),
-        "WTINT2YR": ("interview", "Interview participants", False),
-        "WTSAF2YR": ("fasting_subsample", "Morning fasting laboratory subsample", True),
-        "WTSAFPRP": ("fasting_subsample_prepandemic", "2017-2020 pre-pandemic fasting laboratory subsample", True),
-    }
-    domain_id, label, is_subsample = known.get(upper, ("custom_weight", f"Custom or less common NHANES weight {weight}", upper.startswith("WTS") or upper.startswith("WTSAF")))
+    domains = ((adapter.get("surveyDesign") or {}).get("weightDomains") or [])
+    matched = next((item for item in domains if str(item.get("weight", "")).upper() == upper), None)
+    domain_id = str(matched.get("id") or upper.lower()) if matched else "custom_weight"
+    label = str(matched.get("label") or f"Custom or less common NHANES weight {weight}") if matched else f"Custom or less common NHANES weight {weight}"
+    is_subsample = bool(matched.get("isSubsample")) if matched else (upper.startswith("WTS") or upper.startswith("WTSAF"))
     rationale = str(survey.get("weightRationale") or survey.get("weight_rationale") or "").strip()
     eligibility = str(survey.get("eligibilityNote") or survey.get("eligibility_note") or survey.get("subsampleEligibility") or "").strip()
+    if not rationale and matched:
+        rationale = str(matched.get("rationale") or "").strip()
+    if not eligibility and matched:
+        eligibility = str(matched.get("eligibilityNote") or "").strip()
     if is_subsample and (not rationale or not eligibility):
         raise SystemExit(f"Subsample weight {weight} requires surveyDesign.weightRationale and surveyDesign.eligibilityNote before execution.")
     if not rationale:
-        rationale = f"{weight} selected from AnalysisSpec surveyDesign."
+        rationale = f"{weight} was selected from the survey design section of the analysis plan."
+    rationale = reader_text(rationale)
+    eligibility = reader_text(eligibility)
     if not eligibility:
         eligibility = label
     return {
@@ -8614,7 +9733,46 @@ def weight_domain_info(spec, weight):
         "isSubsample": bool(is_subsample),
         "rationale": rationale,
         "eligibilityNote": eligibility,
+        "cycleYears": matched.get("cycleYears") if matched else None,
+        "multiCycleConstruction": matched.get("multiCycleConstruction") if matched else "No adapter multi-cycle policy declared for this weight.",
     }
+
+
+def reader_text(text):
+    out = str(text)
+    replacements = [
+        ("for this AnalysisSpec", "for this analysis"),
+        ("this AnalysisSpec", "this analysis"),
+        ("the AnalysisSpec", "the analysis plan"),
+        ("AnalysisSpec", "analysis plan"),
+        ("analysis spec", "analysis plan"),
+        ("Interpret estimates for ", ""),
+        ("interpret estimates for ", ""),
+    ]
+    for old, new in replacements:
+        out = out.replace(old, new)
+    return out
+
+
+def metadata_for(adapter, variable):
+    return (adapter.get("variableMetadata") or {}).get(str(variable).upper(), {})
+
+
+def label_for(adapter, variable):
+    meta = metadata_for(adapter, variable)
+    return str(meta.get("label") or variable)
+
+
+def unit_for(adapter, variable):
+    meta = metadata_for(adapter, variable)
+    unit = meta.get("unit")
+    return str(unit) if unit else ""
+
+
+def label_with_code(adapter, variable):
+    label = label_for(adapter, variable)
+    code = str(variable)
+    return label if label == code else f"{label} ({code})"
 
 
 def build_design(df, y_variable, exposure, covariates, weight, strata, psu, threshold=None):
@@ -8875,6 +10033,7 @@ def main():
     out_dir = Path(config["outDir"])
     backend = config.get("backend", "python-linearized")
     rscript = config.get("rscript", "Rscript")
+    adapter = config.get("datasetAdapter") or {}
     raw_spec = json.loads(Path(config["analysisSpecPath"]).read_text())
     spec = unwrap_spec(raw_spec)
     outcome = variable_list(spec, "outcome")[0]
@@ -8887,7 +10046,7 @@ def main():
     psu = survey_value(spec, "psuVariable", "psu")
     if not all([outcome, exposure, weight, strata, psu]):
         raise SystemExit("AnalysisSpec must declare outcome, exposure, weight, strata, and psu.")
-    weight_domain = weight_domain_info(spec, weight)
+    weight_domain = weight_domain_info(spec, weight, adapter)
     outcome_source = threshold["variable"] if threshold else outcome
     required = ["SEQN", outcome_source, exposure, weight, strata, psu] + covariates
     tables = table_files_for_variables(config["dataRoot"], required)
@@ -8951,10 +10110,18 @@ def main():
             "psuCount": fit["psuCount"],
             "lonelyStrata": fit["lonelyStrata"],
         }
-    effect_phrase = f"an adjusted odds ratio of {model['oddsRatio']:.2f}" if family == "logistic" else f"an adjusted mean difference of {effect:.2f} outcome units"
+    exposure_label = label_for(adapter, exposure)
+    exposure_label_code = label_with_code(adapter, exposure)
+    outcome_label = label_for(adapter, outcome_source)
+    outcome_label_code = label_with_code(adapter, outcome_source)
+    outcome_unit = unit_for(adapter, outcome_source)
+    outcome_unit_phrase = f" {outcome_unit}" if outcome_unit else f" {outcome_label} units"
+    weight_label_code = label_with_code(adapter, weight)
+    covariate_labels = [label_for(adapter, covariate) for covariate in covariates]
+    effect_phrase = f"an adjusted odds ratio of {model['oddsRatio']:.2f}" if family == "logistic" else f"an adjusted mean difference of {effect:.2f}{outcome_unit_phrase}"
     result_phrase = f"odds ratio {model['oddsRatio']:.2f}" if family == "logistic" else f"mean difference {effect:.2f}"
     model_phrase = ("R survey-weighted logistic regression" if family == "logistic" else "R survey-weighted linear regression") if backend == "r-survey" else ("weighted logistic regression" if family == "logistic" else "weighted linear regression")
-    outcome_definition = f"Binary threshold {threshold['name']} from {threshold['variable']} {threshold['operator']} {threshold['value']}" if threshold else f"Continuous {outcome}"
+    outcome_definition = f"Binary threshold {threshold['name']} from {label_with_code(adapter, threshold['variable'])} {threshold['operator']} {threshold['value']}" if threshold else f"Continuous {outcome_label_code}"
     analysis = {
         "paperId": out_dir.name,
         "title": title,
@@ -8962,9 +10129,9 @@ def main():
         "analysisSpecPath": config["analysisSpecPath"],
         "dataRoot": config["dataRoot"],
         "inputFiles": [str(path) for path, _ in tables],
-        "population": "; ".join(simple_filters(spec)) or "AnalysisSpec-defined population",
-        "exposure": {"name": exposure, "variable": exposure, "definition": f"Continuous {exposure}"},
-        "outcome": {"name": threshold["name"] if threshold else outcome, "variable": outcome_source, "definition": outcome_definition},
+        "population": "; ".join(simple_filters(spec)) or "Pre-specified eligible population",
+        "exposure": {"name": exposure_label, "variable": exposure, "definition": f"Continuous {exposure_label_code}"},
+        "outcome": {"name": threshold["name"] if threshold else outcome_label, "variable": outcome_source, "definition": outcome_definition},
         "rowCounts": {"mergedRows": int(len(merged)), "eligibleRows": int(len(adults)), "completeCaseEligible": int(len(cc))},
         "missingnessEligibleRows": missingness,
         "weights": {"weight": weight, "strata": strata, "psu": psu, "implementation": (f"R survey Taylor linearized variance via svyglm for weighted {family} regression" if backend == "r-survey" else f"strata/PSU linearized sandwich variance for weighted {family} regression"), "domain": weight_domain},
@@ -8972,19 +10139,22 @@ def main():
         "model": model,
         "thresholds": {"binaryOutcome": outcome_definition} if threshold else {},
         "groupSummary": groups,
+        "datasetAdapter": {"id": adapter.get("id"), "label": adapter.get("label"), "variableMetadataSource": "dataset-adapter-manifest", "variableMetadataCount": len(adapter.get("variableMetadata") or {})},
         "analysisSpec": {"inferencePolicy": {"estimandType": "associational", "varianceEstimator": "complex_survey", "allowedInference": "design_corrected_inference", "pValueLanguage": "standard", "causalClaimsAllowed": False}},
-        "limitations": ["Cross-sectional analysis; no temporality or causality.", "Complete-case analysis may induce selection bias.", ("R survey svyglm provides design-aware Taylor linearized variance for the declared design." if backend == "r-survey" else "Design-based linearized variance is implemented for primary weighted linear and logistic models."), "Subsample weights change the analytic population and must be interpreted using the declared weight-domain eligibility." if weight_domain["isSubsample"] else "Weight-domain eligibility follows the declared AnalysisSpec survey design."],
+        "limitations": ["Cross-sectional analysis; no temporality or causality.", "Complete-case analysis may induce selection bias.", ("R survey svyglm provides design-aware Taylor linearized variance for the declared design." if backend == "r-survey" else "Design-based linearized variance is implemented for primary weighted linear and logistic models."), "Subsample weights change the analytic population and must be interpreted using the declared weight-domain eligibility." if weight_domain["isSubsample"] else "Weight-domain eligibility follows the declared survey design."],
         "sources": ["https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx", "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx", "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0309210"],
     }
     p_text = f"{p:.3g}" if p is not None else "not estimable"
-    weight_domain_sentence = f" The selected weight domain was {weight_domain['label']}; the AnalysisSpec rationale was: {weight_domain['rationale']} Eligibility note: {weight_domain['eligibilityNote']}" if weight_domain["isSubsample"] else ""
+    weight_domain_rationale = str(weight_domain["rationale"]).rstrip(".; ")
+    weight_domain_eligibility = str(weight_domain["eligibilityNote"]).rstrip(".; ")
+    weight_domain_sentence = f" The selected weight domain was {weight_domain['label']} because {weight_domain_rationale}. This means results apply to {weight_domain_eligibility}." if weight_domain["isSubsample"] else ""
     variance_phrase = "R survey Taylor linearized variance" if backend == "r-survey" else "strata/PSU linearized sandwich variance"
-    safety_header = f"""## Local Review Safety Header
+    safety_header = f"""## Study Summary
 
 - Analysis type: observational cross-sectional association.
-- Survey method: {model_phrase} with {weight} weights, {strata} strata, {psu} PSU, and {variance_phrase}.
+- Survey method: {model_phrase} with {weight_label_code}, survey strata, survey primary sampling units, and {variance_phrase}.
 - Weight domain: {weight_domain['label']} ({'subsample analytic population' if weight_domain['isSubsample'] else 'standard analytic population for this weight'}).
-- Population: {len(cc):,} complete-case eligible participants after AnalysisSpec filters.
+- Population: {len(cc):,} complete-case eligible participants after applying the stated eligibility criteria.
 - Causal status: not causal; this cannot infer causality or temporality.
 - Clinical actionability: not clinically actionable and not a diagnostic rule.
 - Human review: required before sharing, publication, clinical interpretation, or product integration.
@@ -8995,25 +10165,27 @@ def main():
 
 ## Abstract
 
-This spec-governed NHANES analysis evaluated {question.rstrip('?')}. The AnalysisSpec existed before execution, and the analytic sample included {len(cc):,} complete-case eligible adults or participants after applying the declared population filters. A {model_phrase} with {weight} survey weights and {variance_phrase} estimated {effect_phrase} per one-unit higher {exposure} (95% CI {ci[0]:.2f} to {ci[1]:.2f}; p={p_text}).{weight_domain_sentence} This is an observational cross-sectional association and cannot infer causality.
+Main finding: higher {exposure_label} was associated with higher {outcome_label} in the analyzed NHANES sample.
+
+This NHANES analysis evaluated the adjusted association between {exposure_label_code} and {outcome_label_code} in the stated study population. The analysis followed a pre-specified plan, and the analytic sample included {len(cc):,} complete-case eligible participants after applying the stated population filters. A {model_phrase} with {weight_label_code} and {variance_phrase} estimated {effect_phrase} per one-unit higher {exposure_label} (95% CI {ci[0]:.2f} to {ci[1]:.2f}; p={p_text}).{weight_domain_sentence} This is an observational cross-sectional association and cannot infer causality.
 
 ## Introduction
 
-NHANES analyses need explicit handling of survey weights, strata, PSU, missingness, and cross-sectional interpretation. This paper is generated from a pre-run AnalysisSpec to test whether Agenteer can move from a design contract to a reproducible, inspectable public-health paper without retrospective provenance. Backend used: {backend}.
+NHANES analyses need explicit handling of survey weights, strata, primary sampling units, missingness, and cross-sectional interpretation. This report evaluates the adjusted association between {exposure_label} and {outcome_label} in a reproducible public-health analysis using a pre-specified plan. The statistical backend was {backend}.
 
 ## Methods
 
-The pre-run AnalysisSpec was read from analysis-spec.json. Agenteer loaded local cached NHANES files under the declared data root, selected files containing the required variables, merged them by SEQN, applied the declared population filters, and required complete cases for {outcome}, {exposure}, {weight}, {strata}, {psu}, and covariates. The complete-case analytic sample was {len(cc):,} from {len(adults):,} eligible merged rows. Missingness among eligible rows included {exposure}: {missingness.get(exposure, 0) * 100:.1f}%, {outcome}: {missingness.get(outcome, 0) * 100:.1f}%, and {weight}: {missingness.get(weight, 0) * 100:.1f}%. Weight-domain clearance: {weight_domain['label']}; rationale: {weight_domain['rationale']}; eligibility: {weight_domain['eligibilityNote']}.
+The analysis plan was read before execution. Local cached NHANES component files were loaded from the declared data directory, files containing the required variables were selected, records were merged by participant identifier, population filters were applied, and complete cases were required for {outcome_label}, {exposure_label}, {weight_label_code}, survey strata, survey primary sampling units, and covariates. The complete-case analytic sample was {len(cc):,} from {len(adults):,} eligible merged rows. Missingness among eligible rows included {exposure_label}: {missingness.get(exposure, 0) * 100:.1f}%, {outcome_label}: {missingness.get(outcome, 0) * 100:.1f}%, and {label_for(adapter, weight)}: {missingness.get(weight, 0) * 100:.1f}%. The weight domain was {weight_domain['label']} because {weight_domain_rationale}. Results apply to {weight_domain_eligibility}.
 
-The primary model was {model_phrase} with covariate adjustment for {', '.join(covariates) if covariates else 'no additional covariates'}. Unlike earlier approximate papers, this runner used {variance_phrase} with {fit['strataCount']} strata and {fit['psuCount']} PSU clusters contributing to variance estimation.
+The primary model was {model_phrase} with covariate adjustment for {', '.join(covariate_labels) if covariate_labels else 'no additional covariates'}. Unlike earlier approximate papers, this analysis used {variance_phrase} with {fit['strataCount']} strata and {fit['psuCount']} primary sampling unit clusters contributing to variance estimation.
 
 ## Results
 
-The adjusted {result_phrase} per one-unit higher {exposure} had a 95% CI of {ci[0]:.2f} to {ci[1]:.2f} (p={p_text}). Weighted descriptive quartiles of {exposure} showed outcome means or event fractions of {groups[0]['weightedMeanOutcome']:.2f}, {groups[1]['weightedMeanOutcome']:.2f}, {groups[2]['weightedMeanOutcome']:.2f}, and {groups[3]['weightedMeanOutcome']:.2f}. These descriptive summaries support inspection of the model direction but do not establish a causal gradient.
+The adjusted {result_phrase} per one-unit higher {exposure_label} had a 95% CI of {ci[0]:.2f} to {ci[1]:.2f} (p={p_text}). Weighted descriptive quartiles of {exposure_label} showed {outcome_label} means or event fractions of {groups[0]['weightedMeanOutcome']:.2f}, {groups[1]['weightedMeanOutcome']:.2f}, {groups[2]['weightedMeanOutcome']:.2f}, and {groups[3]['weightedMeanOutcome']:.2f}. These descriptive summaries support inspection of the model direction but do not establish a causal gradient.
 
 ## Discussion
 
-The generated paper demonstrates a complete AnalysisSpec-to-paper path with design-aware variance evidence. The association is still observational and cross-sectional, so the result should be interpreted as a population-survey association conditional on the variables included in the specification, not as evidence that the exposure caused the outcome.
+In this cross-sectional survey analysis, {exposure_label} was associated with {outcome_label} after the stated covariate adjustment. The result should be interpreted as a population-survey association conditional on the variables included in the model, not as evidence that the exposure caused the outcome.
 
 ## Limitations
 
@@ -9021,7 +10193,7 @@ This analysis cannot establish temporality or causality. Complete-case analysis 
 
 ## Reproducibility
 
-Agenteer generated this paper through research paper-run from a pre-run AnalysisSpec using backend {backend}. The packet includes analysis.json, paper.md, qa-cli.json, runner-record.json, task/evidence receipts, interop exports, and lifecycle.md. Input files and output files are hashed in runner provenance.
+The companion packet includes the analysis results, quality checks, run metadata, and file hashes needed to audit or rerun the analysis. Input files and output files are hashed in the companion metadata.
 
 ## References
 
@@ -9031,7 +10203,7 @@ Agenteer generated this paper through research paper-run from a pre-run Analysis
 """
     critique = """# Critique
 
-This paper resolves the prior manual-orchestration issue for the supported survey path: Agenteer starts from an AnalysisSpec, executes the analysis, runs QA, records provenance, creates task receipts, and emits lifecycle state. Backend used: {backend}. Remaining methods limits include domain analysis, replicate weights, and multiple-cycle weight construction.
+This report is suitable for local scientific review of the supported survey path. The main remaining methods limits are domain analysis, replicate weights, and multiple-cycle weight construction.
 """
     (out_dir / "analysis.json").write_text(json.dumps(analysis, indent=2) + "\n")
     (out_dir / "paper.md").write_text(paper)

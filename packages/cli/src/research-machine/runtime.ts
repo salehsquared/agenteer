@@ -54,6 +54,8 @@ export interface DatasetAdapterInspection {
   evidence: string[];
   issues: MachineIssue[];
   discoveredFiles: Array<{ path: string; bytes: number; role: string }>;
+  variableMetadataCount: number;
+  surveyWeightDomains: Array<{ weight: string; label: string; isSubsample: boolean; cycleYears: number; multiCycleConstruction: string }>;
 }
 
 export interface BackendRuntimeStatus {
@@ -176,11 +178,34 @@ export async function inspectDatasetAdapter(dataset: DatasetAdapterId, opts: { d
       evidence: adapter.localCachePolicy === "not-applicable" ? ["No local cache required."] : ["No data root supplied."],
       issues: adapter.localCachePolicy === "required" ? [issue("warning", "DATA_ROOT_NOT_SUPPLIED", `${adapter.id} requires a local data root before execution.`)] : [],
       discoveredFiles: [],
+      variableMetadataCount: Object.keys(adapter.variableMetadata ?? {}).length,
+      surveyWeightDomains: (adapter.surveyDesign.weightDomains ?? []).map(domain => ({
+        weight: domain.weight,
+        label: domain.label,
+        isSubsample: domain.isSubsample,
+        cycleYears: domain.cycleYears,
+        multiCycleConstruction: domain.multiCycleConstruction,
+      })),
     };
   }
   const dataRoot = path.resolve(opts.dataRoot);
   if (!await pathExists(dataRoot)) {
-    return { adapter, dataRoot, availability: "missing", evidence: [`Data root does not exist: ${dataRoot}`], issues: [issue("blocker", "DATA_ROOT_MISSING", `Dataset root does not exist: ${dataRoot}`)], discoveredFiles: [] };
+    return {
+      adapter,
+      dataRoot,
+      availability: "missing",
+      evidence: [`Data root does not exist: ${dataRoot}`],
+      issues: [issue("blocker", "DATA_ROOT_MISSING", `Dataset root does not exist: ${dataRoot}`)],
+      discoveredFiles: [],
+      variableMetadataCount: Object.keys(adapter.variableMetadata ?? {}).length,
+      surveyWeightDomains: (adapter.surveyDesign.weightDomains ?? []).map(domain => ({
+        weight: domain.weight,
+        label: domain.label,
+        isSubsample: domain.isSubsample,
+        cycleYears: domain.cycleYears,
+        multiCycleConstruction: domain.multiCycleConstruction,
+      })),
+    };
   }
   const files = await discoverDataFiles(dataRoot, adapter.supportedFormats);
   const names = files.map(file => path.basename(file.path).toUpperCase());
@@ -195,7 +220,24 @@ export async function inspectDatasetAdapter(dataset: DatasetAdapterId, opts: { d
     evidence.push(`NHANES design evidence: ${hasDesign ? "present" : "not obvious"}.`);
   }
   if (!files.length) issues.push(issue("blocker", "NO_SUPPORTED_DATA_FILES", `No ${adapter.supportedFormats.join("/")} files found under ${dataRoot}.`));
-  return { adapter, dataRoot, availability, evidence, issues, discoveredFiles: files.slice(0, 50) };
+  evidence.push(`Adapter variable metadata entries: ${Object.keys(adapter.variableMetadata ?? {}).length}.`);
+  evidence.push(`Survey weight domains: ${(adapter.surveyDesign.weightDomains ?? []).map(domain => domain.weight).join(", ") || "(none declared)"}.`);
+  return {
+    adapter,
+    dataRoot,
+    availability,
+    evidence,
+    issues,
+    discoveredFiles: files.slice(0, 50),
+    variableMetadataCount: Object.keys(adapter.variableMetadata ?? {}).length,
+    surveyWeightDomains: (adapter.surveyDesign.weightDomains ?? []).map(domain => ({
+      weight: domain.weight,
+      label: domain.label,
+      isSubsample: domain.isSubsample,
+      cycleYears: domain.cycleYears,
+      multiCycleConstruction: domain.multiCycleConstruction,
+    })),
+  };
 }
 
 async function discoverDataFiles(root: string, formats: string[]): Promise<Array<{ path: string; bytes: number; role: string }>> {

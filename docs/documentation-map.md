@@ -33,6 +33,7 @@ Use this map to choose the right document before opening source. It is intention
 | Document | Covers |
 |---|---|
 | [Research Pipeline](research-pipeline.md) | Research packet ownership, stage-based workflow, AnalysisSpec-to-paper path, research machine path, audit commands, packet readiness. |
+| [Dataset Intelligence](dataset-intelligence.md) | Canonical dataset manifests, variable registries, relationship graphs, data profiles, watchouts, question seeds, and agent context files for any dataset. |
 | [Research ML Modeling](research-ml.md) | ML adapter registry, `modeling-plan`, stats runner, ML run/compare/inspect, analysis manifests, benchmark readiness, preprocessing, metrics, artifacts, explainability. |
 | [Research Methods Foundation](research-methods-foundation.md) | Method ontology, analysis selection, classical statistics, survey and biomedical methods foundations. |
 | [Research Machine Build Tracks](research-machine-build-tracks.md) | Long-term tracks: execution core, engines, AnalysisSpec, study archetypes, dataset adapters, QA harness, planner/product layer. |
@@ -79,4 +80,3 @@ When adding a new research capability:
 2. Update [Research Pipeline](research-pipeline.md) for packet/paper/golden-path behavior.
 3. Update [Research Methods Foundation](research-methods-foundation.md) for method selection semantics.
 4. Update [Research Machine Build Tracks](research-machine-build-tracks.md) if it changes long-term architecture.
-

@@ -36,6 +36,20 @@ import {
   type ModelingDecisionRequest,
 } from "./modeling.js";
 import { buildAnalysisRunManifest, type AnalysisRunManifest } from "./analysis-manifest.js";
+import {
+  renderDatasetRun,
+  renderDatasetRunIndex,
+  renderDatasetRunIndexJson,
+  renderDatasetRunJson,
+  renderDatasetSpec,
+  renderDatasetSpecJson,
+  researchDatasetRunCommand,
+  researchDatasetRunIndexCommand,
+  researchDatasetSpecCommand,
+  type DatasetRunIndex,
+  type DatasetRunResult,
+  type DatasetSpecFromStudyResult,
+} from "./dataset-run.js";
 import { runStatsMethod } from "./stats/runner.js";
 import type { StatsMethod, StatsRunRequest, StatsRunResult } from "./stats/schemas.js";
 import {
@@ -66,6 +80,20 @@ import {
 } from "./schemas.js";
 
 export type { DatasetAdapterInspection, MachineBenchmarkResult, SpecV2Result } from "./runtime.js";
+export {
+  renderDatasetRun,
+  renderDatasetRunIndex,
+  renderDatasetRunIndexJson,
+  renderDatasetRunJson,
+  renderDatasetSpec,
+  renderDatasetSpecJson,
+  researchDatasetRunCommand,
+  researchDatasetRunIndexCommand,
+  researchDatasetSpecCommand,
+  type DatasetRunIndex,
+  type DatasetRunResult,
+  type DatasetSpecFromStudyResult,
+} from "./dataset-run.js";
 
 export async function researchMachineStatusCommand(opts: { python?: string; rscript?: string; dataRoot?: string } = {}): Promise<MachineStatus> {
   return buildMachineStatus(opts);
@@ -170,6 +198,7 @@ export function researchModelingPlanCommand(opts: {
   tableSummary?: ModelingDecisionRequest["tableSummary"];
   backendStatus?: ModelingDecisionRequest["backendStatus"];
   priorRuns?: ModelingDecisionRequest["priorRuns"];
+  explorationHandoff?: ModelingDecisionRequest["explorationHandoff"];
   highMissingness?: boolean;
   smallSample?: boolean;
   requiresInference?: boolean;
@@ -345,15 +374,20 @@ async function writeDiagnosticAnalysisPaper(opts: {
   const qaPath = path.join(opts.outDir, "paper-qa.json");
   const first = opts.statsRun.estimates[0] ?? {};
   const diagnostics = opts.statsRun.diagnostics as Record<string, unknown>;
+  const reference = String(first.reference ?? opts.statsRun.variables[0] ?? "the reference measure");
+  const indexTest = String(first.term ?? opts.statsRun.variables[1] ?? "the index measure");
+  const referencePositive = String(diagnostics.reference_positive_level ?? "the positive reference definition");
+  const indexPositive = String(diagnostics.test_positive_level ?? "the positive index-test definition");
+  const completeCaseN = opts.statsRun.completeCaseN;
+  const sparseCells = opts.statsRun.issues.some(issue => issue.code === "SPARSE_DIAGNOSTIC_CELL");
   const paper = [
-    `# Diagnostic Accuracy Study`,
+    `# Diagnostic Accuracy of ${indexTest} Against ${reference}`,
     "",
-    "## Local Review Safety Header",
+    "## Summary",
     "",
-    "- This is a local diagnostic accuracy report generated from a standard-table stats route.",
-    "- It is not a clinical screening recommendation, deployment validation, or diagnostic replacement claim.",
-    "- PPV and NPV are prevalence-dependent and local to the analyzed table.",
-    "- Sensitivity, specificity, PPV, and NPV include Wilson binomial intervals when available.",
+    `This report estimates how well ${indexTest} identified records meeting the ${reference} reference definition in the analyzed table. It is a diagnostic accuracy analysis of local data, not a clinical screening recommendation or validation of a deployable diagnostic rule.`,
+    "",
+    `Main finding: in ${completeCaseN} complete records, sensitivity was ${formatEstimateWithCi(first.sensitivity, first.sensitivity_ci_low, first.sensitivity_ci_high)} and specificity was ${formatEstimateWithCi(first.specificity, first.specificity_ci_low, first.specificity_ci_high)}. Positive and negative predictive values depend on the prevalence in this analyzed table.`,
     "",
     "## Research Question",
     "",
@@ -361,21 +395,17 @@ async function writeDiagnosticAnalysisPaper(opts: {
     "",
     "## Methods",
     "",
-    `- Reference standard: ${first.reference ?? opts.statsRun.variables[0] ?? "(missing)"}.`,
-    `- Index test: ${first.term ?? opts.statsRun.variables[1] ?? "(missing)"}.`,
-    `- Reference positive level: ${diagnostics.reference_positive_level ?? "(missing)"}.`,
-    `- Index-test positive level: ${diagnostics.test_positive_level ?? "(missing)"}.`,
-    `- Reference threshold: ${diagnostics.reference_threshold ?? "(not threshold-derived)"}.`,
-    `- Index-test threshold: ${diagnostics.test_threshold ?? "(not threshold-derived)"}.`,
-    `- Complete-case N: ${opts.statsRun.completeCaseN}.`,
-    `- Result posture: ${opts.statsRun.resultPosture?.status ?? "(missing)"}.`,
+    `The reference standard was ${reference}; records were considered reference-positive when ${referencePositive}. The index test was ${indexTest}; records were considered test-positive when ${indexPositive}.`,
+    "",
+    `The analysis used complete records for both measures (N = ${completeCaseN}). It formed a 2 x 2 diagnostic accuracy table and estimated sensitivity, specificity, positive predictive value, negative predictive value, likelihood ratios, and prevalence in the analyzed table. Wilson binomial intervals were used for sensitivity, specificity, PPV, and NPV when available.`,
+    typeof diagnostics.reference_threshold === "number" || typeof diagnostics.test_threshold === "number"
+      ? `Thresholds were applied before the 2 x 2 table was formed: ${reference} was positive at ${formatValue(diagnostics.reference_threshold)} and ${indexTest} was positive at ${formatValue(diagnostics.test_threshold)}.`
+      : "The input table already contained binary positive/negative indicators for the reference standard and index test.",
     "",
     "## Results",
     "",
-    `- True positives: ${first.true_positive ?? "(missing)"}.`,
-    `- False positives: ${first.false_positive ?? "(missing)"}.`,
-    `- True negatives: ${first.true_negative ?? "(missing)"}.`,
-    `- False negatives: ${first.false_negative ?? "(missing)"}.`,
+    `The diagnostic table contained ${formatValue(first.true_positive)} true positives, ${formatValue(first.false_positive)} false positives, ${formatValue(first.true_negative)} true negatives, and ${formatValue(first.false_negative)} false negatives.`,
+    "",
     `- Sensitivity: ${formatEstimateWithCi(first.sensitivity, first.sensitivity_ci_low, first.sensitivity_ci_high)}.`,
     `- Specificity: ${formatEstimateWithCi(first.specificity, first.specificity_ci_low, first.specificity_ci_high)}.`,
     `- Positive predictive value: ${formatEstimateWithCi(first.positive_predictive_value, first.positive_predictive_value_ci_low, first.positive_predictive_value_ci_high)}.`,
@@ -386,26 +416,30 @@ async function writeDiagnosticAnalysisPaper(opts: {
     "",
     "## Interpretation",
     "",
-    "These results summarize local agreement between an index test and a reference standard in the analyzed table. They do not establish external validity, clinical utility, causal interpretation, or a recommendation to screen.",
-    opts.statsRun.issues.some(issue => issue.code === "SPARSE_DIAGNOSTIC_CELL")
-      ? "Sparse diagnostic cells were detected, so the accuracy estimates may be unstable and should be reviewed before promotion."
-      : "No sparse diagnostic cell warning was emitted.",
+    `These results describe agreement between ${indexTest} and ${reference} in the analyzed records. They do not establish external validity, clinical utility, causal interpretation, or a recommendation to screen.`,
+    sparseCells
+      ? "One or more diagnostic cells were sparse, so the accuracy estimates may be unstable and should be reviewed with caution."
+      : "No sparse diagnostic-cell warning was detected in this run.",
     "",
-    "## Artifact Posture",
+    "## Limitations",
     "",
-    `- Analysis manifest readiness: ${opts.analysisRunManifest.readiness}.`,
-    `- Stats QA status: ${statsQaStatus(opts.statsRun)}.`,
-    `- Issues: ${opts.statsRun.issues.map(issue => issue.code).join(", ") || "(none)"}.`,
+    "This analysis used only the rows available in the supplied table and should not be generalized without external validation. Predictive values are prevalence-dependent. Threshold-derived classifications can be sensitive to the chosen cut points. This report does not assess clinical utility, calibration across populations, harms, or implementation feasibility.",
+    "",
+    "## Reproducibility Note",
+    "",
+    "The companion files in this packet contain the numerical estimates, quality checks, run metadata, and file hashes needed to audit or rerun the analysis.",
     "",
   ].join("\n");
   await writeFile(paperPath, paper, "utf-8");
+  const forbiddenTerms = readerFacingPaperJargonHits(paper);
   const checks = [
-    { id: "local-review-safety-header", status: paper.includes("Local Review Safety Header") ? "pass" : "fail" },
-    { id: "reference-standard", status: paper.includes("Reference standard:") ? "pass" : "fail" },
-    { id: "index-test", status: paper.includes("Index test:") ? "pass" : "fail" },
-    { id: "predictive-value-prevalence", status: /PPV and NPV are prevalence-dependent/i.test(paper) ? "pass" : "fail" },
+    { id: "reader-facing-summary", status: paper.includes("## Summary") && /Main finding:/i.test(paper) ? "pass" : "fail" },
+    { id: "reference-standard", status: paper.includes("reference standard") ? "pass" : "fail" },
+    { id: "index-test", status: paper.includes("index test") ? "pass" : "fail" },
+    { id: "predictive-value-prevalence", status: /predictive values are prevalence-dependent|positive and negative predictive values depend on the prevalence/i.test(paper) ? "pass" : "fail" },
     { id: "intervals", status: /Wilson binomial intervals/i.test(paper) && typeof first.sensitivity_ci_low === "number" ? "pass" : "warning" },
     { id: "screening-overclaim-boundary", status: /not a clinical screening recommendation/i.test(paper) ? "pass" : "fail" },
+    { id: "reader-facing-language", status: forbiddenTerms.length === 0 ? "pass" : "fail", hits: forbiddenTerms },
     { id: "manifest-readiness", status: opts.analysisRunManifest.readiness === "local_review_ready" ? "pass" : "warning" },
   ] as Array<{ id: string; status: "pass" | "warning" | "fail" }>;
   const qa = {
@@ -415,6 +449,25 @@ async function writeDiagnosticAnalysisPaper(opts: {
   };
   await writeFile(qaPath, `${JSON.stringify(qa, null, 2)}\n`, "utf-8");
   return { diagnosticPaper: paperPath, diagnosticPaperQa: qaPath };
+}
+
+function readerFacingPaperJargonHits(text: string): string[] {
+  const forbidden = [
+    /\bAgenteer\b/i,
+    /\bAnalysisSpec\b/i,
+    /\bresult posture\b/i,
+    /\blocal_review_ready\b/i,
+    /\bartifact posture\b/i,
+    /\brunner record\b/i,
+    /\btask envelope\b/i,
+    /\bevidence receipt\b/i,
+    /\binterop\b/i,
+    /\bspec-governed\b/i,
+    /\bpaper-run\b/i,
+  ];
+  return forbidden
+    .map(pattern => text.match(pattern)?.[0])
+    .filter((match): match is string => Boolean(match));
 }
 
 function formatEstimateWithCi(value: unknown, low: unknown, high: unknown): string {
@@ -741,6 +794,8 @@ export function renderResearchDatasetAdapter(result: DatasetAdapterInspection): 
     `  status: ${result.availability}`,
     `  data root: ${result.dataRoot ?? "(not supplied)"}`,
     `  files: ${result.discoveredFiles.length}`,
+    `  variable metadata: ${result.variableMetadataCount}`,
+    `  survey weight domains: ${result.surveyWeightDomains.map(domain => `${domain.weight}${domain.isSubsample ? " (subsample)" : ""}`).join(", ") || "(none)"}`,
     ...result.evidence.map(item => `  evidence: ${item}`),
     `  issues: ${result.issues.length}`,
   ].join("\n");
@@ -854,6 +909,7 @@ export function renderResearchModelingPlan(result: ModelingDecisionPlan): string
     `  evidence: ${result.dataEvidence.source}; rows=${result.dataEvidence.rowCount ?? "?"}; features=${result.dataEvidence.featureCount ?? "?"}; target classes=${result.dataEvidence.targetClassCount ?? "?"}; max missing=${result.dataEvidence.maxMissingFraction === null ? "?" : `${(result.dataEvidence.maxMissingFraction * 100).toFixed(1)}%`}`,
     `  backend evidence: ${result.backendEvidence.source}; available=${result.backendEvidence.available.join(",") || "(none)"}; missing=${result.backendEvidence.missing.join(",") || "(none)"}`,
     `  prior runs: ${result.priorRunEvidence.source}; actions=${result.priorRunEvidence.runs.map(run => run.action).join(",") || "(none)"}`,
+    `  exploration handoff: ${result.request.explorationHandoff ? `${result.request.explorationHandoff.status}; clearance=${result.request.explorationHandoff.clearanceLevel}; question=${result.request.explorationHandoff.questionId ?? "(unknown)"}` : "(none)"}`,
     `  method selection: ${result.methodSelectionEvidence.selectionId}; primary=${result.methodSelectionEvidence.primaryMethodId ?? "(none)"}; backend=${result.methodSelectionEvidence.recommendedBackend}; review=${result.methodSelectionEvidence.stopForHumanReview ? "required" : "not-required"}`,
     `  route: ${result.routeRecommendation.route}; ${result.routeRecommendation.reason}`,
     `  blocking policies: ${result.blockingPolicies.map(candidate => candidate.id).join(", ") || "(none)"}`,

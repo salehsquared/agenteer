@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:48.680119+00:00",
+  "study": {
+    "id": "mimic-neuro-intracranial-hemorrhage",
+    "title": "Intracranial Hemorrhage ICU Outcomes",
+    "domain": "neurology",
+    "question": "Among ICU admissions with intracranial hemorrhage diagnoses, how do first-day GCS and vital signs predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "hemorrhage phenotype",
+      "GCS-centered mortality model",
+      "LOS model with neurologic caveat"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "I61",
+      "expectedTerms": [
+        "intracerebral hemorrhage"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "I61",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "I61",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=I61&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 9,
+          "sampleRows": [
+            {
+              "code": "I61.0",
+              "name": "Nontraumatic intracerebral hemorrhage in hemisphere, subcortical"
+            },
+            {
+              "code": "I61.1",
+              "name": "Nontraumatic intracerebral hemorrhage in hemisphere, cortical"
+            },
+            {
+              "code": "I61.2",
+              "name": "Nontraumatic intracerebral hemorrhage in hemisphere, unspecified"
+            },
+            {
+              "code": "I61.3",
+              "name": "Nontraumatic intracerebral hemorrhage in brain stem"
+            },
+            {
+              "code": "I61.4",
+              "name": "Nontraumatic intracerebral hemorrhage in cerebellum"
+            },
+            {
+              "code": "I61.5",
+              "name": "Nontraumatic intracerebral hemorrhage, intraventricular"
+            },
+            {
+              "code": "I61.6",
+              "name": "Nontraumatic intracerebral hemorrhage, multiple localized"
+            },
+            {
+              "code": "I61.8",
+              "name": "Other nontraumatic intracerebral hemorrhage"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:47.211551+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd10cm",
+      "query": "I60",
+      "expectedTerms": [
+        "subarachnoid hemorrhage"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "I60",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "I60",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=I60&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 18,
+          "sampleRows": [
+            {
+              "code": "I60.00",
+              "name": "Nontraumatic subarachnoid hemorrhage from unspecified carotid siphon and bifurcation"
+            },
+            {
+              "code": "I60.01",
+              "name": "Nontraumatic subarachnoid hemorrhage from right carotid siphon and bifurcation"
+            },
+            {
+              "code": "I60.02",
+              "name": "Nontraumatic subarachnoid hemorrhage from left carotid siphon and bifurcation"
+            },
+            {
+              "code": "I60.10",
+              "name": "Nontraumatic subarachnoid hemorrhage from unspecified middle cerebral artery"
+            },
+            {
+              "code": "I60.11",
+              "name": "Nontraumatic subarachnoid hemorrhage from right middle cerebral artery"
+            },
+            {
+              "code": "I60.12",
+              "name": "Nontraumatic subarachnoid hemorrhage from left middle cerebral artery"
+            },
+            {
+              "code": "I60.2",
+              "name": "Nontraumatic subarachnoid hemorrhage from anterior communicating artery"
+            },
+            {
+              "code": "I60.30",
+              "name": "Nontraumatic subarachnoid hemorrhage from unspecified posterior communicating artery"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:47.687149+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "431",
+      "expectedTerms": [
+        "intracerebral hemorrhage"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "431",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "431",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=431&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "431",
+              "name": "Intracerebral hemorrhage"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:48.214417+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "430",
+      "expectedTerms": [
+        "subarachnoid hemorrhage"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "430",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "430",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=430&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 1,
+          "sampleRows": [
+            {
+              "code": "430",
+              "name": "Subarachnoid hemorrhage"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:48.680055+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "missingTables": [],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-apsiii"
+    ],
+    "unprofiledTables": [],
+    "estimatedBytesForNaiveFullRequiredTableRead": 72020696,
+    "estimatedTransferUsdAt012PerGb": 0.008048940002918243,
+    "status": "ready_for_bounded_design",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [],
+    "warnings": [
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "promote_to_candidate_queue",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "ad0cc9d4f1f9a0a0df2be9651f422992f9fc0352ae723f4c02684e18615c8916"
+}

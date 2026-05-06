@@ -1,0 +1,420 @@
+{
+  "study": {
+    "id": "mimic-obesity-icu-outcomes",
+    "title": "Obesity Diagnosis And ICU Outcomes",
+    "domain": "metabolic",
+    "question": "Among ICU patients, are obesity diagnosis codes associated with mortality or ICU length of stay after severity adjustment?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-weight",
+      "derived-first-day-height",
+      "derived-oasis"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "diagnosis-vs-measured-BMI feasibility",
+      "height/weight missingness audit",
+      "mortality/LOS models"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "E66",
+        "expectedTerms": [
+          "obesity"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "E66",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "E66",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=E66&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 10,
+            "sampleRows": [
+              {
+                "code": "E66.01",
+                "name": "Morbid (severe) obesity due to excess calories"
+              },
+              {
+                "code": "E66.09",
+                "name": "Other obesity due to excess calories"
+              },
+              {
+                "code": "E66.1",
+                "name": "Drug-induced obesity"
+              },
+              {
+                "code": "E66.2",
+                "name": "Morbid (severe) obesity with alveolar hypoventilation"
+              },
+              {
+                "code": "E66.3",
+                "name": "Overweight"
+              },
+              {
+                "code": "E66.811",
+                "name": "Obesity, class 1"
+              },
+              {
+                "code": "E66.812",
+                "name": "Obesity, class 2"
+              },
+              {
+                "code": "E66.813",
+                "name": "Obesity, class 3"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:57.279115+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "278.0",
+        "expectedTerms": [
+          "obesity"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "2780",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "2780",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=2780&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 4,
+            "sampleRows": [
+              {
+                "code": "278.00",
+                "name": "Obesity, unspecified"
+              },
+              {
+                "code": "278.01",
+                "name": "Morbid obesity"
+              },
+              {
+                "code": "278.02",
+                "name": "Overweight"
+              },
+              {
+                "code": "278.03",
+                "name": "Obesity hypoventilation syndrome"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:57.887651+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 11,
+    "matchedDiagnosisRows": 52151,
+    "matchedAdmissions": 51617,
+    "firstIcuStayRows": 9795,
+    "uniquePatients": 8164
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 9795,
+        "missing": 0,
+        "mean": 62.15752935171005,
+        "sd": 13.571372274630646,
+        "median": 64.0,
+        "iqr": [
+          54.0,
+          72.0
+        ],
+        "min": 18.0,
+        "max": 97.0
+      },
+      "los_icu": {
+        "n": 9792,
+        "missing": 3,
+        "mean": 4.182535743464053,
+        "sd": 6.193625492854314,
+        "median": 2.13,
+        "iqr": [
+          1.17,
+          4.29
+        ],
+        "min": 0.0,
+        "max": 99.63
+      },
+      "los_hospital": {
+        "n": 9795,
+        "missing": 0,
+        "mean": 11.40357325165901,
+        "sd": 12.071445450993481,
+        "median": 8.0,
+        "iqr": [
+          5.0,
+          14.0
+        ],
+        "min": 0.0,
+        "max": 321.0
+      },
+      "oasis": {
+        "n": 9795,
+        "missing": 0,
+        "mean": 30.392036753445634,
+        "sd": 8.45811901660393,
+        "median": 30.0,
+        "iqr": [
+          24.0,
+          36.0
+        ],
+        "min": 6.0,
+        "max": 72.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 9795,
+        "positive": 856,
+        "proportion": 0.08739152628892292
+      },
+      "male": {
+        "n": 9795,
+        "positive": 4903,
+        "proportion": 0.5005615109749872
+      },
+      "prolonged_icu_los": {
+        "n": 9795,
+        "positive": 2428,
+        "proportion": 0.24788157223072996
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "oasis",
+    "gcs",
+    "urineoutput"
+  ],
+  "missingness": [
+    {
+      "column": "urineoutput",
+      "missing": 422,
+      "missingFraction": 0.04308320571720266
+    },
+    {
+      "column": "gcs",
+      "missing": 31,
+      "missingFraction": 0.003164880040837162
+    },
+    {
+      "column": "los_icu",
+      "missing": 3,
+      "missingFraction": 0.00030627871362940275
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "oasis",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 9366,
+      "events": 779,
+      "predictors": [
+        "admission_age",
+        "male",
+        "oasis",
+        "gcs",
+        "urineoutput"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 62.19143711296178,
+          "sd": 13.56099016167816
+        },
+        "oasis": {
+          "mean": 30.6386931454196,
+          "sd": 8.402014209505511
+        },
+        "gcs": {
+          "mean": 13.895793294896434,
+          "sd": 2.5679509440034507
+        },
+        "urineoutput": {
+          "mean": 1824.1637273116828,
+          "sd": 1300.4779642172825
+        }
+      },
+      "metrics": {
+        "auroc": 0.7792373700400628,
+        "averagePrecision": 0.3073531957702738
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.083293882982521,
+          "ci95": [
+            0.9977947749888773,
+            1.1761192444813409
+          ],
+          "pValue": 0.05647737413414486,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.1111843873155858,
+          "ci95": [
+            0.9491200521054423,
+            1.300921564005416
+          ],
+          "pValue": 0.18994869568048744,
+          "scale": "per unit"
+        },
+        {
+          "term": "oasis",
+          "oddsRatio": 2.777973305421386,
+          "ci95": [
+            2.5311849052720765,
+            3.0488233670958578
+          ],
+          "pValue": 9.127202578118683e-103,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "gcs",
+          "oddsRatio": 1.1056991927339197,
+          "ci95": [
+            1.0338967440218023,
+            1.1824882048246983
+          ],
+          "pValue": 0.0033566060833758434,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "urineoutput",
+          "oddsRatio": 0.7885263610687486,
+          "ci95": [
+            0.7111258461163668,
+            0.8743513198064483
+          ],
+          "pValue": 6.56918326732307e-06,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 9363,
+      "predictors": [
+        "admission_age",
+        "male",
+        "oasis",
+        "gcs",
+        "urineoutput"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 62.1943821424757,
+          "sd": 13.558753696606631
+        },
+        "oasis": {
+          "mean": 30.635266474420593,
+          "sd": 8.400920050948566
+        },
+        "gcs": {
+          "mean": 13.896934743137884,
+          "sd": 2.5658501626061407
+        },
+        "urineoutput": {
+          "mean": 1824.2478340276857,
+          "sd": 1300.5045071833756
+        }
+      },
+      "rSquared": 0.13109182624956373,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -4.783935858612187,
+          "ci95PercentChange": [
+            -6.160487777576518,
+            -3.3871910044894538
+          ],
+          "pValue": 4.175209018496931e-11,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 4.839683581717469,
+          "ci95PercentChange": [
+            2.079376985557291,
+            7.674631038057322
+          ],
+          "pValue": 0.0005170659217687743,
+          "scale": "per unit"
+        },
+        {
+          "term": "oasis",
+          "percentChangeInLos": 32.09699598656264,
+          "ci95PercentChange": [
+            29.85458916949191,
+            34.378126027551794
+          ],
+          "pValue": 7.843689067568606e-223,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "gcs",
+          "percentChangeInLos": 2.1240177135863902,
+          "ci95PercentChange": [
+            0.4386071526355284,
+            3.837710315074183
+          ],
+          "pValue": 0.013308174501563564,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "urineoutput",
+          "percentChangeInLos": 8.60006640545279,
+          "ci95PercentChange": [
+            6.859100173881139,
+            10.369396748406068
+          ],
+          "pValue": 1.438909516951254e-23,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "explorationHandoff": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-06T00:30:08.972Z",
+    "sourceExplorationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/exploration/exploration.json",
+    "sourceExplorationSha256": "ef57b61fa310f73d6e57d3212cf38f6f16fe1785531b70d38decdad9b0712c26",
+    "questionId": "question_01_288de2dac7",
+    "status": "needs_methods_review",
+    "clearanceLevel": "hold_for_methods_review",
+    "methodsReviewNote": "Reviewed low-N and proxy risk; use only as modeling-plan seed.",
+    "question": {
+      "id": "question_01_288de2dac7",
+      "question": "Is bmi associated with hba1c in this dataset?",
+      "outcome": "hba1c",
+      "exposure": "bmi",
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.994 across 16 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "high",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "low complete-pair count for promotion",
+        "near-perfect target association; may be duplicate, derived, or target leakage"
+      ]
+    },
+    "blockers": [
+      "10 candidate questions need methods review",
+      "low complete-pair count for promotion",
+      "near-perfect target association; may be duplicate, derived, or target leakage",
+      "no candidate questions are currently promotable",
+      "possible target leakage/proxy pairs detected"
+    ],
+    "modelingPlanSeed": {
+      "question": "Is bmi associated with hba1c in this dataset?",
+      "target": "hba1c",
+      "outcome": "hba1c",
+      "exposure": "bmi",
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "tablePath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/explore-fixture.csv",
+      "rowCount": 16,
+      "columnCount": 7,
+      "designWarnings": [
+        "10 candidate questions need methods review",
+        "Candidate questions must be promoted into an explicit analysis plan before execution or paper generation.",
+        "Exploration is hypothesis generation, not confirmation.",
+        "low complete-pair count for promotion",
+        "Multiple comparisons, missingness, sparse categories, survey design, clustering, and temporal ordering must be handled before inferential claims.",
+        "near-perfect target association; may be duplicate, derived, or target leakage",
+        "no candidate questions are currently promotable",
+        "possible target leakage/proxy pairs detected",
+        "Reported associations are unadjusted and should not be interpreted causally."
+      ],
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ]
+    },
+    "recommendedCommand": "agenteer research modeling-plan --question \"Is bmi associated with hba1c in this dataset?\" --target \"hba1c\" --table \"/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/explore-fixture.csv\" --json",
+    "artifacts": [
+      {
+        "kind": "exploration-handoff",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0243-exploration-mode/exploration/handoff-question-01.json",
+        "sha256": "4e5ddc821d0fba2c391a4505494dbde2929ece329694e4795efca3690611d1e3",
+        "bytes": 3616
+      }
+    ]
+  }
+}

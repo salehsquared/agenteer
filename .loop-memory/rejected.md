@@ -1103,3 +1103,237 @@ Reason: local path leakage changes packet share posture, so the warning belongs 
 # Tick 0234
 
 - Rejected adding a new rerun-stability CLI command before proving the route-specific receipt is useful.
+
+# Tick 0235
+
+- Rejected solving paper readability with another caveat paragraph. The generator and QA must structurally separate reader-facing prose from framework provenance.
+
+# Tick 0236
+
+- Rejected stripping framework terms from all internal artifacts. The fix belongs at the reader-facing paper boundary; provenance artifacts still need precise internal names for auditability.
+
+# Tick 0237
+
+- Rejected hand-editing the latest actual paper. Regenerating through `paper-run` forced the template, QA, lifecycle, capabilities, and task validation to agree.
+
+# Tick 0238
+
+- Rejected adding a separate paper-language-audit command. The existing `paper-index` is already the artifact-discovery surface, so the language audit belongs there.
+
+# Tick 0239
+
+- Rejected treating forbidden-term QA as enough. Reader-facing papers also need human labels, main findings, and readable methods prose.
+
+# Tick 0240
+
+- Rejected relying on an LLM rewrite step for readability. Deterministic readability gates should exist before optional prose polishing.
+
+# Tick 0241
+
+- Rejected hiding all variable codes. A small number of parenthetical codes helps auditability, but reader-facing prose should lead with human labels.
+
+# Tick 0242
+
+- Rejected burying the paper-language contract only in loop memory. Future agents need it in normal docs where they look before running paper commands.
+
+# Tick 0243
+
+- Rejected making exploration automatically generate a paper or AnalysisSpec. The safer first boundary is a hypothesis-generation packet with QA warnings; promotion into modeling or paper generation needs a separate, reviewable handoff.
+
+# Tick 0244
+
+- Rejected deleting unrelated high correlations when `--target` is supplied. They can reveal duplicate variables, leakage, batch effects, or data artifacts, so they belong in a background map rather than the primary candidate-question lane.
+
+# Tick 0245
+
+- Rejected treating the generic `exploratory-only` warning as enough. Exploration needs structured burden and promotion-gate fields that downstream commands can inspect instead of relying on prose caveats.
+
+# Tick 0246
+
+- Rejected letting any high-strength exploratory association be immediately promotable. Very strong associations can be leakage, duplicate measurement, proxy construction, or tiny-sample artifact, so the first implementation errs toward methods review.
+
+# Tick 0247
+
+- Rejected using only per-question blockers as the safety surface. Agents need a packet-level clearance state so they cannot cherry-pick a convenient candidate while ignoring global exploration burden.
+
+# Tick 0248
+
+- Rejected making `explore-promote` silently run `modeling-plan`. The handoff should be an inspectable artifact first; automatic planning can consume that artifact after the contract proves stable.
+
+# Tick 0249
+
+- Rejected keeping the old association-ranking wrapper as a convenience alias. It no longer returned burden counts, so retaining it would encourage future code to bypass the richer scanner contract.
+
+# Tick 0250
+
+- Rejected adding another exploration subcommand before actual-data pressure. The next implementation should either run the current mode on real cached public-health data or make `modeling-plan` consume the handoff artifact directly.
+
+# Tick 0251
+
+- Rejected downloading new public data before inspecting cached local sources. The reliability proof should first use existing local NHANES/public-health artifacts to avoid cost, network variance, and new data-provenance noise.
+
+# Tick 0252
+
+- Rejected treating the first actual-data exploration output as acceptable without code changes. The run exposed missed design variables, so the tick fixed detection before recording the proof.
+
+# Tick 0253
+
+- Rejected waiting for a full codebook adapter before adding proxy aliases. The actual-data run exposed an immediate safety issue, and a small alias map is a reversible bridge.
+
+# Tick 0254
+
+- Rejected silently treating an exploration handoff as proof of an analysis plan. The handoff can seed `modeling-plan`, but held/blocked posture must remain visible and still gate execution.
+
+# Tick 0255
+
+- Rejected building the AnalysisSpec handoff bridge before improving candidate quality. A smoother bridge is harmful if it mainly promotes obvious same-domain biomarkers or proxy relationships as research questions.
+
+# Tick 0256
+
+- Rejected using association strength as the candidate-question sort key after adding taxonomy. Strong same-domain/proxy relationships should remain visible in the signal map but should not automatically outrank more meaningful public-health candidates.
+
+# Tick 0257
+
+- Rejected adding more taxonomy categories before exposing rule evidence. Category breadth without audit evidence would make exploration look smarter while becoming harder to debug.
+
+# Tick 0258
+
+- Rejected switching to a second outcome before taxonomy auditability. A broader outcome sweep would multiply opaque classification decisions rather than proving generality.
+
+# Tick 0259
+
+- Rejected adding more correlation statistics before route intent exists. More signals would not solve the central ambiguity between exploratory insight, explanatory analysis, prediction, diagnosis, and data-quality review.
+
+# Tick 0260
+
+- Rejected adding another metadata field without a concise recommendation object. Detailed evidence belongs in JSON, but the report needs one clear next question and route.
+
+# Tick 0261
+
+- Rejected making route intent only a report label. It must travel through the handoff and affect modeling-plan defaults, or it becomes decorative documentation.
+
+# Tick 0262
+
+- Rejected writing a full executable AnalysisSpec directly from exploratory output. The correct bridge is a candidate with explicit methods-review status and required pre-execution checks.
+- Ticks 263-292: rejected running broad MIMIC event-table analyses before online ICD verification, cost gates, and phenotype-specific audit artifacts existed.
+- Tick 0292: rejected counting the MIMIC study atlas as validated science; it is a verified study-design queue, not an executed analysis suite.
+
+# Tick 0293
+
+- Rejected counting verified study-design ticks as complete executed MIMIC ticks. The corrected run requires bounded execution, runner verification, or audit decisions tied to executed artifacts.
+
+# Tick 0294
+
+- Rejected starting the corrected run with a broad multi-study batch. The runner is now verified, but the first row-level read should remain one bounded study with inspected artifacts.
+
+# Tick 0295
+
+- Rejected widening the first executed MIMIC paper to all hip/femur fractures. The narrower geriatric fracture phenotype is easier to audit and gives a baseline for later broader orthopedic runs.
+
+# Tick 0296
+
+- Rejected dropping the periprosthetic study because it is sparse. Sparse cohorts are useful stress tests when the pipeline labels them as methods-review, not mature findings.
+
+# Tick 0297
+
+- Rejected leaving sparse-event concerns as paper prose only. The runner now emits typed QA issues and downgrades packet status when a fitted model is statistically fragile.
+
+# Tick 0298
+
+- Rejected merging vertebral fracture into the hip-fracture paper. Separate phenotypes make ICD/code drift and outcome differences easier to inspect.
+
+# Tick 0299
+
+- Rejected forcing every executed MIMIC packet to fit both mortality and LOS models. A justified non-fit is safer than a fragile estimate.
+
+# Tick 0300
+
+- Rejected using model-fit success as the main progress metric. Batch progress must include QA posture, cache cleanup, cost, and honest failure attribution.
+
+# Tick 0301
+
+- Rejected promoting the first septic-arthritis output unchanged after overflow warnings appeared. Non-finite scientific values require runner hardening.
+
+# Tick 0302
+
+- Rejected clipping infinite LOS estimates to large finite values. The runner should mark them unrenderable and methods-review, not invent interpretable precision.
+
+# Tick 0303
+
+- Rejected collapsing orthopedic infection phenotypes into one broad paper. Sparse phenotypes need separate audit trails.
+
+# Tick 0304
+
+- Rejected skipping KDIGO-derived tables purely to save cost. The richer derived-table path remained safely under the per-run and session budget.
+
+# Tick 0305
+
+- Rejected keeping all executions orthopedic. A high-volume medical comparator helps distinguish phenotype sparsity from runner weakness.
+
+# Tick 0306
+
+- Rejected treating review-only packets as failed ticks. They are useful when the review reason is typed, inspected, and cost-bounded.
+
+# Tick 0307
+
+- A broad heart-failure phenotype is useful as a comparator; it should not be merged with MI because the clinical syndrome and coding behavior differ.
+
+# Tick 0308
+
+- Rejected treating COPD and pneumonia as the same respiratory paper; chronic disease and acute infection stress different clinical assumptions.
+
+# Tick 0309
+
+- Rejected forcing the pneumonia packet to pass because the cohort was large; numerical instability still matters in large cohorts.
+
+# Tick 0310
+
+- Rejected avoiding AKI because the KDIGO tables are larger. A bounded large read is exactly the pressure test needed for dataset-scale planning.
+
+# Tick 0311
+
+- Rejected interpreting CKD/fracture as causal interaction; the current runner only produces associational ICU outcome models.
+
+# Tick 0312
+
+- Rejected continuing without a cost/cache audit after the largest KDIGO-derived read. The run remains under budget, but that must be recorded.
+
+# Tick 0313
+
+- Rejected narrowing to fracture-only before checking diabetes-coded ICU behavior; high-volume metabolic cohorts are useful runner comparators.
+
+# Tick 0314
+
+- Rejected pooling all neurologic events into one phenotype; ischemic stroke and intracranial hemorrhage should remain separately inspectable.
+
+# Tick 0315
+
+- Rejected merging hemorrhage with ischemic stroke, because the clinical trajectory and mortality baseline differ.
+
+# Tick 0316
+
+- Rejected over-specializing the runner for orthopedic and cardiopulmonary cohorts; a GI bleed packet exercises different variable salience.
+
+# Tick 0317
+
+- Rejected treating cirrhosis as a pure liver-score analysis in this generic runner; publication-grade cirrhosis work would need MELD/ascites/bleeding-specific design review.
+
+# Tick 0318
+
+- Rejected assuming cross-domain success from green QA alone; the audit verifies cache cleanup, review status, and cumulative cost.
+
+# Tick 0319
+
+- Rejected claiming anemia diagnosis codes identify biologic severity by themselves; lab values and coding have to be interpreted cautiously.
+
+# Tick 0320
+
+- Rejected making delirium a causal exposure in this generic packet; delirium coding may reflect severity, documentation, and timing.
+
+# Tick 0321
+
+- Rejected treating coded obesity as measured BMI. The current packet is diagnosis-code based and should say so plainly.
+
+# Tick 0322
+
+- Rejected extending beyond 30 ticks after meeting the cost and execution criteria. The next move should be selected from the audit, not raw momentum.

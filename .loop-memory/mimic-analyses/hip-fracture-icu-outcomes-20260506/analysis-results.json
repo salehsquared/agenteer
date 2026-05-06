@@ -1,0 +1,888 @@
+{
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 3189,
+    "matchedDiagnosisRows": 6704,
+    "fractureAdmissions": 6068,
+    "icuStaysBeforeFirstStayRestriction": 1070,
+    "firstIcuStayCohortRows": 920,
+    "firstIcuStayUniquePatients": 909
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 920,
+        "missing": 0,
+        "mean": 70.2141304347826,
+        "sd": 19.946959490905517,
+        "median": 75.0,
+        "iqr": [
+          59.0,
+          87.0
+        ],
+        "min": 18.0,
+        "max": 100.0
+      },
+      "los_hospital": {
+        "n": 920,
+        "missing": 0,
+        "mean": 12.491304347826087,
+        "sd": 10.84683806515673,
+        "median": 9.0,
+        "iqr": [
+          6.0,
+          15.0
+        ],
+        "min": 0.0,
+        "max": 94.0
+      },
+      "los_icu": {
+        "n": 920,
+        "missing": 0,
+        "mean": 3.61425,
+        "sd": 4.504463471605623,
+        "median": 2.04,
+        "iqr": [
+          1.04,
+          4.3425
+        ],
+        "min": 0.04,
+        "max": 47.0
+      },
+      "apsiii": {
+        "n": 920,
+        "missing": 0,
+        "mean": 47.24673913043478,
+        "sd": 18.55090312533025,
+        "median": 44.0,
+        "iqr": [
+          35.0,
+          56.0
+        ],
+        "min": 12.0,
+        "max": 151.0
+      },
+      "oasis": {
+        "n": 920,
+        "missing": 0,
+        "mean": 33.426086956521736,
+        "sd": 7.809411881977793,
+        "median": 33.0,
+        "iqr": [
+          28.0,
+          38.0
+        ],
+        "min": 15.0,
+        "max": 60.0
+      },
+      "sofa": {
+        "n": 920,
+        "missing": 0,
+        "mean": 4.529347826086957,
+        "sd": 3.1424655749533295,
+        "median": 4.0,
+        "iqr": [
+          2.0,
+          6.0
+        ],
+        "min": 0.0,
+        "max": 19.0
+      },
+      "hemoglobin_min": {
+        "n": 913,
+        "missing": 7,
+        "mean": 9.074041621029574,
+        "sd": 1.9434479404883984,
+        "median": 8.9,
+        "iqr": [
+          7.8,
+          10.2
+        ],
+        "min": 3.1,
+        "max": 18.8
+      },
+      "wbc_max": {
+        "n": 913,
+        "missing": 7,
+        "mean": 14.689704271631983,
+        "sd": 7.420306362497847,
+        "median": 13.3,
+        "iqr": [
+          9.8,
+          17.9
+        ],
+        "min": 1.0,
+        "max": 67.1
+      },
+      "creatinine_max": {
+        "n": 913,
+        "missing": 7,
+        "mean": 1.5184008762322014,
+        "sd": 1.477481136994537,
+        "median": 1.1,
+        "iqr": [
+          0.8,
+          1.6
+        ],
+        "min": 0.1,
+        "max": 11.8
+      },
+      "bun_max": {
+        "n": 914,
+        "missing": 6,
+        "mean": 29.60503282275711,
+        "sd": 22.319261099886877,
+        "median": 23.0,
+        "iqr": [
+          16.0,
+          34.0
+        ],
+        "min": 3.0,
+        "max": 168.0
+      },
+      "glucose_max": {
+        "n": 911,
+        "missing": 9,
+        "mean": 167.50164654226126,
+        "sd": 106.85922621868056,
+        "median": 146.0,
+        "iqr": [
+          124.0,
+          180.0
+        ],
+        "min": 55.0,
+        "max": 2275.0
+      },
+      "sbp_min": {
+        "n": 919,
+        "missing": 1,
+        "mean": 87.76985854189336,
+        "sd": 19.17023482221877,
+        "median": 87.0,
+        "iqr": [
+          76.0,
+          99.0
+        ],
+        "min": 12.0,
+        "max": 168.0
+      },
+      "heart_rate_max": {
+        "n": 919,
+        "missing": 1,
+        "mean": 109.3329706202394,
+        "sd": 21.539094288711468,
+        "median": 109.0,
+        "iqr": [
+          94.0,
+          121.0
+        ],
+        "min": 55.0,
+        "max": 217.0
+      },
+      "spo2_min": {
+        "n": 918,
+        "missing": 2,
+        "mean": 90.380174291939,
+        "sd": 8.752897583610515,
+        "median": 92.0,
+        "iqr": [
+          89.0,
+          95.0
+        ],
+        "min": 2.0,
+        "max": 100.0
+      }
+    },
+    "binary": {
+      "male": {
+        "n": 920,
+        "positive": 427,
+        "proportion": 0.4641304347826087
+      },
+      "hospital_expire_flag": {
+        "n": 920,
+        "positive": 133,
+        "proportion": 0.14456521739130435
+      }
+    },
+    "raceGroupCounts": {
+      "White": 648,
+      "Unknown": 144,
+      "Black": 54,
+      "Other": 33,
+      "Hispanic": 24,
+      "Asian": 17
+    }
+  },
+  "missingness": [
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "apsiii",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "oasis",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "sofa",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 7,
+      "missingFraction": 0.007608695652173913
+    },
+    {
+      "column": "wbc_max",
+      "missing": 7,
+      "missingFraction": 0.007608695652173913
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 7,
+      "missingFraction": 0.007608695652173913
+    },
+    {
+      "column": "bun_max",
+      "missing": 6,
+      "missingFraction": 0.006521739130434782
+    },
+    {
+      "column": "sbp_min",
+      "missing": 1,
+      "missingFraction": 0.0010869565217391304
+    },
+    {
+      "column": "heart_rate_max",
+      "missing": 1,
+      "missingFraction": 0.0010869565217391304
+    },
+    {
+      "column": "spo2_min",
+      "missing": 2,
+      "missingFraction": 0.002173913043478261
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "modelResults": {
+    "mortality": {
+      "label": "Adjusted mortality model",
+      "status": "fit",
+      "n": 909,
+      "events": 130,
+      "nonEvents": 779,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "sofa",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scaling": {
+        "admission_age": {
+          "mean": 70.25962596259626,
+          "sd": 19.974839026462007
+        },
+        "apsiii": {
+          "mean": 47.37183718371837,
+          "sd": 18.57892792414207
+        },
+        "oasis": {
+          "mean": 33.45984598459846,
+          "sd": 7.785094222084773
+        },
+        "sofa": {
+          "mean": 4.547854785478548,
+          "sd": 3.1380091890431863
+        },
+        "hemoglobin_min": {
+          "mean": 9.069196919691969,
+          "sd": 1.944912462428663
+        },
+        "wbc_max": {
+          "mean": 14.702640264026403,
+          "sd": 7.430092230542512
+        },
+        "creatinine_max": {
+          "mean": 1.5202420242024204,
+          "sd": 1.480269481789246
+        },
+        "bun_max": {
+          "mean": 29.643564356435643,
+          "sd": 22.35330334740893
+        },
+        "sbp_min": {
+          "mean": 87.69251925192519,
+          "sd": 19.025018571396316
+        },
+        "heart_rate_max": {
+          "mean": 109.23982398239824,
+          "sd": 21.554196581579045
+        },
+        "spo2_min": {
+          "mean": 90.38173817381738,
+          "sd": 8.788918286150047
+        }
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.8715880033236552,
+          "ci95": [
+            1.354869784551849,
+            2.585371446115512
+          ],
+          "pValue": 0.00014331225175172354,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.026298444455207,
+          "ci95": [
+            0.6538839988187463,
+            1.610818584020963
+          ],
+          "pValue": 0.9101372883607844,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "oddsRatio": 1.575082863291116,
+          "ci95": [
+            1.1309388384271843,
+            2.193651806744519
+          ],
+          "pValue": 0.007188084997063845,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "oddsRatio": 1.2885903084176913,
+          "ci95": [
+            0.9472169958227302,
+            1.752993232037354
+          ],
+          "pValue": 0.10638917395618425,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sofa",
+          "oddsRatio": 1.4826536307299274,
+          "ci95": [
+            1.101971321281779,
+            1.9948448260519935
+          ],
+          "pValue": 0.009286351493255797,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 1.1589564433911543,
+          "ci95": [
+            0.9211580719160328,
+            1.4581428298012138
+          ],
+          "pValue": 0.20801059526008636,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.0957943842182454,
+          "ci95": [
+            0.8896614567298863,
+            1.3496879328659206
+          ],
+          "pValue": 0.38958288167470456,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 0.8773873296378255,
+          "ci95": [
+            0.6630645738950712,
+            1.1609857569178699
+          ],
+          "pValue": 0.3599914971564082,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.345231387682115,
+          "ci95": [
+            1.0210436875698412,
+            1.7723506921748302
+          ],
+          "pValue": 0.0350318251507723,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.8757418294424967,
+          "ci95": [
+            0.6802820986676322,
+            1.1273613598496137
+          ],
+          "pValue": 0.3031678792421063,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 1.1272106345768613,
+          "ci95": [
+            0.8963059822720556,
+            1.417600506784863
+          ],
+          "pValue": 0.3058821281241364,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 0.8812532637309928,
+          "ci95": [
+            0.7349017365559797,
+            1.0567498703649751
+          ],
+          "pValue": 0.17248818002071886,
+          "scale": "per 1 SD"
+        }
+      ],
+      "metrics": {
+        "auroc": 0.8250518416115336,
+        "averagePrecision": 0.5381411769187157,
+        "eventRate": 0.14301430143014301
+      },
+      "aic": 588.8336489321505,
+      "warnings": []
+    },
+    "los": {
+      "label": "Adjusted robust linear model for log(1 + ICU LOS)",
+      "status": "fit",
+      "n": 909,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "sofa",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scaling": {
+        "admission_age": {
+          "mean": 70.25962596259626,
+          "sd": 19.974839026462007
+        },
+        "apsiii": {
+          "mean": 47.37183718371837,
+          "sd": 18.57892792414207
+        },
+        "oasis": {
+          "mean": 33.45984598459846,
+          "sd": 7.785094222084773
+        },
+        "sofa": {
+          "mean": 4.547854785478548,
+          "sd": 3.1380091890431863
+        },
+        "hemoglobin_min": {
+          "mean": 9.069196919691969,
+          "sd": 1.944912462428663
+        },
+        "wbc_max": {
+          "mean": 14.702640264026403,
+          "sd": 7.430092230542512
+        },
+        "creatinine_max": {
+          "mean": 1.5202420242024204,
+          "sd": 1.480269481789246
+        },
+        "bun_max": {
+          "mean": 29.643564356435643,
+          "sd": 22.35330334740893
+        },
+        "sbp_min": {
+          "mean": 87.69251925192519,
+          "sd": 19.025018571396316
+        },
+        "heart_rate_max": {
+          "mean": 109.23982398239824,
+          "sd": 21.554196581579045
+        },
+        "spo2_min": {
+          "mean": 90.38173817381738,
+          "sd": 8.788918286150047
+        }
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "multiplicativeChangeInLos": 0.8789612196697695,
+          "percentChangeInLos": -12.103878033023053,
+          "ci95PercentChange": [
+            -16.788915508100267,
+            -7.155058679883497
+          ],
+          "pValue": 3.904569176989604e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "multiplicativeChangeInLos": 1.1048673042111787,
+          "percentChangeInLos": 10.486730421117873,
+          "ci95PercentChange": [
+            0.9260698768184916,
+            20.953066081419358
+          ],
+          "pValue": 0.030804830827213536,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "multiplicativeChangeInLos": 0.9508217377643854,
+          "percentChangeInLos": -4.917826223561461,
+          "ci95PercentChange": [
+            -12.67219059968998,
+            3.5250950657736313
+          ],
+          "pValue": 0.2453113722152387,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "multiplicativeChangeInLos": 1.1953142145410593,
+          "percentChangeInLos": 19.531421454105935,
+          "ci95PercentChange": [
+            12.707467260023542,
+            26.768536834177013
+          ],
+          "pValue": 2.7057874538519775e-09,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sofa",
+          "multiplicativeChangeInLos": 1.097777369992618,
+          "percentChangeInLos": 9.77773699926181,
+          "ci95PercentChange": [
+            1.938445488134577,
+            18.21988733467419
+          ],
+          "pValue": 0.013592353301761567,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "multiplicativeChangeInLos": 0.986957327088088,
+          "percentChangeInLos": -1.3042672911911968,
+          "ci95PercentChange": [
+            -5.642663987227136,
+            3.2336018220145757
+          ],
+          "pValue": 0.5670446857693034,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "multiplicativeChangeInLos": 1.0365377893448302,
+          "percentChangeInLos": 3.6537789344830207,
+          "ci95PercentChange": [
+            -1.0546217853193207,
+            8.586232942455464
+          ],
+          "pValue": 0.13028711624225622,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "multiplicativeChangeInLos": 1.0218560055909784,
+          "percentChangeInLos": 2.1856005590978445,
+          "ci95PercentChange": [
+            -3.3022719816185653,
+            7.984925557284872
+          ],
+          "pValue": 0.4426883961888395,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "multiplicativeChangeInLos": 0.9671804913679052,
+          "percentChangeInLos": -3.281950863209482,
+          "ci95PercentChange": [
+            -9.890586498512432,
+            3.8113629345972733
+          ],
+          "pValue": 0.35542876061512463,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "multiplicativeChangeInLos": 0.9168286714717,
+          "percentChangeInLos": -8.31713285283,
+          "ci95PercentChange": [
+            -13.01142905649063,
+            -3.3695112225220814
+          ],
+          "pValue": 0.0012031091606652103,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "multiplicativeChangeInLos": 1.0100961973306375,
+          "percentChangeInLos": 1.009619733063749,
+          "ci95PercentChange": [
+            -4.0907437207123305,
+            6.381215686911168
+          ],
+          "pValue": 0.7039465753688916,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "multiplicativeChangeInLos": 1.0697067458121499,
+          "percentChangeInLos": 6.970674581214986,
+          "ci95PercentChange": [
+            2.1356544244185205,
+            12.034580723501742
+          ],
+          "pValue": 0.004298008274243252,
+          "scale": "per 1 SD"
+        }
+      ],
+      "rSquared": 0.16319535679043196,
+      "aic": 1757.7257743811606
+    },
+    "prolonged_los": {
+      "label": "Adjusted prolonged ICU stay model",
+      "status": "fit",
+      "n": 909,
+      "events": 229,
+      "nonEvents": 680,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "sofa",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scaling": {
+        "admission_age": {
+          "mean": 70.25962596259626,
+          "sd": 19.974839026462007
+        },
+        "apsiii": {
+          "mean": 47.37183718371837,
+          "sd": 18.57892792414207
+        },
+        "oasis": {
+          "mean": 33.45984598459846,
+          "sd": 7.785094222084773
+        },
+        "sofa": {
+          "mean": 4.547854785478548,
+          "sd": 3.1380091890431863
+        },
+        "hemoglobin_min": {
+          "mean": 9.069196919691969,
+          "sd": 1.944912462428663
+        },
+        "wbc_max": {
+          "mean": 14.702640264026403,
+          "sd": 7.430092230542512
+        },
+        "creatinine_max": {
+          "mean": 1.5202420242024204,
+          "sd": 1.480269481789246
+        },
+        "bun_max": {
+          "mean": 29.643564356435643,
+          "sd": 22.35330334740893
+        },
+        "sbp_min": {
+          "mean": 87.69251925192519,
+          "sd": 19.025018571396316
+        },
+        "heart_rate_max": {
+          "mean": 109.23982398239824,
+          "sd": 21.554196581579045
+        },
+        "spo2_min": {
+          "mean": 90.38173817381738,
+          "sd": 8.788918286150047
+        }
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 0.7106623505560193,
+          "ci95": [
+            0.5864718569712956,
+            0.8611512564404695
+          ],
+          "pValue": 0.0004914901823566932,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.4388474175364878,
+          "ci95": [
+            1.0235109973417886,
+            2.022725594867327
+          ],
+          "pValue": 0.03628765699480926,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "oddsRatio": 0.8575555034092942,
+          "ci95": [
+            0.660286483882301,
+            1.1137611618272296
+          ],
+          "pValue": 0.24925866427579924,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "oddsRatio": 1.6729747333112894,
+          "ci95": [
+            1.3270673347929351,
+            2.1090447974402817
+          ],
+          "pValue": 1.334677379682944e-05,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sofa",
+          "oddsRatio": 1.418040953736648,
+          "ci95": [
+            1.1168757560598241,
+            1.800415252604547
+          ],
+          "pValue": 0.004138432967305709,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 0.990539635681212,
+          "ci95": [
+            0.8351369558149114,
+            1.1748597197426878
+          ],
+          "pValue": 0.9130680090927797,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.170185037338013,
+          "ci95": [
+            1.0003550982079934,
+            1.3688469465120432
+          ],
+          "pValue": 0.049483531799144415,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 0.9631157694915724,
+          "ci95": [
+            0.7642067006126593,
+            1.213797241897643
+          ],
+          "pValue": 0.7501765274051502,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.0242881678595535,
+          "ci95": [
+            0.7996312523452841,
+            1.3120625885242991
+          ],
+          "pValue": 0.8493390446791425,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.7894271341243836,
+          "ci95": [
+            0.650222459599289,
+            0.9584338265951201
+          ],
+          "pValue": 0.016899086992289453,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 0.9668678708031098,
+          "ci95": [
+            0.8041559008031117,
+            1.1625027916324677
+          ],
+          "pValue": 0.7200601829064179,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 1.1885816624148642,
+          "ci95": [
+            0.9900142596917635,
+            1.4269757777718557
+          ],
+          "pValue": 0.06397447331473216,
+          "scale": "per 1 SD"
+        }
+      ],
+      "metrics": {
+        "auroc": 0.7323144104803492,
+        "averagePrecision": 0.460963932896315,
+        "eventRate": 0.25192519251925194
+      },
+      "aic": 943.4237072306656,
+      "warnings": []
+    }
+  }
+}

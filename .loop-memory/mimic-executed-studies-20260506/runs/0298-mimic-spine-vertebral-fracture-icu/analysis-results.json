@@ -1,0 +1,677 @@
+{
+  "study": {
+    "id": "mimic-spine-vertebral-fracture-icu",
+    "title": "Vertebral Fracture ICU Outcomes",
+    "domain": "orthopedics-spine",
+    "question": "Among ICU patients with vertebral fracture diagnoses, what first-day factors predict mortality and ICU length of stay?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-vitalsign",
+      "derived-first-day-sofa"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "spine fracture phenotype",
+      "neurologic injury sensitivity",
+      "mortality/LOS models"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "S12",
+        "expectedTerms": [
+          "cervical",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "S12",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "S12",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S12&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 420,
+            "sampleRows": [
+              {
+                "code": "S12.000A",
+                "name": "Unspecified displaced fracture of first cervical vertebra, initial encounter for closed fracture"
+              },
+              {
+                "code": "S12.000B",
+                "name": "Unspecified displaced fracture of first cervical vertebra, initial encounter for open fracture"
+              },
+              {
+                "code": "S12.000D",
+                "name": "Unspecified displaced fracture of first cervical vertebra, subsequent encounter for fracture with routine healing"
+              },
+              {
+                "code": "S12.000G",
+                "name": "Unspecified displaced fracture of first cervical vertebra, subsequent encounter for fracture with delayed healing"
+              },
+              {
+                "code": "S12.000K",
+                "name": "Unspecified displaced fracture of first cervical vertebra, subsequent encounter for fracture with nonunion"
+              },
+              {
+                "code": "S12.000S",
+                "name": "Unspecified displaced fracture of first cervical vertebra, sequela"
+              },
+              {
+                "code": "S12.001A",
+                "name": "Unspecified nondisplaced fracture of first cervical vertebra, initial encounter for closed fracture"
+              },
+              {
+                "code": "S12.001B",
+                "name": "Unspecified nondisplaced fracture of first cervical vertebra, initial encounter for open fracture"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:32.601944+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "S22.0",
+        "expectedTerms": [
+          "thoracic",
+          "vertebra"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "S22.0",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "S22.0",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S22.0&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 270,
+            "sampleRows": [
+              {
+                "code": "S22.000A",
+                "name": "Wedge compression fracture of unspecified thoracic vertebra, initial encounter for closed fracture"
+              },
+              {
+                "code": "S22.000B",
+                "name": "Wedge compression fracture of unspecified thoracic vertebra, initial encounter for open fracture"
+              },
+              {
+                "code": "S22.000D",
+                "name": "Wedge compression fracture of unspecified thoracic vertebra, subsequent encounter for fracture with routine healing"
+              },
+              {
+                "code": "S22.000G",
+                "name": "Wedge compression fracture of unspecified thoracic vertebra, subsequent encounter for fracture with delayed healing"
+              },
+              {
+                "code": "S22.000K",
+                "name": "Wedge compression fracture of unspecified thoracic vertebra, subsequent encounter for fracture with nonunion"
+              },
+              {
+                "code": "S22.000S",
+                "name": "Wedge compression fracture of unspecified thoracic vertebra, sequela"
+              },
+              {
+                "code": "S22.001A",
+                "name": "Stable burst fracture of unspecified thoracic vertebra, initial encounter for closed fracture"
+              },
+              {
+                "code": "S22.001B",
+                "name": "Stable burst fracture of unspecified thoracic vertebra, initial encounter for open fracture"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:33.088772+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "S32.0",
+        "expectedTerms": [
+          "lumbar",
+          "vertebra"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "S32.0",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "S32.0",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S32.0&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 180,
+            "sampleRows": [
+              {
+                "code": "S32.000A",
+                "name": "Wedge compression fracture of unspecified lumbar vertebra, initial encounter for closed fracture"
+              },
+              {
+                "code": "S32.000B",
+                "name": "Wedge compression fracture of unspecified lumbar vertebra, initial encounter for open fracture"
+              },
+              {
+                "code": "S32.000D",
+                "name": "Wedge compression fracture of unspecified lumbar vertebra, subsequent encounter for fracture with routine healing"
+              },
+              {
+                "code": "S32.000G",
+                "name": "Wedge compression fracture of unspecified lumbar vertebra, subsequent encounter for fracture with delayed healing"
+              },
+              {
+                "code": "S32.000K",
+                "name": "Wedge compression fracture of unspecified lumbar vertebra, subsequent encounter for fracture with nonunion"
+              },
+              {
+                "code": "S32.000S",
+                "name": "Wedge compression fracture of unspecified lumbar vertebra, sequela"
+              },
+              {
+                "code": "S32.001A",
+                "name": "Stable burst fracture of unspecified lumbar vertebra, initial encounter for closed fracture"
+              },
+              {
+                "code": "S32.001B",
+                "name": "Stable burst fracture of unspecified lumbar vertebra, initial encounter for open fracture"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:33.573628+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "805",
+        "expectedTerms": [
+          "vertebral",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "805",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "805",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=805&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 26,
+            "sampleRows": [
+              {
+                "code": "805.00",
+                "name": "Closed fracture of cervical vertebra, unspecified level"
+              },
+              {
+                "code": "805.01",
+                "name": "Closed fracture of first cervical vertebra"
+              },
+              {
+                "code": "805.02",
+                "name": "Closed fracture of second cervical vertebra"
+              },
+              {
+                "code": "805.03",
+                "name": "Closed fracture of third cervical vertebra"
+              },
+              {
+                "code": "805.04",
+                "name": "Closed fracture of fourth cervical vertebra"
+              },
+              {
+                "code": "805.05",
+                "name": "Closed fracture of fifth cervical vertebra"
+              },
+              {
+                "code": "805.06",
+                "name": "Closed fracture of sixth cervical vertebra"
+              },
+              {
+                "code": "805.07",
+                "name": "Closed fracture of seventh cervical vertebra"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:34.070014+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "806",
+        "expectedTerms": [
+          "vertebral",
+          "spinal cord"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "806",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "806",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=806&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 52,
+            "sampleRows": [
+              {
+                "code": "806.00",
+                "name": "Closed fracture of C1-C4 level with unspecified spinal cord injury"
+              },
+              {
+                "code": "806.01",
+                "name": "Closed fracture of C1-C4 level with complete lesion of cord"
+              },
+              {
+                "code": "806.02",
+                "name": "Closed fracture of C1-C4 level with anterior cord syndrome"
+              },
+              {
+                "code": "806.03",
+                "name": "Closed fracture of C1-C4 level with central cord syndrome"
+              },
+              {
+                "code": "806.04",
+                "name": "Closed fracture of C1-C4 level with other specified spinal cord injury"
+              },
+              {
+                "code": "806.05",
+                "name": "Closed fracture of C5-C7 level with unspecified spinal cord injury"
+              },
+              {
+                "code": "806.06",
+                "name": "Closed fracture of C5-C7 level with complete lesion of cord"
+              },
+              {
+                "code": "806.07",
+                "name": "Closed fracture of C5-C7 level with anterior cord syndrome"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:34.545830+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 1121,
+    "matchedDiagnosisRows": 8716,
+    "matchedAdmissions": 5932,
+    "firstIcuStayRows": 1647,
+    "uniquePatients": 1609
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 1647,
+        "missing": 0,
+        "mean": 61.42683667273831,
+        "sd": 22.020852453570797,
+        "median": 65.0,
+        "iqr": [
+          45.0,
+          80.0
+        ],
+        "min": 18.0,
+        "max": 100.0
+      },
+      "los_icu": {
+        "n": 1647,
+        "missing": 0,
+        "mean": 4.870698239222829,
+        "sd": 6.7399039611288165,
+        "median": 2.42,
+        "iqr": [
+          1.13,
+          5.5600000000000005
+        ],
+        "min": 0.0,
+        "max": 99.63
+      },
+      "los_hospital": {
+        "n": 1647,
+        "missing": 0,
+        "mean": 11.896174863387978,
+        "sd": 12.467777323411426,
+        "median": 8.0,
+        "iqr": [
+          5.0,
+          15.0
+        ],
+        "min": 0.0,
+        "max": 161.0
+      },
+      "sofa": {
+        "n": 1647,
+        "missing": 0,
+        "mean": 3.6964177292046143,
+        "sd": 2.912474621899593,
+        "median": 3.0,
+        "iqr": [
+          1.5,
+          5.0
+        ],
+        "min": 0.0,
+        "max": 19.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 1647,
+        "positive": 210,
+        "proportion": 0.12750455373406194
+      },
+      "male": {
+        "n": 1647,
+        "positive": 1035,
+        "proportion": 0.6284153005464481
+      },
+      "prolonged_icu_los": {
+        "n": 1647,
+        "positive": 412,
+        "proportion": 0.2501517911353977
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "sofa",
+    "glucose_max",
+    "sbp_min",
+    "heart_rate_max",
+    "spo2_min"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 37,
+      "missingFraction": 0.022465088038858532
+    },
+    {
+      "column": "spo2_min",
+      "missing": 7,
+      "missingFraction": 0.004250151791135397
+    },
+    {
+      "column": "sbp_min",
+      "missing": 4,
+      "missingFraction": 0.0024286581663630845
+    },
+    {
+      "column": "heart_rate_max",
+      "missing": 4,
+      "missingFraction": 0.0024286581663630845
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "sofa",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 1606,
+      "events": 199,
+      "predictors": [
+        "admission_age",
+        "male",
+        "sofa",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 61.39601494396015,
+          "sd": 21.977078607254285
+        },
+        "sofa": {
+          "mean": 3.713574097135741,
+          "sd": 2.908601925632986
+        },
+        "glucose_max": {
+          "mean": 169.84495641344955,
+          "sd": 76.57724865734967
+        },
+        "sbp_min": {
+          "mean": 94.25529265255292,
+          "sd": 18.699939693914676
+        },
+        "heart_rate_max": {
+          "mean": 105.10647571606475,
+          "sd": 20.54986781157586
+        },
+        "spo2_min": {
+          "mean": 92.40473225404732,
+          "sd": 5.72619950485389
+        }
+      },
+      "metrics": {
+        "auroc": 0.8373566482019194,
+        "averagePrecision": 0.46695414612784514
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 2.0476816596823846,
+          "ci95": [
+            1.64876747306012,
+            2.5431118989855963
+          ],
+          "pValue": 8.995937890123817e-11,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9198229635122149,
+          "ci95": [
+            0.6493639953379952,
+            1.3029276188372751
+          ],
+          "pValue": 0.6380393103667701,
+          "scale": "per unit"
+        },
+        {
+          "term": "sofa",
+          "oddsRatio": 2.2902883015103006,
+          "ci95": [
+            1.9288646928526103,
+            2.7194341435517964
+          ],
+          "pValue": 3.1733863698942044e-21,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.1776766133741865,
+          "ci95": [
+            1.0235402607282251,
+            1.3550245739251434
+          ],
+          "pValue": 0.022309227339363327,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.70989747699127,
+          "ci95": [
+            0.5861369755572445,
+            0.8597895182426559
+          ],
+          "pValue": 0.0004556307038213932,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 1.188107965368455,
+          "ci95": [
+            0.9978796068939422,
+            1.414600045556397
+          ],
+          "pValue": 0.05285293182577984,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 0.9157939961566702,
+          "ci95": [
+            0.8004928095735622,
+            1.047702906717405
+          ],
+          "pValue": 0.20011641603481478,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 1606,
+      "predictors": [
+        "admission_age",
+        "male",
+        "sofa",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 61.39601494396015,
+          "sd": 21.977078607254285
+        },
+        "sofa": {
+          "mean": 3.713574097135741,
+          "sd": 2.908601925632986
+        },
+        "glucose_max": {
+          "mean": 169.84495641344955,
+          "sd": 76.57724865734967
+        },
+        "sbp_min": {
+          "mean": 94.25529265255292,
+          "sd": 18.699939693914676
+        },
+        "heart_rate_max": {
+          "mean": 105.10647571606475,
+          "sd": 20.54986781157586
+        },
+        "spo2_min": {
+          "mean": 92.40473225404732,
+          "sd": 5.72619950485389
+        }
+      },
+      "rSquared": 0.1326840442176721,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -6.1481582254552025,
+          "ci95PercentChange": [
+            -9.98873209445602,
+            -2.143715898799392
+          ],
+          "pValue": 0.0029157021211388104,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 6.589365220517118,
+          "ci95PercentChange": [
+            -1.2298685154250144,
+            15.027616217024931
+          ],
+          "pValue": 0.10066956037706758,
+          "scale": "per unit"
+        },
+        {
+          "term": "sofa",
+          "percentChangeInLos": 20.451573413431355,
+          "ci95PercentChange": [
+            15.150563037189846,
+            25.99661829777986
+          ],
+          "pValue": 5.350819445084609e-16,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 8.042926813950913,
+          "ci95PercentChange": [
+            3.1719349143127795,
+            13.143889801230735
+          ],
+          "pValue": 0.0010138034487140288,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "percentChangeInLos": -8.32496347583378,
+          "ci95PercentChange": [
+            -12.328662516246325,
+            -4.138426960069941
+          ],
+          "pValue": 0.00013617006946760825,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "percentChangeInLos": 6.170151526570833,
+          "ci95PercentChange": [
+            1.9785463327470776,
+            10.534043487883537
+          ],
+          "pValue": 0.0035765201685102896,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "percentChangeInLos": 9.74853650594143,
+          "ci95PercentChange": [
+            4.609861601501342,
+            15.139634837477821
+          ],
+          "pValue": 0.00014355498475579866,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

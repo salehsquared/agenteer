@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "explorationHandoff": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-06T01:53:15.536Z",
+    "sourceExplorationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/exploration.json",
+    "sourceExplorationSha256": "59025ff8636a31caeb2f8ded15e7d77597407704c33815b23dc8474dc18e8b5f",
+    "questionId": "question_01_929694bdfd",
+    "status": "needs_methods_review",
+    "clearanceLevel": "hold_for_methods_review",
+    "methodsReviewNote": "Actual NHANES exploration reviewed: age and HbA1c require survey-aware, adjusted planning before modeling; handoff is hypothesis-generation only.",
+    "question": {
+      "id": "question_01_929694bdfd",
+      "question": "Is RIDAGEYR associated with LBXGH in this dataset?",
+      "outcome": "LBXGH",
+      "exposure": "RIDAGEYR",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "social_demographic_determinant",
+      "researchInterestScore": 44,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.social-demographic"
+        ],
+        "matchedTerms": [
+          "glycemic",
+          "LBXGH",
+          "RIDAGEYR",
+          "social_demographic"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 15,
+            "reason": "Unadjusted association strength 0.281."
+          },
+          {
+            "id": "score.category.social_demographic_determinant",
+            "delta": 20,
+            "reason": "Taxonomy category social_demographic_determinant."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28712 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -3,
+            "reason": "Maximum pair missingness 9.8%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "RIDAGEYR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "rationale": "pearson exploratory strength 0.281 across 28712 complete pairs.",
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ],
+      "priority": "medium",
+      "promotionStatus": "needs_methods_review",
+      "promotionBlockers": [
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ]
+    },
+    "blockers": [
+      "12 candidate questions need methods review",
+      "no candidate questions are currently promotable",
+      "possible target leakage/proxy pairs detected",
+      "survey/design candidate variables detected",
+      "survey/design fields detected; promotion needs survey-aware plan"
+    ],
+    "modelingPlanSeed": {
+      "question": "Is RIDAGEYR associated with LBXGH in this dataset?",
+      "target": "LBXGH",
+      "outcome": "LBXGH",
+      "exposure": "RIDAGEYR",
+      "routeIntent": "explanatory_association",
+      "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "taxonomy": "social_demographic_determinant",
+      "researchInterestScore": 44,
+      "primaryQuestionUse": "recommended",
+      "taxonomyEvidence": {
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "matchedRuleIds": [
+          "taxonomy.social-demographic"
+        ],
+        "matchedTerms": [
+          "glycemic",
+          "LBXGH",
+          "RIDAGEYR",
+          "social_demographic"
+        ],
+        "scoreAdjustments": [
+          {
+            "id": "score.association-strength",
+            "delta": 15,
+            "reason": "Unadjusted association strength 0.281."
+          },
+          {
+            "id": "score.category.social_demographic_determinant",
+            "delta": 20,
+            "reason": "Taxonomy category social_demographic_determinant."
+          },
+          {
+            "id": "score.sample-size",
+            "delta": 8,
+            "reason": "28712 complete pairs."
+          },
+          {
+            "id": "score.target-centered",
+            "delta": 8,
+            "reason": "Candidate is target-centered."
+          },
+          {
+            "id": "score.missingness",
+            "delta": -3,
+            "reason": "Maximum pair missingness 9.8%."
+          },
+          {
+            "id": "score.multiplicity",
+            "delta": -4,
+            "reason": "Multiplicity risk medium."
+          }
+        ],
+        "rejectedCategories": []
+      },
+      "whyThisQuestion": "RIDAGEYR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+      "avoidAsPrimaryQuestion": null,
+      "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+      "tablePath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+      "rowCount": 31849,
+      "columnCount": 22,
+      "designWarnings": [
+        "12 candidate questions need methods review",
+        "Candidate questions must be promoted into an explicit analysis plan before execution or paper generation.",
+        "Exploration is hypothesis generation, not confirmation.",
+        "Multiple comparisons, missingness, sparse categories, survey design, clustering, and temporal ordering must be handled before inferential claims.",
+        "no candidate questions are currently promotable",
+        "possible target leakage/proxy pairs detected",
+        "Reported associations are unadjusted and should not be interpreted causally.",
+        "survey/design candidate variables detected",
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ],
+      "requiredNextChecks": [
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling."
+      ]
+    },
+    "analysisSpecCandidate": {
+      "status": "needs_methods_review",
+      "routeIntent": "explanatory_association",
+      "researchQuestion": "Is RIDAGEYR associated with LBXGH in this dataset?",
+      "estimandBoundary": "Exploratory explanatory association only; not causal and not a prediction-model development claim.",
+      "population": {
+        "sourceTable": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+        "rowCount": 31849,
+        "description": "Rows available in the exploration source table; refine eligibility and survey domains before execution."
+      },
+      "variables": {
+        "outcome": "LBXGH",
+        "exposure": "RIDAGEYR",
+        "covariates": [],
+        "excludedUntilReviewed": [
+          "elevated_hba1c",
+          "nhanes_cycle_id",
+          "SDMVPSU",
+          "SDMVSTRA",
+          "WTMEC2YR",
+          "WTMECPRP",
+          "WTSAF2YR"
+        ]
+      },
+      "designRequirements": [
+        "12 candidate questions need methods review",
+        "Candidate questions must be promoted into an explicit analysis plan before execution or paper generation.",
+        "Exploration is hypothesis generation, not confirmation.",
+        "Multiple comparisons, missingness, sparse categories, survey design, clustering, and temporal ordering must be handled before inferential claims.",
+        "no candidate questions are currently promotable",
+        "possible target leakage/proxy pairs detected",
+        "Reported associations are unadjusted and should not be interpreted causally.",
+        "survey/design candidate variables detected",
+        "survey/design fields detected; promotion needs survey-aware plan"
+      ],
+      "suggestedModelFamily": "correlation followed by adjusted linear regression if scientifically justified",
+      "requiredBeforeExecution": [
+        "Confirm survey weights, strata, PSU, cycle handling, missingness policy, and sparse-cell policy when applicable.",
+        "Confirm temporal/design plausibility; do not infer causality from exploration.",
+        "Declare whether the study is explanatory, predictive, diagnostic, causal, descriptive, or data-quality review.",
+        "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+        "Select covariates from domain knowledge before confirmatory modeling.",
+        "Write or approve an AnalysisSpec before execution."
+      ],
+      "provenance": {
+        "sourceExplorationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/exploration.json",
+        "sourceExplorationSha256": "59025ff8636a31caeb2f8ded15e7d77597407704c33815b23dc8474dc18e8b5f",
+        "questionId": "question_01_929694bdfd",
+        "taxonomyVersion": "exploration-taxonomy-v1",
+        "routeIntent": "explanatory_association"
+      }
+    },
+    "recommendedCommand": "agenteer research modeling-plan --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --target \"LBXGH\" --table \"/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv\" --json",
+    "artifacts": [
+      {
+        "kind": "exploration-handoff",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/handoff-question-01.json",
+        "sha256": "8cad887dcce6b043727ac2fa73c1233b48c6a28e8e3a8179662edee541aafc12",
+        "bytes": 10354
+      }
+    ]
+  }
+}
+

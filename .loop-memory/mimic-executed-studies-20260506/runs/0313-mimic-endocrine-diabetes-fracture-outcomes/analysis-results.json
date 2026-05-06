@@ -1,0 +1,654 @@
+{
+  "study": {
+    "id": "mimic-endocrine-diabetes-fracture-outcomes",
+    "title": "Diabetes And Hip/Femur Fracture ICU Outcomes",
+    "domain": "ortho-endocrine",
+    "question": "Among hip/femur fracture ICU patients, is diabetes diagnosis associated with mortality or prolonged ICU stay?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab",
+      "derived-charlson"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "fracture + diabetes phenotype",
+      "Charlson overlap audit",
+      "complete-case logistic model"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "S72",
+        "expectedTerms": [
+          "femur",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "S72",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "S72",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S72&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 2466,
+            "sampleRows": [
+              {
+                "code": "S72.001A",
+                "name": "Fracture of unspecified part of neck of right femur, initial encounter for closed fracture"
+              },
+              {
+                "code": "S72.001B",
+                "name": "Fracture of unspecified part of neck of right femur, initial encounter for open fracture type I or II"
+              },
+              {
+                "code": "S72.001C",
+                "name": "Fracture of unspecified part of neck of right femur, initial encounter for open fracture type IIIA, IIIB, or IIIC"
+              },
+              {
+                "code": "S72.001D",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for closed fracture with routine healing"
+              },
+              {
+                "code": "S72.001E",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type I or II with routine healing"
+              },
+              {
+                "code": "S72.001F",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type IIIA, IIIB, or IIIC with routine healing"
+              },
+              {
+                "code": "S72.001G",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for closed fracture with delayed healing"
+              },
+              {
+                "code": "S72.001H",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type I or II with delayed healing"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:29.147809+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "E10",
+        "expectedTerms": [
+          "diabetes"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "E10",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "E10",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=E10&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 87,
+            "sampleRows": [
+              {
+                "code": "E10.10",
+                "name": "Type 1 diabetes mellitus with ketoacidosis without coma"
+              },
+              {
+                "code": "E10.11",
+                "name": "Type 1 diabetes mellitus with ketoacidosis with coma"
+              },
+              {
+                "code": "E10.21",
+                "name": "Type 1 diabetes mellitus with diabetic nephropathy"
+              },
+              {
+                "code": "E10.22",
+                "name": "Type 1 diabetes mellitus with diabetic chronic kidney disease"
+              },
+              {
+                "code": "E10.29",
+                "name": "Type 1 diabetes mellitus with other diabetic kidney complication"
+              },
+              {
+                "code": "E10.311",
+                "name": "Type 1 diabetes mellitus with unspecified diabetic retinopathy with macular edema"
+              },
+              {
+                "code": "E10.319",
+                "name": "Type 1 diabetes mellitus with unspecified diabetic retinopathy without macular edema"
+              },
+              {
+                "code": "E10.3211",
+                "name": "Type 1 diabetes mellitus with mild nonproliferative diabetic retinopathy with macular edema, right eye"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:44.700885+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "E11",
+        "expectedTerms": [
+          "diabetes"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "E11",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "E11",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=E11&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 87,
+            "sampleRows": [
+              {
+                "code": "E11.00",
+                "name": "Type 2 diabetes mellitus with hyperosmolarity without nonketotic hyperglycemic-hyperosmolar coma (NKHHC)"
+              },
+              {
+                "code": "E11.01",
+                "name": "Type 2 diabetes mellitus with hyperosmolarity with coma"
+              },
+              {
+                "code": "E11.10",
+                "name": "Type 2 diabetes mellitus with ketoacidosis without coma"
+              },
+              {
+                "code": "E11.11",
+                "name": "Type 2 diabetes mellitus with ketoacidosis with coma"
+              },
+              {
+                "code": "E11.21",
+                "name": "Type 2 diabetes mellitus with diabetic nephropathy"
+              },
+              {
+                "code": "E11.22",
+                "name": "Type 2 diabetes mellitus with diabetic chronic kidney disease"
+              },
+              {
+                "code": "E11.29",
+                "name": "Type 2 diabetes mellitus with other diabetic kidney complication"
+              },
+              {
+                "code": "E11.311",
+                "name": "Type 2 diabetes mellitus with unspecified diabetic retinopathy with macular edema"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:45.224213+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "250",
+        "expectedTerms": [
+          "diabetes"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "250",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "250",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=250&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 40,
+            "sampleRows": [
+              {
+                "code": "250.00",
+                "name": "Diabetes mellitus without mention of complication, type II or unspecified type, not stated as uncontrolled"
+              },
+              {
+                "code": "250.01",
+                "name": "Diabetes mellitus without mention of complication, type I [juvenile type], not stated as uncontrolled"
+              },
+              {
+                "code": "250.02",
+                "name": "Diabetes mellitus without mention of complication, type II or unspecified type, uncontrolled"
+              },
+              {
+                "code": "250.03",
+                "name": "Diabetes mellitus without mention of complication, type I [juvenile type], uncontrolled"
+              },
+              {
+                "code": "250.10",
+                "name": "Diabetes with ketoacidosis, type II or unspecified type, not stated as uncontrolled"
+              },
+              {
+                "code": "250.11",
+                "name": "Diabetes with ketoacidosis, type I [juvenile type], not stated as uncontrolled"
+              },
+              {
+                "code": "250.12",
+                "name": "Diabetes with ketoacidosis, type II or unspecified type, uncontrolled"
+              },
+              {
+                "code": "250.13",
+                "name": "Diabetes with ketoacidosis, type I [juvenile type], uncontrolled"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:45.726751+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 2929,
+    "matchedDiagnosisRows": 182181,
+    "matchedAdmissions": 134809,
+    "firstIcuStayRows": 25949,
+    "uniquePatients": 19098
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 25949,
+        "missing": 0,
+        "mean": 67.61050522178118,
+        "sd": 14.098270434288871,
+        "median": 69.0,
+        "iqr": [
+          59.0,
+          78.0
+        ],
+        "min": 18.0,
+        "max": 103.0
+      },
+      "los_icu": {
+        "n": 25943,
+        "missing": 6,
+        "mean": 3.6270805226843468,
+        "sd": 5.260722976199925,
+        "median": 2.0,
+        "iqr": [
+          1.13,
+          3.88
+        ],
+        "min": 0.0,
+        "max": 136.04
+      },
+      "los_hospital": {
+        "n": 25949,
+        "missing": 0,
+        "mean": 10.71733014759721,
+        "sd": 12.132194144316228,
+        "median": 7.0,
+        "iqr": [
+          4.0,
+          13.0
+        ],
+        "min": 0.0,
+        "max": 515.0
+      },
+      "charlson_comorbidity_index": {
+        "n": 25949,
+        "missing": 0,
+        "mean": 6.467802227446144,
+        "sd": 2.8525661842282957,
+        "median": 6.0,
+        "iqr": [
+          4.0,
+          8.0
+        ],
+        "min": 0.0,
+        "max": 20.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 25949,
+        "positive": 3014,
+        "proportion": 0.11615091140313692
+      },
+      "male": {
+        "n": 25949,
+        "positive": 14870,
+        "proportion": 0.5730471309106324
+      },
+      "prolonged_icu_los": {
+        "n": 25949,
+        "positive": 6438,
+        "proportion": 0.24810204632163088
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "charlson_comorbidity_index",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 264,
+      "missingFraction": 0.010173802458668928
+    },
+    {
+      "column": "wbc_max",
+      "missing": 230,
+      "missingFraction": 0.008863540020810051
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 228,
+      "missingFraction": 0.008786465759759528
+    },
+    {
+      "column": "bun_max",
+      "missing": 163,
+      "missingFraction": 0.0062815522756175576
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 162,
+      "missingFraction": 0.006243015145092296
+    },
+    {
+      "column": "los_icu",
+      "missing": 6,
+      "missingFraction": 0.00023122278315156652
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "charlson_comorbidity_index",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 25591,
+      "events": 2930,
+      "predictors": [
+        "admission_age",
+        "male",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 67.61447383845884,
+          "sd": 14.081064361051116
+        },
+        "charlson_comorbidity_index": {
+          "mean": 6.4747372123012,
+          "sd": 2.850374591342547
+        },
+        "hemoglobin_min": {
+          "mean": 9.862584502364113,
+          "sd": 2.2217460952245887
+        },
+        "wbc_max": {
+          "mean": 13.821751787737877,
+          "sd": 10.77256960903619
+        },
+        "creatinine_max": {
+          "mean": 2.0231096869993355,
+          "sd": 2.137982425636228
+        },
+        "bun_max": {
+          "mean": 35.1064436716033,
+          "sd": 26.647609970374425
+        },
+        "glucose_max": {
+          "mean": 225.2206244382791,
+          "sd": 157.6452247784384
+        }
+      },
+      "metrics": {
+        "auroc": 0.7141146860696301,
+        "averagePrecision": 0.22888532640304224
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.2117881132103523,
+          "ci95": [
+            1.1495037862817419,
+            1.2774472331820534
+          ],
+          "pValue": 9.66143720470612e-13,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9575719644809051,
+          "ci95": [
+            0.8824834870139499,
+            1.0390495467087706
+          ],
+          "pValue": 0.298079209186507,
+          "scale": "per unit"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "oddsRatio": 1.528651772849692,
+          "ci95": [
+            1.4576196226082887,
+            1.6031454340982594
+          ],
+          "pValue": 1.991985114742069e-68,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 1.013856037749412,
+          "ci95": [
+            0.9713723071873414,
+            1.0581978276252142
+          ],
+          "pValue": 0.5286504083937662,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.2281697081252025,
+          "ci95": [
+            1.179596199345866,
+            1.278743380822026
+          ],
+          "pValue": 1.8185492358281195e-23,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 0.9930314962016419,
+          "ci95": [
+            0.9492641802082652,
+            1.0388167730421705
+          ],
+          "pValue": 0.7610779911551684,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.339161422605318,
+          "ci95": [
+            1.2829406949680435,
+            1.3978458418445983
+          ],
+          "pValue": 1.249169517228284e-40,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.1053070360441177,
+          "ci95": [
+            1.0648515906565934,
+            1.1472994496588236
+          ],
+          "pValue": 1.4187843345668361e-07,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 25578,
+      "predictors": [
+        "admission_age",
+        "male",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 67.6127531472359,
+          "sd": 14.080895700254437
+        },
+        "charlson_comorbidity_index": {
+          "mean": 6.474118382985378,
+          "sd": 2.8500149796301164
+        },
+        "hemoglobin_min": {
+          "mean": 9.862800062553756,
+          "sd": 2.2215287496485625
+        },
+        "wbc_max": {
+          "mean": 13.822263273125344,
+          "sd": 10.774498949549226
+        },
+        "creatinine_max": {
+          "mean": 2.022839940573931,
+          "sd": 2.138059107541244
+        },
+        "bun_max": {
+          "mean": 35.103057314879976,
+          "sd": 26.650545350137737
+        },
+        "glucose_max": {
+          "mean": 225.2150285401517,
+          "sd": 157.66705972389386
+        }
+      },
+      "rSquared": 0.02033677971524861,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -3.3185591566351147,
+          "ci95PercentChange": [
+            -4.286575053544195,
+            -2.3407530471493465
+          ],
+          "pValue": 4.921535312234327e-11,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 2.3120505532131075,
+          "ci95PercentChange": [
+            0.6514903584861953,
+            4.000006866472283
+          ],
+          "pValue": 0.006185811525413796,
+          "scale": "per unit"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "percentChangeInLos": 5.1222475238966725,
+          "ci95PercentChange": [
+            4.011591324560171,
+            6.244763528255048
+          ],
+          "pValue": 3.0328913277535184e-20,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -1.197462983880293,
+          "ci95PercentChange": [
+            -2.0663939830738,
+            -0.32082226059853003
+          ],
+          "pValue": 0.007518922012351353,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 6.359097434770966,
+          "ci95PercentChange": [
+            3.8757974740935675,
+            8.901764243594478
+          ],
+          "pValue": 3.143824918814151e-07,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -1.7822195924928175,
+          "ci95PercentChange": [
+            -3.096454245099356,
+            -0.4501608994071038
+          ],
+          "pValue": 0.008886314776573668,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 5.114212027732767,
+          "ci95PercentChange": [
+            3.7942125415707517,
+            6.450998563970156
+          ],
+          "pValue": 1.0286619961561885e-14,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -0.25088534050285993,
+          "ci95PercentChange": [
+            -1.0133492260722354,
+            0.5174515710983263
+          ],
+          "pValue": 0.5211050983740448,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

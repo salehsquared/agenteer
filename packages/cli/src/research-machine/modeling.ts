@@ -76,6 +76,15 @@ export const modelingDecisionRequestSchema = z.object({
     issueCodes: z.array(z.string().min(1)).default([]),
     errors: z.array(z.string()).default([]),
   })).default([]),
+  explorationHandoff: z.object({
+    path: z.string().min(1),
+    status: z.enum(["ready_for_modeling_plan", "needs_methods_review", "blocked"]),
+    clearanceLevel: z.enum(["clear_for_handoff", "hold_for_methods_review", "stop"]),
+    sourceExplorationSha256: z.string().min(1).nullable().optional(),
+    questionId: z.string().min(1).nullable().optional(),
+    blockers: z.array(z.string()).default([]),
+    methodsReviewNote: z.string().min(1).nullable().optional(),
+  }).optional(),
   highMissingness: z.boolean().default(false),
   smallSample: z.boolean().default(false),
   requiresInference: z.boolean().default(true),
@@ -209,6 +218,15 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   const inferredStudyDesign = inferStudyDesign(evidenceAdjustedRequest);
   const inferredDataStructures = inferDataStructures(evidenceAdjustedRequest);
   const issues: MachineIssue[] = [...dataEvidence.warnings, ...backendEvidence.warnings, ...priorRunEvidence.warnings];
+  if (evidenceAdjustedRequest.explorationHandoff) {
+    const handoff = evidenceAdjustedRequest.explorationHandoff;
+    if (handoff.status === "blocked" || handoff.clearanceLevel === "stop") {
+      issues.push(issue("blocker", "EXPLORATION_HANDOFF_BLOCKED", `Exploration handoff is blocked: ${handoff.blockers.join("; ") || handoff.clearanceLevel}.`, ["request.explorationHandoff"]));
+    } else if (handoff.status === "needs_methods_review" || handoff.clearanceLevel === "hold_for_methods_review") {
+      issues.push(issue("warning", "EXPLORATION_HANDOFF_METHODS_REVIEW", `Exploration handoff requires methods review: ${handoff.blockers.join("; ") || handoff.clearanceLevel}.`, ["request.explorationHandoff"]));
+      if (!handoff.methodsReviewNote) issues.push(issue("blocker", "EXPLORATION_HANDOFF_MISSING_REVIEW_NOTE", "Held exploration handoff is missing a methods-review note.", ["request.explorationHandoff.methodsReviewNote"]));
+    }
+  }
   if (evidenceAdjustedRequest.image) issues.push(issue("warning", "IMAGE_MODELING_NOT_IN_THIS_PASS", "Image modeling requires a separate computer-vision adapter layer; tabular/statistical planning can only emit a stop-for-review candidate.", ["request.image"]));
   if (evidenceAdjustedRequest.text) issues.push(issue("warning", "TEXT_MODELING_NOT_IN_THIS_PASS", "Text/NLP modeling needs a later text adapter layer; current executable ML support is tabular.", ["request.text"]));
   if (evidenceAdjustedRequest.timeToEvent) issues.push(issue("warning", "SURVIVAL_BACKEND_NOT_YET_EXECUTABLE", "Survival methods can be selected as method contracts, but Cox/random-survival-forest execution is not yet production-ready in Agenteer.", ["request.timeToEvent"]));

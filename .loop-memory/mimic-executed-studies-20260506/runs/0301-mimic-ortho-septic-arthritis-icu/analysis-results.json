@@ -1,0 +1,459 @@
+{
+  "study": {
+    "id": "mimic-ortho-septic-arthritis-icu",
+    "title": "Septic Arthritis ICU Outcomes",
+    "domain": "orthopedic-infection",
+    "question": "Among ICU patients with septic arthritis codes, what predicts mortality and prolonged stay?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab",
+      "derived-antibiotic",
+      "derived-apsiii"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "sparse phenotype check",
+      "complete-case feasibility",
+      "descriptive if low events"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "M00",
+        "expectedTerms": [
+          "pyogenic",
+          "arthritis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "M00",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "M00",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=M00&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 97,
+            "sampleRows": [
+              {
+                "code": "M00.00",
+                "name": "Staphylococcal arthritis, unspecified joint"
+              },
+              {
+                "code": "M00.011",
+                "name": "Staphylococcal arthritis, right shoulder"
+              },
+              {
+                "code": "M00.012",
+                "name": "Staphylococcal arthritis, left shoulder"
+              },
+              {
+                "code": "M00.019",
+                "name": "Staphylococcal arthritis, unspecified shoulder"
+              },
+              {
+                "code": "M00.021",
+                "name": "Staphylococcal arthritis, right elbow"
+              },
+              {
+                "code": "M00.022",
+                "name": "Staphylococcal arthritis, left elbow"
+              },
+              {
+                "code": "M00.029",
+                "name": "Staphylococcal arthritis, unspecified elbow"
+              },
+              {
+                "code": "M00.031",
+                "name": "Staphylococcal arthritis, right wrist"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:35.939640+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "711.0",
+        "expectedTerms": [
+          "pyogenic",
+          "arthritis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "7110",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "7110",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=7110&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 10,
+            "sampleRows": [
+              {
+                "code": "711.00",
+                "name": "Pyogenic arthritis, site unspecified"
+              },
+              {
+                "code": "711.01",
+                "name": "Pyogenic arthritis, shoulder region"
+              },
+              {
+                "code": "711.02",
+                "name": "Pyogenic arthritis, upper arm"
+              },
+              {
+                "code": "711.03",
+                "name": "Pyogenic arthritis, forearm"
+              },
+              {
+                "code": "711.04",
+                "name": "Pyogenic arthritis, hand"
+              },
+              {
+                "code": "711.05",
+                "name": "Pyogenic arthritis, pelvic region and thigh"
+              },
+              {
+                "code": "711.06",
+                "name": "Pyogenic arthritis, lower leg"
+              },
+              {
+                "code": "711.07",
+                "name": "Pyogenic arthritis, ankle and foot"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:36.452536+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 140,
+    "matchedDiagnosisRows": 1648,
+    "matchedAdmissions": 1571,
+    "firstIcuStayRows": 313,
+    "uniquePatients": 290
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 313,
+        "missing": 0,
+        "mean": 62.62300319488818,
+        "sd": 15.031538892100615,
+        "median": 63.0,
+        "iqr": [
+          54.0,
+          73.0
+        ],
+        "min": 20.0,
+        "max": 98.0
+      },
+      "los_icu": {
+        "n": 313,
+        "missing": 0,
+        "mean": 4.567923322683706,
+        "sd": 5.63388590167356,
+        "median": 2.54,
+        "iqr": [
+          1.25,
+          5.96
+        ],
+        "min": 0.08,
+        "max": 49.88
+      },
+      "los_hospital": {
+        "n": 313,
+        "missing": 0,
+        "mean": 20.20447284345048,
+        "sd": 18.27136207941928,
+        "median": 16.0,
+        "iqr": [
+          9.0,
+          24.0
+        ],
+        "min": 1.0,
+        "max": 163.0
+      },
+      "apsiii": {
+        "n": 313,
+        "missing": 0,
+        "mean": 49.587859424920126,
+        "sd": 18.83904785091044,
+        "median": 47.0,
+        "iqr": [
+          38.0,
+          59.0
+        ],
+        "min": 6.0,
+        "max": 115.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 313,
+        "positive": 41,
+        "proportion": 0.13099041533546327
+      },
+      "male": {
+        "n": 313,
+        "positive": 184,
+        "proportion": 0.5878594249201278
+      },
+      "prolonged_icu_los": {
+        "n": 313,
+        "positive": 78,
+        "proportion": 0.24920127795527156
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "apsiii",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max",
+    "any_antibiotic_record",
+    "antibiotic_record_count"
+  ],
+  "missingness": [
+    {
+      "column": "any_antibiotic_record",
+      "missing": 28,
+      "missingFraction": 0.08945686900958466
+    },
+    {
+      "column": "antibiotic_record_count",
+      "missing": 28,
+      "missingFraction": 0.08945686900958466
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 2,
+      "missingFraction": 0.006389776357827476
+    },
+    {
+      "column": "wbc_max",
+      "missing": 2,
+      "missingFraction": 0.006389776357827476
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 1,
+      "missingFraction": 0.003194888178913738
+    },
+    {
+      "column": "bun_max",
+      "missing": 1,
+      "missingFraction": 0.003194888178913738
+    },
+    {
+      "column": "glucose_max",
+      "missing": 1,
+      "missingFraction": 0.003194888178913738
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "apsiii",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "not_fit",
+      "reason": "Singular matrix",
+      "n": 283,
+      "events": 38
+    },
+    "los": {
+      "status": "fit",
+      "n": 283,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "any_antibiotic_record",
+        "antibiotic_record_count"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 62.42756183745583,
+          "sd": 15.002749750050887
+        },
+        "apsiii": {
+          "mean": 50.342756183745585,
+          "sd": 18.627912466859158
+        },
+        "hemoglobin_min": {
+          "mean": 8.858657243816255,
+          "sd": 1.893555971969413
+        },
+        "wbc_max": {
+          "mean": 15.488339222614844,
+          "sd": 8.515657568724942
+        },
+        "creatinine_max": {
+          "mean": 2.1787985865724377,
+          "sd": 2.3451419466780505
+        },
+        "bun_max": {
+          "mean": 39.08833922261484,
+          "sd": 30.652871830994187
+        },
+        "glucose_max": {
+          "mean": 169.31802120141342,
+          "sd": 91.50280734545164
+        },
+        "antibiotic_record_count": {
+          "mean": 5.946996466431095,
+          "sd": 5.704982563792719
+        }
+      },
+      "rSquared": 0.5049720311721757,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -5.567667601194937,
+          "ci95PercentChange": [
+            -5.567667601209325,
+            -5.56766760118056
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 0.36467834125881726,
+          "ci95PercentChange": [
+            0.3646783412271981,
+            0.3646783412904364
+          ],
+          "pValue": 0.0,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "percentChangeInLos": 2.002142174894761,
+          "ci95PercentChange": [
+            2.002142174873889,
+            2.0021421749156554
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -2.1220311420461213,
+          "ci95PercentChange": [
+            -2.1220311420620863,
+            -2.1220311420301563
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 3.5472727085827493,
+          "ci95PercentChange": [
+            3.54727270856654,
+            3.5472727085989364
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -14.306165814656502,
+          "ci95PercentChange": [
+            -14.306165814674475,
+            -14.306165814638538
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 13.61106891267978,
+          "ci95PercentChange": [
+            13.61106891265662,
+            13.611068912702962
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -4.344104667680549,
+          "ci95PercentChange": [
+            -4.344104667692861,
+            -4.344104667668236
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "any_antibiotic_record",
+          "percentChangeInLos": null,
+          "ci95PercentChange": [
+            null,
+            null
+          ],
+          "pValue": 0.0,
+          "scale": "per unit"
+        },
+        {
+          "term": "antibiotic_record_count",
+          "percentChangeInLos": 65.14035985977142,
+          "ci95PercentChange": [
+            65.14035985973517,
+            65.1403598598077
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

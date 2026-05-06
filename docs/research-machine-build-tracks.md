@@ -39,6 +39,8 @@ AnalysisSpec should be the universal executable contract before code generation 
 
 The current AnalysisSpec path already gates survey fields, subsample-weight rationale, binary thresholds, and local review safety language. V2 should make these rules schema-level rather than command-specific.
 
+Manifest-backed dataset execution extends AnalysisSpec v2 with `datasetAccess` and `phenotype` sections. `datasetAccess` declares required tables, join keys, maximum bytes/cost boundary, PHI/PII risk, and row-level cache policy. `phenotype` records diagnosis-code cohort families, expected dictionary terms, external coding verification references, sensitivity analyses, and coding review status. This is the minimum contract for EHR/claims-style studies where the cohort definition itself is part of the method.
+
 Next work:
 
 - define `AnalysisSpecV2` with explicit model, estimand, backend, and artifact sections
@@ -50,6 +52,8 @@ Next work:
 ## 4. Study Archetype Library
 
 The researcher should know study shapes before it knows variables. Each archetype should declare required fields, compatible datasets, supported engines, expected artifacts, QA gates, and common failure modes.
+
+The current archetype set includes `ehr-diagnosis-cohort-outcome` for MIMIC/claims/user-table style diagnosis-code cohorts with binary or continuous hospital outcomes. Its gates cover phenotype evidence, required table presence, join-key availability, model artifact completeness, cost receipts, aggregate-only output policy, sparse cells, low events-per-predictor, and conservative clinical language.
 
 Initial archetypes:
 
@@ -89,6 +93,8 @@ Next work:
 - include codebook provenance and variable-level caveats
 - add cache manifests and source download receipts
 - make multi-cycle weight construction explicit and blocked until verified
+
+MIMIC is now a partial first-class adapter rather than a design-only placeholder. It exposes ICU stay/outcome, diagnosis, severity-score, first-day lab/vital, and admission identifiers; records de-identification and row-level cache risks; and supports bounded manifest-backed execution through `research dataset-spec` and `research dataset-run`. NHANES remains the stronger survey adapter for public-health survey inference.
 
 ## 6. QA / Benchmark Harness
 
@@ -153,6 +159,9 @@ agenteer research method-select --question "In NHANES adults, is BMI associated 
 agenteer research method-apply --spec ./analysis-spec-v2.json --selection ./method-selection.json --out ./analysis-spec-v2-method.json --json
 agenteer research method-validate --spec ./analysis-spec-v2-method.json --method binary-logistic-regression --json
 agenteer research dataset-adapter --dataset nhanes --data-root /path/to/nhanes --json
+agenteer research dataset-spec --study ./study.json --dataset-dir .loop-memory/datasets/mimiciv-3-1 --out ./analysis-spec-v2.json --json
+agenteer research dataset-run --analysis-spec ./analysis-spec-v2.json --dataset-dir .loop-memory/datasets/mimiciv-3-1 --out-dir ./dataset-run --max-usd 1 --json
+agenteer research dataset-run-index --run-root ./runs --out ./dataset-run-index.json --report ./dataset-run-index.md --json
 agenteer research machine-plan --question "In NHANES adults, is BMI associated with fasting glucose?" --json
 agenteer research execution-contract --spec ./analysis-spec-v2.json --backend r-survey --data-root /path/to/nhanes --json
 agenteer research machine-benchmark --packet ./paper --spec ./analysis-spec-v2.json --out ./machine-benchmark.json --json

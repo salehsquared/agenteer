@@ -1,3 +1,3 @@
 # Critique
 
-This paper resolves the prior manual-orchestration issue for the supported survey path: Agenteer starts from an AnalysisSpec, executes the analysis, runs QA, records provenance, creates task receipts, and emits lifecycle state. Backend used: {backend}. Remaining methods limits include domain analysis, replicate weights, and multiple-cycle weight construction.
+This report is suitable for local scientific review of the supported survey path. The main remaining methods limits are domain analysis, replicate weights, and multiple-cycle weight construction.

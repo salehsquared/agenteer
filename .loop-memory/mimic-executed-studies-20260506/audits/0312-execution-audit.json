@@ -1,0 +1,76 @@
+{
+  "tick": 312,
+  "runsAudited": [
+    {
+      "run": "0307-mimic-cardiology-heart-failure-icu",
+      "cohortRows": 22580,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.0093,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0308-mimic-pulmonary-copd-respiratory-failure",
+      "cohortRows": 25835,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.0095,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0309-mimic-pneumonia-respiratory-outcomes",
+      "cohortRows": 8173,
+      "qa": "review",
+      "issues": [
+        "NONFINITE_LOS_EFFECT_REVIEW"
+      ],
+      "mortality": "not_fit",
+      "los": "fit",
+      "costUsd": 0.0113,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0310-mimic-renal-aki-icu-mortality",
+      "cohortRows": 25658,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.0367,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0311-mimic-renal-ckd-fracture-interaction",
+      "cohortRows": 14584,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.0087,
+      "cacheRemoved": true
+    }
+  ],
+  "totalRuns": 5,
+  "reviewRuns": [
+    {
+      "run": "0309-mimic-pneumonia-respiratory-outcomes",
+      "cohortRows": 8173,
+      "qa": "review",
+      "issues": [
+        "NONFINITE_LOS_EFFECT_REVIEW"
+      ],
+      "mortality": "not_fit",
+      "los": "fit",
+      "costUsd": 0.0113,
+      "cacheRemoved": true
+    }
+  ],
+  "allCachesRemoved": true,
+  "estimatedCumulativeUsd": 0.1869330347701907,
+  "costCeilingUsd": 1.0,
+  "verdict": "continue; largest AKI run remained bounded"
+}
