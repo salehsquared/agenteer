@@ -1,0 +1,736 @@
+{
+  "study": {
+    "id": "mimic-trauma-lower-extremity-fracture-aki",
+    "title": "Lower-Extremity Fracture And Early AKI Signal",
+    "domain": "trauma-renal",
+    "question": "Among ICU admissions with lower-extremity fracture diagnoses, how common is early renal dysfunction and is it associated with mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-kdigo-stages",
+      "derived-first-day-lab"
+    ],
+    "outcomes": [
+      "aki_stage",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "phenotype + KDIGO stage",
+      "missingness audit",
+      "ordinal/binary AKI simplification"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "S72",
+        "expectedTerms": [
+          "femur",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "S72",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "S72",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S72&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 2466,
+            "sampleRows": [
+              {
+                "code": "S72.001A",
+                "name": "Fracture of unspecified part of neck of right femur, initial encounter for closed fracture"
+              },
+              {
+                "code": "S72.001B",
+                "name": "Fracture of unspecified part of neck of right femur, initial encounter for open fracture type I or II"
+              },
+              {
+                "code": "S72.001C",
+                "name": "Fracture of unspecified part of neck of right femur, initial encounter for open fracture type IIIA, IIIB, or IIIC"
+              },
+              {
+                "code": "S72.001D",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for closed fracture with routine healing"
+              },
+              {
+                "code": "S72.001E",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type I or II with routine healing"
+              },
+              {
+                "code": "S72.001F",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type IIIA, IIIB, or IIIC with routine healing"
+              },
+              {
+                "code": "S72.001G",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for closed fracture with delayed healing"
+              },
+              {
+                "code": "S72.001H",
+                "name": "Fracture of unspecified part of neck of right femur, subsequent encounter for open fracture type I or II with delayed healing"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:29.147809+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "S82",
+        "expectedTerms": [
+          "lower leg",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "S82",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "S82",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=S82&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 3096,
+            "sampleRows": [
+              {
+                "code": "S82.001A",
+                "name": "Unspecified fracture of right patella, initial encounter for closed fracture"
+              },
+              {
+                "code": "S82.001B",
+                "name": "Unspecified fracture of right patella, initial encounter for open fracture type I or II"
+              },
+              {
+                "code": "S82.001C",
+                "name": "Unspecified fracture of right patella, initial encounter for open fracture type IIIA, IIIB, or IIIC"
+              },
+              {
+                "code": "S82.001D",
+                "name": "Unspecified fracture of right patella, subsequent encounter for closed fracture with routine healing"
+              },
+              {
+                "code": "S82.001E",
+                "name": "Unspecified fracture of right patella, subsequent encounter for open fracture type I or II with routine healing"
+              },
+              {
+                "code": "S82.001F",
+                "name": "Unspecified fracture of right patella, subsequent encounter for open fracture type IIIA, IIIB, or IIIC with routine healing"
+              },
+              {
+                "code": "S82.001G",
+                "name": "Unspecified fracture of right patella, subsequent encounter for closed fracture with delayed healing"
+              },
+              {
+                "code": "S82.001H",
+                "name": "Unspecified fracture of right patella, subsequent encounter for open fracture type I or II with delayed healing"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:37.863523+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "820",
+        "expectedTerms": [
+          "femur",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "820",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "820",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=820&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 18,
+            "sampleRows": [
+              {
+                "code": "820.00",
+                "name": "Closed fracture of intracapsular section of neck of femur, unspecified"
+              },
+              {
+                "code": "820.01",
+                "name": "Closed fracture of epiphysis (separation) (upper) of neck of femur"
+              },
+              {
+                "code": "820.02",
+                "name": "Closed fracture of midcervical section of neck of femur"
+              },
+              {
+                "code": "820.03",
+                "name": "Closed fracture of base of neck of femur"
+              },
+              {
+                "code": "820.09",
+                "name": "Other closed transcervical fracture of neck of femur"
+              },
+              {
+                "code": "820.10",
+                "name": "Open fracture of intracapsular section of neck of femur, unspecified"
+              },
+              {
+                "code": "820.11",
+                "name": "Open fracture of epiphysis (separation) (upper) of neck of femur"
+              },
+              {
+                "code": "820.12",
+                "name": "Open fracture of midcervical section of neck of femur"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:30.119940+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "821",
+        "expectedTerms": [
+          "femur",
+          "fracture"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "821",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "821",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=821&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 14,
+            "sampleRows": [
+              {
+                "code": "821.00",
+                "name": "Closed fracture of unspecified part of femur"
+              },
+              {
+                "code": "821.01",
+                "name": "Closed fracture of shaft of femur"
+              },
+              {
+                "code": "821.10",
+                "name": "Open fracture of unspecified part of femur"
+              },
+              {
+                "code": "821.11",
+                "name": "Open fracture of shaft of femur"
+              },
+              {
+                "code": "821.20",
+                "name": "Closed fracture of lower end of femur, unspecified part"
+              },
+              {
+                "code": "821.21",
+                "name": "Closed fracture of condyle, femoral"
+              },
+              {
+                "code": "821.22",
+                "name": "Closed fracture of epiphysis, lower (separation) of femur"
+              },
+              {
+                "code": "821.23",
+                "name": "Closed supracondylar fracture of femur"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:30.617748+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "823",
+        "expectedTerms": [
+          "tibia",
+          "fibula"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "823",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "823",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=823&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 21,
+            "sampleRows": [
+              {
+                "code": "823.00",
+                "name": "Closed fracture of upper end of tibia alone"
+              },
+              {
+                "code": "823.01",
+                "name": "Closed fracture of upper end of fibula alone"
+              },
+              {
+                "code": "823.02",
+                "name": "Closed fracture of upper end of fibula with tibia"
+              },
+              {
+                "code": "823.10",
+                "name": "Open fracture of upper end of tibia alone"
+              },
+              {
+                "code": "823.11",
+                "name": "Open fracture of upper end of fibula alone"
+              },
+              {
+                "code": "823.12",
+                "name": "Open fracture of upper end of fibula with tibia"
+              },
+              {
+                "code": "823.20",
+                "name": "Closed fracture of shaft of tibia alone"
+              },
+              {
+                "code": "823.21",
+                "name": "Closed fracture of shaft of fibula alone"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:38.337567+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 6059,
+    "matchedDiagnosisRows": 9918,
+    "matchedAdmissions": 8626,
+    "firstIcuStayRows": 1181,
+    "uniquePatients": 1168
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 1181,
+        "missing": 0,
+        "mean": 65.66977138018628,
+        "sd": 21.691270032565054,
+        "median": 70.0,
+        "iqr": [
+          52.0,
+          85.0
+        ],
+        "min": 18.0,
+        "max": 100.0
+      },
+      "los_icu": {
+        "n": 1181,
+        "missing": 0,
+        "mean": 3.8602963590177817,
+        "sd": 5.003103273941487,
+        "median": 2.13,
+        "iqr": [
+          1.08,
+          4.42
+        ],
+        "min": 0.04,
+        "max": 47.0
+      },
+      "los_hospital": {
+        "n": 1181,
+        "missing": 0,
+        "mean": 12.626587637595259,
+        "sd": 11.071812015745957,
+        "median": 9.0,
+        "iqr": [
+          6.0,
+          16.0
+        ],
+        "min": 0.0,
+        "max": 94.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 1181,
+        "positive": 156,
+        "proportion": 0.13209144792548688
+      },
+      "male": {
+        "n": 1181,
+        "positive": 572,
+        "proportion": 0.48433530906011857
+      },
+      "prolonged_icu_los": {
+        "n": 1181,
+        "positive": 292,
+        "proportion": 0.2472480948348857
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max",
+    "aki_stage",
+    "aki_stage_smoothed"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 15,
+      "missingFraction": 0.012701100762066046
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 12,
+      "missingFraction": 0.010160880609652836
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 11,
+      "missingFraction": 0.009314140558848433
+    },
+    {
+      "column": "wbc_max",
+      "missing": 11,
+      "missingFraction": 0.009314140558848433
+    },
+    {
+      "column": "bun_max",
+      "missing": 11,
+      "missingFraction": 0.009314140558848433
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "aki_stage",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "aki_stage_smoothed",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 1164,
+      "events": 153,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "aki_stage",
+        "aki_stage_smoothed"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 65.74484536082474,
+          "sd": 21.689143205625317
+        },
+        "hemoglobin_min": {
+          "mean": 9.285223367697595,
+          "sd": 2.0359253732571827
+        },
+        "wbc_max": {
+          "mean": 14.73015463917526,
+          "sd": 7.2340857192009524
+        },
+        "creatinine_max": {
+          "mean": 1.5038659793814433,
+          "sd": 1.4646574680757312
+        },
+        "bun_max": {
+          "mean": 27.572164948453608,
+          "sd": 21.073693285832857
+        },
+        "glucose_max": {
+          "mean": 169.78780068728523,
+          "sd": 103.8233857637302
+        },
+        "aki_stage": {
+          "mean": 1.4639175257731958,
+          "sd": 1.03982790761596
+        },
+        "aki_stage_smoothed": {
+          "mean": 1.5790378006872852,
+          "sd": 1.0266142511098884
+        }
+      },
+      "metrics": {
+        "auroc": 0.7257358597906687,
+        "averagePrecision": 0.32567998009276633
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.6271383968180748,
+          "ci95": [
+            1.2707347312942838,
+            2.0835027934611112
+          ],
+          "pValue": 0.00011365629859338545,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.129364265775841,
+          "ci95": [
+            0.7755155442801462,
+            1.6446654799102998
+          ],
+          "pValue": 0.5258552971982657,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 0.9635939518853125,
+          "ci95": [
+            0.7940351651648263,
+            1.1693604324403095
+          ],
+          "pValue": 0.7072475017746664,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.173072305773213,
+          "ci95": [
+            0.9937266329964259,
+            1.3847859047741071
+          ],
+          "pValue": 0.05934552860322733,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 1.0125542813616608,
+          "ci95": [
+            0.8171487264726452,
+            1.2546873530961211
+          ],
+          "pValue": 0.9092008515438326,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.5005832669510302,
+          "ci95": [
+            1.2053252470211424,
+            1.8681680705008321
+          ],
+          "pValue": 0.000282870996525556,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.1217757989725132,
+          "ci95": [
+            0.9733671491846557,
+            1.292812218097259
+          ],
+          "pValue": 0.11248227714928107,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage",
+          "oddsRatio": 1.7130418566365986,
+          "ci95": [
+            0.9755701400562701,
+            3.007997356724863
+          ],
+          "pValue": 0.06094956313241716,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage_smoothed",
+          "oddsRatio": 0.7263581545357526,
+          "ci95": [
+            0.4098743592654718,
+            1.2872143785868417
+          ],
+          "pValue": 0.2734605302026435,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 1164,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "aki_stage",
+        "aki_stage_smoothed"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 65.74484536082474,
+          "sd": 21.689143205625317
+        },
+        "hemoglobin_min": {
+          "mean": 9.285223367697595,
+          "sd": 2.0359253732571827
+        },
+        "wbc_max": {
+          "mean": 14.73015463917526,
+          "sd": 7.2340857192009524
+        },
+        "creatinine_max": {
+          "mean": 1.5038659793814433,
+          "sd": 1.4646574680757312
+        },
+        "bun_max": {
+          "mean": 27.572164948453608,
+          "sd": 21.073693285832857
+        },
+        "glucose_max": {
+          "mean": 169.78780068728523,
+          "sd": 103.8233857637302
+        },
+        "aki_stage": {
+          "mean": 1.4639175257731958,
+          "sd": 1.03982790761596
+        },
+        "aki_stage_smoothed": {
+          "mean": 1.5790378006872852,
+          "sd": 1.0266142511098884
+        }
+      },
+      "rSquared": 0.30599538598561526,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -13.735328516697276,
+          "ci95PercentChange": [
+            -17.097700601596554,
+            -10.236584508228308
+          ],
+          "pValue": 3.2453424325238736e-13,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 8.189513520057234,
+          "ci95PercentChange": [
+            0.6958271977326236,
+            16.24087274959305
+          ],
+          "pValue": 0.03161042990358551,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -4.869464235902554,
+          "ci95PercentChange": [
+            -8.301417429688973,
+            -1.3090651883832405
+          ],
+          "pValue": 0.007747931934035204,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 6.528861479982417,
+          "ci95PercentChange": [
+            2.785908690501282,
+            10.408114038203964
+          ],
+          "pValue": 0.0005288877253158857,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -7.786769721233478,
+          "ci95PercentChange": [
+            -12.311019967355719,
+            -3.029094017523315
+          ],
+          "pValue": 0.0015867309607872908,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 1.265199981478693,
+          "ci95PercentChange": [
+            -4.16141425719908,
+            6.999082340477569
+          ],
+          "pValue": 0.6545828786831914,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 1.7770047903927555,
+          "ci95PercentChange": [
+            -0.9235824056551989,
+            4.551203562035999
+          ],
+          "pValue": 0.19923911809457473,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage",
+          "percentChangeInLos": 33.35837423616594,
+          "ci95PercentChange": [
+            23.72947872101454,
+            43.73661121626249
+          ],
+          "pValue": 5.127390890276215e-14,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage_smoothed",
+          "percentChangeInLos": 8.900520988132365,
+          "ci95PercentChange": [
+            1.0622740226690741,
+            17.34669129675943
+          ],
+          "pValue": 0.025272020929783243,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

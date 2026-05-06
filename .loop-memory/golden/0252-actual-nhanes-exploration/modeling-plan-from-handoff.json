@@ -1,0 +1,1811 @@
+{
+  "schemaVersion": 1,
+  "modelingPlan": {
+    "schemaVersion": 1,
+    "decisionId": "modeling_3f8a125d93fb443a",
+    "request": {
+      "question": "Is RIDAGEYR associated with LBXGH in this dataset?",
+      "goal": "associate",
+      "dataStructures": [],
+      "surveyDesign": true,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "rowCount": 31849,
+      "featureCount": 21,
+      "classCount": 5,
+      "target": "LBXGH",
+      "tableSummary": {
+        "rowCount": 31849,
+        "columnCount": 22,
+        "columns": [
+          {
+            "name": "BMXBMI",
+            "inferredType": "number",
+            "nonMissingRows": 29719,
+            "missingFraction": 0.06687808094445666,
+            "sampleValues": [
+              "20.1",
+              "23.2",
+              "23.3",
+              "28.5",
+              "33.3"
+            ]
+          },
+          {
+            "name": "BMXWAIST",
+            "inferredType": "number",
+            "nonMissingRows": 28356,
+            "missingFraction": 0.10967377311689536,
+            "sampleValues": [
+              "112.5",
+              "116.5",
+              "120.4",
+              "69.6",
+              "80.1"
+            ]
+          },
+          {
+            "name": "DIQ010",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "2"
+            ]
+          },
+          {
+            "name": "elevated_hba1c",
+            "inferredType": "string",
+            "nonMissingRows": 28712,
+            "missingFraction": 0.09849602813275142,
+            "sampleValues": [
+              "False"
+            ]
+          },
+          {
+            "name": "high_waist_cm",
+            "inferredType": "string",
+            "nonMissingRows": 28356,
+            "missingFraction": 0.10967377311689536,
+            "sampleValues": [
+              "False",
+              "True"
+            ]
+          },
+          {
+            "name": "INDFMPIR",
+            "inferredType": "number",
+            "nonMissingRows": 28067,
+            "missingFraction": 0.11874784137649534,
+            "sampleValues": [
+              "0.05",
+              "0.33",
+              "1.67",
+              "2.02",
+              "3.15"
+            ]
+          },
+          {
+            "name": "LBDHDD",
+            "inferredType": "number",
+            "nonMissingRows": 28270,
+            "missingFraction": 0.11237401488272787,
+            "sampleValues": [
+              "28",
+              "41",
+              "43",
+              "47",
+              "54"
+            ]
+          },
+          {
+            "name": "LBXGH",
+            "inferredType": "number",
+            "nonMissingRows": 28712,
+            "missingFraction": 0.09849602813275142,
+            "sampleValues": [
+              "4.9",
+              "5",
+              "5.1",
+              "5.4",
+              "5.6"
+            ]
+          },
+          {
+            "name": "LBXGLU",
+            "inferredType": "number",
+            "nonMissingRows": 13936,
+            "missingFraction": 0.5624352412948601,
+            "sampleValues": [
+              "104",
+              "105",
+              "107",
+              "82",
+              "83"
+            ]
+          },
+          {
+            "name": "LBXTC",
+            "inferredType": "number",
+            "nonMissingRows": 28270,
+            "missingFraction": 0.11237401488272787,
+            "sampleValues": [
+              "132",
+              "168",
+              "169",
+              "171",
+              "190"
+            ]
+          },
+          {
+            "name": "LBXTR",
+            "inferredType": "number",
+            "nonMissingRows": 13573,
+            "missingFraction": 0.5738327733994788,
+            "sampleValues": [
+              "100",
+              "126",
+              "141",
+              "40",
+              "56"
+            ]
+          },
+          {
+            "name": "low_hdl",
+            "inferredType": "string",
+            "nonMissingRows": 28270,
+            "missingFraction": 0.11237401488272787,
+            "sampleValues": [
+              "False",
+              "True"
+            ]
+          },
+          {
+            "name": "nhanes_cycle_id",
+            "inferredType": "string",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "2011-2012"
+            ]
+          },
+          {
+            "name": "RIAGENDR",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "1",
+              "2"
+            ]
+          },
+          {
+            "name": "RIDAGEYR",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "21",
+              "22",
+              "34",
+              "43",
+              "44"
+            ]
+          },
+          {
+            "name": "RIDRETH3",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "3",
+              "4",
+              "6"
+            ]
+          },
+          {
+            "name": "SDMVPSU",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "name": "SDMVSTRA",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "90",
+              "91",
+              "92",
+              "94",
+              "95"
+            ]
+          },
+          {
+            "name": "SEQN",
+            "inferredType": "number",
+            "nonMissingRows": 31849,
+            "missingFraction": 0,
+            "sampleValues": [
+              "62161",
+              "62164",
+              "62169",
+              "62172",
+              "62174"
+            ]
+          },
+          {
+            "name": "WTMEC2YR",
+            "inferredType": "number",
+            "nonMissingRows": 22617,
+            "missingFraction": 0.2898678137461145,
+            "sampleValues": [
+              "104236.582554",
+              "127965.226204",
+              "13189.875012",
+              "14783.600953",
+              "27122.911908"
+            ]
+          },
+          {
+            "name": "WTMECPRP",
+            "inferredType": "number",
+            "nonMissingRows": 9232,
+            "missingFraction": 0.7101321862538855,
+            "sampleValues": [
+              "13794.793542",
+              "22163.59685",
+              "31816.3465",
+              "5.397605346934028e-79",
+              "7801.600218"
+            ]
+          },
+          {
+            "name": "WTSAF2YR",
+            "inferredType": "number",
+            "nonMissingRows": 10434,
+            "missingFraction": 0.6723915978523658,
+            "sampleValues": [
+              "17583.539",
+              "240011.713",
+              "26860.795",
+              "288182.78",
+              "30061.013"
+            ]
+          }
+        ]
+      },
+      "priorRuns": [],
+      "explorationHandoff": {
+        "path": ".loop-memory/golden/0252-actual-nhanes-exploration/exploration/handoff-question-01.json",
+        "status": "needs_methods_review",
+        "clearanceLevel": "hold_for_methods_review",
+        "sourceExplorationSha256": "59025ff8636a31caeb2f8ded15e7d77597407704c33815b23dc8474dc18e8b5f",
+        "questionId": "question_01_929694bdfd",
+        "blockers": [
+          "12 candidate questions need methods review",
+          "no candidate questions are currently promotable",
+          "possible target leakage/proxy pairs detected",
+          "survey/design candidate variables detected",
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ],
+        "methodsReviewNote": "Actual NHANES exploration reviewed: age and HbA1c require survey-aware, adjusted planning before modeling; handoff is hypothesis-generation only."
+      },
+      "highMissingness": true,
+      "smallSample": false,
+      "requiresInference": true,
+      "requiresPrediction": false,
+      "maxCandidates": 12
+    },
+    "inferredGoal": "associate",
+    "inferredOutcomeType": "continuous",
+    "inferredStudyDesign": "cross_sectional",
+    "inferredDataStructures": [
+      "complex_survey"
+    ],
+    "dataEvidence": {
+      "source": "table-summary",
+      "rowCount": 31849,
+      "featureCount": 21,
+      "target": "LBXGH",
+      "targetClassCount": 5,
+      "maxMissingFraction": 0.7101321862538855,
+      "highMissingness": true,
+      "smallSample": false,
+      "highDimensional": false,
+      "warnings": [
+        {
+          "severity": "warning",
+          "code": "TABLE_HIGH_MISSINGNESS",
+          "message": "At least one column has 71.0% missingness.",
+          "evidenceRefs": [
+            "tableSummary.columns"
+          ]
+        }
+      ]
+    },
+    "backendEvidence": {
+      "source": "not-supplied",
+      "available": [],
+      "missing": [],
+      "notChecked": [],
+      "warnings": []
+    },
+    "priorRunEvidence": {
+      "source": "none",
+      "runs": [],
+      "warnings": [],
+      "recommendedAction": "No prior run evidence supplied."
+    },
+    "methodSelectionEvidence": {
+      "selectionId": "method_selection_3fc4064cb326",
+      "selectionHash": "ae7b9a14d992e0b0a4fc8f94daf683d3a7f1ecfceaf07e42d44d579c0a10b12f",
+      "primaryMethodId": "multiple-linear-regression",
+      "candidateMethodIds": [
+        "multiple-linear-regression",
+        "binary-logistic-regression",
+        "effect-size-suite",
+        "interaction-regression",
+        "model-diagnostics-linear-logistic",
+        "survey-weighted-descriptive-summary",
+        "table-one-descriptive-summary",
+        "epidemiologic-2x2-measures",
+        "gamma-glm",
+        "pearson-correlation",
+        "spearman-correlation"
+      ],
+      "recommendedBackend": "r-survey",
+      "recommendedArchetype": "continuous-biomarker-model",
+      "stopForHumanReview": true,
+      "issueCodes": [
+        "HUMAN_REVIEW_GATE"
+      ],
+      "applyCommandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+    },
+    "routeRecommendation": {
+      "route": "paper-run",
+      "commandHint": "agenteer research paper-run --analysis-spec <analysis-spec.json> --data-root <dir> --out-dir <paper-dir> --backend r-survey --json",
+      "reason": "Complex survey inference should use the R survey backend when available.",
+      "requiredArtifacts": [
+        "analysis-spec.json",
+        "paper.md",
+        "analysis.json",
+        "runner-record.json",
+        "lifecycle-summary.md"
+      ]
+    },
+    "primary": {
+      "id": "method:multiple-linear-regression",
+      "rank": 2,
+      "tier": "primary",
+      "source": "statistical-method",
+      "label": "Multiple linear regression",
+      "family": "linear",
+      "backend": "r-survey",
+      "taskType": null,
+      "score": 0.7999999999999999,
+      "compatible": true,
+      "reasons": [
+        "supports outcome type continuous",
+        "supports study design cross_sectional",
+        "supports data structure complex_survey",
+        "matches goal associate",
+        "compatible with survey backend"
+      ],
+      "cautions": [
+        {
+          "severity": "note",
+          "code": "HUMAN_REVIEW_GATE",
+          "message": "causal interpretation requested without causal design",
+          "evidenceRefs": []
+        }
+      ],
+      "requiredBeforeExecution": [
+        "continuous outcome",
+        "exposure",
+        "covariates",
+        "residual plots",
+        "influence",
+        "VIF",
+        "heteroscedasticity",
+        "provide continuous outcome",
+        "provide exposure",
+        "provide covariates",
+        "confirm assumption: Linearity",
+        "confirm assumption: model residual policy"
+      ],
+      "expectedMetrics": [
+        "beta coefficient",
+        "mean difference",
+        "standardized beta"
+      ],
+      "expectedArtifacts": [
+        "analysis.json",
+        "method-report.md",
+        "diagnostics.json"
+      ],
+      "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+    },
+    "blockingPolicies": [
+      {
+        "id": "policy:complex-survey-design",
+        "rank": 1,
+        "tier": "primary",
+        "source": "workflow-policy",
+        "label": "Complex survey design policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.9199999999999999,
+        "compatible": true,
+        "reasons": [
+          "Survey data require weight, strata, PSU, domain eligibility, and cross-sectional limitations before inference."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "survey weight variable",
+          "strata variable",
+          "PSU variable",
+          "weight-domain rationale"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "policy:missing-data-sensitivity",
+        "rank": 9,
+        "tier": "sensitivity",
+        "source": "workflow-policy",
+        "label": "Missing-data sensitivity policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.98,
+        "compatible": true,
+        "reasons": [
+          "High missingness was declared; complete-case results need missingness diagnostics and sensitivity analysis before interpretation."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "missingness-summary.json",
+          "complete-case flow counts",
+          "imputation or inverse-probability sensitivity plan"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      }
+    ],
+    "executableCandidates": [
+      {
+        "id": "method:multiple-linear-regression",
+        "rank": 2,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Multiple linear regression",
+        "family": "linear",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.7999999999999999,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "matches goal associate",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation requested without causal design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "exposure",
+          "covariates",
+          "residual plots",
+          "influence",
+          "VIF",
+          "heteroscedasticity",
+          "provide continuous outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Linearity",
+          "confirm assumption: model residual policy"
+        ],
+        "expectedMetrics": [
+          "beta coefficient",
+          "mean difference",
+          "standardized beta"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:binary-logistic-regression",
+        "rank": 3,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Binary logistic regression",
+        "family": "logistic",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.62,
+        "compatible": true,
+        "reasons": [
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "matches goal associate",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic or causal language is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "binary outcome",
+          "exposure",
+          "covariates",
+          "event count",
+          "separation",
+          "calibration if predictive",
+          "influence",
+          "provide binary outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Outcome threshold is justified",
+          "confirm assumption: adequate events per parameter"
+        ],
+        "expectedMetrics": [
+          "odds ratio",
+          "marginal risk difference"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:gamma-glm",
+        "rank": 4,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Gamma GLM",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.41,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "matches goal associate"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "many zero costs require two-part model",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "SURVEY_SUPPORT_NOT_EXPLICIT",
+            "message": "gamma-glm does not explicitly support complex survey design.",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "positive continuous outcome",
+          "link function",
+          "covariates",
+          "zero values",
+          "skewness",
+          "deviance residuals",
+          "provide positive continuous outcome",
+          "provide link function",
+          "provide covariates",
+          "confirm assumption: Outcome is strictly positive",
+          "confirm assumption: link and variance family are justified",
+          "produce diagnostic: zero values"
+        ],
+        "expectedMetrics": [
+          "mean ratio",
+          "marginal mean"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:pearson-correlation",
+        "rank": 5,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Pearson correlation",
+        "family": "correlation",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.41,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "matches goal associate"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation is requested",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "SURVEY_SUPPORT_NOT_EXPLICIT",
+            "message": "pearson-correlation does not explicitly support complex survey design.",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "two continuous variables",
+          "scatterplot",
+          "outlier influence",
+          "linearity",
+          "provide two continuous variables",
+          "confirm assumption: Approximate linear relationship",
+          "confirm assumption: outliers assessed",
+          "produce diagnostic: scatterplot",
+          "produce diagnostic: outlier influence",
+          "produce diagnostic: linearity",
+          "verify survey weight/strata/PSU and domain/subsample eligibility"
+        ],
+        "expectedMetrics": [
+          "Pearson r",
+          "r-squared"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:spearman-correlation",
+        "rank": 6,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Spearman rank correlation",
+        "family": "correlation",
+        "backend": "python-scipy",
+        "taskType": null,
+        "score": 0.41,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "matches goal associate"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "partial correlation is needed for confounding control",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "SURVEY_SUPPORT_NOT_EXPLICIT",
+            "message": "spearman-correlation does not explicitly support complex survey design.",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "two rankable variables",
+          "scatterplot",
+          "tie frequency",
+          "provide two rankable variables",
+          "confirm assumption: Monotonic association",
+          "confirm assumption: ties handled",
+          "produce diagnostic: scatterplot",
+          "produce diagnostic: tie frequency",
+          "verify survey weight/strata/PSU and domain/subsample eligibility"
+        ],
+        "expectedMetrics": [
+          "Spearman rho"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 7,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:table-one-descriptive-summary",
+        "rank": 8,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Table 1 descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "baseline table is used to imply causal balance outside randomized data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "analysis population",
+          "variable roles",
+          "mean/SD or median/IQR",
+          "counts/percentages",
+          "missingness by variable",
+          "distribution checks",
+          "provide analysis population",
+          "provide variable roles",
+          "confirm assumption: Variables are correctly typed and units are known.",
+          "produce diagnostic: mean/SD or median/IQR",
+          "produce diagnostic: counts/percentages",
+          "produce diagnostic: missingness by variable"
+        ],
+        "expectedMetrics": [
+          "mean",
+          "median",
+          "standard deviation",
+          "interquartile range",
+          "count",
+          "percentage"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:model-diagnostics-linear-logistic",
+        "rank": 10,
+        "tier": "sensitivity",
+        "source": "statistical-method",
+        "label": "Regression model diagnostics",
+        "family": "diagnostics",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic failure changes interpretation",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "fitted model",
+          "design matrix",
+          "residuals or influence metrics",
+          "residuals",
+          "VIF",
+          "influence",
+          "overdispersion",
+          "proportional hazards",
+          "calibration",
+          "provide fitted model",
+          "provide design matrix",
+          "provide residuals or influence metrics"
+        ],
+        "expectedMetrics": [
+          "diagnostic status",
+          "assumption violation flags"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:effect-size-suite",
+        "rank": 11,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Effect size estimation suite",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "primary effect estimate",
+          "uncertainty interval",
+          "scale interpretation",
+          "absolute vs relative effect",
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect",
+          "verify survey weight/strata/PSU and domain/subsample eligibility"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "standardized mean difference",
+          "odds ratio",
+          "risk ratio",
+          "hazard ratio",
+          "NNT"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:interaction-regression",
+        "rank": 12,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Interaction/effect-modification regression",
+        "family": "linear",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical subgroup conclusion requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "exposure",
+          "moderator",
+          "interaction term",
+          "cell counts by subgroup",
+          "interaction contrast",
+          "multiplicity review",
+          "provide outcome",
+          "provide exposure",
+          "provide moderator",
+          "provide interaction term",
+          "confirm assumption: Interaction scale is prespecified"
+        ],
+        "expectedMetrics": [
+          "interaction coefficient",
+          "stratum-specific effects"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      }
+    ],
+    "baselines": [
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 7,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:table-one-descriptive-summary",
+        "rank": 8,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Table 1 descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "baseline table is used to imply causal balance outside randomized data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "analysis population",
+          "variable roles",
+          "mean/SD or median/IQR",
+          "counts/percentages",
+          "missingness by variable",
+          "distribution checks",
+          "provide analysis population",
+          "provide variable roles",
+          "confirm assumption: Variables are correctly typed and units are known.",
+          "produce diagnostic: mean/SD or median/IQR",
+          "produce diagnostic: counts/percentages",
+          "produce diagnostic: missingness by variable"
+        ],
+        "expectedMetrics": [
+          "mean",
+          "median",
+          "standard deviation",
+          "interquartile range",
+          "count",
+          "percentage"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      }
+    ],
+    "sensitivityAnalyses": [
+      {
+        "id": "policy:missing-data-sensitivity",
+        "rank": 9,
+        "tier": "sensitivity",
+        "source": "workflow-policy",
+        "label": "Missing-data sensitivity policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.98,
+        "compatible": true,
+        "reasons": [
+          "High missingness was declared; complete-case results need missingness diagnostics and sensitivity analysis before interpretation."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "missingness-summary.json",
+          "complete-case flow counts",
+          "imputation or inverse-probability sensitivity plan"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:model-diagnostics-linear-logistic",
+        "rank": 10,
+        "tier": "sensitivity",
+        "source": "statistical-method",
+        "label": "Regression model diagnostics",
+        "family": "diagnostics",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic failure changes interpretation",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "fitted model",
+          "design matrix",
+          "residuals or influence metrics",
+          "residuals",
+          "VIF",
+          "influence",
+          "overdispersion",
+          "proportional hazards",
+          "calibration",
+          "provide fitted model",
+          "provide design matrix",
+          "provide residuals or influence metrics"
+        ],
+        "expectedMetrics": [
+          "diagnostic status",
+          "assumption violation flags"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      }
+    ],
+    "candidates": [
+      {
+        "id": "policy:complex-survey-design",
+        "rank": 1,
+        "tier": "primary",
+        "source": "workflow-policy",
+        "label": "Complex survey design policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.9199999999999999,
+        "compatible": true,
+        "reasons": [
+          "Survey data require weight, strata, PSU, domain eligibility, and cross-sectional limitations before inference."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "survey weight variable",
+          "strata variable",
+          "PSU variable",
+          "weight-domain rationale"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:multiple-linear-regression",
+        "rank": 2,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Multiple linear regression",
+        "family": "linear",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.7999999999999999,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "matches goal associate",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation requested without causal design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "continuous outcome",
+          "exposure",
+          "covariates",
+          "residual plots",
+          "influence",
+          "VIF",
+          "heteroscedasticity",
+          "provide continuous outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Linearity",
+          "confirm assumption: model residual policy"
+        ],
+        "expectedMetrics": [
+          "beta coefficient",
+          "mean difference",
+          "standardized beta"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:binary-logistic-regression",
+        "rank": 3,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Binary logistic regression",
+        "family": "logistic",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.62,
+        "compatible": true,
+        "reasons": [
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "matches goal associate",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic or causal language is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "binary outcome",
+          "exposure",
+          "covariates",
+          "event count",
+          "separation",
+          "calibration if predictive",
+          "influence",
+          "provide binary outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Outcome threshold is justified",
+          "confirm assumption: adequate events per parameter"
+        ],
+        "expectedMetrics": [
+          "odds ratio",
+          "marginal risk difference"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:gamma-glm",
+        "rank": 4,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Gamma GLM",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.41,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "matches goal associate"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "many zero costs require two-part model",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "SURVEY_SUPPORT_NOT_EXPLICIT",
+            "message": "gamma-glm does not explicitly support complex survey design.",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "positive continuous outcome",
+          "link function",
+          "covariates",
+          "zero values",
+          "skewness",
+          "deviance residuals",
+          "provide positive continuous outcome",
+          "provide link function",
+          "provide covariates",
+          "confirm assumption: Outcome is strictly positive",
+          "confirm assumption: link and variance family are justified",
+          "produce diagnostic: zero values"
+        ],
+        "expectedMetrics": [
+          "mean ratio",
+          "marginal mean"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:pearson-correlation",
+        "rank": 5,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Pearson correlation",
+        "family": "correlation",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.41,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "matches goal associate"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal interpretation is requested",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "SURVEY_SUPPORT_NOT_EXPLICIT",
+            "message": "pearson-correlation does not explicitly support complex survey design.",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "two continuous variables",
+          "scatterplot",
+          "outlier influence",
+          "linearity",
+          "provide two continuous variables",
+          "confirm assumption: Approximate linear relationship",
+          "confirm assumption: outliers assessed",
+          "produce diagnostic: scatterplot",
+          "produce diagnostic: outlier influence",
+          "produce diagnostic: linearity",
+          "verify survey weight/strata/PSU and domain/subsample eligibility"
+        ],
+        "expectedMetrics": [
+          "Pearson r",
+          "r-squared"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:spearman-correlation",
+        "rank": 6,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Spearman rank correlation",
+        "family": "correlation",
+        "backend": "python-scipy",
+        "taskType": null,
+        "score": 0.41,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "matches goal associate"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "partial correlation is needed for confounding control",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "SURVEY_SUPPORT_NOT_EXPLICIT",
+            "message": "spearman-correlation does not explicitly support complex survey design.",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "two rankable variables",
+          "scatterplot",
+          "tie frequency",
+          "provide two rankable variables",
+          "confirm assumption: Monotonic association",
+          "confirm assumption: ties handled",
+          "produce diagnostic: scatterplot",
+          "produce diagnostic: tie frequency",
+          "verify survey weight/strata/PSU and domain/subsample eligibility"
+        ],
+        "expectedMetrics": [
+          "Spearman rho"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:survey-weighted-descriptive-summary",
+        "rank": 7,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Survey-weighted descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "multi-cycle weight construction is requested without evidence",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "weight",
+          "strata",
+          "psu",
+          "analysis population",
+          "unweighted N",
+          "weighted estimate",
+          "standard error",
+          "design degrees of freedom",
+          "provide weight",
+          "provide strata",
+          "provide psu",
+          "provide analysis population"
+        ],
+        "expectedMetrics": [
+          "weighted mean",
+          "weighted proportion",
+          "standard error",
+          "confidence interval"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:table-one-descriptive-summary",
+        "rank": 8,
+        "tier": "baseline",
+        "source": "statistical-method",
+        "label": "Table 1 descriptive summary",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "baseline table is used to imply causal balance outside randomized data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "analysis population",
+          "variable roles",
+          "mean/SD or median/IQR",
+          "counts/percentages",
+          "missingness by variable",
+          "distribution checks",
+          "provide analysis population",
+          "provide variable roles",
+          "confirm assumption: Variables are correctly typed and units are known.",
+          "produce diagnostic: mean/SD or median/IQR",
+          "produce diagnostic: counts/percentages",
+          "produce diagnostic: missingness by variable"
+        ],
+        "expectedMetrics": [
+          "mean",
+          "median",
+          "standard deviation",
+          "interquartile range",
+          "count",
+          "percentage"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "policy:missing-data-sensitivity",
+        "rank": 9,
+        "tier": "sensitivity",
+        "source": "workflow-policy",
+        "label": "Missing-data sensitivity policy",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.98,
+        "compatible": true,
+        "reasons": [
+          "High missingness was declared; complete-case results need missingness diagnostics and sensitivity analysis before interpretation."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "missingness-summary.json",
+          "complete-case flow counts",
+          "imputation or inverse-probability sensitivity plan"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:model-diagnostics-linear-logistic",
+        "rank": 10,
+        "tier": "sensitivity",
+        "source": "statistical-method",
+        "label": "Regression model diagnostics",
+        "family": "diagnostics",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic failure changes interpretation",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "fitted model",
+          "design matrix",
+          "residuals or influence metrics",
+          "residuals",
+          "VIF",
+          "influence",
+          "overdispersion",
+          "proportional hazards",
+          "calibration",
+          "provide fitted model",
+          "provide design matrix",
+          "provide residuals or influence metrics"
+        ],
+        "expectedMetrics": [
+          "diagnostic status",
+          "assumption violation flags"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:effect-size-suite",
+        "rank": 11,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Effect size estimation suite",
+        "family": "descriptive",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "primary effect estimate",
+          "uncertainty interval",
+          "scale interpretation",
+          "absolute vs relative effect",
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect",
+          "verify survey weight/strata/PSU and domain/subsample eligibility"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "standardized mean difference",
+          "odds ratio",
+          "risk ratio",
+          "hazard ratio",
+          "NNT"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      },
+      {
+        "id": "method:interaction-regression",
+        "rank": 12,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Interaction/effect-modification regression",
+        "family": "linear",
+        "backend": "r-survey",
+        "taskType": null,
+        "score": 0.58,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type continuous",
+          "supports study design cross_sectional",
+          "supports data structure complex_survey",
+          "compatible with survey backend"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "clinical subgroup conclusion requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "exposure",
+          "moderator",
+          "interaction term",
+          "cell counts by subgroup",
+          "interaction contrast",
+          "multiplicity review",
+          "provide outcome",
+          "provide exposure",
+          "provide moderator",
+          "provide interaction term",
+          "confirm assumption: Interaction scale is prespecified"
+        ],
+        "expectedMetrics": [
+          "interaction coefficient",
+          "stratum-specific effects"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Is RIDAGEYR associated with LBXGH in this dataset?\" --json"
+      }
+    ],
+    "blocked": false,
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "TABLE_HIGH_MISSINGNESS",
+        "message": "At least one column has 71.0% missingness.",
+        "evidenceRefs": [
+          "tableSummary.columns"
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "EXPLORATION_HANDOFF_METHODS_REVIEW",
+        "message": "Exploration handoff requires methods review: 12 candidate questions need methods review; no candidate questions are currently promotable; possible target leakage/proxy pairs detected; survey/design candidate variables detected; survey/design fields detected; promotion needs survey-aware plan.",
+        "evidenceRefs": [
+          "request.explorationHandoff"
+        ]
+      }
+    ],
+    "nextAction": "agenteer research paper-run --analysis-spec <analysis-spec.json> --data-root <dir> --out-dir <paper-dir> --backend r-survey --json"
+  }
+}
+

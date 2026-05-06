@@ -1,0 +1,179 @@
+{
+  "analysisId": "hip-fracture-icu-outcomes-20260506",
+  "generatedAtIso": "2026-05-06T18:36:20.873904+00:00",
+  "dataset": {
+    "id": "mimiciv-3-1",
+    "source": {
+      "kind": "manifest",
+      "uri": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/",
+      "manifestPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/cloud/mimiciv-v31-schema-metadata-20260506.json"
+    },
+    "access": {
+      "local": false,
+      "cloud": true,
+      "piiPhiRisk": "high",
+      "license": null,
+      "restrictions": [
+        "Confirm source license and redistribution rights before export or sharing.",
+        "Treat as credentialed clinical data; do not publish row-level data or derived identifiable artifacts."
+      ]
+    }
+  },
+  "requiredTables": [
+    "hosp-diagnoses-icd",
+    "hosp-d-icd-diagnoses",
+    "derived-icustay-detail",
+    "derived-apsiii",
+    "derived-oasis",
+    "derived-first-day-sofa",
+    "derived-first-day-lab",
+    "derived-first-day-vitalsign"
+  ],
+  "sourceInventory": {
+    "hosp-diagnoses-icd": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/diagnoses_icd/",
+      "manifestRows": 6364488,
+      "manifestBytes": 60407388,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/diagnoses_icd/part-000000000000.parquet",
+          "size": 60407388,
+          "generation": "1778042001388106",
+          "crc32c": "vhyTmg==",
+          "md5Hash": "Eer9L9mesotsy6wZdWQyDA==",
+          "updated": "2026-05-06T04:33:21.430000+00:00"
+        }
+      ],
+      "localDigest": "99487a2240d4b46b773f121799475d81a83d0e56df4dee7be1ec6a012a5f3583",
+      "bytesCopied": 60407388
+    },
+    "hosp-d-icd-diagnoses": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_diagnoses/",
+      "manifestRows": 112107,
+      "manifestBytes": 1984186,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_diagnoses/part-000000000000.parquet",
+          "size": 1984186,
+          "generation": "1778041984408066",
+          "crc32c": "+3MVrA==",
+          "md5Hash": "2orLr4jsWgt+D7A1TVyGHA==",
+          "updated": "2026-05-06T04:33:04.450000+00:00"
+        }
+      ],
+      "localDigest": "13a58f173283ad39dacc8194960f12aeecc8dec473a73dd949e5d3f9b8ee62b1",
+      "bytesCopied": 1984186
+    },
+    "derived-icustay-detail": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_detail/",
+      "manifestRows": 94458,
+      "manifestBytes": 6066167,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_detail/part-000000000000.parquet",
+          "size": 6066167,
+          "generation": "1778041583672740",
+          "crc32c": "RrfNvQ==",
+          "md5Hash": "RPf1QSFRA0iyqbkxZqYdkw==",
+          "updated": "2026-05-06T04:26:23.713000+00:00"
+        }
+      ],
+      "localDigest": "a454116f9ccdddbfdb5dd0bda67951a42fa9adee8b86864f14370f4318801a72",
+      "bytesCopied": 6066167
+    },
+    "derived-apsiii": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/apsiii/",
+      "manifestRows": 94458,
+      "manifestBytes": 2308513,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/apsiii/part-000000000000.parquet",
+          "size": 2308513,
+          "generation": "1778041429889556",
+          "crc32c": "2kuZvA==",
+          "md5Hash": "rJ0oDrGSSpLZv0F0JW4HjA==",
+          "updated": "2026-05-06T04:23:49.930000+00:00"
+        }
+      ],
+      "localDigest": "a90d7a741ead3a6f2d56f23332dd2a063bf0d46f11479b95ce21d8d64d9751c5",
+      "bytesCopied": 2308513
+    },
+    "derived-oasis": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oasis/",
+      "manifestRows": 94458,
+      "manifestBytes": 3015072,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oasis/part-000000000000.parquet",
+          "size": 3015072,
+          "generation": "1778041647400668",
+          "crc32c": "ZTEW1w==",
+          "md5Hash": "bbYLBElyCKxTZ1t18wXYHw==",
+          "updated": "2026-05-06T04:27:27.441000+00:00"
+        }
+      ],
+      "localDigest": "e4870dd2dde72057e46f4642001e68e19c8c63a6552f498d6de7a05e2f8843ae",
+      "bytesCopied": 3015072
+    },
+    "derived-first-day-sofa": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_sofa/",
+      "manifestRows": 94458,
+      "manifestBytes": 2011162,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_sofa/part-000000000000.parquet",
+          "size": 2011162,
+          "generation": "1778041553589643",
+          "crc32c": "7RFUZA==",
+          "md5Hash": "2Kuqj32+QFfdl1HOShYyUw==",
+          "updated": "2026-05-06T04:25:53.631000+00:00"
+        }
+      ],
+      "localDigest": "2d3c286043016573451240892c44d6797b03a77f0a2e38a0f75892804fd476ea",
+      "bytesCopied": 2011162
+    },
+    "derived-first-day-lab": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_lab/",
+      "manifestRows": 94458,
+      "manifestBytes": 7100465,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_lab/part-000000000000.parquet",
+          "size": 7100465,
+          "generation": "1778041545917137",
+          "crc32c": "NWYAZg==",
+          "md5Hash": "Cw81FJCgvcerGXtyaW89dw==",
+          "updated": "2026-05-06T04:25:45.959000+00:00"
+        }
+      ],
+      "localDigest": "4dc6bc05397e49230f24d3412f50c769d1e449ca7f1c53a2f21276649042034d",
+      "bytesCopied": 7100465
+    },
+    "derived-first-day-vitalsign": {
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_vitalsign/",
+      "manifestRows": 94458,
+      "manifestBytes": 5613073,
+      "objects": [
+        {
+          "url": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_vitalsign/part-000000000000.parquet",
+          "size": 5613073,
+          "generation": "1778041563577507",
+          "crc32c": "BBXz6g==",
+          "md5Hash": "bQbjAju4LEyzKPq34+DQ8A==",
+          "updated": "2026-05-06T04:26:03.620000+00:00"
+        }
+      ],
+      "localDigest": "606359e7fff7bc63bfdf113013b72baf3d6368c49be5e1238efcfac17cd8387a",
+      "bytesCopied": 5613073
+    }
+  },
+  "rowLevelCachePersisted": false,
+  "cost": {
+    "plannedBytes": 88506026,
+    "actualBytes": 88506026,
+    "estimatedTransferUsd": 0.009891319200396537,
+    "estimatedClassBOperationsUsdUpperBound": 0.004,
+    "hardCostCeilingUsd": 1.0,
+    "source": "Conservative guard estimate; final GCP billing may lag."
+  }
+}

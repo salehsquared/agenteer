@@ -1920,14 +1920,14 @@ JSON
     }
   });
 
-  it("requires a local-review safety header for paper-run evidence", async () => {
+  it("requires a reader-facing study summary for paper-run evidence", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-safety-header-"));
     try {
       const paper = path.join(dir, "paper.md");
       const evidence = path.join(dir, "analysis.json");
       await writeFile(paper, [
         "# Paper",
-        "## Local Review Safety Header",
+        "## Study Summary",
         "- Analysis type: observational cross-sectional association.",
         "- Survey method: weighted linear regression with WTMEC2YR survey weights, strata, and PSU.",
         "- Weight domain: MEC-exam participants.",
@@ -1935,6 +1935,7 @@ JSON
         "- Clinical actionability: not clinically actionable.",
         "- Human review: required before sharing.",
         "## Abstract",
+        "Main finding: higher exposure was associated with higher outcome in this sample.",
         "A cross-sectional observational NHANES analysis.",
         "## Introduction",
         "Motivation.",
@@ -1971,7 +1972,41 @@ JSON
 
       const qa = await researchPaperQaCommand({ paperPath: paper, evidencePath: evidence });
       expect(qa.status).toBe("pass");
-      expect(qa.checks.find(check => check.id === "local-review-safety-header")?.status).toBe("pass");
+      expect(qa.checks.find(check => check.id === "reader-safety-summary")?.status).toBe("pass");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("blocks internal framework jargon in reader-facing paper markdown", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-paper-language-qa-"));
+    try {
+      const paper = path.join(dir, "paper.md");
+      await writeFile(paper, [
+        "# Paper",
+        "## Abstract",
+        "Agenteer generated this paper from an AnalysisSpec.",
+        "## Introduction",
+        "Motivation.",
+        "## Methods",
+        "The result posture was local_review_ready.",
+        "## Results",
+        "There were 100 complete-case eligible rows.",
+        "## Discussion",
+        "This observational cross-sectional analysis cannot infer causality.",
+        "## Limitations",
+        "Missing data may bias results.",
+        "## Reproducibility",
+        "Evidence is available in companion files.",
+        "## References",
+        "https://www.strobe-statement.org/",
+        "https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx",
+        "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+      ].join("\n"));
+
+      const qa = await researchPaperQaCommand({ paperPath: paper });
+      expect(qa.status).toBe("fail");
+      expect(qa.checks.find(check => check.id === "reader-facing-language")?.status).toBe("fail");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -2119,10 +2154,20 @@ JSON
       await writeFile(path.join(first, "qa-cli.json"), `${JSON.stringify({
         paperQa: { status: "pass", summary: "10/10 paper QA checks passed." },
       })}\n`);
+      await writeFile(path.join(first, "paper.md"), [
+        "# First paper",
+        "## Abstract",
+        "This paper uses reader-facing scientific language.",
+      ].join("\n"));
       await writeFile(path.join(second, "analysis.json"), `${JSON.stringify({
         title: "Second paper",
         rowCounts: { completeCaseEligible: 456 },
       })}\n`);
+      await writeFile(path.join(second, "paper.md"), [
+        "# Second paper",
+        "## Abstract",
+        "Agenteer generated this paper from an AnalysisSpec.",
+      ].join("\n"));
       await writeFile(path.join(second, "qa-old.json"), `${JSON.stringify({
         paperQa: { status: "warning", summary: "9/10 paper QA checks passed." },
       })}\n`);
@@ -2150,12 +2195,16 @@ JSON
 
       expect(index.papers).toHaveLength(2);
       expect(index.papers[1]?.latestQaPath).toContain("qa-new.json");
+      expect(index.papers[0]?.readerFacingLanguageStatus).toBe("pass");
+      expect(index.papers[1]?.readerFacingLanguageStatus).toBe("legacy_or_fail");
+      expect(index.papers[1]?.readerFacingLanguageHits).toEqual(expect.arrayContaining(["Agenteer", "AnalysisSpec"]));
       expect(index.papers[0]?.runnerStatus).toBe("missing");
       expect(index.papers[1]?.runnerStatus).toBe("retrospective_succeeded");
       expect(parsed.schemaVersion).toBe(1);
       expect(parsed.paperIndex.papers[1]?.latestQaSummary).toContain("12/12");
       expect(parsed.paperIndex.papers[1]?.runnerStatus).toBe("retrospective_succeeded");
       expect(renderResearchPaperIndex(index)).toContain("First paper");
+      expect(renderResearchPaperIndex(index)).toContain("legacy/fail");
       expect(renderResearchPaperIndex(index)).toContain("retrospective_succeeded");
       expect(await readFile(out, "utf-8")).toContain("Second paper");
     } finally {

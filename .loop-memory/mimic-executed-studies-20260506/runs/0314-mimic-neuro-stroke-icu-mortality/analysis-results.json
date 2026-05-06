@@ -1,0 +1,621 @@
+{
+  "study": {
+    "id": "mimic-neuro-stroke-icu-mortality",
+    "title": "Ischemic Stroke ICU Mortality",
+    "domain": "neurology",
+    "question": "Among ICU admissions with ischemic stroke codes, which first-day severity and physiologic variables predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-gcs",
+      "derived-oasis",
+      "derived-apsiii",
+      "derived-first-day-vitalsign"
+    ],
+    "outcomes": [
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "stroke phenotype",
+      "GCS missingness audit",
+      "mortality prediction review"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "I63",
+        "expectedTerms": [
+          "cerebral infarction"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "I63",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "I63",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=I63&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 91,
+            "sampleRows": [
+              {
+                "code": "I63.00",
+                "name": "Cerebral infarction due to thrombosis of unspecified precerebral artery"
+              },
+              {
+                "code": "I63.011",
+                "name": "Cerebral infarction due to thrombosis of right vertebral artery"
+              },
+              {
+                "code": "I63.012",
+                "name": "Cerebral infarction due to thrombosis of left vertebral artery"
+              },
+              {
+                "code": "I63.013",
+                "name": "Cerebral infarction due to thrombosis of bilateral vertebral arteries"
+              },
+              {
+                "code": "I63.019",
+                "name": "Cerebral infarction due to thrombosis of unspecified vertebral artery"
+              },
+              {
+                "code": "I63.02",
+                "name": "Cerebral infarction due to thrombosis of basilar artery"
+              },
+              {
+                "code": "I63.031",
+                "name": "Cerebral infarction due to thrombosis of right carotid artery"
+              },
+              {
+                "code": "I63.032",
+                "name": "Cerebral infarction due to thrombosis of left carotid artery"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:46.226146+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "434",
+        "expectedTerms": [
+          "cerebral artery occlusion"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "434",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "434",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=434&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 6,
+            "sampleRows": [
+              {
+                "code": "434.00",
+                "name": "Cerebral thrombosis without mention of cerebral infarction"
+              },
+              {
+                "code": "434.01",
+                "name": "Cerebral thrombosis with cerebral infarction"
+              },
+              {
+                "code": "434.10",
+                "name": "Cerebral embolism without mention of cerebral infarction"
+              },
+              {
+                "code": "434.11",
+                "name": "Cerebral embolism with cerebral infarction"
+              },
+              {
+                "code": "434.90",
+                "name": "Cerebral artery occlusion, unspecified without mention of cerebral infarction"
+              },
+              {
+                "code": "434.91",
+                "name": "Cerebral artery occlusion, unspecified with cerebral infarction"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:46.690820+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 119,
+    "matchedDiagnosisRows": 7564,
+    "matchedAdmissions": 7057,
+    "firstIcuStayRows": 3546,
+    "uniquePatients": 3471
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 3546,
+        "missing": 0,
+        "mean": 69.23181049069375,
+        "sd": 15.207000946706458,
+        "median": 71.0,
+        "iqr": [
+          60.0,
+          81.0
+        ],
+        "min": 18.0,
+        "max": 102.0
+      },
+      "los_icu": {
+        "n": 3546,
+        "missing": 0,
+        "mean": 5.960022560631697,
+        "sd": 7.502696256262563,
+        "median": 3.33,
+        "iqr": [
+          1.75,
+          7.08
+        ],
+        "min": 0.0,
+        "max": 88.04
+      },
+      "los_hospital": {
+        "n": 3546,
+        "missing": 0,
+        "mean": 13.604906937394247,
+        "sd": 15.823564176551594,
+        "median": 9.0,
+        "iqr": [
+          4.0,
+          17.0
+        ],
+        "min": 0.0,
+        "max": 186.0
+      },
+      "apsiii": {
+        "n": 3546,
+        "missing": 0,
+        "mean": 41.15284827975184,
+        "sd": 20.25215624336348,
+        "median": 37.0,
+        "iqr": [
+          27.0,
+          50.0
+        ],
+        "min": 0.0,
+        "max": 166.0
+      },
+      "oasis": {
+        "n": 3546,
+        "missing": 0,
+        "mean": 31.695431472081218,
+        "sd": 8.542287838770617,
+        "median": 31.0,
+        "iqr": [
+          26.0,
+          37.0
+        ],
+        "min": 10.0,
+        "max": 68.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 3546,
+        "positive": 656,
+        "proportion": 0.18499717992103779
+      },
+      "male": {
+        "n": 3546,
+        "positive": 1813,
+        "proportion": 0.5112803158488438
+      },
+      "prolonged_icu_los": {
+        "n": 3546,
+        "positive": 883,
+        "proportion": 0.24901297236322617
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "apsiii",
+    "oasis",
+    "glucose_max",
+    "sbp_min",
+    "heart_rate_max",
+    "spo2_min",
+    "gcs",
+    "urineoutput"
+  ],
+  "missingness": [
+    {
+      "column": "urineoutput",
+      "missing": 217,
+      "missingFraction": 0.06119571347997744
+    },
+    {
+      "column": "glucose_max",
+      "missing": 54,
+      "missingFraction": 0.015228426395939087
+    },
+    {
+      "column": "gcs",
+      "missing": 6,
+      "missingFraction": 0.001692047377326565
+    },
+    {
+      "column": "spo2_min",
+      "missing": 2,
+      "missingFraction": 0.0005640157924421884
+    },
+    {
+      "column": "sbp_min",
+      "missing": 1,
+      "missingFraction": 0.0002820078962210942
+    },
+    {
+      "column": "heart_rate_max",
+      "missing": 1,
+      "missingFraction": 0.0002820078962210942
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "apsiii",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "oasis",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 3281,
+      "events": 599,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min",
+        "gcs",
+        "urineoutput"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 69.03261200853399,
+          "sd": 15.226476364350088
+        },
+        "apsiii": {
+          "mean": 41.52758305394697,
+          "sd": 20.15255652950472
+        },
+        "oasis": {
+          "mean": 32.082291984151176,
+          "sd": 8.462214817839113
+        },
+        "glucose_max": {
+          "mean": 785.799908564462,
+          "sd": 24681.504159401342
+        },
+        "sbp_min": {
+          "mean": 101.18104236513258,
+          "sd": 20.60403376942681
+        },
+        "heart_rate_max": {
+          "mean": 100.78360256019506,
+          "sd": 20.785829760846003
+        },
+        "spo2_min": {
+          "mean": 91.98232246266382,
+          "sd": 6.338254325696125
+        },
+        "gcs": {
+          "mean": 12.832368180432795,
+          "sd": 3.009730282221135
+        },
+        "urineoutput": {
+          "mean": 1587.4155135638682,
+          "sd": 1222.411598630716
+        }
+      },
+      "metrics": {
+        "auroc": 0.7870139021162539,
+        "averagePrecision": 0.4150221536873228
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.2158476624365684,
+          "ci95": [
+            1.0888288363235996,
+            1.357684044485686
+          ],
+          "pValue": 0.0005172622614603677,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.2561855977480985,
+          "ci95": [
+            1.0305882697619662,
+            1.531166521383187
+          ],
+          "pValue": 0.023927703788475495,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "oddsRatio": 1.7255225311933369,
+          "ci95": [
+            1.4819233709125208,
+            2.0091646195055657
+          ],
+          "pValue": 2.1315589736776036e-12,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "oddsRatio": 1.80920625307405,
+          "ci95": [
+            1.5619840859650391,
+            2.0955573719177485
+          ],
+          "pValue": 2.6003983952704362e-15,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 0.001424334342213197,
+          "ci95": [
+            2.1352359051182223e-14,
+            95011905.40796812
+          ],
+          "pValue": 0.6062707651875936,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.9521146958581773,
+          "ci95": [
+            0.853728803843594,
+            1.0618388298342896
+          ],
+          "pValue": 0.3779079542980086,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 1.105123726119182,
+          "ci95": [
+            0.9991529224744324,
+            1.2223338615744244
+          ],
+          "pValue": 0.051957328986425036,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 1.0958218841095508,
+          "ci95": [
+            0.9973409059740937,
+            1.2040272232898845
+          ],
+          "pValue": 0.05683926133768401,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "gcs",
+          "oddsRatio": 1.3281931411120156,
+          "ci95": [
+            1.1844194569019229,
+            1.4894191494551583
+          ],
+          "pValue": 1.2009826457255827e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "urineoutput",
+          "oddsRatio": 1.1424142988553643,
+          "ci95": [
+            1.0206134698097626,
+            1.278750936407355
+          ],
+          "pValue": 0.020630343356806878,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 3281,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min",
+        "gcs",
+        "urineoutput"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 69.03261200853399,
+          "sd": 15.226476364350088
+        },
+        "apsiii": {
+          "mean": 41.52758305394697,
+          "sd": 20.15255652950472
+        },
+        "oasis": {
+          "mean": 32.082291984151176,
+          "sd": 8.462214817839113
+        },
+        "glucose_max": {
+          "mean": 785.799908564462,
+          "sd": 24681.504159401342
+        },
+        "sbp_min": {
+          "mean": 101.18104236513258,
+          "sd": 20.60403376942681
+        },
+        "heart_rate_max": {
+          "mean": 100.78360256019506,
+          "sd": 20.785829760846003
+        },
+        "spo2_min": {
+          "mean": 91.98232246266382,
+          "sd": 6.338254325696125
+        },
+        "gcs": {
+          "mean": 12.832368180432795,
+          "sd": 3.009730282221135
+        },
+        "urineoutput": {
+          "mean": 1587.4155135638682,
+          "sd": 1222.411598630716
+        }
+      },
+      "rSquared": 0.11929034787459292,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -11.38779958028272,
+          "ci95PercentChange": [
+            -13.798642252487259,
+            -8.909531492261113
+          ],
+          "pValue": 8.648819580539531e-18,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 4.956927977591885,
+          "ci95PercentChange": [
+            -0.26552976575914267,
+            10.452852505466147
+          ],
+          "pValue": 0.06318877251213685,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "percentChangeInLos": 8.921844091383836,
+          "ci95PercentChange": [
+            3.884962596787611,
+            14.202939710492712
+          ],
+          "pValue": 0.00040356934631736194,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "percentChangeInLos": 24.752267321339726,
+          "ci95PercentChange": [
+            19.29501150646946,
+            30.459170130269932
+          ],
+          "pValue": 3.3052884386659875e-22,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -1.1046394759338107,
+          "ci95PercentChange": [
+            -3.826801570598637,
+            1.694572842604658
+          ],
+          "pValue": 0.4353919747055651,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "percentChangeInLos": -1.752551670485225,
+          "ci95PercentChange": [
+            -4.556085582604386,
+            1.1333322001868762
+          ],
+          "pValue": 0.23130377372237998,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "percentChangeInLos": -2.703099611846438,
+          "ci95PercentChange": [
+            -5.677544316574268,
+            0.365143767198961
+          ],
+          "pValue": 0.08365195330458922,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "percentChangeInLos": 4.114407905651074,
+          "ci95PercentChange": [
+            0.8770022547313072,
+            7.455710332985177
+          ],
+          "pValue": 0.012358290551343569,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "gcs",
+          "percentChangeInLos": 7.468562728388051,
+          "ci95PercentChange": [
+            3.469877190848747,
+            11.621781029106671
+          ],
+          "pValue": 0.000196776307748757,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "urineoutput",
+          "percentChangeInLos": 11.71571113580332,
+          "ci95PercentChange": [
+            5.063187932473778,
+            18.789467178548303
+          ],
+          "pValue": 0.0004051153702731839,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

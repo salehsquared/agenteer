@@ -1,0 +1,1644 @@
+{
+  "billingAccount": "billingAccounts/019189-1FBEAA-4322E9",
+  "cost": {
+    "bigqueryExtractProcessingUsd": 0,
+    "bigqueryLogicalBytes": 86204442642,
+    "bigqueryLogicalGiB": 80.28414346463978,
+    "derivedOnlyEstimatedMonthlyGcsStorageUsd": null,
+    "estimatedGcsStandardUsUsdPerGbMonth": 0.026,
+    "estimatedMonthlyGcsStorageUsd": 0.7899347667379999,
+    "estimatedOneDayGcsStorageUsd": 0.02633115889126666,
+    "gcsExportedBytesExcludingManifests": 30382106413,
+    "gcsExportedGBDecimalExcludingManifests": 30.382106413,
+    "gcsExportedGiBExcludingManifests": 28.2955415667966,
+    "pricingBasis": "BigQuery extract jobs to Cloud Storage have no BigQuery processing charge; Cloud Storage Standard US multi-region storage estimated at $0.026 per GB-month. Billing export is not configured in this project, so immediately-post-export invoice charges were not available through local CLI."
+  },
+  "coverageQa": {
+    "allPass": true,
+    "expectedTables": 81,
+    "extraTables": [],
+    "gcsTables": 81,
+    "missingTables": [],
+    "zeroByteTables": []
+  },
+  "createdAtUtc": "2026-05-06T04:44:15.286161+00:00",
+  "destination": {
+    "bucket": "agenteer-mimiciv-cache-ultra-sound-403618",
+    "bucketLocation": "US",
+    "compression": "SNAPPY",
+    "format": "PARQUET",
+    "prefix": "mimiciv/v3.1",
+    "rootUri": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/",
+    "storageClass": "STANDARD"
+  },
+  "exportJobs": {
+    "derived": {
+      "attempted": 50,
+      "failures": 0,
+      "seconds": 245.36
+    },
+    "hospIcu": {
+      "attempted": 31,
+      "failures": 0,
+      "seconds": 176.35
+    },
+    "total": {
+      "attempted": 81,
+      "failures": 0,
+      "seconds": 421.71
+    }
+  },
+  "largestTablesByExportedBytes": [
+    {
+      "bigqueryLogicalBytes": 34927332044,
+      "bigqueryRows": 432997491,
+      "bigquerySchemaFields": 11,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/",
+      "gcsExportedBytes": 12007438910,
+      "gcsObjectCount": 1000,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.chartevents",
+      "table": "chartevents"
+    },
+    {
+      "bigqueryLogicalBytes": 16052762274,
+      "bigqueryRows": 158374764,
+      "bigquerySchemaFields": 16,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/",
+      "gcsExportedBytes": 6161328534,
+      "gcsObjectCount": 300,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.labevents",
+      "table": "labevents"
+    },
+    {
+      "bigqueryLogicalBytes": 4886679154,
+      "bigqueryRows": 42808593,
+      "bigquerySchemaFields": 12,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/",
+      "gcsExportedBytes": 2635117267,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.emar",
+      "table": "emar"
+    },
+    {
+      "bigqueryLogicalBytes": 4767748464,
+      "bigqueryRows": 52212109,
+      "bigquerySchemaFields": 12,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/",
+      "gcsExportedBytes": 1920440665,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.poe",
+      "table": "poe"
+    },
+    {
+      "bigqueryLogicalBytes": 7408021201,
+      "bigqueryRows": 87371064,
+      "bigquerySchemaFields": 33,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/",
+      "gcsExportedBytes": 1746715673,
+      "gcsObjectCount": 150,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.emar_detail",
+      "table": "emar_detail"
+    },
+    {
+      "bigqueryLogicalBytes": 3244401436,
+      "bigqueryRows": 17847567,
+      "bigquerySchemaFields": 27,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/",
+      "gcsExportedBytes": 1217415870,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.pharmacy",
+      "table": "pharmacy"
+    },
+    {
+      "bigqueryLogicalBytes": 3327080571,
+      "bigqueryRows": 20292611,
+      "bigquerySchemaFields": 21,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/",
+      "gcsExportedBytes": 1063839220,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.prescriptions",
+      "table": "prescriptions"
+    },
+    {
+      "bigqueryLogicalBytes": 1929787734,
+      "bigqueryRows": 14253480,
+      "bigquerySchemaFields": 17,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/",
+      "gcsExportedBytes": 851175698,
+      "gcsObjectCount": 50,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.ingredientevents",
+      "table": "ingredientevents"
+    },
+    {
+      "bigqueryLogicalBytes": 2635483042,
+      "bigqueryRows": 10953713,
+      "bigquerySchemaFields": 26,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/",
+      "gcsExportedBytes": 731119446,
+      "gcsObjectCount": 50,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.inputevents",
+      "table": "inputevents"
+    },
+    {
+      "bigqueryLogicalBytes": 803853972,
+      "bigqueryRows": 9979761,
+      "bigquerySchemaFields": 10,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/",
+      "gcsExportedBytes": 254014332,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.datetimeevents",
+      "table": "datetimeevents"
+    },
+    {
+      "bigqueryLogicalBytes": 763457753,
+      "bigqueryRows": 3988224,
+      "bigquerySchemaFields": 25,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/",
+      "gcsExportedBytes": 184567367,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.microbiologyevents",
+      "table": "microbiologyevents"
+    },
+    {
+      "bigqueryLogicalBytes": 434820456,
+      "bigqueryRows": 4976408,
+      "bigquerySchemaFields": 16,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/",
+      "gcsExportedBytes": 141703433,
+      "gcsObjectCount": 14,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.chemistry",
+      "table": "chemistry"
+    },
+    {
+      "bigqueryLogicalBytes": 426321776,
+      "bigqueryRows": 4377900,
+      "bigquerySchemaFields": 14,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/",
+      "gcsExportedBytes": 133369779,
+      "gcsObjectCount": 14,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.complete_blood_count",
+      "table": "complete_blood_count"
+    },
+    {
+      "bigqueryLogicalBytes": 251574528,
+      "bigqueryRows": 10482272,
+      "bigquerySchemaFields": 3,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/",
+      "gcsExportedBytes": 132945370,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.icustay_hourly",
+      "table": "icustay_hourly"
+    },
+    {
+      "bigqueryLogicalBytes": 461119456,
+      "bigqueryRows": 5099899,
+      "bigquerySchemaFields": 15,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/",
+      "gcsExportedBytes": 132618970,
+      "gcsObjectCount": 15,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.kdigo_stages",
+      "table": "kdigo_stages"
+    }
+  ],
+  "manifestVersion": "mimiciv-gcs-export-v1",
+  "operation": "bigquery_extract_to_gcs_parquet",
+  "project": "ultra-sound-403618",
+  "sha256": "9744f23516f8a88fd61fd73a649a6cb2677c0b516f0b24fe8b19ae0a9b07f9c3",
+  "source": {
+    "datasets": {
+      "derived": "mimiciv_3_1_derived",
+      "hosp": "mimiciv_3_1_hosp",
+      "icu": "mimiciv_3_1_icu"
+    },
+    "mimicVersion": "3.1",
+    "project": "physionet-data"
+  },
+  "sourceArtifacts": {
+    "bigqueryMetadataLocal": "/tmp/mimiciv_v31_bq_meta.json",
+    "derivedExportResultsLocal": "/tmp/mimiciv_derived_export_results.jsonl",
+    "derivedManifestLocal": "/Users/saleh/TechProjects/agenteer/.loop-memory/cloud/mimiciv-derived-export-20260506.json",
+    "gcsRecursiveListingLocal": "/tmp/mimiciv_v31_gcs_ls.txt",
+    "hospIcuExportResultsLocal": "/tmp/mimiciv_rest_export_results.jsonl"
+  },
+  "spotCheckQa": {
+    "allPass": true,
+    "checks": [
+      {
+        "bigqueryRows": 364627,
+        "bigquerySchemaFields": 6,
+        "dataset": "hosp",
+        "downloadedBytes": 2576273,
+        "files": 1,
+        "parquetFields": 6,
+        "parquetRows": 364627,
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "table": "patients"
+      },
+      {
+        "bigqueryRows": 546028,
+        "bigquerySchemaFields": 16,
+        "dataset": "hosp",
+        "downloadedBytes": 23202784,
+        "files": 1,
+        "parquetFields": 16,
+        "parquetRows": 546028,
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "table": "admissions"
+      },
+      {
+        "bigqueryRows": 94458,
+        "bigquerySchemaFields": 8,
+        "dataset": "icu",
+        "downloadedBytes": 4528825,
+        "files": 1,
+        "parquetFields": 8,
+        "parquetRows": 94458,
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "table": "icustays"
+      },
+      {
+        "bigqueryRows": 4095,
+        "bigquerySchemaFields": 9,
+        "dataset": "icu",
+        "downloadedBytes": 126723,
+        "files": 1,
+        "parquetFields": 9,
+        "parquetRows": 4095,
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "table": "d_items"
+      }
+    ]
+  },
+  "tables": [
+    {
+      "bigqueryLogicalBytes": 114,
+      "bigqueryRows": 3,
+      "bigquerySchemaFields": 2,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/_metadata/",
+      "gcsExportedBytes": 727,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/_metadata/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived._metadata",
+      "table": "_metadata"
+    },
+    {
+      "bigqueryLogicalBytes": 5959629,
+      "bigqueryRows": 135153,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/acei/",
+      "gcsExportedBytes": 3234464,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/acei/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.acei",
+      "table": "acei"
+    },
+    {
+      "bigqueryLogicalBytes": 26209344,
+      "bigqueryRows": 546028,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/age/",
+      "gcsExportedBytes": 10089906,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/age/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.age",
+      "table": "age"
+    },
+    {
+      "bigqueryLogicalBytes": 51976058,
+      "bigqueryRows": 949901,
+      "bigquerySchemaFields": 7,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/antibiotic/",
+      "gcsExportedBytes": 21537545,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/antibiotic/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.antibiotic",
+      "table": "antibiotic"
+    },
+    {
+      "bigqueryLogicalBytes": 13985720,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 21,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/apsiii/",
+      "gcsExportedBytes": 2308513,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/apsiii/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.apsiii",
+      "table": "apsiii"
+    },
+    {
+      "bigqueryLogicalBytes": 2651098,
+      "bigqueryRows": 53603,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/arb/",
+      "gcsExportedBytes": 1414585,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/arb/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.arb",
+      "table": "arb"
+    },
+    {
+      "bigqueryLogicalBytes": 72950440,
+      "bigqueryRows": 697418,
+      "bigquerySchemaFields": 27,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/bg/",
+      "gcsExportedBytes": 16330694,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/bg/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.bg",
+      "table": "bg"
+    },
+    {
+      "bigqueryLogicalBytes": 357386912,
+      "bigqueryRows": 4154226,
+      "bigquerySchemaFields": 20,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/blood_differential/",
+      "gcsExportedBytes": 121173516,
+      "gcsObjectCount": 12,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/blood_differential/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/blood_differential/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/blood_differential/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.blood_differential",
+      "table": "blood_differential"
+    },
+    {
+      "bigqueryLogicalBytes": 14999528,
+      "bigqueryRows": 380131,
+      "bigquerySchemaFields": 7,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/cardiac_marker/",
+      "gcsExportedBytes": 8598560,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/cardiac_marker/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.cardiac_marker",
+      "table": "cardiac_marker"
+    },
+    {
+      "bigqueryLogicalBytes": 91732704,
+      "bigqueryRows": 546028,
+      "bigquerySchemaFields": 21,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/charlson/",
+      "gcsExportedBytes": 7381162,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/charlson/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.charlson",
+      "table": "charlson"
+    },
+    {
+      "bigqueryLogicalBytes": 434820456,
+      "bigqueryRows": 4976408,
+      "bigquerySchemaFields": 16,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/",
+      "gcsExportedBytes": 141703433,
+      "gcsObjectCount": 14,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.chemistry",
+      "table": "chemistry"
+    },
+    {
+      "bigqueryLogicalBytes": 101705840,
+      "bigqueryRows": 1991167,
+      "bigquerySchemaFields": 10,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/coagulation/",
+      "gcsExportedBytes": 46137641,
+      "gcsObjectCount": 4,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/coagulation/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/coagulation/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/coagulation/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.coagulation",
+      "table": "coagulation"
+    },
+    {
+      "bigqueryLogicalBytes": 20994080,
+      "bigqueryRows": 354306,
+      "bigquerySchemaFields": 8,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/code_status/",
+      "gcsExportedBytes": 6581329,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/code_status/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.code_status",
+      "table": "code_status"
+    },
+    {
+      "bigqueryLogicalBytes": 426321776,
+      "bigqueryRows": 4377900,
+      "bigquerySchemaFields": 14,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/",
+      "gcsExportedBytes": 133369779,
+      "gcsObjectCount": 14,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.complete_blood_count",
+      "table": "complete_blood_count"
+    },
+    {
+      "bigqueryLogicalBytes": 26772980,
+      "bigqueryRows": 546028,
+      "bigquerySchemaFields": 7,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/creatinine_baseline/",
+      "gcsExportedBytes": 3253643,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/creatinine_baseline/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.creatinine_baseline",
+      "table": "creatinine_baseline"
+    },
+    {
+      "bigqueryLogicalBytes": 55822572,
+      "bigqueryRows": 475214,
+      "bigquerySchemaFields": 24,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/crrt/",
+      "gcsExportedBytes": 7658472,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/crrt/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.crrt",
+      "table": "crrt"
+    },
+    {
+      "bigqueryLogicalBytes": 492672,
+      "bigqueryRows": 10264,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/dobutamine/",
+      "gcsExportedBytes": 400052,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/dobutamine/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.dobutamine",
+      "table": "dobutamine"
+    },
+    {
+      "bigqueryLogicalBytes": 868080,
+      "bigqueryRows": 18085,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/dopamine/",
+      "gcsExportedBytes": 696661,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/dopamine/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.dopamine",
+      "table": "dopamine"
+    },
+    {
+      "bigqueryLogicalBytes": 127141096,
+      "bigqueryRows": 2187060,
+      "bigquerySchemaFields": 15,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/enzyme/",
+      "gcsExportedBytes": 54392006,
+      "gcsObjectCount": 4,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/enzyme/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/enzyme/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/enzyme/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.enzyme",
+      "table": "enzyme"
+    },
+    {
+      "bigqueryLogicalBytes": 1511760,
+      "bigqueryRows": 31495,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/epinephrine/",
+      "gcsExportedBytes": 1229609,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/epinephrine/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.epinephrine",
+      "table": "epinephrine"
+    },
+    {
+      "bigqueryLogicalBytes": 12049472,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 44,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_bg/",
+      "gcsExportedBytes": 2842053,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_bg/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_bg",
+      "table": "first_day_bg"
+    },
+    {
+      "bigqueryLogicalBytes": 9651504,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 44,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_bg_art/",
+      "gcsExportedBytes": 2489207,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_bg_art/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_bg_art",
+      "table": "first_day_bg_art"
+    },
+    {
+      "bigqueryLogicalBytes": 5253240,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 7,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_gcs/",
+      "gcsExportedBytes": 1254442,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_gcs/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_gcs",
+      "table": "first_day_gcs"
+    },
+    {
+      "bigqueryLogicalBytes": 2170992,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 3,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_height/",
+      "gcsExportedBytes": 1225219,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_height/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_height",
+      "table": "first_day_height"
+    },
+    {
+      "bigqueryLogicalBytes": 40577312,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 88,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_lab/",
+      "gcsExportedBytes": 7100465,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_lab/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_lab",
+      "table": "first_day_lab"
+    },
+    {
+      "bigqueryLogicalBytes": 1613812,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_rrt/",
+      "gcsExportedBytes": 1178938,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_rrt/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_rrt",
+      "table": "first_day_rrt"
+    },
+    {
+      "bigqueryLogicalBytes": 6722264,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 10,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_sofa/",
+      "gcsExportedBytes": 2011162,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_sofa/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_sofa",
+      "table": "first_day_sofa"
+    },
+    {
+      "bigqueryLogicalBytes": 2226864,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 3,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_urine_output/",
+      "gcsExportedBytes": 1264060,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_urine_output/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_urine_output",
+      "table": "first_day_urine_output"
+    },
+    {
+      "bigqueryLogicalBytes": 21696312,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 26,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_vitalsign/",
+      "gcsExportedBytes": 5613073,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_vitalsign/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_vitalsign",
+      "table": "first_day_vitalsign"
+    },
+    {
+      "bigqueryLogicalBytes": 4398376,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_weight/",
+      "gcsExportedBytes": 1431992,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_weight/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.first_day_weight",
+      "table": "first_day_weight"
+    },
+    {
+      "bigqueryLogicalBytes": 141809416,
+      "bigqueryRows": 2217787,
+      "bigquerySchemaFields": 8,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/gcs/",
+      "gcsExportedBytes": 27687593,
+      "gcsObjectCount": 5,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/gcs/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/gcs/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/gcs/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.gcs",
+      "table": "gcs"
+    },
+    {
+      "bigqueryLogicalBytes": 1733680,
+      "bigqueryRows": 43342,
+      "bigquerySchemaFields": 4,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/height/",
+      "gcsExportedBytes": 1027593,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/height/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.height",
+      "table": "height"
+    },
+    {
+      "bigqueryLogicalBytes": 7682632,
+      "bigqueryRows": 243283,
+      "bigquerySchemaFields": 4,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icp/",
+      "gcsExportedBytes": 2182055,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icp/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.icp",
+      "table": "icp"
+    },
+    {
+      "bigqueryLogicalBytes": 12404159,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 18,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_detail/",
+      "gcsExportedBytes": 6066167,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_detail/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.icustay_detail",
+      "table": "icustay_detail"
+    },
+    {
+      "bigqueryLogicalBytes": 251574528,
+      "bigqueryRows": 10482272,
+      "bigquerySchemaFields": 3,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/",
+      "gcsExportedBytes": 132945370,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.icustay_hourly",
+      "table": "icustay_hourly"
+    },
+    {
+      "bigqueryLogicalBytes": 3777984,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_times/",
+      "gcsExportedBytes": 3661178,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_times/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.icustay_times",
+      "table": "icustay_times"
+    },
+    {
+      "bigqueryLogicalBytes": 6044696,
+      "bigqueryRows": 174269,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/inflammation/",
+      "gcsExportedBytes": 3953622,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/inflammation/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.inflammation",
+      "table": "inflammation"
+    },
+    {
+      "bigqueryLogicalBytes": 4588848,
+      "bigqueryRows": 108165,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/invasive_line/",
+      "gcsExportedBytes": 2481688,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/invasive_line/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.invasive_line",
+      "table": "invasive_line"
+    },
+    {
+      "bigqueryLogicalBytes": 37338480,
+      "bigqueryRows": 811585,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_creatinine/",
+      "gcsExportedBytes": 11338546,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_creatinine/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.kdigo_creatinine",
+      "table": "kdigo_creatinine"
+    },
+    {
+      "bigqueryLogicalBytes": 461119456,
+      "bigqueryRows": 5099899,
+      "bigquerySchemaFields": 15,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/",
+      "gcsExportedBytes": 132618970,
+      "gcsObjectCount": 15,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.kdigo_stages",
+      "table": "kdigo_stages"
+    },
+    {
+      "bigqueryLogicalBytes": 457751920,
+      "bigqueryRows": 4127634,
+      "bigquerySchemaFields": 12,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_uo/",
+      "gcsExportedBytes": 109120001,
+      "gcsObjectCount": 15,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_uo/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_uo/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_uo/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.kdigo_uo",
+      "table": "kdigo_uo"
+    },
+    {
+      "bigqueryLogicalBytes": 7435304,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 10,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/lods/",
+      "gcsExportedBytes": 1952879,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/lods/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.lods",
+      "table": "lods"
+    },
+    {
+      "bigqueryLogicalBytes": 7136288,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 10,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/meld/",
+      "gcsExportedBytes": 2102858,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/meld/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.meld",
+      "table": "meld"
+    },
+    {
+      "bigqueryLogicalBytes": 512064,
+      "bigqueryRows": 10668,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/milrinone/",
+      "gcsExportedBytes": 415325,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/milrinone/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.milrinone",
+      "table": "milrinone"
+    },
+    {
+      "bigqueryLogicalBytes": 932640,
+      "bigqueryRows": 19430,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/neuroblock/",
+      "gcsExportedBytes": 814219,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/neuroblock/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.neuroblock",
+      "table": "neuroblock"
+    },
+    {
+      "bigqueryLogicalBytes": 22070400,
+      "bigqueryRows": 459800,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/norepinephrine/",
+      "gcsExportedBytes": 15121347,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/norepinephrine/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.norepinephrine",
+      "table": "norepinephrine"
+    },
+    {
+      "bigqueryLogicalBytes": 31344520,
+      "bigqueryRows": 783613,
+      "bigquerySchemaFields": 4,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/norepinephrine_equivalent_dose/",
+      "gcsExportedBytes": 12680008,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/norepinephrine_equivalent_dose/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.norepinephrine_equivalent_dose",
+      "table": "norepinephrine_equivalent_dose"
+    },
+    {
+      "bigqueryLogicalBytes": 12396292,
+      "bigqueryRows": 293253,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/nsaid/",
+      "gcsExportedBytes": 7105040,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/nsaid/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.nsaid",
+      "table": "nsaid"
+    },
+    {
+      "bigqueryLogicalBytes": 19482832,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 25,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oasis/",
+      "gcsExportedBytes": 3015072,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oasis/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.oasis",
+      "table": "oasis"
+    },
+    {
+      "bigqueryLogicalBytes": 37862268,
+      "bigqueryRows": 794232,
+      "bigquerySchemaFields": 9,
+      "coverageStatus": "ok",
+      "dataset": "derived",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oxygen_delivery/",
+      "gcsExportedBytes": 8633666,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oxygen_delivery/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_derived.oxygen_delivery",
+      "table": "oxygen_delivery"
+    },
+    {
+      "bigqueryLogicalBytes": 77145724,
+      "bigqueryRows": 546028,
+      "bigquerySchemaFields": 16,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/admissions/",
+      "gcsExportedBytes": 23202784,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/admissions/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.admissions",
+      "table": "admissions"
+    },
+    {
+      "bigqueryLogicalBytes": 3906265,
+      "bigqueryRows": 89208,
+      "bigquerySchemaFields": 4,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_hcpcs/",
+      "gcsExportedBytes": 1041522,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_hcpcs/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.d_hcpcs",
+      "table": "d_hcpcs"
+    },
+    {
+      "bigqueryLogicalBytes": 9723069,
+      "bigqueryRows": 112107,
+      "bigquerySchemaFields": 3,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_diagnoses/",
+      "gcsExportedBytes": 1984186,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_diagnoses/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.d_icd_diagnoses",
+      "table": "d_icd_diagnoses"
+    },
+    {
+      "bigqueryLogicalBytes": 7915160,
+      "bigqueryRows": 86423,
+      "bigquerySchemaFields": 3,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_procedures/",
+      "gcsExportedBytes": 1530069,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_procedures/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.d_icd_procedures",
+      "table": "d_icd_procedures"
+    },
+    {
+      "bigqueryLogicalBytes": 72297,
+      "bigqueryRows": 1650,
+      "bigquerySchemaFields": 4,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_labitems/",
+      "gcsExportedBytes": 24263,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_labitems/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.d_labitems",
+      "table": "d_labitems"
+    },
+    {
+      "bigqueryLogicalBytes": 245609614,
+      "bigqueryRows": 6364488,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/diagnoses_icd/",
+      "gcsExportedBytes": 60407388,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/diagnoses_icd/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.diagnoses_icd",
+      "table": "diagnoses_icd"
+    },
+    {
+      "bigqueryLogicalBytes": 58873707,
+      "bigqueryRows": 761856,
+      "bigquerySchemaFields": 7,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/drgcodes/",
+      "gcsExportedBytes": 8051841,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/drgcodes/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.drgcodes",
+      "table": "drgcodes"
+    },
+    {
+      "bigqueryLogicalBytes": 4886679154,
+      "bigqueryRows": 42808593,
+      "bigquerySchemaFields": 12,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/",
+      "gcsExportedBytes": 2635117267,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.emar",
+      "table": "emar"
+    },
+    {
+      "bigqueryLogicalBytes": 7408021201,
+      "bigqueryRows": 87371064,
+      "bigquerySchemaFields": 33,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/",
+      "gcsExportedBytes": 1746715673,
+      "gcsObjectCount": 150,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.emar_detail",
+      "table": "emar_detail"
+    },
+    {
+      "bigqueryLogicalBytes": 12448070,
+      "bigqueryRows": 186074,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/hcpcsevents/",
+      "gcsExportedBytes": 2616181,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/hcpcsevents/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.hcpcsevents",
+      "table": "hcpcsevents"
+    },
+    {
+      "bigqueryLogicalBytes": 16052762274,
+      "bigqueryRows": 158374764,
+      "bigquerySchemaFields": 16,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/",
+      "gcsExportedBytes": 6161328534,
+      "gcsObjectCount": 300,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.labevents",
+      "table": "labevents"
+    },
+    {
+      "bigqueryLogicalBytes": 763457753,
+      "bigqueryRows": 3988224,
+      "bigquerySchemaFields": 25,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/",
+      "gcsExportedBytes": 184567367,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.microbiologyevents",
+      "table": "microbiologyevents"
+    },
+    {
+      "bigqueryLogicalBytes": 351854852,
+      "bigqueryRows": 7753027,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/omr/",
+      "gcsExportedBytes": 36014617,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/omr/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.omr",
+      "table": "omr"
+    },
+    {
+      "bigqueryLogicalBytes": 14891488,
+      "bigqueryRows": 364627,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/patients/",
+      "gcsExportedBytes": 2576273,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/patients/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.patients",
+      "table": "patients"
+    },
+    {
+      "bigqueryLogicalBytes": 3244401436,
+      "bigqueryRows": 17847567,
+      "bigquerySchemaFields": 27,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/",
+      "gcsExportedBytes": 1217415870,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.pharmacy",
+      "table": "pharmacy"
+    },
+    {
+      "bigqueryLogicalBytes": 4767748464,
+      "bigqueryRows": 52212109,
+      "bigquerySchemaFields": 12,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/",
+      "gcsExportedBytes": 1920440665,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.poe",
+      "table": "poe"
+    },
+    {
+      "bigqueryLogicalBytes": 475862780,
+      "bigqueryRows": 8504982,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe_detail/",
+      "gcsExportedBytes": 107448463,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe_detail/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe_detail/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe_detail/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.poe_detail",
+      "table": "poe_detail"
+    },
+    {
+      "bigqueryLogicalBytes": 3327080571,
+      "bigqueryRows": 20292611,
+      "bigquerySchemaFields": 21,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/",
+      "gcsExportedBytes": 1063839220,
+      "gcsObjectCount": 100,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.prescriptions",
+      "table": "prescriptions"
+    },
+    {
+      "bigqueryLogicalBytes": 40686959,
+      "bigqueryRows": 859655,
+      "bigquerySchemaFields": 6,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/procedures_icd/",
+      "gcsExportedBytes": 11184193,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/procedures_icd/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.procedures_icd",
+      "table": "procedures_icd"
+    },
+    {
+      "bigqueryLogicalBytes": 337952,
+      "bigqueryRows": 42244,
+      "bigquerySchemaFields": 1,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/provider/",
+      "gcsExportedBytes": 321918,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/provider/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.provider",
+      "table": "provider"
+    },
+    {
+      "bigqueryLogicalBytes": 17835066,
+      "bigqueryRows": 593071,
+      "bigquerySchemaFields": 5,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/services/",
+      "gcsExportedBytes": 10680671,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/services/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.services",
+      "table": "services"
+    },
+    {
+      "bigqueryLogicalBytes": 150927397,
+      "bigqueryRows": 2413581,
+      "bigquerySchemaFields": 7,
+      "coverageStatus": "ok",
+      "dataset": "hosp",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/transfers/",
+      "gcsExportedBytes": 75502529,
+      "gcsObjectCount": 5,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/transfers/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/transfers/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/transfers/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_hosp.transfers",
+      "table": "transfers"
+    },
+    {
+      "bigqueryLogicalBytes": 143872,
+      "bigqueryRows": 17984,
+      "bigquerySchemaFields": 1,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/caregiver/",
+      "gcsExportedBytes": 106496,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/caregiver/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.caregiver",
+      "table": "caregiver"
+    },
+    {
+      "bigqueryLogicalBytes": 34927332044,
+      "bigqueryRows": 432997491,
+      "bigquerySchemaFields": 11,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/",
+      "gcsExportedBytes": 12007438910,
+      "gcsObjectCount": 1000,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.chartevents",
+      "table": "chartevents"
+    },
+    {
+      "bigqueryLogicalBytes": 390817,
+      "bigqueryRows": 4095,
+      "bigquerySchemaFields": 9,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/d_items/",
+      "gcsExportedBytes": 126723,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/d_items/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.d_items",
+      "table": "d_items"
+    },
+    {
+      "bigqueryLogicalBytes": 803853972,
+      "bigqueryRows": 9979761,
+      "bigquerySchemaFields": 10,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/",
+      "gcsExportedBytes": 254014332,
+      "gcsObjectCount": 17,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.datetimeevents",
+      "table": "datetimeevents"
+    },
+    {
+      "bigqueryLogicalBytes": 11352178,
+      "bigqueryRows": 94458,
+      "bigquerySchemaFields": 8,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/icustays/",
+      "gcsExportedBytes": 4528825,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/icustays/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.icustays",
+      "table": "icustays"
+    },
+    {
+      "bigqueryLogicalBytes": 1929787734,
+      "bigqueryRows": 14253480,
+      "bigquerySchemaFields": 17,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/",
+      "gcsExportedBytes": 851175698,
+      "gcsObjectCount": 50,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.ingredientevents",
+      "table": "ingredientevents"
+    },
+    {
+      "bigqueryLogicalBytes": 2635483042,
+      "bigqueryRows": 10953713,
+      "bigquerySchemaFields": 26,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/",
+      "gcsExportedBytes": 731119446,
+      "gcsObjectCount": 50,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.inputevents",
+      "table": "inputevents"
+    },
+    {
+      "bigqueryLogicalBytes": 364438860,
+      "bigqueryRows": 5359395,
+      "bigquerySchemaFields": 9,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/outputevents/",
+      "gcsExportedBytes": 124353984,
+      "gcsObjectCount": 12,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/outputevents/part-000000000000.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/outputevents/part-000000000001.parquet",
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/outputevents/part-000000000002.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.outputevents",
+      "table": "outputevents"
+    },
+    {
+      "bigqueryLogicalBytes": 147757456,
+      "bigqueryRows": 808706,
+      "bigquerySchemaFields": 22,
+      "coverageStatus": "ok",
+      "dataset": "icu",
+      "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/procedureevents/",
+      "gcsExportedBytes": 38404400,
+      "gcsObjectCount": 1,
+      "sampleUris": [
+        "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/procedureevents/part-000000000000.parquet"
+      ],
+      "source": "physionet-data:mimiciv_3_1_icu.procedureevents",
+      "table": "procedureevents"
+    }
+  ]
+}

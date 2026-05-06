@@ -14,7 +14,8 @@ The pipeline's target shape is:
 question
 -> clarify
 -> retrieve evidence when useful
--> load dataset registry
+-> register or load dataset intelligence
+-> inspect dataset registry/profile/relationships/watchouts
 -> design candidate protocols
 -> validate feasibility
 -> scout cohort/data quality
@@ -42,6 +43,7 @@ Agenteer owns the orchestration substrate:
 
 The research pipeline owns reusable research workflow logic:
 
+- dataset intelligence bundles for new datasets
 - dataset registry loading
 - question decomposition
 - protocol design
@@ -109,6 +111,8 @@ The current CLI is intentionally stage-based rather than a single hidden "run ev
 Use this path when driving a packet forward:
 
 ```bash
+agenteer research dataset-register --id my-dataset --source /path/to/data --out-dir ./.loop-memory/datasets
+agenteer research dataset-describe --dataset-dir ./.loop-memory/datasets/my-dataset
 agenteer research design --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet
 agenteer research next --packet ./packet --trace --exit-zero-on-blocked --json
 agenteer research validate-methods --packet ./packet --json
@@ -121,6 +125,8 @@ agenteer research manifest --packet ./packet --json
 agenteer research packet-readiness --packet ./packet --json
 agenteer research export --packet ./packet --out ./exports/packet
 ```
+
+For non-MedBrevia datasets, start with `dataset-register` and read the generated `DATASET_CONTEXT.md` before method selection or exploration. The dataset intelligence directory is the standard place for source facts, variable roles, inferred relationships, missingness, semantic oddities, access restrictions, and question seeds.
 
 ### AnalysisSpec-To-Paper Path
 
@@ -149,6 +155,10 @@ agenteer research paper-run \
 7. validates task/capability envelopes
 8. exports MCP/A2A-shaped task views
 9. writes `lifecycle.md` and `lifecycle.json`
+
+`paper.md` is the reader-facing scientific report. It should explain the question, population, variables, methods, results, interpretation, limitations, and reproducibility in ordinary research language. It must not rely on Agenteer-specific terms such as `AnalysisSpec`, result posture, task envelopes, evidence receipts, or runner records. Those details belong in `analysis.json`, runner provenance, lifecycle files, receipts, and QA artifacts.
+
+Current paper QA enforces this boundary. It checks for internal framework language, a plain-language main finding for generated paper packets, excessive raw variable-code exposure, known awkward generator phrases, survey-design disclosure, sample construction, missingness, causal overclaiming, threshold caveats, numeric consistency, and companion evidence readability. `paper-index` also reports a `Reader Language` status so older pre-contract papers are not mistaken for current output quality.
 
 Check local analysis runtime readiness before broadening a study:
 
@@ -223,6 +233,47 @@ agenteer research paper-lifecycle \
 ```
 
 Lifecycle status is stricter than paper QA. A paper can pass QA while still requiring methods review if its AnalysisSpec binding is retrospective, or while still needing task envelopes if provenance has not been integrated.
+
+### Manifest-Backed Dataset Run Path
+
+Use this path when the source data is a registered dataset directory and the study needs cohort construction across multiple tables, such as an EHR diagnosis-code cohort with outcomes and severity covariates. This is the promoted version of the earlier loop-memory study scripts: the run starts from AnalysisSpec v2, reads the dataset manifest, enforces cost and cache policy, executes locally or against explicitly allowed GCS Parquet, and writes a reviewable aggregate-only packet.
+
+```bash
+agenteer research dataset-spec \
+  --study ./studies/hip-fracture-icu-outcomes.json \
+  --dataset-dir ./.loop-memory/datasets/mimiciv-3-1 \
+  --out ./runs/hip-fracture/analysis-spec-v2.json \
+  --json
+
+agenteer research dataset-run \
+  --analysis-spec ./runs/hip-fracture/analysis-spec-v2.json \
+  --dataset-dir ./.loop-memory/datasets/mimiciv-3-1 \
+  --out-dir ./runs/hip-fracture \
+  --max-usd 1 \
+  --json
+
+agenteer research dataset-run-index \
+  --run-root ./runs \
+  --out ./runs/dataset-run-index.json \
+  --report ./runs/dataset-run-index.md
+```
+
+`dataset-spec` converts a study artifact into a strict `AnalysisSpecV2`. For diagnosis-code cohorts it records the ICD family, expected dictionary terms, coding verification references, phenotype tables, join keys, missingness policy, sensitivity analyses, artifact expectations, and conservative claim language. This makes the study contract explicit before any runner code touches the data.
+
+`dataset-run` currently supports the `ehr-diagnosis-cohort-outcome` archetype. It constructs the cohort from diagnosis and dictionary tables, records the exact matched diagnosis codes, merges requested outcome/covariate tables through declared keys, fits supported mortality and ICU length-of-stay models when the data are adequate, and downgrades the packet to methods review when sparse events, small cohorts, low events-per-predictor, missing tables, unsafe cache policy, or incomplete coding review make promotion unsafe.
+
+The packet includes:
+
+- `analysis-results.json`: cohort counts, matched code evidence, model summaries, and method issues.
+- `paper.md`: reader-facing study report without Agenteer-specific framework language.
+- `qa.json`: promotion status, readiness, typed issues, and next action.
+- `run-manifest.json`: artifact inventory with hashes.
+- `cost-receipt.json`: estimated bytes read and estimated cost.
+- `matched-icd-codes.csv`: cohort-code evidence for human coding review.
+- `lifecycle.json`: execution status and remaining review needs.
+- `critique.md`: conservative methods critique.
+
+This path is intentionally stricter than a manual notebook. A run can succeed technically while remaining `needs_methods_review`; that is the expected outcome when the data are too sparse, the coding evidence is incomplete, or the fitted model is not stable enough for a research claim.
 
 ### Audit And Debug Commands
 

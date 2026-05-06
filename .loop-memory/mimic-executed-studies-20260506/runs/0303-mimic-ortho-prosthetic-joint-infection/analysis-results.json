@@ -1,0 +1,317 @@
+{
+  "study": {
+    "id": "mimic-ortho-prosthetic-joint-infection",
+    "title": "Prosthetic Joint Infection ICU Outcomes",
+    "domain": "orthopedic-infection",
+    "question": "Are prosthetic joint infection diagnoses associated with higher ICU resource use than other orthopedic infection diagnoses?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-antibiotic",
+      "derived-first-day-sofa"
+    ],
+    "outcomes": [
+      "los_icu",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "prosthetic infection phenotype",
+      "comparison group design",
+      "sparse-cell refusal if needed"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "infection joint prosthesis",
+        "expectedTerms": [
+          "infection",
+          "joint prosthesis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "infection joint prosthesis",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "infection joint prosthesis",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=infection+joint+prosthesis&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 6,
+            "sampleRows": [
+              {
+                "code": "T84.50XS",
+                "name": "Infection and inflammatory reaction due to unspecified internal joint prosthesis, sequela"
+              },
+              {
+                "code": "T84.59XS",
+                "name": "Infection and inflammatory reaction due to other internal joint prosthesis, sequela"
+              },
+              {
+                "code": "T84.50XA",
+                "name": "Infection and inflammatory reaction due to unspecified internal joint prosthesis, initial encounter"
+              },
+              {
+                "code": "T84.50XD",
+                "name": "Infection and inflammatory reaction due to unspecified internal joint prosthesis, subsequent encounter"
+              },
+              {
+                "code": "T84.59XA",
+                "name": "Infection and inflammatory reaction due to other internal joint prosthesis, initial encounter"
+              },
+              {
+                "code": "T84.59XD",
+                "name": "Infection and inflammatory reaction due to other internal joint prosthesis, subsequent encounter"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:36.910030+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "996.66",
+        "expectedTerms": [
+          "infection",
+          "joint prosthesis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "99666",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "99666",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=99666&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "996.66",
+                "name": "Infection and inflammatory reaction due to internal joint prosthesis"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:37.391250+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 10,
+    "matchedDiagnosisRows": 477,
+    "matchedAdmissions": 477,
+    "firstIcuStayRows": 81,
+    "uniquePatients": 72
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 81,
+        "missing": 0,
+        "mean": 66.95061728395062,
+        "sd": 11.879500446744279,
+        "median": 70.0,
+        "iqr": [
+          58.0,
+          75.0
+        ],
+        "min": 24.0,
+        "max": 89.0
+      },
+      "los_icu": {
+        "n": 81,
+        "missing": 0,
+        "mean": 3.7460493827160493,
+        "sd": 4.339662336810418,
+        "median": 2.21,
+        "iqr": [
+          1.13,
+          4.04
+        ],
+        "min": 0.08,
+        "max": 19.71
+      },
+      "los_hospital": {
+        "n": 81,
+        "missing": 0,
+        "mean": 14.17283950617284,
+        "sd": 9.867611316140282,
+        "median": 12.0,
+        "iqr": [
+          7.0,
+          18.0
+        ],
+        "min": 1.0,
+        "max": 57.0
+      },
+      "sofa": {
+        "n": 81,
+        "missing": 0,
+        "mean": 4.654320987654321,
+        "sd": 3.244843963225198,
+        "median": 4.0,
+        "iqr": [
+          2.0,
+          7.0
+        ],
+        "min": 0.0,
+        "max": 14.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 81,
+        "positive": 13,
+        "proportion": 0.16049382716049382
+      },
+      "male": {
+        "n": 81,
+        "positive": 34,
+        "proportion": 0.41975308641975306
+      },
+      "prolonged_icu_los": {
+        "n": 81,
+        "positive": 20,
+        "proportion": 0.24691358024691357
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "sofa",
+    "any_antibiotic_record",
+    "antibiotic_record_count"
+  ],
+  "missingness": [
+    {
+      "column": "any_antibiotic_record",
+      "missing": 12,
+      "missingFraction": 0.14814814814814814
+    },
+    {
+      "column": "antibiotic_record_count",
+      "missing": 12,
+      "missingFraction": 0.14814814814814814
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "sofa",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "not_fit",
+      "reason": "Singular matrix",
+      "n": 69,
+      "events": 13
+    },
+    "los": {
+      "status": "fit",
+      "n": 69,
+      "predictors": [
+        "admission_age",
+        "male",
+        "sofa",
+        "any_antibiotic_record",
+        "antibiotic_record_count"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 66.27536231884058,
+          "sd": 12.109651058715661
+        },
+        "sofa": {
+          "mean": 4.695652173913044,
+          "sd": 3.3046506793505372
+        },
+        "antibiotic_record_count": {
+          "mean": 5.188405797101449,
+          "sd": 3.812808762111796
+        }
+      },
+      "rSquared": 0.5009568344327353,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -0.5622853532469829,
+          "ci95PercentChange": [
+            -11.569520144211031,
+            11.815056418262614
+          ],
+          "pValue": 0.924945949462908,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 29.370370594940187,
+          "ci95PercentChange": [
+            0.008944455697168507,
+            67.35195915687649
+          ],
+          "pValue": 0.049920452092210625,
+          "scale": "per unit"
+        },
+        {
+          "term": "sofa",
+          "percentChangeInLos": 2.530520825998006,
+          "ci95PercentChange": [
+            -10.801220070271022,
+            17.854837354638597
+          ],
+          "pValue": 0.7251130777931513,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "any_antibiotic_record",
+          "percentChangeInLos": 90.26867070265632,
+          "ci95PercentChange": [
+            75.83938439691424,
+            105.8820165636975
+          ],
+          "pValue": 1.591370898982358e-57,
+          "scale": "per unit"
+        },
+        {
+          "term": "antibiotic_record_count",
+          "percentChangeInLos": 55.57526426201393,
+          "ci95PercentChange": [
+            36.86999911086208,
+            76.83687446064032
+          ],
+          "pValue": 1.3591297603361967e-11,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,458 @@
+{
+  "study": {
+    "id": "mimic-ortho-osteomyelitis-icu",
+    "title": "Osteomyelitis-Associated ICU Admissions",
+    "domain": "orthopedic-infection",
+    "question": "What severity and comorbidity patterns characterize ICU stays with osteomyelitis diagnosis codes?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-charlson",
+      "derived-first-day-lab",
+      "derived-antibiotic"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu",
+      "antibiotic exposure pattern"
+    ],
+    "methods": [
+      "infection phenotype",
+      "antibiotic timing caveat",
+      "severity-adjusted descriptive outcome model"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "M86",
+        "expectedTerms": [
+          "osteomyelitis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "M86",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "M86",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=M86&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 179,
+            "sampleRows": [
+              {
+                "code": "M86.00",
+                "name": "Acute hematogenous osteomyelitis, unspecified site"
+              },
+              {
+                "code": "M86.011",
+                "name": "Acute hematogenous osteomyelitis, right shoulder"
+              },
+              {
+                "code": "M86.012",
+                "name": "Acute hematogenous osteomyelitis, left shoulder"
+              },
+              {
+                "code": "M86.019",
+                "name": "Acute hematogenous osteomyelitis, unspecified shoulder"
+              },
+              {
+                "code": "M86.021",
+                "name": "Acute hematogenous osteomyelitis, right humerus"
+              },
+              {
+                "code": "M86.022",
+                "name": "Acute hematogenous osteomyelitis, left humerus"
+              },
+              {
+                "code": "M86.029",
+                "name": "Acute hematogenous osteomyelitis, unspecified humerus"
+              },
+              {
+                "code": "M86.031",
+                "name": "Acute hematogenous osteomyelitis, right radius and ulna"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:35.024425+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "730",
+        "expectedTerms": [
+          "osteomyelitis"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "730",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "730",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=730&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 70,
+            "sampleRows": [
+              {
+                "code": "730.00",
+                "name": "Acute osteomyelitis, site unspecified"
+              },
+              {
+                "code": "730.01",
+                "name": "Acute osteomyelitis, shoulder region"
+              },
+              {
+                "code": "730.02",
+                "name": "Acute osteomyelitis, upper arm"
+              },
+              {
+                "code": "730.03",
+                "name": "Acute osteomyelitis, forearm"
+              },
+              {
+                "code": "730.04",
+                "name": "Acute osteomyelitis, hand"
+              },
+              {
+                "code": "730.05",
+                "name": "Acute osteomyelitis, pelvic region and thigh"
+              },
+              {
+                "code": "730.06",
+                "name": "Acute osteomyelitis, lower leg"
+              },
+              {
+                "code": "730.07",
+                "name": "Acute osteomyelitis, ankle and foot"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:35.507254+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 278,
+    "matchedDiagnosisRows": 6500,
+    "matchedAdmissions": 6106,
+    "firstIcuStayRows": 972,
+    "uniquePatients": 838
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 972,
+        "missing": 0,
+        "mean": 64.04732510288066,
+        "sd": 14.785100602993753,
+        "median": 65.0,
+        "iqr": [
+          55.0,
+          74.0
+        ],
+        "min": 19.0,
+        "max": 102.0
+      },
+      "los_icu": {
+        "n": 972,
+        "missing": 0,
+        "mean": 4.478837448559671,
+        "sd": 6.2416322387189656,
+        "median": 2.4,
+        "iqr": [
+          1.17,
+          4.88
+        ],
+        "min": 0.04,
+        "max": 52.83
+      },
+      "los_hospital": {
+        "n": 972,
+        "missing": 0,
+        "mean": 19.0761316872428,
+        "sd": 18.68835878628089,
+        "median": 13.0,
+        "iqr": [
+          7.75,
+          24.0
+        ],
+        "min": 0.0,
+        "max": 163.0
+      },
+      "charlson_comorbidity_index": {
+        "n": 972,
+        "missing": 0,
+        "mean": 5.987654320987654,
+        "sd": 3.02203576358505,
+        "median": 6.0,
+        "iqr": [
+          4.0,
+          8.0
+        ],
+        "min": 0.0,
+        "max": 16.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 972,
+        "positive": 142,
+        "proportion": 0.14609053497942387
+      },
+      "male": {
+        "n": 972,
+        "positive": 591,
+        "proportion": 0.6080246913580247
+      },
+      "prolonged_icu_los": {
+        "n": 972,
+        "positive": 242,
+        "proportion": 0.24897119341563786
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "charlson_comorbidity_index",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max",
+    "any_antibiotic_record",
+    "antibiotic_record_count"
+  ],
+  "missingness": [
+    {
+      "column": "any_antibiotic_record",
+      "missing": 105,
+      "missingFraction": 0.10802469135802469
+    },
+    {
+      "column": "antibiotic_record_count",
+      "missing": 105,
+      "missingFraction": 0.10802469135802469
+    },
+    {
+      "column": "wbc_max",
+      "missing": 11,
+      "missingFraction": 0.01131687242798354
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 10,
+      "missingFraction": 0.0102880658436214
+    },
+    {
+      "column": "glucose_max",
+      "missing": 9,
+      "missingFraction": 0.009259259259259259
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 7,
+      "missingFraction": 0.00720164609053498
+    },
+    {
+      "column": "bun_max",
+      "missing": 7,
+      "missingFraction": 0.00720164609053498
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "charlson_comorbidity_index",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "not_fit",
+      "reason": "Singular matrix",
+      "n": 858,
+      "events": 118
+    },
+    "los": {
+      "status": "fit",
+      "n": 858,
+      "predictors": [
+        "admission_age",
+        "male",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "any_antibiotic_record",
+        "antibiotic_record_count"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 63.913752913752916,
+          "sd": 14.865700527621186
+        },
+        "charlson_comorbidity_index": {
+          "mean": 5.933566433566433,
+          "sd": 2.9934220546221595
+        },
+        "hemoglobin_min": {
+          "mean": 8.875524475524475,
+          "sd": 1.9292703362468593
+        },
+        "wbc_max": {
+          "mean": 16.11958041958042,
+          "sd": 14.416610535547708
+        },
+        "creatinine_max": {
+          "mean": 2.2602564102564107,
+          "sd": 2.0384217084217213
+        },
+        "bun_max": {
+          "mean": 40.2995337995338,
+          "sd": 31.75397731983157
+        },
+        "glucose_max": {
+          "mean": 194.89743589743588,
+          "sd": 120.55114087534189
+        },
+        "antibiotic_record_count": {
+          "mean": 6.162004662004662,
+          "sd": 5.4054384377922915
+        }
+      },
+      "rSquared": 0.5499761722919432,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -2.250756913918195,
+          "ci95PercentChange": [
+            -6.34477699572945,
+            2.022228097905665
+          ],
+          "pValue": 0.29702375608594134,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 2.362291281778006,
+          "ci95PercentChange": [
+            -4.400002338745191,
+            9.602917706996461
+          ],
+          "pValue": 0.5031367342924501,
+          "scale": "per unit"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "percentChangeInLos": 2.5926372005002474,
+          "ci95PercentChange": [
+            -1.994790386828993,
+            7.394793085968465
+          ],
+          "pValue": 0.27279092408441463,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -4.381295006734865,
+          "ci95PercentChange": [
+            -7.3920993521707885,
+            -1.2726054620547989
+          ],
+          "pValue": 0.006059027388072004,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": -1.352715512767877,
+          "ci95PercentChange": [
+            -5.620736786117897,
+            3.1083143195543395
+          ],
+          "pValue": 0.5461566663148643,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -6.655173013488092,
+          "ci95PercentChange": [
+            -11.520404724276212,
+            -1.522416575378438
+          ],
+          "pValue": 0.011679296240225612,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 4.477276185636492,
+          "ci95PercentChange": [
+            -0.2868962703305389,
+            9.469075085282652
+          ],
+          "pValue": 0.06586935962490431,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -3.2272588887540476,
+          "ci95PercentChange": [
+            -6.263588950961296,
+            -0.0925753676988661
+          ],
+          "pValue": 0.04370516101295774,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "any_antibiotic_record",
+          "percentChangeInLos": 103.8533728876558,
+          "ci95PercentChange": [
+            98.71042197537558,
+            109.12943178603554
+          ],
+          "pValue": 0.0,
+          "scale": "per unit"
+        },
+        {
+          "term": "antibiotic_record_count",
+          "percentChangeInLos": 71.33895911153172,
+          "ci95PercentChange": [
+            61.486727276920305,
+            81.7922711324824
+          ],
+          "pValue": 4.835535322124496e-71,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

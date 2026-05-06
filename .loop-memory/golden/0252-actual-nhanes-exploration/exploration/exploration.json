@@ -1,0 +1,2237 @@
+{
+  "schemaVersion": 1,
+  "exploration": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-06T01:50:06.422Z",
+    "dataPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration",
+    "target": "LBXGH",
+    "posture": "exploratory_hypothesis_generation",
+    "tableSummary": {
+      "file": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+      "format": "csv",
+      "adapter": {
+        "kind": "node-tabular",
+        "executable": "node",
+        "version": "v24.14.0",
+        "packages": {}
+      },
+      "fileSizeBytes": 3782576,
+      "fileMtimeMs": 1778027652878.2605,
+      "fileSha256": "b00a1c49268965d78a954e2e719c328f1d6eb64bf0dfacd1ce22c0fc7f877703",
+      "rowCount": 31849,
+      "columnCount": 22,
+      "columns": [
+        {
+          "name": "BMXBMI",
+          "inferredType": "number",
+          "nonMissingRows": 29719,
+          "missingFraction": 0.06687808094445666,
+          "sampleValues": [
+            "20.1",
+            "23.2",
+            "23.3",
+            "28.5",
+            "33.3"
+          ],
+          "min": 13.4,
+          "max": 92.3,
+          "mean": 29.519310878562475
+        },
+        {
+          "name": "BMXWAIST",
+          "inferredType": "number",
+          "nonMissingRows": 28356,
+          "missingFraction": 0.10967377311689536,
+          "sampleValues": [
+            "112.5",
+            "116.5",
+            "120.4",
+            "69.6",
+            "80.1"
+          ],
+          "min": 55.5,
+          "max": 187.5,
+          "mean": 100.00601283678994
+        },
+        {
+          "name": "DIQ010",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "2"
+          ],
+          "min": 1,
+          "max": 9,
+          "mean": 1.8878457722377469
+        },
+        {
+          "name": "elevated_hba1c",
+          "inferredType": "string",
+          "nonMissingRows": 28712,
+          "missingFraction": 0.09849602813275142,
+          "sampleValues": [
+            "False"
+          ]
+        },
+        {
+          "name": "high_waist_cm",
+          "inferredType": "string",
+          "nonMissingRows": 28356,
+          "missingFraction": 0.10967377311689536,
+          "sampleValues": [
+            "False",
+            "True"
+          ]
+        },
+        {
+          "name": "INDFMPIR",
+          "inferredType": "number",
+          "nonMissingRows": 28067,
+          "missingFraction": 0.11874784137649534,
+          "sampleValues": [
+            "0.05",
+            "0.33",
+            "1.67",
+            "2.02",
+            "3.15"
+          ],
+          "min": 5.397605346934028e-79,
+          "max": 5,
+          "mean": 2.5067606085438525
+        },
+        {
+          "name": "LBDHDD",
+          "inferredType": "number",
+          "nonMissingRows": 28270,
+          "missingFraction": 0.11237401488272787,
+          "sampleValues": [
+            "28",
+            "41",
+            "43",
+            "47",
+            "54"
+          ],
+          "min": 5,
+          "max": 226,
+          "mean": 53.300141492748494
+        },
+        {
+          "name": "LBXGH",
+          "inferredType": "number",
+          "nonMissingRows": 28712,
+          "missingFraction": 0.09849602813275142,
+          "sampleValues": [
+            "4.9",
+            "5",
+            "5.1",
+            "5.4",
+            "5.6"
+          ],
+          "min": 2.8,
+          "max": 17.8,
+          "mean": 5.826386179994414
+        },
+        {
+          "name": "LBXGLU",
+          "inferredType": "number",
+          "nonMissingRows": 13936,
+          "missingFraction": 0.5624352412948601,
+          "sampleValues": [
+            "104",
+            "105",
+            "107",
+            "82",
+            "83"
+          ],
+          "min": 21,
+          "max": 479,
+          "mean": 111.72445464982778
+        },
+        {
+          "name": "LBXTC",
+          "inferredType": "number",
+          "nonMissingRows": 28270,
+          "missingFraction": 0.11237401488272787,
+          "sampleValues": [
+            "132",
+            "168",
+            "169",
+            "171",
+            "190"
+          ],
+          "min": 59,
+          "max": 813,
+          "mean": 188.88100459851432
+        },
+        {
+          "name": "LBXTR",
+          "inferredType": "number",
+          "nonMissingRows": 13573,
+          "missingFraction": 0.5738327733994788,
+          "sampleValues": [
+            "100",
+            "126",
+            "141",
+            "40",
+            "56"
+          ],
+          "min": 10,
+          "max": 4233,
+          "mean": 116.6613129006115
+        },
+        {
+          "name": "low_hdl",
+          "inferredType": "string",
+          "nonMissingRows": 28270,
+          "missingFraction": 0.11237401488272787,
+          "sampleValues": [
+            "False",
+            "True"
+          ]
+        },
+        {
+          "name": "nhanes_cycle_id",
+          "inferredType": "string",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "2011-2012"
+          ]
+        },
+        {
+          "name": "RIAGENDR",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "1",
+            "2"
+          ],
+          "min": 1,
+          "max": 2,
+          "mean": 1.5156519827938082
+        },
+        {
+          "name": "RIDAGEYR",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "21",
+            "22",
+            "34",
+            "43",
+            "44"
+          ],
+          "min": 20,
+          "max": 80,
+          "mean": 50.16609626675877
+        },
+        {
+          "name": "RIDRETH3",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "3",
+            "4",
+            "6"
+          ],
+          "min": 1,
+          "max": 7,
+          "mean": 3.4182862884234986
+        },
+        {
+          "name": "SDMVPSU",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "1",
+            "2",
+            "3"
+          ],
+          "min": 1,
+          "max": 3,
+          "mean": 1.5344908788345002
+        },
+        {
+          "name": "SDMVSTRA",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "90",
+            "91",
+            "92",
+            "94",
+            "95"
+          ],
+          "min": 90,
+          "max": 172,
+          "mean": 130.57866809004992
+        },
+        {
+          "name": "SEQN",
+          "inferredType": "number",
+          "nonMissingRows": 31849,
+          "missingFraction": 0,
+          "sampleValues": [
+            "62161",
+            "62164",
+            "62169",
+            "62172",
+            "62174"
+          ],
+          "min": 62161,
+          "max": 124822,
+          "mean": 93001.77964771264
+        },
+        {
+          "name": "WTMEC2YR",
+          "inferredType": "number",
+          "nonMissingRows": 22617,
+          "missingFraction": 0.2898678137461145,
+          "sampleValues": [
+            "104236.582554",
+            "127965.226204",
+            "13189.875012",
+            "14783.600953",
+            "27122.911908"
+          ],
+          "min": 5.397605346934028e-79,
+          "max": 419762.836487576,
+          "mean": 40958.721796494865
+        },
+        {
+          "name": "WTMECPRP",
+          "inferredType": "number",
+          "nonMissingRows": 9232,
+          "missingFraction": 0.7101321862538855,
+          "sampleValues": [
+            "13794.793542",
+            "22163.59685",
+            "31816.3465",
+            "5.397605346934028e-79",
+            "7801.600218"
+          ],
+          "min": 5.397605346934028e-79,
+          "max": 367555.742979,
+          "mean": 26045.22238218654
+        },
+        {
+          "name": "WTSAF2YR",
+          "inferredType": "number",
+          "nonMissingRows": 10434,
+          "missingFraction": 0.6723915978523658,
+          "sampleValues": [
+            "17583.539",
+            "240011.713",
+            "26860.795",
+            "288182.78",
+            "30061.013"
+          ],
+          "min": 5.397605346934028e-79,
+          "max": 944153.249752,
+          "mean": 88807.46077941038
+        }
+      ],
+      "warnings": []
+    },
+    "variableMap": [
+      {
+        "name": "BMXBMI",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 29719,
+        "missingFraction": 0.06687808094445666,
+        "cardinality": 506,
+        "notes": []
+      },
+      {
+        "name": "BMXWAIST",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 28356,
+        "missingFraction": 0.10967377311689536,
+        "cardinality": 973,
+        "notes": []
+      },
+      {
+        "name": "DIQ010",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 5,
+        "notes": []
+      },
+      {
+        "name": "elevated_hba1c",
+        "role": "candidate_outcome",
+        "inferredType": "string",
+        "nonMissingRows": 28712,
+        "missingFraction": 0.09849602813275142,
+        "cardinality": 2,
+        "notes": []
+      },
+      {
+        "name": "high_waist_cm",
+        "role": "feature",
+        "inferredType": "string",
+        "nonMissingRows": 28356,
+        "missingFraction": 0.10967377311689536,
+        "cardinality": 2,
+        "notes": []
+      },
+      {
+        "name": "INDFMPIR",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 28067,
+        "missingFraction": 0.11874784137649534,
+        "cardinality": 500,
+        "notes": []
+      },
+      {
+        "name": "LBDHDD",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 28270,
+        "missingFraction": 0.11237401488272787,
+        "cardinality": 148,
+        "notes": []
+      },
+      {
+        "name": "LBXGH",
+        "role": "candidate_outcome",
+        "inferredType": "number",
+        "nonMissingRows": 28712,
+        "missingFraction": 0.09849602813275142,
+        "cardinality": 125,
+        "notes": [
+          "User-declared target variable."
+        ]
+      },
+      {
+        "name": "LBXGLU",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 13936,
+        "missingFraction": 0.5624352412948601,
+        "cardinality": 315,
+        "notes": [
+          "Moderate/high missingness; require missing-data review."
+        ]
+      },
+      {
+        "name": "LBXTC",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 28270,
+        "missingFraction": 0.11237401488272787,
+        "cardinality": 315,
+        "notes": []
+      },
+      {
+        "name": "LBXTR",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 13573,
+        "missingFraction": 0.5738327733994788,
+        "cardinality": 498,
+        "notes": [
+          "Moderate/high missingness; require missing-data review."
+        ]
+      },
+      {
+        "name": "low_hdl",
+        "role": "candidate_outcome",
+        "inferredType": "string",
+        "nonMissingRows": 28270,
+        "missingFraction": 0.11237401488272787,
+        "cardinality": 2,
+        "notes": []
+      },
+      {
+        "name": "nhanes_cycle_id",
+        "role": "identifier_or_index",
+        "inferredType": "string",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 5,
+        "notes": [
+          "Looks like an identifier or row index."
+        ]
+      },
+      {
+        "name": "RIAGENDR",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 2,
+        "notes": []
+      },
+      {
+        "name": "RIDAGEYR",
+        "role": "candidate_exposure",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 61,
+        "notes": []
+      },
+      {
+        "name": "RIDRETH3",
+        "role": "feature",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 6,
+        "notes": []
+      },
+      {
+        "name": "SDMVPSU",
+        "role": "metadata_or_weight",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 3,
+        "notes": [
+          "Looks like design, time, or metadata rather than a substantive exposure."
+        ]
+      },
+      {
+        "name": "SDMVSTRA",
+        "role": "metadata_or_weight",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 83,
+        "notes": [
+          "Looks like design, time, or metadata rather than a substantive exposure."
+        ]
+      },
+      {
+        "name": "SEQN",
+        "role": "identifier_or_index",
+        "inferredType": "number",
+        "nonMissingRows": 31849,
+        "missingFraction": 0,
+        "cardinality": 31849,
+        "notes": [
+          "Looks like an identifier or row index."
+        ]
+      },
+      {
+        "name": "WTMEC2YR",
+        "role": "metadata_or_weight",
+        "inferredType": "number",
+        "nonMissingRows": 22617,
+        "missingFraction": 0.2898678137461145,
+        "cardinality": 18732,
+        "notes": [
+          "Looks like design, time, or metadata rather than a substantive exposure.",
+          "Moderate/high missingness; require missing-data review."
+        ]
+      },
+      {
+        "name": "WTMECPRP",
+        "role": "metadata_or_weight",
+        "inferredType": "number",
+        "nonMissingRows": 9232,
+        "missingFraction": 0.7101321862538855,
+        "cardinality": 7989,
+        "notes": [
+          "Looks like design, time, or metadata rather than a substantive exposure.",
+          "Moderate/high missingness; require missing-data review."
+        ]
+      },
+      {
+        "name": "WTSAF2YR",
+        "role": "metadata_or_weight",
+        "inferredType": "number",
+        "nonMissingRows": 10434,
+        "missingFraction": 0.6723915978523658,
+        "cardinality": 9014,
+        "notes": [
+          "Looks like design, time, or metadata rather than a substantive exposure.",
+          "Moderate/high missingness; require missing-data review."
+        ]
+      }
+    ],
+    "associations": [
+      {
+        "id": "a68c2fd0ab",
+        "left": "LBXGH",
+        "right": "LBXGLU",
+        "method": "pearson",
+        "strength": 0.8342400587140499,
+        "direction": "positive",
+        "n": 13914,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "ea1c563c79",
+        "left": "elevated_hba1c",
+        "right": "LBXGH",
+        "method": "eta_squared",
+        "strength": 0.5859553166346517,
+        "direction": "unsigned",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "07a8728ea7",
+        "left": "DIQ010",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.4700339413754804,
+        "direction": "negative",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "929694bdfd",
+        "left": "LBXGH",
+        "right": "RIDAGEYR",
+        "method": "pearson",
+        "strength": 0.2809136316229929,
+        "direction": "positive",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "6fac7dc92b",
+        "left": "BMXWAIST",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.24908413543449218,
+        "direction": "positive",
+        "n": 27229,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": []
+      },
+      {
+        "id": "18aa5bcf2c",
+        "left": "LBXGH",
+        "right": "LBXTR",
+        "method": "pearson",
+        "strength": 0.19107860868574425,
+        "direction": "positive",
+        "n": 13554,
+        "missingFractionMax": 0.5738327733994788,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "c13157628f",
+        "left": "BMXBMI",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.1907727054484304,
+        "direction": "positive",
+        "n": 28316,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "4eff326c1e",
+        "left": "LBDHDD",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.16684775175734246,
+        "direction": "negative",
+        "n": 28237,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "688b664e4f",
+        "left": "INDFMPIR",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.0719090788931153,
+        "direction": "negative",
+        "n": 25615,
+        "missingFractionMax": 0.11874784137649534,
+        "caveats": []
+      },
+      {
+        "id": "1268825d6a",
+        "left": "high_waist_cm",
+        "right": "LBXGH",
+        "method": "eta_squared",
+        "strength": 0.046008816256379086,
+        "direction": "unsigned",
+        "n": 27229,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "5fd08fe81a",
+        "left": "LBXGH",
+        "right": "RIAGENDR",
+        "method": "pearson",
+        "strength": 0.033890553617798955,
+        "direction": "negative",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "eb468124d1",
+        "left": "LBXGH",
+        "right": "LBXTC",
+        "method": "pearson",
+        "strength": 0.03371417704169279,
+        "direction": "positive",
+        "n": 28237,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "42bfadc62a",
+        "left": "LBXGH",
+        "right": "RIDRETH3",
+        "method": "pearson",
+        "strength": 0.01860631539019887,
+        "direction": "negative",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "f366ee638d",
+        "left": "LBXGH",
+        "right": "low_hdl",
+        "method": "eta_squared",
+        "strength": 0.014991273140908208,
+        "direction": "unsigned",
+        "n": 28237,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "730a9b618a",
+        "left": "BMXBMI",
+        "right": "BMXWAIST",
+        "method": "pearson",
+        "strength": 0.9070827260995686,
+        "direction": "positive",
+        "n": 28288,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": []
+      },
+      {
+        "id": "2bdf55b185",
+        "left": "BMXWAIST",
+        "right": "high_waist_cm",
+        "method": "eta_squared",
+        "strength": 0.6247933523976349,
+        "direction": "unsigned",
+        "n": 28356,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "bfb6982eeb",
+        "left": "BMXBMI",
+        "right": "high_waist_cm",
+        "method": "eta_squared",
+        "strength": 0.48706663724045035,
+        "direction": "unsigned",
+        "n": 28288,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "d4f8744589",
+        "left": "elevated_hba1c",
+        "right": "LBXGLU",
+        "method": "eta_squared",
+        "strength": 0.44854478326465647,
+        "direction": "unsigned",
+        "n": 13914,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness",
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "bb96935587",
+        "left": "DIQ010",
+        "right": "LBXGLU",
+        "method": "pearson",
+        "strength": 0.43987755606533613,
+        "direction": "negative",
+        "n": 13936,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "004b83522e",
+        "left": "LBDHDD",
+        "right": "LBXTR",
+        "method": "pearson",
+        "strength": 0.34763560458684906,
+        "direction": "negative",
+        "n": 13573,
+        "missingFractionMax": 0.5738327733994788,
+        "caveats": [
+          "high missingness"
+        ]
+      }
+    ],
+    "targetAssociations": [
+      {
+        "id": "a68c2fd0ab",
+        "left": "LBXGH",
+        "right": "LBXGLU",
+        "method": "pearson",
+        "strength": 0.8342400587140499,
+        "direction": "positive",
+        "n": 13914,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "ea1c563c79",
+        "left": "elevated_hba1c",
+        "right": "LBXGH",
+        "method": "eta_squared",
+        "strength": 0.5859553166346517,
+        "direction": "unsigned",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "07a8728ea7",
+        "left": "DIQ010",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.4700339413754804,
+        "direction": "negative",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "929694bdfd",
+        "left": "LBXGH",
+        "right": "RIDAGEYR",
+        "method": "pearson",
+        "strength": 0.2809136316229929,
+        "direction": "positive",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "6fac7dc92b",
+        "left": "BMXWAIST",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.24908413543449218,
+        "direction": "positive",
+        "n": 27229,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": []
+      },
+      {
+        "id": "18aa5bcf2c",
+        "left": "LBXGH",
+        "right": "LBXTR",
+        "method": "pearson",
+        "strength": 0.19107860868574425,
+        "direction": "positive",
+        "n": 13554,
+        "missingFractionMax": 0.5738327733994788,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "c13157628f",
+        "left": "BMXBMI",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.1907727054484304,
+        "direction": "positive",
+        "n": 28316,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "4eff326c1e",
+        "left": "LBDHDD",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.16684775175734246,
+        "direction": "negative",
+        "n": 28237,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "688b664e4f",
+        "left": "INDFMPIR",
+        "right": "LBXGH",
+        "method": "pearson",
+        "strength": 0.0719090788931153,
+        "direction": "negative",
+        "n": 25615,
+        "missingFractionMax": 0.11874784137649534,
+        "caveats": []
+      },
+      {
+        "id": "1268825d6a",
+        "left": "high_waist_cm",
+        "right": "LBXGH",
+        "method": "eta_squared",
+        "strength": 0.046008816256379086,
+        "direction": "unsigned",
+        "n": 27229,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "5fd08fe81a",
+        "left": "LBXGH",
+        "right": "RIAGENDR",
+        "method": "pearson",
+        "strength": 0.033890553617798955,
+        "direction": "negative",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "eb468124d1",
+        "left": "LBXGH",
+        "right": "LBXTC",
+        "method": "pearson",
+        "strength": 0.03371417704169279,
+        "direction": "positive",
+        "n": 28237,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "42bfadc62a",
+        "left": "LBXGH",
+        "right": "RIDRETH3",
+        "method": "pearson",
+        "strength": 0.01860631539019887,
+        "direction": "negative",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": []
+      },
+      {
+        "id": "f366ee638d",
+        "left": "LBXGH",
+        "right": "low_hdl",
+        "method": "eta_squared",
+        "strength": 0.014991273140908208,
+        "direction": "unsigned",
+        "n": 28237,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      }
+    ],
+    "backgroundAssociations": [
+      {
+        "id": "730a9b618a",
+        "left": "BMXBMI",
+        "right": "BMXWAIST",
+        "method": "pearson",
+        "strength": 0.9070827260995686,
+        "direction": "positive",
+        "n": 28288,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": []
+      },
+      {
+        "id": "2bdf55b185",
+        "left": "BMXWAIST",
+        "right": "high_waist_cm",
+        "method": "eta_squared",
+        "strength": 0.6247933523976349,
+        "direction": "unsigned",
+        "n": 28356,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "bfb6982eeb",
+        "left": "BMXBMI",
+        "right": "high_waist_cm",
+        "method": "eta_squared",
+        "strength": 0.48706663724045035,
+        "direction": "unsigned",
+        "n": 28288,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "d4f8744589",
+        "left": "elevated_hba1c",
+        "right": "LBXGLU",
+        "method": "eta_squared",
+        "strength": 0.44854478326465647,
+        "direction": "unsigned",
+        "n": 13914,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness",
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "bb96935587",
+        "left": "DIQ010",
+        "right": "LBXGLU",
+        "method": "pearson",
+        "strength": 0.43987755606533613,
+        "direction": "negative",
+        "n": 13936,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "004b83522e",
+        "left": "LBDHDD",
+        "right": "LBXTR",
+        "method": "pearson",
+        "strength": 0.34763560458684906,
+        "direction": "negative",
+        "n": 13573,
+        "missingFractionMax": 0.5738327733994788,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "5e1fd205a8",
+        "left": "BMXWAIST",
+        "right": "LBDHDD",
+        "method": "pearson",
+        "strength": 0.3328895222367127,
+        "direction": "negative",
+        "n": 26831,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "aed4b44d50",
+        "left": "LBXTC",
+        "right": "LBXTR",
+        "method": "pearson",
+        "strength": 0.312179813998093,
+        "direction": "positive",
+        "n": 13573,
+        "missingFractionMax": 0.5738327733994788,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "d5ce62dccf",
+        "left": "LBDHDD",
+        "right": "low_hdl",
+        "method": "eta_squared",
+        "strength": 0.308612850764261,
+        "direction": "unsigned",
+        "n": 28270,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "48b52d5bec",
+        "left": "LBDHDD",
+        "right": "RIAGENDR",
+        "method": "pearson",
+        "strength": 0.29565581980248934,
+        "direction": "positive",
+        "n": 28270,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "7408c2cf0c",
+        "left": "DIQ010",
+        "right": "elevated_hba1c",
+        "method": "eta_squared",
+        "strength": 0.2758253923303548,
+        "direction": "unsigned",
+        "n": 28712,
+        "missingFractionMax": 0.09849602813275142,
+        "caveats": [
+          "unadjusted group mean separation"
+        ]
+      },
+      {
+        "id": "4cf90cc0e9",
+        "left": "BMXBMI",
+        "right": "LBDHDD",
+        "method": "pearson",
+        "strength": 0.26887776374980504,
+        "direction": "negative",
+        "n": 27884,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "637675520c",
+        "left": "BMXWAIST",
+        "right": "LBXGLU",
+        "method": "pearson",
+        "strength": 0.24941216733326957,
+        "direction": "positive",
+        "n": 13279,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "df8c7d3006",
+        "left": "LBXGLU",
+        "right": "LBXTR",
+        "method": "pearson",
+        "strength": 0.22399322711826494,
+        "direction": "positive",
+        "n": 13564,
+        "missingFractionMax": 0.5738327733994788,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "e7bf108c2e",
+        "left": "LBXGLU",
+        "right": "RIDAGEYR",
+        "method": "pearson",
+        "strength": 0.22159957458011315,
+        "direction": "positive",
+        "n": 13936,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      },
+      {
+        "id": "166d4f73ff",
+        "left": "elevated_hba1c",
+        "right": "high_waist_cm",
+        "method": "cramers_v",
+        "strength": 0.19727167625706432,
+        "direction": "unsigned",
+        "n": 27229,
+        "missingFractionMax": 0.10967377311689536,
+        "caveats": [
+          "unadjusted categorical association"
+        ]
+      },
+      {
+        "id": "2e750e12ed",
+        "left": "high_waist_cm",
+        "right": "low_hdl",
+        "method": "cramers_v",
+        "strength": 0.19575680165494322,
+        "direction": "unsigned",
+        "n": 26831,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": [
+          "unadjusted categorical association"
+        ]
+      },
+      {
+        "id": "bc323ab6cb",
+        "left": "DIQ010",
+        "right": "RIDAGEYR",
+        "method": "pearson",
+        "strength": 0.19541111186196036,
+        "direction": "negative",
+        "n": 31849,
+        "missingFractionMax": 0,
+        "caveats": []
+      },
+      {
+        "id": "6be02e03a3",
+        "left": "LBDHDD",
+        "right": "LBXTC",
+        "method": "pearson",
+        "strength": 0.19000463166475853,
+        "direction": "positive",
+        "n": 28270,
+        "missingFractionMax": 0.11237401488272787,
+        "caveats": []
+      },
+      {
+        "id": "b13c779bd2",
+        "left": "BMXBMI",
+        "right": "LBXGLU",
+        "method": "pearson",
+        "strength": 0.1852279168292489,
+        "direction": "positive",
+        "n": 13747,
+        "missingFractionMax": 0.5624352412948601,
+        "caveats": [
+          "high missingness"
+        ]
+      }
+    ],
+    "explorationBurden": {
+      "eligiblePairCount": 105,
+      "testedPairCount": 105,
+      "targetPairCount": 14,
+      "multiplicityRisk": "medium",
+      "highMissingnessVariables": [
+        {
+          "name": "LBXGLU",
+          "missingFraction": 0.5624352412948601
+        },
+        {
+          "name": "LBXTR",
+          "missingFraction": 0.5738327733994788
+        },
+        {
+          "name": "WTMECPRP",
+          "missingFraction": 0.7101321862538855
+        },
+        {
+          "name": "WTSAF2YR",
+          "missingFraction": 0.6723915978523658
+        }
+      ],
+      "sparseCategoricalVariables": [],
+      "surveyDesignCandidates": [
+        {
+          "name": "nhanes_cycle_id",
+          "reason": "possible cycle/time/design metadata"
+        },
+        {
+          "name": "SDMVPSU",
+          "reason": "possible complex-design field"
+        },
+        {
+          "name": "SDMVSTRA",
+          "reason": "possible complex-design field"
+        },
+        {
+          "name": "WTMEC2YR",
+          "reason": "possible analysis weight"
+        },
+        {
+          "name": "WTMECPRP",
+          "reason": "possible analysis weight"
+        },
+        {
+          "name": "WTSAF2YR",
+          "reason": "possible analysis weight"
+        }
+      ],
+      "possibleLeakagePairs": [
+        {
+          "associationId": "ea1c563c79",
+          "left": "elevated_hba1c",
+          "right": "LBXGH",
+          "reason": "variable name suggests target proxy or derived measure"
+        }
+      ],
+      "promotionSummary": {
+        "promotable": 0,
+        "needsMethodsReview": 12,
+        "blocked": 0
+      },
+      "promotionClearance": {
+        "level": "hold_for_methods_review",
+        "reasons": [
+          "12 candidate questions need methods review",
+          "no candidate questions are currently promotable",
+          "survey/design candidate variables detected",
+          "possible target leakage/proxy pairs detected"
+        ]
+      }
+    },
+    "candidateQuestions": [
+      {
+        "id": "question_01_929694bdfd",
+        "question": "Is RIDAGEYR associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "RIDAGEYR",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "social_demographic_determinant",
+        "researchInterestScore": 44,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.social-demographic"
+          ],
+          "matchedTerms": [
+            "glycemic",
+            "LBXGH",
+            "RIDAGEYR",
+            "social_demographic"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 15,
+              "reason": "Unadjusted association strength 0.281."
+            },
+            {
+              "id": "score.category.social_demographic_determinant",
+              "delta": 20,
+              "reason": "Taxonomy category social_demographic_determinant."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "28712 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -3,
+              "reason": "Maximum pair missingness 9.8%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "RIDAGEYR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.281 across 28712 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_02_6fac7dc92b",
+        "question": "Is BMXWAIST associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "BMXWAIST",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 40,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "BMXWAIST",
+            "glycemic",
+            "LBXGH"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 14,
+              "reason": "Unadjusted association strength 0.249."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "27229 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.0%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "BMXWAIST is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.249 across 27229 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_03_c13157628f",
+        "question": "Is BMXBMI associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "BMXBMI",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 37,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "BMXBMI",
+            "glycemic",
+            "LBXGH"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 10,
+              "reason": "Unadjusted association strength 0.191."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "28316 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -3,
+              "reason": "Maximum pair missingness 9.8%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "BMXBMI is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.191 across 28316 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_04_166d4f73ff",
+        "question": "Is high_waist_cm associated with elevated_hba1c in this dataset?",
+        "outcome": "elevated_hba1c",
+        "exposure": "high_waist_cm",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 37,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "elevated_hba1c",
+            "glycemic",
+            "high_waist_cm"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 11,
+              "reason": "Unadjusted association strength 0.197."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "27229 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.0%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "high_waist_cm is a plausible risk marker for elevated_hba1c; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "cross-tabulation with chi-square/Fisher review and adjusted logistic/multinomial model if appropriate",
+        "rationale": "cramers_v exploratory strength 0.197 across 27229 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_05_2e750e12ed",
+        "question": "Is high_waist_cm associated with low_hdl in this dataset?",
+        "outcome": "low_hdl",
+        "exposure": "high_waist_cm",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 37,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "high_waist_cm",
+            "lipid",
+            "low_hdl"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 11,
+              "reason": "Unadjusted association strength 0.196."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "26831 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.2%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "high_waist_cm is a plausible risk marker for low_hdl; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "cross-tabulation with chi-square/Fisher review and adjusted logistic/multinomial model if appropriate",
+        "rationale": "cramers_v exploratory strength 0.196 across 26831 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_06_5e1fd205a8",
+        "question": "Is BMXWAIST associated with LBDHDD in this dataset?",
+        "outcome": "LBDHDD",
+        "exposure": "BMXWAIST",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 36,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "BMXWAIST",
+            "LBDHDD",
+            "lipid"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 18,
+              "reason": "Unadjusted association strength 0.333."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "26831 complete pairs."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.2%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "BMXWAIST is a plausible risk marker for LBDHDD; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.333 across 26831 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_07_4eff326c1e",
+        "question": "Is LBDHDD associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "LBDHDD",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 35,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "glycemic",
+            "LBDHDD",
+            "LBXGH",
+            "lipid"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 9,
+              "reason": "Unadjusted association strength 0.167."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "28237 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.2%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "LBDHDD is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.167 across 28237 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_08_48b52d5bec",
+        "question": "Is LBDHDD associated with RIAGENDR in this dataset?",
+        "outcome": "RIAGENDR",
+        "exposure": "LBDHDD",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 34,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "LBDHDD",
+            "lipid",
+            "RIAGENDR",
+            "social_demographic"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 16,
+              "reason": "Unadjusted association strength 0.296."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "28270 complete pairs."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.2%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "LBDHDD is a plausible risk marker for RIAGENDR; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.296 across 28270 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_09_4cf90cc0e9",
+        "question": "Is BMXBMI associated with LBDHDD in this dataset?",
+        "outcome": "LBDHDD",
+        "exposure": "BMXBMI",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 33,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "BMXBMI",
+            "LBDHDD",
+            "lipid"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 15,
+              "reason": "Unadjusted association strength 0.269."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "27884 complete pairs."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.2%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "BMXBMI is a plausible risk marker for LBDHDD; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.269 across 27884 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_10_688b664e4f",
+        "question": "Is INDFMPIR associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "INDFMPIR",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "social_demographic_determinant",
+        "researchInterestScore": 32,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.social-demographic"
+          ],
+          "matchedTerms": [
+            "glycemic",
+            "INDFMPIR",
+            "LBXGH",
+            "social_demographic"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 4,
+              "reason": "Unadjusted association strength 0.072."
+            },
+            {
+              "id": "score.category.social_demographic_determinant",
+              "delta": 20,
+              "reason": "Taxonomy category social_demographic_determinant."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "25615 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.9%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "INDFMPIR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.072 across 25615 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_11_5fd08fe81a",
+        "question": "Is RIAGENDR associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "RIAGENDR",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "social_demographic_determinant",
+        "researchInterestScore": 31,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.social-demographic"
+          ],
+          "matchedTerms": [
+            "glycemic",
+            "LBXGH",
+            "RIAGENDR",
+            "social_demographic"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 2,
+              "reason": "Unadjusted association strength 0.034."
+            },
+            {
+              "id": "score.category.social_demographic_determinant",
+              "delta": 20,
+              "reason": "Taxonomy category social_demographic_determinant."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "28712 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -3,
+              "reason": "Maximum pair missingness 9.8%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "RIAGENDR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "correlation followed by adjusted linear regression if scientifically justified",
+        "rationale": "pearson exploratory strength 0.034 across 28712 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "medium",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      },
+      {
+        "id": "question_12_1268825d6a",
+        "question": "Is high_waist_cm associated with LBXGH in this dataset?",
+        "outcome": "LBXGH",
+        "exposure": "high_waist_cm",
+        "routeIntent": "explanatory_association",
+        "routeIntentRationale": "This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+        "taxonomy": "plausible_risk_factor",
+        "researchInterestScore": 29,
+        "primaryQuestionUse": "recommended",
+        "taxonomyEvidence": {
+          "taxonomyVersion": "exploration-taxonomy-v1",
+          "matchedRuleIds": [
+            "taxonomy.plausible-risk-factor"
+          ],
+          "matchedTerms": [
+            "anthropometric",
+            "glycemic",
+            "high_waist_cm",
+            "LBXGH"
+          ],
+          "scoreAdjustments": [
+            {
+              "id": "score.association-strength",
+              "delta": 3,
+              "reason": "Unadjusted association strength 0.046."
+            },
+            {
+              "id": "score.category.plausible_risk_factor",
+              "delta": 18,
+              "reason": "Taxonomy category plausible_risk_factor."
+            },
+            {
+              "id": "score.sample-size",
+              "delta": 8,
+              "reason": "27229 complete pairs."
+            },
+            {
+              "id": "score.target-centered",
+              "delta": 8,
+              "reason": "Candidate is target-centered."
+            },
+            {
+              "id": "score.missingness",
+              "delta": -4,
+              "reason": "Maximum pair missingness 11.0%."
+            },
+            {
+              "id": "score.multiplicity",
+              "delta": -4,
+              "reason": "Multiplicity risk medium."
+            }
+          ],
+          "rejectedCategories": []
+        },
+        "whyThisQuestion": "high_waist_cm is a plausible risk marker for LBXGH; this is a stronger candidate for adjusted modeling than a duplicate or same-domain marker.",
+        "avoidAsPrimaryQuestion": null,
+        "suggestedMethod": "group comparison followed by adjusted regression",
+        "rationale": "eta_squared exploratory strength 0.046 across 27229 complete pairs.",
+        "requiredNextChecks": [
+          "Confirm temporal/design plausibility; do not infer causality from exploration.",
+          "Review missingness, sparse cells, outliers, and multiple-comparison burden.",
+          "Select covariates from domain knowledge before confirmatory modeling."
+        ],
+        "priority": "low",
+        "promotionStatus": "needs_methods_review",
+        "promotionBlockers": [
+          "survey/design fields detected; promotion needs survey-aware plan"
+        ]
+      }
+    ],
+    "recommendedQuestion": {
+      "questionId": "question_01_929694bdfd",
+      "question": "Is RIDAGEYR associated with LBXGH in this dataset?",
+      "routeIntent": "explanatory_association",
+      "primaryQuestionUse": "recommended",
+      "reason": "RIDAGEYR may capture social or demographic patterning in LBXGH, which can generate public-health questions if survey design and confounding are handled carefully. Route intent: explanatory_association. This candidate is best treated as an explanatory association question until a separate prediction, diagnostic, or causal design is specified.",
+      "nextCommand": "agenteer research explore-promote --exploration \"/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/exploration.json\" --question question_01_929694bdfd --methods-review-note <review-note> --out <handoff.json> --json"
+    },
+    "qa": {
+      "status": "warning",
+      "checks": [
+        {
+          "id": "non-empty-table",
+          "status": "pass",
+          "message": "31849 rows found."
+        },
+        {
+          "id": "enough-columns",
+          "status": "pass",
+          "message": "22 columns found."
+        },
+        {
+          "id": "association-scan",
+          "status": "pass",
+          "message": "20 candidate associations ranked; 105 pairs tested."
+        },
+        {
+          "id": "candidate-questions",
+          "status": "pass",
+          "message": "12 candidate questions generated."
+        },
+        {
+          "id": "taxonomy-evidence",
+          "status": "pass",
+          "message": "12/12 candidate questions include taxonomy evidence and primary-use recommendations."
+        },
+        {
+          "id": "route-intent",
+          "status": "pass",
+          "message": "12/12 candidate questions include route intent."
+        },
+        {
+          "id": "target-present",
+          "status": "pass",
+          "message": "target=LBXGH"
+        },
+        {
+          "id": "target-association-scan",
+          "status": "pass",
+          "message": "14 associations involve the target."
+        },
+        {
+          "id": "promotion-gate",
+          "status": "warning",
+          "message": "0 promotable; 12 need methods review; 0 blocked."
+        },
+        {
+          "id": "promotion-clearance",
+          "status": "warning",
+          "message": "clearance=hold_for_methods_review."
+        },
+        {
+          "id": "multiplicity-review",
+          "status": "pass",
+          "message": "105 tested pairs; multiplicity risk medium."
+        },
+        {
+          "id": "survey-design-review",
+          "status": "warning",
+          "message": "6 survey/design candidate variables detected."
+        },
+        {
+          "id": "high-missingness-review",
+          "status": "warning",
+          "message": "4 variables exceed 50% missingness."
+        },
+        {
+          "id": "exploratory-only",
+          "status": "warning",
+          "message": "This mode generates hypotheses only; confirmatory analysis requires a promoted plan."
+        }
+      ]
+    },
+    "artifacts": [
+      {
+        "kind": "exploration",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/exploration.json",
+        "sha256": "dce11da507df2361f1f45628779cb67a1a5c567827108b3d3699bfa12015002b",
+        "bytes": 71847
+      },
+      {
+        "kind": "exploration-report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/exploration-report.md",
+        "sha256": "4122fa46d8ff7cea71d4b6cdc22282c2c8329720288340e596fa6fc251e5ec13",
+        "bytes": 12992
+      },
+      {
+        "kind": "candidate-questions",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/exploration/candidate-questions.json",
+        "sha256": "289a2ee5bbdf637e21f28c59f8d70714986817d91e27e0b4c7d021a942fedf71",
+        "bytes": 31989
+      }
+    ],
+    "limitations": [
+      "Exploration is hypothesis generation, not confirmation.",
+      "Reported associations are unadjusted and should not be interpreted causally.",
+      "Multiple comparisons, missingness, sparse categories, survey design, clustering, and temporal ordering must be handled before inferential claims.",
+      "Candidate questions must be promoted into an explicit analysis plan before execution or paper generation."
+    ],
+    "nextAction": "Resolve promotion blockers or perform methods review before turning an exploratory question into an analysis plan."
+  }
+}

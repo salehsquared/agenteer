@@ -1,0 +1,508 @@
+{
+  "study": {
+    "id": "mimic-cardiology-mi-icu-mortality",
+    "title": "Acute Myocardial Infarction ICU Mortality",
+    "domain": "cardiology",
+    "question": "Which first-day ICU features predict in-hospital mortality among admissions with acute myocardial infarction codes?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-cardiac-marker",
+      "derived-apsiii",
+      "derived-first-day-vitalsign"
+    ],
+    "outcomes": [
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "MI phenotype",
+      "troponin/marker missingness audit",
+      "logistic regression",
+      "calibration if predictive framing"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "I21",
+        "expectedTerms": [
+          "myocardial infarction"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "I21",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "I21",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=I21&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 13,
+            "sampleRows": [
+              {
+                "code": "I21.01",
+                "name": "ST elevation (STEMI) myocardial infarction involving left main coronary artery"
+              },
+              {
+                "code": "I21.02",
+                "name": "ST elevation (STEMI) myocardial infarction involving left anterior descending coronary artery"
+              },
+              {
+                "code": "I21.09",
+                "name": "ST elevation (STEMI) myocardial infarction involving other coronary artery of anterior wall"
+              },
+              {
+                "code": "I21.11",
+                "name": "ST elevation (STEMI) myocardial infarction involving right coronary artery"
+              },
+              {
+                "code": "I21.19",
+                "name": "ST elevation (STEMI) myocardial infarction involving other coronary artery of inferior wall"
+              },
+              {
+                "code": "I21.21",
+                "name": "ST elevation (STEMI) myocardial infarction involving left circumflex coronary artery"
+              },
+              {
+                "code": "I21.29",
+                "name": "ST elevation (STEMI) myocardial infarction involving other sites"
+              },
+              {
+                "code": "I21.3",
+                "name": "ST elevation (STEMI) myocardial infarction of unspecified site"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:38.822327+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "410",
+        "expectedTerms": [
+          "myocardial infarction"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "410",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "410",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=410&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 30,
+            "sampleRows": [
+              {
+                "code": "410.00",
+                "name": "Acute myocardial infarction of anterolateral wall, episode of care unspecified"
+              },
+              {
+                "code": "410.01",
+                "name": "Acute myocardial infarction of anterolateral wall, initial episode of care"
+              },
+              {
+                "code": "410.02",
+                "name": "Acute myocardial infarction of anterolateral wall, subsequent episode of care"
+              },
+              {
+                "code": "410.10",
+                "name": "Acute myocardial infarction of other anterior wall, episode of care unspecified"
+              },
+              {
+                "code": "410.11",
+                "name": "Acute myocardial infarction of other anterior wall, initial episode of care"
+              },
+              {
+                "code": "410.12",
+                "name": "Acute myocardial infarction of other anterior wall, subsequent episode of care"
+              },
+              {
+                "code": "410.20",
+                "name": "Acute myocardial infarction of inferolateral wall, episode of care unspecified"
+              },
+              {
+                "code": "410.21",
+                "name": "Acute myocardial infarction of inferolateral wall, initial episode of care"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:39.327357+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 41,
+    "matchedDiagnosisRows": 11645,
+    "matchedAdmissions": 11527,
+    "firstIcuStayRows": 6094,
+    "uniquePatients": 5717
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 6094,
+        "missing": 0,
+        "mean": 70.29963898916968,
+        "sd": 13.33111046959326,
+        "median": 71.0,
+        "iqr": [
+          62.0,
+          80.0
+        ],
+        "min": 19.0,
+        "max": 100.0
+      },
+      "los_icu": {
+        "n": 6092,
+        "missing": 2,
+        "mean": 3.938667104399212,
+        "sd": 5.992572946293228,
+        "median": 2.13,
+        "iqr": [
+          1.21,
+          4.17
+        ],
+        "min": 0.0,
+        "max": 127.88
+      },
+      "los_hospital": {
+        "n": 6094,
+        "missing": 0,
+        "mean": 11.626846078109615,
+        "sd": 14.898416615754607,
+        "median": 8.0,
+        "iqr": [
+          4.0,
+          14.0
+        ],
+        "min": 0.0,
+        "max": 515.0
+      },
+      "apsiii": {
+        "n": 6094,
+        "missing": 0,
+        "mean": 46.79849031834591,
+        "sd": 21.81006045974337,
+        "median": 43.0,
+        "iqr": [
+          31.0,
+          57.0
+        ],
+        "min": 6.0,
+        "max": 167.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 6094,
+        "positive": 1070,
+        "proportion": 0.17558254020347883
+      },
+      "male": {
+        "n": 6094,
+        "positive": 3918,
+        "proportion": 0.6429274696422711
+      },
+      "prolonged_icu_los": {
+        "n": 6094,
+        "positive": 1504,
+        "proportion": 0.24680013127666559
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "apsiii",
+    "glucose_max",
+    "sbp_min",
+    "heart_rate_max",
+    "spo2_min"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 62,
+      "missingFraction": 0.01017394158188382
+    },
+    {
+      "column": "spo2_min",
+      "missing": 17,
+      "missingFraction": 0.002789629143419757
+    },
+    {
+      "column": "sbp_min",
+      "missing": 6,
+      "missingFraction": 0.0009845749917952085
+    },
+    {
+      "column": "heart_rate_max",
+      "missing": 2,
+      "missingFraction": 0.0003281916639317361
+    },
+    {
+      "column": "los_icu",
+      "missing": 2,
+      "missingFraction": 0.0003281916639317361
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "apsiii",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 6016,
+      "events": 1033,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 70.23653590425532,
+          "sd": 13.317520191134344
+        },
+        "apsiii": {
+          "mean": 46.83078457446808,
+          "sd": 21.75209734184756
+        },
+        "glucose_max": {
+          "mean": 916.6823470744681,
+          "sd": 27725.346401879877
+        },
+        "sbp_min": {
+          "mean": 88.18472401374113,
+          "sd": 17.054132964745452
+        },
+        "heart_rate_max": {
+          "mean": 101.5652260638298,
+          "sd": 20.82641300972469
+        },
+        "spo2_min": {
+          "mean": 90.90940824468085,
+          "sd": 7.169386607055141
+        }
+      },
+      "metrics": {
+        "auroc": 0.8213439731874433,
+        "averagePrecision": 0.5100931349003222
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.4202319916916202,
+          "ci95": [
+            1.307114983560661,
+            1.5431380831774684
+          ],
+          "pValue": 1.1861201287342538e-16,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.8829524499054033,
+          "ci95": [
+            0.7539540445369252,
+            1.0340219466198146
+          ],
+          "pValue": 0.12239707626191719,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "oddsRatio": 2.6645496946061282,
+          "ci95": [
+            2.448747406452155,
+            2.8993701254439013
+          ],
+          "pValue": 1.685438080197803e-114,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 0.8946902688476823,
+          "ci95": [
+            0.46824573119247176,
+            1.7095098232549728
+          ],
+          "pValue": 0.7362356210093317,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.8031893906681385,
+          "ci95": [
+            0.7390748996655789,
+            0.8728657915101167
+          ],
+          "pValue": 2.424234079302121e-07,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 1.0912841994646396,
+          "ci95": [
+            1.0150009663742499,
+            1.1733005617278118
+          ],
+          "pValue": 0.018143361001543738,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 0.8590392930737503,
+          "ci95": [
+            0.8013974807375422,
+            0.9208270861614136
+          ],
+          "pValue": 1.8071124513123435e-05,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 6014,
+      "predictors": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 70.23528433654805,
+          "sd": 13.318309245600496
+        },
+        "apsiii": {
+          "mean": 46.827402726970405,
+          "sd": 21.75296667033452
+        },
+        "glucose_max": {
+          "mean": 916.9231792484203,
+          "sd": 27729.953772834837
+        },
+        "sbp_min": {
+          "mean": 88.18445288770646,
+          "sd": 17.05505133853779
+        },
+        "heart_rate_max": {
+          "mean": 101.56059195211175,
+          "sd": 20.820401140648496
+        },
+        "spo2_min": {
+          "mean": 90.91303624875292,
+          "sd": 7.164475228389272
+        }
+      },
+      "rSquared": 0.0800649373740776,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -4.862989905340697,
+          "ci95PercentChange": [
+            -6.510146465646438,
+            -3.186812818939455
+          ],
+          "pValue": 2.2128986143382913e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 1.1326459042918735,
+          "ci95PercentChange": [
+            -2.34226606510205,
+            4.731204129937128
+          ],
+          "pValue": 0.5278103653203496,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "percentChangeInLos": 17.08668403789524,
+          "ci95PercentChange": [
+            14.591853233936792,
+            19.635830925979448
+          ],
+          "pValue": 9.928320916773413e-47,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -0.9788685863115543,
+          "ci95PercentChange": [
+            -2.130503453368948,
+            0.1863176211922557
+          ],
+          "pValue": 0.09933330433705467,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "percentChangeInLos": -5.217387716785593,
+          "ci95PercentChange": [
+            -7.018770633581917,
+            -3.38110549359123
+          ],
+          "pValue": 4.41786117179042e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "percentChangeInLos": 3.955770097068978,
+          "ci95PercentChange": [
+            2.0705678320678045,
+            5.875791288382093
+          ],
+          "pValue": 3.2557015747562034e-05,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "percentChangeInLos": 5.435343246538293,
+          "ci95PercentChange": [
+            3.3034731669810524,
+            7.611208652649215
+          ],
+          "pValue": 3.805857370459784e-07,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

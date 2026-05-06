@@ -1,0 +1,902 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T04:31:33.875838+00:00",
+  "operation": "bigquery_extract_to_gcs_parquet",
+  "sourceProject": "physionet-data",
+  "sourceDataset": "mimiciv_3_1_derived",
+  "destinationBucket": "agenteer-mimiciv-cache-ultra-sound-403618",
+  "destinationPrefix": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/",
+  "costEstimate": {
+    "bigQueryExtractProcessingUsd": 0,
+    "logicalBytes": 3465661414,
+    "logicalGiB": 3.227648710832,
+    "exportedBytes": 1098826105,
+    "exportedGiB": 1.0233615571632981,
+    "estimatedMonthlyGcsStandardUsUsdAt0_026PerGbMonth": 0.02856947873
+  },
+  "exportJobs": {
+    "attempted": 50,
+    "failures": [],
+    "totalSeconds": 245.36000000000004
+  },
+  "coverageQa": {
+    "expectedTables": 50,
+    "gcsTables": 50,
+    "missingTables": [],
+    "extraTables": [],
+    "zeroByteTables": [],
+    "status": "pass"
+  },
+  "spotCheckQa": {
+    "status": "pass",
+    "checks": [
+      {
+        "table": "age",
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "parquetRows": 546028,
+        "bigqueryRows": 546028,
+        "columns": 6
+      },
+      {
+        "table": "icustay_detail",
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "parquetRows": 94458,
+        "bigqueryRows": 94458,
+        "columns": 18
+      },
+      {
+        "table": "first_day_lab",
+        "rowMatch": true,
+        "schemaFieldMatch": true,
+        "parquetRows": 94458,
+        "bigqueryRows": 94458,
+        "columns": 88
+      }
+    ]
+  },
+  "tables": [
+    {
+      "table": "_metadata",
+      "numRows": 3,
+      "numBytes": 114,
+      "schemaFields": 2,
+      "gcsObjects": 1,
+      "gcsBytes": 727,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 727,
+          "updated": "2026-05-06T04:23:30Z"
+        }
+      ]
+    },
+    {
+      "table": "acei",
+      "numRows": 135153,
+      "numBytes": 5959629,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 3234464,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 3234464,
+          "updated": "2026-05-06T04:23:34Z"
+        }
+      ]
+    },
+    {
+      "table": "age",
+      "numRows": 546028,
+      "numBytes": 26209344,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 10089906,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 10089906,
+          "updated": "2026-05-06T04:23:38Z"
+        }
+      ]
+    },
+    {
+      "table": "antibiotic",
+      "numRows": 949901,
+      "numBytes": 51976058,
+      "schemaFields": 7,
+      "gcsObjects": 1,
+      "gcsBytes": 21537545,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 21537545,
+          "updated": "2026-05-06T04:23:44Z"
+        }
+      ]
+    },
+    {
+      "table": "apsiii",
+      "numRows": 94458,
+      "numBytes": 13985720,
+      "schemaFields": 21,
+      "gcsObjects": 1,
+      "gcsBytes": 2308513,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2308513,
+          "updated": "2026-05-06T04:23:49Z"
+        }
+      ]
+    },
+    {
+      "table": "arb",
+      "numRows": 53603,
+      "numBytes": 2651098,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 1414585,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1414585,
+          "updated": "2026-05-06T04:23:54Z"
+        }
+      ]
+    },
+    {
+      "table": "bg",
+      "numRows": 697418,
+      "numBytes": 72950440,
+      "schemaFields": 27,
+      "gcsObjects": 1,
+      "gcsBytes": 16330694,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 16330694,
+          "updated": "2026-05-06T04:23:59Z"
+        }
+      ]
+    },
+    {
+      "table": "blood_differential",
+      "numRows": 4154226,
+      "numBytes": 357386912,
+      "schemaFields": 20,
+      "gcsObjects": 12,
+      "gcsBytes": 121173516,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 10064922,
+          "updated": "2026-05-06T04:24:05Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 10123892,
+          "updated": "2026-05-06T04:24:05Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 10091025,
+          "updated": "2026-05-06T04:24:05Z"
+        }
+      ]
+    },
+    {
+      "table": "cardiac_marker",
+      "numRows": 380131,
+      "numBytes": 14999528,
+      "schemaFields": 7,
+      "gcsObjects": 1,
+      "gcsBytes": 8598560,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 8598560,
+          "updated": "2026-05-06T04:24:11Z"
+        }
+      ]
+    },
+    {
+      "table": "charlson",
+      "numRows": 546028,
+      "numBytes": 91732704,
+      "schemaFields": 21,
+      "gcsObjects": 1,
+      "gcsBytes": 7381162,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 7381162,
+          "updated": "2026-05-06T04:24:17Z"
+        }
+      ]
+    },
+    {
+      "table": "chemistry",
+      "numRows": 4976408,
+      "numBytes": 434820456,
+      "schemaFields": 16,
+      "gcsObjects": 14,
+      "gcsBytes": 141703433,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 10121647,
+          "updated": "2026-05-06T04:24:22Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 10156886,
+          "updated": "2026-05-06T04:24:23Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 10141706,
+          "updated": "2026-05-06T04:24:22Z"
+        }
+      ]
+    },
+    {
+      "table": "coagulation",
+      "numRows": 1991167,
+      "numBytes": 101705840,
+      "schemaFields": 10,
+      "gcsObjects": 4,
+      "gcsBytes": 46137641,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 11540877,
+          "updated": "2026-05-06T04:24:27Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 11506540,
+          "updated": "2026-05-06T04:24:27Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 11524942,
+          "updated": "2026-05-06T04:24:27Z"
+        }
+      ]
+    },
+    {
+      "table": "code_status",
+      "numRows": 354306,
+      "numBytes": 20994080,
+      "schemaFields": 8,
+      "gcsObjects": 1,
+      "gcsBytes": 6581329,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 6581329,
+          "updated": "2026-05-06T04:24:32Z"
+        }
+      ]
+    },
+    {
+      "table": "complete_blood_count",
+      "numRows": 4377900,
+      "numBytes": 426321776,
+      "schemaFields": 14,
+      "gcsObjects": 14,
+      "gcsBytes": 133369779,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 9537469,
+          "updated": "2026-05-06T04:24:37Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 9523625,
+          "updated": "2026-05-06T04:24:37Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 9518960,
+          "updated": "2026-05-06T04:24:37Z"
+        }
+      ]
+    },
+    {
+      "table": "creatinine_baseline",
+      "numRows": 546028,
+      "numBytes": 26772980,
+      "schemaFields": 7,
+      "gcsObjects": 1,
+      "gcsBytes": 3253643,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 3253643,
+          "updated": "2026-05-06T04:24:42Z"
+        }
+      ]
+    },
+    {
+      "table": "crrt",
+      "numRows": 475214,
+      "numBytes": 55822572,
+      "schemaFields": 24,
+      "gcsObjects": 1,
+      "gcsBytes": 7658472,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 7658472,
+          "updated": "2026-05-06T04:24:47Z"
+        }
+      ]
+    },
+    {
+      "table": "dobutamine",
+      "numRows": 10264,
+      "numBytes": 492672,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 400052,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 400052,
+          "updated": "2026-05-06T04:24:51Z"
+        }
+      ]
+    },
+    {
+      "table": "dopamine",
+      "numRows": 18085,
+      "numBytes": 868080,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 696661,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 696661,
+          "updated": "2026-05-06T04:24:55Z"
+        }
+      ]
+    },
+    {
+      "table": "enzyme",
+      "numRows": 2187060,
+      "numBytes": 127141096,
+      "schemaFields": 15,
+      "gcsObjects": 4,
+      "gcsBytes": 54392006,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 13583625,
+          "updated": "2026-05-06T04:24:59Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 13570379,
+          "updated": "2026-05-06T04:25:19Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 13609309,
+          "updated": "2026-05-06T04:24:59Z"
+        }
+      ]
+    },
+    {
+      "table": "epinephrine",
+      "numRows": 31495,
+      "numBytes": 1511760,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 1229609,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1229609,
+          "updated": "2026-05-06T04:25:26Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_bg",
+      "numRows": 94458,
+      "numBytes": 12049472,
+      "schemaFields": 44,
+      "gcsObjects": 1,
+      "gcsBytes": 2842053,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2842053,
+          "updated": "2026-05-06T04:25:30Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_bg_art",
+      "numRows": 94458,
+      "numBytes": 9651504,
+      "schemaFields": 44,
+      "gcsObjects": 1,
+      "gcsBytes": 2489207,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2489207,
+          "updated": "2026-05-06T04:25:34Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_gcs",
+      "numRows": 94458,
+      "numBytes": 5253240,
+      "schemaFields": 7,
+      "gcsObjects": 1,
+      "gcsBytes": 1254442,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1254442,
+          "updated": "2026-05-06T04:25:37Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_height",
+      "numRows": 94458,
+      "numBytes": 2170992,
+      "schemaFields": 3,
+      "gcsObjects": 1,
+      "gcsBytes": 1225219,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1225219,
+          "updated": "2026-05-06T04:25:41Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_lab",
+      "numRows": 94458,
+      "numBytes": 40577312,
+      "schemaFields": 88,
+      "gcsObjects": 1,
+      "gcsBytes": 7100465,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 7100465,
+          "updated": "2026-05-06T04:25:45Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_rrt",
+      "numRows": 94458,
+      "numBytes": 1613812,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 1178938,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1178938,
+          "updated": "2026-05-06T04:25:49Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_sofa",
+      "numRows": 94458,
+      "numBytes": 6722264,
+      "schemaFields": 10,
+      "gcsObjects": 1,
+      "gcsBytes": 2011162,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2011162,
+          "updated": "2026-05-06T04:25:53Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_urine_output",
+      "numRows": 94458,
+      "numBytes": 2226864,
+      "schemaFields": 3,
+      "gcsObjects": 1,
+      "gcsBytes": 1264060,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1264060,
+          "updated": "2026-05-06T04:25:56Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_vitalsign",
+      "numRows": 94458,
+      "numBytes": 21696312,
+      "schemaFields": 26,
+      "gcsObjects": 1,
+      "gcsBytes": 5613073,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 5613073,
+          "updated": "2026-05-06T04:26:03Z"
+        }
+      ]
+    },
+    {
+      "table": "first_day_weight",
+      "numRows": 94458,
+      "numBytes": 4398376,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 1431992,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1431992,
+          "updated": "2026-05-06T04:26:07Z"
+        }
+      ]
+    },
+    {
+      "table": "gcs",
+      "numRows": 2217787,
+      "numBytes": 141809416,
+      "schemaFields": 8,
+      "gcsObjects": 5,
+      "gcsBytes": 27687593,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 5530385,
+          "updated": "2026-05-06T04:26:11Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 5512950,
+          "updated": "2026-05-06T04:26:11Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 5560718,
+          "updated": "2026-05-06T04:26:11Z"
+        }
+      ]
+    },
+    {
+      "table": "height",
+      "numRows": 43342,
+      "numBytes": 1733680,
+      "schemaFields": 4,
+      "gcsObjects": 1,
+      "gcsBytes": 1027593,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1027593,
+          "updated": "2026-05-06T04:26:16Z"
+        }
+      ]
+    },
+    {
+      "table": "icp",
+      "numRows": 243283,
+      "numBytes": 7682632,
+      "schemaFields": 4,
+      "gcsObjects": 1,
+      "gcsBytes": 2182055,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2182055,
+          "updated": "2026-05-06T04:26:19Z"
+        }
+      ]
+    },
+    {
+      "table": "icustay_detail",
+      "numRows": 94458,
+      "numBytes": 12404159,
+      "schemaFields": 18,
+      "gcsObjects": 1,
+      "gcsBytes": 6066167,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 6066167,
+          "updated": "2026-05-06T04:26:23Z"
+        }
+      ]
+    },
+    {
+      "table": "icustay_hourly",
+      "numRows": 10482272,
+      "numBytes": 251574528,
+      "schemaFields": 3,
+      "gcsObjects": 17,
+      "gcsBytes": 132945370,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 7838867,
+          "updated": "2026-05-06T04:26:27Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 7810408,
+          "updated": "2026-05-06T04:26:27Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 7813661,
+          "updated": "2026-05-06T04:26:27Z"
+        }
+      ]
+    },
+    {
+      "table": "icustay_times",
+      "numRows": 94458,
+      "numBytes": 3777984,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 3661178,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 3661178,
+          "updated": "2026-05-06T04:26:32Z"
+        }
+      ]
+    },
+    {
+      "table": "inflammation",
+      "numRows": 174269,
+      "numBytes": 6044696,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 3953622,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 3953622,
+          "updated": "2026-05-06T04:26:35Z"
+        }
+      ]
+    },
+    {
+      "table": "invasive_line",
+      "numRows": 108165,
+      "numBytes": 4588848,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 2481688,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2481688,
+          "updated": "2026-05-06T04:26:39Z"
+        }
+      ]
+    },
+    {
+      "table": "kdigo_creatinine",
+      "numRows": 811585,
+      "numBytes": 37338480,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 11338546,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 11338546,
+          "updated": "2026-05-06T04:26:44Z"
+        }
+      ]
+    },
+    {
+      "table": "kdigo_stages",
+      "numRows": 5099899,
+      "numBytes": 461119456,
+      "schemaFields": 15,
+      "gcsObjects": 15,
+      "gcsBytes": 132618970,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 8814106,
+          "updated": "2026-05-06T04:26:49Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 8846315,
+          "updated": "2026-05-06T04:26:48Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 8829651,
+          "updated": "2026-05-06T04:26:49Z"
+        }
+      ]
+    },
+    {
+      "table": "kdigo_uo",
+      "numRows": 4127634,
+      "numBytes": 457751920,
+      "schemaFields": 12,
+      "gcsObjects": 15,
+      "gcsBytes": 109120001,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 7259897,
+          "updated": "2026-05-06T04:26:53Z"
+        },
+        {
+          "object": "part-000000000001.parquet",
+          "bytes": 7273139,
+          "updated": "2026-05-06T04:26:53Z"
+        },
+        {
+          "object": "part-000000000002.parquet",
+          "bytes": 7261616,
+          "updated": "2026-05-06T04:26:53Z"
+        }
+      ]
+    },
+    {
+      "table": "lods",
+      "numRows": 94458,
+      "numBytes": 7435304,
+      "schemaFields": 10,
+      "gcsObjects": 1,
+      "gcsBytes": 1952879,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 1952879,
+          "updated": "2026-05-06T04:26:58Z"
+        }
+      ]
+    },
+    {
+      "table": "meld",
+      "numRows": 94458,
+      "numBytes": 7136288,
+      "schemaFields": 10,
+      "gcsObjects": 1,
+      "gcsBytes": 2102858,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 2102858,
+          "updated": "2026-05-06T04:27:02Z"
+        }
+      ]
+    },
+    {
+      "table": "milrinone",
+      "numRows": 10668,
+      "numBytes": 512064,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 415325,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 415325,
+          "updated": "2026-05-06T04:27:05Z"
+        }
+      ]
+    },
+    {
+      "table": "neuroblock",
+      "numRows": 19430,
+      "numBytes": 932640,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 814219,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 814219,
+          "updated": "2026-05-06T04:27:09Z"
+        }
+      ]
+    },
+    {
+      "table": "norepinephrine",
+      "numRows": 459800,
+      "numBytes": 22070400,
+      "schemaFields": 6,
+      "gcsObjects": 1,
+      "gcsBytes": 15121347,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 15121347,
+          "updated": "2026-05-06T04:27:14Z"
+        }
+      ]
+    },
+    {
+      "table": "norepinephrine_equivalent_dose",
+      "numRows": 783613,
+      "numBytes": 31344520,
+      "schemaFields": 4,
+      "gcsObjects": 1,
+      "gcsBytes": 12680008,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 12680008,
+          "updated": "2026-05-06T04:27:19Z"
+        }
+      ]
+    },
+    {
+      "table": "nsaid",
+      "numRows": 293253,
+      "numBytes": 12396292,
+      "schemaFields": 5,
+      "gcsObjects": 1,
+      "gcsBytes": 7105040,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 7105040,
+          "updated": "2026-05-06T04:27:23Z"
+        }
+      ]
+    },
+    {
+      "table": "oasis",
+      "numRows": 94458,
+      "numBytes": 19482832,
+      "schemaFields": 25,
+      "gcsObjects": 1,
+      "gcsBytes": 3015072,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 3015072,
+          "updated": "2026-05-06T04:27:27Z"
+        }
+      ]
+    },
+    {
+      "table": "oxygen_delivery",
+      "numRows": 794232,
+      "numBytes": 37862268,
+      "schemaFields": 9,
+      "gcsObjects": 1,
+      "gcsBytes": 8633666,
+      "gcsSampleObjects": [
+        {
+          "object": "part-000000000000.parquet",
+          "bytes": 8633666,
+          "updated": "2026-05-06T04:27:31Z"
+        }
+      ]
+    }
+  ],
+  "nextAction": "Review manifest, then approve exporting hosp/icu or create a local/GCS dataset adapter over this derived prefix."
+}

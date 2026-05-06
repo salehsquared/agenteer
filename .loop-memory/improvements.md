@@ -70,6 +70,77 @@ Web grounding:
 - PROV-AGENT paper: agentic workflows need provenance that links decisions, artifacts, and workflow outcomes.
 - STROBE/TRIPOD+AI: research reports should preserve design, methods, limitations, intended use, and validation boundaries.
 
+## Tick 243
+
+- Added `agenteer research explore`, a dataset exploration mode for hypothesis generation rather than confirmatory analysis.
+- The command summarizes a CSV/JSON/Parquet table, maps variable roles, ranks unadjusted numeric/categorical associations, proposes candidate research questions, emits QA checks, and writes `exploration.json`, `exploration-report.md`, and `candidate-questions.json`.
+- Added docs, CLI help, exports, a targeted unit test, and a golden smoke run at `.loop-memory/golden/0243-exploration-mode`.
+- The mode deliberately labels output as `exploratory_hypothesis_generation`; associations are not adjusted, causal, survey-aware, or publication-ready.
+
+## Tick 244
+
+- Made `research explore --target` target-centered instead of only globally ranking pairwise associations.
+- Added `targetAssociations` and `backgroundAssociations` to the exploration JSON contract.
+- The Markdown report now separates target-centered associations from the background correlation map.
+- Candidate questions now begin with target-focused questions when a target is supplied, and QA includes `target-association-scan`.
+- Regenerated `.loop-memory/golden/0243-exploration-mode` to prove the `hba1c` target is foregrounded.
+
+## Tick 246
+
+- Added `explorationBurden` to `research explore`, including eligible/tested pair counts, target-pair count, multiplicity risk, high-missingness variables, sparse categorical variables, survey/design candidate variables, possible leakage/proxy pairs, and promotion summary.
+- Added `promotionStatus` and `promotionBlockers` to each candidate question.
+- Added QA checks for promotion gate, multiplicity review, and survey-design review.
+- Updated docs/tests and regenerated the golden exploration packet; the tiny fixture now correctly marks all questions `needs_methods_review` rather than directly promotable.
+
+## Tick 247
+
+- Cross-domain search:
+  - Query: `astronomy blind source catalog cross matching false discovery rate threshold candidate vetting`
+    - Finding: source catalogs and candidate vetting separate detection from confirmation; applied as a keep-exploration-separate principle.
+  - Query: `cryptography certificate transparency gossip protocol evidence receipts audit logs`
+    - Source: https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Certificate_Transparency
+    - Finding: certificate transparency uses logged evidence plus efficient inclusion/audit proof rather than trust in issuer assertion.
+    - Applicability: future exploration handoff should carry evidence receipts rather than only copied question text.
+  - Query: `air traffic control conflict alert runway incursion safety net levels false alarms`
+    - Source: https://skybrary.aero/articles/autonomous-runway-incursion-warning-system-ariws
+    - Finding: runway warning systems act as independent safety nets and red-light warnings indicate unsafe entry/crossing until cleared.
+    - Applicability: added `promotionClearance` with `clear_for_handoff`, `hold_for_methods_review`, and `stop`.
+- Exploration burden now includes promotion clearance, and QA/report output surfaces it directly.
+
+## Tick 248
+
+- Added `research explore-promote` to convert one exploration candidate question into a modeling-plan handoff artifact.
+- The command refuses blocked questions and refuses held questions unless `--methods-review-note` is supplied.
+- The handoff records source exploration hash, selected question, clearance level, blockers, modeling-plan seed, recommended command, and artifact hash.
+- Added docs, CLI help, exports, test coverage, and golden handoff smoke artifacts.
+
+## Tick 252
+
+- Built `.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv` from cached read-only NHANES Parquet inputs, with `extract-manifest.json` recording source hashes and derived variables.
+- Ran `research explore --target LBXGH` on 31,849 adult rows and 22 columns.
+- Actual-data pressure exposed a design-variable bug; fixed detection/exclusion for NHANES-style `WT*`, `SDMVPSU`, and `SDMVSTRA` columns.
+- The resulting exploration packet detects 6 survey/design candidates, 4 high-missingness variables, 105 tested pairs, 14 target-centered pairs, medium multiplicity risk, and `promotionClearance=hold_for_methods_review`.
+- Proved `explore-promote` refusal without a methods-review note and successful held handoff with a note.
+
+## Ticks 293-322
+
+- Corrected the MIMIC loop from design-only ticks into real bounded execution ticks.
+- Added a conservative MIMIC execution runner under `.loop-memory/mimic-executed-studies-20260506/run_mimic_study.py`.
+- Executed 22 MIMIC study packets across orthopedic, cardiology, pulmonary, renal, endocrine, neurologic, GI/liver, hematologic, cognitive, metabolic, and toxicology domains.
+- Added runner QA guards for sparse binary outcomes, low events per predictor, small cohorts, and non-finite LOS percent-change estimates.
+- Wrote final executed-study index and audit with cumulative estimated cost `$0.2704` under the `$1.00` ceiling.
+
+## Tick 253
+
+- Tail-sample selected derived-variable/proxy detection over the obvious modeling-plan handoff.
+- Added target alias groups so `LBXGH` maps to HbA1c/glycohemoglobin terms, and similar aliases exist for common NHANES biomarkers.
+- Regenerated the actual NHANES exploration packet; `elevated_hba1c` is now recorded in `possibleLeakagePairs` as a target proxy/derived measure for `LBXGH`.
+
+## Tick 249
+
+- Removed the now-unused `rankExploratoryAssociations` wrapper after `research explore` moved to the richer `scanExploratoryAssociations` result.
+- Verified no references remain and reran the exploration handoff smoke.
+
 ## Tick 001
 
 - Initialized `.loop-memory/` as the durable operating memory for the dogfood loop.
@@ -874,3 +945,39 @@ Sources:
 
 - Added a saved rerun-stability receipt for the threshold-derived diagnostic golden route.
 - Proved diagnostic `estimates` and `diagnostics` are stable across baseline and repeat route executions.
+
+# Tick 0254
+
+- `research modeling-plan` now accepts `--exploration-handoff`, reads `modelingPlanSeed`, carries review/blocked posture into typed modeling issues, and can use the handoff's table path to derive table evidence.
+- Saved actual-data handoff planning proof at `.loop-memory/golden/0252-actual-nhanes-exploration/modeling-plan-from-handoff.json`.
+- The actual NHANES exploration handoff routes to `paper-run` under `--survey` while preserving `EXPLORATION_HANDOFF_METHODS_REVIEW`.
+
+# Tick 0256
+
+- Added exploration candidate taxonomy, research-interest scoring, `whyThisQuestion`, and `avoidAsPrimaryQuestion`.
+- Regenerated the actual NHANES exploration proof; the top handoff is now an age/HbA1c public-health candidate rather than a glucose/HbA1c same-domain biomarker relationship.
+- `explore-promote` now carries taxonomy and research-interest fields into `modelingPlanSeed`.
+
+# Tick 0258
+
+- Added `primaryQuestionUse` and `taxonomyEvidence` to exploration candidates.
+- `taxonomyEvidence` records `exploration-taxonomy-v1`, matched rule ids, matched terms, score adjustments, and rejected categories.
+- Added `taxonomy-evidence` QA and regenerated actual NHANES exploration/handoff/modeling-plan artifacts.
+
+# Tick 0259
+
+- Web-search finding from QUIS (https://arxiv.org/abs/2410.10270): exploration should be question-guided, not only association-ranked; Agenteer should separate signal maps from question agendas.
+- Web-search finding from Graph-RAG dataset discovery (https://link.springer.com/article/10.1007/s41019-025-00313-x): explainable ranking criteria and semantic metadata are central to trustworthy discovery; Agenteer taxonomy evidence is directionally right but needs codebook/adapter backing.
+- Web-search finding from TRIPOD+AI (https://pmc.ncbi.nlm.nih.gov/articles/PMC11025451/): exploratory association, explanatory modeling, and prediction-model development need different reporting/evaluation routes.
+
+# Tick 0261
+
+- Added `routeIntent` and `routeIntentRationale` to exploration candidates.
+- Added run-level `recommendedQuestion` so reports start with one concise next question and command.
+- Handoffs now carry route intent into `modelingPlanSeed`; `modeling-plan --exploration-handoff` defaults `goal=associate` for explanatory association handoffs.
+
+# Tick 0262
+
+- Added `analysisSpecCandidate` to exploration handoffs.
+- The candidate records route intent, research question, estimand boundary, source population, outcome/exposure, excluded variables pending review, design requirements, suggested model family, required pre-execution checks, and provenance.
+- Regenerated the actual NHANES handoff and modeling-plan artifacts with the pre-spec bridge.

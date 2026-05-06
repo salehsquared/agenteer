@@ -1,0 +1,1874 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "nhanes",
+  "generatedAtIso": "2026-05-06T18:05:41.502Z",
+  "nodes": [
+    {
+      "tableId": "registry-alb-cr",
+      "rowCount": null,
+      "columnCount": 4,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-biopro",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-bmx",
+      "rowCount": null,
+      "columnCount": 5,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=examination"
+    },
+    {
+      "tableId": "registry-bpq",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire"
+    },
+    {
+      "tableId": "registry-bpx",
+      "rowCount": null,
+      "columnCount": 7,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=examination"
+    },
+    {
+      "tableId": "registry-bpxo",
+      "rowCount": null,
+      "columnCount": 7,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=unknown"
+    },
+    {
+      "tableId": "registry-demo",
+      "rowCount": null,
+      "columnCount": 16,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=demographics"
+    },
+    {
+      "tableId": "registry-diq",
+      "rowCount": null,
+      "columnCount": 4,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire"
+    },
+    {
+      "tableId": "registry-ghb",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-glu",
+      "rowCount": null,
+      "columnCount": 3,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-hdl",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-hiq",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire"
+    },
+    {
+      "tableId": "registry-huq",
+      "rowCount": null,
+      "columnCount": 3,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire"
+    },
+    {
+      "tableId": "registry-rxq-rx",
+      "rowCount": null,
+      "columnCount": 3,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire"
+    },
+    {
+      "tableId": "registry-smq",
+      "rowCount": null,
+      "columnCount": 3,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire"
+    },
+    {
+      "tableId": "registry-tchol",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-trigly",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "registry-vid",
+      "rowCount": null,
+      "columnCount": 2,
+      "sourcePath": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory"
+    },
+    {
+      "tableId": "actual-adult-exploration-table",
+      "rowCount": 31849,
+      "columnCount": 22,
+      "sourcePath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv"
+    }
+  ],
+  "edges": [
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-alb-cr",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-biopro",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-bmx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-bpq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-bpx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-bpxo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "actual-adult-exploration-table",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "one-to-many",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-biopro",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-bmx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-bpq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-bpx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-bpxo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-alb-cr",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-bmx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-bpq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-bpx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-bpxo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-biopro",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-bpq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-bpx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-bpxo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bmx",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-bpx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-bpxo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpq",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-bpxo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpx",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-demo",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-bpxo",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-diq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-demo",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-ghb",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-diq",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-glu",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-ghb",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-hdl",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-glu",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-hiq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hdl",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hiq",
+      "rightTable": "registry-huq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hiq",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hiq",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hiq",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hiq",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-hiq",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-huq",
+      "rightTable": "registry-rxq-rx",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-huq",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-huq",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-huq",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-huq",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-rxq-rx",
+      "rightTable": "registry-smq",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-rxq-rx",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-rxq-rx",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-rxq-rx",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-smq",
+      "rightTable": "registry-tchol",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-smq",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-smq",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-tchol",
+      "rightTable": "registry-trigly",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-tchol",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    },
+    {
+      "leftTable": "registry-trigly",
+      "rightTable": "registry-vid",
+      "keys": [
+        "SEQN"
+      ],
+      "confidence": 0.9,
+      "cardinality": "unknown",
+      "rationale": "Both tables contain likely join key SEQN."
+    }
+  ],
+  "entityHints": [
+    {
+      "entity": "survey participant",
+      "keys": [
+        "SEQN"
+      ],
+      "tables": [
+        "actual-adult-exploration-table",
+        "registry-alb-cr",
+        "registry-biopro",
+        "registry-bmx",
+        "registry-bpq",
+        "registry-bpx",
+        "registry-bpxo",
+        "registry-demo",
+        "registry-diq",
+        "registry-ghb",
+        "registry-glu",
+        "registry-hdl",
+        "registry-hiq",
+        "registry-huq",
+        "registry-rxq-rx",
+        "registry-smq",
+        "registry-tchol",
+        "registry-trigly",
+        "registry-vid"
+      ],
+      "rationale": "Detected SEQN in 19 table(s)."
+    },
+    {
+      "entity": "entity",
+      "keys": [
+        "nhanes_cycle_id"
+      ],
+      "tables": [
+        "actual-adult-exploration-table"
+      ],
+      "rationale": "Detected nhanes_cycle_id in 1 table(s)."
+    }
+  ],
+  "warnings": []
+}

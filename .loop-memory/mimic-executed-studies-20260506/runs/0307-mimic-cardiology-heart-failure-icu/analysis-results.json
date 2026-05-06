@@ -1,0 +1,652 @@
+{
+  "study": {
+    "id": "mimic-cardiology-heart-failure-icu",
+    "title": "Heart Failure ICU Outcomes",
+    "domain": "cardiology",
+    "question": "Among ICU admissions with heart failure diagnoses, how do first-day renal and vital-sign features relate to mortality and ICU length of stay?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab",
+      "derived-first-day-vitalsign",
+      "derived-first-day-sofa"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "heart-failure phenotype",
+      "renal interaction candidate",
+      "mortality and LOS models"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "I50",
+        "expectedTerms": [
+          "heart failure"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "I50",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "I50",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=I50&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 23,
+            "sampleRows": [
+              {
+                "code": "I50.1",
+                "name": "Left ventricular failure, unspecified"
+              },
+              {
+                "code": "I50.20",
+                "name": "Unspecified systolic (congestive) heart failure"
+              },
+              {
+                "code": "I50.21",
+                "name": "Acute systolic (congestive) heart failure"
+              },
+              {
+                "code": "I50.22",
+                "name": "Chronic systolic (congestive) heart failure"
+              },
+              {
+                "code": "I50.23",
+                "name": "Acute on chronic systolic (congestive) heart failure"
+              },
+              {
+                "code": "I50.30",
+                "name": "Unspecified diastolic (congestive) heart failure"
+              },
+              {
+                "code": "I50.31",
+                "name": "Acute diastolic (congestive) heart failure"
+              },
+              {
+                "code": "I50.32",
+                "name": "Chronic diastolic (congestive) heart failure"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:39.793793+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "428",
+        "expectedTerms": [
+          "heart failure"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "428",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "428",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=428&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 15,
+            "sampleRows": [
+              {
+                "code": "428.0",
+                "name": "Congestive heart failure, unspecified"
+              },
+              {
+                "code": "428.1",
+                "name": "Left heart failure"
+              },
+              {
+                "code": "428.20",
+                "name": "Systolic heart failure, unspecified"
+              },
+              {
+                "code": "428.21",
+                "name": "Acute systolic heart failure"
+              },
+              {
+                "code": "428.22",
+                "name": "Chronic systolic heart failure"
+              },
+              {
+                "code": "428.23",
+                "name": "Acute on chronic systolic heart failure"
+              },
+              {
+                "code": "428.30",
+                "name": "Diastolic heart failure, unspecified"
+              },
+              {
+                "code": "428.31",
+                "name": "Acute diastolic heart failure"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:40.301787+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 43,
+    "matchedDiagnosisRows": 112810,
+    "matchedAdmissions": 80512,
+    "firstIcuStayRows": 22580,
+    "uniquePatients": 16583
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 22580,
+        "missing": 0,
+        "mean": 72.5607617360496,
+        "sd": 13.42975688316856,
+        "median": 74.0,
+        "iqr": [
+          64.0,
+          83.0
+        ],
+        "min": 18.0,
+        "max": 103.0
+      },
+      "los_icu": {
+        "n": 22578,
+        "missing": 2,
+        "mean": 3.943374523872797,
+        "sd": 5.432692809506846,
+        "median": 2.25,
+        "iqr": [
+          1.21,
+          4.42
+        ],
+        "min": 0.0,
+        "max": 140.04
+      },
+      "los_hospital": {
+        "n": 22580,
+        "missing": 0,
+        "mean": 11.615234720992028,
+        "sd": 12.014221534403555,
+        "median": 8.0,
+        "iqr": [
+          5.0,
+          14.0
+        ],
+        "min": 0.0,
+        "max": 296.0
+      },
+      "sofa": {
+        "n": 22580,
+        "missing": 0,
+        "mean": 5.159565987599645,
+        "sd": 3.295842096485988,
+        "median": 5.0,
+        "iqr": [
+          3.0,
+          7.0
+        ],
+        "min": 0.0,
+        "max": 22.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 22580,
+        "positive": 3339,
+        "proportion": 0.14787422497785652
+      },
+      "male": {
+        "n": 22580,
+        "positive": 12423,
+        "proportion": 0.5501771479185119
+      },
+      "prolonged_icu_los": {
+        "n": 22580,
+        "positive": 5603,
+        "proportion": 0.24813994685562443
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "sofa",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max",
+    "sbp_min",
+    "heart_rate_max",
+    "spo2_min"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 194,
+      "missingFraction": 0.008591674047829938
+    },
+    {
+      "column": "wbc_max",
+      "missing": 168,
+      "missingFraction": 0.007440212577502214
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 164,
+      "missingFraction": 0.007263064658990257
+    },
+    {
+      "column": "bun_max",
+      "missing": 133,
+      "missingFraction": 0.005890168290522586
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 129,
+      "missingFraction": 0.005713020372010629
+    },
+    {
+      "column": "sbp_min",
+      "missing": 60,
+      "missingFraction": 0.002657218777679362
+    },
+    {
+      "column": "spo2_min",
+      "missing": 56,
+      "missingFraction": 0.0024800708591674048
+    },
+    {
+      "column": "heart_rate_max",
+      "missing": 24,
+      "missingFraction": 0.0010628875110717448
+    },
+    {
+      "column": "los_icu",
+      "missing": 2,
+      "missingFraction": 8.857395925597875e-05
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "sofa",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 22250,
+      "events": 3232,
+      "predictors": [
+        "admission_age",
+        "male",
+        "sofa",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 72.56184269662921,
+          "sd": 13.411742765695621
+        },
+        "sofa": {
+          "mean": 5.172629213483146,
+          "sd": 3.2979449347192893
+        },
+        "hemoglobin_min": {
+          "mean": 9.798930337078652,
+          "sd": 2.224513914879211
+        },
+        "wbc_max": {
+          "mean": 13.833288539325842,
+          "sd": 9.594528936948237
+        },
+        "creatinine_max": {
+          "mean": 2.087433707865169,
+          "sd": 1.948891988805845
+        },
+        "bun_max": {
+          "mean": 39.02894382022472,
+          "sd": 27.23391395841496
+        },
+        "glucose_max": {
+          "mean": 180.4019775280899,
+          "sd": 111.27520431755639
+        },
+        "sbp_min": {
+          "mean": 89.54762981273407,
+          "sd": 17.54621461058941
+        },
+        "heart_rate_max": {
+          "mean": 102.28473258426965,
+          "sd": 22.048117699120937
+        },
+        "spo2_min": {
+          "mean": 90.38116853932584,
+          "sd": 7.164411541610394
+        }
+      },
+      "metrics": {
+        "auroc": 0.77544366840065,
+        "averagePrecision": 0.44296751016428665
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.474056400562078,
+          "ci95": [
+            1.4058697853174649,
+            1.5455501602855568
+          ],
+          "pValue": 5.086317246459846e-58,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9148170803859809,
+          "ci95": [
+            0.8407211593510323,
+            0.9954433539081385
+          ],
+          "pValue": 0.03883402871740117,
+          "scale": "per unit"
+        },
+        {
+          "term": "sofa",
+          "oddsRatio": 2.0039496831065455,
+          "ci95": [
+            1.9170029834967919,
+            2.0948398969612483
+          ],
+          "pValue": 3.630666891821277e-207,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 1.0003399587379844,
+          "ci95": [
+            0.9580636134618868,
+            1.0444818266628815
+          ],
+          "pValue": 0.9876907778974745,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.1027509600343897,
+          "ci95": [
+            1.0664218651669486,
+            1.1403176543706686
+          ],
+          "pValue": 1.0492443647769104e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 0.8713347236592244,
+          "ci95": [
+            0.8246430928363464,
+            0.920670053808318
+          ],
+          "pValue": 9.518368142028494e-07,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.3117795431030914,
+          "ci95": [
+            1.2524354589888735,
+            1.3739355248636749
+          ],
+          "pValue": 1.4889466755661796e-30,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.060717771108216,
+          "ci95": [
+            1.0207851514619473,
+            1.1022125354521517
+          ],
+          "pValue": 0.002606487762590256,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.825192067658906,
+          "ci95": [
+            0.7875630179267574,
+            0.8646189994036861
+          ],
+          "pValue": 7.108688586092812e-16,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 1.2632226444034076,
+          "ci95": [
+            1.213406502340029,
+            1.315083977427353
+          ],
+          "pValue": 5.0983125319400165e-30,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 0.7786808004635452,
+          "ci95": [
+            0.7520201699408173,
+            0.8062866040657735
+          ],
+          "pValue": 5.5275858608462e-45,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 22240,
+      "predictors": [
+        "admission_age",
+        "male",
+        "sofa",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 72.56169064748201,
+          "sd": 13.411807648419499
+        },
+        "sofa": {
+          "mean": 5.173291366906475,
+          "sd": 3.2976515622998326
+        },
+        "hemoglobin_min": {
+          "mean": 9.798372302158274,
+          "sd": 2.224424882662026
+        },
+        "wbc_max": {
+          "mean": 13.833717176258993,
+          "sd": 9.596176714991758
+        },
+        "creatinine_max": {
+          "mean": 2.087410071942446,
+          "sd": 1.948930636857781
+        },
+        "bun_max": {
+          "mean": 39.028821942446044,
+          "sd": 27.235599705589763
+        },
+        "glucose_max": {
+          "mean": 180.41771582733813,
+          "sd": 111.29585228126629
+        },
+        "sbp_min": {
+          "mean": 89.535106264988,
+          "sd": 17.533331264116914
+        },
+        "heart_rate_max": {
+          "mean": 102.29259442446042,
+          "sd": 22.04516545927658
+        },
+        "spo2_min": {
+          "mean": 90.37945143884892,
+          "sd": 7.164881582770794
+        }
+      },
+      "rSquared": 0.1160463240213443,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -5.575021421757198,
+          "ci95PercentChange": [
+            -6.405288784449303,
+            -4.737388857713453
+          ],
+          "pValue": 4.0045944821849254e-37,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 1.491004068306756,
+          "ci95PercentChange": [
+            -0.21878088763548353,
+            3.2300867680686407
+          ],
+          "pValue": 0.08776539287852335,
+          "scale": "per unit"
+        },
+        {
+          "term": "sofa",
+          "percentChangeInLos": 20.529348760612454,
+          "ci95PercentChange": [
+            19.225177444247965,
+            21.847786047125915
+          ],
+          "pValue": 4.504702118349077e-248,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": 0.6623378593407336,
+          "ci95PercentChange": [
+            -0.22906181524074976,
+            1.5617017106083209
+          ],
+          "pValue": 0.14576677532180612,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 2.6068588567061735,
+          "ci95PercentChange": [
+            1.553827817954856,
+            3.6708089754409867
+          ],
+          "pValue": 1.011035453885863e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -6.4271246055454645,
+          "ci95PercentChange": [
+            -7.564727372548951,
+            -5.275521338313993
+          ],
+          "pValue": 1.8543159505685583e-26,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 3.299714064609427,
+          "ci95PercentChange": [
+            2.114361253770314,
+            4.498826558894753
+          ],
+          "pValue": 3.523732978890654e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 0.7380005920036625,
+          "ci95PercentChange": [
+            -0.11549067409977187,
+            1.5987847541350186
+          ],
+          "pValue": 0.09030848867166082,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "percentChangeInLos": -3.8754256022771605,
+          "ci95PercentChange": [
+            -4.815969804968912,
+            -2.9255875779705454
+          ],
+          "pValue": 3.3132152395706265e-15,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "percentChangeInLos": 6.345099581095104,
+          "ci95PercentChange": [
+            5.4160266637100385,
+            7.282360783631248
+          ],
+          "pValue": 5.755718389259044e-43,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "percentChangeInLos": 2.906125859266795,
+          "ci95PercentChange": [
+            1.843867514901576,
+            3.9794638377593117
+          ],
+          "pValue": 6.26329446691307e-08,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

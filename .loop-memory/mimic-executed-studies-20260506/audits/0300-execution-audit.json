@@ -1,0 +1,61 @@
+{
+  "tick": 300,
+  "runsAudited": [
+    {
+      "run": "0295-mimic-ortho-geriatric-hip-fracture",
+      "cohortRows": 527,
+      "codes": 1104,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.008470470607280732,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0296-mimic-ortho-periprosthetic-hip-fracture",
+      "cohortRows": 55,
+      "codes": 10,
+      "qa": "review",
+      "issues": [
+        "SMALL_COHORT_REVIEW",
+        "SPARSE_BINARY_OUTCOME_REVIEW",
+        "LOW_EVENTS_PER_PREDICTOR"
+      ],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.0087022839859128,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0298-mimic-spine-vertebral-fracture-icu",
+      "cohortRows": 1647,
+      "codes": 1121,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "fit",
+      "los": "fit",
+      "costUsd": 0.008502823412418365,
+      "cacheRemoved": true
+    },
+    {
+      "run": "0299-mimic-ortho-osteomyelitis-icu",
+      "cohortRows": 972,
+      "codes": 278,
+      "qa": "pass",
+      "issues": [],
+      "mortality": "not_fit",
+      "los": "fit",
+      "costUsd": 0.011676204912364482,
+      "cacheRemoved": true
+    }
+  ],
+  "totalRuns": 4,
+  "allCachesRemoved": true,
+  "qaCounts": {
+    "pass": 3,
+    "review": 1
+  },
+  "estimatedCumulativeUsd": 0.046054066903889176,
+  "verdict": "real_execution_progress_with_methods_review_boundary"
+}

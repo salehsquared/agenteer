@@ -1,9 +1,11 @@
 research paper lifecycle: 0179-bmi-fasting-glucose-r-survey
   title: BMI and fasting glucose in the NHANES fasting subsample
   status: ready_for_local_review
-  qa: pass (26/26 paper QA checks passed.)
+  qa: pass (30/30 paper QA checks passed.)
   runner: succeeded binding=spec-governed
   task: succeeded validation=pass receipts=pass,pass,pass
   capabilities: pass count=3
   rerun stability: pass (15/15 rerun stability checks passed.)
+  stats-run: missing binding=missing
+
   next: Proceed to methods review or manifest inclusion; rerun stability is available.

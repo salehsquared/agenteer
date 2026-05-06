@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T00:34:12.879069+00:00",
+  "purpose": "Actual cached NHANES exploration extract for Agenteer research explore proof. Domain repo was read only; output written under Agenteer loop memory.",
+  "rowCount": 31849,
+  "columnCount": 22,
+  "output": {
+    "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+    "sha256": "b00a1c49268965d78a954e2e719c328f1d6eb64bf0dfacd1ce22c0fc7f877703",
+    "bytes": 3782576
+  },
+  "inputs": {
+    "demographics": {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/demographics/demographics.parquet",
+      "sha256": "b9340569e5ce712444e9e68a86c62c4a9cc42663462dc31e6c4caab33b31eb65",
+      "bytes": 1476850
+    },
+    "anthropometrics": {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/anthropometrics/anthropometrics.parquet",
+      "sha256": "f20e1af4ecb35e12808b568d803bf2f72e2a306f810cccdeb1391d664adde319",
+      "bytes": 611124
+    },
+    "diabetes": {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/diabetes/diabetes.parquet",
+      "sha256": "195dacb3ab0e238f8cfcd3d2e6122a9219bbf4cd986d1c082ef002187d33f3e9",
+      "bytes": 520148
+    },
+    "lipids": {
+      "path": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430/lipids/lipids.parquet",
+      "sha256": "ea1e3417bb06b804c1dd5969806f16761df27b043b16b1b7c1e105a1b23f97d4",
+      "bytes": 391132
+    }
+  },
+  "filters": [
+    "RIDAGEYR >= 20"
+  ],
+  "derivedVariables": {
+    "elevated_hba1c": "LBXGH >= 6.5 when LBXGH nonmissing",
+    "high_waist_cm": "BMXWAIST >= 100 when BMXWAIST nonmissing",
+    "low_hdl": "LBDHDD < 40 when LBDHDD nonmissing"
+  },
+  "readOnlyDomainInputs": true
+}

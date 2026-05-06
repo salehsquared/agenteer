@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:39.327419+00:00",
+  "study": {
+    "id": "mimic-cardiology-mi-icu-mortality",
+    "title": "Acute Myocardial Infarction ICU Mortality",
+    "domain": "cardiology",
+    "question": "Which first-day ICU features predict in-hospital mortality among admissions with acute myocardial infarction codes?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-cardiac-marker",
+      "derived-apsiii",
+      "derived-first-day-vitalsign"
+    ],
+    "outcomes": [
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "MI phenotype",
+      "troponin/marker missingness audit",
+      "logistic regression",
+      "calibration if predictive framing"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "I21",
+      "expectedTerms": [
+        "myocardial infarction"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "I21",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "I21",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=I21&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 13,
+          "sampleRows": [
+            {
+              "code": "I21.01",
+              "name": "ST elevation (STEMI) myocardial infarction involving left main coronary artery"
+            },
+            {
+              "code": "I21.02",
+              "name": "ST elevation (STEMI) myocardial infarction involving left anterior descending coronary artery"
+            },
+            {
+              "code": "I21.09",
+              "name": "ST elevation (STEMI) myocardial infarction involving other coronary artery of anterior wall"
+            },
+            {
+              "code": "I21.11",
+              "name": "ST elevation (STEMI) myocardial infarction involving right coronary artery"
+            },
+            {
+              "code": "I21.19",
+              "name": "ST elevation (STEMI) myocardial infarction involving other coronary artery of inferior wall"
+            },
+            {
+              "code": "I21.21",
+              "name": "ST elevation (STEMI) myocardial infarction involving left circumflex coronary artery"
+            },
+            {
+              "code": "I21.29",
+              "name": "ST elevation (STEMI) myocardial infarction involving other sites"
+            },
+            {
+              "code": "I21.3",
+              "name": "ST elevation (STEMI) myocardial infarction of unspecified site"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:38.822327+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "410",
+      "expectedTerms": [
+        "myocardial infarction"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "410",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "410",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=410&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 30,
+          "sampleRows": [
+            {
+              "code": "410.00",
+              "name": "Acute myocardial infarction of anterolateral wall, episode of care unspecified"
+            },
+            {
+              "code": "410.01",
+              "name": "Acute myocardial infarction of anterolateral wall, initial episode of care"
+            },
+            {
+              "code": "410.02",
+              "name": "Acute myocardial infarction of anterolateral wall, subsequent episode of care"
+            },
+            {
+              "code": "410.10",
+              "name": "Acute myocardial infarction of other anterior wall, episode of care unspecified"
+            },
+            {
+              "code": "410.11",
+              "name": "Acute myocardial infarction of other anterior wall, initial episode of care"
+            },
+            {
+              "code": "410.12",
+              "name": "Acute myocardial infarction of other anterior wall, subsequent episode of care"
+            },
+            {
+              "code": "410.20",
+              "name": "Acute myocardial infarction of inferolateral wall, episode of care unspecified"
+            },
+            {
+              "code": "410.21",
+              "name": "Acute myocardial infarction of inferolateral wall, initial episode of care"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:39.327357+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-cardiac-marker",
+      "derived-apsiii",
+      "derived-first-day-vitalsign"
+    ],
+    "missingTables": [],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-cardiac-marker",
+      "derived-apsiii",
+      "derived-first-day-vitalsign"
+    ],
+    "unprofiledTables": [],
+    "estimatedBytesForNaiveFullRequiredTableRead": 84977887,
+    "estimatedTransferUsdAt012PerGb": 0.009497018940746784,
+    "status": "ready_for_bounded_design",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [],
+    "warnings": [
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "promote_to_candidate_queue",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "45ef62f42899926b58772bf34d164d520b6295e66dea38484d2c3b9be9f8a1fb"
+}

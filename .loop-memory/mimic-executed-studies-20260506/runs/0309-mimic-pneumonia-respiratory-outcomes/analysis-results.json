@@ -1,0 +1,320 @@
+{
+  "study": {
+    "id": "mimic-pneumonia-respiratory-outcomes",
+    "title": "Pneumonia ICU Respiratory Outcomes",
+    "domain": "pulmonary-infection",
+    "question": "Among ICU admissions with pneumonia codes, what respiratory and oxygen-delivery features are associated with mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-bg",
+      "derived-oxygen-delivery",
+      "derived-antibiotic"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "pneumonia phenotype",
+      "respiratory-data missingness gate",
+      "antibiotic exposure timing caveat"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "J18",
+        "expectedTerms": [
+          "pneumonia"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "J18",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "J18",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=J18&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 5,
+            "sampleRows": [
+              {
+                "code": "J18.0",
+                "name": "Bronchopneumonia, unspecified organism"
+              },
+              {
+                "code": "J18.1",
+                "name": "Lobar pneumonia, unspecified organism"
+              },
+              {
+                "code": "J18.2",
+                "name": "Hypostatic pneumonia, unspecified organism"
+              },
+              {
+                "code": "J18.8",
+                "name": "Other pneumonia, unspecified organism"
+              },
+              {
+                "code": "J18.9",
+                "name": "Pneumonia, unspecified organism"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:53.171304+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "486",
+        "expectedTerms": [
+          "pneumonia"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "486",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "486",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=486&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "486",
+                "name": "Pneumonia, organism unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:53.633521+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 7,
+    "matchedDiagnosisRows": 21100,
+    "matchedAdmissions": 21091,
+    "firstIcuStayRows": 8173,
+    "uniquePatients": 7497
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 8173,
+        "missing": 0,
+        "mean": 67.9355193931237,
+        "sd": 15.951802017530264,
+        "median": 70.0,
+        "iqr": [
+          58.0,
+          80.0
+        ],
+        "min": 18.0,
+        "max": 103.0
+      },
+      "los_icu": {
+        "n": 8171,
+        "missing": 2,
+        "mean": 4.883055929506792,
+        "sd": 6.372061042794679,
+        "median": 2.75,
+        "iqr": [
+          1.38,
+          5.88
+        ],
+        "min": 0.0,
+        "max": 136.04
+      },
+      "los_hospital": {
+        "n": 8173,
+        "missing": 0,
+        "mean": 14.028753211794935,
+        "sd": 15.787968255268694,
+        "median": 10.0,
+        "iqr": [
+          5.0,
+          17.0
+        ],
+        "min": 0.0,
+        "max": 515.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 8173,
+        "positive": 1813,
+        "proportion": 0.22182797014560138
+      },
+      "male": {
+        "n": 8173,
+        "positive": 4454,
+        "proportion": 0.5449651290835679
+      },
+      "prolonged_icu_los": {
+        "n": 8173,
+        "positive": 2039,
+        "proportion": 0.2494799951058363
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "hemoglobin_min",
+    "glucose_max",
+    "any_antibiotic_record",
+    "antibiotic_record_count"
+  ],
+  "missingness": [
+    {
+      "column": "hemoglobin_min",
+      "missing": 6949,
+      "missingFraction": 0.8502385904808516
+    },
+    {
+      "column": "glucose_max",
+      "missing": 6368,
+      "missingFraction": 0.7791508625963538
+    },
+    {
+      "column": "any_antibiotic_record",
+      "missing": 918,
+      "missingFraction": 0.11232105713936132
+    },
+    {
+      "column": "antibiotic_record_count",
+      "missing": 918,
+      "missingFraction": 0.11232105713936132
+    },
+    {
+      "column": "los_icu",
+      "missing": 2,
+      "missingFraction": 0.0002447081854888046
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "not_fit",
+      "reason": "Singular matrix",
+      "n": 932,
+      "events": 231
+    },
+    "los": {
+      "status": "fit",
+      "n": 932,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "glucose_max",
+        "any_antibiotic_record",
+        "antibiotic_record_count"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 66.04828326180258,
+          "sd": 16.23355409229521
+        },
+        "hemoglobin_min": {
+          "mean": 9.816630901287555,
+          "sd": 2.8278141731528335
+        },
+        "glucose_max": {
+          "mean": 187.42596566523605,
+          "sd": 93.56126267242288
+        },
+        "antibiotic_record_count": {
+          "mean": 7.5568669527897,
+          "sd": 6.310272093175194
+        }
+      },
+      "rSquared": 0.49378221654484844,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": 0.2755253262217705,
+          "ci95PercentChange": [
+            0.2755253261606416,
+            0.2755253262829216
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 2.2525120286846834,
+          "ci95PercentChange": [
+            2.2525120285640687,
+            2.252512028805276
+          ],
+          "pValue": 0.0,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -3.955646365334742,
+          "ci95PercentChange": [
+            -3.9556463654032092,
+            -3.9556463652662743
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -2.495791297061678,
+          "ci95PercentChange": [
+            -2.495791297117711,
+            -2.495791297005645
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "any_antibiotic_record",
+          "percentChangeInLos": null,
+          "ci95PercentChange": [
+            null,
+            null
+          ],
+          "pValue": 0.0,
+          "scale": "per unit"
+        },
+        {
+          "term": "antibiotic_record_count",
+          "percentChangeInLos": 74.93513520130064,
+          "ci95PercentChange": [
+            74.93513520115262,
+            74.93513520144867
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

@@ -177,6 +177,15 @@ AnalysisSpec is the executable contract. Prefer spec-first execution for any ser
 | `research semantic-quality` | Run semantic clinical/data plausibility checks. |
 | `research cohort-scout-file` | Scout cohort feasibility from spec and local rows. |
 | `research dataset-candidate` | Record a candidate dataset with intended use and caveats. |
+| `research dataset-register` | Create the canonical dataset intelligence bundle: manifest, registry, relationships, profile, watchouts, question seeds, summary, and agent context. |
+| `research dataset-inspect` | Read the persisted dataset manifest. |
+| `research dataset-profile` | Read the persisted table/variable profile and aggregate data-quality summary. |
+| `research dataset-relationships` | Read inferred table/entity relationship graph. |
+| `research dataset-questions` | Read exploratory question seeds generated from variable roles and relationships. |
+| `research dataset-describe` | Print the reader-facing dataset summary markdown. |
+| `research dataset-spec` | Convert a dataset-grounded study artifact plus dataset manifest into AnalysisSpec v2. |
+| `research dataset-run` | Execute an AnalysisSpec v2 against a manifest-backed dataset with bounded cost, cohort construction, typed QA, and aggregate-only artifacts. |
+| `research dataset-run-index` | Summarize a directory of dataset-run packets, readiness, issues, cost receipts, and next actions. |
 | `research dataset-adapter` | Inspect dataset adapter manifest such as NHANES. |
 | `research data-access` | Record local file access for a packet. |
 | `research data-access-redact` | Remove local-sensitive paths from packet access records. |
@@ -186,7 +195,9 @@ AnalysisSpec is the executable contract. Prefer spec-first execution for any ser
 | `research table-summary` | Summarize rows with schema/missingness/class evidence. |
 | `research infer-schema` | Infer schema from JSON rows. |
 
-Use public/local dataset adapters where possible. Do not write into MedBrevia repos without explicit approval.
+Use `dataset-register` before analysis when a dataset is new or unfamiliar. It standardizes where agents look before planning: `DATASET_CONTEXT.md`, `dataset-manifest.json`, `variable-registry.json`, `relationship-graph.json`, `data-profile.json`, `watchouts.json`, and `question-seeds.json`. Use public/local dataset adapters where possible. Do not write into MedBrevia repos without explicit approval.
+
+Use `dataset-spec` and `dataset-run` when the study depends on multiple manifest-backed tables rather than one already-joined analysis table. This path is currently strongest for EHR diagnosis-cohort outcome studies. It requires AnalysisSpec v2, records ICD/phenotype sensitivity assumptions, blocks unsafe cloud reads unless `--allow-gcs` is explicit, writes cost receipts, and stores only aggregate outputs in the packet.
 
 ## Research Method Ontology And Modeling Commands
 
@@ -198,7 +209,7 @@ Use public/local dataset adapters where possible. Do not write into MedBrevia re
 | `research method-select` | Rank method candidates from question/outcome/design/data flags. |
 | `research method-apply` | Merge method requirements into AnalysisSpec v2. |
 | `research method-validate` | Validate that a spec can support a method. |
-| `research modeling-plan` | Choose route, candidate methods/models, baselines, policies, artifacts, and next command. |
+| `research modeling-plan` | Choose route, candidate methods/models, baselines, policies, artifacts, and next command; can consume `--exploration-handoff` artifacts from dataset exploration. |
 | `research execution-contract` | Bind AnalysisSpec v2 to backend/dataset/archetype/runner/policy. |
 | `research archetypes` | List or inspect study archetype manifests. |
 | `research machine-plan` | Build a higher-level machine execution plan. |
@@ -220,6 +231,8 @@ The modeling plan is the front door after a research proposal exists.
 | `research ml-inspect` | Inspect one persisted ML run. |
 | `research paper-run` | Execute AnalysisSpec-to-paper path with Python/R backend, QA, provenance, lifecycle, and task envelopes. |
 | `research paper-runner-record` | Record runner provenance for a paper. |
+| `research explore` | Explore a table, rank unadjusted associations, map variable roles, and generate bounded candidate research questions. |
+| `research explore-promote` | Convert one exploration question into a modeling-plan handoff while enforcing promotion clearance and methods-review requirements. |
 
 Use `analysis-manifest --require-ready` in scripts when a run must be promotion-ready.
 
@@ -227,8 +240,8 @@ Use `analysis-manifest --require-ready` in scripts when a run must be promotion-
 
 | Command | Purpose |
 |---|---|
-| `research paper-qa` | QA a paper against evidence and claims. |
-| `research paper-index` | Build an index over generated papers. |
+| `research paper-qa` | QA a paper against evidence, claims, reader-facing language, readability, and known overclaim risks. |
+| `research paper-index` | Build an index over generated papers, including reader-facing language status for legacy/current paper separation. |
 | `research paper-lifecycle` | Summarize paper lifecycle, provenance, envelopes, and remaining review needs. |
 | `research paper-rerun-stability` | Compare repeat paper runs within tolerance. |
 | `research benchmark-register` | Register a packet as a benchmark case. |
@@ -291,4 +304,3 @@ Specialization loops are the framework path for reusable domain capability creat
 | `lab medbrevia-nhanes` | Prototype command for MedBrevia/NHANES packet design. |
 
 Prefer the durable `research ...` commands for new work. Treat lab commands as compatibility/prototype surface.
-

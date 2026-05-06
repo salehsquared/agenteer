@@ -1,0 +1,1244 @@
+{
+  "schemaVersion": 1,
+  "sourceManifest": "/Users/saleh/WebstormProjects/medbrevia_v3/data/analytics/nhanes/registry.json",
+  "source": {
+    "dataset": "nhanes",
+    "name": "National Health and Nutrition Examination Survey",
+    "baseUrl": "https://wwwn.cdc.gov/Nchs/Nhanes",
+    "documentationUrl": "https://wwwn.cdc.gov/nchs/nhanes/",
+    "defaultCycles": [
+      "2011-2012",
+      "2013-2014",
+      "2015-2016",
+      "2017-2018",
+      "2017-2020-prepandemic"
+    ],
+    "cycles": [
+      {
+        "id": "2011-2012",
+        "label": "2011-2012",
+        "sourcePath": "2011-2012",
+        "suffix": "G",
+        "weightYears": 2,
+        "trendComparable": true
+      },
+      {
+        "id": "2013-2014",
+        "label": "2013-2014",
+        "sourcePath": "2013-2014",
+        "suffix": "H",
+        "weightYears": 2,
+        "trendComparable": true
+      },
+      {
+        "id": "2015-2016",
+        "label": "2015-2016",
+        "sourcePath": "2015-2016",
+        "suffix": "I",
+        "weightYears": 2,
+        "trendComparable": true
+      },
+      {
+        "id": "2017-2018",
+        "label": "2017-2018",
+        "sourcePath": "2017-2018",
+        "suffix": "J",
+        "weightYears": 2,
+        "trendComparable": true
+      },
+      {
+        "id": "2017-2020-prepandemic",
+        "label": "2017-March 2020 pre-pandemic",
+        "sourcePath": "2017-2020",
+        "fileBaseUrl": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles",
+        "filePrefix": "P_",
+        "suffix": "",
+        "extension": "xpt",
+        "weightYears": 3.2,
+        "trendComparable": false,
+        "notes": "Special combined pre-pandemic sample. Do not split into normal two-year trend cycles."
+      }
+    ],
+    "weightRules": [
+      {
+        "id": "interview",
+        "weightVariable": "WTINT2YR",
+        "strataVariable": "SDMVSTRA",
+        "psuVariable": "SDMVPSU",
+        "description": "Use for interview-only questionnaire analyses."
+      },
+      {
+        "id": "mec",
+        "weightVariable": "WTMEC2YR",
+        "strataVariable": "SDMVSTRA",
+        "psuVariable": "SDMVPSU",
+        "description": "Use for examination and most laboratory analyses from MEC participants."
+      },
+      {
+        "id": "prepandemic_interview",
+        "weightVariable": "WTINTPRP",
+        "strataVariable": "SDMVSTRA",
+        "psuVariable": "SDMVPSU",
+        "description": "Use for interview-only analyses in the special 2017-March 2020 pre-pandemic release."
+      },
+      {
+        "id": "prepandemic_mec",
+        "weightVariable": "WTMECPRP",
+        "strataVariable": "SDMVSTRA",
+        "psuVariable": "SDMVPSU",
+        "description": "Use for MEC analyses in the special 2017-March 2020 pre-pandemic release."
+      },
+      {
+        "id": "fasting",
+        "weightVariable": "WTSAF2YR",
+        "strataVariable": "SDMVSTRA",
+        "psuVariable": "SDMVPSU",
+        "description": "Use for fasting subsample analyses such as fasting glucose and triglycerides."
+      }
+    ],
+    "domains": {
+      "demographics": {
+        "label": "Demographics and survey design",
+        "required": true,
+        "description": "Participant demographics, interview/exam status, income ratio, and survey design variables."
+      },
+      "anthropometrics": {
+        "label": "Anthropometrics",
+        "description": "Measured weight, height, BMI, and waist circumference."
+      },
+      "blood_pressure": {
+        "label": "Blood pressure",
+        "description": "Measured blood pressure readings and questionnaire history."
+      },
+      "diabetes": {
+        "label": "Diabetes and glycemia",
+        "description": "Self-reported diabetes, treatment, HbA1c, and fasting glucose where available."
+      },
+      "lipids": {
+        "label": "Lipids",
+        "description": "Total cholesterol, HDL cholesterol, triglycerides, and derived LDL where available."
+      },
+      "kidney": {
+        "label": "Kidney markers",
+        "description": "Creatinine and urine albumin/creatinine measures where available."
+      },
+      "vitamin_d": {
+        "label": "Vitamin D",
+        "description": "Serum 25-hydroxyvitamin D measures where available."
+      },
+      "smoking": {
+        "label": "Smoking",
+        "description": "Smoking history questionnaire variables."
+      },
+      "medications": {
+        "label": "Prescription medications",
+        "description": "Prescription medication questionnaire records."
+      },
+      "insurance_access": {
+        "label": "Insurance and access",
+        "description": "Health insurance and health care access questionnaire variables."
+      }
+    }
+  },
+  "destination": {
+    "rootUri": "https://wwwn.cdc.gov/Nchs/Nhanes",
+    "documentationUri": "https://wwwn.cdc.gov/nchs/nhanes/",
+    "localRegistryPath": "/Users/saleh/WebstormProjects/medbrevia_v3/data/analytics/nhanes/registry.json",
+    "localExplorationTablePath": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv"
+  },
+  "tables": [
+    {
+      "dataset": "registry",
+      "table": "alb_cr",
+      "source": "NHANES registry table ALB_CR",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 4,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "kidney",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "kidney",
+          "role": "id"
+        },
+        {
+          "name": "URDACT",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Urine albumin/creatinine ratio",
+          "domain": "kidney",
+          "role": "measure",
+          "unit": "mg/g",
+          "weightHint": null
+        },
+        {
+          "name": "URXUCR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Urine creatinine",
+          "domain": "kidney",
+          "role": "measure",
+          "unit": "mg/dL",
+          "weightHint": null
+        },
+        {
+          "name": "URXUMA",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Urine albumin",
+          "domain": "kidney",
+          "role": "measure",
+          "unit": "ug/mL",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "biopro",
+      "source": "NHANES registry table BIOPRO",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "kidney",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "kidney",
+          "role": "id"
+        },
+        {
+          "name": "LBXSCR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Creatinine",
+          "domain": "kidney",
+          "role": "measure",
+          "unit": "mg/dL",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "bmx",
+      "source": "NHANES registry table BMX",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=examination",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 5,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "anthropometrics",
+      "component": "examination",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "anthropometrics",
+          "role": "id"
+        },
+        {
+          "name": "BMXBMI",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Body mass index",
+          "domain": "anthropometrics",
+          "role": "measure",
+          "unit": "kg/m2",
+          "weightHint": null
+        },
+        {
+          "name": "BMXHT",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Standing height",
+          "domain": "anthropometrics",
+          "role": "measure",
+          "unit": "cm",
+          "weightHint": null
+        },
+        {
+          "name": "BMXWAIST",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Waist circumference",
+          "domain": "anthropometrics",
+          "role": "measure",
+          "unit": "cm",
+          "weightHint": null
+        },
+        {
+          "name": "BMXWT",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Weight",
+          "domain": "anthropometrics",
+          "role": "measure",
+          "unit": "kg",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "bpq",
+      "source": "NHANES registry table BPQ",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "blood_pressure",
+      "component": "questionnaire",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "blood_pressure",
+          "role": "id"
+        },
+        {
+          "name": "BPQ020",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Ever told you had high blood pressure",
+          "domain": "blood_pressure",
+          "role": "questionnaire",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "bpx",
+      "source": "NHANES registry table BPX",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=examination",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 7,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "blood_pressure",
+      "component": "examination",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "blood_pressure",
+          "role": "id"
+        },
+        {
+          "name": "BPXDI1",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Diastolic BP - reading 1",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXDI2",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Diastolic BP - reading 2",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXDI3",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Diastolic BP - reading 3",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXSY1",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Systolic BP - reading 1",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXSY2",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Systolic BP - reading 2",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXSY3",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Systolic BP - reading 3",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "bpxo",
+      "source": "NHANES registry table BPXO",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=unknown",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 7,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "blood_pressure",
+      "component": null,
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "blood_pressure",
+          "role": "id"
+        },
+        {
+          "name": "BPXODI1",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Oscillometric diastolic BP - reading 1",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXODI2",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Oscillometric diastolic BP - reading 2",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXODI3",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Oscillometric diastolic BP - reading 3",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXOSY1",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Oscillometric systolic BP - reading 1",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXOSY2",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Oscillometric systolic BP - reading 2",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        },
+        {
+          "name": "BPXOSY3",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Oscillometric systolic BP - reading 3",
+          "domain": "blood_pressure",
+          "role": "measure",
+          "unit": "mmHg",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "demo",
+      "source": "NHANES registry table DEMO",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=demographics",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 16,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "demographics",
+      "component": "demographics",
+      "required": true,
+      "columns": [
+        {
+          "name": "DMDEDUC2",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Education level - adults 20+",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "DMDMARTL",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Marital status",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "INDFMPIR",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Family income to poverty ratio",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "RIAGENDR",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Gender",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "RIDAGEYR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Age in years at screening",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": "years",
+          "weightHint": null
+        },
+        {
+          "name": "RIDRETH1",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Race/Hispanic origin",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "RIDRETH3",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Race/Hispanic origin with Asian category",
+          "domain": "demographics",
+          "role": "covariate",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "RIDSTATR",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Interview/examination status",
+          "domain": "demographics",
+          "role": "eligibility",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "SDDSRVYR",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Data release cycle",
+          "domain": "demographics",
+          "role": "cycle",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "SDMVPSU",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Masked variance pseudo-PSU",
+          "domain": "demographics",
+          "role": "survey_design",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "SDMVSTRA",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Masked variance pseudo-stratum",
+          "domain": "demographics",
+          "role": "survey_design",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "demographics",
+          "role": "id",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "WTINT2YR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Full sample 2-year interview weight",
+          "domain": "demographics",
+          "role": "survey_weight",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "WTINTPRP",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Full sample pre-pandemic interview weight",
+          "domain": "demographics",
+          "role": "survey_weight",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "WTMEC2YR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Full sample 2-year MEC exam weight",
+          "domain": "demographics",
+          "role": "survey_weight",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "WTMECPRP",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Full sample pre-pandemic MEC exam weight",
+          "domain": "demographics",
+          "role": "survey_weight",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "diq",
+      "source": "NHANES registry table DIQ",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 4,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "diabetes",
+      "component": "questionnaire",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "diabetes",
+          "role": "id"
+        },
+        {
+          "name": "DID040",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Age when first told you had diabetes",
+          "domain": "diabetes",
+          "role": "questionnaire",
+          "unit": "years",
+          "weightHint": null
+        },
+        {
+          "name": "DIQ010",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Doctor told you have diabetes",
+          "domain": "diabetes",
+          "role": "outcome",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "DIQ050",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Taking insulin now",
+          "domain": "diabetes",
+          "role": "questionnaire",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "ghb",
+      "source": "NHANES registry table GHB",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "diabetes",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "diabetes",
+          "role": "id"
+        },
+        {
+          "name": "LBXGH",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Glycohemoglobin/HbA1c",
+          "domain": "diabetes",
+          "role": "measure",
+          "unit": "%",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "glu",
+      "source": "NHANES registry table GLU",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 3,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "diabetes",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "diabetes",
+          "role": "id"
+        },
+        {
+          "name": "LBXGLU",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Fasting glucose",
+          "domain": "diabetes",
+          "role": "measure",
+          "unit": "mg/dL",
+          "weightHint": "fasting"
+        },
+        {
+          "name": "WTSAF2YR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Fasting subsample 2-year weight",
+          "domain": "diabetes",
+          "role": "survey_weight",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "hdl",
+      "source": "NHANES registry table HDL",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "lipids",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "lipids",
+          "role": "id"
+        },
+        {
+          "name": "LBDHDD",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Direct HDL cholesterol",
+          "domain": "lipids",
+          "role": "measure",
+          "unit": "mg/dL",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "hiq",
+      "source": "NHANES registry table HIQ",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "insurance_access",
+      "component": "questionnaire",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "insurance_access",
+          "role": "id"
+        },
+        {
+          "name": "HIQ011",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Covered by health insurance",
+          "domain": "insurance_access",
+          "role": "questionnaire",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "huq",
+      "source": "NHANES registry table HUQ",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 3,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "insurance_access",
+      "component": "questionnaire",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "insurance_access",
+          "role": "id"
+        },
+        {
+          "name": "HUQ010",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "General health condition",
+          "domain": "insurance_access",
+          "role": "questionnaire",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "HUQ030",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Routine place to go for healthcare",
+          "domain": "insurance_access",
+          "role": "questionnaire",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "rxq_rx",
+      "source": "NHANES registry table RXQ_RX",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 3,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "medications",
+      "component": "questionnaire",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "medications",
+          "role": "id"
+        },
+        {
+          "name": "RXDDRGID",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Multum Lexicon drug code",
+          "domain": "medications",
+          "role": "medication_code",
+          "unit": null,
+          "weightHint": null
+        },
+        {
+          "name": "RXDDRUG",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Generic drug name",
+          "domain": "medications",
+          "role": "medication",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "smq",
+      "source": "NHANES registry table SMQ",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=questionnaire",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 3,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "smoking",
+      "component": "questionnaire",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "smoking",
+          "role": "id"
+        },
+        {
+          "name": "SMD030",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Age started smoking cigarettes regularly",
+          "domain": "smoking",
+          "role": "questionnaire",
+          "unit": "years",
+          "weightHint": null
+        },
+        {
+          "name": "SMQ020",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "Smoked at least 100 cigarettes in life",
+          "domain": "smoking",
+          "role": "questionnaire",
+          "unit": null,
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "tchol",
+      "source": "NHANES registry table TCHOL",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "lipids",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "lipids",
+          "role": "id"
+        },
+        {
+          "name": "LBXTC",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Total cholesterol",
+          "domain": "lipids",
+          "role": "measure",
+          "unit": "mg/dL",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "trigly",
+      "source": "NHANES registry table TRIGLY",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "lipids",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "lipids",
+          "role": "id"
+        },
+        {
+          "name": "LBXTR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "Triglycerides",
+          "domain": "lipids",
+          "role": "measure",
+          "unit": "mg/dL",
+          "weightHint": "fasting"
+        }
+      ]
+    },
+    {
+      "dataset": "registry",
+      "table": "vid",
+      "source": "NHANES registry table VID",
+      "destinationPrefix": "https://wwwn.cdc.gov/Nchs/Nhanes/search/datapage.aspx?Component=laboratory",
+      "bigqueryRows": null,
+      "bigquerySchemaFields": 2,
+      "gcsExportedBytes": 0,
+      "gcsObjectCount": 0,
+      "domain": "vitamin_d",
+      "component": "laboratory",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "INTEGER",
+          "mode": "NULLABLE",
+          "description": "Respondent sequence number",
+          "domain": "vitamin_d",
+          "role": "id"
+        },
+        {
+          "name": "LBXVIDMS",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "25-hydroxyvitamin D",
+          "domain": "vitamin_d",
+          "role": "measure",
+          "unit": "nmol/L",
+          "weightHint": null
+        }
+      ]
+    },
+    {
+      "dataset": "actual",
+      "table": "adult_exploration_table",
+      "source": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+      "destinationPrefix": "/Users/saleh/TechProjects/agenteer/.loop-memory/golden/0252-actual-nhanes-exploration/nhanes-adult-exploration.csv",
+      "bigqueryRows": 31849,
+      "bigquerySchemaFields": 22,
+      "gcsExportedBytes": 3782576,
+      "gcsObjectCount": 1,
+      "domain": "public-health-survey-derived-table",
+      "component": "derived-local-analysis-table",
+      "required": false,
+      "columns": [
+        {
+          "name": "SEQN",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "SEQN"
+        },
+        {
+          "name": "nhanes_cycle_id",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "nhanes cycle id"
+        },
+        {
+          "name": "RIDAGEYR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "RIDAGEYR"
+        },
+        {
+          "name": "RIAGENDR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "RIAGENDR"
+        },
+        {
+          "name": "RIDRETH3",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "RIDRETH3"
+        },
+        {
+          "name": "INDFMPIR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "INDFMPIR"
+        },
+        {
+          "name": "SDMVPSU",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "SDMVPSU"
+        },
+        {
+          "name": "SDMVSTRA",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "SDMVSTRA"
+        },
+        {
+          "name": "WTMEC2YR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "WTMEC2YR"
+        },
+        {
+          "name": "WTMECPRP",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "WTMECPRP"
+        },
+        {
+          "name": "WTSAF2YR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "WTSAF2YR"
+        },
+        {
+          "name": "BMXBMI",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "BMXBMI"
+        },
+        {
+          "name": "BMXWAIST",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "BMXWAIST"
+        },
+        {
+          "name": "LBXGH",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "LBXGH"
+        },
+        {
+          "name": "LBXGLU",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "LBXGLU"
+        },
+        {
+          "name": "DIQ010",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "DIQ010"
+        },
+        {
+          "name": "LBDHDD",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "LBDHDD"
+        },
+        {
+          "name": "LBXTC",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "LBXTC"
+        },
+        {
+          "name": "LBXTR",
+          "type": "FLOAT",
+          "mode": "NULLABLE",
+          "description": "LBXTR"
+        },
+        {
+          "name": "elevated_hba1c",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "elevated hba1c"
+        },
+        {
+          "name": "high_waist_cm",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "high waist cm"
+        },
+        {
+          "name": "low_hdl",
+          "type": "STRING",
+          "mode": "NULLABLE",
+          "description": "low hdl"
+        }
+      ]
+    }
+  ]
+}

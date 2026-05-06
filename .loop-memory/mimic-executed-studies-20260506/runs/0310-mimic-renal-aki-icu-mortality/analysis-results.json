@@ -1,0 +1,544 @@
+{
+  "study": {
+    "id": "mimic-renal-aki-icu-mortality",
+    "title": "Acute Kidney Injury ICU Mortality",
+    "domain": "renal",
+    "question": "Among ICU admissions with AKI diagnosis codes or derived AKI stages, how strongly does AKI severity predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-kdigo-stages",
+      "derived-kdigo-creatinine",
+      "derived-kdigo-uo",
+      "derived-icustay-detail",
+      "derived-first-day-lab"
+    ],
+    "outcomes": [
+      "aki_stage",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "diagnosis-vs-derived AKI comparison",
+      "KDIGO stage model",
+      "measurement-window audit"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "N17",
+        "expectedTerms": [
+          "acute kidney failure"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "N17",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "N17",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=N17&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 5,
+            "sampleRows": [
+              {
+                "code": "N17.0",
+                "name": "Acute kidney failure with tubular necrosis"
+              },
+              {
+                "code": "N17.1",
+                "name": "Acute kidney failure with acute cortical necrosis"
+              },
+              {
+                "code": "N17.2",
+                "name": "Acute kidney failure with medullary necrosis"
+              },
+              {
+                "code": "N17.8",
+                "name": "Other acute kidney failure"
+              },
+              {
+                "code": "N17.9",
+                "name": "Acute kidney failure, unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:42.791251+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "584",
+        "expectedTerms": [
+          "acute kidney failure"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "584",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "584",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=584&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 5,
+            "sampleRows": [
+              {
+                "code": "584.5",
+                "name": "Acute kidney failure with lesion of tubular necrosis"
+              },
+              {
+                "code": "584.6",
+                "name": "Acute kidney failure with lesion of renal cortical necrosis"
+              },
+              {
+                "code": "584.7",
+                "name": "Acute kidney failure with lesion of renal medullary [papillary] necrosis"
+              },
+              {
+                "code": "584.8",
+                "name": "Acute kidney failure with other specified pathological lesion in kidney"
+              },
+              {
+                "code": "584.9",
+                "name": "Acute kidney failure, unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:43.245486+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 11,
+    "matchedDiagnosisRows": 73580,
+    "matchedAdmissions": 73202,
+    "firstIcuStayRows": 25658,
+    "uniquePatients": 21251
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 25658,
+        "missing": 0,
+        "mean": 68.11372671291605,
+        "sd": 15.646091434036958,
+        "median": 70.0,
+        "iqr": [
+          58.0,
+          80.0
+        ],
+        "min": 18.0,
+        "max": 103.0
+      },
+      "los_icu": {
+        "n": 25649,
+        "missing": 9,
+        "mean": 4.838388631135717,
+        "sd": 6.8905328985004335,
+        "median": 2.54,
+        "iqr": [
+          1.33,
+          5.25
+        ],
+        "min": 0.0,
+        "max": 159.67
+      },
+      "los_hospital": {
+        "n": 25658,
+        "missing": 0,
+        "mean": 14.05405721412425,
+        "sd": 15.072686425528698,
+        "median": 10.0,
+        "iqr": [
+          5.0,
+          17.0
+        ],
+        "min": 0.0,
+        "max": 309.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 25658,
+        "positive": 5370,
+        "proportion": 0.2092914490607218
+      },
+      "male": {
+        "n": 25658,
+        "positive": 15167,
+        "proportion": 0.5911216774495284
+      },
+      "prolonged_icu_los": {
+        "n": 25658,
+        "positive": 6408,
+        "proportion": 0.24974666770597864
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max",
+    "aki_stage",
+    "aki_stage_smoothed"
+  ],
+  "missingness": [
+    {
+      "column": "wbc_max",
+      "missing": 175,
+      "missingFraction": 0.006820484839036558
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 173,
+      "missingFraction": 0.00674253644087614
+    },
+    {
+      "column": "glucose_max",
+      "missing": 147,
+      "missingFraction": 0.0057292072647907085
+    },
+    {
+      "column": "bun_max",
+      "missing": 116,
+      "missingFraction": 0.004521007093304233
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 114,
+      "missingFraction": 0.004443058695143815
+    },
+    {
+      "column": "los_icu",
+      "missing": 9,
+      "missingFraction": 0.0003507677917218801
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "aki_stage",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "aki_stage_smoothed",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 25431,
+      "events": 5289,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "aki_stage",
+        "aki_stage_smoothed"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 68.10734929810074,
+          "sd": 15.63515018193955
+        },
+        "hemoglobin_min": {
+          "mean": 9.554913294797688,
+          "sd": 2.2992714021797083
+        },
+        "wbc_max": {
+          "mean": 15.315933309740078,
+          "sd": 14.2223341760408
+        },
+        "creatinine_max": {
+          "mean": 2.2598167590735714,
+          "sd": 1.8676571964113249
+        },
+        "bun_max": {
+          "mean": 44.07597027250206,
+          "sd": 29.43775348322204
+        },
+        "glucose_max": {
+          "mean": 199.23341590971648,
+          "sd": 146.074279668324
+        },
+        "aki_stage": {
+          "mean": 1.6775588848256064,
+          "sd": 1.112824870371957
+        },
+        "aki_stage_smoothed": {
+          "mean": 1.944870433722622,
+          "sd": 1.041655197488753
+        }
+      },
+      "metrics": {
+        "auroc": 0.7136434829443792,
+        "averagePrecision": 0.38829150514187444
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.1601124420931959,
+          "ci95": [
+            1.1205373155716616,
+            1.2010852825662701
+          ],
+          "pValue": 5.0033622340511255e-17,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9777189721896012,
+          "ci95": [
+            0.9158480059681484,
+            1.0437696892389543
+          ],
+          "pValue": 0.49930786474237665,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 0.9303232260976311,
+          "ci95": [
+            0.900025263838281,
+            0.9616411225232226
+          ],
+          "pValue": 1.908049417367656e-05,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 1.18424443308646,
+          "ci95": [
+            1.1449707222927903,
+            1.2248652738367944
+          ],
+          "pValue": 8.576069299294202e-23,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 0.8412375475273978,
+          "ci95": [
+            0.8027483910741626,
+            0.8815721329854788
+          ],
+          "pValue": 4.650912196047219e-13,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 1.334624384399891,
+          "ci95": [
+            1.2808087633980374,
+            1.3907011712733237
+          ],
+          "pValue": 5.412819433092966e-43,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.008944740105883,
+          "ci95": [
+            0.976290900457441,
+            1.0426907473073428
+          ],
+          "pValue": 0.5957619683273143,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage",
+          "oddsRatio": 2.165290055597119,
+          "ci95": [
+            2.0122431982388966,
+            2.329977325291051
+          ],
+          "pValue": 8.604904098567987e-95,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage_smoothed",
+          "oddsRatio": 0.9540986678504156,
+          "ci95": [
+            0.8853067245051419,
+            1.0282360257714849
+          ],
+          "pValue": 0.21844371742015,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 25411,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max",
+        "aki_stage",
+        "aki_stage_smoothed"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 68.11144779819763,
+          "sd": 15.633154784802725
+        },
+        "hemoglobin_min": {
+          "mean": 9.554090748101215,
+          "sd": 2.298644110946549
+        },
+        "wbc_max": {
+          "mean": 15.316595175317776,
+          "sd": 14.224147925676037
+        },
+        "creatinine_max": {
+          "mean": 2.259930738656487,
+          "sd": 1.8680930923211834
+        },
+        "bun_max": {
+          "mean": 44.080634370941716,
+          "sd": 29.44302175581003
+        },
+        "glucose_max": {
+          "mean": 199.24296564479948,
+          "sd": 146.10589092453995
+        },
+        "aki_stage": {
+          "mean": 1.6780528117744284,
+          "sd": 1.1124700147739786
+        },
+        "aki_stage_smoothed": {
+          "mean": 1.9454960450198733,
+          "sd": 1.0411734672928377
+        }
+      },
+      "rSquared": 0.33051705805496256,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -6.734770883702934,
+          "ci95PercentChange": [
+            -7.471905120741096,
+            -5.991764193718208
+          ],
+          "pValue": 1.8275943717763862e-66,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 4.661110438133087,
+          "ci95PercentChange": [
+            3.0554061045355407,
+            6.291833220586374
+          ],
+          "pValue": 7.681904084739255e-09,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": 2.263413459868624,
+          "ci95PercentChange": [
+            1.454373165628975,
+            3.0789053852926296
+          ],
+          "pValue": 3.333984543469079e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 1.6696932087800542,
+          "ci95PercentChange": [
+            0.7283679628452777,
+            2.619815313400786
+          ],
+          "pValue": 0.00048458934061244456,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": -7.489457985620074,
+          "ci95PercentChange": [
+            -8.674965784508759,
+            -6.2885608824371335
+          ],
+          "pValue": 2.7335517012581956e-32,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 3.2841296619986027,
+          "ci95PercentChange": [
+            2.133031912525163,
+            4.448200942209635
+          ],
+          "pValue": 1.595489185232059e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": -0.5817264556736368,
+          "ci95PercentChange": [
+            -1.3013456677537283,
+            0.14313955347675655
+          ],
+          "pValue": 0.11547456029825609,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage",
+          "percentChangeInLos": 41.50067677473348,
+          "ci95PercentChange": [
+            39.96923048080472,
+            43.0488790924193
+          ],
+          "pValue": 0.0,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "aki_stage_smoothed",
+          "percentChangeInLos": 10.147330305514624,
+          "ci95PercentChange": [
+            9.055007733612186,
+            11.25059385689049
+          ],
+          "pValue": 1.5037299395802203e-80,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

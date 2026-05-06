@@ -3,5 +3,253 @@
   "dataRoot": "/Users/saleh/WebstormProjects/medbrevia_v3/.cache/analytics-pilot/curated/nhanes/nhanes-v1-20260430",
   "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/actual-nhanes/papers/0179-bmi-fasting-glucose-r-survey",
   "backend": "r-survey",
-  "rscript": ".research-runtime/micromamba-root/envs/research-r/bin/Rscript"
+  "rscript": ".research-runtime/micromamba-root/envs/research-r/bin/Rscript",
+  "datasetAdapter": {
+    "schemaVersion": 1,
+    "id": "nhanes",
+    "label": "NHANES local/public-cache adapter",
+    "domain": "public-health-survey",
+    "productionStatus": "partial",
+    "localCachePolicy": "required",
+    "supportedFormats": [
+      "parquet",
+      "csv",
+      "json",
+      "xpt"
+    ],
+    "keyFields": [
+      "SEQN"
+    ],
+    "surveyDesign": {
+      "supportsWeights": true,
+      "weightVariables": [
+        "WTINT2YR",
+        "WTMEC2YR",
+        "WTSAF2YR",
+        "WTSAFPRP",
+        "WTMECPRP"
+      ],
+      "strataVariables": [
+        "SDMVSTRA"
+      ],
+      "psuVariables": [
+        "SDMVPSU"
+      ],
+      "replicateWeights": false,
+      "multiCyclePolicy": "explicit-required",
+      "weightDomains": [
+        {
+          "weight": "WTINT2YR",
+          "label": "Interview participants",
+          "isSubsample": false,
+          "rationale": "Use the interview survey weight when all variables come from the interview component.",
+          "eligibilityNote": "interview participants with positive interview weights and complete analysis variables",
+          "leastCommonDenominatorFor": [
+            "interview questionnaire variables"
+          ],
+          "cycleYears": 2,
+          "multiCycleConstruction": "Divide each 2-year interview weight by the number of combined 2-year cycles when pooling comparable cycles."
+        },
+        {
+          "weight": "WTMEC2YR",
+          "label": "MEC exam participants",
+          "isSubsample": false,
+          "rationale": "Use the MEC exam survey weight when any analysis variable comes from examination or laboratory components available to MEC participants.",
+          "eligibilityNote": "MEC-exam participants with positive MEC weights and complete analysis variables",
+          "leastCommonDenominatorFor": [
+            "examination variables",
+            "standard laboratory variables"
+          ],
+          "cycleYears": 2,
+          "multiCycleConstruction": "Divide each 2-year MEC weight by the number of combined 2-year cycles when pooling comparable cycles."
+        },
+        {
+          "weight": "WTSAF2YR",
+          "label": "Morning fasting laboratory subsample",
+          "isSubsample": true,
+          "rationale": "Use the fasting subsample survey weight when fasting laboratory measures are required.",
+          "eligibilityNote": "fasting subsample-eligible participants with positive fasting subsample weights and complete analysis variables",
+          "leastCommonDenominatorFor": [
+            "fasting glucose",
+            "fasting insulin",
+            "triglycerides when collected in the fasting subsample"
+          ],
+          "cycleYears": 2,
+          "multiCycleConstruction": "Divide each 2-year fasting subsample weight by the number of combined 2-year cycles when pooling comparable cycles; do not mix with full-sample MEC weights."
+        },
+        {
+          "weight": "WTSAFPRP",
+          "label": "2017-2020 pre-pandemic fasting laboratory subsample",
+          "isSubsample": true,
+          "rationale": "Use the pre-pandemic fasting subsample weight for 2017-2020 pre-pandemic fasting laboratory analyses.",
+          "eligibilityNote": "2017-2020 pre-pandemic fasting subsample-eligible participants with positive fasting weights and complete analysis variables",
+          "leastCommonDenominatorFor": [
+            "2017-2020 pre-pandemic fasting laboratory variables"
+          ],
+          "cycleYears": 3.2,
+          "multiCycleConstruction": "Treat as a special 2017-2020 pre-pandemic weight; do not divide like ordinary 2-year cycles unless a specific CDC-compatible pooling policy is declared."
+        },
+        {
+          "weight": "WTMECPRP",
+          "label": "2017-2020 pre-pandemic MEC participants",
+          "isSubsample": false,
+          "rationale": "Use the pre-pandemic MEC weight for 2017-2020 pre-pandemic MEC analyses.",
+          "eligibilityNote": "2017-2020 pre-pandemic MEC participants with positive MEC weights and complete analysis variables",
+          "leastCommonDenominatorFor": [
+            "2017-2020 pre-pandemic examination and standard laboratory variables"
+          ],
+          "cycleYears": 3.2,
+          "multiCycleConstruction": "Treat as a special 2017-2020 pre-pandemic MEC weight; do not divide like ordinary 2-year cycles unless a specific CDC-compatible pooling policy is declared."
+        }
+      ]
+    },
+    "variableMetadata": {
+      "SEQN": {
+        "label": "participant identifier",
+        "role": "id",
+        "domain": "demographics"
+      },
+      "SDMVSTRA": {
+        "label": "survey strata",
+        "role": "survey-design",
+        "domain": "demographics"
+      },
+      "SDMVPSU": {
+        "label": "survey primary sampling unit",
+        "role": "survey-design",
+        "domain": "demographics"
+      },
+      "WTINT2YR": {
+        "label": "interview survey weight",
+        "role": "weight",
+        "domain": "demographics"
+      },
+      "WTMEC2YR": {
+        "label": "MEC exam survey weight",
+        "role": "weight",
+        "domain": "demographics"
+      },
+      "WTSAF2YR": {
+        "label": "fasting subsample survey weight",
+        "role": "weight",
+        "domain": "fasting laboratory"
+      },
+      "WTSAFPRP": {
+        "label": "pre-pandemic fasting subsample survey weight",
+        "role": "weight",
+        "domain": "fasting laboratory"
+      },
+      "WTMECPRP": {
+        "label": "pre-pandemic MEC survey weight",
+        "role": "weight",
+        "domain": "demographics"
+      },
+      "RIDAGEYR": {
+        "label": "age",
+        "unit": "years",
+        "role": "demographic",
+        "domain": "demographics"
+      },
+      "RIAGENDR": {
+        "label": "sex",
+        "role": "demographic",
+        "domain": "demographics"
+      },
+      "RIDRETH1": {
+        "label": "race and ethnicity",
+        "role": "demographic",
+        "domain": "demographics"
+      },
+      "INDFMPIR": {
+        "label": "family poverty-income ratio",
+        "role": "demographic",
+        "domain": "demographics"
+      },
+      "BMXBMI": {
+        "label": "body mass index",
+        "unit": "kg/m^2",
+        "role": "anthropometric",
+        "domain": "anthropometrics"
+      },
+      "BMXWAIST": {
+        "label": "waist circumference",
+        "unit": "cm",
+        "role": "anthropometric",
+        "domain": "anthropometrics"
+      },
+      "LBXGH": {
+        "label": "HbA1c",
+        "unit": "%",
+        "role": "laboratory",
+        "domain": "diabetes"
+      },
+      "LBXGLU": {
+        "label": "fasting plasma glucose",
+        "unit": "mg/dL",
+        "role": "laboratory",
+        "domain": "diabetes",
+        "caveats": [
+          "Use fasting subsample weights."
+        ]
+      },
+      "LBDHDD": {
+        "label": "HDL cholesterol",
+        "unit": "mg/dL",
+        "role": "laboratory",
+        "domain": "lipids"
+      },
+      "LBXTC": {
+        "label": "total cholesterol",
+        "unit": "mg/dL",
+        "role": "laboratory",
+        "domain": "lipids"
+      },
+      "LBXTR": {
+        "label": "triglycerides",
+        "unit": "mg/dL",
+        "role": "laboratory",
+        "domain": "lipids",
+        "caveats": [
+          "Often fasting subsample-specific."
+        ]
+      },
+      "LBXVIDMS": {
+        "label": "serum 25-hydroxyvitamin D",
+        "unit": "nmol/L",
+        "role": "laboratory",
+        "domain": "vitamin D"
+      },
+      "BPXSY1": {
+        "label": "first systolic blood pressure",
+        "unit": "mmHg",
+        "role": "clinical-threshold",
+        "domain": "blood pressure"
+      },
+      "BPXDI1": {
+        "label": "first diastolic blood pressure",
+        "unit": "mmHg",
+        "role": "clinical-threshold",
+        "domain": "blood pressure"
+      },
+      "URDACT": {
+        "label": "urine albumin-creatinine ratio",
+        "unit": "mg/g",
+        "role": "laboratory",
+        "domain": "kidney"
+      }
+    },
+    "codebookPolicy": "required",
+    "caveats": [
+      "Cross-sectional design limits temporality and causality.",
+      "Subsample weights define narrower analytic populations.",
+      "Multi-cycle weight construction must be explicit."
+    ],
+    "validationRules": [
+      "weight-positive",
+      "strata-present",
+      "psu-present",
+      "cycle-policy",
+      "subsample-clearance"
+    ]
+  }
 }

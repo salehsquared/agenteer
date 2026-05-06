@@ -1,0 +1,775 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "mimiciv-3-1",
+  "title": "MIMIC-IV v3.1 Local GCS Parquet Cache",
+  "description": "MIMIC-IV v3.1 exported from BigQuery public PhysioNet tables to a project-owned GCS Parquet cache for local/controlled analysis planning.",
+  "domain": "ehr",
+  "generatedAtIso": "2026-05-06T05:14:39.007Z",
+  "source": {
+    "kind": "manifest",
+    "uri": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/",
+    "manifestPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/cloud/mimiciv-v31-schema-metadata-20260506.json"
+  },
+  "storage": {
+    "totalBytes": 30382106413,
+    "tableCount": 81,
+    "profiledTableCount": 81,
+    "rowCountTotalKnown": 935654014,
+    "supportedFormats": [
+      "parquet"
+    ]
+  },
+  "access": {
+    "local": false,
+    "cloud": true,
+    "piiPhiRisk": "high",
+    "license": null,
+    "restrictions": [
+      "Confirm source license and redistribution rights before export or sharing.",
+      "Treat as credentialed clinical data; do not publish row-level data or derived identifiable artifacts."
+    ]
+  },
+  "standardLayout": {
+    "root": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1",
+    "manifest": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/dataset-manifest.json",
+    "variableRegistry": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/variable-registry.json",
+    "relationshipGraph": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/relationship-graph.json",
+    "profile": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/data-profile.json",
+    "watchouts": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/watchouts.json",
+    "questions": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/question-seeds.json",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/dataset-summary.md",
+    "context": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md"
+  },
+  "tables": [
+    {
+      "tableId": "derived-metadata",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/_metadata/",
+      "format": "parquet",
+      "bytes": 727,
+      "rowCount": 3,
+      "columnCount": 2,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-acei",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/acei/",
+      "format": "parquet",
+      "bytes": 3234464,
+      "rowCount": 135153,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-age",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/age/",
+      "format": "parquet",
+      "bytes": 10089906,
+      "rowCount": 546028,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-antibiotic",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/antibiotic/",
+      "format": "parquet",
+      "bytes": 21537545,
+      "rowCount": 949901,
+      "columnCount": 7,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-apsiii",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/apsiii/",
+      "format": "parquet",
+      "bytes": 2308513,
+      "rowCount": 94458,
+      "columnCount": 21,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-arb",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/arb/",
+      "format": "parquet",
+      "bytes": 1414585,
+      "rowCount": 53603,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-bg",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/bg/",
+      "format": "parquet",
+      "bytes": 16330694,
+      "rowCount": 697418,
+      "columnCount": 27,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-blood-differential",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/blood_differential/",
+      "format": "parquet",
+      "bytes": 121173516,
+      "rowCount": 4154226,
+      "columnCount": 20,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-cardiac-marker",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/cardiac_marker/",
+      "format": "parquet",
+      "bytes": 8598560,
+      "rowCount": 380131,
+      "columnCount": 7,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-charlson",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/charlson/",
+      "format": "parquet",
+      "bytes": 7381162,
+      "rowCount": 546028,
+      "columnCount": 21,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-chemistry",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/chemistry/",
+      "format": "parquet",
+      "bytes": 141703433,
+      "rowCount": 4976408,
+      "columnCount": 16,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-coagulation",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/coagulation/",
+      "format": "parquet",
+      "bytes": 46137641,
+      "rowCount": 1991167,
+      "columnCount": 10,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-code-status",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/code_status/",
+      "format": "parquet",
+      "bytes": 6581329,
+      "rowCount": 354306,
+      "columnCount": 8,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-complete-blood-count",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/complete_blood_count/",
+      "format": "parquet",
+      "bytes": 133369779,
+      "rowCount": 4377900,
+      "columnCount": 14,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-creatinine-baseline",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/creatinine_baseline/",
+      "format": "parquet",
+      "bytes": 3253643,
+      "rowCount": 546028,
+      "columnCount": 7,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-crrt",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/crrt/",
+      "format": "parquet",
+      "bytes": 7658472,
+      "rowCount": 475214,
+      "columnCount": 24,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-dobutamine",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/dobutamine/",
+      "format": "parquet",
+      "bytes": 400052,
+      "rowCount": 10264,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-dopamine",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/dopamine/",
+      "format": "parquet",
+      "bytes": 696661,
+      "rowCount": 18085,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-enzyme",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/enzyme/",
+      "format": "parquet",
+      "bytes": 54392006,
+      "rowCount": 2187060,
+      "columnCount": 15,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-epinephrine",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/epinephrine/",
+      "format": "parquet",
+      "bytes": 1229609,
+      "rowCount": 31495,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-bg",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_bg/",
+      "format": "parquet",
+      "bytes": 2842053,
+      "rowCount": 94458,
+      "columnCount": 44,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-bg-art",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_bg_art/",
+      "format": "parquet",
+      "bytes": 2489207,
+      "rowCount": 94458,
+      "columnCount": 44,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-gcs",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_gcs/",
+      "format": "parquet",
+      "bytes": 1254442,
+      "rowCount": 94458,
+      "columnCount": 7,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-height",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_height/",
+      "format": "parquet",
+      "bytes": 1225219,
+      "rowCount": 94458,
+      "columnCount": 3,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-lab",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_lab/",
+      "format": "parquet",
+      "bytes": 7100465,
+      "rowCount": 94458,
+      "columnCount": 88,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-rrt",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_rrt/",
+      "format": "parquet",
+      "bytes": 1178938,
+      "rowCount": 94458,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-sofa",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_sofa/",
+      "format": "parquet",
+      "bytes": 2011162,
+      "rowCount": 94458,
+      "columnCount": 10,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-urine-output",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_urine_output/",
+      "format": "parquet",
+      "bytes": 1264060,
+      "rowCount": 94458,
+      "columnCount": 3,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-vitalsign",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_vitalsign/",
+      "format": "parquet",
+      "bytes": 5613073,
+      "rowCount": 94458,
+      "columnCount": 26,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-first-day-weight",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/first_day_weight/",
+      "format": "parquet",
+      "bytes": 1431992,
+      "rowCount": 94458,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-gcs",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/gcs/",
+      "format": "parquet",
+      "bytes": 27687593,
+      "rowCount": 2217787,
+      "columnCount": 8,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-height",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/height/",
+      "format": "parquet",
+      "bytes": 1027593,
+      "rowCount": 43342,
+      "columnCount": 4,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-icp",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icp/",
+      "format": "parquet",
+      "bytes": 2182055,
+      "rowCount": 243283,
+      "columnCount": 4,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-icustay-detail",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_detail/",
+      "format": "parquet",
+      "bytes": 6066167,
+      "rowCount": 94458,
+      "columnCount": 18,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-icustay-hourly",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_hourly/",
+      "format": "parquet",
+      "bytes": 132945370,
+      "rowCount": 10482272,
+      "columnCount": 3,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-icustay-times",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/icustay_times/",
+      "format": "parquet",
+      "bytes": 3661178,
+      "rowCount": 94458,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-inflammation",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/inflammation/",
+      "format": "parquet",
+      "bytes": 3953622,
+      "rowCount": 174269,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-invasive-line",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/invasive_line/",
+      "format": "parquet",
+      "bytes": 2481688,
+      "rowCount": 108165,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-kdigo-creatinine",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_creatinine/",
+      "format": "parquet",
+      "bytes": 11338546,
+      "rowCount": 811585,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-kdigo-stages",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_stages/",
+      "format": "parquet",
+      "bytes": 132618970,
+      "rowCount": 5099899,
+      "columnCount": 15,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-kdigo-uo",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/kdigo_uo/",
+      "format": "parquet",
+      "bytes": 109120001,
+      "rowCount": 4127634,
+      "columnCount": 12,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-lods",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/lods/",
+      "format": "parquet",
+      "bytes": 1952879,
+      "rowCount": 94458,
+      "columnCount": 10,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-meld",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/meld/",
+      "format": "parquet",
+      "bytes": 2102858,
+      "rowCount": 94458,
+      "columnCount": 10,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-milrinone",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/milrinone/",
+      "format": "parquet",
+      "bytes": 415325,
+      "rowCount": 10668,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-neuroblock",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/neuroblock/",
+      "format": "parquet",
+      "bytes": 814219,
+      "rowCount": 19430,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-norepinephrine",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/norepinephrine/",
+      "format": "parquet",
+      "bytes": 15121347,
+      "rowCount": 459800,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-norepinephrine-equivalent-dose",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/norepinephrine_equivalent_dose/",
+      "format": "parquet",
+      "bytes": 12680008,
+      "rowCount": 783613,
+      "columnCount": 4,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-nsaid",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/nsaid/",
+      "format": "parquet",
+      "bytes": 7105040,
+      "rowCount": 293253,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-oasis",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oasis/",
+      "format": "parquet",
+      "bytes": 3015072,
+      "rowCount": 94458,
+      "columnCount": 25,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "derived-oxygen-delivery",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/derived/oxygen_delivery/",
+      "format": "parquet",
+      "bytes": 8633666,
+      "rowCount": 794232,
+      "columnCount": 9,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-admissions",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/admissions/",
+      "format": "parquet",
+      "bytes": 23202784,
+      "rowCount": 546028,
+      "columnCount": 16,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-d-hcpcs",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_hcpcs/",
+      "format": "parquet",
+      "bytes": 1041522,
+      "rowCount": 89208,
+      "columnCount": 4,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-d-icd-diagnoses",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_diagnoses/",
+      "format": "parquet",
+      "bytes": 1984186,
+      "rowCount": 112107,
+      "columnCount": 3,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-d-icd-procedures",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_icd_procedures/",
+      "format": "parquet",
+      "bytes": 1530069,
+      "rowCount": 86423,
+      "columnCount": 3,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-d-labitems",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/d_labitems/",
+      "format": "parquet",
+      "bytes": 24263,
+      "rowCount": 1650,
+      "columnCount": 4,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-diagnoses-icd",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/diagnoses_icd/",
+      "format": "parquet",
+      "bytes": 60407388,
+      "rowCount": 6364488,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-drgcodes",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/drgcodes/",
+      "format": "parquet",
+      "bytes": 8051841,
+      "rowCount": 761856,
+      "columnCount": 7,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-emar",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar/",
+      "format": "parquet",
+      "bytes": 2635117267,
+      "rowCount": 42808593,
+      "columnCount": 12,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-emar-detail",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/emar_detail/",
+      "format": "parquet",
+      "bytes": 1746715673,
+      "rowCount": 87371064,
+      "columnCount": 33,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-hcpcsevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/hcpcsevents/",
+      "format": "parquet",
+      "bytes": 2616181,
+      "rowCount": 186074,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-labevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/labevents/",
+      "format": "parquet",
+      "bytes": 6161328534,
+      "rowCount": 158374764,
+      "columnCount": 16,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-microbiologyevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/microbiologyevents/",
+      "format": "parquet",
+      "bytes": 184567367,
+      "rowCount": 3988224,
+      "columnCount": 25,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-omr",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/omr/",
+      "format": "parquet",
+      "bytes": 36014617,
+      "rowCount": 7753027,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-patients",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/patients/",
+      "format": "parquet",
+      "bytes": 2576273,
+      "rowCount": 364627,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-pharmacy",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/pharmacy/",
+      "format": "parquet",
+      "bytes": 1217415870,
+      "rowCount": 17847567,
+      "columnCount": 27,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-poe",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe/",
+      "format": "parquet",
+      "bytes": 1920440665,
+      "rowCount": 52212109,
+      "columnCount": 12,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-poe-detail",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/poe_detail/",
+      "format": "parquet",
+      "bytes": 107448463,
+      "rowCount": 8504982,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-prescriptions",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/prescriptions/",
+      "format": "parquet",
+      "bytes": 1063839220,
+      "rowCount": 20292611,
+      "columnCount": 21,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-procedures-icd",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/procedures_icd/",
+      "format": "parquet",
+      "bytes": 11184193,
+      "rowCount": 859655,
+      "columnCount": 6,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-provider",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/provider/",
+      "format": "parquet",
+      "bytes": 321918,
+      "rowCount": 42244,
+      "columnCount": 1,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-services",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/services/",
+      "format": "parquet",
+      "bytes": 10680671,
+      "rowCount": 593071,
+      "columnCount": 5,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "hosp-transfers",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/hosp/transfers/",
+      "format": "parquet",
+      "bytes": 75502529,
+      "rowCount": 2413581,
+      "columnCount": 7,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-caregiver",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/caregiver/",
+      "format": "parquet",
+      "bytes": 106496,
+      "rowCount": 17984,
+      "columnCount": 1,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-chartevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/chartevents/",
+      "format": "parquet",
+      "bytes": 12007438910,
+      "rowCount": 432997491,
+      "columnCount": 11,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-d-items",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/d_items/",
+      "format": "parquet",
+      "bytes": 126723,
+      "rowCount": 4095,
+      "columnCount": 9,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-datetimeevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/datetimeevents/",
+      "format": "parquet",
+      "bytes": 254014332,
+      "rowCount": 9979761,
+      "columnCount": 10,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-icustays",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/icustays/",
+      "format": "parquet",
+      "bytes": 4528825,
+      "rowCount": 94458,
+      "columnCount": 8,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-ingredientevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/ingredientevents/",
+      "format": "parquet",
+      "bytes": 851175698,
+      "rowCount": 14253480,
+      "columnCount": 17,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-inputevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/inputevents/",
+      "format": "parquet",
+      "bytes": 731119446,
+      "rowCount": 10953713,
+      "columnCount": 26,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-outputevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/outputevents/",
+      "format": "parquet",
+      "bytes": 124353984,
+      "rowCount": 5359395,
+      "columnCount": 9,
+      "profileStatus": "profiled"
+    },
+    {
+      "tableId": "icu-procedureevents",
+      "sourcePath": "gs://agenteer-mimiciv-cache-ultra-sound-403618/mimiciv/v3.1/icu/procedureevents/",
+      "format": "parquet",
+      "bytes": 38404400,
+      "rowCount": 808706,
+      "columnCount": 22,
+      "profileStatus": "profiled"
+    }
+  ],
+  "hash": "0b8d0172a96515494f04d157d067f58f01093589ce534b46019e37998e756304"
+}

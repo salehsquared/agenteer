@@ -94,6 +94,55 @@ For `diagnostic-accuracy`, `analysis-run` also writes a concise `paper.md` and `
 
 When `--table` or `--table-summary` is supplied, the planner derives row count, feature count, target class count, maximum missingness, small-sample status, and high-dimensional status. These evidence fields affect ranking: small or high-missingness tables downgrade high-capacity ML, and high missingness emits a blocking policy for diagnostics/sensitivity before interpretation.
 
+## Dataset Exploration Mode
+
+Use `research explore` before a protocol exists, when the task is to understand a dataset, map variables, find plausible associations, and propose research questions:
+
+```bash
+agenteer research explore \
+  --data ./rows.csv \
+  --target hba1c \
+  --out-dir ./exploration \
+  --max-pairs 25 \
+  --json
+```
+
+Exploration writes `exploration.json`, `exploration-report.md`, and `candidate-questions.json`. The output includes table summary, variable roles, ranked unadjusted associations, candidate research questions, QA checks, limitations, and artifact hashes. When `--target` is supplied, the report and JSON foreground target-centered associations/questions separately from the broader background correlation map.
+
+Candidate questions are not ranked by association strength alone. Each candidate includes a `routeIntent`, `taxonomy`, `researchInterestScore`, `primaryQuestionUse`, `taxonomyEvidence`, `whyThisQuestion`, and optional `avoidAsPrimaryQuestion` reason. This separates likely duplicate/proxy relationships and expected same-domain biomarker signals from more useful public-health candidates such as plausible risk factors, social/demographic determinants, or surprising cross-domain signals. `taxonomyEvidence` records the taxonomy version, matched rule ids, matched terms, score adjustments, and rejected category candidates so the ranking can be audited and overridden. `routeIntent` separates data-quality review, explanatory association, prediction, diagnosis, causal-design review, and descriptive profiling before the question reaches modeling.
+
+The Markdown report starts with `Recommended Next Question`, which is the concise operator view over the longer signal map and question agenda.
+
+The JSON also includes an `explorationBurden` section and question-level `promotionStatus`. This records how many pairs were tested, target-centered pair count, multiplicity risk, high-missingness variables, sparse categorical variables, survey/design candidate columns, possible target leakage/proxy pairs, and whether each candidate is currently a `promotable_hypothesis`, `needs_methods_review`, or `blocked`. The burden object also emits `promotionClearance`: `clear_for_handoff`, `hold_for_methods_review`, or `stop`.
+
+The posture is always hypothesis generation. Associations are unadjusted and should not be treated as confirmatory evidence. Before any paper or inference, promote one candidate question into `method-select` / `modeling-plan`, add design constraints and covariates, review missingness and sparse cells, and account for survey design or clustering when applicable.
+
+Use `research explore-promote` to create that handoff safely:
+
+```bash
+agenteer research explore-promote \
+  --exploration ./exploration/exploration.json \
+  --question question_01_288de2dac7 \
+  --methods-review-note "Reviewed low-N and proxy risk; handoff is for planning only." \
+  --out ./exploration/handoff.json \
+  --json
+```
+
+The handoff refuses blocked questions and requires a methods-review note when clearance is `hold_for_methods_review`.
+
+Pass the handoff directly into `modeling-plan` when moving from exploration to analysis design:
+
+```bash
+agenteer research modeling-plan \
+  --exploration-handoff ./exploration/handoff.json \
+  --survey \
+  --json
+```
+
+The planner reads the candidate question, target/outcome seed, table path when available, route intent, source exploration hash, blocker list, and review status from the handoff. Held handoffs remain visible as warnings after methods review; held handoffs without a review note and blocked handoffs stop the plan.
+
+The handoff also includes an `analysisSpecCandidate`. This is not executable by itself. It is the pre-spec bridge that records route intent, research question, estimand boundary, source population, outcome/exposure, excluded variables pending review, design requirements, suggested model family, required pre-execution checks, and exploration provenance. Use it to author or validate a real AnalysisSpec before runner execution.
+
 ## Adapters
 
 Classification adapters include logistic regression, k-nearest neighbors, SVM, decision tree, random forest, extra trees, gradient boosting, AdaBoost, and MLP. XGBoost, LightGBM, and CatBoost are registered as optional adapters and report the missing package instead of breaking the registry.

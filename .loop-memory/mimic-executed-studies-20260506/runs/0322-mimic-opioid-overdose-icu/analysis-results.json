@@ -1,0 +1,480 @@
+{
+  "study": {
+    "id": "mimic-opioid-overdose-icu",
+    "title": "Opioid Poisoning ICU Outcomes",
+    "domain": "toxicology",
+    "question": "Among ICU admissions with opioid poisoning codes, what first-day factors are associated with mortality and length of stay?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-vitalsign",
+      "derived-first-day-bg"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "poisoning phenotype",
+      "intent/external-cause caveat",
+      "respiratory markers"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "T40.2",
+        "expectedTerms": [
+          "opioids",
+          "poisoning"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "T40.2",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "T40.2",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=T40.2&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 18,
+            "sampleRows": [
+              {
+                "code": "T40.2X1A",
+                "name": "Poisoning by other opioids, accidental (unintentional), initial encounter"
+              },
+              {
+                "code": "T40.2X1D",
+                "name": "Poisoning by other opioids, accidental (unintentional), subsequent encounter"
+              },
+              {
+                "code": "T40.2X1S",
+                "name": "Poisoning by other opioids, accidental (unintentional), sequela"
+              },
+              {
+                "code": "T40.2X2A",
+                "name": "Poisoning by other opioids, intentional self-harm, initial encounter"
+              },
+              {
+                "code": "T40.2X2D",
+                "name": "Poisoning by other opioids, intentional self-harm, subsequent encounter"
+              },
+              {
+                "code": "T40.2X2S",
+                "name": "Poisoning by other opioids, intentional self-harm, sequela"
+              },
+              {
+                "code": "T40.2X3A",
+                "name": "Poisoning by other opioids, assault, initial encounter"
+              },
+              {
+                "code": "T40.2X3D",
+                "name": "Poisoning by other opioids, assault, subsequent encounter"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:58.398899+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "965.0",
+        "expectedTerms": [
+          "opiates",
+          "poisoning"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "9650",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "9650",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=9650&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 4,
+            "sampleRows": [
+              {
+                "code": "965.00",
+                "name": "Poisoning by opium (alkaloids), unspecified"
+              },
+              {
+                "code": "965.01",
+                "name": "Poisoning by heroin"
+              },
+              {
+                "code": "965.02",
+                "name": "Poisoning by methadone"
+              },
+              {
+                "code": "965.09",
+                "name": "Poisoning by other opiates and related narcotics"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:58.917966+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 30,
+    "matchedDiagnosisRows": 3257,
+    "matchedAdmissions": 3237,
+    "firstIcuStayRows": 829,
+    "uniquePatients": 807
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 829,
+        "missing": 0,
+        "mean": 56.905910735826296,
+        "sd": 17.411080549195475,
+        "median": 59.0,
+        "iqr": [
+          45.0,
+          69.0
+        ],
+        "min": 18.0,
+        "max": 96.0
+      },
+      "los_icu": {
+        "n": 829,
+        "missing": 0,
+        "mean": 3.6167068757539202,
+        "sd": 4.895620110653924,
+        "median": 2.0,
+        "iqr": [
+          1.13,
+          3.92
+        ],
+        "min": 0.04,
+        "max": 41.88
+      },
+      "los_hospital": {
+        "n": 829,
+        "missing": 0,
+        "mean": 12.281061519903497,
+        "sd": 12.466840688250201,
+        "median": 8.0,
+        "iqr": [
+          5.0,
+          15.0
+        ],
+        "min": 0.0,
+        "max": 108.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 829,
+        "positive": 96,
+        "proportion": 0.1158021712907117
+      },
+      "male": {
+        "n": 829,
+        "positive": 449,
+        "proportion": 0.5416164053075995
+      },
+      "prolonged_icu_los": {
+        "n": 829,
+        "positive": 206,
+        "proportion": 0.24849215922798554
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "hemoglobin_min",
+    "glucose_max",
+    "sbp_min",
+    "heart_rate_max",
+    "spo2_min"
+  ],
+  "missingness": [
+    {
+      "column": "hemoglobin_min",
+      "missing": 666,
+      "missingFraction": 0.8033775633293124
+    },
+    {
+      "column": "glucose_max",
+      "missing": 21,
+      "missingFraction": 0.025331724969843185
+    },
+    {
+      "column": "sbp_min",
+      "missing": 3,
+      "missingFraction": 0.0036188178528347406
+    },
+    {
+      "column": "heart_rate_max",
+      "missing": 2,
+      "missingFraction": 0.0024125452352231603
+    },
+    {
+      "column": "spo2_min",
+      "missing": 2,
+      "missingFraction": 0.0024125452352231603
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 163,
+      "events": 20,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 60.87116564417178,
+          "sd": 16.82926142143235
+        },
+        "hemoglobin_min": {
+          "mean": 10.195092024539877,
+          "sd": 2.784609458641951
+        },
+        "glucose_max": {
+          "mean": 202.70552147239263,
+          "sd": 70.93780378868654
+        },
+        "sbp_min": {
+          "mean": 85.38343558282209,
+          "sd": 14.363187100343252
+        },
+        "heart_rate_max": {
+          "mean": 104.16564417177914,
+          "sd": 19.68306403794865
+        },
+        "spo2_min": {
+          "mean": 91.78527607361963,
+          "sd": 7.025300249537552
+        }
+      },
+      "metrics": {
+        "auroc": 0.7388111888111887,
+        "averagePrecision": 0.3001315494061975
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.0871897357533138,
+          "ci95": [
+            0.6165569529624005,
+            1.9170678650986535
+          ],
+          "pValue": 0.7726833492895694,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 1.22653723501173,
+          "ci95": [
+            0.41782774044685783,
+            3.6005115104643437
+          ],
+          "pValue": 0.710159044951252,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 1.6394547223739442,
+          "ci95": [
+            0.9346200367628886,
+            2.8758336874775554
+          ],
+          "pValue": 0.08468105372039804,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.139778793400541,
+          "ci95": [
+            0.7097948453985851,
+            1.830241098970064
+          ],
+          "pValue": 0.5882086644155887,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "oddsRatio": 0.6274660001421709,
+          "ci95": [
+            0.3764126569041575,
+            1.0459626532554736
+          ],
+          "pValue": 0.07383980883615453,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "oddsRatio": 1.2997451101911577,
+          "ci95": [
+            0.7956450225220887,
+            2.123229962667083
+          ],
+          "pValue": 0.29509614075942614,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "oddsRatio": 0.9231051001608197,
+          "ci95": [
+            0.6221406866292938,
+            1.3696629142833403
+          ],
+          "pValue": 0.6910423212951928,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 163,
+      "predictors": [
+        "admission_age",
+        "male",
+        "hemoglobin_min",
+        "glucose_max",
+        "sbp_min",
+        "heart_rate_max",
+        "spo2_min"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 60.87116564417178,
+          "sd": 16.82926142143235
+        },
+        "hemoglobin_min": {
+          "mean": 10.195092024539877,
+          "sd": 2.784609458641951
+        },
+        "glucose_max": {
+          "mean": 202.70552147239263,
+          "sd": 70.93780378868654
+        },
+        "sbp_min": {
+          "mean": 85.38343558282209,
+          "sd": 14.363187100343252
+        },
+        "heart_rate_max": {
+          "mean": 104.16564417177914,
+          "sd": 19.68306403794865
+        },
+        "spo2_min": {
+          "mean": 91.78527607361963,
+          "sd": 7.025300249537552
+        }
+      },
+      "rSquared": 0.23073625623480676,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -13.694436793097653,
+          "ci95PercentChange": [
+            -22.64188995470966,
+            -3.7120964291952885
+          ],
+          "pValue": 0.008355311667916665,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 5.377486774760332,
+          "ci95PercentChange": [
+            -13.356849127710134,
+            28.162637290655024
+          ],
+          "pValue": 0.5999692002529946,
+          "scale": "per unit"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": 8.892148246722398,
+          "ci95PercentChange": [
+            -3.081996178710855,
+            22.345688956312728
+          ],
+          "pValue": 0.15178187854134811,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 5.883352748076476,
+          "ci95PercentChange": [
+            -7.088882515142069,
+            20.666769410030383
+          ],
+          "pValue": 0.3912691920047653,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sbp_min",
+          "percentChangeInLos": -3.6770561730948947,
+          "ci95PercentChange": [
+            -13.002781664873886,
+            6.648346752196943
+          ],
+          "pValue": 0.4708631671061376,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "heart_rate_max",
+          "percentChangeInLos": 14.380025611365799,
+          "ci95PercentChange": [
+            2.9472624523760205,
+            27.082449277452803
+          ],
+          "pValue": 0.012399566865981204,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "spo2_min",
+          "percentChangeInLos": 6.48724054821328,
+          "ci95PercentChange": [
+            -8.740344160027579,
+            24.25569979638511
+          ],
+          "pValue": 0.42468607455564267,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}

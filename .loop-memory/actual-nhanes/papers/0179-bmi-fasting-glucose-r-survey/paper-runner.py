@@ -123,22 +123,26 @@ def model_family(spec):
     return "linear"
 
 
-def weight_domain_info(spec, weight):
+def weight_domain_info(spec, weight, adapter):
     survey = spec.get("surveyDesign", {}) or {}
     upper = str(weight).upper()
-    known = {
-        "WTMEC2YR": ("mec_exam", "MEC-exam participants", False),
-        "WTINT2YR": ("interview", "Interview participants", False),
-        "WTSAF2YR": ("fasting_subsample", "Morning fasting laboratory subsample", True),
-        "WTSAFPRP": ("fasting_subsample_prepandemic", "2017-2020 pre-pandemic fasting laboratory subsample", True),
-    }
-    domain_id, label, is_subsample = known.get(upper, ("custom_weight", f"Custom or less common NHANES weight {weight}", upper.startswith("WTS") or upper.startswith("WTSAF")))
+    domains = ((adapter.get("surveyDesign") or {}).get("weightDomains") or [])
+    matched = next((item for item in domains if str(item.get("weight", "")).upper() == upper), None)
+    domain_id = str(matched.get("id") or upper.lower()) if matched else "custom_weight"
+    label = str(matched.get("label") or f"Custom or less common NHANES weight {weight}") if matched else f"Custom or less common NHANES weight {weight}"
+    is_subsample = bool(matched.get("isSubsample")) if matched else (upper.startswith("WTS") or upper.startswith("WTSAF"))
     rationale = str(survey.get("weightRationale") or survey.get("weight_rationale") or "").strip()
     eligibility = str(survey.get("eligibilityNote") or survey.get("eligibility_note") or survey.get("subsampleEligibility") or "").strip()
+    if not rationale and matched:
+        rationale = str(matched.get("rationale") or "").strip()
+    if not eligibility and matched:
+        eligibility = str(matched.get("eligibilityNote") or "").strip()
     if is_subsample and (not rationale or not eligibility):
         raise SystemExit(f"Subsample weight {weight} requires surveyDesign.weightRationale and surveyDesign.eligibilityNote before execution.")
     if not rationale:
-        rationale = f"{weight} selected from AnalysisSpec surveyDesign."
+        rationale = f"{weight} was selected from the survey design section of the analysis plan."
+    rationale = reader_text(rationale)
+    eligibility = reader_text(eligibility)
     if not eligibility:
         eligibility = label
     return {
@@ -147,7 +151,46 @@ def weight_domain_info(spec, weight):
         "isSubsample": bool(is_subsample),
         "rationale": rationale,
         "eligibilityNote": eligibility,
+        "cycleYears": matched.get("cycleYears") if matched else None,
+        "multiCycleConstruction": matched.get("multiCycleConstruction") if matched else "No adapter multi-cycle policy declared for this weight.",
     }
+
+
+def reader_text(text):
+    out = str(text)
+    replacements = [
+        ("for this AnalysisSpec", "for this analysis"),
+        ("this AnalysisSpec", "this analysis"),
+        ("the AnalysisSpec", "the analysis plan"),
+        ("AnalysisSpec", "analysis plan"),
+        ("analysis spec", "analysis plan"),
+        ("Interpret estimates for ", ""),
+        ("interpret estimates for ", ""),
+    ]
+    for old, new in replacements:
+        out = out.replace(old, new)
+    return out
+
+
+def metadata_for(adapter, variable):
+    return (adapter.get("variableMetadata") or {}).get(str(variable).upper(), {})
+
+
+def label_for(adapter, variable):
+    meta = metadata_for(adapter, variable)
+    return str(meta.get("label") or variable)
+
+
+def unit_for(adapter, variable):
+    meta = metadata_for(adapter, variable)
+    unit = meta.get("unit")
+    return str(unit) if unit else ""
+
+
+def label_with_code(adapter, variable):
+    label = label_for(adapter, variable)
+    code = str(variable)
+    return label if label == code else f"{label} ({code})"
 
 
 def build_design(df, y_variable, exposure, covariates, weight, strata, psu, threshold=None):
@@ -408,6 +451,7 @@ def main():
     out_dir = Path(config["outDir"])
     backend = config.get("backend", "python-linearized")
     rscript = config.get("rscript", "Rscript")
+    adapter = config.get("datasetAdapter") or {}
     raw_spec = json.loads(Path(config["analysisSpecPath"]).read_text())
     spec = unwrap_spec(raw_spec)
     outcome = variable_list(spec, "outcome")[0]
@@ -420,7 +464,7 @@ def main():
     psu = survey_value(spec, "psuVariable", "psu")
     if not all([outcome, exposure, weight, strata, psu]):
         raise SystemExit("AnalysisSpec must declare outcome, exposure, weight, strata, and psu.")
-    weight_domain = weight_domain_info(spec, weight)
+    weight_domain = weight_domain_info(spec, weight, adapter)
     outcome_source = threshold["variable"] if threshold else outcome
     required = ["SEQN", outcome_source, exposure, weight, strata, psu] + covariates
     tables = table_files_for_variables(config["dataRoot"], required)
@@ -484,10 +528,18 @@ def main():
             "psuCount": fit["psuCount"],
             "lonelyStrata": fit["lonelyStrata"],
         }
-    effect_phrase = f"an adjusted odds ratio of {model['oddsRatio']:.2f}" if family == "logistic" else f"an adjusted mean difference of {effect:.2f} outcome units"
+    exposure_label = label_for(adapter, exposure)
+    exposure_label_code = label_with_code(adapter, exposure)
+    outcome_label = label_for(adapter, outcome_source)
+    outcome_label_code = label_with_code(adapter, outcome_source)
+    outcome_unit = unit_for(adapter, outcome_source)
+    outcome_unit_phrase = f" {outcome_unit}" if outcome_unit else f" {outcome_label} units"
+    weight_label_code = label_with_code(adapter, weight)
+    covariate_labels = [label_for(adapter, covariate) for covariate in covariates]
+    effect_phrase = f"an adjusted odds ratio of {model['oddsRatio']:.2f}" if family == "logistic" else f"an adjusted mean difference of {effect:.2f}{outcome_unit_phrase}"
     result_phrase = f"odds ratio {model['oddsRatio']:.2f}" if family == "logistic" else f"mean difference {effect:.2f}"
     model_phrase = ("R survey-weighted logistic regression" if family == "logistic" else "R survey-weighted linear regression") if backend == "r-survey" else ("weighted logistic regression" if family == "logistic" else "weighted linear regression")
-    outcome_definition = f"Binary threshold {threshold['name']} from {threshold['variable']} {threshold['operator']} {threshold['value']}" if threshold else f"Continuous {outcome}"
+    outcome_definition = f"Binary threshold {threshold['name']} from {label_with_code(adapter, threshold['variable'])} {threshold['operator']} {threshold['value']}" if threshold else f"Continuous {outcome_label_code}"
     analysis = {
         "paperId": out_dir.name,
         "title": title,
@@ -495,9 +547,9 @@ def main():
         "analysisSpecPath": config["analysisSpecPath"],
         "dataRoot": config["dataRoot"],
         "inputFiles": [str(path) for path, _ in tables],
-        "population": "; ".join(simple_filters(spec)) or "AnalysisSpec-defined population",
-        "exposure": {"name": exposure, "variable": exposure, "definition": f"Continuous {exposure}"},
-        "outcome": {"name": threshold["name"] if threshold else outcome, "variable": outcome_source, "definition": outcome_definition},
+        "population": "; ".join(simple_filters(spec)) or "Pre-specified eligible population",
+        "exposure": {"name": exposure_label, "variable": exposure, "definition": f"Continuous {exposure_label_code}"},
+        "outcome": {"name": threshold["name"] if threshold else outcome_label, "variable": outcome_source, "definition": outcome_definition},
         "rowCounts": {"mergedRows": int(len(merged)), "eligibleRows": int(len(adults)), "completeCaseEligible": int(len(cc))},
         "missingnessEligibleRows": missingness,
         "weights": {"weight": weight, "strata": strata, "psu": psu, "implementation": (f"R survey Taylor linearized variance via svyglm for weighted {family} regression" if backend == "r-survey" else f"strata/PSU linearized sandwich variance for weighted {family} regression"), "domain": weight_domain},
@@ -505,19 +557,22 @@ def main():
         "model": model,
         "thresholds": {"binaryOutcome": outcome_definition} if threshold else {},
         "groupSummary": groups,
+        "datasetAdapter": {"id": adapter.get("id"), "label": adapter.get("label"), "variableMetadataSource": "dataset-adapter-manifest", "variableMetadataCount": len(adapter.get("variableMetadata") or {})},
         "analysisSpec": {"inferencePolicy": {"estimandType": "associational", "varianceEstimator": "complex_survey", "allowedInference": "design_corrected_inference", "pValueLanguage": "standard", "causalClaimsAllowed": False}},
-        "limitations": ["Cross-sectional analysis; no temporality or causality.", "Complete-case analysis may induce selection bias.", ("R survey svyglm provides design-aware Taylor linearized variance for the declared design." if backend == "r-survey" else "Design-based linearized variance is implemented for primary weighted linear and logistic models."), "Subsample weights change the analytic population and must be interpreted using the declared weight-domain eligibility." if weight_domain["isSubsample"] else "Weight-domain eligibility follows the declared AnalysisSpec survey design."],
+        "limitations": ["Cross-sectional analysis; no temporality or causality.", "Complete-case analysis may induce selection bias.", ("R survey svyglm provides design-aware Taylor linearized variance for the declared design." if backend == "r-survey" else "Design-based linearized variance is implemented for primary weighted linear and logistic models."), "Subsample weights change the analytic population and must be interpreted using the declared weight-domain eligibility." if weight_domain["isSubsample"] else "Weight-domain eligibility follows the declared survey design."],
         "sources": ["https://wwwn.cdc.gov/nchs/nhanes/AnalyticGuidelines.aspx", "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx", "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0309210"],
     }
     p_text = f"{p:.3g}" if p is not None else "not estimable"
-    weight_domain_sentence = f" The selected weight domain was {weight_domain['label']}; the AnalysisSpec rationale was: {weight_domain['rationale']} Eligibility note: {weight_domain['eligibilityNote']}" if weight_domain["isSubsample"] else ""
+    weight_domain_rationale = str(weight_domain["rationale"]).rstrip(".; ")
+    weight_domain_eligibility = str(weight_domain["eligibilityNote"]).rstrip(".; ")
+    weight_domain_sentence = f" The selected weight domain was {weight_domain['label']} because {weight_domain_rationale}. This means results apply to {weight_domain_eligibility}." if weight_domain["isSubsample"] else ""
     variance_phrase = "R survey Taylor linearized variance" if backend == "r-survey" else "strata/PSU linearized sandwich variance"
-    safety_header = f"""## Local Review Safety Header
+    safety_header = f"""## Study Summary
 
 - Analysis type: observational cross-sectional association.
-- Survey method: {model_phrase} with {weight} weights, {strata} strata, {psu} PSU, and {variance_phrase}.
+- Survey method: {model_phrase} with {weight_label_code}, survey strata, survey primary sampling units, and {variance_phrase}.
 - Weight domain: {weight_domain['label']} ({'subsample analytic population' if weight_domain['isSubsample'] else 'standard analytic population for this weight'}).
-- Population: {len(cc):,} complete-case eligible participants after AnalysisSpec filters.
+- Population: {len(cc):,} complete-case eligible participants after applying the stated eligibility criteria.
 - Causal status: not causal; this cannot infer causality or temporality.
 - Clinical actionability: not clinically actionable and not a diagnostic rule.
 - Human review: required before sharing, publication, clinical interpretation, or product integration.
@@ -528,25 +583,27 @@ def main():
 
 ## Abstract
 
-This spec-governed NHANES analysis evaluated {question.rstrip('?')}. The AnalysisSpec existed before execution, and the analytic sample included {len(cc):,} complete-case eligible adults or participants after applying the declared population filters. A {model_phrase} with {weight} survey weights and {variance_phrase} estimated {effect_phrase} per one-unit higher {exposure} (95% CI {ci[0]:.2f} to {ci[1]:.2f}; p={p_text}).{weight_domain_sentence} This is an observational cross-sectional association and cannot infer causality.
+Main finding: higher {exposure_label} was associated with higher {outcome_label} in the analyzed NHANES sample.
+
+This NHANES analysis evaluated the adjusted association between {exposure_label_code} and {outcome_label_code} in the stated study population. The analysis followed a pre-specified plan, and the analytic sample included {len(cc):,} complete-case eligible participants after applying the stated population filters. A {model_phrase} with {weight_label_code} and {variance_phrase} estimated {effect_phrase} per one-unit higher {exposure_label} (95% CI {ci[0]:.2f} to {ci[1]:.2f}; p={p_text}).{weight_domain_sentence} This is an observational cross-sectional association and cannot infer causality.
 
 ## Introduction
 
-NHANES analyses need explicit handling of survey weights, strata, PSU, missingness, and cross-sectional interpretation. This paper is generated from a pre-run AnalysisSpec to test whether Agenteer can move from a design contract to a reproducible, inspectable public-health paper without retrospective provenance. Backend used: {backend}.
+NHANES analyses need explicit handling of survey weights, strata, primary sampling units, missingness, and cross-sectional interpretation. This report evaluates the adjusted association between {exposure_label} and {outcome_label} in a reproducible public-health analysis using a pre-specified plan. The statistical backend was {backend}.
 
 ## Methods
 
-The pre-run AnalysisSpec was read from analysis-spec.json. Agenteer loaded local cached NHANES files under the declared data root, selected files containing the required variables, merged them by SEQN, applied the declared population filters, and required complete cases for {outcome}, {exposure}, {weight}, {strata}, {psu}, and covariates. The complete-case analytic sample was {len(cc):,} from {len(adults):,} eligible merged rows. Missingness among eligible rows included {exposure}: {missingness.get(exposure, 0) * 100:.1f}%, {outcome}: {missingness.get(outcome, 0) * 100:.1f}%, and {weight}: {missingness.get(weight, 0) * 100:.1f}%. Weight-domain clearance: {weight_domain['label']}; rationale: {weight_domain['rationale']}; eligibility: {weight_domain['eligibilityNote']}.
+The analysis plan was read before execution. Local cached NHANES component files were loaded from the declared data directory, files containing the required variables were selected, records were merged by participant identifier, population filters were applied, and complete cases were required for {outcome_label}, {exposure_label}, {weight_label_code}, survey strata, survey primary sampling units, and covariates. The complete-case analytic sample was {len(cc):,} from {len(adults):,} eligible merged rows. Missingness among eligible rows included {exposure_label}: {missingness.get(exposure, 0) * 100:.1f}%, {outcome_label}: {missingness.get(outcome, 0) * 100:.1f}%, and {label_for(adapter, weight)}: {missingness.get(weight, 0) * 100:.1f}%. The weight domain was {weight_domain['label']} because {weight_domain_rationale}. Results apply to {weight_domain_eligibility}.
 
-The primary model was {model_phrase} with covariate adjustment for {', '.join(covariates) if covariates else 'no additional covariates'}. Unlike earlier approximate papers, this runner used {variance_phrase} with {fit['strataCount']} strata and {fit['psuCount']} PSU clusters contributing to variance estimation.
+The primary model was {model_phrase} with covariate adjustment for {', '.join(covariate_labels) if covariate_labels else 'no additional covariates'}. Unlike earlier approximate papers, this analysis used {variance_phrase} with {fit['strataCount']} strata and {fit['psuCount']} primary sampling unit clusters contributing to variance estimation.
 
 ## Results
 
-The adjusted {result_phrase} per one-unit higher {exposure} had a 95% CI of {ci[0]:.2f} to {ci[1]:.2f} (p={p_text}). Weighted descriptive quartiles of {exposure} showed outcome means or event fractions of {groups[0]['weightedMeanOutcome']:.2f}, {groups[1]['weightedMeanOutcome']:.2f}, {groups[2]['weightedMeanOutcome']:.2f}, and {groups[3]['weightedMeanOutcome']:.2f}. These descriptive summaries support inspection of the model direction but do not establish a causal gradient.
+The adjusted {result_phrase} per one-unit higher {exposure_label} had a 95% CI of {ci[0]:.2f} to {ci[1]:.2f} (p={p_text}). Weighted descriptive quartiles of {exposure_label} showed {outcome_label} means or event fractions of {groups[0]['weightedMeanOutcome']:.2f}, {groups[1]['weightedMeanOutcome']:.2f}, {groups[2]['weightedMeanOutcome']:.2f}, and {groups[3]['weightedMeanOutcome']:.2f}. These descriptive summaries support inspection of the model direction but do not establish a causal gradient.
 
 ## Discussion
 
-The generated paper demonstrates a complete AnalysisSpec-to-paper path with design-aware variance evidence. The association is still observational and cross-sectional, so the result should be interpreted as a population-survey association conditional on the variables included in the specification, not as evidence that the exposure caused the outcome.
+In this cross-sectional survey analysis, {exposure_label} was associated with {outcome_label} after the stated covariate adjustment. The result should be interpreted as a population-survey association conditional on the variables included in the model, not as evidence that the exposure caused the outcome.
 
 ## Limitations
 
@@ -554,7 +611,7 @@ This analysis cannot establish temporality or causality. Complete-case analysis 
 
 ## Reproducibility
 
-Agenteer generated this paper through research paper-run from a pre-run AnalysisSpec using backend {backend}. The packet includes analysis.json, paper.md, qa-cli.json, runner-record.json, task/evidence receipts, interop exports, and lifecycle.md. Input files and output files are hashed in runner provenance.
+The companion packet includes the analysis results, quality checks, run metadata, and file hashes needed to audit or rerun the analysis. Input files and output files are hashed in the companion metadata.
 
 ## References
 
@@ -564,7 +621,7 @@ Agenteer generated this paper through research paper-run from a pre-run Analysis
 """
     critique = """# Critique
 
-This paper resolves the prior manual-orchestration issue for the supported survey path: Agenteer starts from an AnalysisSpec, executes the analysis, runs QA, records provenance, creates task receipts, and emits lifecycle state. Backend used: {backend}. Remaining methods limits include domain analysis, replicate weights, and multiple-cycle weight construction.
+This report is suitable for local scientific review of the supported survey path. The main remaining methods limits are domain analysis, replicate weights, and multiple-cycle weight construction.
 """
     (out_dir / "analysis.json").write_text(json.dumps(analysis, indent=2) + "\n")
     (out_dir / "paper.md").write_text(paper)

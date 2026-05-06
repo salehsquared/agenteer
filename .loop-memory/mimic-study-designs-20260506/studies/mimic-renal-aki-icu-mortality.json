@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-06T18:57:43.245563+00:00",
+  "study": {
+    "id": "mimic-renal-aki-icu-mortality",
+    "title": "Acute Kidney Injury ICU Mortality",
+    "domain": "renal",
+    "question": "Among ICU admissions with AKI diagnosis codes or derived AKI stages, how strongly does AKI severity predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-kdigo-stages",
+      "derived-kdigo-creatinine",
+      "derived-kdigo-uo",
+      "derived-icustay-detail",
+      "derived-first-day-lab"
+    ],
+    "outcomes": [
+      "aki_stage",
+      "hospital_expire_flag"
+    ],
+    "methods": [
+      "diagnosis-vs-derived AKI comparison",
+      "KDIGO stage model",
+      "measurement-window audit"
+    ]
+  },
+  "icdFamilies": [
+    {
+      "system": "icd10cm",
+      "query": "N17",
+      "expectedTerms": [
+        "acute kidney failure"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "N17",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd10cm",
+          "terms": "N17",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=N17&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+          "reportedTotalMatches": 5,
+          "sampleRows": [
+            {
+              "code": "N17.0",
+              "name": "Acute kidney failure with tubular necrosis"
+            },
+            {
+              "code": "N17.1",
+              "name": "Acute kidney failure with acute cortical necrosis"
+            },
+            {
+              "code": "N17.2",
+              "name": "Acute kidney failure with medullary necrosis"
+            },
+            {
+              "code": "N17.8",
+              "name": "Other acute kidney failure"
+            },
+            {
+              "code": "N17.9",
+              "name": "Acute kidney failure, unspecified"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:42.791251+00:00"
+        }
+      }
+    },
+    {
+      "system": "icd9cm_dx",
+      "query": "584",
+      "expectedTerms": [
+        "acute kidney failure"
+      ],
+      "verification": {
+        "status": "verified_online",
+        "lookupTerms": "584",
+        "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+        "source": {
+          "system": "icd9cm_dx",
+          "terms": "584",
+          "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=584&maxList=8",
+          "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+          "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+          "reportedTotalMatches": 5,
+          "sampleRows": [
+            {
+              "code": "584.5",
+              "name": "Acute kidney failure with lesion of tubular necrosis"
+            },
+            {
+              "code": "584.6",
+              "name": "Acute kidney failure with lesion of renal cortical necrosis"
+            },
+            {
+              "code": "584.7",
+              "name": "Acute kidney failure with lesion of renal medullary [papillary] necrosis"
+            },
+            {
+              "code": "584.8",
+              "name": "Acute kidney failure with other specified pathological lesion in kidney"
+            },
+            {
+              "code": "584.9",
+              "name": "Acute kidney failure, unspecified"
+            }
+          ],
+          "retrievedAtIso": "2026-05-06T18:57:43.245486+00:00"
+        }
+      }
+    }
+  ],
+  "feasibility": {
+    "tablesRequested": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-kdigo-stages",
+      "derived-kdigo-creatinine",
+      "derived-kdigo-uo",
+      "derived-icustay-detail",
+      "derived-first-day-lab"
+    ],
+    "missingTables": [],
+    "profiledTables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-lab"
+    ],
+    "unprofiledTables": [
+      "derived-kdigo-stages",
+      "derived-kdigo-creatinine",
+      "derived-kdigo-uo"
+    ],
+    "estimatedBytesForNaiveFullRequiredTableRead": 328635723,
+    "estimatedTransferUsdAt012PerGb": 0.036727904118597506,
+    "status": "needs_table_or_profile_review",
+    "notes": [
+      "Study design uses existing schema/audit artifacts only; no row-level reads were performed in this 30-tick design run.",
+      "Large event-table use must be narrowed by cohort/time windows before execution."
+    ]
+  },
+  "selfAudit": {
+    "blockers": [],
+    "warnings": [
+      "Unprofiled required tables: derived-kdigo-stages, derived-kdigo-creatinine, derived-kdigo-uo.",
+      "Diagnosis-code timing may not equal clinical onset timing.",
+      "Mortality models are associational unless a causal design is specified."
+    ],
+    "promotionDecision": "promote_to_candidate_queue",
+    "counterDesignRejected": "Rejected running the full analysis immediately; design/ICD verification comes first to avoid broad unvetted GCS reads and phenotype drift."
+  },
+  "sourceEvidence": {
+    "datasetContext": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/DATASET_CONTEXT.md",
+    "boundedDataAudit": "/Users/saleh/TechProjects/agenteer/.loop-memory/datasets/mimiciv-3-1/audit-20260506/MIMIC_DATA_AUDIT.md",
+    "officialSourceNotes": [
+      {
+        "label": "CDC ICD-10-CM overview/browser",
+        "url": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        "use": "Authority for ICD-10-CM as the U.S. diagnosis coding system and CDC/NCHS browser."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-10-CM API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+        "use": "Online lookup used to verify ICD-10-CM code families and representative titles."
+      },
+      {
+        "label": "NLM Clinical Tables ICD-9-CM diagnosis API docs",
+        "url": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+        "use": "Online lookup used to verify ICD-9-CM diagnosis code families and representative titles."
+      }
+    ]
+  },
+  "artifactHash": "d574a6bbf33d541d2bc261b058a9992164c18b75954540c31b7ad651412c2814"
+}

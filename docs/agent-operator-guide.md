@@ -87,7 +87,7 @@ Use this decision table instead of starting with arbitrary commands.
 | Improve Agenteer itself | `agent context-manifest` -> `plan-v2` -> `plan-critic` -> implement -> tests -> `improvement-run` | Improvement has benchmark evidence or is explicitly rejected. |
 | Generate or evaluate research methods | `research method-select` -> `modeling-plan` -> `analysis-run`, `stats-run`, `ml-run`, or `paper-run` | Manifest and QA say local review ready or methods review blocks execution. |
 | Compare ML models | `ml-models` -> `modeling-plan` -> `ml-compare` -> `analysis-manifest` | Comparison posture is ready or missing validation is explicit. |
-| Produce a public-health paper | AnalysisSpec -> `paper-run` -> `paper-qa` -> `paper-lifecycle` -> benchmark | Paper has runner record, evidence receipts, lifecycle status, and QA. |
+| Produce a public-health paper | AnalysisSpec -> `paper-run` -> `paper-qa` -> `paper-lifecycle` -> benchmark | `paper.md` is reader-facing and passes language/readability QA; provenance lives in companion artifacts. |
 | Create a reusable specialist | `specialize init` -> `plan` -> `run-loop` -> `inspect` | Candidates are promoted or rejected with evaluation, critique, and lineage. |
 | Prove a result is repeatable | `analysis-manifest`, `analysis-benchmark`, benchmark suite, rerun stability | Reproducibility metadata and artifact hashes are stable or failure is typed. |
 
@@ -205,7 +205,7 @@ Prefer durable JSON artifacts over prose-only progress:
 - Repairs: `repair-run.json`, `repair-provenance.json`.
 - Tasks: `task.json`, evidence receipts, MCP/A2A exports.
 - Research: `method-selection.json`, `modeling-plan.json`, `analysis-spec-v2.json`, `execution-contract.json`, `stats-run.json`, `ml-run.json`, `comparison.json`, `analysis-run-manifest.json`, `benchmark-eval.json`.
-- Papers: `analysis.json`, `paper.md`, `critique.md`, `paper-qa.json`, runner record, lifecycle files.
+- Papers: `paper.md` for reader-facing scientific prose; `analysis.json`, `critique.md`, `paper-qa.json`, runner record, lifecycle files, and receipts for audit/provenance.
 - Specializations: `specialization.json`, candidate/evaluation/critique/repair/promotion records, report JSON/Markdown.
 
 When a command has `--json`, use it in automation and save the output. Human-readable output is for inspection, not provenance.
@@ -269,4 +269,3 @@ npm test -- packages/cli/tests/specialize.test.ts
 ```
 
 If a verifier cannot run because a local backend such as R, Python package, or optional ML library is unavailable, record the exact command, missing dependency, and the fallback posture.
-

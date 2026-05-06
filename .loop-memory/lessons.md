@@ -5,3 +5,24 @@
 - Standard-table statistics are useful, but they must be visibly downgraded or blocked when survey-aware inference is required.
 - Route selection should be evidence-aware: table shape, method selection, backend availability, and previous run outcomes should influence the recommended path.
 - Keep benchmark families honest: analysis-route readiness and paper-run lifecycle readiness are related but not interchangeable.
+- `paper.md` is for scientific readers, not framework operators. Internal provenance terms belong in manifests, runner records, lifecycle files, and QA artifacts.
+- Reader-facing language must be enforced by tests and QA, not only style guidance; otherwise generated papers will drift back into platform self-commentary.
+- Readability needs its own deterministic checks. Passing a forbidden-jargon scan does not prove a paper is readable.
+- Dataset exploration must be framed as hypothesis generation. Correlation maps and candidate questions are useful only if downstream commands keep them separate from adjusted, survey-aware, or confirmatory results.
+- If a target is declared, exploration should optimize the first screen for that target. Background associations still matter for data understanding, but they should not outrank the user's outcome in the candidate-question path.
+- Exploration candidates need machine-readable promotion gates. A caveat paragraph helps a reader, but downstream automation needs explicit `promotable`, `needs_methods_review`, or `blocked` status.
+- A run-level clearance state is easier for agents to obey than many independent warnings. Keep detailed blockers, but also emit a compact clear/hold/stop decision.
+- Handoff commands are where exploratory creativity becomes disciplined planning. Do not let exploration outputs feed model execution without a gate that carries review notes and source hashes.
+- After adding richer scanner metadata, remove old thin wrappers quickly. Compatibility shims that are never called become misleading architecture.
+- Actual data is the quickest way to find fake robustness. NHANES immediately exposed missing design-variable detection for `WT*` and `SDMVSTRA`, which the fixture could not.
+- Proxy/leakage detection needs semantic aliases, not only exact-name matching. Public datasets use code names where derived variables may not share the raw target code.
+- Planning should consume handoff artifacts directly once a gate exists. Copying exploratory questions by hand loses source hashes, clearance, blockers, and methods-review posture.
+- Exploration ranking must optimize for research value, not only statistical strength. Same-domain biomarkers and proxies can be important data-quality signals while still being poor primary research questions.
+- Any heuristic ontology used by an agent must carry its own audit trail. Rule ids and score adjustments matter as much as the final category label.
+- Exploration needs a first-screen recommendation. Detailed evidence supports review, but the operator needs one question, one route intent, one reason, and one next command.
+- Handoff artifacts should bridge to specs without pretending to be executable specs. A pre-spec candidate is useful precisely because it names what still requires review.
+- MIMIC study design should verify ICD families online before execution; title-substring phenotype bugs are easy and costly to miss.
+- A verified study-design atlas is not an executed analysis suite. Count execution ticks only when data are read or a runner/audit directly changes executed packet behavior.
+- Fitted models still need methods QA. Sparse events-per-predictor and non-finite transformed effects should downgrade packets to review even when statsmodels returns coefficients.
+- Cost discipline works best as a packet artifact. Per-run cost receipts and a cumulative ledger made 22 MIMIC packets possible while staying under `$0.28` estimated read cost.
+- Row-level cache cleanup must be verified after every MIMIC run. Local aggregate artifacts are useful; lingering copied row-level Parquet would create privacy/storage risk.

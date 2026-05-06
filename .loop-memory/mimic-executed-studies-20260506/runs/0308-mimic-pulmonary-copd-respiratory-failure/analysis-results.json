@@ -1,0 +1,552 @@
+{
+  "study": {
+    "id": "mimic-pulmonary-copd-respiratory-failure",
+    "title": "COPD And Respiratory Failure ICU Outcomes",
+    "domain": "pulmonary",
+    "question": "Among ICU patients with COPD and/or acute respiratory failure codes, which first-day respiratory markers predict mortality?",
+    "tables": [
+      "hosp-diagnoses-icd",
+      "hosp-d-icd-diagnoses",
+      "derived-icustay-detail",
+      "derived-first-day-bg",
+      "derived-first-day-bg-art",
+      "derived-oxygen-delivery",
+      "derived-oasis"
+    ],
+    "outcomes": [
+      "hospital_expire_flag",
+      "los_icu"
+    ],
+    "methods": [
+      "respiratory phenotype",
+      "blood-gas high-missingness warning",
+      "sensitivity using oxygen-delivery data"
+    ],
+    "icdFamilies": [
+      {
+        "system": "icd10cm",
+        "query": "J44",
+        "expectedTerms": [
+          "chronic obstructive",
+          "pulmonary"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "J44",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "J44",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=J44&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 5,
+            "sampleRows": [
+              {
+                "code": "J44.0",
+                "name": "Chronic obstructive pulmonary disease with (acute) lower respiratory infection"
+              },
+              {
+                "code": "J44.1",
+                "name": "Chronic obstructive pulmonary disease with (acute) exacerbation"
+              },
+              {
+                "code": "J44.81",
+                "name": "Bronchiolitis obliterans and bronchiolitis obliterans syndrome"
+              },
+              {
+                "code": "J44.89",
+                "name": "Other specified chronic obstructive pulmonary disease"
+              },
+              {
+                "code": "J44.9",
+                "name": "Chronic obstructive pulmonary disease, unspecified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:40.791148+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd10cm",
+        "query": "J96",
+        "expectedTerms": [
+          "respiratory failure"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "J96",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd10cm",
+            "terms": "J96",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code%2Cname&terms=J96&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-10-CM API; CDC/NCHS maintains ICD-10-CM for U.S. morbidity coding.",
+            "reportedTotalMatches": 12,
+            "sampleRows": [
+              {
+                "code": "J96.00",
+                "name": "Acute respiratory failure, unspecified whether with hypoxia or hypercapnia"
+              },
+              {
+                "code": "J96.01",
+                "name": "Acute respiratory failure with hypoxia"
+              },
+              {
+                "code": "J96.02",
+                "name": "Acute respiratory failure with hypercapnia"
+              },
+              {
+                "code": "J96.10",
+                "name": "Chronic respiratory failure, unspecified whether with hypoxia or hypercapnia"
+              },
+              {
+                "code": "J96.11",
+                "name": "Chronic respiratory failure with hypoxia"
+              },
+              {
+                "code": "J96.12",
+                "name": "Chronic respiratory failure with hypercapnia"
+              },
+              {
+                "code": "J96.20",
+                "name": "Acute and chronic respiratory failure, unspecified whether with hypoxia or hypercapnia"
+              },
+              {
+                "code": "J96.21",
+                "name": "Acute and chronic respiratory failure with hypoxia"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:41.288524+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "496",
+        "expectedTerms": [
+          "chronic airway obstruction"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "496",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "496",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=496&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "496",
+                "name": "Chronic airway obstruction, not elsewhere classified"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:41.762972+00:00"
+          }
+        }
+      },
+      {
+        "system": "icd9cm_dx",
+        "query": "518.81",
+        "expectedTerms": [
+          "respiratory failure"
+        ],
+        "verification": {
+          "status": "verified_online",
+          "lookupTerms": "51881",
+          "reason": "NLM API returned matching code-family titles with expected clinical terms.",
+          "source": {
+            "system": "icd9cm_dx",
+            "terms": "51881",
+            "url": "https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=code%2Cname&terms=51881&maxList=8",
+            "sourceDoc": "https://clinicaltables.nlm.nih.gov/apidoc/icd9cm_dx/v3/doc.html",
+            "authority": "NLM Clinical Tables ICD-9-CM diagnosis API from CMS Data version 32.",
+            "reportedTotalMatches": 1,
+            "sampleRows": [
+              {
+                "code": "518.81",
+                "name": "Acute respiratory failure"
+              }
+            ],
+            "retrievedAtIso": "2026-05-06T18:57:42.310269+00:00"
+          }
+        }
+      }
+    ]
+  },
+  "cohortSummary": {
+    "matchedDiagnosisCodes": 23,
+    "matchedDiagnosisRows": 67320,
+    "matchedAdmissions": 58145,
+    "firstIcuStayRows": 25835,
+    "uniquePatients": 21370
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 25835,
+        "missing": 0,
+        "mean": 67.62810141281207,
+        "sd": 15.421871660340852,
+        "median": 69.0,
+        "iqr": [
+          59.0,
+          79.0
+        ],
+        "min": 18.0,
+        "max": 103.0
+      },
+      "los_icu": {
+        "n": 25827,
+        "missing": 8,
+        "mean": 5.367544043055717,
+        "sd": 7.086858920093767,
+        "median": 2.88,
+        "iqr": [
+          1.38,
+          6.29
+        ],
+        "min": 0.0,
+        "max": 136.04
+      },
+      "los_hospital": {
+        "n": 25835,
+        "missing": 0,
+        "mean": 13.574066189278112,
+        "sd": 15.229994669926908,
+        "median": 9.0,
+        "iqr": [
+          5.0,
+          17.0
+        ],
+        "min": 0.0,
+        "max": 515.0
+      },
+      "oasis": {
+        "n": 25835,
+        "missing": 0,
+        "mean": 34.21571511515386,
+        "sd": 8.828431034831887,
+        "median": 34.0,
+        "iqr": [
+          28.0,
+          40.0
+        ],
+        "min": 6.0,
+        "max": 72.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 25835,
+        "positive": 5856,
+        "proportion": 0.22666924714534545
+      },
+      "male": {
+        "n": 25835,
+        "positive": 14137,
+        "proportion": 0.547203406231856
+      },
+      "prolonged_icu_los": {
+        "n": 25835,
+        "positive": 6448,
+        "proportion": 0.24958389781304433
+      }
+    }
+  },
+  "predictors": [
+    "admission_age",
+    "male",
+    "oasis",
+    "hemoglobin_min",
+    "glucose_max",
+    "gcs",
+    "urineoutput"
+  ],
+  "missingness": [
+    {
+      "column": "hemoglobin_min",
+      "missing": 20261,
+      "missingFraction": 0.7842461776659571
+    },
+    {
+      "column": "glucose_max",
+      "missing": 18274,
+      "missingFraction": 0.7073350106444746
+    },
+    {
+      "column": "urineoutput",
+      "missing": 1230,
+      "missingFraction": 0.04760983162376621
+    },
+    {
+      "column": "gcs",
+      "missing": 106,
+      "missingFraction": 0.0041029610992839175
+    },
+    {
+      "column": "los_icu",
+      "missing": 8,
+      "missingFraction": 0.00030965744145538995
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "oasis",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 4680,
+      "events": 1116,
+      "predictors": [
+        "admission_age",
+        "male",
+        "oasis",
+        "hemoglobin_min",
+        "glucose_max",
+        "gcs",
+        "urineoutput"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 66.4448717948718,
+          "sd": 14.978033191674083
+        },
+        "oasis": {
+          "mean": 36.534615384615385,
+          "sd": 8.804305329159387
+        },
+        "hemoglobin_min": {
+          "mean": 9.940064102564103,
+          "sd": 2.6727319435464705
+        },
+        "glucose_max": {
+          "mean": 189.66645299145299,
+          "sd": 85.02780095891761
+        },
+        "gcs": {
+          "mean": 13.30940170940171,
+          "sd": 3.4416948092208224
+        },
+        "urineoutput": {
+          "mean": 1565.3625,
+          "sd": 1298.1189154261012
+        }
+      },
+      "metrics": {
+        "auroc": 0.7511977601583336,
+        "averagePrecision": 0.507480454538733
+      },
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "oddsRatio": 0.9315228556709065,
+          "ci95": [
+            0.8647378444462992,
+            1.0034657742924393
+          ],
+          "pValue": 0.06164870814285619,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.9541744494577965,
+          "ci95": [
+            0.8211808154722418,
+            1.1087069532603624
+          ],
+          "pValue": 0.5402013534305143,
+          "scale": "per unit"
+        },
+        {
+          "term": "oasis",
+          "oddsRatio": 2.633604442691214,
+          "ci95": [
+            2.3919382629655788,
+            2.899687031204413
+          ],
+          "pValue": 1.4824831806834671e-86,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 1.102786414823639,
+          "ci95": [
+            1.0252325846819312,
+            1.1862068128637082
+          ],
+          "pValue": 0.008544721892302591,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.1575698093033233,
+          "ci95": [
+            1.0814519131333222,
+            1.2390452567865033
+          ],
+          "pValue": 2.483136533572633e-05,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "gcs",
+          "oddsRatio": 1.249540779607086,
+          "ci95": [
+            1.1568363974299354,
+            1.3496741314241445
+          ],
+          "pValue": 1.4775052968921377e-08,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "urineoutput",
+          "oddsRatio": 0.8233572965010328,
+          "ci95": [
+            0.7520932941788521,
+            0.9013738627222451
+          ],
+          "pValue": 2.576562152077556e-05,
+          "scale": "per 1 SD"
+        }
+      ]
+    },
+    "los": {
+      "status": "fit",
+      "n": 4679,
+      "predictors": [
+        "admission_age",
+        "male",
+        "oasis",
+        "hemoglobin_min",
+        "glucose_max",
+        "gcs",
+        "urineoutput"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 66.44133361829451,
+          "sd": 14.977677890411838
+        },
+        "oasis": {
+          "mean": 36.53280615516136,
+          "sd": 8.804376198383626
+        },
+        "hemoglobin_min": {
+          "mean": 9.939880316306903,
+          "sd": 2.672988022926607
+        },
+        "glucose_max": {
+          "mean": 189.6789912374439,
+          "sd": 85.03256153330105
+        },
+        "gcs": {
+          "mean": 13.30904039324642,
+          "sd": 3.4419738783768126
+        },
+        "urineoutput": {
+          "mean": 1565.3978414191067,
+          "sd": 1298.2554034949217
+        }
+      },
+      "rSquared": 0.043606066207173,
+      "coefficients": [
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -9.00755005153453,
+          "ci95PercentChange": [
+            -11.211998181508731,
+            -6.748369396239151
+          ],
+          "pValue": 4.5698673392919906e-14,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": 4.355122476741102,
+          "ci95PercentChange": [
+            -0.48564964100699104,
+            9.431368921673489
+          ],
+          "pValue": 0.0785645884672477,
+          "scale": "per unit"
+        },
+        {
+          "term": "oasis",
+          "percentChangeInLos": 17.586435749120955,
+          "ci95PercentChange": [
+            14.45194189443546,
+            20.80677394652739
+          ],
+          "pValue": 6.904008642594893e-32,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -3.825230127845569,
+          "ci95PercentChange": [
+            -6.348216386242267,
+            -1.2342744254678406
+          ],
+          "pValue": 0.004032131444673751,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 1.4606015400471684,
+          "ci95PercentChange": [
+            -0.987341020438548,
+            3.9690658847289395
+          ],
+          "pValue": 0.2445565391170923,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "gcs",
+          "percentChangeInLos": 3.8878172773263886,
+          "ci95PercentChange": [
+            1.2416895407338924,
+            6.60310616709725
+          ],
+          "pValue": 0.0037626895936807244,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "urineoutput",
+          "percentChangeInLos": 6.776903039297877,
+          "ci95PercentChange": [
+            3.996926132348122,
+            9.631192446535742
+          ],
+          "pValue": 1.106252373888031e-06,
+          "scale": "per 1 SD"
+        }
+      ]
+    }
+  }
+}
