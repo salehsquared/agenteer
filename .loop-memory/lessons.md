@@ -1,5 +1,9 @@
 # Lessons
 
+- The exact SAVR/TAVR dialysis question is a claims/registry question. MIMIC-IV can provide a useful same-hospital feasibility packet, but it must not claim complete 2008-2022 CPT-based longitudinal follow-up.
+- HCPCS/CPT evidence needs dictionary-level verification and clear reporting. In this run, TAVR-related HCPCS/CPT evidence was present, while requested SAVR CPT codes were not observed.
+- Tiny peritoneal dialysis strata should stay descriptive. A group with 12 patients overall and 3 TAVR patients cannot support strong adjusted modality-specific claims.
+
 - Sparse MIMIC derived tables must be left-joined with explicit zero-fill for binary exposure flags. Otherwise the analyzed denominator can silently become the exposed subset and make exposure prevalence look like 100%.
 - Propensity matching is useful only when balance, overlap, unmatched treated rows, matched pairs, and score distributions are emitted as auditable artifacts.
 - Propensity warnings should keep a packet in methods-review without making the run look failed. Residual imbalance and unmatched treated rows are substantive interpretation boundaries.
@@ -39,3 +43,9 @@
 - Negative causal test cases are productive ticks when the expected behavior is a blocker. No covariates, tiny treatment groups, poor support, and method-selection mismatches should count as success only when they refuse or downgrade cleanly.
 - Overlap deserves its own artifact. A single common-support scalar is useful, but bin-level treated/control counts make positivity failures easier to audit and explain.
 - Rerun stability belongs in the same hardening suite as correctness checks. Propensity pipelines need repeatability evidence before they are useful as demos.
+- Broad statistical support should be validated as durable packets, not only unit tests. The first validation corpus showed that core inference routes run and produce inspectable artifacts, while route-level QA still needs method-specific nuance.
+- Route-specific variables such as survival `id` and `strata` must be retained in complete-case frames, not only validated up front. Validation packets found a real recurrent-event crash that unit coverage did not previously catch.
+- Causal route success should mean "design-review artifact produced," not "causal effect proven." The validation corpus preserves unmatched treated rows, residual imbalance, target-trial review, and positivity artifacts as interpretation constraints.
+- A failed model fit can be valuable validation evidence. The zero-inflated negative binomial stress run failed cleanly with a convergence blocker, while a better-shaped fixture succeeded.
+- Figure files are not enough. A generated study packet needs visual QA over dimensions, blankness, captions, alt text, axis labels, and source columns before a paper should be trusted as demo material.
+- Manual image review still matters after deterministic QA. The first pass showed technically nonblank plots with weak labels, which led to axis metadata and plot-label improvements.

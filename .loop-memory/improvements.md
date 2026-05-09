@@ -1,5 +1,63 @@
 # Improvements
 
+## Tick 0389
+
+- Added a challenge note for the expanded statistics implementation. The validation bar now requires representative CLI execution, reader-facing artifacts, figure contracts, explicit backend blockers, and a durable validation index before treating the broad method surface as mature.
+
+## Tick 0390
+
+- Added a framework-minimalist challenge for stats validation and trimmed `MEMORY.md` below 200 lines. The next validation tick must distinguish implemented-and-validated methods from review-limited or backend-blocked routes.
+
+## Tick 0391
+
+- Created `.loop-memory/stats-method-validation-20260509/validation-data.csv` and validated five core inference/association routes through the CLI. The ANOVA route now has manuscript QA and run inspection evidence.
+
+## Tick 0392
+
+- Web-grounded the expanded stats validation against STROBE, ASA p-value guidance, and TRIPOD+AI reporting expectations.
+- Validated 12 regression/GLM routes through the CLI, including robust linear, logistic, ordinal, multinomial, count, zero-inflated, Gamma, inverse Gaussian, quantile, and penalized models. Penalized routes correctly emit inference caveats.
+
+## Tick 0393
+
+- Validated survival and longitudinal stats routes. Fixed a runner bug where recurrent-event `--id` and stratified-Cox `--strata` variables could be dropped from the complete-case frame, then added targeted regression coverage.
+- Confirmed Fine-Gray, time-varying Cox, and GLMM routes fail as explicit backend blockers rather than partial successes.
+
+## Tick 0394
+
+- Validated 12 causal/quasi-experimental routes. Propensity matching and weighting now have fresh validation packets with reader-facing papers and passing paper QA; target-trial and propensity warnings remain explicit design-review boundaries.
+
+## Tick 0395
+
+- Added a skeptical-statistician challenge requiring the final validation index to distinguish execution-validated routes from assumption-validated or review-limited routes.
+
+## Tick 0396
+
+- Validated 28 additional stats routes covering remaining core inference, missingness, diagnostics, reliability, PCA, clustering, agreement, multiple-comparison, power, and prediction evaluation. All 28 succeeded; MICE preserved its assumption-review issue.
+
+## Tick 0397
+
+- Generated the stats validation index at `.loop-memory/stats-method-validation-20260509/VALIDATION_INDEX.md` / `.json`.
+- Added zero-inflated negative binomial validation: one nonconverged stress run and one successful better-shaped fixture run, both preserved in the index.
+
+## Tick 0398
+
+- Ran verification gates for the expanded stats implementation: build passed, targeted stats/ML tests passed (28 tests), full suite passed (58 files / 413 tests), and `git diff --check` passed.
+
+## Ticks 0399-0408
+
+- Added deterministic `research figure-qa` and integrated automatic `figure-qa.json` generation into `stats-run`.
+- Figure QA now checks PNG readability, dimensions, file size, nonblank sampled pixels, color detail, title, caption, alt text, axis-label metadata, and source columns.
+- Improved generated figures with axis labels, alt text, survival legend titles, heatmap tick labels/colorbar, and ROC no-skill diagonal reference line.
+- Generated 10 study papers under `.loop-memory/figure-study-suite-20260509/studies/`, spanning descriptive, Welch t-test, chi-square, Pearson correlation, adjusted linear regression, Kaplan-Meier, Aalen-Johansen CIF, PCA, Bland-Altman, and ROC/prediction evaluation.
+- All 10 study-level figure QA runs passed; the suite index is `.loop-memory/figure-study-suite-20260509/STUDY_INDEX.md`.
+
+## Tick 0388
+
+- Committed and pushed prior research-machine progress to `origin/main` as `f37215a8`.
+- Added a bounded MIMIC-IV SAVR/TAVR dialysis-status longitudinal runner under `.loop-memory/mimic-savr-tavr-dialysis-20260509/`.
+- Generated a local-review packet for 4,255 first observed SAVR/TAVR admissions with outcome tables, model estimates, code-match evidence, literature evidence, QA, cost receipt, source inventory, artifact index, and unified run inspection.
+- The run makes the core feasibility boundary explicit: MIMIC supports same-hospital EHR follow-up and ICD-driven SAVR/TAVR cohorts, but not complete national CPT/claims longitudinal capture.
+
 ## Ticks 0378-0387
 
 - Built `.loop-memory/mimic-dialysis-cardiac-papers-20260509/run_mimic_paper_series.py`, a bounded MIMIC paper-series runner for dialysis and cardiac-surgery ICU studies.

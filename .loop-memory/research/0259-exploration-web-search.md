@@ -2,13 +2,13 @@
 
 ## Sources
 
-1. QUIS: Question-guided Insights Generation for Automated Exploratory Data Analysis, EMNLP Industry 2024 / arXiv 2410.10270  
+1. QUIS: Question-guided Insights Generation for Automated Exploratory Data Analysis, EMNLP Industry 2024 / arXiv 2410.10270
    Source: https://arxiv.org/abs/2410.10270
 
-2. A Graph RAG Approach to Enhance Explainability in Dataset Discovery, Data Science and Engineering 2025/2026  
+2. A Graph RAG Approach to Enhance Explainability in Dataset Discovery, Data Science and Engineering 2025/2026
    Source: https://link.springer.com/article/10.1007/s41019-025-00313-x
 
-3. TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods, BMJ 2024  
+3. TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods, BMJ 2024
    Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC11025451/
 
 ## Findings

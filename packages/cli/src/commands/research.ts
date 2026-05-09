@@ -3933,7 +3933,7 @@ export async function researchSemanticQualityCommand(file: string): Promise<Rese
   const variableStats: ResearchSemanticQualityReport["variableStats"] = {};
   const variables = uniqueStrings(rows.flatMap(row => Object.keys(row)));
   for (const variable of variables) {
-    const rule = SEMANTIC_VARIABLE_RULES[variable];
+    const rule = SEMANTIC_VARIABLE_RULES[variable] ?? inferredSemanticRuleForVariable(variable);
     const values = rows.map(row => Number(row[variable])).filter(value => Number.isFinite(value));
     if (values.length) {
       variableStats[variable] = {
@@ -3946,12 +3946,19 @@ export async function researchSemanticQualityCommand(file: string): Promise<Rese
       variableStats[variable] = { nonMissingRows: 0 };
     }
     if (!rule || !values.length) continue;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
     if (rule.allowed) {
       const unexpected = uniqueStrings(values.map(value => String(value)).filter(value => !rule.allowed?.has(Number(value))));
-      if (unexpected.length) warnings.push({ severity: "warning", code: "UNEXPECTED_CODE_VALUES", message: `${variable} contains values outside the semantic registry: ${unexpected.join(", ")}.` });
+      const nonInteger = values.filter(value => !Number.isInteger(value));
+      if (unexpected.length || nonInteger.length) failures.push({ severity: "blocker", code: "UNEXPECTED_CODE_VALUES", message: `${variable} contains values outside the semantic registry: ${unexpected.join(", ") || "non-integer value(s)"}.` });
     }
-    if (rule.min !== undefined && Math.min(...values) < rule.min) failures.push({ severity: "blocker", code: "VALUE_BELOW_REASONABLE_RANGE", message: `${variable} has values below ${rule.min}.` });
-    if (rule.max !== undefined && Math.max(...values) > rule.max) failures.push({ severity: "blocker", code: "VALUE_ABOVE_REASONABLE_RANGE", message: `${variable} has values above ${rule.max}.` });
+    if (rule.min !== undefined && min < rule.min) failures.push({ severity: "blocker", code: "VALUE_BELOW_REASONABLE_RANGE", message: `${variable} minimum ${min.toFixed(4)} is below plausible lower bound ${rule.min}.` });
+    if (rule.max !== undefined && max > rule.max) failures.push({ severity: "blocker", code: "VALUE_ABOVE_REASONABLE_RANGE", message: `${variable} maximum ${max.toFixed(4)} is above plausible upper bound ${rule.max}.` });
+    if (values.length >= 30 && rule.meanMin !== undefined && mean < rule.meanMin) warnings.push({ severity: "warning", code: "MEAN_BELOW_EXPECTED_RANGE", message: `${variable} mean ${mean.toFixed(4)} is outside a broad expected range; confirm units/coding.` });
+    if (values.length >= 30 && rule.meanMax !== undefined && mean > rule.meanMax) warnings.push({ severity: "warning", code: "MEAN_ABOVE_EXPECTED_RANGE", message: `${variable} mean ${mean.toFixed(4)} is outside a broad expected range; confirm units/coding.` });
+    if (rule.kind === "count" && max > rows.length) warnings.push({ severity: "warning", code: "COUNT_EXCEEDS_ROW_COUNT", message: `${variable} includes values larger than the table row count; confirm whether it is an aggregate count or a row-level variable.` });
   }
   return {
     file: resolved,
@@ -9205,22 +9212,22 @@ function rowPassesBasicPopulation(row: Record<string, unknown>, spec: ResearchAn
   return true;
 }
 
-const SEMANTIC_VARIABLE_RULES: Record<string, { min?: number; max?: number; allowed?: Set<number> }> = {
+const SEMANTIC_VARIABLE_RULES: Record<string, { kind?: string; min?: number; max?: number; meanMin?: number; meanMax?: number; allowed?: Set<number> }> = {
   SEQN: { min: 1 },
-  RIDAGEYR: { min: 0, max: 120 },
+  RIDAGEYR: { kind: "age", min: 0, max: 120, meanMin: 0, meanMax: 95 },
   RIAGENDR: { allowed: new Set([1, 2]) },
   RIDSTATR: { allowed: new Set([1, 2]) },
   RIDRETH3: { allowed: new Set([1, 2, 3, 4, 6, 7]) },
-  BMXBMI: { min: 5, max: 100 },
+  BMXBMI: { kind: "bmi", min: 5, max: 100, meanMin: 10, meanMax: 60 },
   BPQ020: { allowed: new Set([1, 2, 7, 9]) },
-  BPXSY1: { min: 40, max: 300 },
-  BPXSY2: { min: 40, max: 300 },
-  BPXSY3: { min: 40, max: 300 },
-  BPXDI1: { min: 0, max: 180 },
-  BPXDI2: { min: 0, max: 180 },
-  BPXDI3: { min: 0, max: 180 },
+  BPXSY1: { kind: "systolic_bp", min: 40, max: 300, meanMin: 70, meanMax: 220 },
+  BPXSY2: { kind: "systolic_bp", min: 40, max: 300, meanMin: 70, meanMax: 220 },
+  BPXSY3: { kind: "systolic_bp", min: 40, max: 300, meanMin: 70, meanMax: 220 },
+  BPXDI1: { kind: "diastolic_bp", min: 0, max: 180, meanMin: 30, meanMax: 140 },
+  BPXDI2: { kind: "diastolic_bp", min: 0, max: 180, meanMin: 30, meanMax: 140 },
+  BPXDI3: { kind: "diastolic_bp", min: 0, max: 180, meanMin: 30, meanMax: 140 },
   DIQ010: { allowed: new Set([1, 2, 3, 7, 9]) },
-  LBXGH: { min: 2, max: 20 },
+  LBXGH: { kind: "hba1c_percent", min: 2, max: 20, meanMin: 3, meanMax: 14 },
   LBXVIDMS: { min: 0, max: 500 },
   SMQ020: { allowed: new Set([1, 2, 7, 9]) },
   HIQ011: { allowed: new Set([1, 2, 7, 9]) },
@@ -9228,6 +9235,21 @@ const SEMANTIC_VARIABLE_RULES: Record<string, { min?: number; max?: number; allo
   WTMECPRP: { min: 0 },
   SDMVPSU: { allowed: new Set([1, 2, 3]) },
 };
+
+function inferredSemanticRuleForVariable(variable: string): { kind?: string; min?: number; max?: number; meanMin?: number; meanMax?: number; allowed?: Set<number> } | undefined {
+  const lower = variable.toLowerCase();
+  if (/^(elevated|high|has|is)_/.test(lower) || /_(flag|indicator|binary)$/.test(lower)) return { kind: "binary_indicator", allowed: new Set([0, 1]) };
+  if (/age|ridageyr/.test(lower)) return { kind: "age", min: 0, max: 120, meanMin: 0, meanMax: 95 };
+  if (/\bbmi\b|bmxbmi|body.?mass/.test(lower)) return { kind: "bmi", min: 5, max: 100, meanMin: 10, meanMax: 60 };
+  if (/hba1c|lbxgh|glycohemoglobin/.test(lower)) return { kind: "hba1c_percent", min: 2, max: 20, meanMin: 3, meanMax: 14 };
+  if (/systolic|bpxsy|sbp|blood.?pressure/.test(lower)) return { kind: "systolic_bp", min: 40, max: 300, meanMin: 70, meanMax: 220 };
+  if (/diastolic|bpxdi|dbp/.test(lower)) return { kind: "diastolic_bp", min: 0, max: 180, meanMin: 30, meanMax: 140 };
+  if (/weight|^wt|_wt/.test(lower)) return { kind: "weight", min: 0 };
+  if (/los|length.?of.?stay/.test(lower)) return { kind: "length_of_stay", min: 0, max: 3650, meanMin: 0, meanMax: 365 };
+  if (/mortality|death|expire/.test(lower) || lower === "event" || lower === "outcome_bin") return { kind: "binary_indicator", allowed: new Set([0, 1]) };
+  if (/count/.test(lower) || lower.endsWith("_n") || lower.startsWith("n_")) return { kind: "count", min: 0 };
+  return undefined;
+}
 
 function buildNhanesQuestions(registry: NhanesRegistry): ResearchQuestionCandidate[] {
   const domains = new Set(Object.keys(registry.domains ?? {}));

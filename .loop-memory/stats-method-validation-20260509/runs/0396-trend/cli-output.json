@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1619721958317789510",
+    "method": "cochran-armitage-trend",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_binary",
+      "group"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "group",
+        "z_statistic": 0.4972451580988469,
+        "p_value": 0.6190161801767022,
+        "groups": 3
+      }
+    ],
+    "diagnostics": {
+      "test": "Cochran-Armitage trend",
+      "ordered_groups": [
+        "control",
+        "enhanced",
+        "standard"
+      ],
+      "table": {
+        "0": {
+          "control": 52,
+          "enhanced": 55,
+          "standard": 49
+        },
+        "1": {
+          "control": 28,
+          "enhanced": 25,
+          "standard": 31
+        }
+      }
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/stats-config.json",
+        "sha256": "868358a9e1c88d160335e3a210b239f9350699fdbcd8bab79609227859cc781b"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/stats-summary.json",
+        "sha256": "62352a51dba434f9755490ca495b240a4241cbc3a9907346bc618a9f3fc47a36"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/estimates.csv",
+        "sha256": "b71f9781ba7b3491a07471da938c41d388264d52ca37cbb9bf873d9ddc37be98"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/diagnostics.json",
+        "sha256": "474393af4d2c3d586d6bf95b86c62149e3e733d903daa3870f69a83526679194"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/figures.json",
+        "sha256": "c2fec28ee09934f148bfa1c587f047967db97b31f2c03ec2ed1fd864efdc60b5"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/contingency-heatmap.png",
+        "sha256": "7d6ba3c7a3fbf92ed7a32ed09d3917cacce2c7508462d112be1e869bd82e3d9e"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/stats-report.md",
+        "sha256": "3fa73626150e8e0d596ce9a423e563a5e0a5fdb3d670b97eae2de79e240f6a31"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend/stats-qa.json",
+        "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-trend",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

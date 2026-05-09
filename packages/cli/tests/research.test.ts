@@ -1329,6 +1329,12 @@ JSON
       const badRowsPath = path.join(dir, "bad-rows.json");
       await writeFile(badRowsPath, `${JSON.stringify([{ RIDAGEYR: 45, BPXSY1: 500, BPXDI1: 80, WTMEC2YR: 1 }], null, 2)}\n`);
       const badQuality = await researchSemanticQualityCommand(badRowsPath);
+      const implausibleMeanPath = path.join(dir, "implausible-mean.csv");
+      await writeFile(implausibleMeanPath, [
+        "age,bmi,outcome_bin",
+        ...Array.from({ length: 36 }, (_, index) => `${55 + (index % 10)},65,${index % 2}`),
+      ].join("\n"));
+      const meanQuality = await researchSemanticQualityCommand(implausibleMeanPath);
 
       expect(scout.status).toBe("passed");
       expect(scout.eligibleRows).toBe(3);
@@ -1336,6 +1342,8 @@ JSON
       expect(scout.positiveWeightRows).toBe(3);
       expect(quality.status).toBe("passed");
       expect(badQuality.status).toBe("failed");
+      expect(meanQuality.status).toBe("warning");
+      expect(meanQuality.warnings.map(issue => issue.code)).toContain("MEAN_ABOVE_EXPECTED_RANGE");
       expect(renderResearchCohortScoutFile(scout)).toContain("research cohort scout file");
       expect(renderResearchSemanticQuality(quality)).toContain("research semantic quality");
       expect(JSON.parse(renderResearchCohortScoutFileJson(scout)).schemaVersion).toBe(1);

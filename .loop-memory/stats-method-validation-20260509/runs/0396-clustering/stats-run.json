@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_5212176553739622243",
+  "method": "clustering-validation",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "age",
+    "severity",
+    "bmi",
+    "albumin"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "kmeans",
+      "clusters": 3,
+      "silhouette": 0.45378797794914105,
+      "davies_bouldin": 0.7510611945552048,
+      "calinski_harabasz": 474.0116490503811
+    }
+  ],
+  "diagnostics": {
+    "test": "clustering validation",
+    "cluster_counts": {
+      "0": 74,
+      "1": 82,
+      "2": 84
+    }
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/stats-config.json",
+      "sha256": "376f9764ebf567a1f84e688e7e0b5a58292e8e8a6bbd00bb5cc8292b712411a5"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/stats-summary.json",
+      "sha256": "59adf86a28aa50240433b56eb48838a675cce6395f8ab0e2ec2cb5bf4f05b16a"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/estimates.csv",
+      "sha256": "64009a28262f931972d24f05e475177b7cd35484a47fd62fa169bf98aaa3c052"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/diagnostics.json",
+      "sha256": "77415ea86e6a820989fe0e8e52f831e825d33fa44d4bee4626317cbaf5ff62a7"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/stats-report.md",
+      "sha256": "47da41fb49528d3ccea5b0484b0feaeb959a26083f1802a398fe214ff4298898"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering/stats-qa.json",
+      "sha256": "ecb5bc71f3f327ee7e284e66959545a27e67eebae15307fc2c42ddb89656a1df"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-clustering",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

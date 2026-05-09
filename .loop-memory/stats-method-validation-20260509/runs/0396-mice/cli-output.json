@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_6248616002994397484",
+    "method": "multiple-imputation-mice",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 218,
+    "variables": [
+      "missing_marker",
+      "albumin",
+      "hemoglobin",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "missing_marker",
+        "missing_before": 22,
+        "imputed_values": 22
+      },
+      {
+        "term": "albumin",
+        "missing_before": 0,
+        "imputed_values": 0
+      },
+      {
+        "term": "hemoglobin",
+        "missing_before": 0,
+        "imputed_values": 0
+      },
+      {
+        "term": "severity",
+        "missing_before": 0,
+        "imputed_values": 0
+      }
+    ],
+    "diagnostics": {
+      "test": "MICE-style iterative imputation",
+      "imputed_data": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/imputed-data.csv",
+      "assumption": "MAR sensitivity required"
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "IMPUTATION_ASSUMPTION_REVIEW",
+        "message": "Multiple imputation relies on MAR/model assumptions; compare against complete-case and sensitivity analyses.",
+        "evidenceRefs": [
+          "imputed-data.csv"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/stats-config.json",
+        "sha256": "a714fee01fc59074d9ed3c55da83477ba2aae0fe6647226d4354e73e89be3c36"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/stats-summary.json",
+        "sha256": "bdb7699b5f7b5f2428ff9ff8a8b1833151882720314e939e9568a8a78cd742df"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/estimates.csv",
+        "sha256": "51a261a4a4eb7e424982382aed8734d4efcfffe76edf4d950badbfe265d6380f"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/diagnostics.json",
+        "sha256": "83c4ec884c1f63233e39b149872eb490713b3d04ddb305ece34a5ca714f73340"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "imputed-data",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/imputed-data.csv",
+        "sha256": "4c1078f1e3d3cfdabe36a1ceaaf8c134bfdcf57af98f143e79a56d0c1dfd25a4"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/stats-report.md",
+        "sha256": "3054a0e05287cf68219326da754e7f805e124e622008dd39fd8c5495be09bdcd"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice/stats-qa.json",
+        "sha256": "c18ef16b177247a2539e8facc135e4b1156e9c023977ea1e4d00576188a2cc85"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mice",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

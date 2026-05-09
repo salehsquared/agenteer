@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_8190564138026911042",
+  "method": "doubly-robust-aipw",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment",
+    "age",
+    "severity",
+    "albumin"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "estimand": "ATE",
+      "effect_measure": "AIPW mean difference",
+      "estimate": 0.9372593784509635
+    }
+  ],
+  "diagnostics": {
+    "test": "doubly-robust-aipw",
+    "propensity_model": {
+      "aic": 297.07484020817895
+    },
+    "balance": {
+      "max_abs_smd_before": 0.6509123873374751,
+      "max_abs_smd_after": 1.2235931869907775e-15,
+      "mean_abs_smd_before": 0.5146556918029893,
+      "mean_abs_smd_after": 7.641254491197591e-16,
+      "covariates_over_0_1_before": 3,
+      "covariates_over_0_1_after": 0,
+      "covariate_terms": 3
+    },
+    "positivity": {
+      "treated_min": 0.21024702376374668,
+      "treated_max": 0.9395750181570478,
+      "control_min": 0.16469513196238075,
+      "control_max": 0.8821848697024102,
+      "common_support_lower": 0.21024702376374668,
+      "common_support_upper": 0.8821848697024102,
+      "common_support_fraction": 0.9458333333333333
+    },
+    "artifacts": {
+      "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/balance.csv"
+    }
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/stats-config.json",
+      "sha256": "322687bc35cadcdbd299295ad04c135105bcff76e20c38f9c5ae8abd91b06326"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/stats-summary.json",
+      "sha256": "47088785c063caf1e5b9eb421216c4b39c8688a8d67f4531ace2bedd4df9efa0"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/estimates.csv",
+      "sha256": "d5779eff386207cd856f98f6ac439532306e83315fb53268c681e9a0b9c4b6e8"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/diagnostics.json",
+      "sha256": "3f812011c82051b5c030748e06bc0ec3712405d2b69823066496ac7081ccad1e"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "balance",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/balance.csv",
+      "sha256": "01b9a32e77b1d9228112a99e15a3e1e8beb7d043292d1d12f7a4475946718a4b"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/stats-report.md",
+      "sha256": "1eec9dd399fe65cd935e9d053e049de31a61138605d0fb8623e63ca34dced73b"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw/stats-qa.json",
+      "sha256": "ecb5bc71f3f327ee7e284e66959545a27e67eebae15307fc2c42ddb89656a1df"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-aipw",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

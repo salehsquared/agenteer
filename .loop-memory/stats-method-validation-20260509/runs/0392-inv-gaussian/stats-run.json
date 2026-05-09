@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_7822381054481840417",
+  "method": "inverse-gaussian-glm",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment",
+    "age",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "const",
+      "estimate": 2.4451085500829666,
+      "std_error": 0.02923674878997435,
+      "p_value": 0,
+      "ci_low": 2.3878055754295717,
+      "ci_high": 2.5024115247363614,
+      "rate_ratio": 11.531801308889841,
+      "rr_ci_low": 10.889571361534397,
+      "rr_ci_high": 12.21190779808394
+    },
+    {
+      "term": "treatment",
+      "estimate": 0.052606641697214865,
+      "std_error": 0.012510405738828037,
+      "p_value": 0.000026104658272854008,
+      "ci_low": 0.028086697017128705,
+      "ci_high": 0.07712658637730102,
+      "rate_ratio": 1.0540149580293974,
+      "rr_ci_low": 1.0284848471247068,
+      "rr_ci_high": 1.0801788036601057
+    },
+    {
+      "term": "age",
+      "estimate": 0.005794309597557876,
+      "std_error": 0.0004243449643483308,
+      "p_value": 1.8922791632508983e-42,
+      "ci_low": 0.004962608750414214,
+      "ci_high": 0.006626010444701538,
+      "rate_ratio": 1.0058111290794838,
+      "rr_ci_low": 1.0049749428879449,
+      "rr_ci_high": 1.0066480110170728
+    },
+    {
+      "term": "severity",
+      "estimate": 0.0959018211203007,
+      "std_error": 0.007231848138898936,
+      "p_value": 3.894615029238196e-40,
+      "ci_low": 0.08172765922639577,
+      "ci_high": 0.11007598301420563,
+      "rate_ratio": 1.1006509980072428,
+      "rr_ci_low": 1.0851602362047885,
+      "rr_ci_high": 1.1163628918538082
+    }
+  ],
+  "diagnostics": {
+    "model_family": "inverse-gaussian-glm",
+    "aic": 1017.5423933859333,
+    "bic": -1293.3414421323457,
+    "df_resid": 236,
+    "residual_mean": -0.008391706808626864,
+    "residual_sd": 1.923645486487754,
+    "shapiro_p_value": 0.9355222147090297,
+    "max_leverage": 0.05143254074453018,
+    "max_cooks_distance": 0.17417517928485782,
+    "vif": [
+      {
+        "term": "treatment",
+        "vif": 1.1266739538918475
+      },
+      {
+        "term": "age",
+        "vif": 1.0808383501003018
+      },
+      {
+        "term": "severity",
+        "vif": 1.146630084030013
+      }
+    ],
+    "max_vif": 1.146630084030013,
+    "weighted": false
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/stats-config.json",
+      "sha256": "c951c33bdb444920f4adf37eeb8561c71db0a3e99baac4be37577eed43e337ec"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/stats-summary.json",
+      "sha256": "e2cf3a3082ce8eae81b8d2e1cd2b3605eb4e400194647f38d62a9d97c6354d20"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/estimates.csv",
+      "sha256": "d1ac43b9a209113d26e9d1d4d24bbc06e05b66f14259235097da8adb3491905a"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/diagnostics.json",
+      "sha256": "5fea060b14e7ef658a965235196a34c7b889e8a821cb391626fba1c3787b25fc"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/figures.json",
+      "sha256": "ff0dcab94fc4243c1a86b97cedf7dd9247dcd2fcb448f882e2652841c0d185bd"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/model-residuals.png",
+      "sha256": "bf068dfbb4bd83d38f2863b74dd452742fbd98247ba14dfaeeadc0db985b94d4"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/stats-report.md",
+      "sha256": "4957d06798c3d1b42ff57e8fdb7aed4b4228ed14bb6545068d29f5d729cd14fc"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian/stats-qa.json",
+      "sha256": "d6d388431cb1d3e8cb24f90b9b6b5181ab81af5ea5effdd8d4cc4964e02bb9c8"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-inv-gaussian",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_4133084442128122591",
+  "method": "missingness-summary",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 218,
+  "variables": [
+    "missing_marker",
+    "albumin",
+    "hemoglobin",
+    "outcome_cont"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "missing_marker",
+      "missing": 22,
+      "non_missing": 218,
+      "missing_fraction": 0.09166666666666666
+    },
+    {
+      "term": "albumin",
+      "missing": 0,
+      "non_missing": 240,
+      "missing_fraction": 0
+    },
+    {
+      "term": "hemoglobin",
+      "missing": 0,
+      "non_missing": 240,
+      "missing_fraction": 0
+    },
+    {
+      "term": "outcome_cont",
+      "missing": 0,
+      "non_missing": 240,
+      "missing_fraction": 0
+    }
+  ],
+  "diagnostics": {
+    "test": "missingness-summary",
+    "complete_case_n": 218,
+    "input_rows": 240
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/stats-config.json",
+      "sha256": "ce49a739b0fac7db6645088d93d94af7a5123a7b6627dc9685715bd88c621851"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/stats-summary.json",
+      "sha256": "7dcb1b9cecdc5266895143434d3d56fc548627fa855cdf983e05daf6720672e5"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/estimates.csv",
+      "sha256": "75a8e007ca8fc8ba2b68c391cfa8042e33d967c78fae0488dcab1e0003c6a309"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/diagnostics.json",
+      "sha256": "156e5db3367d18741efeafb7ed3d92f440ac78e7505814849042455e11a308ec"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/figures.json",
+      "sha256": "de00efc7bb44cbebd0a0d65dddded8599c199a9d1e532b3ef2061c7d4cf5abaa"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/missingness-bar.png",
+      "sha256": "9accbbf5e73acfd33098b9e0be4e5e8efff49ff6bba1d1fab0038a076fb14a13"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/stats-report.md",
+      "sha256": "b66da8705264eb8a27b589d85bf7f15d9410686ae98537d2186890f2bba407cc"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness/stats-qa.json",
+      "sha256": "c4e7c4bd4f5823653c5ec0a0a6fcf058b016a254cdea0b9d4a53114ce3e9ba6c"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missingness",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

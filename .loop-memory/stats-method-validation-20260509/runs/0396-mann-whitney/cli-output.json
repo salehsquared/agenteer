@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_2311342973165761007",
+    "method": "mann-whitney",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "treatment",
+        "group_a": 0,
+        "group_b": 1,
+        "n_a": 96,
+        "n_b": 144,
+        "median_a": 20.0565,
+        "median_b": 23.076500000000003,
+        "statistic": 10079,
+        "p_value": 1.8599038046060571e-9
+      }
+    ],
+    "diagnostics": {
+      "test": "Mann-Whitney U",
+      "ties_possible": true
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/stats-config.json",
+        "sha256": "e2d60443e3002e4ed8b280395ac4778529a2f9fe1c6ed437d8b40a1ef8adef4b"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/stats-summary.json",
+        "sha256": "169abcfdc89bd9801eda35eabe9f12fbd22501b26b551ea098f6272efdda9416"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/estimates.csv",
+        "sha256": "7b6b8da91f27d2f4ca61e1a7afc3ed9a38ff0e47e04ca0308826936f3c6c6992"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/diagnostics.json",
+        "sha256": "db32c7d2f31d074ff0ba63c43d9f798e3bf96d75af333f38b6fef7209c24e59a"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/figures.json",
+        "sha256": "e948da7487e1759c291272755510bda0361eaf0d7a5bbe41f1989ef123985fdc"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/group-distribution.png",
+        "sha256": "2b79ecb998ffc196d2855dcf4d153af2e7e93c91f66ef5688c85aaaa37b1bfa8"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/stats-report.md",
+        "sha256": "8c7a1b31d04ca97d5011331ed7dc6c5774648536cd5125bd710227684a04ee89"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney/stats-qa.json",
+        "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mann-whitney",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

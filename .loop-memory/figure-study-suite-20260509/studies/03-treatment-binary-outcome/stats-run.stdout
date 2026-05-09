@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_2071845447855395494",
+    "method": "chi-square",
+    "status": "succeeded",
+    "rowCount": 360,
+    "completeCaseN": 360,
+    "variables": [
+      "outcome_bin",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "treatment",
+        "chi_square": 6.674679487179491,
+        "degrees_of_freedom": 1,
+        "p_value": 0.00977920960687392,
+        "cramers_v": 0.13616451943614521
+      }
+    ],
+    "diagnostics": {
+      "test": "Chi-square independence",
+      "table": {
+        "0": {
+          "0": 106,
+          "1": 50
+        },
+        "1": {
+          "0": 110,
+          "1": 94
+        }
+      },
+      "min_expected": 62.4
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/stats-config.json",
+        "sha256": "fa5d8854348eb78e3ab325346bf742d85a8c4e51b39f1a7df18a060307fd14e4"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/stats-summary.json",
+        "sha256": "95c1795e45825226b62ee7812ae84a64a67884b4e027990890131f1b96962b5d"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/estimates.csv",
+        "sha256": "88404051af529c23f80e0bab71ca5ff41cf4f0ae247b0ff892613174b24abbb2"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/diagnostics.json",
+        "sha256": "8ecdcbc22bd189153db14734ad2e4615b4607b99e8ec8e9bd5e4ab3a188bcf5e"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/figures.json",
+        "sha256": "9e3aa53dc4308b97fe6a25b81de977fe72b0262957170faa614e470a6ec0feb3"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/contingency-heatmap.png",
+        "sha256": "00218912da8290aca9236a80c0b268227b503ad5aeeb0757f0e821ad53ba8b21"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/figure-qa.json",
+        "sha256": "ab067d380f51e9b7d1554c27abe301991c157dcbd2a4478344d8b28fd6462093"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/stats-report.md",
+        "sha256": "cbab3c6ba49f31e4e0e076ec8c05c9bc4a18de72cc3ed3d63de3575c365d7220"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/stats-qa.json",
+        "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

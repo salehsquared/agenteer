@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_8030265937884138675",
+  "method": "ancova",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "group",
+    "age",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "C(group)",
+      "sum_sq": 17.197542103973838,
+      "df": 2,
+      "f_statistic": 2.191763477356693,
+      "p_value": 0.11399822958541696
+    },
+    {
+      "term": "age",
+      "sum_sq": 831.9384082833592,
+      "df": 1,
+      "f_statistic": 212.05497944550945,
+      "p_value": 1.1453978378314278e-34
+    },
+    {
+      "term": "severity",
+      "sum_sq": 814.9736847310398,
+      "df": 1,
+      "f_statistic": 207.73079622669533,
+      "p_value": 3.6080265129480807e-34
+    },
+    {
+      "term": "Residual",
+      "sum_sq": 921.9567795946398,
+      "df": 235,
+      "f_statistic": null,
+      "p_value": null
+    }
+  ],
+  "diagnostics": {
+    "model_family": "ancova",
+    "aic": 1014.0967572951508,
+    "bic": 1031.4999519118608,
+    "df_resid": 235,
+    "residual_mean": 3.709033080667723e-13,
+    "residual_sd": 1.9640671442845092,
+    "shapiro_p_value": 0.7920537966485959,
+    "max_leverage": 0.05248887842411279,
+    "max_cooks_distance": 0.05358121655346542,
+    "vif": [
+      {
+        "term": "age",
+        "vif": 1.0625929394815323
+      },
+      {
+        "term": "severity",
+        "vif": 1.0772526852274302
+      },
+      {
+        "term": "group_enhanced",
+        "vif": 1.349749621234435
+      },
+      {
+        "term": "group_standard",
+        "vif": 1.3338671960019923
+      }
+    ],
+    "max_vif": 1.349749621234435,
+    "test": "ANCOVA"
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/stats-config.json",
+      "sha256": "103f0c5114361740d6d16bbea2ca133469df897f8b9613448f01f70a8b28ecc6"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/stats-summary.json",
+      "sha256": "06f3c4356e0d0c5207cfe50c11c15098a06c307dfedc48f3f9227c9e4ead6baa"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/estimates.csv",
+      "sha256": "d84f25c7d5f751cd94d4e22394d5494e9cdb66c6ae53679182f1bc73bc448b69"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/diagnostics.json",
+      "sha256": "045bca6152c6b9c201bbdabc946c058f57d663cc89aa97019238e9182e57102d"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/figures.json",
+      "sha256": "aa31ba77946e7cf25cbc66315130cefc333bd534d3f5234f24b0d56222b09aeb"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/anova-group-distribution.png",
+      "sha256": "fa536c2f5c58dc2fc315f0e9260c6462cbe7e21a191d7ba1b4e8b79856ff1393"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/stats-report.md",
+      "sha256": "f5c9859e67532847df17242698c8c30c7e3aa4d8ee5ef49f9ed878182908a2b2"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova/stats-qa.json",
+      "sha256": "d6d388431cb1d3e8cb24f90b9b6b5181ab81af5ea5effdd8d4cc4964e02bb9c8"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-ancova",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

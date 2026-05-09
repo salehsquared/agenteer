@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T16:23:04.955914+00:00",
+  "status": "pass",
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "SAVR_CPT_CODES_ABSENT",
+      "message": "Requested SAVR CPT codes were not observed in local HCPCS event data."
+    },
+    {
+      "severity": "warning",
+      "code": "MIXED_VALVE_STRATEGY",
+      "message": "Some index admissions contain both SAVR and TAVR-coded evidence."
+    }
+  ],
+  "readerFacingRequiredCaveats": [
+    "single-center same-hospital follow-up",
+    "approximate calendar-year groups",
+    "ICD-driven valve cohort because CPT codes were absent",
+    "dialysis modality misclassification risk"
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_986380283093849327",
+    "method": "missingness-ipw",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 218,
+    "variables": [
+      "missing_marker",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "missing_marker",
+        "observed_fraction": 0.9083333333333333,
+        "max_ipw": 1.1582608775868328
+      }
+    ],
+    "diagnostics": {
+      "test": "missingness-ipw",
+      "weights": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/missingness-ipw.csv"
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/stats-config.json",
+        "sha256": "84a93fc0476d92bad6ad8d18eaceec71aeecefdf66142a9c99057a54d701bab9"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/stats-summary.json",
+        "sha256": "ae99ea983f92911fd31ca41ce7376d32a2b5f292b90b1618e0a0e67ff93b515b"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/estimates.csv",
+        "sha256": "5f377c25dcaf4846c095251613c2345a46ff36275c420c0564821e08b35b31cb"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/diagnostics.json",
+        "sha256": "b70fa8cb45cccc9e7f71af5373741ce5542e8c2caef0f921af0ed3f72771989a"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/stats-report.md",
+        "sha256": "d177925a97860fe61b6674640c2bffb7ddfc8a63db28dbd0c470447be98038fe"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw/stats-qa.json",
+        "sha256": "ecb5bc71f3f327ee7e284e66959545a27e67eebae15307fc2c42ddb89656a1df"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-missing-ipw",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

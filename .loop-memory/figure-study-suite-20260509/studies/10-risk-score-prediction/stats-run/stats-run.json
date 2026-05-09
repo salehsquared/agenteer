@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_3089441686510759243",
+  "method": "prediction-evaluation",
+  "status": "succeeded",
+  "rowCount": 360,
+  "completeCaseN": 360,
+  "variables": [
+    "outcome_bin",
+    "risk_score"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "risk_score",
+      "auroc": 0.7179172951231775,
+      "brier_score": 0.21320706336111112,
+      "n": 360
+    }
+  ],
+  "diagnostics": {
+    "test": "prediction evaluation",
+    "roc_points": 152
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/stats-config.json",
+      "sha256": "e9199a8eabee98604a14f8e5cdab6db87062262d463e2d2c8db11230743ae053"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/stats-summary.json",
+      "sha256": "a0bba948d03c3803ed10fad3a68d5ac17228b978b6218419df19d72c427ea8a4"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/estimates.csv",
+      "sha256": "3e8e07de70601c585dee1386ab6028f5b2dab8807371944a26cc284182b06c85"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/diagnostics.json",
+      "sha256": "e6fa417320f033e0c6e45960e1fd7b879b44e57b628fac877884050ed8097979"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/figures.json",
+      "sha256": "2bcd235974e8052631035b17ea7bfbdaf9749a7b4e55153de007404d25286e90"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/roc-curve.png",
+      "sha256": "2940f98bd05763e62e6d604d6642435628777aa409e2eb97e91177aee0e04257"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/figure-qa.json",
+      "sha256": "390c73afa2a42eb3e5ad49d6a197fdcfb93d44ed6c5142403293ec294219fc4d"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/stats-report.md",
+      "sha256": "3342273d926fbe36a05aed4118952a42cd7636fe919d3621afb9c7539acd1509"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/stats-qa.json",
+      "sha256": "e947c936d346f3ab9d525e325cb27328618718f4ff1c13f038bb30c9f5715260"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

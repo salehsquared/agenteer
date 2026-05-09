@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_5608775374316526967",
+  "method": "aalen-johansen-cif",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "survival_time",
+    "competing_event",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "0",
+      "final_cumulative_incidence": 0.5729300198569098
+    },
+    {
+      "term": "1",
+      "final_cumulative_incidence": 0.885632760150764
+    }
+  ],
+  "diagnostics": {
+    "test": "Aalen-Johansen cumulative incidence",
+    "curve_path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/cumulative-incidence.csv",
+    "event_of_interest_code": 1
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/stats-config.json",
+      "sha256": "a6a5e8103e768a135234cc78c214f176e79e7e21a5f42d13609fe2fe5fd17058"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/stats-summary.json",
+      "sha256": "b1977177adbeb9fbd2ef54997377f3bfc3456ef74d456afa34c92516f671a7ff"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/estimates.csv",
+      "sha256": "3e6361e4977e74db8fe32882dc30c9a7189522998c87bec9bcbb803adbf14624"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/diagnostics.json",
+      "sha256": "702c472f7d682cb9245ff5a7198b316817ed45126d4b3a2857069705e496f5dd"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/figures.json",
+      "sha256": "20351c8279580fafcc9875e671901a35504571657fcdeaf319efe0a7f23c50db"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/cumulative-incidence.png",
+      "sha256": "db0a97216c669b8abee2615a9e27b38129810a723755a7a03a5ce37cda81acbd"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/stats-report.md",
+      "sha256": "990f2506c632ad6066c58c14aaa44d5a94eba0b50dc4b73a134e741332b4f410"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif/stats-qa.json",
+      "sha256": "5ae22e9b174d0d018be5e28a559f986ff9fec27e248b3ae19bc4b02e7004982b"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cif",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

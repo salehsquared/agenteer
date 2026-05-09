@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_8057139435702309346",
+    "method": "wilcoxon",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "paired_pre",
+      "paired_post"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "paired_post - paired_pre",
+        "n": 240,
+        "median_difference": -1.9065000000000012,
+        "statistic": 8929,
+        "p_value": 2.7892930817287556e-7
+      }
+    ],
+    "diagnostics": {
+      "test": "Wilcoxon signed-rank"
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/stats-config.json",
+        "sha256": "f9b1292d982b6762aef7e21c2cb0f613009c9b4e128c6af75771bdce8d882fd4"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/stats-summary.json",
+        "sha256": "1934653248d3027f0c1f853b52917d0ebf3054dcadfc5f804cbec0a63ee982e7"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/estimates.csv",
+        "sha256": "6939084fc3a2b48a65ebfbecdd8163376e1f1eb737ba2899be2bb5d9ef3f9fcf"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/diagnostics.json",
+        "sha256": "0f91658ece0f4414b68fa466c2b51c5ad1c92d8cbe51f9380ec783e0128faed4"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/stats-report.md",
+        "sha256": "2301015b32b920cda08df01d7baaa6fd89c5e3af6767ed3a81edccaf0fcfff2e"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon/stats-qa.json",
+        "sha256": "55cd738ab13b0bdfb042911870311ed02773a5fc2576149267c1e196440631be"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-wilcoxon",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5115750104090240381",
+    "method": "time-varying-cox",
+    "status": "failed",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "survival_time",
+      "event",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "time-varying-cox",
+        "status": "blocked",
+        "reason": "backend_not_available"
+      }
+    ],
+    "diagnostics": {
+      "test": "time-varying-cox",
+      "required_backend": "R survival/cmprsk or equivalent validated survival backend"
+    },
+    "issues": [
+      {
+        "severity": "blocker",
+        "code": "METHOD_BACKEND_NOT_AVAILABLE",
+        "message": "time-varying-cox requires a dedicated survival/competing-risk backend that is not available in the local runtime.",
+        "evidenceRefs": [
+          "r-survival/cmprsk or lifelines/scikit-survival"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/stats-config.json",
+        "sha256": "8440926d541ee6bafd4945bb64e1c9deea319ead345670daaeb0b9d4096147e8"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/stats-summary.json",
+        "sha256": "1d726169bd14d7977b7bbb75f9b17219389499fb9e7245fdf6e280ec043f6c29"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/estimates.csv",
+        "sha256": "2817913e5561c861bdf692c5d142b14e64e9b8773c5c5c502d33100de8df916a"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/diagnostics.json",
+        "sha256": "026c18e14d347426e490e3043d855d2ce0d15db3182ec55796083db306a0e534"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/stats-report.md",
+        "sha256": "b95aef2872727368352a76279d1e985e5c7b32b3b403445d9d0a813be517df67"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block/stats-qa.json",
+        "sha256": "ff473f115a7452499dd36e90376e159b4a8b19f4fa8bb8b6939f05fd3c80062f"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-time-varying-block",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "failed",
+      "label": "Failed execution",
+      "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+      "supports": [
+        "failure attribution",
+        "repair planning"
+      ],
+      "cannotSupport": [
+        "effect estimates",
+        "confidence intervals",
+        "p-values",
+        "paper-ready inference"
+      ],
+      "nextAction": "Resolve blocker issues and rerun the stats method."
+    }
+  }
+}

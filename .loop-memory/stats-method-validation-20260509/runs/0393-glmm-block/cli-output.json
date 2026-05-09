@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4173490542602106366",
+    "method": "generalized-mixed-model",
+    "status": "failed",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_binary",
+      "treatment",
+      "id",
+      "age"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "generalized-mixed-model",
+        "status": "blocked",
+        "reason": "backend_not_available"
+      }
+    ],
+    "diagnostics": {
+      "test": "generalized-mixed-model"
+    },
+    "issues": [
+      {
+        "severity": "blocker",
+        "code": "GLMM_BACKEND_NOT_AVAILABLE",
+        "message": "Generalized mixed models require a validated GLMM backend; use GEE for population-average binary/continuous repeated measures in this runtime.",
+        "evidenceRefs": [
+          "method"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/stats-config.json",
+        "sha256": "6ed25bf313145aad8ed2c88634285f6ac28843a4f7347eb25462042569b891ef"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/stats-summary.json",
+        "sha256": "5d4e726d39ddb09b51cc07bb64eec2057108c07f9330979ede7564c512754475"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/estimates.csv",
+        "sha256": "5671250405a77aae7b6ba6d410238127a00c60f56f5e16a68a518e9709d0d72d"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/diagnostics.json",
+        "sha256": "120a8c28f5020073296f2e8622621147783896792133d8ec716014123f28e58e"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/stats-report.md",
+        "sha256": "0eaceea5a055f42130b2653fd96f6aaac41ccf2faa22ad556a35ebda8b82a26c"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block/stats-qa.json",
+        "sha256": "ff473f115a7452499dd36e90376e159b4a8b19f4fa8bb8b6939f05fd3c80062f"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-glmm-block",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "failed",
+      "label": "Failed execution",
+      "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+      "supports": [
+        "failure attribution",
+        "repair planning"
+      ],
+      "cannotSupport": [
+        "effect estimates",
+        "confidence intervals",
+        "p-values",
+        "paper-ready inference"
+      ],
+      "nextAction": "Resolve blocker issues and rerun the stats method."
+    }
+  }
+}

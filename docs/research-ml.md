@@ -89,7 +89,7 @@ Use `research analysis-manifest --run-dir <dir>` after `stats-run` or `ml-run` t
 The same manifest command also accepts an `ml-compare` directory containing `comparison.json` and `model-review-card.md`; `--require-ready` then requires `baseline_comparison_ready` plus the review-card artifact.
 Use `research analysis-benchmark --run-dir <dir> --run-dir <dir> --require-ready --out benchmark.json --report benchmark.md` to check multiple stats, ML, or ML-comparison directories through the same manifest readiness gate. The benchmark reports route coverage across `stats`, `ml`, and `ml-comparison`, per-route readiness, artifact completeness, interpretation-boundary checks, and an explicit narrow-versus-multi-route coverage posture. Add `--require-multi-route` in promotion scripts when a single passing route should not count as benchmark maturity. This is the preferred gate for golden stats/ML route promotion.
 
-For standard-table statistics, `research analysis-run` composes the golden route in one bounded command while preserving intermediate artifacts: initial `modeling-plan.json`, `stats-run/`, `analysis-run-manifest.json`, and `modeling-plan-after-prior.json`. It accepts `--method-selection` and `--analysis-spec` and can enforce `--require-bound` so benchmark or paper-like runs fail unless execution is tied to upstream method/spec evidence. It also accepts `--literature <literature-search.json>` to copy MedBrevia search evidence into the run and produce `literature-qa.json` / `literature-qa.md` against the generated reader-facing paper when one exists. It is intentionally limited to the stats route for now; survey-aware paper generation remains under `paper-run`.
+For standard-table statistics, `research analysis-run` composes the golden route in one bounded command while preserving intermediate artifacts: initial `modeling-plan.json`, `stats-run/`, `feasibility-trial.json`, `analysis-run-manifest.json`, and `modeling-plan-after-prior.json`. It accepts `--method-selection` and `--analysis-spec` and can enforce `--require-bound` so benchmark or paper-like runs fail unless execution is tied to upstream method/spec evidence. The feasibility trial records requested versus observed variables, complete-case fraction, typed blocker codes, and semantic plausibility issue codes so a user-suggested or agent-suggested idea is explicitly marked feasible, needs methods review, or blocked before promotion. It also accepts `--literature <literature-search.json>` to copy MedBrevia search evidence into the run and produce `literature-qa.json` / `literature-qa.md` against the generated reader-facing paper when one exists. It is intentionally limited to the stats route for now; survey-aware paper generation remains under `paper-run`.
 For `diagnostic-accuracy`, `analysis-run` also writes a concise `paper.md` and `paper-qa.json` at the analysis-run root. This diagnostic paper wrapper consumes the stats-run estimates, thresholds, intervals, QA posture, and manifest readiness; it is intended for local review and does not replace a full survey-aware or externally validated diagnostic paper workflow.
 
 When `--table` or `--table-summary` is supplied, the planner derives row count, feature count, target class count, maximum missingness, small-sample status, and high-dimensional status. These evidence fields affect ranking: small or high-missingness tables downgrade high-capacity ML, and high missingness emits a blocking policy for diagnostics/sensitivity before interpretation.
@@ -164,12 +164,15 @@ Use the trust layer after `stats-run`, `ml-run`, `analysis-run`, `paper-run`, or
 ```bash
 agenteer research method-qa --run-dir ./run --out ./run/method-qa.json --report ./run/method-qa.md
 agenteer research manuscript --run-dir ./run
+agenteer research study-critic --run-dir ./run --stage final --panel default --autonomy aggressive
 agenteer research run-inspect --run-dir ./run --out ./run/run-inspection.json --report ./run/run-inspection.md
 ```
 
-`method-qa` is intentionally methods-aware rather than only artifact-aware. It checks numerical stability, separation, sparse or overfit models, missingness, regression diagnostics, effect-size consistency, claims, semantic plausibility, survey design, and artifact completeness.
+`method-qa` is intentionally methods-aware rather than only artifact-aware. It checks numerical stability, separation, sparse or overfit models, missingness, regression diagnostics, effect-size consistency, claims, semantic plausibility, survey design, and artifact completeness. It also reads `feasibility-trial.json` when present, so a blocked feasibility trial or semantic plausibility issue is visible during later run inspection instead of remaining a one-off preflight artifact.
 
 `run-inspect` is the preferred single status command for a run. It summarizes readiness, blockers, cost, provenance, paper/manuscript paths, QA, lifecycle state, rerun stability, and next action.
+
+`study-critic` is the true external-review gate. It builds a cold review packet from the run directory, sends it to configured reviewers, writes `review-panel.json`, adjudicates accepted/rejected findings into `review-adjudication.json`, and writes `review-response.json` plus `state-reentry.json`. The default panel is Anthropic Opus 4.7 plus DeepSeek v4 Pro for a different perspective from the main runner; `--panel strict` adds OpenAI GPT-5.4 and Gemini 3.1 Pro. Reviewer failures such as exhausted API credit are recorded as unavailable reviewer results rather than crashing the whole panel. The default autonomy is aggressive, with `--autonomy balanced` and `--autonomy conservative` available when reviewer feedback should require more human approval.
 
 For regression pressure over the whole research machine, use:
 
@@ -200,17 +203,79 @@ Dimensionality reduction adapters include PCA, truncated SVD, NMF, and t-SNE. UM
 
 - `descriptive`
 - `t-test`
+- `welch-t-test`
+- `paired-t-test`
+- `anova`
+- `ancova`
 - `mann-whitney`
+- `wilcoxon`
+- `kruskal-wallis`
+- `friedman`
 - `chi-square`
 - `fisher-exact`
+- `mcnemar`
+- `cochran-armitage-trend`
 - `pearson`
 - `spearman`
+- `kendall`
+- `partial-correlation`
 - `linear-regression`
+- `robust-linear-regression`
 - `logistic-regression`
+- `ordinal-logistic-regression`
+- `multinomial-logistic-regression`
 - `poisson-regression`
+- `negative-binomial-regression`
+- `zero-inflated-poisson`
+- `zero-inflated-negative-binomial`
+- `gamma-glm`
+- `inverse-gaussian-glm`
+- `quantile-regression`
+- `penalized-linear-regression`
+- `penalized-logistic-regression`
+- `kaplan-meier`
+- `log-rank`
+- `cox-proportional-hazards`
+- `stratified-cox`
+- `aalen-johansen-cif`
+- `recurrent-event-rate`
+- `linear-mixed-model`
+- `gee`
+- `repeated-measures-anova`
+- `overlap-weighting`
+- `entropy-balancing`
+- `doubly-robust-aipw`
+- `difference-in-differences`
+- `event-study-did`
+- `interrupted-time-series`
+- `regression-discontinuity`
+- `instrumental-variables-2sls`
+- `target-trial-emulation-spec`
+- `unmeasured-confounding-sensitivity`
+- `prediction-evaluation`
+- `missingness-summary`
+- `multiple-imputation-mice`
+- `missingness-ipw`
+- `complete-case-sensitivity`
+- `mnar-sensitivity`
+- `model-diagnostics`
+- `reliability-kappa`
+- `intraclass-correlation`
+- `cronbach-alpha`
+- `pca`
+- `clustering-validation`
+- `bland-altman`
+- `multiple-comparison-correction`
+- `power-sample-size`
 - `diagnostic-accuracy`
 - `propensity-score-matching`
 - `propensity-score-weighting`
+
+Methods that need a validated backend not present in the local runtime are registered but blocked rather than silently approximated:
+
+- `fine-gray`
+- `time-varying-cox`
+- `generalized-mixed-model`
 
 Example:
 
@@ -226,7 +291,20 @@ agenteer research stats-run \
   --json
 ```
 
-Each run writes `stats-run.json`, `stats-summary.json`, `estimates.csv`, `diagnostics.json`, `stats-report.md`, and `stats-qa.json` with artifact hashes. The run also declares a typed `resultPosture` such as `exploratory_standard_table`, `bound_standard_table`, `exploratory_survey_approximation`, `blocked_survey_required`, or `invalid_binding`. The report includes the posture, interpretation boundary, local-review safety header, and p-value/effect-size interpretation cautions. This runner is for standard table methods and does not replace survey-aware `paper-run --backend r-survey` when complex survey variance is required.
+Each run writes `stats-run.json`, `stats-summary.json`, `estimates.csv`, `diagnostics.json`, `figures.json`, `stats-report.md`, and `stats-qa.json` with artifact hashes. Methods with natural visual checks also write PNG figures such as histograms, missingness bars, group boxplots, contingency heatmaps, scatterplots, residual plots, Kaplan-Meier curves, cumulative-incidence curves, PCA scree plots, Bland-Altman plots, and ROC curves. The figure manifest records title, caption, source columns, format, and figure QA so visual artifacts can be audited like tables. Standard-table execution also performs generic semantic plausibility checks for common clinical/data variables such as age, BMI, HbA1c, blood pressure, binary outcomes, counts, and length of stay; impossible values block execution and implausible aggregate means force methods review.
+
+The run declares a typed `resultPosture` such as `exploratory_standard_table`, `bound_standard_table`, `exploratory_survey_approximation`, `blocked_survey_required`, or `invalid_binding`. The report includes the posture, interpretation boundary, local-review safety header, and p-value/effect-size interpretation cautions. This runner is for standard table methods and does not replace survey-aware `paper-run --backend r-survey` when complex survey variance is required.
+
+Additional argument conventions:
+
+- Survival methods use `--time`, `--event`, optional `--group`, optional `--strata`, and repeated `--covariate`.
+- Repeated/clustered methods use `--cluster` or `--id`.
+- Difference-in-differences and interrupted time series use `--post` or `--period`.
+- Regression discontinuity uses `--running-variable` and `--cutoff`.
+- Instrumental variables use `--instrument`.
+- Penalized models use `--alpha-penalty` and `--l1-ratio`.
+
+The runner is intentionally conservative. Successful execution does not mean publication readiness. Fine-Gray, time-varying Cox, and GLMM routes currently fail with explicit backend blockers because the local runtime lacks a validated competing-risk/GLMM backend. Penalized models run, but their QA warns that shrinkage coefficients are not classical inference and need bootstrap or post-selection methods before inferential claims.
 `diagnostic-accuracy` expects a binary reference outcome in `--outcome` and a binary test/screen indicator in `--exposure` or `--group`. If the reference or index-test columns are continuous, pass `--outcome-threshold <n>` and/or `--exposure-threshold <n>` to derive positive indicators using `>= threshold`. It reports a confusion matrix, sensitivity, specificity, PPV, NPV, likelihood ratios, accuracy, prevalence, and Wilson intervals for sensitivity/specificity/PPV/NPV. Treat PPV/NPV as prevalence-dependent and local to the analyzed table unless external validation is supplied.
 Diagnostic accuracy planning follows the STARD framing: keep the reference standard and index test explicit, preserve participant/sampling context, and do not promote screening recommendations from local accuracy estimates alone. STARD-AI adds additional dataset-practice, algorithmic-bias, and fairness disclosure pressure for AI-centered diagnostic tests; Agenteer's current diagnostic route is a classical standard-table route, not a deployment-ready AI diagnostic workflow.
 

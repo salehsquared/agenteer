@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4904196806470215656",
+    "method": "chi-square",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_binary",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "treatment",
+        "chi_square": 11.172924297924299,
+        "degrees_of_freedom": 1,
+        "p_value": 0.0008299970166527486,
+        "cramers_v": 0.21576341497425194
+      }
+    ],
+    "diagnostics": {
+      "test": "Chi-square independence",
+      "table": {
+        "0": {
+          "0": 75,
+          "1": 81
+        },
+        "1": {
+          "0": 21,
+          "1": 63
+        }
+      },
+      "min_expected": 33.6
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/stats-config.json",
+        "sha256": "a6de5c322f84c817d1ddbb3cae04683d0cd4cccd100687275c4206bc437fcbd9"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/stats-summary.json",
+        "sha256": "6a9d6133e80a123cc0bf65864f61472bb389c88c86b65eaecb433886cf81c927"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/estimates.csv",
+        "sha256": "a680ba05f93cbf9c23a2dd7d43139ea12f62fee04c15cc344220d1c4838e4d8a"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/diagnostics.json",
+        "sha256": "34718d3f3ea024bd2f1339def45a77b9014f9385892ef3284aa1a9be219483c5"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/figures.json",
+        "sha256": "4156aca55148658be78a7bd69e110668b2557d5920481fa9416e3dd657e09687"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/contingency-heatmap.png",
+        "sha256": "da15edb73bbf5d6fdebd2d6873d412ac03e303d8d3b8732fa888e1751dbf97a1"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/stats-report.md",
+        "sha256": "a08d7cf691165489ee9512fd3ba7f59b32ffa33fc4aa6e64fe3cc7a15c789448"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square/stats-qa.json",
+        "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-chi-square",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

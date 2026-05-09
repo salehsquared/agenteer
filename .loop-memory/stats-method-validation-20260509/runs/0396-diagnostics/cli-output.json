@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_3199896057517978778",
+    "method": "model-diagnostics",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "diagnostics-request",
+        "status": "review_artifacts"
+      }
+    ],
+    "diagnostics": {
+      "required_diagnostics": [
+        "residuals",
+        "VIF/collinearity",
+        "Cook distance",
+        "leverage",
+        "convergence",
+        "overdispersion",
+        "sparse cells/events per variable",
+        "effect-size/CI/p-value consistency"
+      ]
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/stats-config.json",
+        "sha256": "ecb66f4101b9990339f92c35c6dcf93dc7fa51ffce2bb0f148401cf95b3bacf6"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/stats-summary.json",
+        "sha256": "664ac25750af81e487a48c97251e9c4313e3779769e518d96db750e7b9dfc1eb"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/estimates.csv",
+        "sha256": "6a5ba40ee6750951708e8dab3d3b8235847d02b59d9bb33b7c31e2a092ca59e9"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/diagnostics.json",
+        "sha256": "7a6001c28b728b4dfbc362d710081b1c4ae5dfc3639bcf9ba6d15051f45e52b0"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/stats-report.md",
+        "sha256": "f482436266ed415181a0f1ce734722927681bd631cd647a57b6c33376783f405"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics/stats-qa.json",
+        "sha256": "ecb5bc71f3f327ee7e284e66959545a27e67eebae15307fc2c42ddb89656a1df"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-diagnostics",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

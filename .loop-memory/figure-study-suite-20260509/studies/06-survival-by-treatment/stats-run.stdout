@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1563166676077854423",
+    "method": "kaplan-meier",
+    "status": "succeeded",
+    "rowCount": 360,
+    "completeCaseN": 360,
+    "variables": [
+      "time",
+      "event",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "0",
+        "time": 1252,
+        "survival": 0.4128577025395899
+      },
+      {
+        "term": "1",
+        "time": 851,
+        "survival": 0.2816902284943026
+      }
+    ],
+    "diagnostics": {
+      "test": "Kaplan-Meier",
+      "curve_path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/kaplan-meier-curve.csv",
+      "groups": [
+        0,
+        1
+      ]
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/stats-config.json",
+        "sha256": "bf3f943af3c26ceaee4b2a1d0837f277da600d154361aa46094e28390b7a325c"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/stats-summary.json",
+        "sha256": "cc08ccd589e0d8f5005479d99af2739dee28ba76dde56c4958c37fe855b22b1e"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/estimates.csv",
+        "sha256": "9fae84008853af6a0081dbea4735cd6360d2219e7b87efce0918931d9c2f9e36"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/diagnostics.json",
+        "sha256": "46cea5c0fa19770dad9768bfda65e23e9cf5369255edcb8e1a4dceddf16550e6"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/figures.json",
+        "sha256": "fd16ce5c1c2a11af6dc0dd32f3a4c4db201e3618bc6898ede6d880083fe091a1"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/kaplan-meier.png",
+        "sha256": "98c366e62ca970afe087138fa2e06344216c5e59830a45932aad567e64cc1781"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/figure-qa.json",
+        "sha256": "86183adae13aad2e291fd7444e990cdc082102582fb50fe4b7b613041b1cb73d"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/stats-report.md",
+        "sha256": "4ed95b463ac2ca7ad9f681369731ba5ee13162906bf81445f0c98be3343f05aa"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/stats-qa.json",
+        "sha256": "d54c7471d88d1bb067edc3034bf19ff0d67f4741ec3774568312eddb989ea118"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

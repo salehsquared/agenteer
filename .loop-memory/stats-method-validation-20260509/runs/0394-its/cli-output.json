@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1934035113343701835",
+    "method": "interrupted-time-series",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "patient_id",
+      "post"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": 21.29457198879556,
+        "std_error": 0.7489131645461646,
+        "ci_low": 19.82672915873716,
+        "ci_high": 22.762414818853962,
+        "p_value": 7.69296501759707e-178
+      },
+      {
+        "term": "_time",
+        "estimate": 0.004790270157649974,
+        "std_error": 0.010738088593086085,
+        "ci_low": -0.01625599674759913,
+        "ci_high": 0.02583653706289908,
+        "p_value": 0.6555244184297075
+      },
+      {
+        "term": "_post",
+        "estimate": 4.358743086325499,
+        "std_error": 1.97935267939384,
+        "ci_low": 0.4792831220107163,
+        "ci_high": 8.238203050640282,
+        "p_value": 0.027657869039577995
+      },
+      {
+        "term": "_time_after",
+        "estimate": -0.020126595596917415,
+        "std_error": 0.014401836522808754,
+        "ci_low": -0.04835367649285614,
+        "ci_high": 0.008100485299021309,
+        "p_value": 0.16226266038091808
+      }
+    ],
+    "diagnostics": {
+      "model_family": "interrupted-time-series",
+      "aic": 1294.6742058092445,
+      "bic": 1308.5967615026125,
+      "df_resid": 236,
+      "residual_mean": -2.1538326677728035e-15,
+      "residual_sd": 3.5385619457689885,
+      "shapiro_p_value": 0.23987336568779116,
+      "max_leverage": 0.03292011019283882,
+      "max_cooks_distance": 0.04313901470327204,
+      "vif": [
+        {
+          "term": "_time",
+          "vif": 8.00041669560386
+        },
+        {
+          "term": "_post",
+          "vif": 16.101257031738303
+        },
+        {
+          "term": "_time_after",
+          "vif": 29.15209389540945
+        }
+      ],
+      "max_vif": 29.15209389540945
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/stats-config.json",
+        "sha256": "3029685467894197a1ecd5a757fe460081fad7f0b89e7582b43758ff1b836bc2"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/stats-summary.json",
+        "sha256": "eca77a5a0b84ed2b2267af50cfdf07ffbda1be006290f9ae93d7a227a982fe3b"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/estimates.csv",
+        "sha256": "417958c9c51ae5aa16b1ae7bc596621b5a268a831f3a162561d1f83daf493529"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/diagnostics.json",
+        "sha256": "fe9b9834c36d2730320e773272eb2df4a85011aa44d6b8c160545acf6e5b1365"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/stats-report.md",
+        "sha256": "19b490de90cf65534f0b2f6911a31e6b02217c6a03ef59de5a3c9469aa07deab"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its/stats-qa.json",
+        "sha256": "1e82ba95da570f4beca2eab995e4308c50d7d9682963499d21f42d7865a3d3c2"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-its",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

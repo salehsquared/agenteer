@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5866818635782451430",
+    "method": "ordinal-logistic-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "group",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "treatment",
+        "estimate": -0.200501627008468,
+        "std_error": 0.25840407998476084,
+        "p_value": 0.4377945473137217,
+        "ci_low": -0.7069643172368066,
+        "ci_high": 0.3059610632198707,
+        "odds_ratio": 0.8183201586108215,
+        "or_ci_low": 0.49313894091240257,
+        "or_ci_high": 1.3579294321187896
+      },
+      {
+        "term": "age",
+        "estimate": 0.0034769700064439368,
+        "std_error": 0.008644322519110856,
+        "p_value": 0.6875178167027244,
+        "ci_low": -0.013465590801761894,
+        "ci_high": 0.02041953081464977,
+        "odds_ratio": 1.0034830216784514,
+        "or_ci_low": 0.9866246646973352,
+        "or_ci_high": 1.0206294357194323
+      },
+      {
+        "term": "severity",
+        "estimate": 0.03838268315578904,
+        "std_error": 0.14767970259862662,
+        "p_value": 0.7949371063041768,
+        "ci_low": -0.25106421518510535,
+        "ci_high": 0.3278295814966834,
+        "odds_ratio": 1.039128813893639,
+        "or_ci_low": 0.7779724123124399,
+        "or_ci_high": 1.387952419359505
+      },
+      {
+        "term": "0/1",
+        "estimate": -0.4882444939115187,
+        "std_error": 0.6090843872696511,
+        "p_value": 0.42278205096526345,
+        "ci_low": -1.6820279565056815,
+        "ci_high": 0.7055389686826441,
+        "odds_ratio": 0.61370280809852,
+        "or_ci_low": 0.18599640070479082,
+        "or_ci_high": 2.024937768907631
+      },
+      {
+        "term": "1/2",
+        "estimate": 0.32899614717576187,
+        "std_error": 0.09881074361407399,
+        "p_value": 0.0008698380241320073,
+        "ci_low": 0.1353306484065557,
+        "ci_high": 0.522661645944968,
+        "odds_ratio": 1.3895725017986815,
+        "or_ci_low": 1.1449152861873708,
+        "or_ci_high": 1.6865105751055924
+      }
+    ],
+    "diagnostics": {
+      "outcome_levels": [
+        "control",
+        "enhanced",
+        "standard"
+      ],
+      "model_family": "ordinal-logistic-regression",
+      "diagnostic_error": "'OrderedResults' object has no attribute 'fittedvalues'",
+      "vif": [
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "severity",
+          "vif": 1.146630084030013
+        }
+      ],
+      "max_vif": 1.146630084030013,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/stats-config.json",
+        "sha256": "ee0ae5cb00b03fe14678f4c60fc2b7de891b110c1755fb8b2a1ebb0cfd8dd00c"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/stats-summary.json",
+        "sha256": "c155ad4ee69ed4cbe124f21a1607101bbbc7f0fabf855357b1479b80dd3a0ad3"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/estimates.csv",
+        "sha256": "d0adb17b26f2791d53bd9733e5f6148bede037fff07248a4f0364441b4a0871f"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/diagnostics.json",
+        "sha256": "1eccf5859337ab72773180ede8e0f363e39d26b25deb9fc8291bf534cb28e9a1"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/stats-report.md",
+        "sha256": "28859a397dc9d47b0ada65bbb243805e249a4b63cb3b813444dc8a8ecbe206e1"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal/stats-qa.json",
+        "sha256": "0c5dd6d8afdf3db7348ba3e49ebeaf1b96783e7cf8ae8aeb7654dc39f67744b3"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-ordinal",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_6322288960605922258",
+  "method": "fine-gray",
+  "status": "failed",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "survival_time",
+    "competing_event",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "fine-gray",
+      "status": "blocked",
+      "reason": "backend_not_available"
+    }
+  ],
+  "diagnostics": {
+    "test": "fine-gray",
+    "required_backend": "R survival/cmprsk or equivalent validated survival backend"
+  },
+  "issues": [
+    {
+      "severity": "blocker",
+      "code": "METHOD_BACKEND_NOT_AVAILABLE",
+      "message": "fine-gray requires a dedicated survival/competing-risk backend that is not available in the local runtime.",
+      "evidenceRefs": [
+        "r-survival/cmprsk or lifelines/scikit-survival"
+      ]
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/stats-config.json",
+      "sha256": "4eb6cef5a34e3dbf3c4141b3b7314e737d957ca99912c1eb1e3ffa1932b6564a"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/stats-summary.json",
+      "sha256": "d29cd3530eae5a2264586633c1cba3e6a0e3cd05ff6de0a44d94dd8b78a6a830"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/estimates.csv",
+      "sha256": "47f43557909d0d1c9e03c4bf26c4222110b470875fbfddb664fa069b0605ad2b"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/diagnostics.json",
+      "sha256": "cdcce18e325d1d68dc32f7f13ab1dc019aab14c37c2dfcb82da8a20379db9464"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/stats-report.md",
+      "sha256": "c2637d237ccf620ea4d466871f8a121837fbc8f439c398dcfc655e68c59cfa79"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block/stats-qa.json",
+      "sha256": "ff473f115a7452499dd36e90376e159b4a8b19f4fa8bb8b6939f05fd3c80062f"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-fine-gray-block",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "failed",
+    "label": "Failed execution",
+    "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+    "supports": [
+      "failure attribution",
+      "repair planning"
+    ],
+    "cannotSupport": [
+      "effect estimates",
+      "confidence intervals",
+      "p-values",
+      "paper-ready inference"
+    ],
+    "nextAction": "Resolve blocker issues and rerun the stats method."
+  }
+}

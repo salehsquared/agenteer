@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5427067861281793357",
+    "method": "penalized-logistic-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_binary",
+      "treatment",
+      "age",
+      "severity",
+      "albumin"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "intercept",
+        "estimate": -0.43767569515856025,
+        "odds_ratio": 0.6455350990722775,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "No classical inference reported."
+      },
+      {
+        "term": "treatment",
+        "estimate": 0.3478616720347115,
+        "odds_ratio": 1.4160363587634535,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized logistic coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      },
+      {
+        "term": "age",
+        "estimate": 0.033978805384611045,
+        "odds_ratio": 1.034562679337663,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized logistic coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      },
+      {
+        "term": "severity",
+        "estimate": 0.6684049284424092,
+        "odds_ratio": 1.9511226569850855,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized logistic coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      },
+      {
+        "term": "albumin",
+        "estimate": -1.264965811598642,
+        "odds_ratio": 0.28224894561580793,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized logistic coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      }
+    ],
+    "diagnostics": {
+      "model_family": "penalized-logistic-regression",
+      "alpha_penalty": 0.1,
+      "l1_ratio": 0.5,
+      "accuracy_in_sample": 0.7083333333333334,
+      "outcome_levels": [
+        0,
+        1
+      ],
+      "nonzero_coefficients": 4
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "PENALIZED_INFERENCE_CAVEAT",
+        "message": "Penalized logistic coefficients are shrinkage estimates; bootstrap or post-selection inference is required for classical inference.",
+        "evidenceRefs": [
+          "diagnostics"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/stats-config.json",
+        "sha256": "b656b7d952fa1bdbb826208080aa61fd4af2f0fa37580139c85a9cdd8e37f0b5"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/stats-summary.json",
+        "sha256": "8b372dffe7067dd5ff5758f48cc234a49772f2c5d70bb2c7bae6a61a9b941b2f"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/estimates.csv",
+        "sha256": "f707312c4e5c4a7924b9478e2fb921c406eee937037e2cebd2435027f63009bf"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/diagnostics.json",
+        "sha256": "b1949804fbfa0ee8fb2069df7cdd9266d09981f59e751dc3781da2eacd92d64d"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/stats-report.md",
+        "sha256": "605127938b2034c73a40c17cee8292e5d377fe63fc6c57d93f81953e96b1cf7e"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic/stats-qa.json",
+        "sha256": "0c5dd6d8afdf3db7348ba3e49ebeaf1b96783e7cf8ae8aeb7654dc39f67744b3"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-logistic",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

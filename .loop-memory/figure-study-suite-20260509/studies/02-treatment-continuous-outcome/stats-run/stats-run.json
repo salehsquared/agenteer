@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_4332478008891640464",
+  "method": "welch-t-test",
+  "status": "succeeded",
+  "rowCount": 360,
+  "completeCaseN": 360,
+  "variables": [
+    "outcome_cont",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "group_a": 1,
+      "group_b": 0,
+      "n_a": 144,
+      "n_b": 216,
+      "mean_a": 37.35120972222222,
+      "mean_b": 36.8581537037037,
+      "mean_difference": -0.4930560185185229,
+      "cohen_d": -0.10123206174676652,
+      "statistic": -0.9433403127301444,
+      "p_value": 0.3462432970884973
+    }
+  ],
+  "diagnostics": {
+    "test": "two-sample t-test",
+    "equal_variance_assumed": false,
+    "levene_p_value": 0.6866949681435065
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/stats-config.json",
+      "sha256": "1e737c3f09d20474cc2024a1d1545b92547dad03bf98a304771979ea452c6f1d"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/stats-summary.json",
+      "sha256": "0365290d1251683ad02e2e8a704e2a42cad1ba5a7d240828931d7314b541a859"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/estimates.csv",
+      "sha256": "3d1a2d319caeb7b3b95052aabde0187608a036e1b5da579c5e7447a54f175d0c"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/diagnostics.json",
+      "sha256": "d3ae8e8e0e859e9b5713e152254ce43e05b20f68814f195699586c59781bf5d0"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/figures.json",
+      "sha256": "e0708263e67e10605a0ea78efaf264c8495d4b4c9593f47a951ee0f62f13dd54"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/group-distribution.png",
+      "sha256": "66ac67747002f80d3f753bdceee552814096af02dd3b2edc383274842af2fb3f"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/figure-qa.json",
+      "sha256": "3ddb8108749be14f7d0f8492e6262cf3c9cbd585200b5091a5881301ba06a698"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/stats-report.md",
+      "sha256": "560592de8ef551a2f8ac78f71c0aa8fded106ac7152e39fa3cdee11efe0e8881"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/stats-qa.json",
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

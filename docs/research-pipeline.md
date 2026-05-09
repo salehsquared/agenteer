@@ -170,7 +170,7 @@ agenteer research modeling-plan \
   --json
 ```
 
-`literature-context` does not replace dataset evidence or AnalysisSpec validation. It turns retrieved sources into auditable planning signals: evidence strength, source sufficiency, design signals such as diagnostic accuracy or prediction validation, method signals such as propensity, survival, survey design, missing data, calibration, and follow-up searches. `modeling-plan --literature` consumes either a raw search packet or a context packet and carries literature warnings into route selection. `analysis-run --literature` persists the search, context, and post-report literature QA into the packet so later inspection can see whether the paper actually used the evidence.
+`literature-context` does not replace dataset evidence or AnalysisSpec validation. It turns retrieved sources into auditable planning signals: evidence strength, source sufficiency, design signals such as diagnostic accuracy or prediction validation, method signals such as propensity, survival, survey design, missing data, calibration, and follow-up searches. `modeling-plan --literature` consumes either a raw search packet or a context packet and carries literature warnings into route selection. `analysis-run --literature` persists the search, context, and post-report literature QA into the packet so later inspection can see whether the paper actually used the evidence. Every `analysis-run` also writes `feasibility-trial.json`, which is the standard artifact for trialing whether a proposed idea is practically analyzable against the supplied data before it becomes a paper or benchmark case.
 
 Authentication is intentionally explicit. Agenteer supports `--bearer-token`, `--cookie`, or `--auth-secret` for a locally signed mobile JWT. It also sends a local dev API-key header by default (`x-agenteer-api-key`) using `agenteer-local-literature-dev-key-2026`. The matching MedBrevia local patch accepts that key only when `NODE_ENV` is not `production` and the request host is `localhost`, `127.0.0.1`, or `[::1]`; set `MEDBREVIA_AGENT_API_KEY` in MedBrevia if you want to override the default local key.
 
@@ -236,6 +236,12 @@ agenteer research method-qa \
 agenteer research manuscript \
   --run-dir ./papers/my-paper
 
+agenteer research study-critic \
+  --run-dir ./papers/my-paper \
+  --stage final \
+  --panel default \
+  --autonomy aggressive
+
 agenteer research run-inspect \
   --run-dir ./papers/my-paper \
   --out ./papers/my-paper/run-inspection.json \
@@ -247,6 +253,8 @@ agenteer research run-inspect \
 `manuscript` writes a publication-style, reader-facing report with abstract, study design, cohort construction, variables, statistical analysis, results, limitations, interpretation boundaries, and reproducibility. It writes `manuscript-qa.json` and keeps internal framework terms out of reader-facing prose.
 
 `run-inspect` is the one-command status view. It reports readiness, blockers, warnings, cost, data/provenance paths, QA state, literature evidence state, lifecycle state, rerun stability, paper/manuscript paths, artifact hash, and the next recommended action. Literature QA failures block readiness; literature warnings downgrade readiness to methods review. This is the command to run before deciding whether a packet is ready for human scientific review or benchmark promotion.
+
+`study-critic` adds true cold external review. It can call Anthropic, DeepSeek, OpenAI, Gemini, xAI, or a mock reviewer, then writes reviewer panel, adjudication, response, and state-reentry artifacts. Accepted reviewer findings are actionable and explicitly route the run back to protocol, AnalysisSpec, feasibility, method selection, execution, QA, manuscript, literature, human review, or promotion.
 
 Check local analysis runtime readiness before broadening a study:
 
@@ -346,9 +354,9 @@ agenteer research dataset-run-index \
   --report ./runs/dataset-run-index.md
 ```
 
-`dataset-spec` converts a study artifact into a strict `AnalysisSpecV2`. For diagnosis-code cohorts it records the ICD family, expected dictionary terms, coding verification references, phenotype tables, join keys, missingness policy, sensitivity analyses, artifact expectations, and conservative claim language. This makes the study contract explicit before any runner code touches the data.
+`dataset-spec` converts a study artifact into a strict `AnalysisSpecV2`. For diagnosis/procedure-code cohorts it records legacy ICD families when present plus versioned phenotype IDs, expected dictionary terms, coding verification references, phenotype tables, join keys, missingness policy, sensitivity analyses, artifact expectations, and conservative claim language. This makes the study contract explicit before any runner code touches the data.
 
-`dataset-run` currently supports the `ehr-diagnosis-cohort-outcome` archetype. It constructs the cohort from diagnosis and dictionary tables, records the exact matched diagnosis codes, merges requested outcome/covariate tables through declared keys, fits supported mortality and ICU length-of-stay models when the data are adequate, and downgrades the packet to methods review when sparse events, small cohorts, low events-per-predictor, missing tables, unsafe cache policy, or incomplete coding review make promotion unsafe.
+`dataset-run` currently supports the `ehr-diagnosis-cohort-outcome` archetype. It constructs the cohort from diagnosis/procedure event tables and dictionaries, records the exact matched codes, applies exact/prefix/range/regex/ICD-10-PCS-axis matching from the phenotype registry, merges requested outcome/covariate tables through declared keys, fits supported mortality and ICU length-of-stay models when the data are adequate, and downgrades the packet to methods review when sparse events, small cohorts, low events-per-predictor, missing tables, unsafe cache policy, or incomplete coding review make promotion unsafe.
 
 The packet includes:
 
@@ -358,6 +366,7 @@ The packet includes:
 - `run-manifest.json`: artifact inventory with hashes.
 - `cost-receipt.json`: estimated bytes read and estimated cost.
 - `matched-icd-codes.csv`: cohort-code evidence for human coding review.
+- `phenotype-coding-review.json`: phenotype IDs, matched-code count, timing warnings, sensitivity definitions, and coding-review status.
 - `lifecycle.json`: execution status and remaining review needs.
 - `critique.md`: conservative methods critique.
 
@@ -459,6 +468,7 @@ agenteer research protocol-edit --protocol ./protocol-promotion.json --add-covar
 agenteer research analysis-spec --packet ./packet --json
 agenteer research cohort-scout-file --spec ./analysis-spec.json --file ./rows.csv --json
 agenteer research semantic-quality --file ./rows.csv --json
+agenteer research analysis-run --question "..." --method linear-regression --data ./rows.csv --outcome y --exposure x --out-dir ./analysis-run
 agenteer research progress --phase cohort_scout_complete --next-step "Review scout counts" --json
 agenteer research job-lifecycle --job job_123 --status queued --json
 agenteer research repair-plan --packet ./packet --json

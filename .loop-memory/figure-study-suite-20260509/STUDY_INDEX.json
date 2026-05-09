@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "dataPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/visual-study-data.csv",
+  "studyCount": 10,
+  "studies": [
+    {
+      "slug": "01-descriptive-profile",
+      "question": "Descriptive profile of synthetic public-health risk variables",
+      "method": "descriptive",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/01-descriptive-profile",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/01-descriptive-profile/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/01-descriptive-profile/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/01-descriptive-profile/stats-run/descriptive-histograms.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.25017540532852944,
+          "xLabel": "Value",
+          "yLabel": "Frequency",
+          "altText": "Histograms for the first numeric variables in the descriptive run."
+        },
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/01-descriptive-profile/stats-run/missingness-bar.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.1050914952119086,
+          "xLabel": "Variable",
+          "yLabel": "Fraction missing",
+          "altText": "Fraction missing for variables included in the run."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "02-treatment-continuous-outcome",
+      "question": "Welch comparison of continuous outcome by treatment group",
+      "method": "welch-t-test",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/02-treatment-continuous-outcome/stats-run/group-distribution.png",
+          "status": "pass",
+          "width": 960,
+          "height": 720,
+          "nonBlankRatio": 0.02918939251457589,
+          "xLabel": "treatment",
+          "yLabel": "outcome_cont",
+          "altText": "Boxplot of the numeric outcome by comparison group."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "03-treatment-binary-outcome",
+      "question": "Chi-square association between treatment and binary outcome",
+      "method": "chi-square",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/03-treatment-binary-outcome/stats-run/contingency-heatmap.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.6214658196643595,
+          "xLabel": "treatment",
+          "yLabel": "outcome_bin",
+          "altText": "Observed counts for the categorical association test."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "04-biomarker-continuous-correlation",
+      "question": "Correlation between biomarker level and continuous outcome",
+      "method": "pearson",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/correlation-scatter.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.08045889826490946,
+          "xLabel": "biomarker",
+          "yLabel": "outcome_cont",
+          "altText": "Scatterplot for the two variables used in the correlation run."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "05-adjusted-linear-model",
+      "question": "Adjusted linear model for continuous outcome using biomarker and covariates",
+      "method": "linear-regression",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/model-residuals.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.08275338958945672,
+          "xLabel": "Fitted value",
+          "yLabel": "Residual",
+          "altText": "Residual diagnostic plot for the fitted model."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "06-survival-by-treatment",
+      "question": "Kaplan-Meier survival analysis by treatment group",
+      "method": "kaplan-meier",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/06-survival-by-treatment/stats-run/kaplan-meier.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.033488195695458425,
+          "xLabel": "Time",
+          "yLabel": "Survival probability",
+          "altText": "Estimated survival curves by group."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "07-competing-risk-incidence",
+      "question": "Cumulative incidence of the primary event with competing events",
+      "method": "aalen-johansen-cif",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/cumulative-incidence.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.03307101545463165,
+          "xLabel": "Time",
+          "yLabel": "Cumulative incidence",
+          "altText": "Nonparametric cumulative incidence for event code 1 with other nonzero codes treated as competing events."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "08-latent-component-structure",
+      "question": "PCA of correlated component variables",
+      "method": "pca",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/08-latent-component-structure",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/08-latent-component-structure/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/08-latent-component-structure/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/08-latent-component-structure/stats-run/pca-scree.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.022167440978477292,
+          "xLabel": "Principal component",
+          "yLabel": "Explained variance ratio",
+          "altText": "Explained variance ratio by component."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "09-measurement-agreement",
+      "question": "Bland-Altman agreement between two biomarker measurements",
+      "method": "bland-altman",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/09-measurement-agreement",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/09-measurement-agreement/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/09-measurement-agreement/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/09-measurement-agreement/stats-run/bland-altman.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.08326538352138049,
+          "xLabel": "Mean of measurements",
+          "yLabel": "Difference between measurements",
+          "altText": "Difference versus mean for two measurements."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    },
+    {
+      "slug": "10-risk-score-prediction",
+      "question": "ROC analysis for risk score prediction of binary outcome",
+      "method": "prediction-evaluation",
+      "studyDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction",
+      "paper": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/paper.md",
+      "figureQa": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/figure-qa.json",
+      "figureQaStatus": "pass",
+      "figures": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/10-risk-score-prediction/stats-run/roc-curve.png",
+          "status": "pass",
+          "width": 1125,
+          "height": 750,
+          "nonBlankRatio": 0.02442400682658576,
+          "xLabel": "False positive rate",
+          "yLabel": "True positive rate",
+          "altText": "Receiver operating characteristic curve."
+        }
+      ],
+      "statsStatus": "succeeded",
+      "statsIssues": [],
+      "manuscriptQaStatus": "pass",
+      "runInspectExitCode": 0
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2004988787597436478",
+  "method": "overlap-weighting",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment",
+    "age",
+    "severity",
+    "albumin"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "_t",
+      "method": "overlap weighting",
+      "estimand": "overlap",
+      "effect_measure": "mean difference",
+      "estimate": 0.9256641630565388,
+      "mean_difference": 0.9256641630565388,
+      "treated_mean": 22.418083941546417,
+      "control_mean": 21.49241977848987,
+      "std_error": 0.40714801644253834,
+      "ci_low": 0.1235900908803762,
+      "ci_high": 1.7277382352327013,
+      "p_value": 0.023885793097536884,
+      "treated_n": 144,
+      "control_n": 96
+    }
+  ],
+  "diagnostics": {
+    "test": "overlap-weighting",
+    "propensity_model": {
+      "aic": 297.07484020817895
+    },
+    "balance": {
+      "max_abs_smd_before": 0.6509123873374751,
+      "max_abs_smd_after": 1.2235931869907775e-15,
+      "mean_abs_smd_before": 0.5146556918029893,
+      "mean_abs_smd_after": 7.641254491197591e-16,
+      "covariates_over_0_1_before": 3,
+      "covariates_over_0_1_after": 0,
+      "covariate_terms": 3
+    },
+    "positivity": {
+      "treated_min": 0.21024702376374668,
+      "treated_max": 0.9395750181570478,
+      "control_min": 0.16469513196238075,
+      "control_max": 0.8821848697024102,
+      "common_support_lower": 0.21024702376374668,
+      "common_support_upper": 0.8821848697024102,
+      "common_support_fraction": 0.9458333333333333
+    },
+    "artifacts": {
+      "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/balance.csv"
+    }
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/stats-config.json",
+      "sha256": "7e530c83285b1a2e4e74f9cab5773e547e1790e35f757b4954b31acd466ce1e3"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/stats-summary.json",
+      "sha256": "7f81eddca59f509972acef9328ecdda42456037b1c1db67330133eea0df6d8dd"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/estimates.csv",
+      "sha256": "8b7827bb7ff908456342c03a2910082b0cece7cddff53230b4dba29c2bf6b28c"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/diagnostics.json",
+      "sha256": "d361c2c5326f9965896cc24046cf5e37bb4f45c59ee66f5ec7a79b24c61e178f"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "balance",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/balance.csv",
+      "sha256": "01b9a32e77b1d9228112a99e15a3e1e8beb7d043292d1d12f7a4475946718a4b"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/stats-report.md",
+      "sha256": "79c7faa025ea1f1f9f1a34affc2910824abeb47f0409b9c562f35a6b311cf5b4"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap/stats-qa.json",
+      "sha256": "55cd738ab13b0bdfb042911870311ed02773a5fc2576149267c1e196440631be"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-overlap",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

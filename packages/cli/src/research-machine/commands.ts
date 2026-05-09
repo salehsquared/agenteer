@@ -64,6 +64,40 @@ import {
   type DatasetRunResult,
   type DatasetSpecFromStudyResult,
 } from "./dataset-run.js";
+import {
+  phenotypeCodeSystemSchema,
+  researchPhenotypeInspectCommand,
+  researchPhenotypeListCommand,
+  researchPhenotypeMatchCommand,
+  researchPhenotypeReviewCommand,
+  renderResearchPhenotypeInspect,
+  renderResearchPhenotypeInspectJson,
+  renderResearchPhenotypeList,
+  renderResearchPhenotypeListJson,
+  renderResearchPhenotypeMatch,
+  renderResearchPhenotypeMatchJson,
+  renderResearchPhenotypeReview,
+  renderResearchPhenotypeReviewJson,
+  type PhenotypeCodeSystem,
+} from "./phenotypes.js";
+import {
+  researchReviewAdjudicateCommand,
+  researchReviewerProvidersCommand,
+  researchReviewResponseCommand,
+  researchStudyCriticCommand,
+  renderResearchReviewAdjudication,
+  renderResearchReviewAdjudicationJson,
+  renderResearchReviewerProviders,
+  renderResearchReviewerProvidersJson,
+  renderResearchReviewResponse,
+  renderResearchReviewResponseJson,
+  renderResearchStudyCritic,
+  renderResearchStudyCriticJson,
+  reviewAutonomySchema,
+  reviewStageSchema,
+  type ReviewAutonomy,
+  type ReviewStage,
+} from "./reviewer.js";
 import { runStatsMethod } from "./stats/runner.js";
 import type { StatsMethod, StatsRunRequest, StatsRunResult } from "./stats/schemas.js";
 import {
@@ -151,6 +185,39 @@ export {
   type DatasetRunResult,
   type DatasetSpecFromStudyResult,
 } from "./dataset-run.js";
+
+export {
+  researchPhenotypeInspectCommand,
+  researchPhenotypeListCommand,
+  researchPhenotypeMatchCommand,
+  researchPhenotypeReviewCommand,
+  renderResearchPhenotypeInspect,
+  renderResearchPhenotypeInspectJson,
+  renderResearchPhenotypeList,
+  renderResearchPhenotypeListJson,
+  renderResearchPhenotypeMatch,
+  renderResearchPhenotypeMatchJson,
+  renderResearchPhenotypeReview,
+  renderResearchPhenotypeReviewJson,
+  type PhenotypeCodeSystem,
+} from "./phenotypes.js";
+
+export {
+  researchReviewAdjudicateCommand,
+  researchReviewerProvidersCommand,
+  researchReviewResponseCommand,
+  researchStudyCriticCommand,
+  renderResearchReviewAdjudication,
+  renderResearchReviewAdjudicationJson,
+  renderResearchReviewerProviders,
+  renderResearchReviewerProvidersJson,
+  renderResearchReviewResponse,
+  renderResearchReviewResponseJson,
+  renderResearchStudyCritic,
+  renderResearchStudyCriticJson,
+  type ReviewAutonomy,
+  type ReviewStage,
+} from "./reviewer.js";
 
 export async function researchMachineStatusCommand(opts: { python?: string; rscript?: string; dataRoot?: string } = {}): Promise<MachineStatus> {
   return buildMachineStatus(opts);
@@ -302,6 +369,7 @@ export interface ResearchAnalysisRunResult {
   generatedFiles: {
     modelingPlan: string;
     statsRunEnvelope: string;
+    feasibilityTrial: string;
     analysisManifest: string;
     postRunModelingPlan: string;
     diagnosticPaper?: string;
@@ -329,6 +397,18 @@ export async function researchAnalysisRunCommand(opts: {
   exposureThreshold?: number;
   variables?: string[];
   covariates?: string[];
+  time?: string;
+  event?: string;
+  id?: string;
+  strata?: string;
+  cluster?: string;
+  period?: string;
+  post?: string;
+  runningVariable?: string;
+  cutoff?: number;
+  instrument?: string;
+  alphaPenalty?: number;
+  l1Ratio?: number;
   weight?: string;
   exactCovariates?: string[];
   estimand?: "ATE" | "ATT";
@@ -383,6 +463,18 @@ export async function researchAnalysisRunCommand(opts: {
     exposureThreshold: opts.exposureThreshold,
     variables: opts.variables ?? [],
     covariates: opts.covariates ?? [],
+    time: opts.time,
+    event: opts.event,
+    id: opts.id,
+    strata: opts.strata,
+    cluster: opts.cluster,
+    period: opts.period,
+    post: opts.post,
+    runningVariable: opts.runningVariable,
+    cutoff: opts.cutoff,
+    instrument: opts.instrument,
+    alphaPenalty: opts.alphaPenalty,
+    l1Ratio: opts.l1Ratio,
     weight: opts.weight,
     exactCovariates: opts.exactCovariates ?? [],
     estimand: opts.estimand ?? "ATT",
@@ -401,6 +493,31 @@ export async function researchAnalysisRunCommand(opts: {
   } satisfies StatsRunRequest);
   const statsEnvelopePath = path.join(outDir, "stats-run-envelope.json");
   await writeFile(statsEnvelopePath, `${JSON.stringify({ schemaVersion: 1, statsRun }, null, 2)}\n`);
+  const feasibilityTrial = buildAnalysisFeasibilityTrial({
+    question: opts.question,
+    dataPath: opts.dataPath,
+    method: opts.method,
+    requestedVariables: uniqueStrings([
+      opts.outcome,
+      opts.exposure,
+      opts.group,
+      opts.time,
+      opts.event,
+      opts.id,
+      opts.strata,
+      opts.cluster,
+      opts.period,
+      opts.post,
+      opts.runningVariable,
+      opts.instrument,
+      ...(opts.variables ?? []),
+      ...(opts.covariates ?? []),
+      ...(opts.exactCovariates ?? []),
+    ].filter((value): value is string => typeof value === "string" && value.length > 0)),
+    statsRun,
+  });
+  const feasibilityTrialPath = path.join(outDir, "feasibility-trial.json");
+  await writeFile(feasibilityTrialPath, `${JSON.stringify({ schemaVersion: 1, feasibilityTrial }, null, 2)}\n`);
   const analysisRunManifest = await buildAnalysisRunManifest({ runDir: statsOutDir });
   const canWriteReaderPaper = statsRun.status === "succeeded";
   const diagnosticPaperFiles = canWriteReaderPaper && opts.method === "diagnostic-accuracy"
@@ -461,6 +578,7 @@ export async function researchAnalysisRunCommand(opts: {
     generatedFiles: {
       modelingPlan: modelingPlanPath,
       statsRunEnvelope: statsEnvelopePath,
+      feasibilityTrial: feasibilityTrialPath,
       analysisManifest: finalAnalysisRunManifest.outPath,
       postRunModelingPlan: postRunPath,
       ...diagnosticPaperFiles,
@@ -468,6 +586,67 @@ export async function researchAnalysisRunCommand(opts: {
       ...literatureFiles,
     },
     nextAction: postRunModelingPlan.nextAction,
+  };
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return Array.from(new Set(values));
+}
+
+function buildAnalysisFeasibilityTrial(opts: {
+  question: string;
+  dataPath: string;
+  method: StatsMethod;
+  requestedVariables: string[];
+  statsRun: StatsRunResult;
+}): {
+  schemaVersion: 1;
+  status: "feasible_for_local_review" | "needs_methods_review" | "blocked";
+  question: string;
+  dataPath: string;
+  method: StatsMethod;
+  rowCount: number;
+  completeCaseN: number;
+  requestedVariables: string[];
+  observedVariables: string[];
+  missingRequestedVariables: string[];
+  issueCodes: string[];
+  semanticIssueCodes: string[];
+  blockerIssueCodes: string[];
+  feasibilityRatio: number | null;
+  nextAction: string;
+} {
+  const observedVariables = uniqueStrings(opts.statsRun.variables);
+  const missingRequestedVariables = opts.requestedVariables.filter(variable => !observedVariables.includes(variable));
+  const issueCodes = opts.statsRun.issues.map(issue => issue.code);
+  const semanticIssueCodes = issueCodes.filter(code => code.startsWith("SEMANTIC_"));
+  const blockerIssueCodes = opts.statsRun.issues.filter(issue => issue.severity === "blocker").map(issue => issue.code);
+  const feasibilityRatio = opts.statsRun.rowCount > 0 ? opts.statsRun.completeCaseN / opts.statsRun.rowCount : null;
+  const status = opts.statsRun.status === "failed" || blockerIssueCodes.length || missingRequestedVariables.length
+    ? "blocked"
+    : semanticIssueCodes.length || opts.statsRun.issues.some(issue => issue.severity === "warning") || opts.statsRun.completeCaseN < 30
+      ? "needs_methods_review"
+      : "feasible_for_local_review";
+  return {
+    schemaVersion: 1,
+    status,
+    question: opts.question,
+    dataPath: path.resolve(opts.dataPath),
+    method: opts.method,
+    rowCount: opts.statsRun.rowCount,
+    completeCaseN: opts.statsRun.completeCaseN,
+    requestedVariables: opts.requestedVariables,
+    observedVariables,
+    missingRequestedVariables,
+    issueCodes,
+    semanticIssueCodes,
+    blockerIssueCodes,
+    feasibilityRatio,
+    nextAction: status === "feasible_for_local_review"
+      ? "Proceed to method QA/manuscript review under the declared local-review boundary."
+      : status === "needs_methods_review"
+        ? "Review warning-level feasibility, missingness, sparse cells, or semantic plausibility before paper promotion."
+        : "Resolve blockers before treating this idea as analyzable on the current dataset.",
   };
 }
 
@@ -926,6 +1105,25 @@ function renderAnalysisBenchmarkMarkdown(result: ResearchAnalysisBenchmarkResult
 export function parseBackendId(value: string | undefined): BackendId | undefined {
   if (value === undefined) return undefined;
   return backendIdSchema.parse(value);
+}
+
+export function parsePhenotypeCodeSystem(value: string | undefined): PhenotypeCodeSystem | undefined {
+  if (!value) return undefined;
+  const parsed = phenotypeCodeSystemSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new Error(`Unknown phenotype code system '${value}'. Expected one of: ${phenotypeCodeSystemSchema.options.join(", ")}`);
+  }
+  return parsed.data;
+}
+
+export function parseReviewStage(value: string | undefined): ReviewStage | undefined {
+  if (!value) return undefined;
+  return reviewStageSchema.parse(value);
+}
+
+export function parseReviewAutonomy(value: string | undefined): ReviewAutonomy | undefined {
+  if (!value) return undefined;
+  return reviewAutonomySchema.parse(value);
 }
 
 export function parseDatasetAdapterId(value: string | undefined, fallback: DatasetAdapterId): DatasetAdapterId {

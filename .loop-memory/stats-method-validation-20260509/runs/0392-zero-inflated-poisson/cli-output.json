@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1048407277589003880",
+    "method": "zero-inflated-poisson",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "zero_count",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "inflate_const",
+        "estimate": -0.7722246526049359,
+        "std_error": 0.19108022470782254,
+        "p_value": 0.000053141302196651375,
+        "ci_low": -1.1467350111900887,
+        "ci_high": -0.39771429401978314,
+        "rate_ratio": 0.46198416997771063,
+        "rr_ci_low": 0.31767227442418816,
+        "rr_ci_high": 0.6718539529357911
+      },
+      {
+        "term": "const",
+        "estimate": -0.5877226813994252,
+        "std_error": 0.3833048355613413,
+        "p_value": 0.12520106986963597,
+        "ci_low": -1.3389863541997018,
+        "ci_high": 0.16354099140085154,
+        "rate_ratio": 0.5555911030831565,
+        "rr_ci_low": 0.26211122190837904,
+        "rr_ci_high": 1.177673628689802
+      },
+      {
+        "term": "treatment",
+        "estimate": 0.0761931626172855,
+        "std_error": 0.1625384302132825,
+        "p_value": 0.6392339459255426,
+        "ci_low": -0.24237630670442517,
+        "ci_high": 0.39476263193899613,
+        "rate_ratio": 1.0791710095223734,
+        "rr_ci_low": 0.7847608112265161,
+        "rr_ci_high": 1.4840318873381937
+      },
+      {
+        "term": "age",
+        "estimate": 0.012407462825512227,
+        "std_error": 0.005240918542704279,
+        "p_value": 0.017912523351185847,
+        "ci_low": 0.002135451235903696,
+        "ci_high": 0.02267947441512076,
+        "rate_ratio": 1.0124847547270677,
+        "rr_ci_low": 1.002137732935758,
+        "rr_ci_high": 1.0229386089990147
+      },
+      {
+        "term": "severity",
+        "estimate": 0.047803562239332326,
+        "std_error": 0.09017620143912532,
+        "p_value": 0.5960336972039133,
+        "ci_low": -0.1289385448439823,
+        "ci_high": 0.22454566932264694,
+        "rate_ratio": 1.0489645788316453,
+        "rr_ci_low": 0.8790279846876317,
+        "rr_ci_high": 1.2517538767943315
+      }
+    ],
+    "diagnostics": {
+      "model_family": "zero-inflated-poisson",
+      "aic": 665.3741342648243,
+      "bic": 682.7773288815342,
+      "df_resid": 236,
+      "residual_mean": 0.006350244379038162,
+      "residual_sd": 1.1991337459649716,
+      "shapiro_p_value": 1.9977713162726253e-11,
+      "max_cooks_distance": 0.04900135310634032,
+      "vif": [
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "severity",
+          "vif": 1.146630084030013
+        }
+      ],
+      "max_vif": 1.146630084030013,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/stats-config.json",
+        "sha256": "ee81f6dc926f086fc22715b0bbec695576acb33da4d4b1afdd3b96fcacb98534"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/stats-summary.json",
+        "sha256": "b6898f952c4d542eec01777427c1a4e8e7fac48b98be578c237765ef8ffcf654"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/estimates.csv",
+        "sha256": "0f2b449ee2eb39da120bef5a94839a1cf3f8cff596116b6ca61f42669806e148"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/diagnostics.json",
+        "sha256": "2375195ead501838a8834b5b12bd4d922da964d836b03763a1f00db4378f5e7f"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/figures.json",
+        "sha256": "f3771d18e4d21e6090183bb8a66c0f8b2b6f6a5fdca2c35ee8484a5f0b6a7453"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/model-residuals.png",
+        "sha256": "95106bbc60a507ad38f2e8b9da0c54abdbae4e9c78c7da6b7d28ac40e7043e0a"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/stats-report.md",
+        "sha256": "04ef1edee9bd381bffd6b674033fa295b1a5f669dde4b9a97e23bbfcd8f8b9f3"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson/stats-qa.json",
+        "sha256": "d113f317ffc0c4120b7c3b6711331ee8872a39afc15bc7d8e39423ba143345f0"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-zero-inflated-poisson",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

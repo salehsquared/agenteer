@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_8882449298772335647",
+    "method": "kruskal-wallis",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "group"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "group",
+        "statistic": 3.185579874103584,
+        "p_value": 0.20335746502952384,
+        "groups": 3
+      }
+    ],
+    "diagnostics": {
+      "test": "Kruskal-Wallis",
+      "group_counts": {
+        "control": 80,
+        "standard": 80,
+        "enhanced": 80
+      }
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/stats-config.json",
+        "sha256": "ade7c8ab55eeed108163e1016b52d750a37ead5706984338fe6755e5274e2361"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/stats-summary.json",
+        "sha256": "ec40c2647fbd0426cbd2a14a9564a43f68d811795371b7d4a339b158a87bab42"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/estimates.csv",
+        "sha256": "a1b3c8423b2927928310cbf560feec26f3b7adb9b14f40db0ea73d2789818021"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/diagnostics.json",
+        "sha256": "f6ed2d8622efceb2f83f9d66296557c38b5f53f9fc561768bbfe75e7cd20d726"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/figures.json",
+        "sha256": "ef27c4f2bd265c38d6c5bcfbd9710dd3158143b9ec1fc9c410be1e22d3c4155e"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/anova-group-distribution.png",
+        "sha256": "fa536c2f5c58dc2fc315f0e9260c6462cbe7e21a191d7ba1b4e8b79856ff1393"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/stats-report.md",
+        "sha256": "c2413ff38a9779cc8182ca3a2f1218bdb21956da029496f5fdbeee430faa22b7"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal/stats-qa.json",
+        "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kruskal",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5962237108692628648",
+    "method": "negative-binomial-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "count_events",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": -0.8309992744861459,
+        "std_error": 0.4373434915326194,
+        "p_value": 0.05741912582943826,
+        "ci_low": -1.688176766763078,
+        "ci_high": 0.02617821779078633,
+        "rate_ratio": 0.4356137710309118,
+        "rr_ci_low": 0.18485625299647082,
+        "rr_ci_high": 1.0265238769899465
+      },
+      {
+        "term": "treatment",
+        "estimate": 0.25292560928794716,
+        "std_error": 0.18352833616775804,
+        "p_value": 0.16816365357298435,
+        "ci_low": -0.10678331974341843,
+        "ci_high": 0.6126345383193128,
+        "rate_ratio": 1.2877874738440962,
+        "rr_ci_low": 0.8987203868582379,
+        "rr_ci_high": 1.8452864784643532
+      },
+      {
+        "term": "age",
+        "estimate": 0.011268940601765804,
+        "std_error": 0.006030799573696979,
+        "p_value": 0.061683368323949515,
+        "ci_low": -0.0005512093606597854,
+        "ci_high": 0.023089090564191395,
+        "rate_ratio": 1.011332674291643,
+        "rr_ci_low": 0.9994489425273112,
+        "rr_ci_high": 1.0233577070015636
+      },
+      {
+        "term": "severity",
+        "estimate": 0.1354058568852481,
+        "std_error": 0.10493146056961561,
+        "p_value": 0.19690420521586116,
+        "ci_low": -0.07025602667638328,
+        "ci_high": 0.3410677404468795,
+        "rate_ratio": 1.1450013967623587,
+        "rr_ci_low": 0.9321551327715981,
+        "rr_ci_high": 1.4064485110859628
+      }
+    ],
+    "diagnostics": {
+      "model_family": "negative-binomial-regression",
+      "aic": 817.3626981317952,
+      "bic": -1176.5376279397344,
+      "df_resid": 236,
+      "residual_mean": -0.0006937159453536789,
+      "residual_sd": 1.0705991276588052,
+      "shapiro_p_value": 0.0000816800404523377,
+      "max_leverage": 0.05262748588255761,
+      "max_cooks_distance": 0.052838758422188166,
+      "vif": [
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "severity",
+          "vif": 1.146630084030013
+        }
+      ],
+      "max_vif": 1.146630084030013,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [
+      "/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/families/family.py:1367: ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.\n  warnings.warn(\"Negative binomial dispersion parameter alpha not \""
+    ],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/stats-config.json",
+        "sha256": "69bc2b7cbebb8c764406307f8cc72b8c47e397239d31eb2a707ee26091496860"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/stats-summary.json",
+        "sha256": "638ecb1ab07f0dc7c8520f7c3064234c016c6424d9808bcfa91116b36deaa75f"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/estimates.csv",
+        "sha256": "40ba58edc8ce98cdb88f1388419dff49c37ad7165542776d8af1ee6cda29dd89"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/diagnostics.json",
+        "sha256": "13db3bbc0be490a5567ece025903335f80ae70ac00e2e3bb68294f03ff4bdf9a"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/figures.json",
+        "sha256": "fb845a2764d72f5272b74f32611c19f9a33dc5b290d0f411edbd388ff33240a4"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/model-residuals.png",
+        "sha256": "bcb59f81d1a36dadc09be4cb6ff03b7fa67af1b1eed0bcc8635fa058fdf59dc1"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/stats-report.md",
+        "sha256": "4a5e5f74d64b1a93b17ff5364f257b00a62d7df3aa471e2872e21be2b00ffbf5"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin/stats-qa.json",
+        "sha256": "d6d388431cb1d3e8cb24f90b9b6b5181ab81af5ea5effdd8d4cc4964e02bb9c8"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-neg-bin",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5616294370579534227",
+    "method": "mcnemar",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "rater_a",
+      "rater_b"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "rater_b",
+        "statistic": 1.75,
+        "p_value": 0.18587673236587207
+      }
+    ],
+    "diagnostics": {
+      "test": "McNemar",
+      "table": {
+        "negative": {
+          "negative": 131,
+          "positive": 18
+        },
+        "positive": {
+          "negative": 10,
+          "positive": 81
+        }
+      }
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/stats-config.json",
+        "sha256": "aa28c15019e9f89d36bf6a019daad1e29d9601aaf164b2da5c2f45f4bb2ad354"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/stats-summary.json",
+        "sha256": "dba35533ba95a73a91fcfdecc346eb644177302a9afd976558766543951f13bd"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/estimates.csv",
+        "sha256": "1a2305328fdb380f2fd010e065df863fae38221fd1f8e034863c96e5ae9366b8"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/diagnostics.json",
+        "sha256": "4f784163169545c4e16357787066b82cddf5a8b641d461a4afffc003c0331d5a"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/figures.json",
+        "sha256": "ff734fcdf40a13a6c1cf0a83f5ea1bd878779c3b3acf58f9c39901739621c898"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/contingency-heatmap.png",
+        "sha256": "6338b6b520496a5a4602e001ea2a09f9d9059b4f4a777bc6360e8e0210d3fdf4"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/stats-report.md",
+        "sha256": "7c8e00ab326b9c98be85f62d0afe858bc42c2ad194a42189396839ad3c2b0d2a"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar/stats-qa.json",
+        "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mcnemar",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

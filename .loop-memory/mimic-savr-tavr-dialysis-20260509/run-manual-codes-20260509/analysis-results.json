@@ -1,0 +1,1137 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T16:23:04.680016+00:00",
+  "question": "In hemodialysis, peritoneal dialysis, and non-dialysis patients undergoing SAVR and TAVR across ICD9, ICD10, and CPT/HCPCS-coded hospital data, how do clinical outcomes differ across mortality, heart-failure or cardiac-related admission, MACE, and valve reintervention?",
+  "dataset": "MIMIC-IV v3.1 project-owned GCS Parquet cache",
+  "dataBoundary": {
+    "supports": [
+      "same-hospital longitudinal admissions within deidentified patient timelines",
+      "ICD-9-CM and ICD-10-PCS procedure identification",
+      "HCPCS/CPT-like event table scanning when codes are present",
+      "in-hospital mortality and death-date-based 30/365 day mortality within MIMIC death-date availability"
+    ],
+    "doesNotSupport": [
+      "national claims capture",
+      "complete outside-hospital readmission/reintervention ascertainment",
+      "exact public calendar-year trend analysis; anchor year groups are approximate",
+      "complete CPT capture; local HCPCS descriptions are sparse and requested SAVR CPT codes were not observed"
+    ]
+  },
+  "limitations": [
+    "single-center deidentified EHR dataset rather than national claims or registry data",
+    "same-hospital follow-up may miss outside-hospital readmissions and reinterventions",
+    "anchor-year groups approximate calendar periods rather than exact public dates",
+    "dialysis modality assignment relies on coded evidence and may misclassify outpatient modality",
+    "requested SAVR CPT codes were not observed in local HCPCS event rows",
+    "observational associations cannot establish causality"
+  ],
+  "cohortSummary": {
+    "indexRows": 4255,
+    "uniquePatients": 4255,
+    "rowCounts": {
+      "indexAdmissions": 4255,
+      "uniquePatients": 4255,
+      "matchedProcedureDefinitions": 23,
+      "matchedDiagnosisDefinitions": 232,
+      "matchedHcpcsDefinitions": 8
+    },
+    "valveStrategyCounts": {
+      "SAVR": 3049,
+      "TAVR": 1201,
+      "mixed_savr_tavr_same_admission": 5
+    },
+    "dialysisGroupCounts": {
+      "non_dialysis": 4076,
+      "hemodialysis_or_unspecified_dialysis": 167,
+      "peritoneal_dialysis": 12
+    },
+    "anchorYearGroupCounts": {
+      "2014 - 2016": 1063,
+      "2008 - 2010": 1020,
+      "2011 - 2013": 902,
+      "2017 - 2019": 805,
+      "2020 - 2022": 465
+    },
+    "hcpcsRequestedValveCodesPresent": [
+      "0256T",
+      "33361"
+    ],
+    "hcpcsTavrCodesPresent": [
+      "0256T",
+      "33361"
+    ],
+    "hcpcsSavrCodesPresent": [],
+    "manualCodeSets": {
+      "tavrIcd9Procedure": [
+        "3505",
+        "3506"
+      ],
+      "savrIcd9Procedure": [
+        "3521",
+        "3522"
+      ],
+      "dialysisIcd10Diagnosis": [
+        "N186",
+        "Z992"
+      ],
+      "dialysisIcd9Diagnosis": [
+        "5856",
+        "V4511",
+        "V560",
+        "V561",
+        "V562",
+        "V5631",
+        "V5632",
+        "V568"
+      ],
+      "peritonealDialysisIcd9Procedure": [
+        "5498"
+      ],
+      "peritonealDialysisCptHcpcs": [
+        "49324",
+        "49325",
+        "49326",
+        "49418",
+        "49420",
+        "49421",
+        "49422",
+        "49435",
+        "49436",
+        "G0052"
+      ]
+    }
+  },
+  "outcomes": [
+    "in_hospital_mortality",
+    "death_30d",
+    "death_365d",
+    "hf_readmission_365d",
+    "cardiac_readmission_365d",
+    "mi_365d",
+    "stroke_365d",
+    "mace_365d",
+    "valve_reintervention_365d"
+  ],
+  "models": {
+    "in_hospital_mortality": {
+      "status": "not_fit",
+      "reason": "Singular matrix",
+      "n": 4255,
+      "events": 96
+    },
+    "death_30d": {
+      "status": "not_fit",
+      "reason": "math range error",
+      "n": 4255,
+      "events": 127
+    },
+    "death_365d": {
+      "status": "fit",
+      "n": 4255,
+      "events": 375,
+      "predictors": 14,
+      "terms": [
+        {
+          "term": "admission_age",
+          "odds_ratio": 0.9892299171971806,
+          "ci_low": 0.9759237595251834,
+          "ci_high": 1.0027174966557302,
+          "p_value": 0.11706863565208284
+        },
+        {
+          "term": "male",
+          "odds_ratio": 1.172706755071903,
+          "ci_low": 0.9258494281844003,
+          "ci_high": 1.4853831427947561,
+          "p_value": 0.18647092657616393
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "odds_ratio": 1.3305904060787224,
+          "ci_low": 1.2596875911198218,
+          "ci_high": 1.405484059087101,
+          "p_value": 1.5615998880728543e-24
+        },
+        {
+          "term": "dialysis_group_non_dialysis",
+          "odds_ratio": 0.23785391830760866,
+          "ci_low": 0.16334454305173252,
+          "ci_high": 0.34635063649702075,
+          "p_value": 6.88775135818005e-14
+        },
+        {
+          "term": "dialysis_group_peritoneal_dialysis",
+          "odds_ratio": 0.583807761251478,
+          "ci_low": 0.13952029366914107,
+          "ci_high": 2.4428811976680027,
+          "p_value": 0.4611619619819364
+        },
+        {
+          "term": "valve_strategy_TAVR",
+          "odds_ratio": 1.7726513342045929,
+          "ci_low": 1.3619225173250638,
+          "ci_high": 2.307247815264163,
+          "p_value": 2.0726894440481568e-05
+        },
+        {
+          "term": "valve_strategy_mixed_savr_tavr_same_admission",
+          "odds_ratio": 15.014345458162389,
+          "ci_low": 2.3782711943986925,
+          "ci_high": 94.78757934249714,
+          "p_value": 0.003957807525203522
+        },
+        {
+          "term": "anchor_year_group_2011 - 2013",
+          "odds_ratio": 0.7209599036184805,
+          "ci_low": 0.513920296717286,
+          "ci_high": 1.0114081618214585,
+          "p_value": 0.058187059157238874
+        },
+        {
+          "term": "anchor_year_group_2014 - 2016",
+          "odds_ratio": 0.7584876027182349,
+          "ci_low": 0.5489187895130726,
+          "ci_high": 1.048066589208191,
+          "p_value": 0.09385184913077706
+        },
+        {
+          "term": "anchor_year_group_2017 - 2019",
+          "odds_ratio": 0.8661290566778312,
+          "ci_low": 0.6119493488444965,
+          "ci_high": 1.225885025023957,
+          "p_value": 0.41743192231769766
+        },
+        {
+          "term": "anchor_year_group_2020 - 2022",
+          "odds_ratio": 0.9557220949098377,
+          "ci_low": 0.6365993113248374,
+          "ci_high": 1.4348188985595147,
+          "p_value": 0.8270766408449084
+        },
+        {
+          "term": "insurance_Medicare",
+          "odds_ratio": 0.736919917254796,
+          "ci_low": 0.4459899813532292,
+          "ci_high": 1.2176304113358833,
+          "p_value": 0.23347349971083553
+        },
+        {
+          "term": "insurance_Other",
+          "odds_ratio": 0.3832343949431664,
+          "ci_low": 0.084924054593431,
+          "ci_high": 1.7294110858293308,
+          "p_value": 0.21222065737772922
+        },
+        {
+          "term": "insurance_Private",
+          "odds_ratio": 0.43083749849289726,
+          "ci_low": 0.24561720804319911,
+          "ci_high": 0.7557326768203076,
+          "p_value": 0.0033165067080616634
+        }
+      ]
+    },
+    "hf_readmission_365d": {
+      "status": "fit",
+      "n": 4255,
+      "events": 622,
+      "predictors": 14,
+      "terms": [
+        {
+          "term": "admission_age",
+          "odds_ratio": 0.9825944503339386,
+          "ci_low": 0.972087533259197,
+          "ci_high": 0.9932149325997132,
+          "p_value": 0.00136867287435482
+        },
+        {
+          "term": "male",
+          "odds_ratio": 0.9711666547839819,
+          "ci_low": 0.8069477460210291,
+          "ci_high": 1.1688051376498063,
+          "p_value": 0.7568939049551071
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "odds_ratio": 1.3191332505594424,
+          "ci_low": 1.260744606858496,
+          "ci_high": 1.3802260372681716,
+          "p_value": 3.9613587902555786e-33
+        },
+        {
+          "term": "dialysis_group_non_dialysis",
+          "odds_ratio": 1.1034423476749045,
+          "ci_low": 0.7361911209147423,
+          "ci_high": 1.6538979893283883,
+          "p_value": 0.6335619079444685
+        },
+        {
+          "term": "dialysis_group_peritoneal_dialysis",
+          "odds_ratio": 0.9414252087548376,
+          "ci_low": 0.2232510424388858,
+          "ci_high": 3.9698870562797306,
+          "p_value": 0.9344819825790442
+        },
+        {
+          "term": "valve_strategy_TAVR",
+          "odds_ratio": 2.078260908591302,
+          "ci_low": 1.6829431836543627,
+          "ci_high": 2.5664374449053295,
+          "p_value": 1.078978703486162e-11
+        },
+        {
+          "term": "valve_strategy_mixed_savr_tavr_same_admission",
+          "odds_ratio": 1.7183599864863028,
+          "ci_low": 0.18732491003123,
+          "ci_high": 15.762778386841001,
+          "p_value": 0.6321094832424188
+        },
+        {
+          "term": "anchor_year_group_2011 - 2013",
+          "odds_ratio": 0.719530743710064,
+          "ci_low": 0.5568122452543818,
+          "ci_high": 0.9298008360204675,
+          "p_value": 0.011855846409244074
+        },
+        {
+          "term": "anchor_year_group_2014 - 2016",
+          "odds_ratio": 0.5593398703272562,
+          "ci_low": 0.43336548592117874,
+          "ci_high": 0.7219335657815065,
+          "p_value": 8.098969670890516e-06
+        },
+        {
+          "term": "anchor_year_group_2017 - 2019",
+          "odds_ratio": 0.64790213544959,
+          "ci_low": 0.49362629777350525,
+          "ci_high": 0.8503946791602031,
+          "p_value": 0.0017608551128622703
+        },
+        {
+          "term": "anchor_year_group_2020 - 2022",
+          "odds_ratio": 0.46294763210596085,
+          "ci_low": 0.32540843856790164,
+          "ci_high": 0.658620013100228,
+          "p_value": 1.8544838377486606e-05
+        },
+        {
+          "term": "insurance_Medicare",
+          "odds_ratio": 0.7929061697216289,
+          "ci_low": 0.526333461778505,
+          "ci_high": 1.1944902607146,
+          "p_value": 0.26703500472421515
+        },
+        {
+          "term": "insurance_Other",
+          "odds_ratio": 0.8970979498451018,
+          "ci_low": 0.369069032535235,
+          "ci_high": 2.180580489476456,
+          "p_value": 0.8106188205398234
+        },
+        {
+          "term": "insurance_Private",
+          "odds_ratio": 0.6273123599001301,
+          "ci_low": 0.40840695969883023,
+          "ci_high": 0.9635506632248941,
+          "p_value": 0.033210541064669925
+        }
+      ]
+    },
+    "cardiac_readmission_365d": {
+      "status": "fit",
+      "n": 4255,
+      "events": 1238,
+      "predictors": 14,
+      "terms": [
+        {
+          "term": "admission_age",
+          "odds_ratio": 0.9875288498672821,
+          "ci_low": 0.9796086204762303,
+          "ci_high": 0.9955131150704893,
+          "p_value": 0.002254289763364026
+        },
+        {
+          "term": "male",
+          "odds_ratio": 0.9428339440877405,
+          "ci_low": 0.8189695785867194,
+          "ci_high": 1.0854320714306196,
+          "p_value": 0.4126937509327281
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "odds_ratio": 1.1443599308610433,
+          "ci_low": 1.1031330869192257,
+          "ci_high": 1.1871275251271483,
+          "p_value": 5.88261835694299e-13
+        },
+        {
+          "term": "dialysis_group_non_dialysis",
+          "odds_ratio": 0.9860247335250197,
+          "ci_low": 0.7033418024647884,
+          "ci_high": 1.382321897711689,
+          "p_value": 0.9349257241497722
+        },
+        {
+          "term": "dialysis_group_peritoneal_dialysis",
+          "odds_ratio": 1.987732561326684,
+          "ci_low": 0.5897756146904668,
+          "ci_high": 6.69929484526415,
+          "p_value": 0.26777080064075554
+        },
+        {
+          "term": "valve_strategy_TAVR",
+          "odds_ratio": 1.3861495554925334,
+          "ci_low": 1.1693571882483063,
+          "ci_high": 1.643134030817748,
+          "p_value": 0.00016791834463889435
+        },
+        {
+          "term": "valve_strategy_mixed_savr_tavr_same_admission",
+          "odds_ratio": 0.7033899374557087,
+          "ci_low": 0.07796896147747111,
+          "ci_high": 6.345568733231163,
+          "p_value": 0.7538916635809612
+        },
+        {
+          "term": "anchor_year_group_2011 - 2013",
+          "odds_ratio": 0.6974450654735788,
+          "ci_low": 0.5741491029050774,
+          "ci_high": 0.8472182868390981,
+          "p_value": 0.00028299188593663743
+        },
+        {
+          "term": "anchor_year_group_2014 - 2016",
+          "odds_ratio": 0.5314586707515364,
+          "ci_low": 0.43806639298102285,
+          "ci_high": 0.6447614408285041,
+          "p_value": 1.4459657983530716e-10
+        },
+        {
+          "term": "anchor_year_group_2017 - 2019",
+          "odds_ratio": 0.602369426405038,
+          "ci_low": 0.4901356724634515,
+          "ci_high": 0.7403030349613892,
+          "p_value": 1.4480016393822722e-06
+        },
+        {
+          "term": "anchor_year_group_2020 - 2022",
+          "odds_ratio": 0.48489496094693396,
+          "ci_low": 0.37485320515882986,
+          "ci_high": 0.6272405302019604,
+          "p_value": 3.556389482659301e-08
+        },
+        {
+          "term": "insurance_Medicare",
+          "odds_ratio": 0.7642443620356114,
+          "ci_low": 0.5665513559872668,
+          "ci_high": 1.030920566566159,
+          "p_value": 0.07831265472718672
+        },
+        {
+          "term": "insurance_Other",
+          "odds_ratio": 0.8221036423871317,
+          "ci_low": 0.4396963703845706,
+          "ci_high": 1.5370934225248847,
+          "p_value": 0.539527068794494
+        },
+        {
+          "term": "insurance_Private",
+          "odds_ratio": 0.6682279375208089,
+          "ci_low": 0.49737085531985603,
+          "ci_high": 0.8977779290991115,
+          "p_value": 0.0074576556238564766
+        }
+      ]
+    },
+    "mace_365d": {
+      "status": "fit",
+      "n": 4255,
+      "events": 876,
+      "predictors": 14,
+      "terms": [
+        {
+          "term": "admission_age",
+          "odds_ratio": 0.9737819171885147,
+          "ci_low": 0.9644033568008477,
+          "ci_high": 0.9832516815255716,
+          "p_value": 7.423586958109727e-08
+        },
+        {
+          "term": "male",
+          "odds_ratio": 1.0943424227718015,
+          "ci_low": 0.9247674499333923,
+          "ci_high": 1.2950124254095599,
+          "p_value": 0.29395588125860406
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "odds_ratio": 1.5073636985335512,
+          "ci_low": 1.4429570272762149,
+          "ci_high": 1.5746451742542478,
+          "p_value": 9.331170309367611e-76
+        },
+        {
+          "term": "dialysis_group_non_dialysis",
+          "odds_ratio": 0.5875181403033892,
+          "ci_low": 0.415078787991158,
+          "ci_high": 0.8315952902727131,
+          "p_value": 0.0026975793798495098
+        },
+        {
+          "term": "dialysis_group_peritoneal_dialysis",
+          "odds_ratio": 2.0402543610127792,
+          "ci_low": 0.5462019339007189,
+          "ci_high": 7.621060269604047,
+          "p_value": 0.2889068684832702
+        },
+        {
+          "term": "valve_strategy_TAVR",
+          "odds_ratio": 0.8025440135116967,
+          "ci_low": 0.6583314603821986,
+          "ci_high": 0.9783474319297141,
+          "p_value": 0.029512845038841988
+        },
+        {
+          "term": "valve_strategy_mixed_savr_tavr_same_admission",
+          "odds_ratio": 11.080608793998914,
+          "ci_low": 1.1802445570326376,
+          "ci_high": 104.02919506304556,
+          "p_value": 0.035291153448625184
+        },
+        {
+          "term": "anchor_year_group_2011 - 2013",
+          "odds_ratio": 0.812275662545823,
+          "ci_low": 0.6411118375449826,
+          "ci_high": 1.029136748575419,
+          "p_value": 0.08505422966454758
+        },
+        {
+          "term": "anchor_year_group_2014 - 2016",
+          "odds_ratio": 0.8909050007371463,
+          "ci_low": 0.710455658761031,
+          "ci_high": 1.1171868512140708,
+          "p_value": 0.31714197653494325
+        },
+        {
+          "term": "anchor_year_group_2017 - 2019",
+          "odds_ratio": 0.7596453628341591,
+          "ci_low": 0.590432605703346,
+          "ci_high": 0.9773529979565133,
+          "p_value": 0.032506036129921034
+        },
+        {
+          "term": "anchor_year_group_2020 - 2022",
+          "odds_ratio": 0.8889591850119309,
+          "ci_low": 0.6586743178335489,
+          "ci_high": 1.1997559510385785,
+          "p_value": 0.44163139091801895
+        },
+        {
+          "term": "insurance_Medicare",
+          "odds_ratio": 0.7397532563981787,
+          "ci_low": 0.5195503670806919,
+          "ci_high": 1.0532855234547798,
+          "p_value": 0.09452283482015011
+        },
+        {
+          "term": "insurance_Other",
+          "odds_ratio": 0.8904748680473251,
+          "ci_low": 0.42159741781871723,
+          "ci_high": 1.8808120190263118,
+          "p_value": 0.7610722728754191
+        },
+        {
+          "term": "insurance_Private",
+          "odds_ratio": 0.499230584598861,
+          "ci_low": 0.3465683620579191,
+          "ci_high": 0.7191400135863197,
+          "p_value": 0.0001911537936940218
+        }
+      ]
+    },
+    "valve_reintervention_365d": {
+      "status": "not_fit",
+      "reason": "Low events per predictor",
+      "n": 4255,
+      "events": 31,
+      "predictors": 14
+    }
+  },
+  "estimates": [
+    {
+      "outcome": "death_365d",
+      "term": "admission_age",
+      "oddsRatio": 0.9892299171971806,
+      "ciLow": 0.9759237595251834,
+      "ciHigh": 1.0027174966557302,
+      "pValue": 0.11706863565208284,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "male",
+      "oddsRatio": 1.172706755071903,
+      "ciLow": 0.9258494281844003,
+      "ciHigh": 1.4853831427947561,
+      "pValue": 0.18647092657616393,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "charlson_comorbidity_index",
+      "oddsRatio": 1.3305904060787224,
+      "ciLow": 1.2596875911198218,
+      "ciHigh": 1.405484059087101,
+      "pValue": 1.5615998880728543e-24,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "dialysis_group_non_dialysis",
+      "oddsRatio": 0.23785391830760866,
+      "ciLow": 0.16334454305173252,
+      "ciHigh": 0.34635063649702075,
+      "pValue": 6.88775135818005e-14,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "dialysis_group_peritoneal_dialysis",
+      "oddsRatio": 0.583807761251478,
+      "ciLow": 0.13952029366914107,
+      "ciHigh": 2.4428811976680027,
+      "pValue": 0.4611619619819364,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "valve_strategy_TAVR",
+      "oddsRatio": 1.7726513342045929,
+      "ciLow": 1.3619225173250638,
+      "ciHigh": 2.307247815264163,
+      "pValue": 2.0726894440481568e-05,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "valve_strategy_mixed_savr_tavr_same_admission",
+      "oddsRatio": 15.014345458162389,
+      "ciLow": 2.3782711943986925,
+      "ciHigh": 94.78757934249714,
+      "pValue": 0.003957807525203522,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "anchor_year_group_2011 - 2013",
+      "oddsRatio": 0.7209599036184805,
+      "ciLow": 0.513920296717286,
+      "ciHigh": 1.0114081618214585,
+      "pValue": 0.058187059157238874,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "anchor_year_group_2014 - 2016",
+      "oddsRatio": 0.7584876027182349,
+      "ciLow": 0.5489187895130726,
+      "ciHigh": 1.048066589208191,
+      "pValue": 0.09385184913077706,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "anchor_year_group_2017 - 2019",
+      "oddsRatio": 0.8661290566778312,
+      "ciLow": 0.6119493488444965,
+      "ciHigh": 1.225885025023957,
+      "pValue": 0.41743192231769766,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "anchor_year_group_2020 - 2022",
+      "oddsRatio": 0.9557220949098377,
+      "ciLow": 0.6365993113248374,
+      "ciHigh": 1.4348188985595147,
+      "pValue": 0.8270766408449084,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "insurance_Medicare",
+      "oddsRatio": 0.736919917254796,
+      "ciLow": 0.4459899813532292,
+      "ciHigh": 1.2176304113358833,
+      "pValue": 0.23347349971083553,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "insurance_Other",
+      "oddsRatio": 0.3832343949431664,
+      "ciLow": 0.084924054593431,
+      "ciHigh": 1.7294110858293308,
+      "pValue": 0.21222065737772922,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "death_365d",
+      "term": "insurance_Private",
+      "oddsRatio": 0.43083749849289726,
+      "ciLow": 0.24561720804319911,
+      "ciHigh": 0.7557326768203076,
+      "pValue": 0.0033165067080616634,
+      "n": 4255,
+      "events": 375
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "admission_age",
+      "oddsRatio": 0.9825944503339386,
+      "ciLow": 0.972087533259197,
+      "ciHigh": 0.9932149325997132,
+      "pValue": 0.00136867287435482,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "male",
+      "oddsRatio": 0.9711666547839819,
+      "ciLow": 0.8069477460210291,
+      "ciHigh": 1.1688051376498063,
+      "pValue": 0.7568939049551071,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "charlson_comorbidity_index",
+      "oddsRatio": 1.3191332505594424,
+      "ciLow": 1.260744606858496,
+      "ciHigh": 1.3802260372681716,
+      "pValue": 3.9613587902555786e-33,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "dialysis_group_non_dialysis",
+      "oddsRatio": 1.1034423476749045,
+      "ciLow": 0.7361911209147423,
+      "ciHigh": 1.6538979893283883,
+      "pValue": 0.6335619079444685,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "dialysis_group_peritoneal_dialysis",
+      "oddsRatio": 0.9414252087548376,
+      "ciLow": 0.2232510424388858,
+      "ciHigh": 3.9698870562797306,
+      "pValue": 0.9344819825790442,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "valve_strategy_TAVR",
+      "oddsRatio": 2.078260908591302,
+      "ciLow": 1.6829431836543627,
+      "ciHigh": 2.5664374449053295,
+      "pValue": 1.078978703486162e-11,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "valve_strategy_mixed_savr_tavr_same_admission",
+      "oddsRatio": 1.7183599864863028,
+      "ciLow": 0.18732491003123,
+      "ciHigh": 15.762778386841001,
+      "pValue": 0.6321094832424188,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "anchor_year_group_2011 - 2013",
+      "oddsRatio": 0.719530743710064,
+      "ciLow": 0.5568122452543818,
+      "ciHigh": 0.9298008360204675,
+      "pValue": 0.011855846409244074,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "anchor_year_group_2014 - 2016",
+      "oddsRatio": 0.5593398703272562,
+      "ciLow": 0.43336548592117874,
+      "ciHigh": 0.7219335657815065,
+      "pValue": 8.098969670890516e-06,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "anchor_year_group_2017 - 2019",
+      "oddsRatio": 0.64790213544959,
+      "ciLow": 0.49362629777350525,
+      "ciHigh": 0.8503946791602031,
+      "pValue": 0.0017608551128622703,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "anchor_year_group_2020 - 2022",
+      "oddsRatio": 0.46294763210596085,
+      "ciLow": 0.32540843856790164,
+      "ciHigh": 0.658620013100228,
+      "pValue": 1.8544838377486606e-05,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "insurance_Medicare",
+      "oddsRatio": 0.7929061697216289,
+      "ciLow": 0.526333461778505,
+      "ciHigh": 1.1944902607146,
+      "pValue": 0.26703500472421515,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "insurance_Other",
+      "oddsRatio": 0.8970979498451018,
+      "ciLow": 0.369069032535235,
+      "ciHigh": 2.180580489476456,
+      "pValue": 0.8106188205398234,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "hf_readmission_365d",
+      "term": "insurance_Private",
+      "oddsRatio": 0.6273123599001301,
+      "ciLow": 0.40840695969883023,
+      "ciHigh": 0.9635506632248941,
+      "pValue": 0.033210541064669925,
+      "n": 4255,
+      "events": 622
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "admission_age",
+      "oddsRatio": 0.9875288498672821,
+      "ciLow": 0.9796086204762303,
+      "ciHigh": 0.9955131150704893,
+      "pValue": 0.002254289763364026,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "male",
+      "oddsRatio": 0.9428339440877405,
+      "ciLow": 0.8189695785867194,
+      "ciHigh": 1.0854320714306196,
+      "pValue": 0.4126937509327281,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "charlson_comorbidity_index",
+      "oddsRatio": 1.1443599308610433,
+      "ciLow": 1.1031330869192257,
+      "ciHigh": 1.1871275251271483,
+      "pValue": 5.88261835694299e-13,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "dialysis_group_non_dialysis",
+      "oddsRatio": 0.9860247335250197,
+      "ciLow": 0.7033418024647884,
+      "ciHigh": 1.382321897711689,
+      "pValue": 0.9349257241497722,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "dialysis_group_peritoneal_dialysis",
+      "oddsRatio": 1.987732561326684,
+      "ciLow": 0.5897756146904668,
+      "ciHigh": 6.69929484526415,
+      "pValue": 0.26777080064075554,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "valve_strategy_TAVR",
+      "oddsRatio": 1.3861495554925334,
+      "ciLow": 1.1693571882483063,
+      "ciHigh": 1.643134030817748,
+      "pValue": 0.00016791834463889435,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "valve_strategy_mixed_savr_tavr_same_admission",
+      "oddsRatio": 0.7033899374557087,
+      "ciLow": 0.07796896147747111,
+      "ciHigh": 6.345568733231163,
+      "pValue": 0.7538916635809612,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "anchor_year_group_2011 - 2013",
+      "oddsRatio": 0.6974450654735788,
+      "ciLow": 0.5741491029050774,
+      "ciHigh": 0.8472182868390981,
+      "pValue": 0.00028299188593663743,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "anchor_year_group_2014 - 2016",
+      "oddsRatio": 0.5314586707515364,
+      "ciLow": 0.43806639298102285,
+      "ciHigh": 0.6447614408285041,
+      "pValue": 1.4459657983530716e-10,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "anchor_year_group_2017 - 2019",
+      "oddsRatio": 0.602369426405038,
+      "ciLow": 0.4901356724634515,
+      "ciHigh": 0.7403030349613892,
+      "pValue": 1.4480016393822722e-06,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "anchor_year_group_2020 - 2022",
+      "oddsRatio": 0.48489496094693396,
+      "ciLow": 0.37485320515882986,
+      "ciHigh": 0.6272405302019604,
+      "pValue": 3.556389482659301e-08,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "insurance_Medicare",
+      "oddsRatio": 0.7642443620356114,
+      "ciLow": 0.5665513559872668,
+      "ciHigh": 1.030920566566159,
+      "pValue": 0.07831265472718672,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "insurance_Other",
+      "oddsRatio": 0.8221036423871317,
+      "ciLow": 0.4396963703845706,
+      "ciHigh": 1.5370934225248847,
+      "pValue": 0.539527068794494,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "cardiac_readmission_365d",
+      "term": "insurance_Private",
+      "oddsRatio": 0.6682279375208089,
+      "ciLow": 0.49737085531985603,
+      "ciHigh": 0.8977779290991115,
+      "pValue": 0.0074576556238564766,
+      "n": 4255,
+      "events": 1238
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "admission_age",
+      "oddsRatio": 0.9737819171885147,
+      "ciLow": 0.9644033568008477,
+      "ciHigh": 0.9832516815255716,
+      "pValue": 7.423586958109727e-08,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "male",
+      "oddsRatio": 1.0943424227718015,
+      "ciLow": 0.9247674499333923,
+      "ciHigh": 1.2950124254095599,
+      "pValue": 0.29395588125860406,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "charlson_comorbidity_index",
+      "oddsRatio": 1.5073636985335512,
+      "ciLow": 1.4429570272762149,
+      "ciHigh": 1.5746451742542478,
+      "pValue": 9.331170309367611e-76,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "dialysis_group_non_dialysis",
+      "oddsRatio": 0.5875181403033892,
+      "ciLow": 0.415078787991158,
+      "ciHigh": 0.8315952902727131,
+      "pValue": 0.0026975793798495098,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "dialysis_group_peritoneal_dialysis",
+      "oddsRatio": 2.0402543610127792,
+      "ciLow": 0.5462019339007189,
+      "ciHigh": 7.621060269604047,
+      "pValue": 0.2889068684832702,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "valve_strategy_TAVR",
+      "oddsRatio": 0.8025440135116967,
+      "ciLow": 0.6583314603821986,
+      "ciHigh": 0.9783474319297141,
+      "pValue": 0.029512845038841988,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "valve_strategy_mixed_savr_tavr_same_admission",
+      "oddsRatio": 11.080608793998914,
+      "ciLow": 1.1802445570326376,
+      "ciHigh": 104.02919506304556,
+      "pValue": 0.035291153448625184,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "anchor_year_group_2011 - 2013",
+      "oddsRatio": 0.812275662545823,
+      "ciLow": 0.6411118375449826,
+      "ciHigh": 1.029136748575419,
+      "pValue": 0.08505422966454758,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "anchor_year_group_2014 - 2016",
+      "oddsRatio": 0.8909050007371463,
+      "ciLow": 0.710455658761031,
+      "ciHigh": 1.1171868512140708,
+      "pValue": 0.31714197653494325,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "anchor_year_group_2017 - 2019",
+      "oddsRatio": 0.7596453628341591,
+      "ciLow": 0.590432605703346,
+      "ciHigh": 0.9773529979565133,
+      "pValue": 0.032506036129921034,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "anchor_year_group_2020 - 2022",
+      "oddsRatio": 0.8889591850119309,
+      "ciLow": 0.6586743178335489,
+      "ciHigh": 1.1997559510385785,
+      "pValue": 0.44163139091801895,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "insurance_Medicare",
+      "oddsRatio": 0.7397532563981787,
+      "ciLow": 0.5195503670806919,
+      "ciHigh": 1.0532855234547798,
+      "pValue": 0.09452283482015011,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "insurance_Other",
+      "oddsRatio": 0.8904748680473251,
+      "ciLow": 0.42159741781871723,
+      "ciHigh": 1.8808120190263118,
+      "pValue": 0.7610722728754191,
+      "n": 4255,
+      "events": 876
+    },
+    {
+      "outcome": "mace_365d",
+      "term": "insurance_Private",
+      "oddsRatio": 0.499230584598861,
+      "ciLow": 0.3465683620579191,
+      "ciHigh": 0.7191400135863197,
+      "pValue": 0.0001911537936940218,
+      "n": 4255,
+      "events": 876
+    }
+  ],
+  "cost": {
+    "plannedUsd": 0.01250845469534397,
+    "actualUsd": 0.01250845469534397,
+    "ceilingUsd": 10.0,
+    "actualBytes": 111923758
+  },
+  "artifacts": {
+    "matchedProcedureCodes": "matched-procedure-codes.csv",
+    "matchedDiagnosisCodes": "matched-diagnosis-codes.csv",
+    "matchedHcpcsCodes": "matched-hcpcs-codes.csv",
+    "outcomesByGroup": "outcomes-by-group.csv",
+    "baselineByGroup": "baseline-by-group.csv",
+    "eraSummary": "era-summary.csv",
+    "indexCohortAudit": "index-cohort-audit.csv"
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_6529924689328250154",
+    "method": "linear-regression",
+    "status": "succeeded",
+    "rowCount": 360,
+    "completeCaseN": 360,
+    "variables": [
+      "outcome_cont",
+      "biomarker",
+      "age",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": 27.227215631299472,
+        "std_error": 1.2132330591867948,
+        "p_value": 3.900583200073325e-70,
+        "ci_low": 24.84121084125894,
+        "ci_high": 29.613220421340007
+      },
+      {
+        "term": "biomarker",
+        "estimate": 0.909996606406816,
+        "std_error": 0.20716412345925705,
+        "p_value": 0.000014791391258440116,
+        "ci_low": 0.5025772839976068,
+        "ci_high": 1.3174159288160252
+      },
+      {
+        "term": "age",
+        "estimate": 0.061601863534831186,
+        "std_error": 0.01717526352487413,
+        "p_value": 0.0003817460724562227,
+        "ci_low": 0.027824131605875706,
+        "ci_high": 0.09537959546378666
+      },
+      {
+        "term": "treatment",
+        "estimate": -0.21969807729615287,
+        "std_error": 0.5081521005301431,
+        "p_value": 0.6657509417448998,
+        "ci_low": -1.219055403370636,
+        "ci_high": 0.7796592487783303
+      }
+    ],
+    "diagnostics": {
+      "model_family": "linear-regression",
+      "aic": 2104.9765424701013,
+      "bic": 2120.520958595902,
+      "df_resid": 356,
+      "residual_mean": 3.1382304162737757e-15,
+      "residual_sd": 4.45897851983718,
+      "shapiro_p_value": 0.9365586883390666,
+      "max_leverage": 0.036487756839826094,
+      "max_cooks_distance": 0.028748892347576053,
+      "vif": [
+        {
+          "term": "biomarker",
+          "vif": 1.4982796445011308
+        },
+        {
+          "term": "age",
+          "vif": 1.3852719205265573
+        },
+        {
+          "term": "treatment",
+          "vif": 1.1127202243894898
+        }
+      ],
+      "max_vif": 1.4982796445011308,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/stats-config.json",
+        "sha256": "859a060fb5c0f47fab95a5150b1c26c802a406685bcb204f547135b36483da91"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/stats-summary.json",
+        "sha256": "0a9225228c21cad6b719e26860ffd7f3d2f764c351837a9a9515908e4c3ce042"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/estimates.csv",
+        "sha256": "7ab2f8613015a2b0603c9b1348923b4ad080dff5c6a078bb69b1062088864789"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/diagnostics.json",
+        "sha256": "21d02eedeb551deb412814f2f0b693a8329e44b3d1c9ec8e65be2d36a63b60f0"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/figures.json",
+        "sha256": "e77cbf1727df5c14a2d046e82dd8d1783cdbb6dea374a79db06df52e1d21aa17"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/model-residuals.png",
+        "sha256": "22576c22336a906ef0db754038e6b6b8ab237850014465de62774cf156bc169f"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/figure-qa.json",
+        "sha256": "8e9d95012a9dd47a877657b4b24428121457c9d1c390164793ce04ba7db4f695"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/stats-report.md",
+        "sha256": "63699f4f547545466c47cc81989e998ede443efe0330e54bed6bee514856ed88"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run/stats-qa.json",
+        "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/05-adjusted-linear-model/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

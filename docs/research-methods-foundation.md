@@ -20,6 +20,21 @@ Missing data should be treated as a design and reporting problem rather than a n
 
 Small-cell and reliability checks should be first-class. The pipeline should flag sparse strata, unstable proportions, suppressed counts, and privacy/reliability thresholds before report generation.
 
+## Executable Standard-Table Method Families
+
+The local `research stats-run` route covers the major standard-table method families needed for broad biomedical and public-health research prototyping:
+
+- core inference: independent/paired/Welch t-tests, ANOVA/ANCOVA, nonparametric group tests, categorical tests, trend tests, and correlations
+- regression and GLMs: linear, robust linear, logistic, ordinal, multinomial, Poisson, negative binomial, zero-inflated counts, Gamma/inverse Gaussian GLMs, quantile, and penalized regression with inference caveats
+- survival and longitudinal: Kaplan-Meier, log-rank, Cox/stratified Cox, Aalen-Johansen cumulative incidence, recurrent event rates, mixed models, GEE, and repeated-measures ANOVA
+- causal and quasi-experimental: propensity matching/weighting, overlap weighting, entropy balancing, AIPW, DiD/event-study scaffold, interrupted time series, regression discontinuity, instrumental variables, target-trial scaffolding, and unmeasured-confounding sensitivity
+- prediction and diagnostics: local binary prediction evaluation, diagnostic accuracy, model diagnostics, calibration-related ML artifacts, and method-aware QA
+- missing data and reliability: missingness summaries, MICE-style iterative imputation, missingness IPW, complete-case/MNAR sensitivity, kappa, ICC, Cronbach alpha, PCA, clustering validation, Bland-Altman, multiple-comparison correction, and power/sample-size
+
+Execution success is not the same as scientific readiness. Methods with unavailable validated backends, such as Fine-Gray competing-risk regression, time-varying Cox, and production-grade GLMM, are blocked with explicit QA failures rather than approximated silently.
+
+Every stats run should leave behind a machine-readable estimate table, diagnostics, QA, and a figure manifest. Figures are part of the evidence packet, not decoration: captions, source columns, and render QA should travel with the report.
+
 ## Provenance and Reproducibility
 
 FAIR principles push the workflow toward machine-actionable metadata for finding, accessing, interoperating with, and reusing datasets and artifacts.

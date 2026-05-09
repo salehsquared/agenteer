@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_6797648505059225977",
+    "method": "multiple-comparison-correction",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "p_value"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "bonferroni",
+        "tests": 240,
+        "rejected": 0,
+        "min_adjusted_p": 0.24
+      },
+      {
+        "term": "holm",
+        "tests": 240,
+        "rejected": 0,
+        "min_adjusted_p": 0.24
+      },
+      {
+        "term": "fdr_bh",
+        "tests": 240,
+        "rejected": 0,
+        "min_adjusted_p": 0.12000000000000001
+      },
+      {
+        "term": "fdr_by",
+        "tests": 240,
+        "rejected": 0,
+        "min_adjusted_p": 0.7271923769784133
+      }
+    ],
+    "diagnostics": {
+      "test": "multiple comparison correction",
+      "methods": [
+        "bonferroni",
+        "holm",
+        "fdr_bh",
+        "fdr_by"
+      ]
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/stats-config.json",
+        "sha256": "6feace997baadd1349062075639895812732df5f2c7868394bf21b3e1c2a1671"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/stats-summary.json",
+        "sha256": "9e815694b45f824d0566ea01d44c5a979ea3e3a0725e1ac55faebfe09fc0d287"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/estimates.csv",
+        "sha256": "e22f2de8699af41a734044ab049c60fbc143e505d62544c4f44ca93c82d958be"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/diagnostics.json",
+        "sha256": "dc074047f7814283534d7ee399d949fc7966ad9e92d49314e252f62d1ef21a50"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/stats-report.md",
+        "sha256": "451e545f87210c29d83e9dd29ef4f85ec382ee4353bc37f918240f2bfc051709"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction/stats-qa.json",
+        "sha256": "c18ef16b177247a2539e8facc135e4b1156e9c023977ea1e4d00576188a2cc85"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-multiple-correction",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

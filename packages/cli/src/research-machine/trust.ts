@@ -109,6 +109,8 @@ export interface RunInspectionResult {
     manuscriptQaStatus: MethodQaStatus | null;
     lifecycleStatus: string | null;
     rerunStabilityStatus: string | null;
+    reviewerPanelStatus: string | null;
+    reviewerAdjudicationVerdict: string | null;
   };
   literature: {
     searchPath: string | null;
@@ -231,11 +233,16 @@ const knownJsonFiles = [
   "manuscript-qa.json",
   "stats-qa.json",
   "diagnostics.json",
+  "feasibility-trial.json",
   "analysis-run-manifest.json",
   "run-manifest.json",
   "runner-record.json",
   "lifecycle.json",
   "rerun-stability.json",
+  "review-panel.json",
+  "review-adjudication.json",
+  "review-response.json",
+  "state-reentry.json",
   "cost-receipt.json",
   "analysis-spec-v2.json",
   "analysis-spec.json",
@@ -528,6 +535,8 @@ export async function researchRunInspectCommand(opts: {
   const manuscriptQa = evidence.json["manuscript-qa.json"] ? firstStatus(evidence.json["manuscript-qa.json"]) as MethodQaStatus | null : null;
   const lifecycleStatus = firstStatus(evidence.json["lifecycle.json"], "lifecycleStatus", "status");
   const rerunStabilityStatus = firstStatus(evidence.json["rerun-stability.json"], "status", "stabilityStatus");
+  const reviewerPanelStatus = firstStatus(evidence.json["review-panel.json"], "status");
+  const reviewerAdjudicationVerdict = firstStatus(evidence.json["review-adjudication.json"], "verdict");
   const cost = extractCost(evidence);
   const manifestPaths = evidence.files
     .filter(file => /manifest|runner-record|receipt|lifecycle|spec/i.test(file.relativePath))
@@ -543,6 +552,9 @@ export async function researchRunInspectCommand(opts: {
   if (literature.blockerCount > 0) blockers.push(`Literature QA has ${literature.blockerCount} blocker(s).`);
   if (literature.warningCount > 0) warnings.push(`Literature QA has ${literature.warningCount} warning(s).`);
   if (rerunStabilityStatus && !["pass", "stable"].includes(rerunStabilityStatus)) warnings.push(`Rerun stability status is ${rerunStabilityStatus}.`);
+  if (reviewerAdjudicationVerdict === "block") blockers.push("External reviewer adjudication blocked the run.");
+  else if (reviewerAdjudicationVerdict === "revise") warnings.push("External reviewer adjudication requires revision.");
+  else if (reviewerPanelStatus && !["pass"].includes(reviewerPanelStatus) && !reviewerAdjudicationVerdict) warnings.push(`Reviewer panel status is ${reviewerPanelStatus}.`);
   const readiness: RunReadiness = blockers.length ? "blocked" : warnings.length ? "needs_methods_review" : "local_review_ready";
   const artifactHash = stableHash(evidence.files.map(file => ({ path: file.relativePath, bytes: file.bytes, sha256: file.sha256 })));
   const paperPath = evidence.textPaths["paper.md"] ?? findCanonicalArtifactFile(evidence.files, "paper.md")?.path ?? null;
@@ -570,6 +582,8 @@ export async function researchRunInspectCommand(opts: {
       manuscriptQaStatus: manuscriptQa,
       lifecycleStatus,
       rerunStabilityStatus,
+      reviewerPanelStatus,
+      reviewerAdjudicationVerdict,
     },
     literature,
     paperPath,
@@ -596,6 +610,7 @@ export function renderResearchRunInspect(result: RunInspectionResult): string {
     `  literature: ${result.literature.status ?? "(missing)"}; sources=${result.literature.sourceCount ?? "?"}; high-quality=${result.literature.highQualitySourceCount ?? "?"}`,
     `  lifecycle: ${result.qa.lifecycleStatus ?? "(missing)"}`,
     `  rerun stability: ${result.qa.rerunStabilityStatus ?? "(missing)"}`,
+    `  external review: ${result.qa.reviewerAdjudicationVerdict ?? result.qa.reviewerPanelStatus ?? "(missing)"}`,
     `  paper: ${result.paperPath ?? "(missing)"}`,
     `  manuscript: ${result.manuscriptPath ?? "(missing)"}`,
     `  next: ${result.nextRecommendedAction}`,

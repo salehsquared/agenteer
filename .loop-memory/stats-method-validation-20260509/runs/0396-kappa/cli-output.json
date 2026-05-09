@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_766695935667274658",
+    "method": "reliability-kappa",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "rater_a",
+      "rater_b"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "cohen_kappa",
+        "kappa": 0.7563628453339134,
+        "observed_agreement": 0.8833333333333333,
+        "expected_agreement": 0.5211458333333333
+      }
+    ],
+    "diagnostics": {
+      "test": "Cohen kappa",
+      "table": {
+        "negative": {
+          "negative": 131,
+          "positive": 10
+        },
+        "positive": {
+          "negative": 18,
+          "positive": 81
+        }
+      }
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/stats-config.json",
+        "sha256": "ef68a23b078f6eff72b44656621b1bce5e62f3546b7aaf0d962c2399db38d61e"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/stats-summary.json",
+        "sha256": "554557555a0dc5339f2de3ba944173709530eec6a36286f6dfdf064f6059fe8e"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/estimates.csv",
+        "sha256": "32bead749ad74058cfd8c8b2b55320e917edc54fe84b5919ab8feee54fe9f562"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/diagnostics.json",
+        "sha256": "e33020e2b43b0f07a480712b24a6342a3338ecf056428e75fc22b52314738d7d"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/stats-report.md",
+        "sha256": "2935fb13b51a2d58b18d6f38a8addca20a94e3ddf50054c08f32fed6cdf2eea6"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa/stats-qa.json",
+        "sha256": "ecb5bc71f3f327ee7e284e66959545a27e67eebae15307fc2c42ddb89656a1df"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-kappa",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

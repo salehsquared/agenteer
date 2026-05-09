@@ -1,0 +1,24 @@
+{
+  "method": "propensity-score-weighting",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment",
+    "age",
+    "severity",
+    "albumin"
+  ],
+  "parameters": {
+    "alpha": 0.05,
+    "estimand": "ATE",
+    "matchRatio": 1,
+    "caliper": 0.2,
+    "replacement": false,
+    "trimThreshold": 0.01,
+    "stabilizeWeights": true,
+    "treatmentPositiveLevel": 1,
+    "treatmentNegativeLevel": 0
+  },
+  "warnings": []
+}

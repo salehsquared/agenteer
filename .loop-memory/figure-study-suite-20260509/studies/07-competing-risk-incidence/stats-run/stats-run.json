@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_5038981440765329017",
+  "method": "aalen-johansen-cif",
+  "status": "succeeded",
+  "rowCount": 360,
+  "completeCaseN": 360,
+  "variables": [
+    "time",
+    "comp_event",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "0",
+      "final_cumulative_incidence": 0.5539322463190482
+    },
+    {
+      "term": "1",
+      "final_cumulative_incidence": 0.6990136494352661
+    }
+  ],
+  "diagnostics": {
+    "test": "Aalen-Johansen cumulative incidence",
+    "curve_path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/cumulative-incidence.csv",
+    "event_of_interest_code": 1
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/stats-config.json",
+      "sha256": "a11c03bab598e252dd08ce93a3f3fb3c3624e7dc515723bf0ebfb9f478f0070e"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/stats-summary.json",
+      "sha256": "63fd5f86a36e4c346580fb52c7e1d841638e9e8d208265ad839637f1a369b0cf"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/estimates.csv",
+      "sha256": "c2b03c6fc179a7edc10c4ccde8e8c058f3a13ae840f1788185f99feb4573df3c"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/diagnostics.json",
+      "sha256": "74cc7b7ad7a8eb2ad9202e3217076a89c79a19cfa68c957c5ff31dfa7866554a"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/figures.json",
+      "sha256": "39b3a6a548db219e7add058d464986b0444967181c7cc3bcea57fed9c044dd29"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/cumulative-incidence.png",
+      "sha256": "341b3b3c306cc8a8fa796b1d9f12d4101da449e3bbdedafde5e0b82fb28aa606"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/figure-qa.json",
+      "sha256": "97e55cae9dc4fe6b893577fdbab35ed6ae281ade486e9124ad9471ebc0035f2d"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/stats-report.md",
+      "sha256": "2b116c2f88e0cc44e8beed64a8d73f3eac2f6ebe2d9da538e1a3ca4d4351cb02"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run/stats-qa.json",
+      "sha256": "d54c7471d88d1bb067edc3034bf19ff0d67f4741ec3774568312eddb989ea118"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/07-competing-risk-incidence/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

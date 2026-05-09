@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4257418419485776301",
+    "method": "target-trial-emulation-spec",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_binary",
+      "treatment",
+      "survival_time",
+      "patient_id",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "target_trial_emulation_scaffold",
+        "status": "review_required"
+      }
+    ],
+    "diagnostics": {
+      "required_protocol_items": [
+        "eligibility criteria",
+        "treatment strategies",
+        "assignment time zero",
+        "follow-up",
+        "outcome",
+        "causal contrast",
+        "analysis plan",
+        "emulation gaps"
+      ],
+      "declared_variables": [
+        "outcome_binary",
+        "treatment",
+        "survival_time",
+        "patient_id",
+        "age",
+        "severity"
+      ]
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "TARGET_TRIAL_REVIEW_REQUIRED",
+        "message": "Target trial emulation is a design scaffold; human causal design review is required before execution claims.",
+        "evidenceRefs": [
+          "diagnostics.required_protocol_items"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/stats-config.json",
+        "sha256": "ef499768e954db31c9dbf5f00daa929fbaeae65c51119dc9ce09db000d567a81"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/stats-summary.json",
+        "sha256": "1873495592fcba3c8e302e41117d2167a004166e80f573c450e3233a44b248a1"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/estimates.csv",
+        "sha256": "c0779acd4cb3ca4ebfdd578cb648607a6ad9979216c3fedec18fd503e6be6bc4"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/diagnostics.json",
+        "sha256": "8df244b00ab2756cb8048f04e56a0837ddcda6e313b11eb9f57aa0e4aa873c9a"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/stats-report.md",
+        "sha256": "f1ca227f7b71437aa5b0b5f6645a4dac4d62cd30bec78973fc27af7b6b4ef66e"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial/stats-qa.json",
+        "sha256": "ecb5bc71f3f327ee7e284e66959545a27e67eebae15307fc2c42ddb89656a1df"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-target-trial",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

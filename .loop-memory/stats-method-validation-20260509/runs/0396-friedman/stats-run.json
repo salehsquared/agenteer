@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_4810323494059695185",
+  "method": "friedman",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "scale_item_1",
+    "scale_item_2",
+    "scale_item_3"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "friedman",
+      "statistic": 117.61215932914043,
+      "p_value": 2.88964238795282e-26,
+      "repeated_measures": 3,
+      "n": 240
+    }
+  ],
+  "diagnostics": {
+    "test": "Friedman repeated-measures rank test"
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/stats-config.json",
+      "sha256": "519f3ba79765a1bc613c00aeb8da67929aea0fd978a9ea9be23963246f22ed6b"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/stats-summary.json",
+      "sha256": "63146e8cef914974b01a99f3efa95eb76b71a596a72bbc9a52a085799bd1ece1"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/estimates.csv",
+      "sha256": "e62a89cf02b4aeb829953430d1026fd728d854c822bb93f2a1203454e857d873"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/diagnostics.json",
+      "sha256": "f00819441cb223389f99723fc5aa959357bca26ad9a6bfe3126e6959d0ffa1d5"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/stats-report.md",
+      "sha256": "9f4f7dee52a7904a1803d0a3e65d34a8fa17164a8c16f0f729351ec5a46443d1"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman/stats-qa.json",
+      "sha256": "55cd738ab13b0bdfb042911870311ed02773a5fc2576149267c1e196440631be"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-friedman",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

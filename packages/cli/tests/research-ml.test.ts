@@ -893,7 +893,9 @@ describe("research ML modeling layer", () => {
       expect(result.analysisRunManifest.readiness).toBe("exploratory_only");
       expect(result.postRunModelingPlan.priorRunEvidence.runs[0]?.action).toBe("rerun-with-binding");
       expect(await readFile(result.generatedFiles.modelingPlan, "utf-8")).toContain("modelingPlan");
+      expect(await readFile(result.generatedFiles.feasibilityTrial, "utf-8")).toContain("feasible_for_local_review");
       expect(await readFile(result.generatedFiles.postRunModelingPlan, "utf-8")).toContain("priorRunEvidence");
+      expect(result.analysisRunManifest.artifacts.map(artifact => artifact.kind)).toContain("feasibility-trial");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

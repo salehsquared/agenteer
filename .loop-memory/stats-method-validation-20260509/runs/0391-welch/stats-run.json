@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2364148742421700856",
+  "method": "welch-t-test",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "group_a": 0,
+      "group_b": 1,
+      "n_a": 96,
+      "n_b": 144,
+      "mean_a": 20.48651041666667,
+      "mean_b": 23.400236111111113,
+      "mean_difference": 2.9137256944444445,
+      "cohen_d": 0.8744737870141851,
+      "statistic": 6.5913481275746815,
+      "p_value": 3.8287252527457425e-10
+    }
+  ],
+  "diagnostics": {
+    "test": "two-sample t-test",
+    "equal_variance_assumed": false,
+    "levene_p_value": 0.7081745345644388
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/stats-config.json",
+      "sha256": "5f5e291058f5a20687ed56ef83119dc67cc2691852386e30f853da4470adb28e"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/stats-summary.json",
+      "sha256": "3e7e78d2d7ba28af3fd6ac56732859f6186c0d5cb27cb87a449263d52c801915"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/estimates.csv",
+      "sha256": "5a2b8c3cd242726190f500298a36d7cef403350e4410950037dd510706694d89"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/diagnostics.json",
+      "sha256": "25466afadf328893d04e17f805a9c28d9a2909a971c37d36d6db0a532ec4bbda"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/figures.json",
+      "sha256": "6a60c63e183d2b784e2b211cb41b0d1ea9d7aa5560bf67d61da7c879b4a75c84"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/group-distribution.png",
+      "sha256": "2b79ecb998ffc196d2855dcf4d153af2e7e93c91f66ef5688c85aaaa37b1bfa8"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/stats-report.md",
+      "sha256": "a41a647564e9b182072a9dde1e68b83bda0c45d7b00672e7f743fd2db2b44506"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch/stats-qa.json",
+      "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-welch",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

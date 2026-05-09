@@ -1,5 +1,11 @@
 # Open Questions
 
+## SAVR/TAVR Dialysis Study
+
+- What dataset should answer the exact 2008-2022 CPT-based longitudinal question: Medicare claims, STS/ACC TVT Registry linked to claims, NIS/NRD, or another registry/claims source?
+- Should the MIMIC feasibility packet add rerun stability, separation/collinearity/influence diagnostics, and an AnalysisSpec before being used as a demo?
+- Should peritoneal dialysis be collapsed into any-dialysis for adjusted models, or kept separate and treated as descriptive only because the stratum is tiny?
+
 ## MIMIC Dialysis/Cardiac Paper Series
 
 - Should the MIMIC dialysis/cardiac paper-series runner be promoted from `.loop-memory` into a package command, or should it first be generalized behind dataset adapters?
@@ -16,6 +22,9 @@
 - What production authentication boundary should replace the local dev API-key pattern when MedBrevia integration moves beyond localhost?
 
 ## Modeling Decision Layer
+
+- Stats-method validation corpus result: `.loop-memory/stats-method-validation-20260509/VALIDATION_INDEX.md` proves broad local execution but not route-specific assumption validity. Next likely improvements are route-specific assumption QA, figure/report standardization, or real-data application of the new method families.
+- Figure suite result: `.loop-memory/figure-study-suite-20260509/STUDY_INDEX.md` proves 10 generated study papers with 10/10 figure QA pass. Remaining gap: should figure QA become a mandatory readiness gate in `analysis-manifest`/`run-inspect`, and should every figure write source-data CSV sidecars plus publication-format SVG/PDF exports?
 
 - MIMIC manuscript generation now avoids internal readiness enum leakage, but MIMIC execution packets still lack generated collinearity and influence diagnostics. Should those diagnostics be implemented inside the loop-memory runner first or after promoting it into `agenteer research dataset-run`?
 - Resolved partly: Tick 0331 made high-missingness complete-case denominator shrinkage downgrade trust-layer readiness. Remaining gap: the MIMIC runner should generate missingness sensitivity and separation diagnostics during execution, not only post-hoc inspection.

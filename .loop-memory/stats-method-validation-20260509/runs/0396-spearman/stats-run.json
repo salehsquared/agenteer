@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_3178941090112771240",
+  "method": "spearman",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "severity",
+      "correlation": 0.6141100350875335,
+      "p_value": 2.85238333853314e-26,
+      "n": 240,
+      "adjusted_for": ""
+    }
+  ],
+  "diagnostics": {
+    "test": "spearman",
+    "n": 240
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/stats-config.json",
+      "sha256": "05022dada59f812f169411ef3497316cecca1dcbd254aea2268d3ad2e0fd5692"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/stats-summary.json",
+      "sha256": "1e2f0a77b4c5ccb7c9f0ae3cd9728d8488dde199ffe2e3e25d2866c0b7800f7c"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/estimates.csv",
+      "sha256": "53e4e77e28158558665ec3687f950de76e60c7173e2ec6d3085d577af164b11d"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/diagnostics.json",
+      "sha256": "282dd0ac543e0aaf98345931b10785249641404387876de2dc7ea23591fa9edd"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/figures.json",
+      "sha256": "679092a323c1dcf74f0328c66fe8714be880d0ca21026e47c7ca8f8b0fd4f93b"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/correlation-scatter.png",
+      "sha256": "103bd6d9e25fd04e7958a55ec0e0584b9cd64abd214d5d35b6864941ffd71662"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/stats-report.md",
+      "sha256": "6ee507aae4d70ab37822fbc92b95a4224e717094c4745a262bf9377b76816938"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman/stats-qa.json",
+      "sha256": "fa1b6ea79f4b7c9b9c3ce2796ba7a8d22c3c747f88495b55d912a43b4ea25e82"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-spearman",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

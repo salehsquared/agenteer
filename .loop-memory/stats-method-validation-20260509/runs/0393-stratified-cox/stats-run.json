@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_7473208331940353768",
+  "method": "stratified-cox",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "survival_time",
+    "event",
+    "treatment",
+    "site",
+    "age",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "log_hazard_ratio": 0.45600349464653217,
+      "hazard_ratio": 1.577755858455883,
+      "ci_low": 1.066600859763353,
+      "ci_high": 2.333875438131716,
+      "p_value": 0.022446164252697288
+    },
+    {
+      "term": "age",
+      "log_hazard_ratio": 0.017440275767744595,
+      "hazard_ratio": 1.017593245360529,
+      "ci_low": 1.0052653878521314,
+      "ci_high": 1.0300722829180795,
+      "p_value": 0.005040624782175131
+    },
+    {
+      "term": "severity",
+      "log_hazard_ratio": 0.30566822391326814,
+      "hazard_ratio": 1.3575318352243135,
+      "ci_low": 1.0994349046942777,
+      "ci_high": 1.6762180969322145,
+      "p_value": 0.004496452558129998
+    }
+  ],
+  "diagnostics": {
+    "test": "stratified-cox",
+    "events": 140,
+    "n_predictors": 3,
+    "strata": "site"
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/stats-config.json",
+      "sha256": "7283ae908ec62d629f302ab1ba0b51f0006635d36603e7ecedb6edf31176c2e2"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/stats-summary.json",
+      "sha256": "45058025783a80c4d9c91ef53ab33091fcbdfc03c955f3ce5fe46653e33fa79a"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/estimates.csv",
+      "sha256": "9b6e8f0f25f863eef81a06d208735da9859e8e673203a540faeb166c160d1754"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/diagnostics.json",
+      "sha256": "93b79e4fcb6f5f79e325c7936c46e853c7c3201a95bafe4f8fa3d3fe2e988feb"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/stats-report.md",
+      "sha256": "5d2aa53ff8b59e5aee303aa8d6b5f01323f1a6f9748813371a0703c9de7e6a89"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox/stats-qa.json",
+      "sha256": "f466673be8dc9c95aa66c9ac8f56755bfa57c60835c222c4440ff68632d60e78"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-stratified-cox",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

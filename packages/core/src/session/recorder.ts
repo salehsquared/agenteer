@@ -132,4 +132,3 @@ export class SessionRecorder {
     task.catch(() => undefined).finally(() => this.pending.delete(task));
   }
 }
-

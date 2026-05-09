@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4401513941796335605",
+    "method": "bland-altman",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "measure_a",
+      "measure_b"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "bland_altman",
+        "bias": -0.33347499999999997,
+        "loa_low": -3.2611192200928976,
+        "loa_high": 2.5941692200928976,
+        "n": 240
+      }
+    ],
+    "diagnostics": {
+      "test": "Bland-Altman agreement"
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/stats-config.json",
+        "sha256": "a44d11e1c67f8bd99859faf0abdf2cf94017fcb038b40caba43ebb777ba7c935"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/stats-summary.json",
+        "sha256": "c616aa58b8cb21cf4cc4016fe656d4daedc38a3071cf363e367b787e3bdc10d3"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/estimates.csv",
+        "sha256": "fd3624809baf6a53aa2783e6eb67eb7b7550631306fcc83d4645550bea11b91c"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/diagnostics.json",
+        "sha256": "63e109850c2955969c739e31f8fb84900482734c2ae85e4fc803367732763fab"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/figures.json",
+        "sha256": "051dc42780da76c41c4d6832269cc407321b65f77ffb48a705e1b28f25d95850"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/bland-altman.png",
+        "sha256": "06d2f4012f6e60faffe843c22f6d4ef057871645cb386dbe92acd74b67e855c5"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/stats-report.md",
+        "sha256": "b71a4b030826317dc812f2f4c1b9c30973559365ab07a53b8356930978cf2fec"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman/stats-qa.json",
+        "sha256": "08113f89c54b335c396b426790c89de5f3661bdbfa03c18662758f5cefc7b326"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-bland-altman",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

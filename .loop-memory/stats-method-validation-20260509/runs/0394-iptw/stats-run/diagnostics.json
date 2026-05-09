@@ -1,0 +1,68 @@
+{
+  "weighting": {
+    "estimand": "ATE",
+    "stabilized": true,
+    "trim_threshold": 0.01,
+    "trimmed_rows": 0,
+    "min_weight": 0.47886707632833453,
+    "max_weight": 3.3951496636267176,
+    "mean_weight": 0.9992295439231715,
+    "effective_sample_size": 201.93829135540332
+  },
+  "test": "propensity-score-weighting",
+  "treatment_column": "treatment",
+  "treatment_positive_level": 1,
+  "treatment_negative_level": 0,
+  "covariates": [
+    "age",
+    "severity",
+    "albumin"
+  ],
+  "exact_covariates": [],
+  "propensity_model": {
+    "family": "logistic",
+    "n_parameters": 4,
+    "aic": 297.07484020817895,
+    "converged": true,
+    "propensity_min": 0.16469513196238075,
+    "propensity_max": 0.9395750181570478
+  },
+  "missingness": {
+    "input_rows": 240,
+    "complete_case_rows": 240,
+    "excluded_missing_rows": 0,
+    "complete_case_fraction": 1.0,
+    "missing_counts": {
+      "outcome_cont": 0,
+      "treatment": 0,
+      "age": 0,
+      "severity": 0,
+      "albumin": 0
+    }
+  },
+  "balance": {
+    "max_abs_smd_before": 0.6509123873374751,
+    "max_abs_smd_after": 0.02326487557367539,
+    "mean_abs_smd_before": 0.5146556918029893,
+    "mean_abs_smd_after": 0.01629047591674938,
+    "covariates_over_0_1_before": 3,
+    "covariates_over_0_1_after": 0,
+    "covariate_terms": 3
+  },
+  "positivity": {
+    "treated_min": 0.21024702376374668,
+    "treated_max": 0.9395750181570478,
+    "control_min": 0.16469513196238075,
+    "control_max": 0.8821848697024102,
+    "common_support_lower": 0.21024702376374668,
+    "common_support_upper": 0.8821848697024102,
+    "common_support_fraction": 0.9458333333333333
+  },
+  "artifacts": {
+    "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-iptw/stats-run/propensity-scores.csv",
+    "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-iptw/stats-run/propensity-overlap.csv",
+    "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-iptw/stats-run/balance.csv",
+    "matched_pairs": null,
+    "weights": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-iptw/stats-run/weights.csv"
+  }
+}

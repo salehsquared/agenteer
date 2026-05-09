@@ -451,9 +451,17 @@ export const analysisSpecV2Schema = z.object({
       verifiedOnline: z.boolean().default(false),
       verificationRefs: z.array(z.string()).default([]),
     })).default([]),
+    phenotypeIds: z.array(z.object({
+      phenotypeId: z.string().min(1),
+      version: z.string().min(1).optional(),
+      role: z.enum(["baseline", "index", "outcome", "sensitivity"]).default("index"),
+    })).default([]),
     tables: z.object({
       diagnoses: z.string().min(1).optional(),
       dictionary: z.string().min(1).optional(),
+      procedures: z.string().min(1).optional(),
+      procedureDictionary: z.string().min(1).optional(),
+      hcpcs: z.string().min(1).optional(),
       baseCohort: z.string().min(1).optional(),
     }).default({}),
     sensitivityAnalyses: z.array(z.object({

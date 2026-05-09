@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_6664541094360394862",
+  "method": "gee",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_binary",
+    "treatment",
+    "id",
+    "age"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "Intercept",
+      "estimate": -2.4614329830956416,
+      "std_error": 1.0300114997663912,
+      "ci_low": -4.480218426299855,
+      "ci_high": -0.44264753989142847,
+      "p_value": 0.016861493797833853
+    },
+    {
+      "term": "treatment",
+      "estimate": 0.7127659975181484,
+      "std_error": 0.30211621835229296,
+      "ci_low": 0.12062909040221526,
+      "ci_high": 1.3049029046340817,
+      "p_value": 0.018312190840131377
+    },
+    {
+      "term": "age",
+      "estimate": 0.025879346320005964,
+      "std_error": 0.018002432984282266,
+      "ci_low": -0.009404773963283201,
+      "ci_high": 0.06116346660329513,
+      "p_value": 0.15056258411080095
+    }
+  ],
+  "diagnostics": {
+    "test": "gee",
+    "cluster": "id",
+    "clusters": 80,
+    "aic": 309.08583504995073
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/stats-config.json",
+      "sha256": "4fa2f1dde360a4ceb9d7669ff6615449caa921bae0f6cd5713d5b89572d7052c"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/stats-summary.json",
+      "sha256": "ae610b598ad0c3028344d4b782ef0e2e756475fa74aea1bad827001c2e39880c"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/estimates.csv",
+      "sha256": "0e90386fb71d18dcdd5918eff332a48cbd2c21d6311183810602ad3a55cfaa2d"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/diagnostics.json",
+      "sha256": "e8a1285133118dcb976763828599b286ae57d5fdadb60ed7c4303bf47be05d41"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/stats-report.md",
+      "sha256": "bb463acc6cc33ca657589ae20dc10cd4e0d42488dabcff0a173dac7d5338d3e9"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee/stats-qa.json",
+      "sha256": "f466673be8dc9c95aa66c9ac8f56755bfa57c60835c222c4440ff68632d60e78"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-gee",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

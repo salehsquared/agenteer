@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_2529107448173430830",
+    "method": "entropy-balancing",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "treatment",
+      "age",
+      "severity",
+      "albumin"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "_t",
+        "method": "entropy balancing",
+        "estimand": "ATT",
+        "effect_measure": "mean difference",
+        "estimate": 0.901981007762024,
+        "mean_difference": 0.901981007762024,
+        "treated_mean": 23.400236111111113,
+        "control_mean": 22.49825510334909,
+        "std_error": 0.4202103047425937,
+        "ci_low": 0.07417446890136992,
+        "ci_high": 1.729787546622678,
+        "p_value": 0.032844512119324216,
+        "treated_n": 144,
+        "control_n": 96
+      }
+    ],
+    "diagnostics": {
+      "test": "entropy balancing",
+      "optimized": false,
+      "balance": {
+        "max_abs_smd_before": 0.6509123873374751,
+        "max_abs_smd_after": 0.000013821103566075297,
+        "mean_abs_smd_before": 0.5146556918029893,
+        "mean_abs_smd_after": 0.000006324878809430818,
+        "covariates_over_0_1_before": 3,
+        "covariates_over_0_1_after": 0,
+        "covariate_terms": 3
+      },
+      "artifacts": {}
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/stats-config.json",
+        "sha256": "dcf64f4b46d98bbf7543212e8fe5ee24d93991bf987c4ae5cee455c9fc808eab"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/stats-summary.json",
+        "sha256": "e0511a9d26311a41dd47418dad045ce06dc5bd93aedef91c278c3b109af710d6"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/estimates.csv",
+        "sha256": "8b9ba5f4b02b2dc27f53346a3c8eb6c4734442dbca601782dfa63134bbb2d402"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/diagnostics.json",
+        "sha256": "81106644af0468675b19f3afbcd4a519dde0c76bf4a42507a24da895de2b43ea"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/stats-report.md",
+        "sha256": "94f2b1c53a9d6acae4b0e95760d7c0a1a5b9e8ae526978946e1ce9525ded19ce"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy/stats-qa.json",
+        "sha256": "55cd738ab13b0bdfb042911870311ed02773a5fc2576149267c1e196440631be"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-entropy",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

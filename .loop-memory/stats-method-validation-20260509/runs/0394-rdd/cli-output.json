@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_8297587054523158153",
+    "method": "regression-discontinuity",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "running",
+      "age"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": 9.976193357599666,
+        "std_error": 0.9481189504072862,
+        "ci_low": 8.117914361741468,
+        "ci_high": 11.834472353457864,
+        "p_value": 6.834023279361237e-26
+      },
+      {
+        "term": "_above_cutoff",
+        "estimate": 2.063886761610513,
+        "std_error": 0.6564316806466115,
+        "ci_low": 0.777304309232056,
+        "ci_high": 3.35046921398897,
+        "p_value": 0.0016659857242019244
+      },
+      {
+        "term": "_running_centered",
+        "estimate": -0.21853659575287926,
+        "std_error": 0.11633689261015293,
+        "ci_low": -0.44655271534208296,
+        "ci_high": 0.009479523836324444,
+        "p_value": 0.06031544863801082
+      },
+      {
+        "term": "age",
+        "estimate": 0.16351812217967734,
+        "std_error": 0.012877474345982451,
+        "ci_low": 0.13827873624971326,
+        "ci_high": 0.18875750810964143,
+        "p_value": 6.066298750821206e-37
+      }
+    ],
+    "diagnostics": {
+      "model_family": "regression-discontinuity",
+      "aic": 1157.4018633436901,
+      "bic": 1171.324419037058,
+      "df_resid": 236,
+      "residual_mean": 1.388518929464529e-14,
+      "residual_sd": 2.6584317142144394,
+      "shapiro_p_value": 0.43651309699053903,
+      "max_leverage": 0.03239298154572175,
+      "max_cooks_distance": 0.0747663202854804,
+      "vif": [
+        {
+          "term": "_above_cutoff",
+          "vif": 3.881268941324501
+        },
+        {
+          "term": "_running_centered",
+          "vif": 3.8849899678419355
+        },
+        {
+          "term": "age",
+          "vif": 1.0085455386448041
+        }
+      ],
+      "max_vif": 3.8849899678419355,
+      "cutoff": 0
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/stats-config.json",
+        "sha256": "ea23907c8f041b4ed765e7726f06d84a2093bf3be949d068290590a0bce99fc0"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/stats-summary.json",
+        "sha256": "462c10a627a076fe49ceed8f938908f961175a805b3b8eaf29568c6fd633b186"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/estimates.csv",
+        "sha256": "2ddc59dbc2bbd13e85fac9b49fb2b4602a5410ae74b528d9a82a3180de90d689"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/diagnostics.json",
+        "sha256": "696aabc206d99ec145628d5fe9c90a3faf9df535b8e328e7e336eb737d71fa92"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/stats-report.md",
+        "sha256": "575d0ee4dcb1ccf1797397c91851fcae52a9f1f74a73402f8320914069139ec4"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd/stats-qa.json",
+        "sha256": "1e82ba95da570f4beca2eab995e4308c50d7d9682963499d21f42d7865a3d3c2"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0394-rdd",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

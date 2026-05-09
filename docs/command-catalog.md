@@ -174,7 +174,7 @@ AnalysisSpec is the executable contract. Prefer spec-first execution for any ser
 | `research registry-inspect` | Inspect dataset registry JSON. |
 | `research registry-search` | Search registry variables. |
 | `research data-quality` | Run fixture data-quality checks. |
-| `research semantic-quality` | Run semantic clinical/data plausibility checks. |
+| `research semantic-quality` | Run semantic clinical/data plausibility checks, including registry rules, inferred clinical ranges, aggregate mean plausibility, binary-code validation, and count sanity checks. |
 | `research cohort-scout-file` | Scout cohort feasibility from spec and local rows. |
 | `research dataset-candidate` | Record a candidate dataset with intended use and caveats. |
 | `research dataset-register` | Create the canonical dataset intelligence bundle: manifest, registry, relationships, profile, watchouts, question seeds, summary, and agent context. |
@@ -184,8 +184,12 @@ AnalysisSpec is the executable contract. Prefer spec-first execution for any ser
 | `research dataset-questions` | Read exploratory question seeds generated from variable roles and relationships. |
 | `research dataset-describe` | Print the reader-facing dataset summary markdown. |
 | `research dataset-spec` | Convert a dataset-grounded study artifact plus dataset manifest into AnalysisSpec v2. |
-| `research dataset-run` | Execute an AnalysisSpec v2 against a manifest-backed dataset with bounded cost, cohort construction, typed QA, and aggregate-only artifacts. |
+| `research dataset-run` | Execute an AnalysisSpec v2 against a manifest-backed dataset with bounded cost, cohort construction, typed QA, dataset-profile semantic watchouts, and aggregate-only artifacts. |
 | `research dataset-run-index` | Summarize a directory of dataset-run packets, readiness, issues, cost receipts, and next actions. |
+| `research phenotype-list` | List built-in versioned code phenotypes such as SAVR, TAVR, dialysis, MI, stroke, heart failure, and valve reintervention. |
+| `research phenotype-inspect` | Validate one built-in or custom phenotype definition before use. |
+| `research phenotype-review` | Review a phenotype against a code dictionary, including matched codes, near-misses, sensitivity definitions, source links, and blockers. |
+| `research phenotype-match` | Export matched codes for all rules or a named sensitivity definition. |
 | `research dataset-adapter` | Inspect dataset adapter manifest such as NHANES. |
 | `research data-access` | Record local file access for a packet. |
 | `research data-access-redact` | Remove local-sensitive paths from packet access records. |
@@ -197,7 +201,7 @@ AnalysisSpec is the executable contract. Prefer spec-first execution for any ser
 
 Use `dataset-register` before analysis when a dataset is new or unfamiliar. It standardizes where agents look before planning: `DATASET_CONTEXT.md`, `dataset-manifest.json`, `variable-registry.json`, `relationship-graph.json`, `data-profile.json`, `watchouts.json`, and `question-seeds.json`. Use public/local dataset adapters where possible. Do not write into MedBrevia repos without explicit approval.
 
-Use `dataset-spec` and `dataset-run` when the study depends on multiple manifest-backed tables rather than one already-joined analysis table. This path is currently strongest for EHR diagnosis-cohort outcome studies. It requires AnalysisSpec v2, records ICD/phenotype sensitivity assumptions, blocks unsafe cloud reads unless `--allow-gcs` is explicit, writes cost receipts, and stores only aggregate outputs in the packet.
+Use `dataset-spec` and `dataset-run` when the study depends on multiple manifest-backed tables rather than one already-joined analysis table. This path is currently strongest for EHR diagnosis/procedure-code cohort outcome studies. It requires AnalysisSpec v2, records versioned phenotype IDs and sensitivity assumptions, supports range-aware and ICD-10-PCS-axis matching, blocks unsafe cloud reads unless `--allow-gcs` is explicit, writes cost receipts, and stores only aggregate outputs in the packet.
 
 ## Research Method Ontology And Modeling Commands
 
@@ -224,8 +228,8 @@ The modeling plan is the front door after a research proposal exists.
 
 | Command | Purpose |
 |---|---|
-| `research stats-run` | Execute standard table statistics such as descriptive, t-test, chi-square, correlations, linear/logistic/Poisson regression, diagnostic accuracy, propensity score matching, and IPTW. |
-| `research analysis-run` | Compose method/spec-bound stats execution into a golden route with manifest, prior-run planning, and optional MedBrevia literature context + QA via `--literature`. |
+| `research stats-run` | Execute standard-table statistics across core inference, regression/GLM, survival, longitudinal, causal, prediction-evaluation, missing-data, diagnostics, reliability, PCA/clustering, agreement, multiple-comparison, and power routes; writes tables, diagnostics, figure manifests, QA, and typed blockers for missing validated backends. |
+| `research analysis-run` | Compose method/spec-bound stats execution into a golden route with feasibility trial, manifest, prior-run planning, and optional MedBrevia literature context + QA via `--literature`. |
 | `research analysis-manifest` | Create readiness/hash manifest for stats, ML, or ML comparison runs. |
 | `research analysis-benchmark` | Evaluate one or more analysis run directories through manifest readiness gates. |
 | `research ml-models` | List ML adapters by task and optional dependency status. |
@@ -247,6 +251,10 @@ Use `analysis-manifest --require-ready` in scripts when a run must be promotion-
 | `research method-qa` | Run methods-aware QA over a run directory: convergence, separation, overfitting, missingness, collinearity, influence, effect/p-value consistency, claims, semantic plausibility, survey design, and artifact integrity. |
 | `research manuscript` | Generate a reader-facing publication-style manuscript and `manuscript-qa.json` from existing run artifacts. |
 | `research run-inspect` | Produce a unified readiness view across method QA, literature QA, paper/manuscript QA, lifecycle, cost, provenance, rerun stability, blockers, and next action. |
+| `research reviewer-providers` | List external reviewer providers, default models, env vars, availability, default panel, and cost ceilings. |
+| `research study-critic` | Build a cold review packet, call a reviewer panel, adjudicate findings, and write review response/state-reentry artifacts. |
+| `research review-adjudicate` | Adjudicate an existing `review-panel.json` into accepted/rejected reviewer findings and a reentry point. |
+| `research review-response` | Convert adjudicated reviewer findings into accept/reject/modify/human-review decisions and suggested next commands. |
 | `research paper-qa` | QA a paper against evidence, claims, reader-facing language, readability, and known overclaim risks. |
 | `research paper-index` | Build an index over generated papers, including reader-facing language status for legacy/current paper separation. |
 | `research paper-lifecycle` | Summarize paper lifecycle, provenance, envelopes, and remaining review needs. |
@@ -263,6 +271,7 @@ Trust-layer golden path:
 ```bash
 agenteer research method-qa --run-dir ./run --out ./run/method-qa.json --report ./run/method-qa.md
 agenteer research manuscript --run-dir ./run
+agenteer research study-critic --run-dir ./run --stage final --panel default --autonomy aggressive
 agenteer research run-inspect --run-dir ./run --out ./run/run-inspection.json --report ./run/run-inspection.md
 agenteer research benchmark-suite-run --suite ./.loop-memory/golden --out-dir ./.loop-memory/benchmark-history
 ```

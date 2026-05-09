@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "sourceSummary": {
+    "sourceCount": 5,
+    "highQualitySourceCount": 5,
+    "latestPublicationYear": 2026
+  },
+  "designSignals": [
+    "observational-cohort",
+    "dialysis-high-risk-population",
+    "confounding-control-needed",
+    "registry-or-claims-preferred-for-complete-follow-up"
+  ],
+  "methodSignals": [
+    "same-institution EHR follow-up should be labeled incomplete",
+    "MACE components should be defined explicitly",
+    "dialysis modality misclassification should be treated as a limitation",
+    "exact calendar-year inference should not be claimed from MIMIC shifted dates"
+  ],
+  "claimBoundaries": [
+    "Do not claim national 2008-2022 incidence or complete longitudinal event capture from MIMIC-IV.",
+    "Do not infer causal superiority of TAVR or SAVR without a stronger treatment-selection design.",
+    "Treat peritoneal dialysis results as descriptive because the local stratum is very small."
+  ],
+  "followUpSearches": [
+    "claims registry SAVR TAVR dialysis peritoneal dialysis outcomes reintervention",
+    "CPT codes SAVR TAVR aortic valve replacement claims cohort dialysis",
+    "valve reintervention after TAVR dialysis registry"
+  ]
+}

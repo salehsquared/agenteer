@@ -1,5 +1,11 @@
 # Rejected Counter-Designs
 
+## Tick 0388
+
+- Rejected pretending MIMIC-IV can answer the full 2008-2022 CPT-based longitudinal SAVR/TAVR dialysis question. The run is explicitly a same-hospital MIMIC feasibility packet.
+- Rejected leaving local path leakage in the manuscript after unified inspection flagged it. Reader-facing papers should not expose framework or machine-path details.
+- Rejected hiding the tiny peritoneal dialysis stratum. The small n is central to whether the analysis can support modality-specific conclusions.
+
 ## Ticks 0378-0387
 
 - Rejected hand-writing the dialysis/cardiac papers; the point was to test a repeatable execution path with artifacts, QA, cost receipts, and inspection.
@@ -1434,3 +1440,54 @@ Reason: local path leakage changes packet share posture, so the warning belongs 
 # Tick 0377
 
 - Rejected leaving the connector history only in git diff and tests; the loop needs a human-readable decision trail.
+
+# Tick 0389
+
+- Rejected accepting method registration and existing unit tests as proof of statistical readiness. The next validation must exercise CLI packets, reader artifacts, figure manifests, blockers, and a durable suite index.
+
+# Tick 0390
+
+- Rejected adding a separate validation command before proving the current `stats-run`, `analysis-run`, `manuscript`, and inspection surfaces can produce a coherent validation corpus.
+
+# Tick 0391
+
+- Rejected relying only on the in-test synthetic fixture. Persistent validation artifacts make it easier to audit output quality, figures, manuscripts, and inspection behavior across future changes.
+
+# Tick 0392
+
+- Rejected treating logistic regression as proof of regression support. The route family needed separate pressure for count, ordinal, multinomial, skewed-positive, zero-inflated, quantile, and penalized models.
+
+# Tick 0393
+
+- Rejected writing off the recurrent-event crash as a fixture issue. It exposed a real runner contract bug around retaining auxiliary survival variables.
+
+# Tick 0394
+
+- Rejected treating successful propensity matching or weighting as a green causal conclusion. These routes are validated as design-review artifacts only.
+
+# Tick 0395
+
+- Rejected labeling every successful stats run as research-ready. The validation index must separate execution validation from method-assumption validation.
+
+# Tick 0396
+
+- Rejected creating a new validation command before proving the current run artifacts can support an index. The next step is to generate an index from existing packet files.
+
+# Tick 0397
+
+- Rejected deleting the nonconverged zero-inflated negative binomial run. Keeping the failure beside a successful better-shaped fixture documents the method's practical fragility.
+
+# Tick 0398
+
+- Rejected stopping after targeted stats tests. The runner patch touched shared survival variable handling, so the full suite was required.
+
+# Ticks 0399-0408
+
+- Rejected treating generated PNG existence as evidence of visual quality. Figure QA now inspects image readability and metadata.
+- Rejected relying only on human visual review. Manual inspection caught label weakness, but deterministic QA is needed so future regressions fail automatically.
+- Rejected unlabeled heatmap, survival, CIF, and ROC defaults. Plots now carry axis metadata, and key figures add tick labels, legend titles, color scales, or a no-skill reference line where appropriate.
+- Rejected counting a generated paper as complete when its figures are missing, blank, tiny, inaccessible, or source-opaque.
+
+# Tick 0408
+
+- Rejected ending the suite with only a JSON index. The final prediction packet needed both deterministic figure QA and direct visual inspection of representative images.

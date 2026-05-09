@@ -60,4 +60,3 @@ Agenteer improves by turning this workflow into reusable nodes and better inspec
 - teach inspect to group failures by product concept: question, protocol, data, execution, artifact, report
 - add artifact evidence records for generated code, tables, plots, runner logs, and validation reports
 - add a fixture-driven long-running workflow test with human approval and resume
-

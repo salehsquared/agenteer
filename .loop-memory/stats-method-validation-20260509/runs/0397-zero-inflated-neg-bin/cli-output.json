@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1637713257240034506",
+    "method": "zero-inflated-negative-binomial",
+    "status": "failed",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "zero_count",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "inflate_const",
+        "estimate": -291.81630144668486,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "rate_ratio": 1.8441258359482245e-127,
+        "rr_ci_low": null,
+        "rr_ci_high": null
+      },
+      {
+        "term": "const",
+        "estimate": 36.68546480845965,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "rate_ratio": 8556475917880960,
+        "rr_ci_low": null,
+        "rr_ci_high": null
+      },
+      {
+        "term": "treatment",
+        "estimate": -10.934594879091263,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "rate_ratio": 0.00001783059280382809,
+        "rr_ci_low": null,
+        "rr_ci_high": null
+      },
+      {
+        "term": "age",
+        "estimate": -0.37010318322541513,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "rate_ratio": 0.6906630621181357,
+        "rr_ci_low": null,
+        "rr_ci_high": null
+      },
+      {
+        "term": "severity",
+        "estimate": -0.15392221847671406,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "rate_ratio": 0.8573387035284223,
+        "rr_ci_low": null,
+        "rr_ci_high": null
+      },
+      {
+        "term": "alpha",
+        "estimate": -356.1031093692302,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "rate_ratio": 2.2201617305880675e-155,
+        "rr_ci_low": null,
+        "rr_ci_high": null
+      }
+    ],
+    "diagnostics": {
+      "model_family": "zero-inflated-negative-binomial",
+      "aic": null,
+      "bic": null,
+      "df_resid": 236,
+      "residual_mean": -21890122.27881131,
+      "residual_sd": 120157574.07214741,
+      "shapiro_p_value": 4.154565065950047e-31,
+      "diagnostic_error": "need covariance of parameters for computing (unnormalized) covariances",
+      "vif": [
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "severity",
+          "vif": 1.146630084030013
+        }
+      ],
+      "max_vif": 1.146630084030013,
+      "weighted": false
+    },
+    "issues": [
+      {
+        "severity": "blocker",
+        "code": "REGRESSION_DID_NOT_CONVERGE",
+        "message": "The regression model did not converge.",
+        "evidenceRefs": [
+          "diagnostics.converged"
+        ]
+      }
+    ],
+    "warnings": [
+      "/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/base/model.py:595: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available\n  warnings.warn('Inverting hessian failed, no bse or cov_params '\n/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/base/model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals\n  warnings.warn(\"Maximum Likelihood optimization failed to \""
+    ],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/stats-config.json",
+        "sha256": "0908aa53425907dd4adf0543e8453da7f9740a64d53d7656dd2731cfbd469c81"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/stats-summary.json",
+        "sha256": "1c5c939db8ba5ddde3e02d62f475275079688f01a4c507779d92e2aff1e6db56"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/estimates.csv",
+        "sha256": "2f445bac304496aad2f385bf8ea01789396609d722a30a9cf5ea492f8a58fce6"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/diagnostics.json",
+        "sha256": "84d5f98b68378b31c0fafe0795c26a0d03e53cdc47432846e8cac321f7a8f995"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/figures.json",
+        "sha256": "ab43003db3eb227b813fba441a8714bbed79af86d297faa93c8e8eb482a12660"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/model-residuals.png",
+        "sha256": "d1ad371d52c35bd6617f72fe25b3616f7baa2273d368a183846c739aeb71f22c"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/stats-report.md",
+        "sha256": "001ac59240e41f6b2c4c00be04a805f1ef7835fdde61e1b170c8c1e3e9826c63"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin/stats-qa.json",
+        "sha256": "4bd94fe61aae9d6dc910d9d3fbe4a306d28633c2c5aab8680069a25ee2294e00"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0397-zero-inflated-neg-bin",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "failed",
+      "label": "Failed execution",
+      "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+      "supports": [
+        "failure attribution",
+        "repair planning"
+      ],
+      "cannotSupport": [
+        "effect estimates",
+        "confidence intervals",
+        "p-values",
+        "paper-ready inference"
+      ],
+      "nextAction": "Resolve blocker issues and rerun the stats method."
+    }
+  }
+}

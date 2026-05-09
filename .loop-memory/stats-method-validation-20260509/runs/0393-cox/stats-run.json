@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_6498057086909144714",
+  "method": "cox-proportional-hazards",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "survival_time",
+    "event",
+    "treatment",
+    "age",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "log_hazard_ratio": 0.5235880733030501,
+      "hazard_ratio": 1.688073728604348,
+      "ci_low": 1.14230438397738,
+      "ci_high": 2.4946003474855027,
+      "p_value": 0.008597037671281815
+    },
+    {
+      "term": "age",
+      "log_hazard_ratio": 0.019957010016070732,
+      "hazard_ratio": 1.0201574825302668,
+      "ci_low": 1.0080635564797984,
+      "ci_high": 1.0323965016617953,
+      "p_value": 0.0010385557581535374
+    },
+    {
+      "term": "severity",
+      "log_hazard_ratio": 0.25500854526179956,
+      "hazard_ratio": 1.2904726482523985,
+      "ci_low": 1.0521414698656202,
+      "ci_high": 1.5827906261505438,
+      "p_value": 0.014370523118791481
+    }
+  ],
+  "diagnostics": {
+    "test": "cox-proportional-hazards",
+    "events": 140,
+    "n_predictors": 3,
+    "strata": null
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/stats-config.json",
+      "sha256": "2e938111f6e9cded6a5fecc9089e6aaca52b545fc4e3967d3e089d278a7e5d94"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/stats-summary.json",
+      "sha256": "11b3d978ae97346d403d3c2769cbc2f59e417e641568d44fcc2ff5a0a68f5af8"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/estimates.csv",
+      "sha256": "59d4404f5d5a15c30b2624d7cadfb0d880aafbdfc8a97fea58c9ec1d0c9a269d"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/diagnostics.json",
+      "sha256": "ec44ff5012196168c543caba4be081d84bc022782e107f254ea24eaf70ac6cd1"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/stats-report.md",
+      "sha256": "0f1f8e1d0162e01f9e2825cc77dcbb2eedd52a04e5ed02649492088b12064c33"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox/stats-qa.json",
+      "sha256": "f466673be8dc9c95aa66c9ac8f56755bfa57c60835c222c4440ff68632d60e78"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-cox",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2846186211758509016",
+  "method": "mnar-sensitivity",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 218,
+  "variables": [
+    "missing_marker",
+    "albumin",
+    "outcome_cont"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "delta_-1",
+      "mean": 3.4305147139946746,
+      "assumption": "missing values shifted by delta SD from observed mean"
+    },
+    {
+      "term": "delta_-0.5",
+      "mean": 3.4476633203000895,
+      "assumption": "missing values shifted by delta SD from observed mean"
+    },
+    {
+      "term": "delta_0",
+      "mean": 3.4648119266055044,
+      "assumption": "missing values shifted by delta SD from observed mean"
+    },
+    {
+      "term": "delta_0.5",
+      "mean": 3.4819605329109193,
+      "assumption": "missing values shifted by delta SD from observed mean"
+    },
+    {
+      "term": "delta_1",
+      "mean": 3.4991091392163347,
+      "assumption": "missing values shifted by delta SD from observed mean"
+    }
+  ],
+  "diagnostics": {
+    "test": "mnar-sensitivity",
+    "observed_n": 218,
+    "missing_n": 22
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/stats-config.json",
+      "sha256": "5b84668a560b2e76fcba4b5b8981a7b9de4b3147627152d7b29ecbaab42e3dbf"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/stats-summary.json",
+      "sha256": "5e0a9c9df848e36641e01806faa0414d14b331ff505beee00764fddae21ba5c5"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/estimates.csv",
+      "sha256": "b91ec874744b70bf4eb1a526071734c62d0c879ba160ecdcd6eb186618f665f9"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/diagnostics.json",
+      "sha256": "218c55761cd1c1dd2dcbb0be02de714d28035b86db01af5690fe38ed4cd7125a"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/stats-report.md",
+      "sha256": "c5bc4896a946f6bf00524f95bcde448024aea3752a19ec8432414f3f49675c60"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar/stats-qa.json",
+      "sha256": "cfd32e4a8d753128786bb89daf17b4689589b24287fe4f6aab972685bbbf589d"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0396-mnar",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

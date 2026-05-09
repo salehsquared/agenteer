@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_8018427464756967157",
+  "method": "anova",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "group"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "C(group)",
+      "sum_sq": 37.55615773333331,
+      "df": 2,
+      "f_statistic": 1.4385158270118084,
+      "p_value": 0.23934374159285068
+    },
+    {
+      "term": "Residual",
+      "sum_sq": 3093.7474637625,
+      "df": 237,
+      "f_statistic": null,
+      "p_value": null
+    }
+  ],
+  "diagnostics": {
+    "model_family": "anova",
+    "aic": 1300.6503719016189,
+    "bic": 1311.0922886716448,
+    "df_resid": 237,
+    "residual_mean": -1.0894988614988204e-14,
+    "residual_sd": 3.597853534759813,
+    "shapiro_p_value": 0.38269057489017577,
+    "max_leverage": 0.012500000000000016,
+    "max_cooks_distance": 0.0535285941879534,
+    "vif": [
+      {
+        "term": "group_enhanced",
+        "vif": 1.3333333333333337
+      },
+      {
+        "term": "group_standard",
+        "vif": 1.3333333333333337
+      }
+    ],
+    "max_vif": 1.3333333333333337,
+    "test": "ANOVA"
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/stats-config.json",
+      "sha256": "b74633eb5240405901e33d5aeaa55d992d3403946aae618dbe9995ef02c2f76e"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/stats-summary.json",
+      "sha256": "52be04761101605dfefb5176cefcea1315d89361ee8e7dc5a2fdf00d91274864"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/estimates.csv",
+      "sha256": "474b468daca6ce560a3aaa65345e691e8bd6ef81c17d3f70f3e1b3ae841d0afc"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/diagnostics.json",
+      "sha256": "a7dfb9928a22332a3d708b7dd6f25a5a68ec41101f2715c25d182507e4450738"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/figures.json",
+      "sha256": "b7baba6ce5a1ccfc35f295395857b64de02dcccb0b8f7338eb3511204e1eaf9f"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/anova-group-distribution.png",
+      "sha256": "fa536c2f5c58dc2fc315f0e9260c6462cbe7e21a191d7ba1b4e8b79856ff1393"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/stats-report.md",
+      "sha256": "4bea33fd807ea83ad6ec350c76ee5a673c063b59d786e8c0bcd0312dd400ba11"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova/stats-qa.json",
+      "sha256": "3b2b9fb56234e47298ddcddb05e660f145880f4fee0357e56190000eef1a58aa"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0391-anova",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

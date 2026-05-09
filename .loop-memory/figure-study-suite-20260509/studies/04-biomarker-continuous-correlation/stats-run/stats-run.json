@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2574119772684132249",
+  "method": "pearson",
+  "status": "succeeded",
+  "rowCount": 360,
+  "completeCaseN": 360,
+  "variables": [
+    "outcome_cont",
+    "biomarker"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "biomarker",
+      "correlation": 0.35877350352383897,
+      "p_value": 2.2409705096100076e-12,
+      "n": 360,
+      "adjusted_for": ""
+    }
+  ],
+  "diagnostics": {
+    "test": "pearson",
+    "n": 360
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/stats-config.json",
+      "sha256": "2e1eeb09b8abb144217645e04043a911ef0efba4923bd0a3d61cc0121f50444f"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/stats-summary.json",
+      "sha256": "7c5a12ffbe16d7abf6203e2ead19e75bdc1b35ac77881dcac03014d698ea4c64"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/estimates.csv",
+      "sha256": "79940f4ecc5d0949b336ee9c69f940beab3ebfa6677a0126d4024d2346b90db5"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/diagnostics.json",
+      "sha256": "386790059947df59b52ed2c98042799c66276293b4ad468a64489ec908f6a814"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/figures.json",
+      "sha256": "177c22caa909d24572eaacf94352934dd2b1dc5093a34b584a07c99c103b6639"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/correlation-scatter.png",
+      "sha256": "fc53b1ec4627ab0bacd8c2f7196ed47d649075fa0d9200531781f9436f602234"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/figure-qa.json",
+      "sha256": "6a8034c3f42c6c88168174aeea66026e704701332b495ba2484d983f7ff44b08"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/stats-report.md",
+      "sha256": "f2c99e738b32e8c47cdfe60ed3befe58b838a2adf7e9f1c8225df272931f850e"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run/stats-qa.json",
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/figure-study-suite-20260509/studies/04-biomarker-continuous-correlation/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

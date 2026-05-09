@@ -332,6 +332,54 @@ JSON
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  it("carries dataset-profile semantic watchouts into dataset-run preflight", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-dataset-profile-watchout-"));
+    try {
+      const datasetDir = await writeMimicFixtureDataset(dir, 120, 40);
+      await writeFile(path.join(datasetDir, "data-profile.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        datasetId: "mimic-fixture",
+        generatedAtIso: "2026-05-09T00:00:00.000Z",
+        tableProfiles: [],
+        aggregate: {
+          tableCount: 3,
+          profiledTableCount: 3,
+          rowCountTotalKnown: null,
+          columnCountTotalKnown: null,
+          totalBytes: 3072,
+          highMissingVariableCount: 0,
+          emptyVariableCount: 0,
+          likelyIdentifierCount: 3,
+          semanticWatchoutCount: 1,
+        },
+        watchouts: [{
+          severity: "warning",
+          code: "SEMANTIC_AGE_RANGE",
+          message: "admission_age has values outside the expected clinical range.",
+          evidenceRefs: ["derived-icustay-detail.admission_age"],
+        }],
+      }, null, 2)}\n`);
+      const studyPath = path.join(dir, "watchout-study.json");
+      await writeFile(studyPath, `${JSON.stringify(mimicStudyArtifact(), null, 2)}\n`);
+      const specPath = path.join(dir, "analysis-spec-v2.json");
+      await researchDatasetSpecCommand({ studyPath, datasetDir, outPath: specPath });
+
+      const run = await researchDatasetRunCommand({
+        analysisSpecPath: specPath,
+        datasetDir,
+        outDir: path.join(dir, "runs", "profile-watchout"),
+        python: path.resolve(".research-runtime/python/bin/python"),
+        maxUsd: 1,
+      });
+
+      expect(run.status).toBe("succeeded");
+      expect(run.readiness).toBe("needs_methods_review");
+      expect(run.typedIssues.map(issue => issue.code)).toContain("DATASET_PROFILE_SEMANTIC_AGE_RANGE");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
 });
 
 function wrappedV1Spec(): unknown {

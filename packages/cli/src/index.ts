@@ -120,7 +120,10 @@ export {
 } from "./research-machine/ml/commands.js";
 export {
   parseStatsMethod,
+  researchFigureQaCommand,
   researchStatsRunCommand,
+  renderResearchFigureQa,
+  renderResearchFigureQaJson,
   renderResearchStatsRun,
   renderResearchStatsRunJson,
 } from "./research-machine/stats/commands.js";
@@ -167,6 +170,26 @@ export {
   analysisMethodIdsWithStatsRunner,
   statsRunMethodForAnalysisMethod,
 } from "./research-machine/stats/method-map.js";
+export {
+  researchReviewAdjudicateCommand,
+  researchReviewerProvidersCommand,
+  researchReviewResponseCommand,
+  researchStudyCriticCommand,
+  renderResearchReviewAdjudication,
+  renderResearchReviewAdjudicationJson,
+  renderResearchReviewerProviders,
+  renderResearchReviewerProvidersJson,
+  renderResearchReviewResponse,
+  renderResearchReviewResponseJson,
+  renderResearchStudyCritic,
+  renderResearchStudyCriticJson,
+  type ReviewAdjudicationResult,
+  type ReviewAutonomy,
+  type ReviewPanelResult,
+  type ReviewResponseResult,
+  type ReviewStage,
+  type StudyCriticResult,
+} from "./research-machine/reviewer.js";
 
 export {
   agentAdversarialProtocolsCommand,

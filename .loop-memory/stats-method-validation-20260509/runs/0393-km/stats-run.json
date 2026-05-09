@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_7142069811532182767",
+  "method": "kaplan-meier",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "survival_time",
+    "event",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "0",
+      "time": 493.146,
+      "survival": 0.3672338485262714
+    },
+    {
+      "term": "1",
+      "time": 354.29,
+      "survival": 0
+    }
+  ],
+  "diagnostics": {
+    "test": "Kaplan-Meier",
+    "curve_path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/kaplan-meier-curve.csv",
+    "groups": [
+      0,
+      1
+    ]
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/stats-config.json",
+      "sha256": "e9cbe641ac325279e9363ae3474f7a231dca9cf1a37624de68d9615b91268041"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/stats-summary.json",
+      "sha256": "e7678346428f0393a58c7208e5863061453228fa62badfc208afef1c900012ce"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/estimates.csv",
+      "sha256": "b433af86993d86a0707adb326936419849b2c389e7c9db99b4fa9731e2f9a8d4"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/diagnostics.json",
+      "sha256": "0f8217c77f9bb8bdb5f4094e287bf0f182b82e601e39c8dc9506db0645e5b634"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/figures.json",
+      "sha256": "55c9986c0c22518c66a91e45ca7236e2a1b858e1306a8389792fdb7f8edaed33"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/kaplan-meier.png",
+      "sha256": "beecea121b1f1a008c03880276e0f6e3fee46ad7f75fc4ba6423d448adf49f92"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/stats-report.md",
+      "sha256": "e3614bced8e023b29ea05dcbe6ec73d884211ad7afa7779812b696aaf235d841"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km/stats-qa.json",
+      "sha256": "5ae22e9b174d0d018be5e28a559f986ff9fec27e248b3ae19bc4b02e7004982b"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-km",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

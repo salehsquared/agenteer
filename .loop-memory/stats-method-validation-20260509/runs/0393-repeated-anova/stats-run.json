@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_3070893352853646721",
+  "method": "repeated-measures-anova",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "visit",
+    "id"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "visit",
+      "f_statistic": 87.32215563220268,
+      "df_num": 2,
+      "df_den": 158,
+      "p_value": 2.8673579462728575e-26
+    }
+  ],
+  "diagnostics": {
+    "test": "repeated-measures ANOVA",
+    "subject": "id",
+    "within": "visit"
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/stats-config.json",
+      "sha256": "4ab11580180bf367661fb275b9ddd120ee0c12efa98fb43b709b0f96ef51d1b1"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/stats-summary.json",
+      "sha256": "2986a934970ca71979740b72f514ddb8728424670eab769c1268f72920be07de"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/estimates.csv",
+      "sha256": "d083069927340465def1bea21baf6679d21df1fb1ed491b3e11d2c5dfee0b155"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/diagnostics.json",
+      "sha256": "dcda2cbf72c393d1386ba80df1344da31844517c6a7f023df5c392ececfe279e"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/figures.json",
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/stats-report.md",
+      "sha256": "d5d73ba4f55a90eae9e807fcac66c8762724dcebb74aaf214c9f8b9bb08d743e"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova/stats-qa.json",
+      "sha256": "55cd738ab13b0bdfb042911870311ed02773a5fc2576149267c1e196440631be"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0393-repeated-anova",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

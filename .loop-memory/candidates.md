@@ -16,6 +16,8 @@
 - Make `modeling-plan` and `analysis-run` natively understand diagnostic accuracy route semantics.
 - Add Wilson/exact interval estimates or threshold derivation to diagnostic accuracy before generating a real diagnostic paper.
 - Add stricter readability heuristics beyond forbidden jargon: variable-label substitution, awkward question echo detection, and a short plain-language main finding requirement.
+- Promote figure QA into higher-level readiness/benchmark checks so `analysis-manifest`, `run-inspect`, and future paper-series runs can block or downgrade blank/poorly labeled figures automatically.
+- Add source-data CSV sidecars for every generated figure, not only source-column metadata.
 - Make `modeling-plan` consume backend status and prior run outcome evidence.
 - Generate a complete stats-backed packet wrapper from `StatsRunResult`.
 - Add AnalysisSpec V2 fields for model family, estimand, diagnostics, sensitivity analyses, and backend requirements.

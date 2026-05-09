@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4672210372942488851",
+    "method": "multinomial-logistic-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "group",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const:0",
+        "estimate": -0.4542090381653629,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "treatment:0",
+        "estimate": -0.285025751290216,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "age:0",
+        "estimate": -0.0034575977523707913,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "severity:0",
+        "estimate": 0.37487100004223367,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "const:1",
+        "estimate": -0.2632471192799554,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "treatment:1",
+        "estimate": -0.2655430845739603,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "age:1",
+        "estimate": 0.004400515690660734,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      },
+      {
+        "term": "severity:1",
+        "estimate": 0.05463781961070681,
+        "std_error": null,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null
+      }
+    ],
+    "diagnostics": {
+      "outcome_levels": [
+        "control",
+        "enhanced",
+        "standard"
+      ],
+      "model_family": "multinomial-logistic-regression",
+      "diagnostic_error": "Index(...) must be called with a collection of some kind, 'y' was passed",
+      "vif": [
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "severity",
+          "vif": 1.146630084030013
+        }
+      ],
+      "max_vif": 1.146630084030013,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/stats-config.json",
+        "sha256": "1fe0e14835355b7346f59ff88a3616818aafa6a8e0231e5ad5d112c80205ded3"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/stats-summary.json",
+        "sha256": "dc29b38fe04f6cc8689b5d2b74dbb0e5848b32ce0e3b2a1cbee83cee206966dd"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/estimates.csv",
+        "sha256": "1a06b99f1f899be1eccbc582c21a8a3d8c3c262f54c1fa49c7a2d0924fd7c863"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/diagnostics.json",
+        "sha256": "2fb14c0481748eac70c6c5e472c806f6ebcc3a653b82d425d6c1ba03d8c73340"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/stats-report.md",
+        "sha256": "f1e4597d6d089abf532825c56c3736a710997343902c1da0233206370aa35485"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial/stats-qa.json",
+        "sha256": "a2e952b8c92b0fc11646ad85fbf2112dd4c59a55221b858a12ff7ff8b616b962"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-multinomial",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4991315328558764342",
+    "method": "penalized-linear-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "treatment",
+      "age",
+      "severity",
+      "albumin"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "intercept",
+        "estimate": 10.522352589055277,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "No classical inference reported."
+      },
+      {
+        "term": "treatment",
+        "estimate": 0.6789462396441601,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized regression coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      },
+      {
+        "term": "age",
+        "estimate": 0.13278131606981514,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized regression coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      },
+      {
+        "term": "severity",
+        "estimate": 1.8548956322261432,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized regression coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      },
+      {
+        "term": "albumin",
+        "estimate": -0.5828680719955952,
+        "p_value": null,
+        "ci_low": null,
+        "ci_high": null,
+        "penalized_inference_caveat": "Penalized regression coefficients are shrinkage estimates; standard p-values/CIs are not reported in this route."
+      }
+    ],
+    "diagnostics": {
+      "model_family": "penalized-linear-regression",
+      "alpha_penalty": 0.1,
+      "l1_ratio": 0.5,
+      "r_squared": 0.7220464091195644,
+      "nonzero_coefficients": 4
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "PENALIZED_INFERENCE_CAVEAT",
+        "message": "Penalized regression coefficients are shrinkage estimates; bootstrap or post-selection inference is required for classical inference.",
+        "evidenceRefs": [
+          "diagnostics"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/stats-config.json",
+        "sha256": "e92b5faecc07f01ae174e9b90d52b50ca41b4f3afcf725bd396e3aaa5c8ff2bb"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/stats-summary.json",
+        "sha256": "5cc30736e7b4eadbd3f48a0dffb6392ede294a0e4b7f9368be79082798927685"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/estimates.csv",
+        "sha256": "1249d577796e23e82dd93599cbbbcac378d456fda15648ec34000a129b2a0c48"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/diagnostics.json",
+        "sha256": "50c0148b2d26cea283fc0a0248e9115bbe8f8e1c4afcb34c909d5381a6f49379"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/stats-report.md",
+        "sha256": "6c2b0e0d02b0e4201760b201eea5dfa95dcd3cd0c7327d3f127de44b0e62af4a"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear/stats-qa.json",
+        "sha256": "0c5dd6d8afdf3db7348ba3e49ebeaf1b96783e7cf8ae8aeb7654dc39f67744b3"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/runs/0392-penalized-linear",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}
