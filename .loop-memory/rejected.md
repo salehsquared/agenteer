@@ -1,5 +1,17 @@
 # Rejected Counter-Designs
 
+## Ticks 0378-0387
+
+- Rejected hand-writing the dialysis/cardiac papers; the point was to test a repeatable execution path with artifacts, QA, cost receipts, and inspection.
+- Rejected treating adjusted regression as sufficient once the user requested propensity matching; every final study now has propensity artifacts.
+- Rejected hiding propensity imbalance or unmatched treated rows to make papers look cleaner; those warnings are the actual methods signal.
+- Rejected suppressing low-events-per-predictor blockers in cardiac surgery papers; the runner now caps predictors using event counts before fitting.
+- Rejected counting the early non-propensity dialysis papers as final after adding matching; they were rerun so the batch has one consistent artifact contract.
+
+## Tick 0387
+
+- Rejected stopping after the first seven propensity papers. Rerunning the first three made the demo consistent and removed ambiguity from the user's "use propensity matching" direction.
+
 ## Tick 001
 
 Rejected: build a new "run all research stages" command immediately.
@@ -1337,3 +1349,88 @@ Reason: local path leakage changes packet share posture, so the warning belongs 
 # Tick 0322
 
 - Rejected extending beyond 30 ticks after meeting the cost and execution criteria. The next move should be selected from the audit, not raw momentum.
+# Tick 0323
+
+- Rejected requiring users or agents to pass the deepest run subdirectory to `run-inspect`. That would make inspection faster to implement but would preserve artifact sprawl and fail the unified-lifecycle goal.
+
+# Tick 0324
+
+- Rejected exempting diagnostic accuracy from effect-size QA. Sensitivity, specificity, predictive values, likelihood ratios, and intervals are diagnostic effect/performance quantities and should be recognized, not skipped.
+
+# Tick 0325
+
+- Rejected leaving route-inapplicable warnings in place as harmless caution. False or irrelevant warnings damage trust-layer usability because reviewers learn to discount the warning stream.
+
+# Tick 0326
+
+- Rejected globally downgrading collinearity and influence warnings to notes. They are still real requirements for regression-like routes; the right boundary is route applicability.
+
+# Tick 0327
+
+- Rejected treating child runner folders as separate continuous benchmark cases when their parent packet root is already benchmarkable. Runner-level debugging can still inspect child dirs directly; packet-level benchmark summaries should avoid duplicate internal cases.
+# Tick 328
+
+- Rejected running five fresh MIMIC queries before validating existing executed packets. Existing packets already contain real executed analyses, cost receipts, row-cache cleanup evidence, and papers; trust-layer validation should happen before spending more.
+
+# Tick 329
+
+- Rejected hand-editing only the cardiology manuscript. The failure came from generator-level language leakage, so the fix belongs in `researchManuscriptCommand`.
+
+# Tick 330
+
+- Rejected treating COPD plus acute respiratory failure as a clean single phenotype. The validation should preserve the intentionally broad phenotype while requiring sensitivity and denominator disclosure before stronger claims.
+
+# Tick 331
+
+- Rejected using the broad cohort row count as the displayed complete-case denominator when model-specific `models.*.n` is available. It hides missingness-driven analytic shrinkage.
+
+# Tick 332
+
+- Rejected treating AKI stage as a simple baseline exposure. In ICU EHR data, AKI staging is intertwined with measurement timing, illness severity, and care processes.
+
+# Tick 333
+
+- Rejected leaving runner warnings only in `qa.json`. The unified trust layer must ingest them so reviewers do not need to open each packet artifact manually.
+
+# Tick 334
+
+- Rejected swapping the neurology slot to intracranial hemorrhage. Ischemic stroke is a better coding-ambiguity test because ICD-9 `434` includes occlusion categories whose infarction status varies by subcode.
+
+# Tick 335
+
+- Rejected treating AUROC plus adequate sample size as sufficient for prediction claims. Prediction wording needs calibration, validation design, prediction horizon, and intended-use boundaries.
+
+# Tick 336
+
+- Rejected using upper GI bleed for the hepatology slot. Cirrhosis better exercises derived MELD/coagulation provenance and liver-specific prognostic-score framing.
+
+# Tick 337
+
+- Rejected calling the five MIMIC packets publication-ready. All are useful local-review analyses, but each still needs regression diagnostics or methods evidence, and several need phenotype sensitivity, derived-table profiling, missingness sensitivity, or prediction validation.
+
+# Ticks 0338-0357
+
+- Rejected a bare treatment-effect point estimate as sufficient for propensity matching; balance, overlap, missingness, and adjustment artifacts are required.
+- Rejected treating IPTW as just another regression option without weight distribution, effective sample size, and overlap diagnostics.
+- Rejected global nearest-neighbor matching when exact-match strata are declared.
+- Rejected counting a failed run as a paper-producing run; invalid propensity designs now stop before reader-facing paper generation.
+- Rejected hiding unmatched treated rows under strict calipers; support loss is part of the result.
+- Rejected silently falling back to t-tests or regression when propensity analysis has no baseline covariates.
+- Rejected promoting tiny treated-group propensity output as a normal success; sparse treatment groups must surface blocker issues.
+- Rejected ignoring method-selection mismatch between matching and weighting; binding evidence must control execution.
+- Rejected optimizing only for all-green synthetic success; the hardening suite intentionally includes expected blockers and warnings.
+- Rejected using one fixture as proof of propensity readiness; the suite now records 20 scenario-specific runs.
+
+# Tick 0357
+
+- Rejected declaring the final propensity suite complete from code coverage alone. The final tick requires the full paper/QA/manifest/inspection artifact bundle plus the 20-scenario suite summary.
+
+# Ticks 0358-0377
+
+- Rejected treating MedBrevia literature search as a standalone success; evidence now has to survive into planning, packet artifacts, manifest inspection, literature QA, and readiness.
+- Rejected making literature mandatory for every cheap local run; attached literature affects readiness, while future promotion profiles can require it for selected medical/public-health packet classes.
+- Rejected treating source count or PMID presence as true certainty appraisal; current source quality is a planning heuristic until risk-of-bias rubrics are implemented.
+
+# Tick 0377
+
+- Rejected leaving the connector history only in git diff and tests; the loop needs a human-readable decision trail.

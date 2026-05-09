@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1094335691076529368",
+    "method": "propensity-score-matching",
+    "status": "succeeded",
+    "rowCount": 300,
+    "completeCaseN": 300,
+    "variables": [
+      "outcome",
+      "treated",
+      "age",
+      "bmi",
+      "severity",
+      "frailty",
+      "sex",
+      "site"
+    ],
+    "parameters": {
+      "alpha": 0.05,
+      "estimand": "ATT",
+      "matchRatio": 1,
+      "caliper": 0.2,
+      "replacement": true,
+      "trimThreshold": 0.01,
+      "stabilizeWeights": true,
+      "treatmentPositiveLevel": 1,
+      "treatmentNegativeLevel": 0
+    },
+    "estimates": [
+      {
+        "term": "treated",
+        "method": "nearest-neighbor propensity score matching",
+        "estimand": "ATT",
+        "effect_measure": "risk difference and odds ratio",
+        "estimate": 0.1899441340782123,
+        "risk_difference": 0.1899441340782123,
+        "treated_risk": 0.5754189944134078,
+        "control_risk": 0.3854748603351955,
+        "log_odds_ratio": 0.7703695091384589,
+        "odds_ratio": 2.1605644546147924,
+        "or_ci_low": 1.4161636992405406,
+        "or_ci_high": 3.296256474479813,
+        "p_value": 0.0003510131974078486,
+        "treated_n": 179,
+        "control_n": 60
+      }
+    ],
+    "diagnostics": {
+      "matching": {
+        "match_ratio": 1,
+        "replacement": true,
+        "caliper_logit_sd": 0.2,
+        "caliper_logit_width": 0.17777327351765804,
+        "treated_total": 210,
+        "control_total": 90,
+        "matched_treated": 179,
+        "matched_controls": 60,
+        "matched_pairs": 179,
+        "unmatched_treated": 31,
+        "control_reuse_max": 13
+      },
+      "test": "propensity-score-matching",
+      "treatment_column": "treated",
+      "treatment_positive_level": 1,
+      "treatment_negative_level": 0,
+      "covariates": [
+        "age",
+        "bmi",
+        "severity",
+        "frailty",
+        "sex",
+        "site"
+      ],
+      "exact_covariates": [
+        "sex"
+      ],
+      "propensity_model": {
+        "family": "logistic",
+        "n_parameters": 9,
+        "aic": 342.2483339801267,
+        "converged": true,
+        "propensity_min": 0.16162228127575182,
+        "propensity_max": 0.9564905112767977
+      },
+      "missingness": {
+        "input_rows": 300,
+        "complete_case_rows": 300,
+        "excluded_missing_rows": 0,
+        "complete_case_fraction": 1,
+        "missing_counts": {
+          "outcome": 0,
+          "treated": 0,
+          "age": 0,
+          "bmi": 0,
+          "severity": 0,
+          "frailty": 0,
+          "sex": 0,
+          "site": 0
+        }
+      },
+      "balance": {
+        "max_abs_smd_before": 0.49334612257881655,
+        "max_abs_smd_after": 0.15790327939564164,
+        "mean_abs_smd_before": 0.2682838418791762,
+        "mean_abs_smd_after": 0.07991746917906173,
+        "covariates_over_0_1_before": 7,
+        "covariates_over_0_1_after": 3,
+        "covariate_terms": 8
+      },
+      "positivity": {
+        "treated_min": 0.16162228127575182,
+        "treated_max": 0.9564905112767977,
+        "control_min": 0.28982982641556954,
+        "control_max": 0.894117465250746,
+        "common_support_lower": 0.28982982641556954,
+        "common_support_upper": 0.894117465250746,
+        "common_support_fraction": 0.8933333333333333
+      },
+      "artifacts": {
+        "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/propensity-scores.csv",
+        "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/propensity-overlap.csv",
+        "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/balance.csv",
+        "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/matched-pairs.csv",
+        "weights": null
+      }
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_UNMATCHED_TREATED",
+        "message": "31 treated rows were unmatched under the caliper/exact-match policy.",
+        "evidenceRefs": [
+          "matched-pairs.csv"
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_RESIDUAL_IMBALANCE",
+        "message": "3 covariate terms have post-adjustment absolute SMD above 0.10.",
+        "evidenceRefs": [
+          "balance.csv"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/stats-config.json",
+        "sha256": "4378b5f10a962d72eea5c6f722886fb9fd86c46bbb5674f64d702a47a76aa458"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/stats-summary.json",
+        "sha256": "897e2e7fc8e8e8f48903a06d5c6c48d63ada5200b538e855244330d4a14dc99c"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/estimates.csv",
+        "sha256": "12dfa2ca12d00556dc90702925b822a8f974f1b2aa3688ea769b27c582e6169f"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/diagnostics.json",
+        "sha256": "3c253fe2e1a536e09b18ba14c5b696dc3e3a54d6ea3e8417616f1e7fc9a08203"
+      },
+      {
+        "kind": "balance",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/balance.csv",
+        "sha256": "b6d1242c127a86e99133e121bb519fa9f7f41e89a6d1aef7f23a1b019993c7e3"
+      },
+      {
+        "kind": "propensity-scores",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/propensity-scores.csv",
+        "sha256": "58b1ce793b230c916781568a21fa233d370cd925aaa142e43fe7c0d34b4cca32"
+      },
+      {
+        "kind": "propensity-overlap",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/propensity-overlap.csv",
+        "sha256": "90101ec120ea8abb43a801211e8ca9a0d1338a57f4e0b11028ea743b529fb609"
+      },
+      {
+        "kind": "matched-pairs",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/matched-pairs.csv",
+        "sha256": "c0166588291930925e7b377dd2a2e0144b07dc1bafa52023bb42a74d19e5fdc2"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/stats-report.md",
+        "sha256": "5eed597001e0dc6bb38eb30082879da5682cbcc4f7af30ada00595c4aef96ee9"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run/stats-qa.json",
+        "sha256": "274cd27830863c746d9205414c4bf97f0585f34b132142a7b66d9da8494b0279"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/analysis-run/stats-run",
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0342-replacement-matching/method-selection.json",
+      "methodSelectionId": "method_selection_4609ee25110d",
+      "methodId": "propensity-score-matching",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "bound"
+    },
+    "resultPosture": {
+      "status": "causal_design_review_required",
+      "label": "Causal design review required",
+      "interpretationBoundary": "This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect.",
+      "supports": [
+        "propensity score diagnostics",
+        "balance review",
+        "overlap/positivity review",
+        "local treatment-contrast estimation under declared assumptions"
+      ],
+      "cannotSupport": [
+        "causal claims without target-trial/DAG review",
+        "unmeasured-confounding control",
+        "clinical recommendations",
+        "external validity"
+      ],
+      "nextAction": "Review the target trial, confounding set, positivity, balance, missingness, and sensitivity plan before using causal language."
+    }
+  }
+}

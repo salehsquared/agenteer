@@ -247,6 +247,7 @@ function statsQa(result: StatsRunResult): {
         : "Stats run did not declare an interpretation posture.",
     },
     ...diagnosticAccuracyQaChecks(result),
+    ...propensityQaChecks(result),
   ];
   const status = result.status === "failed" || blockerIssues.length > 0 || checks.some(check => check.status === "fail")
     ? "fail"
@@ -303,6 +304,16 @@ function deriveStatsResultPosture(result: StatsRunResult, request: StatsRunReque
       nextAction: "Use this only to debug data/model shape; rerun with a survey-aware backend for methods review.",
     };
   }
+  if (request.method === "propensity-score-matching" || request.method === "propensity-score-weighting") {
+    return {
+      status: "causal_design_review_required",
+      label: "Causal design review required",
+      interpretationBoundary: "This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect.",
+      supports: ["propensity score diagnostics", "balance review", "overlap/positivity review", "local treatment-contrast estimation under declared assumptions"],
+      cannotSupport: ["causal claims without target-trial/DAG review", "unmeasured-confounding control", "clinical recommendations", "external validity"],
+      nextAction: "Review the target trial, confounding set, positivity, balance, missingness, and sensitivity plan before using causal language.",
+    };
+  }
   if (result.binding.status === "bound") {
     return {
       status: "bound_standard_table",
@@ -328,6 +339,7 @@ function deriveStatsResultPosture(result: StatsRunResult, request: StatsRunReque
 function renderStatsReport(result: StatsRunResult, request: StatsRunRequest, qa: ReturnType<typeof statsQa>): string {
   const table = renderEstimateTable(result);
   const diagnosticSection = renderDiagnosticAccuracySection(result, request);
+  const propensitySection = renderPropensitySection(result, request);
   return [
     `# Stats Run Report`,
     "",
@@ -360,6 +372,7 @@ function renderStatsReport(result: StatsRunResult, request: StatsRunRequest, qa:
     "",
     table,
     ...diagnosticSection,
+    ...propensitySection,
     "",
     "## Diagnostics And QA",
     "",
@@ -376,6 +389,13 @@ function renderStatsReport(result: StatsRunResult, request: StatsRunRequest, qa:
       ? [
           "- STARD 2015 diagnostic accuracy reporting guideline.",
           "- STARD-AI 2025 reporting guideline for AI-centered diagnostic accuracy studies.",
+        ]
+      : []),
+    ...(result.method === "propensity-score-matching" || result.method === "propensity-score-weighting"
+      ? [
+          "- Austin PC. An Introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies. Multivariate Behavioral Research. 2011.",
+          "- Austin PC. Balance diagnostics for comparing the distribution of baseline covariates between treatment groups in propensity-score matched samples. Statistics in Medicine. 2009.",
+          "- MatchIt and cobalt documentation informed the balance-table and Love-plot-style standardized mean-difference artifact conventions.",
         ]
       : []),
   ].join("\n");
@@ -446,6 +466,72 @@ function diagnosticAccuracyQaChecks(result: StatsRunResult): Array<{ id: string;
   ];
 }
 
+function propensityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (result.method !== "propensity-score-matching" && result.method !== "propensity-score-weighting") return [];
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const balance = diagnostics.balance as Record<string, unknown> | undefined;
+  const positivity = diagnostics.positivity as Record<string, unknown> | undefined;
+  const matching = diagnostics.matching as Record<string, unknown> | undefined;
+  const weighting = diagnostics.weighting as Record<string, unknown> | undefined;
+  const missingness = diagnostics.missingness as Record<string, unknown> | undefined;
+  const maxAfter = typeof balance?.max_abs_smd_after === "number" ? balance.max_abs_smd_after : null;
+  const maxBefore = typeof balance?.max_abs_smd_before === "number" ? balance.max_abs_smd_before : null;
+  const afterImbalanced = typeof balance?.covariates_over_0_1_after === "number" ? balance.covariates_over_0_1_after : null;
+  const commonSupportFraction = typeof positivity?.common_support_fraction === "number" ? positivity.common_support_fraction : null;
+  const unmatchedTreated = typeof matching?.unmatched_treated === "number" ? matching.unmatched_treated : 0;
+  const effectiveN = typeof weighting?.effective_sample_size === "number" ? weighting.effective_sample_size : null;
+  const completeN = result.completeCaseN || 0;
+  return [
+    {
+      id: "propensity-treatment-model",
+      status: typeof diagnostics.propensity_model === "object" ? "pass" : "fail",
+      detail: typeof diagnostics.propensity_model === "object"
+        ? "Propensity scores were estimated and recorded with model diagnostics."
+        : "Propensity methods require a recorded treatment model.",
+    },
+    {
+      id: "propensity-balance",
+      status: maxAfter === null ? "fail" : maxAfter <= 0.1 && afterImbalanced === 0 ? "pass" : "warning",
+      detail: maxAfter === null
+        ? "No post-adjustment standardized mean difference diagnostics were recorded."
+        : `Maximum absolute SMD changed from ${maxBefore?.toFixed(3) ?? "unknown"} to ${maxAfter.toFixed(3)}; ${afterImbalanced ?? "unknown"} covariate term(s) remain above 0.10.`,
+    },
+    {
+      id: "propensity-positivity-overlap",
+      status: commonSupportFraction === null ? "fail" : commonSupportFraction >= 0.9 ? "pass" : commonSupportFraction >= 0.75 ? "warning" : "fail",
+      detail: commonSupportFraction === null
+        ? "No common-support/overlap diagnostic was recorded."
+        : `${(commonSupportFraction * 100).toFixed(1)}% of complete cases lie inside the observed cross-arm propensity support.`,
+    },
+    {
+      id: "propensity-unmatched-treated",
+      status: result.method !== "propensity-score-matching" ? "pass" : unmatchedTreated === 0 ? "pass" : "warning",
+      detail: result.method !== "propensity-score-matching"
+        ? "Not applicable to weighting."
+        : `${unmatchedTreated} treated row(s) were unmatched under the declared caliper and exact-match policy.`,
+    },
+    {
+      id: "propensity-effective-sample-size",
+      status: effectiveN === null ? "pass" : effectiveN >= completeN * 0.5 ? "pass" : effectiveN >= completeN * 0.25 ? "warning" : "fail",
+      detail: effectiveN === null
+        ? "Not applicable or not recorded for this method."
+        : `Weighted effective sample size is ${effectiveN.toFixed(1)} of ${completeN} complete cases.`,
+    },
+    {
+      id: "propensity-complete-case-retention",
+      status: typeof missingness?.complete_case_fraction !== "number" ? "fail" : missingness.complete_case_fraction >= 0.8 ? "pass" : missingness.complete_case_fraction >= 0.6 ? "warning" : "fail",
+      detail: typeof missingness?.complete_case_fraction !== "number"
+        ? "No missingness/complete-case retention diagnostic was recorded."
+        : `${(missingness.complete_case_fraction * 100).toFixed(1)}% of rows were retained after requiring treatment, outcome, and propensity covariates.`,
+    },
+    {
+      id: "propensity-causal-claim-boundary",
+      status: "pass",
+      detail: "The result posture requires target-trial, DAG/confounder, positivity, missingness, and sensitivity review before causal claims.",
+    },
+  ];
+}
+
 function renderEstimateTable(result: StatsRunResult): string {
   const firstRows = result.estimates.slice(0, 12);
   if (!firstRows.length) return "_No estimate rows were produced._";
@@ -454,6 +540,13 @@ function renderEstimateTable(result: StatsRunResult): string {
       "| index test | reference standard | TP | FP | TN | FN | sensitivity | specificity | PPV | NPV | LR+ | LR- | prevalence |",
       "|---|---|---:|---:|---:|---:|---|---|---|---|---:|---:|---:|",
       ...firstRows.map(row => `| ${cell(row.term)} | ${cell(row.reference)} | ${cell(row.true_positive)} | ${cell(row.false_positive)} | ${cell(row.true_negative)} | ${cell(row.false_negative)} | ${estimateWithCi(row.sensitivity, row.sensitivity_ci_low, row.sensitivity_ci_high)} | ${estimateWithCi(row.specificity, row.specificity_ci_low, row.specificity_ci_high)} | ${estimateWithCi(row.positive_predictive_value, row.positive_predictive_value_ci_low, row.positive_predictive_value_ci_high)} | ${estimateWithCi(row.negative_predictive_value, row.negative_predictive_value_ci_low, row.negative_predictive_value_ci_high)} | ${cell(row.positive_likelihood_ratio)} | ${cell(row.negative_likelihood_ratio)} | ${cell(row.prevalence)} |`),
+    ].join("\n");
+  }
+  if (result.method === "propensity-score-matching" || result.method === "propensity-score-weighting") {
+    return [
+      "| contrast | estimand | effect measure | estimate | ci_low | ci_high | p_value | treated n | control n |",
+      "|---|---|---|---:|---:|---:|---:|---:|---:|",
+      ...firstRows.map(row => `| ${cell(row.term)} | ${cell(row.estimand)} | ${cell(row.effect_measure)} | ${cell(row.estimate ?? row.risk_difference ?? row.mean_difference ?? row.odds_ratio)} | ${cell(row.ci_low ?? row.or_ci_low)} | ${cell(row.ci_high ?? row.or_ci_high)} | ${cell(row.p_value)} | ${cell(row.treated_n)} | ${cell(row.control_n)} |`),
     ].join("\n");
   }
   return [
@@ -482,6 +575,37 @@ function renderDiagnosticAccuracySection(result: StatsRunResult, request: StatsR
   ];
 }
 
+function renderPropensitySection(result: StatsRunResult, request: StatsRunRequest): string[] {
+  if (result.method !== "propensity-score-matching" && result.method !== "propensity-score-weighting") return [];
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const balance = diagnostics.balance as Record<string, unknown> | undefined;
+  const positivity = diagnostics.positivity as Record<string, unknown> | undefined;
+  const matching = diagnostics.matching as Record<string, unknown> | undefined;
+  const weighting = diagnostics.weighting as Record<string, unknown> | undefined;
+  const missingness = diagnostics.missingness as Record<string, unknown> | undefined;
+  return [
+    "",
+    "## Propensity Design Diagnostics",
+    "",
+    `- Treatment/exposure: ${request.exposure ?? "(missing)"}.`,
+    `- Outcome: ${request.outcome ?? "(missing)"}.`,
+    `- Estimand: ${request.estimand}; method: ${result.method}.`,
+    `- Covariates in propensity model: ${request.covariates.join(", ") || "(none)"}.`,
+    `- Exact-match covariates: ${request.exactCovariates.join(", ") || "(none)"}.`,
+    result.method === "propensity-score-matching"
+      ? `- Matching: nearest-neighbor greedy matching, ratio ${request.matchRatio}:1, ${request.replacement ? "with" : "without"} replacement, caliper ${request.caliper ?? 0.2} SD of the logit propensity score.`
+      : `- Weighting: ${request.estimand} inverse-probability weights${request.stabilizeWeights ? " with stabilization" : ""}; trim threshold ${request.trimThreshold}.`,
+    `- Maximum absolute standardized mean difference before adjustment: ${cell(balance?.max_abs_smd_before)}.`,
+    `- Maximum absolute standardized mean difference after adjustment: ${cell(balance?.max_abs_smd_after)}.`,
+    `- Covariate terms above absolute SMD 0.10 after adjustment: ${cell(balance?.covariates_over_0_1_after)}.`,
+    `- Common-support fraction: ${cell(positivity?.common_support_fraction)}.`,
+    `- Complete-case fraction for treatment, outcome, and propensity covariates: ${cell(missingness?.complete_case_fraction)}.`,
+    matching ? `- Matched treated rows: ${cell(matching.matched_treated)}; matched control rows: ${cell(matching.matched_controls)}; unmatched treated rows: ${cell(matching.unmatched_treated)}.` : "",
+    weighting ? `- Weight range: ${cell(weighting.min_weight)} to ${cell(weighting.max_weight)}; effective sample size ${cell(weighting.effective_sample_size)}.` : "",
+    "- These diagnostics address measured-covariate balance only. They do not address unmeasured confounding, treatment timing, immortal time, consistency, or causal transportability.",
+  ].filter(Boolean);
+}
+
 function cell(value: unknown): string {
   if (value === undefined || value === null || (typeof value === "number" && !Number.isFinite(value))) return "";
   if (typeof value === "number") return Number.isInteger(value) ? String(value) : value.toPrecision(4);
@@ -496,7 +620,7 @@ function estimateWithCi(value: unknown, low: unknown, high: unknown): string {
 }
 
 function variablesFor(request: StatsRunRequest): string[] {
-  return [...new Set([request.outcome, request.exposure, request.group, request.weight, ...request.variables, ...request.covariates].filter((item): item is string => Boolean(item)))];
+  return [...new Set([request.outcome, request.exposure, request.group, request.weight, ...request.variables, ...request.covariates, ...request.exactCovariates].filter((item): item is string => Boolean(item)))];
 }
 
 function statsBridgeSource(): string {
@@ -505,6 +629,7 @@ import json
 import math
 import os
 import sys
+import traceback
 from pathlib import Path
 
 import numpy as np
@@ -597,6 +722,295 @@ def design_matrix(df, exposure, covariates):
     cols = [exposure] + list(covariates)
     x = pd.get_dummies(df[cols], drop_first=True, dtype=float)
     return sm.add_constant(x, has_constant="add")
+
+def covariate_matrix(df, covariates):
+    if not covariates:
+        raise ValueError("Propensity methods require at least one baseline covariate.")
+    x = pd.get_dummies(df[list(covariates)], drop_first=True, dtype=float)
+    if x.shape[1] == 0:
+        raise ValueError("Propensity covariates produced an empty design matrix.")
+    return x
+
+def deterministic_binary_indicator(series, threshold=None):
+    if threshold is not None:
+        numeric = pd.to_numeric(series, errors="coerce")
+        return numeric.map(lambda value: np.nan if pd.isna(value) else int(value >= float(threshold))), f"<{threshold}", f">={threshold}"
+    observed = pd.Series(series).dropna()
+    values = list(observed.unique())
+    if len(values) != 2:
+        raise ValueError("Propensity treatment/exposure must be binary or have an exposure threshold.")
+    try:
+        ordered = sorted(values, key=lambda value: float(value))
+    except Exception:
+        ordered = sorted(values, key=lambda value: str(value))
+    negative, positive = ordered[0], ordered[-1]
+    return pd.Series(series).map(lambda value: np.nan if pd.isna(value) else int(value == positive)), clean_value(negative), clean_value(positive)
+
+def safe_logit(p):
+    p = np.clip(pd.to_numeric(p, errors="coerce").astype(float), 1e-6, 1 - 1e-6)
+    return np.log(p / (1 - p))
+
+def fit_propensity_scores(data, treatment, covariates):
+    if sm is None:
+        raise ValueError("statsmodels is required for propensity score methods.")
+    x = covariate_matrix(data, covariates)
+    x_model = sm.add_constant(x, has_constant="add")
+    model = sm.GLM(data[treatment].astype(float), x_model, family=sm.families.Binomial()).fit()
+    ps = pd.Series(model.predict(x_model), index=data.index).clip(1e-6, 1 - 1e-6)
+    return ps, x, model
+
+def weighted_mean(values, weights):
+    values = pd.to_numeric(values, errors="coerce").astype(float)
+    weights = pd.to_numeric(weights, errors="coerce").astype(float)
+    total = float(weights.sum())
+    if total <= 0:
+        return np.nan
+    return float((values * weights).sum() / total)
+
+def weighted_var(values, weights):
+    values = pd.to_numeric(values, errors="coerce").astype(float)
+    weights = pd.to_numeric(weights, errors="coerce").astype(float)
+    total = float(weights.sum())
+    if total <= 0:
+        return np.nan
+    mean = weighted_mean(values, weights)
+    return float((weights * (values - mean) ** 2).sum() / total)
+
+def balance_rows(x, treatment, adjusted_weights=None, baseline_denominators=None):
+    rows = []
+    t = pd.Series(treatment).astype(int)
+    treated = t == 1
+    control = t == 0
+    if adjusted_weights is None:
+        adjusted_weights = pd.Series(1.0, index=x.index)
+    else:
+        adjusted_weights = pd.Series(adjusted_weights, index=x.index).astype(float)
+    denominators = {}
+    for column_index, col in enumerate(x.columns):
+        values = pd.to_numeric(x.iloc[:, column_index], errors="coerce").astype(float)
+        mt = float(values[treated].mean()) if treated.any() else np.nan
+        mc = float(values[control].mean()) if control.any() else np.nan
+        vt = float(values[treated].var(ddof=1)) if treated.sum() > 1 else 0.0
+        vc = float(values[control].var(ddof=1)) if control.sum() > 1 else 0.0
+        denom = math.sqrt(max(0.0, (vt + vc) / 2))
+        if not denom or math.isnan(denom):
+            denom = 1.0 if abs(mt - mc) > 0 else 1.0
+        denominators[col] = denom
+        base = baseline_denominators[col] if baseline_denominators and col in baseline_denominators else denom
+        w_t = adjusted_weights[treated]
+        w_c = adjusted_weights[control]
+        adj_mt = weighted_mean(values[treated], w_t)
+        adj_mc = weighted_mean(values[control], w_c)
+        adj_vt = weighted_var(values[treated], w_t)
+        adj_vc = weighted_var(values[control], w_c)
+        rows.append({
+            "covariate": str(col),
+            "treated_mean_before": clean_value(mt),
+            "control_mean_before": clean_value(mc),
+            "smd_before": clean_value((mt - mc) / denom),
+            "treated_mean_after": clean_value(adj_mt),
+            "control_mean_after": clean_value(adj_mc),
+            "smd_after": clean_value((adj_mt - adj_mc) / base if base else None),
+            "variance_ratio_after": clean_value(adj_vt / adj_vc if adj_vc and not math.isnan(adj_vc) else None),
+        })
+    return rows, denominators
+
+def balance_summary(rows):
+    before = [abs(r["smd_before"]) for r in rows if r.get("smd_before") is not None]
+    after = [abs(r["smd_after"]) for r in rows if r.get("smd_after") is not None]
+    return {
+        "max_abs_smd_before": clean_value(max(before) if before else None),
+        "max_abs_smd_after": clean_value(max(after) if after else None),
+        "mean_abs_smd_before": clean_value(float(np.mean(before)) if before else None),
+        "mean_abs_smd_after": clean_value(float(np.mean(after)) if after else None),
+        "covariates_over_0_1_before": int(sum(v > 0.1 for v in before)),
+        "covariates_over_0_1_after": int(sum(v > 0.1 for v in after)),
+        "covariate_terms": int(len(rows)),
+    }
+
+def positivity_summary(ps, treatment):
+    t = pd.Series(treatment).astype(int)
+    treated_ps = pd.Series(ps)[t == 1]
+    control_ps = pd.Series(ps)[t == 0]
+    lower = max(float(treated_ps.min()), float(control_ps.min()))
+    upper = min(float(treated_ps.max()), float(control_ps.max()))
+    in_support = (pd.Series(ps) >= lower) & (pd.Series(ps) <= upper)
+    return {
+        "treated_min": clean_value(treated_ps.min()),
+        "treated_max": clean_value(treated_ps.max()),
+        "control_min": clean_value(control_ps.min()),
+        "control_max": clean_value(control_ps.max()),
+        "common_support_lower": clean_value(lower),
+        "common_support_upper": clean_value(upper),
+        "common_support_fraction": clean_value(float(in_support.mean())),
+    }
+
+def overlap_rows(ps, treatment, bins=10):
+    frame = pd.DataFrame({"propensity_score": pd.Series(ps).astype(float), "treatment": pd.Series(treatment).astype(int)})
+    edges = np.linspace(0.0, 1.0, bins + 1)
+    rows = []
+    for i in range(bins):
+        low = float(edges[i])
+        high = float(edges[i + 1])
+        if i == bins - 1:
+            subset = frame[(frame["propensity_score"] >= low) & (frame["propensity_score"] <= high)]
+        else:
+            subset = frame[(frame["propensity_score"] >= low) & (frame["propensity_score"] < high)]
+        treated = int((subset["treatment"] == 1).sum())
+        control = int((subset["treatment"] == 0).sum())
+        rows.append({
+            "bin": i + 1,
+            "lower": clean_value(low),
+            "upper": clean_value(high),
+            "treated": treated,
+            "control": control,
+            "both_groups_present": bool(treated > 0 and control > 0),
+        })
+    return rows
+
+def exact_key(row, exact_covariates):
+    if not exact_covariates:
+        return "__all__"
+    return tuple(row[col] for col in exact_covariates)
+
+def nearest_neighbor_match(data, treatment_col, ps, exact_covariates, ratio, caliper_sd, replacement):
+    logits = pd.Series(safe_logit(ps), index=data.index)
+    sd = float(logits.std(ddof=1)) if len(logits) > 1 else 0.0
+    caliper_width = float(caliper_sd) * sd if sd > 0 else float("inf")
+    treated_idx = list(data.index[data[treatment_col] == 1])
+    control_idx = list(data.index[data[treatment_col] == 0])
+    control_available = set(control_idx)
+    control_use_count = {idx: 0 for idx in control_idx}
+    pairs = []
+    matched_indices = set()
+    unmatched = []
+    ordered_treated = sorted(treated_idx, key=lambda idx: float(logits.loc[idx]))
+    for tidx in ordered_treated:
+        candidates = control_idx if replacement else [idx for idx in control_idx if idx in control_available]
+        tkey = exact_key(data.loc[tidx], exact_covariates)
+        scored = []
+        for cidx in candidates:
+            if exact_key(data.loc[cidx], exact_covariates) != tkey:
+                continue
+            distance = abs(float(logits.loc[tidx]) - float(logits.loc[cidx]))
+            if distance <= caliper_width:
+                scored.append((distance, cidx))
+        scored.sort(key=lambda item: (item[0], str(item[1])))
+        chosen = [cidx for _, cidx in scored[:ratio]]
+        if len(chosen) < ratio:
+            unmatched.append(tidx)
+            continue
+        matched_indices.add(tidx)
+        for cidx in chosen:
+            matched_indices.add(cidx)
+            control_use_count[cidx] += 1
+            if not replacement and cidx in control_available:
+                control_available.remove(cidx)
+            pairs.append({
+                "pair_id": len(pairs) + 1,
+                "treated_row_index": int(tidx) if isinstance(tidx, (int, np.integer)) else str(tidx),
+                "control_row_index": int(cidx) if isinstance(cidx, (int, np.integer)) else str(cidx),
+                "treated_propensity_score": clean_value(ps.loc[tidx]),
+                "control_propensity_score": clean_value(ps.loc[cidx]),
+                "logit_distance": clean_value(abs(float(logits.loc[tidx]) - float(logits.loc[cidx]))),
+            })
+    weights = pd.Series(0.0, index=data.index)
+    for idx in matched_indices:
+        if data.loc[idx, treatment_col] == 1:
+            weights.loc[idx] = 1.0
+    for idx, count in control_use_count.items():
+        if count:
+            weights.loc[idx] = float(count) / float(ratio)
+    return pairs, weights, {
+        "match_ratio": int(ratio),
+        "replacement": bool(replacement),
+        "caliper_logit_sd": clean_value(caliper_sd),
+        "caliper_logit_width": clean_value(caliper_width),
+        "treated_total": int(len(treated_idx)),
+        "control_total": int(len(control_idx)),
+        "matched_treated": int(len(set([p["treated_row_index"] for p in pairs]))),
+        "matched_controls": int(len(set([p["control_row_index"] for p in pairs]))),
+        "matched_pairs": int(len(pairs)),
+        "unmatched_treated": int(len(unmatched)),
+        "control_reuse_max": int(max(control_use_count.values()) if control_use_count else 0),
+    }
+
+def propensity_weights(treatment, ps, estimand, stabilize=True):
+    t = pd.Series(treatment).astype(int)
+    p_treat = float(t.mean())
+    if estimand == "ATE":
+        w = t / ps + (1 - t) / (1 - ps)
+        if stabilize:
+            w = t * p_treat / ps + (1 - t) * (1 - p_treat) / (1 - ps)
+    else:
+        w = t + (1 - t) * ps / (1 - ps)
+        if stabilize:
+            w = t * 1.0 + (1 - t) * p_treat / max(1e-6, 1 - p_treat) * ps / (1 - ps)
+    return pd.Series(w, index=ps.index).astype(float)
+
+def effective_sample_size(weights):
+    weights = pd.Series(weights).astype(float)
+    denom = float((weights ** 2).sum())
+    if denom <= 0:
+        return None
+    return clean_value(float(weights.sum() ** 2 / denom))
+
+def treatment_effect_estimate(data, treatment_col, outcome_col, weights, estimand, method_label):
+    y_raw = data[outcome_col]
+    t = data[treatment_col].astype(int)
+    weights = pd.Series(weights, index=data.index).astype(float)
+    active = weights > 0
+    y_num = pd.to_numeric(y_raw, errors="coerce")
+    binary_outcome = set(pd.Series(y_raw[active]).dropna().unique()).issubset({0, 1, 0.0, 1.0, True, False})
+    x = sm.add_constant(pd.DataFrame({treatment_col: t[active].astype(float)}), has_constant="add")
+    treated_n = int(((t == 1) & active).sum())
+    control_n = int(((t == 0) & active).sum())
+    treated_mean = weighted_mean(y_num[(t == 1) & active], weights[(t == 1) & active])
+    control_mean = weighted_mean(y_num[(t == 0) & active], weights[(t == 0) & active])
+    if binary_outcome:
+        y = pd.Series(y_raw).astype(float)
+        model = sm.GLM(y[active], x, family=sm.families.Binomial(), freq_weights=weights[active]).fit()
+        ci = model.conf_int()
+        log_or = float(model.params[treatment_col])
+        p_value = float(model.pvalues[treatment_col])
+        risk_difference = treated_mean - control_mean
+        return {
+            "term": str(treatment_col),
+            "method": method_label,
+            "estimand": estimand,
+            "effect_measure": "risk difference and odds ratio",
+            "estimate": clean_value(risk_difference),
+            "risk_difference": clean_value(risk_difference),
+            "treated_risk": clean_value(treated_mean),
+            "control_risk": clean_value(control_mean),
+            "log_odds_ratio": clean_value(log_or),
+            "odds_ratio": clean_value(safe_exp(log_or)),
+            "or_ci_low": clean_value(safe_exp(ci.loc[treatment_col, 0])),
+            "or_ci_high": clean_value(safe_exp(ci.loc[treatment_col, 1])),
+            "p_value": clean_value(p_value),
+            "treated_n": treated_n,
+            "control_n": control_n,
+        }
+    y = y_num
+    model = sm.WLS(y[active], x, weights=weights[active]).fit()
+    ci = model.conf_int()
+    effect = float(model.params[treatment_col])
+    return {
+        "term": str(treatment_col),
+        "method": method_label,
+        "estimand": estimand,
+        "effect_measure": "mean difference",
+        "estimate": clean_value(effect),
+        "mean_difference": clean_value(effect),
+        "treated_mean": clean_value(treated_mean),
+        "control_mean": clean_value(control_mean),
+        "std_error": clean_value(model.bse[treatment_col]),
+        "ci_low": clean_value(ci.loc[treatment_col, 0]),
+        "ci_high": clean_value(ci.loc[treatment_col, 1]),
+        "p_value": clean_value(model.pvalues[treatment_col]),
+        "treated_n": treated_n,
+        "control_n": control_n,
+    }
 
 def descriptive(df, req):
     variables = req.get("variables") or list(df.columns)
@@ -778,6 +1192,152 @@ def run(req):
         if min(tp, fp, tn, fn) < 5:
             warnings.append("At least one diagnostic accuracy cell count is below 5; performance metrics may be unstable.")
             issues.append({"severity": "warning", "code": "SPARSE_DIAGNOSTIC_CELL", "message": "At least one diagnostic accuracy cell count is below 5.", "evidenceRefs": ["diagnostics.confusion_matrix"]})
+    elif method in ("propensity-score-matching", "propensity-score-weighting"):
+        if sm is None:
+            raise ValueError("statsmodels is required for propensity score methods.")
+        outcome = req.get("outcome")
+        treatment = req.get("exposure") or req.get("group")
+        covariates = req.get("covariates") or []
+        exact_covariates = req.get("exactCovariates") or []
+        leakage = [c for c in covariates + exact_covariates if c in (outcome, treatment)]
+        if leakage:
+            raise ValueError("Propensity covariates cannot include the treatment/exposure or outcome: " + ", ".join(sorted(set(leakage))))
+        require_columns(df, [outcome, treatment] + covariates + exact_covariates)
+        variables = list(dict.fromkeys([outcome, treatment] + covariates + exact_covariates))
+        raw_all = df[variables].copy()
+        missing_counts = {col: int(raw_all[col].isna().sum()) for col in variables}
+        raw = raw_all.dropna()
+        excluded_missing = int(raw_all.shape[0] - raw.shape[0])
+        if raw_all.shape[0] and excluded_missing / raw_all.shape[0] > 0.2:
+            issues.append({"severity": "warning", "code": "PROPENSITY_HIGH_COMPLETE_CASE_EXCLUSION", "message": f"{excluded_missing} of {raw_all.shape[0]} rows were excluded before propensity estimation because of missing treatment, outcome, or covariates.", "evidenceRefs": ["diagnostics.missingness"]})
+        t_indicator, control_level, treated_level = deterministic_binary_indicator(raw[treatment], req.get("exposureThreshold"))
+        raw["_agenteer_treatment"] = t_indicator
+        data = raw.dropna(subset=["_agenteer_treatment"]).copy()
+        data["_agenteer_treatment"] = data["_agenteer_treatment"].astype(int)
+        if data["_agenteer_treatment"].nunique() != 2:
+            raise ValueError("Propensity methods require both treated and control rows after complete-case filtering.")
+        if int((data["_agenteer_treatment"] == 1).sum()) < 5 or int((data["_agenteer_treatment"] == 0).sum()) < 5:
+            issues.append({"severity": "blocker", "code": "PROPENSITY_GROUP_TOO_SMALL", "message": "Both treatment groups need at least 5 complete-case rows for propensity analysis.", "evidenceRefs": ["completeCaseN"]})
+        ps, x_cov, ps_model = fit_propensity_scores(data, "_agenteer_treatment", covariates)
+        logits = pd.Series(safe_logit(ps), index=data.index)
+        before_rows, denominators = balance_rows(x_cov, data["_agenteer_treatment"])
+        estimand = req.get("estimand", "ATT")
+        score_rows = pd.DataFrame({
+            "row_index": [int(idx) if isinstance(idx, (int, np.integer)) else str(idx) for idx in data.index],
+            "treatment": data["_agenteer_treatment"].astype(int).values,
+            "propensity_score": ps.values,
+            "logit_propensity_score": logits.values,
+        })
+        propensity_path = os.path.join(out_dir, "propensity-scores.csv")
+        score_rows.to_csv(propensity_path, index=False)
+        overlap_path = os.path.join(out_dir, "propensity-overlap.csv")
+        write_csv(overlap_path, overlap_rows(ps, data["_agenteer_treatment"]))
+        pair_path = None
+        weight_path = None
+        if method == "propensity-score-matching":
+            ratio = int(req.get("matchRatio", 1))
+            caliper = float(req.get("caliper") if req.get("caliper") is not None else 0.2)
+            pairs, analysis_weights, match_diag = nearest_neighbor_match(
+                data,
+                "_agenteer_treatment",
+                ps,
+                exact_covariates,
+                ratio,
+                caliper,
+                bool(req.get("replacement", False)),
+            )
+            pair_path = os.path.join(out_dir, "matched-pairs.csv")
+            write_csv(pair_path, pairs)
+            if match_diag["unmatched_treated"] > 0:
+                issues.append({"severity": "warning", "code": "PROPENSITY_UNMATCHED_TREATED", "message": f"{match_diag['unmatched_treated']} treated rows were unmatched under the caliper/exact-match policy.", "evidenceRefs": ["matched-pairs.csv"]})
+            if match_diag["matched_treated"] < 5 or match_diag["matched_controls"] < 5:
+                issues.append({"severity": "blocker", "code": "PROPENSITY_MATCHED_SAMPLE_TOO_SMALL", "message": "Matched sample is too small for a stable treatment contrast.", "evidenceRefs": ["diagnostics.matching"]})
+            diagnostics["matching"] = match_diag
+            method_label = "nearest-neighbor propensity score matching"
+        else:
+            trim = float(req.get("trimThreshold", 0.01))
+            base_weights = propensity_weights(data["_agenteer_treatment"], ps, estimand, bool(req.get("stabilizeWeights", True)))
+            keep = (ps >= trim) & (ps <= (1 - trim))
+            analysis_weights = pd.Series(0.0, index=data.index)
+            analysis_weights.loc[keep] = base_weights.loc[keep]
+            if int((~keep).sum()) > 0:
+                issues.append({"severity": "warning", "code": "PROPENSITY_TRIMMED_NONOVERLAP", "message": f"{int((~keep).sum())} rows were assigned zero weight by the trim threshold.", "evidenceRefs": ["weights.csv"]})
+            if float(base_weights.max()) > 10:
+                issues.append({"severity": "warning", "code": "PROPENSITY_EXTREME_WEIGHTS", "message": "Maximum inverse-probability weight exceeded 10; review positivity and stabilization.", "evidenceRefs": ["diagnostics.weighting"]})
+            weight_path = os.path.join(out_dir, "weights.csv")
+            pd.DataFrame({
+                "row_index": [int(idx) if isinstance(idx, (int, np.integer)) else str(idx) for idx in data.index],
+                "treatment": data["_agenteer_treatment"].astype(int).values,
+                "propensity_score": ps.values,
+                "analysis_weight": analysis_weights.values,
+            }).to_csv(weight_path, index=False)
+            diagnostics["weighting"] = {
+                "estimand": estimand,
+                "stabilized": bool(req.get("stabilizeWeights", True)),
+                "trim_threshold": clean_value(trim),
+                "trimmed_rows": int((~keep).sum()),
+                "min_weight": clean_value(analysis_weights[analysis_weights > 0].min() if (analysis_weights > 0).any() else None),
+                "max_weight": clean_value(analysis_weights.max()),
+                "mean_weight": clean_value(analysis_weights[analysis_weights > 0].mean() if (analysis_weights > 0).any() else None),
+                "effective_sample_size": effective_sample_size(analysis_weights),
+            }
+            method_label = "inverse-probability treatment weighting"
+        after_rows, _ = balance_rows(x_cov, data["_agenteer_treatment"], analysis_weights, denominators)
+        # Preserve before/after rows as one table; after_rows already carries both original and adjusted columns.
+        balance_path = os.path.join(out_dir, "balance.csv")
+        write_csv(balance_path, after_rows)
+        summary = balance_summary(after_rows)
+        if summary["covariates_over_0_1_after"] and summary["covariates_over_0_1_after"] > 0:
+            issues.append({"severity": "warning", "code": "PROPENSITY_RESIDUAL_IMBALANCE", "message": f"{summary['covariates_over_0_1_after']} covariate terms have post-adjustment absolute SMD above 0.10.", "evidenceRefs": ["balance.csv"]})
+        positivity = positivity_summary(ps, data["_agenteer_treatment"])
+        if positivity["common_support_fraction"] is not None and positivity["common_support_fraction"] < 0.75:
+            issues.append({"severity": "blocker", "code": "PROPENSITY_POOR_OVERLAP", "message": "Less than 75% of complete cases lie in common propensity-score support.", "evidenceRefs": ["diagnostics.positivity"]})
+        effect_row = treatment_effect_estimate(data, "_agenteer_treatment", outcome, analysis_weights, estimand, method_label)
+        effect_row["term"] = str(treatment)
+        estimates = [effect_row]
+        diagnostics.update({
+            "test": method,
+            "treatment_column": treatment,
+            "treatment_positive_level": treated_level,
+            "treatment_negative_level": control_level,
+            "covariates": covariates,
+            "exact_covariates": exact_covariates,
+            "propensity_model": {
+                "family": "logistic",
+                "n_parameters": int(len(ps_model.params)),
+                "aic": clean_value(getattr(ps_model, "aic", None)),
+                "converged": bool(getattr(ps_model, "converged", True)),
+                "propensity_min": clean_value(ps.min()),
+                "propensity_max": clean_value(ps.max()),
+            },
+            "missingness": {
+                "input_rows": int(raw_all.shape[0]),
+                "complete_case_rows": int(data.shape[0]),
+                "excluded_missing_rows": excluded_missing,
+                "complete_case_fraction": clean_value(float(data.shape[0]) / float(raw_all.shape[0]) if raw_all.shape[0] else None),
+                "missing_counts": missing_counts,
+            },
+            "balance": summary,
+            "positivity": positivity,
+            "artifacts": {
+                "propensity_scores": propensity_path,
+                "propensity_overlap": overlap_path,
+                "balance": balance_path,
+                "matched_pairs": pair_path,
+                "weights": weight_path,
+            },
+        })
+        params.update({
+            "estimand": estimand,
+            "matchRatio": req.get("matchRatio", 1),
+            "caliper": req.get("caliper") if req.get("caliper") is not None else 0.2,
+            "replacement": bool(req.get("replacement", False)),
+            "trimThreshold": req.get("trimThreshold", 0.01),
+            "stabilizeWeights": bool(req.get("stabilizeWeights", True)),
+            "treatmentPositiveLevel": treated_level,
+            "treatmentNegativeLevel": control_level,
+        })
+        complete = int(data.shape[0])
     elif method in ("linear-regression", "logistic-regression", "poisson-regression"):
         if sm is None:
             raise ValueError("statsmodels is required for regression methods.")
@@ -836,6 +1396,24 @@ def run(req):
     write_csv(table_path, estimates)
     with open(diagnostics_path, "w") as f:
         json.dump(diagnostics, f, indent=2, default=clean_value)
+    artifacts = [
+        {"kind": "config", "path": os.path.join(out_dir, "stats-config.json")},
+        {"kind": "summary", "path": summary_path},
+        {"kind": "table", "path": table_path},
+        {"kind": "diagnostics", "path": diagnostics_path},
+    ]
+    propensity_artifacts = diagnostics.get("artifacts") if isinstance(diagnostics, dict) else None
+    if isinstance(propensity_artifacts, dict):
+        if propensity_artifacts.get("balance"):
+            artifacts.append({"kind": "balance", "path": propensity_artifacts["balance"]})
+        if propensity_artifacts.get("propensity_scores"):
+            artifacts.append({"kind": "propensity-scores", "path": propensity_artifacts["propensity_scores"]})
+        if propensity_artifacts.get("propensity_overlap"):
+            artifacts.append({"kind": "propensity-overlap", "path": propensity_artifacts["propensity_overlap"]})
+        if propensity_artifacts.get("matched_pairs"):
+            artifacts.append({"kind": "matched-pairs", "path": propensity_artifacts["matched_pairs"]})
+        if propensity_artifacts.get("weights"):
+            artifacts.append({"kind": "weights", "path": propensity_artifacts["weights"]})
     return {
         "schemaVersion": 1,
         "runId": "statsrun_" + str(abs(hash(json.dumps({"method": method, "vars": variables, "n": complete}, sort_keys=True)))),
@@ -850,12 +1428,7 @@ def run(req):
         "issues": issues,
         "warnings": warnings,
         "errors": [],
-        "artifacts": [
-            {"kind": "config", "path": os.path.join(out_dir, "stats-config.json")},
-            {"kind": "summary", "path": summary_path},
-            {"kind": "table", "path": table_path},
-            {"kind": "diagnostics", "path": diagnostics_path},
-        ],
+        "artifacts": artifacts,
         "outDir": out_dir,
     }
 
@@ -880,7 +1453,7 @@ def main():
             "diagnostics": {},
             "issues": [],
             "warnings": [],
-            "errors": [str(exc)],
+            "errors": [str(exc), traceback.format_exc()],
             "artifacts": [{"kind": "config", "path": config_path}],
             "outDir": req.get("outDir"),
         }))

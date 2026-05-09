@@ -1,0 +1,1270 @@
+{
+  "schemaVersion": 1,
+  "modelingPlan": {
+    "schemaVersion": 1,
+    "decisionId": "modeling_99bb4b1315275c01",
+    "request": {
+      "question": "Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?",
+      "goal": "causal",
+      "outcomeType": "binary",
+      "dataStructures": [
+        "single_table"
+      ],
+      "surveyDesign": false,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "target": "outcome",
+      "priorRuns": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run/stats-run/stats-run.json",
+          "kind": "stats",
+          "status": "succeeded",
+          "posture": "causal_design_review_required",
+          "methodOrModel": "propensity-score-matching",
+          "issueCodes": [
+            "PROPENSITY_UNMATCHED_TREATED",
+            "PROPENSITY_RESIDUAL_IMBALANCE"
+          ],
+          "errors": []
+        }
+      ],
+      "highMissingness": false,
+      "smallSample": false,
+      "requiresInference": true,
+      "requiresPrediction": false,
+      "maxCandidates": 12
+    },
+    "inferredGoal": "causal",
+    "inferredOutcomeType": "binary",
+    "inferredStudyDesign": "cross_sectional",
+    "inferredDataStructures": [
+      "single_table"
+    ],
+    "dataEvidence": {
+      "source": "request",
+      "rowCount": null,
+      "featureCount": null,
+      "target": "outcome",
+      "targetClassCount": null,
+      "maxMissingFraction": null,
+      "highMissingness": false,
+      "smallSample": false,
+      "highDimensional": false,
+      "warnings": []
+    },
+    "backendEvidence": {
+      "source": "not-supplied",
+      "available": [],
+      "missing": [],
+      "notChecked": [],
+      "warnings": []
+    },
+    "priorRunEvidence": {
+      "source": "prior-run-artifacts",
+      "runs": [
+        {
+          "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run/stats-run/stats-run.json",
+          "kind": "stats",
+          "status": "succeeded",
+          "posture": "causal_design_review_required",
+          "methodOrModel": "propensity-score-matching",
+          "issueCodes": [
+            "PROPENSITY_UNMATCHED_TREATED",
+            "PROPENSITY_RESIDUAL_IMBALANCE"
+          ],
+          "action": "promote-local-review",
+          "reason": "Prior run has no blocking posture; use it only for local review unless stronger validation artifacts exist."
+        }
+      ],
+      "warnings": [
+        {
+          "severity": "note",
+          "code": "PRIOR_RUN_POSTURE_REQUIRES_PLANNING_RESPONSE",
+          "message": "stats prior run /Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run/stats-run/stats-run.json posture=causal_design_review_required action=promote-local-review.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run/stats-run/stats-run.json"
+          ]
+        }
+      ],
+      "recommendedAction": "Prior run has no blocking posture; use it only for local review unless stronger validation artifacts exist."
+    },
+    "methodSelectionEvidence": {
+      "selectionId": "method_selection_e6732f85035b",
+      "selectionHash": "4f567e3ee316992966706fd1891dc18479531550dce8b366c9c921d8bafd075f",
+      "primaryMethodId": "propensity-score-matching",
+      "candidateMethodIds": [
+        "propensity-score-matching",
+        "mediation-analysis",
+        "propensity-score-weighting",
+        "binary-logistic-regression",
+        "clinical-trial-itt-analysis",
+        "regression-discontinuity",
+        "tmle-doubly-robust",
+        "bootstrap-uncertainty",
+        "chi-square-independence",
+        "effect-size-suite",
+        "epidemiologic-2x2-measures",
+        "fisher-exact-test"
+      ],
+      "recommendedBackend": "python-statsmodels",
+      "recommendedArchetype": "target-trial-emulation-sketch",
+      "stopForHumanReview": true,
+      "issueCodes": [
+        "HUMAN_REVIEW_GATE"
+      ],
+      "applyCommandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --out method-selection.json --json && agenteer research method-apply --spec analysis-spec.json --selection method-selection.json --json"
+    },
+    "routeRecommendation": {
+      "route": "stats-run",
+      "commandHint": "agenteer research stats-run --method propensity-score-matching --data <rows.csv> --out-dir <out> # selected from propensity-score-matching",
+      "reason": "method:propensity-score-matching is executable by the standard-table statistics runner.",
+      "requiredArtifacts": [
+        "stats-run.json",
+        "estimates.csv",
+        "diagnostics.json",
+        "stats-report.md",
+        "stats-qa.json"
+      ]
+    },
+    "primary": {
+      "id": "method:propensity-score-matching",
+      "rank": 2,
+      "tier": "primary",
+      "source": "statistical-method",
+      "label": "Propensity score matching",
+      "family": "propensity_weighting",
+      "backend": "python-statsmodels",
+      "taskType": null,
+      "score": 0.62,
+      "compatible": true,
+      "reasons": [
+        "question keyword match: caliper",
+        "supports outcome type binary",
+        "supports data structure single_table",
+        "matches goal causal"
+      ],
+      "cautions": [
+        {
+          "severity": "note",
+          "code": "HUMAN_REVIEW_GATE",
+          "message": "any causal claim is made",
+          "evidenceRefs": []
+        }
+      ],
+      "requiredBeforeExecution": [
+        "binary treatment/exposure",
+        "outcome",
+        "baseline confounders",
+        "match ratio",
+        "caliper policy",
+        "standardized mean differences before/after matching",
+        "propensity overlap",
+        "caliper unmatched count",
+        "matched treated/control counts",
+        "provide binary treatment/exposure",
+        "provide outcome",
+        "provide baseline confounders"
+      ],
+      "expectedMetrics": [
+        "ATT mean difference",
+        "ATT risk difference",
+        "ATT odds ratio"
+      ],
+      "expectedArtifacts": [
+        "analysis.json",
+        "method-report.md",
+        "diagnostics.json",
+        "stats-run.json",
+        "estimates.csv",
+        "stats-report.md",
+        "stats-qa.json"
+      ],
+      "commandHint": "agenteer research stats-run --method propensity-score-matching --data <rows.csv> --out-dir <out> # selected from propensity-score-matching"
+    },
+    "blockingPolicies": [
+      {
+        "id": "policy:causal-stop-for-review",
+        "rank": 1,
+        "tier": "primary",
+        "source": "workflow-policy",
+        "label": "Causal design stop-for-review",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.86,
+        "compatible": true,
+        "reasons": [
+          "Causal language requires target trial, DAG/confounding set, positivity, exchangeability, and sensitivity analysis before modeling."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "causal estimand",
+          "DAG/confounder rationale",
+          "positivity diagnostics",
+          "negative/control or sensitivity analysis"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      }
+    ],
+    "executableCandidates": [
+      {
+        "id": "method:propensity-score-matching",
+        "rank": 2,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Propensity score matching",
+        "family": "propensity_weighting",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.62,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: caliper",
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "any causal claim is made",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "binary treatment/exposure",
+          "outcome",
+          "baseline confounders",
+          "match ratio",
+          "caliper policy",
+          "standardized mean differences before/after matching",
+          "propensity overlap",
+          "caliper unmatched count",
+          "matched treated/control counts",
+          "provide binary treatment/exposure",
+          "provide outcome",
+          "provide baseline confounders"
+        ],
+        "expectedMetrics": [
+          "ATT mean difference",
+          "ATT risk difference",
+          "ATT odds ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method propensity-score-matching --data <rows.csv> --out-dir <out> # selected from propensity-score-matching"
+      },
+      {
+        "id": "method:propensity-score-weighting",
+        "rank": 3,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Propensity score weighting/IPTW",
+        "family": "propensity_weighting",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.53,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "any causal claim is made",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "treatment",
+          "outcome",
+          "confounders",
+          "positivity diagnostics",
+          "standardized mean differences",
+          "weight distribution",
+          "overlap",
+          "provide treatment",
+          "provide outcome",
+          "provide confounders",
+          "provide positivity diagnostics",
+          "confirm assumption: Exchangeability"
+        ],
+        "expectedMetrics": [
+          "ATE",
+          "ATT",
+          "risk difference",
+          "risk ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method propensity-score-weighting --data <rows.csv> --out-dir <out> # selected from propensity-score-weighting"
+      },
+      {
+        "id": "method:binary-logistic-regression",
+        "rank": 7,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Binary logistic regression",
+        "family": "logistic",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.51,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic or causal language is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "binary outcome",
+          "exposure",
+          "covariates",
+          "event count",
+          "separation",
+          "calibration if predictive",
+          "influence",
+          "provide binary outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Outcome threshold is justified",
+          "confirm assumption: adequate events per parameter"
+        ],
+        "expectedMetrics": [
+          "odds ratio",
+          "marginal risk difference"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method logistic-regression --data <rows.csv> --out-dir <out> --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>"
+      },
+      {
+        "id": "method:bootstrap-uncertainty",
+        "rank": 9,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Bootstrap uncertainty estimation",
+        "family": "nonparametric",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "complex survey bootstrap is requested without replicate design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "statistic",
+          "resampling unit",
+          "number of replicates",
+          "bootstrap distribution",
+          "replicate failures",
+          "CI method",
+          "provide statistic",
+          "provide resampling unit",
+          "provide number of replicates",
+          "confirm assumption: Resampling respects clustering and design",
+          "confirm assumption: sample is representative",
+          "produce diagnostic: bootstrap distribution"
+        ],
+        "expectedMetrics": [
+          "bootstrap confidence interval",
+          "standard error"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --json"
+      },
+      {
+        "id": "method:chi-square-independence",
+        "rank": 10,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Chi-square test of independence",
+        "family": "hypothesis_test",
+        "backend": "python-scipy",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "small expected counts require exact or suppressed analysis",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "categorical outcome",
+          "categorical exposure",
+          "cell counts",
+          "expected counts",
+          "sparse cells",
+          "provide categorical outcome",
+          "provide categorical exposure",
+          "confirm assumption: Expected cell counts are adequate or exact test is selected",
+          "confirm assumption: independence or survey design is handled",
+          "produce diagnostic: cell counts",
+          "produce diagnostic: expected counts",
+          "produce diagnostic: sparse cells"
+        ],
+        "expectedMetrics": [
+          "risk difference",
+          "risk ratio",
+          "odds ratio",
+          "Cramer's V"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method chi-square --data <rows.csv> --out-dir <out> --outcome <categorical-outcome> --exposure <categorical-exposure>"
+      },
+      {
+        "id": "method:effect-size-suite",
+        "rank": 11,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Effect size estimation suite",
+        "family": "descriptive",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "primary effect estimate",
+          "uncertainty interval",
+          "scale interpretation",
+          "absolute vs relative effect",
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "standardized mean difference",
+          "odds ratio",
+          "risk ratio",
+          "hazard ratio",
+          "NNT"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --json"
+      },
+      {
+        "id": "method:epidemiologic-2x2-measures",
+        "rank": 12,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Epidemiologic 2x2 measures",
+        "family": "epidemiologic",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "population attributable fraction is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "exposure",
+          "outcome",
+          "person-time for incidence when needed",
+          "2x2 counts",
+          "person-time",
+          "sampling design",
+          "provide exposure",
+          "provide outcome",
+          "provide person-time for incidence when needed",
+          "confirm assumption: Effect measure matches study design",
+          "confirm assumption: case-control designs do not estimate risk directly without sampling information",
+          "produce diagnostic: 2x2 counts"
+        ],
+        "expectedMetrics": [
+          "prevalence",
+          "incidence",
+          "risk ratio",
+          "odds ratio",
+          "risk difference",
+          "attributable risk"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --json"
+      }
+    ],
+    "baselines": [],
+    "sensitivityAnalyses": [],
+    "candidates": [
+      {
+        "id": "policy:causal-stop-for-review",
+        "rank": 1,
+        "tier": "primary",
+        "source": "workflow-policy",
+        "label": "Causal design stop-for-review",
+        "family": "policy",
+        "backend": "manual-review",
+        "taskType": null,
+        "score": 0.86,
+        "compatible": true,
+        "reasons": [
+          "Causal language requires target trial, DAG/confounding set, positivity, exchangeability, and sensitivity analysis before modeling."
+        ],
+        "cautions": [],
+        "requiredBeforeExecution": [
+          "causal estimand",
+          "DAG/confounder rationale",
+          "positivity diagnostics",
+          "negative/control or sensitivity analysis"
+        ],
+        "expectedMetrics": [],
+        "expectedArtifacts": [
+          "analysis-spec.json",
+          "diagnostics.json",
+          "review-note.md"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:propensity-score-matching",
+        "rank": 2,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Propensity score matching",
+        "family": "propensity_weighting",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.62,
+        "compatible": true,
+        "reasons": [
+          "question keyword match: caliper",
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "any causal claim is made",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "binary treatment/exposure",
+          "outcome",
+          "baseline confounders",
+          "match ratio",
+          "caliper policy",
+          "standardized mean differences before/after matching",
+          "propensity overlap",
+          "caliper unmatched count",
+          "matched treated/control counts",
+          "provide binary treatment/exposure",
+          "provide outcome",
+          "provide baseline confounders"
+        ],
+        "expectedMetrics": [
+          "ATT mean difference",
+          "ATT risk difference",
+          "ATT odds ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method propensity-score-matching --data <rows.csv> --out-dir <out> # selected from propensity-score-matching"
+      },
+      {
+        "id": "method:propensity-score-weighting",
+        "rank": 3,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Propensity score weighting/IPTW",
+        "family": "propensity_weighting",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.53,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "any causal claim is made",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "treatment",
+          "outcome",
+          "confounders",
+          "positivity diagnostics",
+          "standardized mean differences",
+          "weight distribution",
+          "overlap",
+          "provide treatment",
+          "provide outcome",
+          "provide confounders",
+          "provide positivity diagnostics",
+          "confirm assumption: Exchangeability"
+        ],
+        "expectedMetrics": [
+          "ATE",
+          "ATT",
+          "risk difference",
+          "risk ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method propensity-score-weighting --data <rows.csv> --out-dir <out> # selected from propensity-score-weighting"
+      },
+      {
+        "id": "method:regression-discontinuity",
+        "rank": 4,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Regression discontinuity",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.45,
+        "compatible": false,
+        "reasons": [
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "regression-discontinuity is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "assignment mechanism is not deterministic or fuzzy RD not specified",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "METHOD_NOT_EXECUTABLE",
+            "message": "regression-discontinuity is design-only; use as design contract only.",
+            "evidenceRefs": [
+              "regression-discontinuity"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "running variable",
+          "cutoff",
+          "treatment assignment",
+          "outcome",
+          "density test",
+          "bandwidth sensitivity",
+          "covariate continuity",
+          "provide running variable",
+          "provide cutoff",
+          "provide treatment assignment",
+          "provide outcome",
+          "confirm assumption: No manipulation around cutoff"
+        ],
+        "expectedMetrics": [
+          "local average treatment effect"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:tmle-doubly-robust",
+        "rank": 5,
+        "tier": "primary",
+        "source": "statistical-method",
+        "label": "Targeted maximum likelihood / doubly robust estimation",
+        "family": "propensity_weighting",
+        "backend": "causal",
+        "taskType": null,
+        "score": 0.45,
+        "compatible": false,
+        "reasons": [
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "tmle-doubly-robust is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "blocker",
+            "code": "METHOD_NO_PRODUCTION_BACKEND",
+            "message": "tmle-doubly-robust has no production-ready backend yet.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal estimand not explicitly reviewed",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "METHOD_NOT_EXECUTABLE",
+            "message": "tmle-doubly-robust is design-only; use as design contract only.",
+            "evidenceRefs": [
+              "tmle-doubly-robust"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "outcome",
+          "treatment",
+          "confounders",
+          "identification assumptions",
+          "positivity",
+          "nuisance model performance",
+          "influence curve",
+          "provide outcome",
+          "provide treatment",
+          "provide confounders",
+          "provide identification assumptions",
+          "confirm assumption: Exchangeability"
+        ],
+        "expectedMetrics": [
+          "ATE",
+          "risk difference",
+          "risk ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:mediation-analysis",
+        "rank": 6,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Mediation analysis",
+        "family": "mediation",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.57,
+        "compatible": false,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "mediation-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "mechanistic causal claim is requested",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "METHOD_NOT_EXECUTABLE",
+            "message": "mediation-analysis is design-only; use as design contract only.",
+            "evidenceRefs": [
+              "mediation-analysis"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "exposure",
+          "mediator",
+          "outcome",
+          "confounders",
+          "path estimates",
+          "sensitivity to mediator-outcome confounding",
+          "provide exposure",
+          "provide mediator",
+          "provide outcome",
+          "provide confounders",
+          "confirm assumption: Temporal ordering",
+          "confirm assumption: no unmeasured exposure-mediator/outcome confounding"
+        ],
+        "expectedMetrics": [
+          "natural direct effect",
+          "natural indirect effect",
+          "proportion mediated"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:binary-logistic-regression",
+        "rank": 7,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Binary logistic regression",
+        "family": "logistic",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.51,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic or causal language is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "binary outcome",
+          "exposure",
+          "covariates",
+          "event count",
+          "separation",
+          "calibration if predictive",
+          "influence",
+          "provide binary outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Outcome threshold is justified",
+          "confirm assumption: adequate events per parameter"
+        ],
+        "expectedMetrics": [
+          "odds ratio",
+          "marginal risk difference"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method logistic-regression --data <rows.csv> --out-dir <out> --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>"
+      },
+      {
+        "id": "method:clinical-trial-itt-analysis",
+        "rank": 8,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Clinical trial ITT/superiority analysis",
+        "family": "glm",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.45,
+        "compatible": false,
+        "reasons": [
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "clinical-trial-itt-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "noninferiority/equivalence margin is involved",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "warning",
+            "code": "METHOD_NOT_EXECUTABLE",
+            "message": "clinical-trial-itt-analysis is design-only; use as design contract only.",
+            "evidenceRefs": [
+              "clinical-trial-itt-analysis"
+            ]
+          }
+        ],
+        "requiredBeforeExecution": [
+          "randomization group",
+          "analysis population",
+          "endpoint",
+          "protocol deviations",
+          "CONSORT flow",
+          "baseline balance",
+          "missing endpoints",
+          "adverse events",
+          "provide randomization group",
+          "provide analysis population",
+          "provide endpoint",
+          "provide protocol deviations"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "risk difference",
+          "hazard ratio"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": null
+      },
+      {
+        "id": "method:bootstrap-uncertainty",
+        "rank": 9,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Bootstrap uncertainty estimation",
+        "family": "nonparametric",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "complex survey bootstrap is requested without replicate design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "statistic",
+          "resampling unit",
+          "number of replicates",
+          "bootstrap distribution",
+          "replicate failures",
+          "CI method",
+          "provide statistic",
+          "provide resampling unit",
+          "provide number of replicates",
+          "confirm assumption: Resampling respects clustering and design",
+          "confirm assumption: sample is representative",
+          "produce diagnostic: bootstrap distribution"
+        ],
+        "expectedMetrics": [
+          "bootstrap confidence interval",
+          "standard error"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --json"
+      },
+      {
+        "id": "method:chi-square-independence",
+        "rank": 10,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Chi-square test of independence",
+        "family": "hypothesis_test",
+        "backend": "python-scipy",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "small expected counts require exact or suppressed analysis",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "categorical outcome",
+          "categorical exposure",
+          "cell counts",
+          "expected counts",
+          "sparse cells",
+          "provide categorical outcome",
+          "provide categorical exposure",
+          "confirm assumption: Expected cell counts are adequate or exact test is selected",
+          "confirm assumption: independence or survey design is handled",
+          "produce diagnostic: cell counts",
+          "produce diagnostic: expected counts",
+          "produce diagnostic: sparse cells"
+        ],
+        "expectedMetrics": [
+          "risk difference",
+          "risk ratio",
+          "odds ratio",
+          "Cramer's V"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json",
+          "stats-run.json",
+          "estimates.csv",
+          "stats-report.md",
+          "stats-qa.json"
+        ],
+        "commandHint": "agenteer research stats-run --method chi-square --data <rows.csv> --out-dir <out> --outcome <categorical-outcome> --exposure <categorical-exposure>"
+      },
+      {
+        "id": "method:effect-size-suite",
+        "rank": 11,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Effect size estimation suite",
+        "family": "descriptive",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "number-needed-to-treat is derived from observational data",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "primary effect estimate",
+          "uncertainty interval",
+          "scale interpretation",
+          "absolute vs relative effect",
+          "provide primary effect estimate",
+          "provide uncertainty interval",
+          "confirm assumption: Effect measure matches design and sampling scheme",
+          "produce diagnostic: scale interpretation",
+          "produce diagnostic: absolute vs relative effect"
+        ],
+        "expectedMetrics": [
+          "mean difference",
+          "standardized mean difference",
+          "odds ratio",
+          "risk ratio",
+          "hazard ratio",
+          "NNT"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --json"
+      },
+      {
+        "id": "method:epidemiologic-2x2-measures",
+        "rank": 12,
+        "tier": "exploratory",
+        "source": "statistical-method",
+        "label": "Epidemiologic 2x2 measures",
+        "family": "epidemiologic",
+        "backend": "python-statsmodels",
+        "taskType": null,
+        "score": 0.43,
+        "compatible": true,
+        "reasons": [
+          "supports outcome type binary",
+          "supports study design cross_sectional",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "population attributable fraction is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "exposure",
+          "outcome",
+          "person-time for incidence when needed",
+          "2x2 counts",
+          "person-time",
+          "sampling design",
+          "provide exposure",
+          "provide outcome",
+          "provide person-time for incidence when needed",
+          "confirm assumption: Effect measure matches study design",
+          "confirm assumption: case-control designs do not estimate risk directly without sampling information",
+          "produce diagnostic: 2x2 counts"
+        ],
+        "expectedMetrics": [
+          "prevalence",
+          "incidence",
+          "risk ratio",
+          "odds ratio",
+          "risk difference",
+          "attributable risk"
+        ],
+        "expectedArtifacts": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "commandHint": "agenteer research method-select --question \"Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?\" --json"
+      }
+    ],
+    "blocked": false,
+    "issues": [
+      {
+        "severity": "note",
+        "code": "PRIOR_RUN_POSTURE_REQUIRES_PLANNING_RESPONSE",
+        "message": "stats prior run /Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run/stats-run/stats-run.json posture=causal_design_review_required action=promote-local-review.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run/stats-run/stats-run.json"
+        ]
+      }
+    ],
+    "nextAction": "agenteer research stats-run --method propensity-score-matching --data <rows.csv> --out-dir <out> # selected from propensity-score-matching"
+  }
+}

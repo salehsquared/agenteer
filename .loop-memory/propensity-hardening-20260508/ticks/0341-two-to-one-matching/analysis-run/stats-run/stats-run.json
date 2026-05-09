@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_4600792827866910704",
+  "method": "propensity-score-matching",
+  "status": "succeeded",
+  "rowCount": 460,
+  "completeCaseN": 460,
+  "variables": [
+    "outcome",
+    "treated",
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site",
+    "renal"
+  ],
+  "parameters": {
+    "alpha": 0.05,
+    "estimand": "ATT",
+    "matchRatio": 2,
+    "caliper": 0.35,
+    "replacement": false,
+    "trimThreshold": 0.01,
+    "stabilizeWeights": true,
+    "treatmentPositiveLevel": 1,
+    "treatmentNegativeLevel": 0
+  },
+  "estimates": [
+    {
+      "term": "treated",
+      "method": "nearest-neighbor propensity score matching",
+      "estimand": "ATT",
+      "effect_measure": "risk difference and odds ratio",
+      "estimate": 0.13114754098360654,
+      "risk_difference": 0.13114754098360654,
+      "treated_risk": 0.4918032786885246,
+      "control_risk": 0.36065573770491804,
+      "log_odds_ratio": 0.5397293699483161,
+      "odds_ratio": 1.7155425219940945,
+      "or_ci_low": 0.8311933592959633,
+      "or_ci_high": 3.540796027608676,
+      "p_value": 0.144327354282773,
+      "treated_n": 61,
+      "control_n": 122
+    }
+  ],
+  "diagnostics": {
+    "matching": {
+      "match_ratio": 2,
+      "replacement": false,
+      "caliper_logit_sd": 0.35,
+      "caliper_logit_width": 0.3420828550000691,
+      "treated_total": 325,
+      "control_total": 135,
+      "matched_treated": 61,
+      "matched_controls": 122,
+      "matched_pairs": 122,
+      "unmatched_treated": 264,
+      "control_reuse_max": 1
+    },
+    "test": "propensity-score-matching",
+    "treatment_column": "treated",
+    "treatment_positive_level": 1,
+    "treatment_negative_level": 0,
+    "covariates": [
+      "age",
+      "bmi",
+      "severity",
+      "frailty",
+      "sex",
+      "site",
+      "renal"
+    ],
+    "exact_covariates": [
+      "sex"
+    ],
+    "propensity_model": {
+      "family": "logistic",
+      "n_parameters": 10,
+      "aic": 502.6008220331024,
+      "converged": true,
+      "propensity_min": 0.10210509397413421,
+      "propensity_max": 0.9676939672738574
+    },
+    "missingness": {
+      "input_rows": 460,
+      "complete_case_rows": 460,
+      "excluded_missing_rows": 0,
+      "complete_case_fraction": 1,
+      "missing_counts": {
+        "outcome": 0,
+        "treated": 0,
+        "age": 0,
+        "bmi": 0,
+        "severity": 0,
+        "frailty": 0,
+        "sex": 0,
+        "site": 0,
+        "renal": 0
+      }
+    },
+    "balance": {
+      "max_abs_smd_before": 0.5221958729276299,
+      "max_abs_smd_after": 0.23631822343497919,
+      "mean_abs_smd_before": 0.26746735970548186,
+      "mean_abs_smd_after": 0.09538220875004257,
+      "covariates_over_0_1_before": 7,
+      "covariates_over_0_1_after": 2,
+      "covariate_terms": 9
+    },
+    "positivity": {
+      "treated_min": 0.10210509397413421,
+      "treated_max": 0.9676939672738574,
+      "control_min": 0.17722900303493866,
+      "control_max": 0.9358089289541442,
+      "common_support_lower": 0.17722900303493866,
+      "common_support_upper": 0.9358089289541442,
+      "common_support_fraction": 0.95
+    },
+    "artifacts": {
+      "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/propensity-scores.csv",
+      "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/propensity-overlap.csv",
+      "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/balance.csv",
+      "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/matched-pairs.csv",
+      "weights": null
+    }
+  },
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "PROPENSITY_UNMATCHED_TREATED",
+      "message": "264 treated rows were unmatched under the caliper/exact-match policy.",
+      "evidenceRefs": [
+        "matched-pairs.csv"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "PROPENSITY_RESIDUAL_IMBALANCE",
+      "message": "2 covariate terms have post-adjustment absolute SMD above 0.10.",
+      "evidenceRefs": [
+        "balance.csv"
+      ]
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/stats-config.json",
+      "sha256": "48f54eff7003f6210b169754ff4bacff61e6551527d01bd8a365dcd3edbd9759"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/stats-summary.json",
+      "sha256": "4a740ed8e8b07d4b4333b3ffd819b796f6959bf57f1757b05de6ce97b8f29904"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/estimates.csv",
+      "sha256": "fc877b362c15f51f7e69c2d81139d9592741c81d214d54f4874cca88a064d053"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/diagnostics.json",
+      "sha256": "d0aff52ab5d5e1f6257570679f563d1369cf896335e2cfc9b7e67b3c0ee00a9b"
+    },
+    {
+      "kind": "balance",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/balance.csv",
+      "sha256": "6144aa8f8b1c0f7ea182391af52095cfff3ea95cfd9fed7847d422a160b8a705"
+    },
+    {
+      "kind": "propensity-scores",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/propensity-scores.csv",
+      "sha256": "b3fc74c1ffd62a1d7179aa3fad71626555fe5f87d735226be2a290008b7c4833"
+    },
+    {
+      "kind": "propensity-overlap",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/propensity-overlap.csv",
+      "sha256": "7be14539ab748470e48443f48df566a566ddfd5bb073c1e4036912e3453d4391"
+    },
+    {
+      "kind": "matched-pairs",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/matched-pairs.csv",
+      "sha256": "1dbd080b387d0f74609483df868ce827ac44e175d6ad00ff52bd5da3ca0f1a7a"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/stats-report.md",
+      "sha256": "88121ce9bf963d023ebd28a1471348921c544c5a09de4fc5682cc84c533baadf"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/stats-qa.json",
+      "sha256": "90e8acc43ab78c91fc46342c35a5666033568ac11504be618470e887a06b0c39"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/method-selection.json",
+    "methodSelectionId": "method_selection_4609ee25110d",
+    "methodId": "propensity-score-matching",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "causal_design_review_required",
+    "label": "Causal design review required",
+    "interpretationBoundary": "This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect.",
+    "supports": [
+      "propensity score diagnostics",
+      "balance review",
+      "overlap/positivity review",
+      "local treatment-contrast estimation under declared assumptions"
+    ],
+    "cannotSupport": [
+      "causal claims without target-trial/DAG review",
+      "unmeasured-confounding control",
+      "clinical recommendations",
+      "external validity"
+    ],
+    "nextAction": "Review the target trial, confounding set, positivity, balance, missingness, and sensitivity plan before using causal language."
+  }
+}

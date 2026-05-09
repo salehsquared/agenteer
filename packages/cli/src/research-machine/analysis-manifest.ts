@@ -131,7 +131,22 @@ async function buildManifestArtifacts(
 }
 
 function requiredArtifacts(runKind: AnalysisRunManifest["runKind"], result: Record<string, unknown>): Set<string> {
-  if (runKind === "stats") return new Set(["stats-run", "summary", "table", "diagnostics", "report", "qa"]);
+  if (runKind === "stats") {
+    const base = new Set(["stats-run", "summary", "table", "diagnostics", "report", "qa"]);
+    if (result.method === "propensity-score-matching") {
+      base.add("balance");
+      base.add("propensity-scores");
+      base.add("propensity-overlap");
+      base.add("matched-pairs");
+    }
+    if (result.method === "propensity-score-weighting") {
+      base.add("balance");
+      base.add("propensity-scores");
+      base.add("propensity-overlap");
+      base.add("weights");
+    }
+    return base;
+  }
   if (runKind === "ml-comparison") return new Set(["comparison", "model-review-card"]);
   const task = String(result.task ?? "");
   if (task === "binary_classification") return new Set(["ml-run", "summary", "predictions", "calibration"]);
@@ -149,8 +164,20 @@ function expectedArtifactPaths(runKind: AnalysisRunManifest["runKind"], runDir: 
       { kind: "diagnostics", path: path.join(runDir, "diagnostics.json") },
       { kind: "report", path: path.join(runDir, "stats-report.md") },
       { kind: "qa", path: path.join(runDir, "stats-qa.json") },
+      { kind: "balance", path: path.join(runDir, "balance.csv") },
+      { kind: "propensity-scores", path: path.join(runDir, "propensity-scores.csv") },
+      { kind: "propensity-overlap", path: path.join(runDir, "propensity-overlap.csv") },
+      { kind: "matched-pairs", path: path.join(runDir, "matched-pairs.csv") },
+      { kind: "weights", path: path.join(runDir, "weights.csv") },
+      { kind: "propensity-paper", path: path.join(path.dirname(runDir), "paper.md") },
+      { kind: "propensity-paper-qa", path: path.join(path.dirname(runDir), "paper-qa.json") },
       { kind: "diagnostic-paper", path: path.join(path.dirname(runDir), "paper.md") },
       { kind: "diagnostic-paper-qa", path: path.join(path.dirname(runDir), "paper-qa.json") },
+      { kind: "literature-search", path: path.join(path.dirname(runDir), "literature-search.json") },
+      { kind: "literature-context", path: path.join(path.dirname(runDir), "literature-context.json") },
+      { kind: "literature-context-report", path: path.join(path.dirname(runDir), "literature-context.md") },
+      { kind: "literature-qa", path: path.join(path.dirname(runDir), "literature-qa.json") },
+      { kind: "literature-qa-report", path: path.join(path.dirname(runDir), "literature-qa.md") },
     ];
   }
   if (runKind === "ml-comparison") {

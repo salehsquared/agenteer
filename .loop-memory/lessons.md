@@ -1,5 +1,12 @@
 # Lessons
 
+- Sparse MIMIC derived tables must be left-joined with explicit zero-fill for binary exposure flags. Otherwise the analyzed denominator can silently become the exposed subset and make exposure prevalence look like 100%.
+- Propensity matching is useful only when balance, overlap, unmatched treated rows, matched pairs, and score distributions are emitted as auditable artifacts.
+- Propensity warnings should keep a packet in methods-review without making the run look failed. Residual imbalance and unmatched treated rows are substantive interpretation boundaries.
+- Cardiac-surgery cohorts can have large row counts but very few death events. Predictor selection must be event-count-aware before model fitting, not only inspected after the fact.
+- GCS-backed Parquet reads need bounded idempotent retry logic. A transient copy failure should not invalidate a study when the read can safely be retried under the same cost ceiling.
+- A strong generated paper needs scientific content in the main text and framework content in sidecars. The dialysis/cardiac series is closer to the right split: manuscript for reader, JSON/CSV/inspection files for the agent.
+
 - Do not add a new command when an existing lifecycle or planner surface can absorb the evidence.
 - Generated analysis text is not progress unless runner output, QA, provenance, and lifecycle state agree.
 - Standard-table statistics are useful, but they must be visibly downgraded or blocked when survey-aware inference is required.
@@ -26,3 +33,9 @@
 - Fitted models still need methods QA. Sparse events-per-predictor and non-finite transformed effects should downgrade packets to review even when statsmodels returns coefficients.
 - Cost discipline works best as a packet artifact. Per-run cost receipts and a cumulative ledger made 22 MIMIC packets possible while staying under `$0.28` estimated read cost.
 - Row-level cache cleanup must be verified after every MIMIC run. Local aggregate artifacts are useful; lingering copied row-level Parquet would create privacy/storage risk.
+- Unified inspection must read packet roots as evidence bundles with nested exhibits. Real golden packets often place results under `analysis-run/stats-run/`; flat-fixture-only ingestion creates false missing-artifact warnings.
+- Propensity runs are design-review artifacts, not causal proof. Every successful run needs balance, overlap, missingness/drop accounting, adjustment artifacts, and a reader-facing causal boundary.
+- Failed method-binding or invalid-design runs must not produce `paper.md`. A reader-facing report is itself a promotion signal, so blocked runs should stop at machine-readable failure artifacts.
+- Negative causal test cases are productive ticks when the expected behavior is a blocker. No covariates, tiny treatment groups, poor support, and method-selection mismatches should count as success only when they refuse or downgrade cleanly.
+- Overlap deserves its own artifact. A single common-support scalar is useful, but bin-level treated/control counts make positivity failures easier to audit and explain.
+- Rerun stability belongs in the same hardening suite as correctness checks. Propensity pipelines need repeatability evidence before they are useful as demos.

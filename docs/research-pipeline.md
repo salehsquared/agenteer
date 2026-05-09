@@ -13,7 +13,7 @@ The pipeline's target shape is:
 ```txt
 question
 -> clarify
--> retrieve evidence when useful
+-> retrieve literature/evidence when useful
 -> register or load dataset intelligence
 -> inspect dataset registry/profile/relationships/watchouts
 -> design candidate protocols
@@ -24,6 +24,7 @@ question
 -> execute with a safe runner or fixture
 -> review artifacts
 -> write report
+-> validate report against literature
 -> critique report
 -> export research packet
 -> recommend framework/pipeline improvements
@@ -44,6 +45,7 @@ Agenteer owns the orchestration substrate:
 The research pipeline owns reusable research workflow logic:
 
 - dataset intelligence bundles for new datasets
+- literature intake and post-report literature QA
 - dataset registry loading
 - question decomposition
 - protocol design
@@ -113,6 +115,7 @@ Use this path when driving a packet forward:
 ```bash
 agenteer research dataset-register --id my-dataset --source /path/to/data --out-dir ./.loop-memory/datasets
 agenteer research dataset-describe --dataset-dir ./.loop-memory/datasets/my-dataset
+agenteer research literature-search --question "..." --out ./packet/literature-search.json --report ./packet/literature-search.md
 agenteer research design --project medbrevia-nhanes --repo /path/to/medbrevia_v3 --question "..." --out ./packet
 agenteer research next --packet ./packet --trace --exit-zero-on-blocked --json
 agenteer research validate-methods --packet ./packet --json
@@ -121,12 +124,72 @@ agenteer research runner-spec --packet ./packet
 agenteer research approve --packet ./packet --note "review note"
 agenteer research analyze --packet ./packet --fixture ./rows.json
 agenteer research review-report --packet ./packet --json
+agenteer research literature-qa --literature ./packet/literature-search.json --paper ./packet/report.md --out ./packet/literature-qa.json --report ./packet/literature-qa.md
 agenteer research manifest --packet ./packet --json
 agenteer research packet-readiness --packet ./packet --json
 agenteer research export --packet ./packet --out ./exports/packet
 ```
 
 For non-MedBrevia datasets, start with `dataset-register` and read the generated `DATASET_CONTEXT.md` before method selection or exploration. The dataset intelligence directory is the standard place for source facts, variable roles, inferred relationships, missingness, semantic oddities, access restrictions, and question seeds.
+
+### MedBrevia Literature Search
+
+Agenteer can use the local MedBrevia search API as a literature-intake and literature-QA stage without writing to the MedBrevia repository:
+
+```bash
+agenteer research literature-search \
+  --question "Among ICU patients with hip fracture, what predicts mortality?" \
+  --base-url http://localhost:3000 \
+  --depth standard \
+  --date-range 5y \
+  --out ./packet/literature-search.json \
+  --report ./packet/literature-search.md
+
+agenteer research literature-qa \
+  --literature ./packet/literature-search.json \
+  --paper ./packet/paper.md \
+  --out ./packet/literature-qa.json \
+  --report ./packet/literature-qa.md
+```
+
+`literature-search` posts to MedBrevia's `/api/search` SSE endpoint, normalizes PubMed articles, trials, guidelines, DailyMed, and ChEMBL lanes into one evidence packet, ranks source quality conservatively, stores the briefing text, and preserves raw events for audit. The command is designed for local development against `localhost:3000`.
+
+Convert the search packet into planning evidence before route selection:
+
+```bash
+agenteer research literature-context \
+  --literature ./packet/literature-search.json \
+  --out ./packet/literature-context.json \
+  --report ./packet/literature-context.md
+
+agenteer research modeling-plan \
+  --question "Among ICU patients with hip fracture, what predicts mortality?" \
+  --literature ./packet/literature-context.json \
+  --table ./rows.csv \
+  --target mortality \
+  --json
+```
+
+`literature-context` does not replace dataset evidence or AnalysisSpec validation. It turns retrieved sources into auditable planning signals: evidence strength, source sufficiency, design signals such as diagnostic accuracy or prediction validation, method signals such as propensity, survival, survey design, missing data, calibration, and follow-up searches. `modeling-plan --literature` consumes either a raw search packet or a context packet and carries literature warnings into route selection. `analysis-run --literature` persists the search, context, and post-report literature QA into the packet so later inspection can see whether the paper actually used the evidence.
+
+Authentication is intentionally explicit. Agenteer supports `--bearer-token`, `--cookie`, or `--auth-secret` for a locally signed mobile JWT. It also sends a local dev API-key header by default (`x-agenteer-api-key`) using `agenteer-local-literature-dev-key-2026`. The matching MedBrevia local patch accepts that key only when `NODE_ENV` is not `production` and the request host is `localhost`, `127.0.0.1`, or `[::1]`; set `MEDBREVIA_AGENT_API_KEY` in MedBrevia if you want to override the default local key.
+
+`literature-qa` is the later review gate. It checks that the search succeeded, enough sources were retrieved, high-quality sources exist, the evidence overlaps the question, the paper cites or discusses retrieved PMIDs/guidelines/trials, and the paper keeps causal/clinical claims bounded. A search artifact can also be attached to a standard-table run:
+
+```bash
+agenteer research analysis-run \
+  --question "How accurately does waist circumference identify elevated HbA1c?" \
+  --method diagnostic-accuracy \
+  --data rows.csv \
+  --outcome hba1c_pct \
+  --exposure waist_cm \
+  --outcome-threshold 6.5 \
+  --exposure-threshold 100 \
+  --literature ./packet/literature-search.json \
+  --out-dir ./packet/analysis-run
+```
+
+That route copies `literature-search.json` into the run directory, writes `literature-qa.json` and `literature-qa.md`, and includes them in the analysis manifest when present.
 
 ### AnalysisSpec-To-Paper Path
 
@@ -159,6 +222,31 @@ agenteer research paper-run \
 `paper.md` is the reader-facing scientific report. It should explain the question, population, variables, methods, results, interpretation, limitations, and reproducibility in ordinary research language. It must not rely on Agenteer-specific terms such as `AnalysisSpec`, result posture, task envelopes, evidence receipts, or runner records. Those details belong in `analysis.json`, runner provenance, lifecycle files, receipts, and QA artifacts.
 
 Current paper QA enforces this boundary. It checks for internal framework language, a plain-language main finding for generated paper packets, excessive raw variable-code exposure, known awkward generator phrases, survey-design disclosure, sample construction, missingness, causal overclaiming, threshold caveats, numeric consistency, and companion evidence readability. `paper-index` also reports a `Reader Language` status so older pre-contract papers are not mistaken for current output quality.
+
+### Trust-Layer Review Path
+
+After any real run, the preferred review path is now:
+
+```bash
+agenteer research method-qa \
+  --run-dir ./papers/my-paper \
+  --out ./papers/my-paper/method-qa.json \
+  --report ./papers/my-paper/method-qa.md
+
+agenteer research manuscript \
+  --run-dir ./papers/my-paper
+
+agenteer research run-inspect \
+  --run-dir ./papers/my-paper \
+  --out ./papers/my-paper/run-inspection.json \
+  --report ./papers/my-paper/run-inspection.md
+```
+
+`method-qa` is the methods-aware reviewer. It looks for convergence/separation problems, sparse or overfit models, missingness review gaps, collinearity/influence evidence gaps, p-value/effect-size inconsistencies, claim-method mismatch, dataset-specific semantic plausibility problems, survey-design mismatches, and artifact completeness.
+
+`manuscript` writes a publication-style, reader-facing report with abstract, study design, cohort construction, variables, statistical analysis, results, limitations, interpretation boundaries, and reproducibility. It writes `manuscript-qa.json` and keeps internal framework terms out of reader-facing prose.
+
+`run-inspect` is the one-command status view. It reports readiness, blockers, warnings, cost, data/provenance paths, QA state, literature evidence state, lifecycle state, rerun stability, paper/manuscript paths, artifact hash, and the next recommended action. Literature QA failures block readiness; literature warnings downgrade readiness to methods review. This is the command to run before deciding whether a packet is ready for human scientific review or benchmark promotion.
 
 Check local analysis runtime readiness before broadening a study:
 

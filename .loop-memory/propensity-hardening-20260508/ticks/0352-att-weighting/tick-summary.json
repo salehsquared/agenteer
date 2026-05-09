@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "tick": 352,
+  "slug": "att-weighting",
+  "axis": "rejected-revival",
+  "method": "propensity-score-weighting",
+  "question": "Does ATT weighting produce stable balance diagnostics and weight artifacts?",
+  "expected": "success",
+  "expectationMet": true,
+  "analysisExitCode": 0,
+  "statsStatus": "succeeded",
+  "posture": "causal_design_review_required",
+  "issues": [
+    "PROPENSITY_EXTREME_WEIGHTS",
+    "PROPENSITY_RESIDUAL_IMBALANCE"
+  ],
+  "errors": [],
+  "methodQaStatus": "fail",
+  "inspectionReadiness": null,
+  "paperQaStatus": "pass",
+  "completeCaseFraction": 1,
+  "maxAbsSmdBefore": 0.5249020085006588,
+  "maxAbsSmdAfter": 0.15241491892565742,
+  "commonSupportFraction": 0.8928571428571429,
+  "rerunComparison": null,
+  "artifactChecks": {
+    "paper": true,
+    "paperQa": true,
+    "balance": true,
+    "propensityScores": true,
+    "overlap": true,
+    "adjustmentArtifact": true
+  },
+  "paths": {
+    "tickDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0352-att-weighting",
+    "data": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0352-att-weighting/synthetic-propensity.csv",
+    "methodSelection": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0352-att-weighting/method-selection.json",
+    "analysisRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0352-att-weighting/analysis-run",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0352-att-weighting/tick-summary.json"
+  }
+}

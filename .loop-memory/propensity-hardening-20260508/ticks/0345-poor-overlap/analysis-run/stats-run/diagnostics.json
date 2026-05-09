@@ -1,0 +1,77 @@
+{
+  "matching": {
+    "match_ratio": 1,
+    "replacement": false,
+    "caliper_logit_sd": 0.2,
+    "caliper_logit_width": 0.871845265656895,
+    "treated_total": 189,
+    "control_total": 151,
+    "matched_treated": 32,
+    "matched_controls": 32,
+    "matched_pairs": 32,
+    "unmatched_treated": 157,
+    "control_reuse_max": 1
+  },
+  "test": "propensity-score-matching",
+  "treatment_column": "treated",
+  "treatment_positive_level": 1,
+  "treatment_negative_level": 0,
+  "covariates": [
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site"
+  ],
+  "exact_covariates": [],
+  "propensity_model": {
+    "family": "logistic",
+    "n_parameters": 9,
+    "aic": 180.2719739267112,
+    "converged": true,
+    "propensity_min": 0.00025396288012404015,
+    "propensity_max": 0.9999945012310821
+  },
+  "missingness": {
+    "input_rows": 340,
+    "complete_case_rows": 340,
+    "excluded_missing_rows": 0,
+    "complete_case_fraction": 1.0,
+    "missing_counts": {
+      "outcome": 0,
+      "treated": 0,
+      "age": 0,
+      "bmi": 0,
+      "severity": 0,
+      "frailty": 0,
+      "sex": 0,
+      "site": 0
+    }
+  },
+  "balance": {
+    "max_abs_smd_before": 1.9553319315291837,
+    "max_abs_smd_after": 0.18623669383489092,
+    "mean_abs_smd_before": 0.4919262932927706,
+    "mean_abs_smd_after": 0.11590953124720735,
+    "covariates_over_0_1_before": 7,
+    "covariates_over_0_1_after": 5,
+    "covariate_terms": 8
+  },
+  "positivity": {
+    "treated_min": 0.00025396288012404015,
+    "treated_max": 0.9999945012310821,
+    "control_min": 0.0006448099286950601,
+    "control_max": 0.9684859444951353,
+    "common_support_lower": 0.0006448099286950601,
+    "common_support_upper": 0.9684859444951353,
+    "common_support_fraction": 0.7029411764705882
+  },
+  "artifacts": {
+    "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/propensity-scores.csv",
+    "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/propensity-overlap.csv",
+    "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/balance.csv",
+    "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/matched-pairs.csv",
+    "weights": null
+  }
+}

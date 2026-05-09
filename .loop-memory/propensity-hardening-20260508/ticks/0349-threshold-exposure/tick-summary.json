@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "tick": 349,
+  "slug": "threshold-exposure",
+  "axis": "add-primitive",
+  "method": "propensity-score-matching",
+  "question": "Does high baseline biomarker exposure relate to mortality after propensity matching?",
+  "expected": "success",
+  "expectationMet": true,
+  "analysisExitCode": 0,
+  "statsStatus": "succeeded",
+  "posture": "failed",
+  "issues": [
+    "PROPENSITY_UNMATCHED_TREATED",
+    "PROPENSITY_RESIDUAL_IMBALANCE",
+    "PROPENSITY_POOR_OVERLAP"
+  ],
+  "errors": [],
+  "methodQaStatus": "fail",
+  "inspectionReadiness": null,
+  "paperQaStatus": "pass",
+  "completeCaseFraction": 1,
+  "maxAbsSmdBefore": 2.849720870611597,
+  "maxAbsSmdAfter": 0.20846212854239615,
+  "commonSupportFraction": 0.235,
+  "rerunComparison": null,
+  "artifactChecks": {
+    "paper": true,
+    "paperQa": true,
+    "balance": true,
+    "propensityScores": true,
+    "overlap": true,
+    "adjustmentArtifact": true
+  },
+  "paths": {
+    "tickDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure",
+    "data": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/synthetic-propensity.csv",
+    "methodSelection": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/method-selection.json",
+    "analysisRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/tick-summary.json"
+  }
+}

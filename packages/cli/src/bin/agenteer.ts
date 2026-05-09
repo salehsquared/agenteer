@@ -81,12 +81,21 @@ import {
   researchMethodApplyCommand,
   researchMethodSelectCommand,
   researchMethodValidateCommand,
+  researchLiteratureContextCommand,
   researchMethodsCatalogCommand,
   researchModelingPlanCommand,
   researchMachineBenchmarkCommand,
   researchMachinePlanCommand,
   researchMachineStatusCommand,
+  researchBenchmarkSuiteRunCommand,
+  researchBenchmarkTrendCommand,
   researchSpecV2Command,
+  researchExplorePlanCommand,
+  researchManuscriptCommand,
+  researchMethodQaCommand,
+  researchLiteratureQaCommand,
+  researchMedbreviaLiteratureSearchCommand,
+  researchRunInspectCommand,
   renderResearchAnalysisBenchmark,
   renderResearchAnalysisBenchmarkJson,
   renderResearchAnalysisManifest,
@@ -111,6 +120,24 @@ import {
   renderResearchMachinePlanJson,
   renderResearchMachineStatus,
   renderResearchMachineStatusJson,
+  renderResearchBenchmarkSuiteRun,
+  renderResearchBenchmarkSuiteRunJson,
+  renderResearchBenchmarkTrend,
+  renderResearchBenchmarkTrendJson,
+  renderResearchExplorePlan,
+  renderResearchExplorePlanJson,
+  renderResearchManuscript,
+  renderResearchManuscriptJson,
+  renderResearchMethodQa,
+  renderResearchMethodQaJson,
+  renderResearchLiteratureContext,
+  renderResearchLiteratureContextJson,
+  renderResearchLiteratureQa,
+  renderResearchLiteratureQaJson,
+  renderResearchMedbreviaLiteratureSearch,
+  renderResearchMedbreviaLiteratureSearchJson,
+  renderResearchRunInspect,
+  renderResearchRunInspectJson,
   renderResearchMethodApply,
   renderResearchMethodApplyJson,
   renderResearchMachineMethodSelection,
@@ -717,8 +744,11 @@ Usage:
   agenteer research method-select --question <text> [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--dataset <id>] [--goal <goal>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--max-candidates <n>] [--out <selection.json>] [--json]
   agenteer research method-apply --spec <analysis-spec.json> --selection <selection.json> [--out <analysis-spec-v2.json>] [--json]
   agenteer research method-validate --spec <analysis-spec.json> --method <id> [--json]
-  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json> | --exploration-handoff <handoff.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
-  agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--variable <col>]* [--method-selection <json>] [--analysis-spec <json>] [--require-bound] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
+  agenteer research literature-search --question <text> [--base-url <url>] [--endpoint <path>] [--api-key <key>] [--bearer-token <token>] [--cookie <cookie>] [--auth-secret <secret>] [--user-id <id>] [--user-email <email>] [--depth quick|standard|long] [--date-range <range>] [--high-impact] [--top-k <n>] [--timeout-ms <n>] [--mock-response <json>] [--out <json>] [--report <md>] [--json]
+  agenteer research literature-context --literature <literature-search.json> [--question <text>] [--out <json>] [--report <md>] [--json]
+  agenteer research literature-qa --literature <literature-search.json> [--question <text>] [--paper <paper.md>] [--out <json>] [--report <md>] [--json]
+  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json> | --exploration-handoff <handoff.json>] [--literature <literature-search-or-context.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
+  agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--exact-covariate <col>]* [--variable <col>]* [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--method-selection <json>] [--analysis-spec <json>] [--literature <literature-search.json>] [--require-bound] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
   agenteer research analysis-manifest --run-dir <dir> [--out <analysis-run-manifest.json>] [--require-ready] [--json]
   agenteer research analysis-benchmark --run-dir <dir>* [--require-ready] [--require-multi-route] [--out <json>] [--report <md>] [--json]
   agenteer research dataset-adapter --dataset <id> [--data-root <dir>] [--json]
@@ -728,9 +758,15 @@ Usage:
   agenteer research ml-run --task <task> --model <id> --data <rows.csv|json|parquet> [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--test-size <n>] [--seed <n>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-compare --task <task> --data <rows.csv|json|parquet> --model <id>* [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-inspect --run <ml-run.json> [--json]
-  agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--weight <column>] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
+  agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--exact-covariate <column>]* [--weight <column>] [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
   agenteer research explore --data <rows.csv|json|parquet> [--out-dir <dir>] [--target <column>] [--max-pairs <n>] [--python <path>] [--json]
   agenteer research explore-promote --exploration <exploration.json> --question <id> [--methods-review-note <text>] [--out <handoff.json>] [--json]
+  agenteer research explore-plan --exploration <exploration.json> --question <id> [--dataset <id>] [--methods-review-note <text>] [--out <formal-plan.json>] [--json]
+  agenteer research method-qa --run-dir <dir> [--out <method-qa.json>] [--report <method-qa.md>] [--json]
+  agenteer research manuscript --run-dir <dir> [--out <manuscript.md>] [--qa-out <manuscript-qa.json>] [--json]
+  agenteer research run-inspect --run-dir <dir> [--out <run-inspection.json>] [--report <run-inspection.md>] [--json]
+  agenteer research benchmark-suite-run --suite <dir> [--out-dir <dir>] [--out <json>] [--report <md>] [--json]
+  agenteer research benchmark-trend --history <dir> [--out <json>] [--report <md>] [--json]
   agenteer research backend-status [--python <python>] [--rscript <Rscript>] [--json]
   agenteer research paper-qa --paper <paper.md> [--evidence <analysis.json>] [--json]
   agenteer research paper-index --papers-dir <dir> [--out <INDEX.md>] [--json]
@@ -1905,6 +1941,51 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchMethodValidationJson(result) : renderResearchMethodValidation(result));
       return result.validation.status === "blocked" ? 1 : 0;
     }
+    case "literature-search": {
+      const result = await researchMedbreviaLiteratureSearchCommand({
+        question: requireFlagString(flags, "question"),
+        baseUrl: flagString(flags, "base-url") ?? undefined,
+        endpoint: flagString(flags, "endpoint") ?? undefined,
+        apiKey: flagString(flags, "api-key") ?? undefined,
+        bearerToken: flagString(flags, "bearer-token") ?? undefined,
+        cookie: flagString(flags, "cookie") ?? undefined,
+        authSecret: flagString(flags, "auth-secret") ?? undefined,
+        userId: flagString(flags, "user-id") ?? undefined,
+        userEmail: flagString(flags, "user-email") ?? undefined,
+        responseDepth: parseLiteratureDepth(flagString(flags, "depth") ?? flagString(flags, "response-depth") ?? undefined),
+        dateRange: flagString(flags, "date-range") ?? undefined,
+        highImpact: flags["high-impact"] === true,
+        prefersList: flags["no-list"] === true ? false : true,
+        topK: parseOptionalIntegerFlag(flags, "top-k"),
+        timeoutMs: parseOptionalIntegerFlag(flags, "timeout-ms"),
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+        mockResponsePath: flagString(flags, "mock-response") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMedbreviaLiteratureSearchJson(result) : renderResearchMedbreviaLiteratureSearch(result));
+      return result.status === "failed" ? 1 : 0;
+    }
+    case "literature-context": {
+      const result = await researchLiteratureContextCommand({
+        question: flagString(flags, "question") ?? undefined,
+        literaturePath: requireFlagString(flags, "literature"),
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchLiteratureContextJson(result) : renderResearchLiteratureContext(result));
+      return result.status === "failed" ? 1 : 0;
+    }
+    case "literature-qa": {
+      const result = await researchLiteratureQaCommand({
+        question: flagString(flags, "question") ?? undefined,
+        literaturePath: requireFlagString(flags, "literature"),
+        paperPath: flagString(flags, "paper") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchLiteratureQaJson(result) : renderResearchLiteratureQa(result));
+      return result.status === "fail" ? 1 : 0;
+    }
     case "modeling-plan": {
       const maxCandidatesRaw = flagString(flags, "max-candidates");
       let explorationHandoff: Parameters<typeof researchModelingPlanCommand>[0]["explorationHandoff"];
@@ -1964,6 +2045,25 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         const rawBackendStatus = JSON.parse(await readFile(backendStatusPath, "utf-8")) as Record<string, unknown>;
         backendStatus = rawBackendStatus.machineStatus ?? rawBackendStatus;
       }
+      let literatureEvidence: Parameters<typeof researchModelingPlanCommand>[0]["literatureEvidence"];
+      const literaturePath = flagString(flags, "literature");
+      if (literaturePath) {
+        const context = await loadLiteratureContextForModeling(literaturePath, question);
+        literatureEvidence = {
+          path: literaturePath,
+          status: context.status,
+          evidenceStrength: context.evidenceStrength,
+          sourceCount: context.sourceSummary.sourceCount,
+          highQualitySourceCount: context.sourceSummary.highQualitySourceCount,
+          latestPublicationYear: context.sourceSummary.latestPublicationYear,
+          questionTokenCoverage: context.quality.questionTokenCoverage,
+          designSignals: context.designSignals,
+          methodSignals: context.methodSignals,
+          planningImplications: context.planningImplications,
+          followUpSearches: context.followUpSearches,
+          issueCodes: context.issues.filter(issue => issue.status !== "pass").map(issue => issue.id),
+        };
+      }
       const priorRuns = await Promise.all(flagList(flags, "prior-run").map(async priorRunPath => {
         const raw = JSON.parse(await readFile(priorRunPath, "utf-8")) as Record<string, unknown>;
         const candidate = "statsRun" in raw && raw.statsRun && typeof raw.statsRun === "object"
@@ -1997,6 +2097,7 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         dataStructures: parseDataStructures(flagList(flags, "data-structure")),
         tableSummary: tableSummary as Parameters<typeof researchModelingPlanCommand>[0]["tableSummary"],
         backendStatus: backendStatus as Parameters<typeof researchModelingPlanCommand>[0]["backendStatus"],
+        literatureEvidence,
         priorRuns,
         explorationHandoff,
         target: flagString(flags, "target") ?? seededOutcome,
@@ -2035,10 +2136,18 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         variables: flagList(flags, "variable"),
         covariates: flagList(flags, "covariate"),
         weight: flagString(flags, "weight") ?? undefined,
+        exactCovariates: flagList(flags, "exact-covariate"),
+        estimand: parseEstimand(flagString(flags, "estimand")) ?? "ATT",
+        matchRatio: parseOptionalIntegerFlag(flags, "match-ratio") ?? 1,
+        caliper: parseOptionalNumberFlag(flags, "caliper"),
+        replacement: flags.replacement === true,
+        trimThreshold: parseOptionalNumberFlag(flags, "trim-threshold") ?? 0.01,
+        stabilizeWeights: flags["no-stabilize-weights"] === true ? false : true,
         surveyDesign: flags.survey === true,
         allowSurveyApproximation: flags["allow-survey-approximation"] === true,
         methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
         analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
+        literaturePath: flagString(flags, "literature") ?? undefined,
         requireBound: flags["require-bound"] === true,
         python: flagString(flags, "python") ?? undefined,
       });
@@ -2164,6 +2273,13 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         variables: flagList(flags, "variable"),
         covariates: flagList(flags, "covariate"),
         weight: flagString(flags, "weight") ?? undefined,
+        exactCovariates: flagList(flags, "exact-covariate"),
+        estimand: parseEstimand(flagString(flags, "estimand")) ?? "ATT",
+        matchRatio: parseOptionalIntegerFlag(flags, "match-ratio") ?? 1,
+        caliper: parseOptionalNumberFlag(flags, "caliper"),
+        replacement: flags.replacement === true,
+        trimThreshold: parseOptionalNumberFlag(flags, "trim-threshold") ?? 0.01,
+        stabilizeWeights: flags["no-stabilize-weights"] === true ? false : true,
         surveyDesign: flags.survey === true,
         allowSurveyApproximation: flags["allow-survey-approximation"] === true,
         methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
@@ -2196,6 +2312,63 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       });
       console.log(flags.json === true ? renderResearchExplorePromoteJson(result) : renderResearchExplorePromote(result));
       return result.status === "blocked" ? 1 : 0;
+    }
+    case "explore-plan": {
+      const result = await researchExplorePlanCommand({
+        explorationPath: requireFlagString(flags, "exploration"),
+        questionId: requireFlagString(flags, "question"),
+        dataset: flagString(flags, "dataset") ? parseDatasetAdapterId(flagString(flags, "dataset") ?? undefined, "user-table") : undefined,
+        methodsReviewNote: flagString(flags, "methods-review-note") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchExplorePlanJson(result) : renderResearchExplorePlan(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "method-qa": {
+      const result = await researchMethodQaCommand({
+        runDir: requireFlagString(flags, "run-dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchMethodQaJson(result) : renderResearchMethodQa(result));
+      return result.overallStatus === "fail" ? 1 : 0;
+    }
+    case "manuscript": {
+      const result = await researchManuscriptCommand({
+        runDir: requireFlagString(flags, "run-dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+        qaOutPath: flagString(flags, "qa-out") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchManuscriptJson(result) : renderResearchManuscript(result));
+      return result.manuscriptQa.status === "fail" ? 1 : 0;
+    }
+    case "run-inspect": {
+      const result = await researchRunInspectCommand({
+        runDir: requireFlagString(flags, "run-dir"),
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchRunInspectJson(result) : renderResearchRunInspect(result));
+      return result.readiness === "blocked" ? 1 : 0;
+    }
+    case "benchmark-suite-run": {
+      const result = await researchBenchmarkSuiteRunCommand({
+        suiteDir: requireFlagString(flags, "suite"),
+        outDir: flagString(flags, "out-dir") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchBenchmarkSuiteRunJson(result) : renderResearchBenchmarkSuiteRun(result));
+      return result.failCount > 0 ? 1 : 0;
+    }
+    case "benchmark-trend": {
+      const result = await researchBenchmarkTrendCommand({
+        historyDir: requireFlagString(flags, "history"),
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchBenchmarkTrendJson(result) : renderResearchBenchmarkTrend(result));
+      return result.trend === "regressing" ? 1 : 0;
     }
     case "backend-status": {
       const result = await researchBackendStatusCommand({
@@ -2502,11 +2675,32 @@ function parseOptionalIntegerFlag(
   return value;
 }
 
+function parseEstimand(raw: string | undefined): "ATE" | "ATT" | undefined {
+  if (raw === undefined) return undefined;
+  const value = raw.toUpperCase();
+  if (value !== "ATE" && value !== "ATT") throw new Error("--estimand must be ATE or ATT");
+  return value;
+}
+
+function parseLiteratureDepth(raw: string | undefined): "quick" | "standard" | "long" | undefined {
+  if (raw === undefined) return undefined;
+  if (raw !== "quick" && raw !== "standard" && raw !== "long") throw new Error("--depth must be quick, standard, or long");
+  return raw;
+}
+
 function parseDatasetDomain(raw: string | undefined): DatasetDomain | undefined {
   if (raw === undefined) return undefined;
   const allowed = new Set<DatasetDomain>(["public-health-survey", "ehr", "registry", "claims", "user-upload", "synthetic", "unknown"]);
   if (!allowed.has(raw as DatasetDomain)) throw new Error(`--domain must be one of ${Array.from(allowed).join(", ")}`);
   return raw as DatasetDomain;
+}
+
+async function loadLiteratureContextForModeling(pathValue: string, question: string): Promise<Awaited<ReturnType<typeof researchLiteratureContextCommand>>> {
+  const raw = JSON.parse(await readFile(pathValue, "utf-8")) as Record<string, unknown>;
+  if (raw.literatureContext && typeof raw.literatureContext === "object") {
+    return raw.literatureContext as Awaited<ReturnType<typeof researchLiteratureContextCommand>>;
+  }
+  return researchLiteratureContextCommand({ literaturePath: pathValue, question });
 }
 
 async function loadSpec(path: string): Promise<unknown> {

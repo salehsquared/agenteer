@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "status": "fail",
+  "summary": "5/13 stats QA checks passed; status=fail.",
+  "checks": [
+    {
+      "id": "execution-status",
+      "status": "fail",
+      "detail": "Stats runner failed: Propensity methods require at least one baseline covariate.; Traceback (most recent call last):\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 814, in main\n    print(json.dumps(run(req)))\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 595, in run\n    ps, x_cov, ps_model = fit_propensity_scores(data, \"_agenteer_treatment\", covariates)\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 130, in fit_propensity_scores\n    x = covariate_matrix(data, covariates)\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 102, in covariate_matrix\n    raise ValueError(\"Propensity methods require at least one baseline covariate.\")\nValueError: Propensity methods require at least one baseline covariate.\n"
+    },
+    {
+      "id": "effect-estimate-table",
+      "status": "fail",
+      "detail": "No estimate rows were produced."
+    },
+    {
+      "id": "uncertainty-and-pvalue-context",
+      "status": "warning",
+      "detail": "Report includes ASA-style caution that p-values are not effect size or practical importance."
+    },
+    {
+      "id": "binding-status",
+      "status": "pass",
+      "detail": "Stats run binding is bound."
+    },
+    {
+      "id": "standard-table-boundary",
+      "status": "pass",
+      "detail": "Standard-table runner is not a complex-survey variance engine."
+    },
+    {
+      "id": "result-posture",
+      "status": "fail",
+      "detail": "failed: This run failed before producing a locally reviewable statistical result."
+    },
+    {
+      "id": "propensity-treatment-model",
+      "status": "fail",
+      "detail": "Propensity methods require a recorded treatment model."
+    },
+    {
+      "id": "propensity-balance",
+      "status": "fail",
+      "detail": "No post-adjustment standardized mean difference diagnostics were recorded."
+    },
+    {
+      "id": "propensity-positivity-overlap",
+      "status": "fail",
+      "detail": "No common-support/overlap diagnostic was recorded."
+    },
+    {
+      "id": "propensity-unmatched-treated",
+      "status": "pass",
+      "detail": "0 treated row(s) were unmatched under the declared caliper and exact-match policy."
+    },
+    {
+      "id": "propensity-effective-sample-size",
+      "status": "pass",
+      "detail": "Not applicable or not recorded for this method."
+    },
+    {
+      "id": "propensity-complete-case-retention",
+      "status": "fail",
+      "detail": "No missingness/complete-case retention diagnostic was recorded."
+    },
+    {
+      "id": "propensity-causal-claim-boundary",
+      "status": "pass",
+      "detail": "The result posture requires target-trial, DAG/confounder, positivity, missingness, and sensitivity review before causal claims."
+    }
+  ]
+}

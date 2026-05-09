@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "runInspection": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-06T21:55:39.016Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure",
+    "readiness": "needs_methods_review",
+    "blockers": [],
+    "warnings": [
+      "Logistic-type model detected; explicit separation diagnostic evidence was not found.",
+      "Model complete-case denominator is 18.1% of the cohort (4679 of 25835).",
+      "No explicit collinearity diagnostic evidence was found.",
+      "No explicit influence diagnostic evidence was found."
+    ],
+    "cost": {
+      "estimatedUsd": 0.009548411406576633,
+      "hardStopUsd": null,
+      "source": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/cost-receipt.json"
+    },
+    "provenance": {
+      "analysisSpecPath": null,
+      "analysisSpecHash": null,
+      "runnerRecordPath": null,
+      "manifestPaths": [
+        "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/cost-receipt.json",
+        "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/run-manifest.json"
+      ],
+      "artifactCount": 8,
+      "artifactHash": "56cff3dc4bc2d8ec0ef870dc40f71a9abc01774e2c0b03f128fdbddd7247ca79"
+    },
+    "qa": {
+      "methodQaStatus": "warning",
+      "paperQaStatus": "pass",
+      "manuscriptQaStatus": null,
+      "lifecycleStatus": null,
+      "rerunStabilityStatus": null
+    },
+    "paperPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/paper.md",
+    "manuscriptPath": null,
+    "nextRecommendedAction": "Add missingness mechanism review and sensitivity analysis before promotion.",
+    "methodQa": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-06T21:55:39.015Z",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure",
+      "overallStatus": "warning",
+      "readiness": "needs_methods_review",
+      "checks": [
+        {
+          "id": "artifact_integrity_01",
+          "category": "artifact_integrity",
+          "status": "pass",
+          "severity": "info",
+          "message": "Run directory contains 8 artifact(s).",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure"
+          ],
+          "recommendedAction": "Continue with artifact-level QA."
+        },
+        {
+          "id": "artifact_integrity_02",
+          "category": "artifact_integrity",
+          "status": "pass",
+          "severity": "info",
+          "message": "A reader-facing report artifact is present.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/paper.md",
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/manuscript.md"
+          ],
+          "recommendedAction": "Run manuscript QA before promotion."
+        },
+        {
+          "id": "convergence_03",
+          "category": "convergence",
+          "status": "pass",
+          "severity": "info",
+          "message": "No convergence failure was detected in available estimate/issue artifacts.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "Preserve convergence evidence with the run artifacts."
+        },
+        {
+          "id": "separation_04",
+          "category": "separation",
+          "status": "warning",
+          "severity": "minor",
+          "message": "Logistic-type model detected; explicit separation diagnostic evidence was not found.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "Record separation diagnostics for logistic models before publication."
+        },
+        {
+          "id": "overfitting_05",
+          "category": "overfitting",
+          "status": "pass",
+          "severity": "info",
+          "message": "Approximate events per predictor: 159.43.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "Keep event counts and predictor counts in the report supplement."
+        },
+        {
+          "id": "missingness_06",
+          "category": "missingness",
+          "status": "warning",
+          "severity": "major",
+          "message": "Model complete-case denominator is 18.1% of the cohort (4679 of 25835).",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "Add missingness mechanism review and sensitivity analysis before promotion."
+        },
+        {
+          "id": "collinearity_07",
+          "category": "collinearity",
+          "status": "warning",
+          "severity": "minor",
+          "message": "No explicit collinearity diagnostic evidence was found.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "For adjusted regression, record VIF/condition-number or justify why collinearity is not material."
+        },
+        {
+          "id": "influence_08",
+          "category": "influence",
+          "status": "warning",
+          "severity": "minor",
+          "message": "No explicit influence diagnostic evidence was found.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "Record influential-point review for model-based papers, especially small cohorts."
+        },
+        {
+          "id": "effect_size_09",
+          "category": "effect_size",
+          "status": "pass",
+          "severity": "info",
+          "message": "Checked 7 estimate-like record(s) for p-value/interval consistency.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json"
+          ],
+          "recommendedAction": "Report effect sizes with intervals; avoid p-value-only conclusions."
+        },
+        {
+          "id": "claim_alignment_10",
+          "category": "claim_alignment",
+          "status": "pass",
+          "severity": "info",
+          "message": "Reader-facing report avoids obvious framework jargon and causal overclaiming.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/paper.md"
+          ],
+          "recommendedAction": "Keep internal framework details in companion artifacts, not the manuscript."
+        },
+        {
+          "id": "semantic_plausibility_11",
+          "category": "semantic_plausibility",
+          "status": "pass",
+          "severity": "info",
+          "message": "No dataset-specific semantic plausibility issue was detected in available artifacts.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/analysis-results.json",
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/matched-icd-codes.csv",
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0308-mimic-pulmonary-copd-respiratory-failure/qa.json"
+          ],
+          "recommendedAction": "For clinical/public-health datasets, attach semantic QA evidence before share/export."
+        },
+        {
+          "id": "survey_design_12",
+          "category": "survey_design",
+          "status": "pass",
+          "severity": "info",
+          "message": "No complex survey design requirement was detected.",
+          "evidenceRefs": [],
+          "recommendedAction": "If the source dataset is a complex survey, encode survey design before inference."
+        }
+      ],
+      "blockerCount": 0,
+      "warningCount": 4,
+      "methodSummary": {
+        "detectedRunKind": "unknown",
+        "detectedModelFamilies": [
+          "logistic"
+        ],
+        "completeCaseN": 4679,
+        "eventCount": 1116,
+        "predictorCount": 7,
+        "resultPosture": null
+      },
+      "nextAction": "Add missingness mechanism review and sensitivity analysis before promotion.",
+      "outPath": null,
+      "reportPath": null
+    },
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/real-study-series-20260506/studies/pulmonary-copd/run-inspection.json",
+    "reportPath": null
+  }
+}

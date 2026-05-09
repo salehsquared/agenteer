@@ -1,0 +1,81 @@
+{
+  "matching": {
+    "match_ratio": 2,
+    "replacement": false,
+    "caliper_logit_sd": 0.35,
+    "caliper_logit_width": 0.3420828550000691,
+    "treated_total": 325,
+    "control_total": 135,
+    "matched_treated": 61,
+    "matched_controls": 122,
+    "matched_pairs": 122,
+    "unmatched_treated": 264,
+    "control_reuse_max": 1
+  },
+  "test": "propensity-score-matching",
+  "treatment_column": "treated",
+  "treatment_positive_level": 1,
+  "treatment_negative_level": 0,
+  "covariates": [
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site",
+    "renal"
+  ],
+  "exact_covariates": [
+    "sex"
+  ],
+  "propensity_model": {
+    "family": "logistic",
+    "n_parameters": 10,
+    "aic": 502.6008220331024,
+    "converged": true,
+    "propensity_min": 0.10210509397413421,
+    "propensity_max": 0.9676939672738574
+  },
+  "missingness": {
+    "input_rows": 460,
+    "complete_case_rows": 460,
+    "excluded_missing_rows": 0,
+    "complete_case_fraction": 1.0,
+    "missing_counts": {
+      "outcome": 0,
+      "treated": 0,
+      "age": 0,
+      "bmi": 0,
+      "severity": 0,
+      "frailty": 0,
+      "sex": 0,
+      "site": 0,
+      "renal": 0
+    }
+  },
+  "balance": {
+    "max_abs_smd_before": 0.5221958729276299,
+    "max_abs_smd_after": 0.23631822343497919,
+    "mean_abs_smd_before": 0.26746735970548186,
+    "mean_abs_smd_after": 0.09538220875004257,
+    "covariates_over_0_1_before": 7,
+    "covariates_over_0_1_after": 2,
+    "covariate_terms": 9
+  },
+  "positivity": {
+    "treated_min": 0.10210509397413421,
+    "treated_max": 0.9676939672738574,
+    "control_min": 0.17722900303493866,
+    "control_max": 0.9358089289541442,
+    "common_support_lower": 0.17722900303493866,
+    "common_support_upper": 0.9358089289541442,
+    "common_support_fraction": 0.95
+  },
+  "artifacts": {
+    "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/propensity-scores.csv",
+    "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/propensity-overlap.csv",
+    "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/balance.csv",
+    "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0341-two-to-one-matching/analysis-run/stats-run/matched-pairs.csv",
+    "weights": null
+  }
+}

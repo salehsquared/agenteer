@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "methodQa": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-06T21:48:19.999Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu",
+    "overallStatus": "warning",
+    "readiness": "needs_methods_review",
+    "checks": [
+      {
+        "id": "artifact_integrity_01",
+        "category": "artifact_integrity",
+        "status": "pass",
+        "severity": "info",
+        "message": "Run directory contains 8 artifact(s).",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu"
+        ],
+        "recommendedAction": "Continue with artifact-level QA."
+      },
+      {
+        "id": "artifact_integrity_02",
+        "category": "artifact_integrity",
+        "status": "pass",
+        "severity": "info",
+        "message": "A reader-facing report artifact is present.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/paper.md",
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/manuscript.md"
+        ],
+        "recommendedAction": "Run manuscript QA before promotion."
+      },
+      {
+        "id": "convergence_03",
+        "category": "convergence",
+        "status": "pass",
+        "severity": "info",
+        "message": "No convergence failure was detected in available estimate/issue artifacts.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "Preserve convergence evidence with the run artifacts."
+      },
+      {
+        "id": "separation_04",
+        "category": "separation",
+        "status": "pass",
+        "severity": "info",
+        "message": "No logistic separation-sensitive model was detected.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "Record separation diagnostics for logistic models before publication."
+      },
+      {
+        "id": "overfitting_05",
+        "category": "overfitting",
+        "status": "pass",
+        "severity": "info",
+        "message": "No events-per-predictor issue was detected.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "Keep event counts and predictor counts in the report supplement."
+      },
+      {
+        "id": "missingness_06",
+        "category": "missingness",
+        "status": "pass",
+        "severity": "info",
+        "message": "Missingness/complete-case evidence is present.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "Report complete-case N and per-variable missingness."
+      },
+      {
+        "id": "collinearity_07",
+        "category": "collinearity",
+        "status": "warning",
+        "severity": "minor",
+        "message": "No explicit collinearity diagnostic evidence was found.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "For adjusted regression, record VIF/condition-number or justify why collinearity is not material."
+      },
+      {
+        "id": "influence_08",
+        "category": "influence",
+        "status": "warning",
+        "severity": "minor",
+        "message": "No explicit influence diagnostic evidence was found.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "Record influential-point review for model-based papers, especially small cohorts."
+      },
+      {
+        "id": "effect_size_09",
+        "category": "effect_size",
+        "status": "pass",
+        "severity": "info",
+        "message": "Checked 11 estimate-like record(s) for p-value/interval consistency.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json"
+        ],
+        "recommendedAction": "Report effect sizes with intervals; avoid p-value-only conclusions."
+      },
+      {
+        "id": "claim_alignment_10",
+        "category": "claim_alignment",
+        "status": "pass",
+        "severity": "info",
+        "message": "Reader-facing report avoids obvious framework jargon and causal overclaiming.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/paper.md"
+        ],
+        "recommendedAction": "Keep internal framework details in companion artifacts, not the manuscript."
+      },
+      {
+        "id": "semantic_plausibility_11",
+        "category": "semantic_plausibility",
+        "status": "pass",
+        "severity": "info",
+        "message": "No dataset-specific semantic plausibility issue was detected in available artifacts.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/analysis-results.json",
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/matched-icd-codes.csv",
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-executed-studies-20260506/runs/0307-mimic-cardiology-heart-failure-icu/qa.json"
+        ],
+        "recommendedAction": "For clinical/public-health datasets, attach semantic QA evidence before share/export."
+      },
+      {
+        "id": "survey_design_12",
+        "category": "survey_design",
+        "status": "pass",
+        "severity": "info",
+        "message": "No complex survey design requirement was detected.",
+        "evidenceRefs": [],
+        "recommendedAction": "If the source dataset is a complex survey, encode survey design before inference."
+      }
+    ],
+    "blockerCount": 0,
+    "warningCount": 2,
+    "methodSummary": {
+      "detectedRunKind": "unknown",
+      "detectedModelFamilies": [
+        "linear"
+      ],
+      "completeCaseN": 22580,
+      "eventCount": 3232,
+      "predictorCount": null,
+      "resultPosture": null
+    },
+    "nextAction": "Complete method-review warnings, regenerate the manuscript if needed, and rerun inspection.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/real-study-series-20260506/studies/cardiology-heart-failure/method-qa.json",
+    "reportPath": null
+  }
+}

@@ -1,10 +1,32 @@
 # Open Questions
 
+## MIMIC Dialysis/Cardiac Paper Series
+
+- Should the MIMIC dialysis/cardiac paper-series runner be promoted from `.loop-memory` into a package command, or should it first be generalized behind dataset adapters?
+- Should the 10-paper batch generate lifecycle, rerun-stability, and MedBrevia-literature artifacts so inspection can move beyond `needs_methods_review` when appropriate?
+- Which papers deserve phenotype-sensitivity reruns first: CABG/valve procedure cohorts, AKI diagnosis exposure after cardiac surgery, or dialysis/RRT exposure studies?
+- Should propensity matching add matched-pair/sandwich variance, bootstrap CIs, Rosenbaum-style sensitivity, or E-value-style unmeasured-confounding summaries before the next demo?
+
+## MedBrevia Literature Connector
+
+- Should promoted medical/public-health packets require literature evidence by profile, or should literature remain optional but readiness-relevant when present?
+- What source-appraisal rubrics should come first: diagnostic accuracy, prediction validation, causal observational studies, survey methods, or guidelines/systematic reviews?
+- How should Agenteer detect contradictions between retrieved sources and generated manuscript claims?
+- Should MedBrevia search support a multi-query agenda API, or should Agenteer orchestrate repeated searches from protocol variables and follow-up gaps?
+- What production authentication boundary should replace the local dev API-key pattern when MedBrevia integration moves beyond localhost?
+
 ## Modeling Decision Layer
 
+- MIMIC manuscript generation now avoids internal readiness enum leakage, but MIMIC execution packets still lack generated collinearity and influence diagnostics. Should those diagnostics be implemented inside the loop-memory runner first or after promoting it into `agenteer research dataset-run`?
+- Resolved partly: Tick 0331 made high-missingness complete-case denominator shrinkage downgrade trust-layer readiness. Remaining gap: the MIMIC runner should generate missingness sensitivity and separation diagnostics during execution, not only post-hoc inspection.
+- Resolved partly: Tick 0333 made runner warning strings visible in method QA. Remaining gap: derived-table profiling should become a typed artifact rather than a prose warning.
+- Stroke validation gap: if a non-ML observational packet uses "predict" language or AUROC/AUPRC, should method QA require calibration/validation-design evidence or force relabeling as local risk-marker association?
+- Five-study MIMIC series result: should the next build be `agenteer research dataset-run` or a narrower `mimic-run` lifecycle/index command? The repeated validation pattern argues for a reusable dataset-run path with derived-table profiles, model diagnostics, phenotype sensitivity, and cost/cache receipts.
 - MIMIC execution runner gap after ticks 293-322: should the loop-memory runner become `agenteer research mimic-run` or a more general `research dataset-run --dataset <manifest> --study <json>` command?
 - MIMIC phenotype gap: how should AnalysisSpec V2 express broad/narrow ICD phenotype sensitivity, primary diagnosis restrictions, present-on-admission uncertainty, and coding-review status?
 - MIMIC methods gap: current executed packets are local-review observational summaries with simple complete-case models. Publication-grade packets need design-specific covariate sets, train/test or validation for prediction claims, survival/time-to-event support when appropriate, and phenotype-specific sensitivity analysis.
+- Resolved: Tick 324 made diagnostic accuracy packets with sensitivity/specificity/PPV/NPV intervals satisfy method-QA estimate evidence checks. Remaining trust-layer diagnostic gap: route-specific QA should not ask diagnostic accuracy packets for regression-only collinearity/influence diagnostics.
+- Resolved: Tick 327 made continuous benchmark discovery collapse child runner directories under packet roots. Remaining trust-layer gap: test `run-inspect` and `benchmark-suite-run` against MIMIC `dataset-run` style packets, not only stats/diagnostic routes.
 
 - Tick 178 added a deterministic modeling-plan command. It should next consume table summaries, AnalysisSpec V2, and backend availability so recommendations are driven by actual data evidence rather than flags alone.
 - The planner currently treats survival and text/image modeling as stop-for-review/contract areas. Future ticks need executable adapters only when backed by mature libraries and tests.
@@ -325,3 +347,11 @@
 # Tick 0234
 
 - Resolved partly: diagnostic rerun stability exists as a saved golden artifact. Remaining gap: make rerun stability a reusable analysis-route command if the pattern repeats.
+
+# Ticks 0338-0357
+
+- Remaining propensity gap: add matched-pair or sandwich/robust variance rather than relying on simple local model-based intervals.
+- Remaining propensity gap: add sensitivity analysis for unmeasured confounding, such as E-value-style summaries or Rosenbaum-style sensitivity for matched contrasts.
+- Remaining propensity gap: add target-trial fields to AnalysisSpec V2 so treatment time zero, eligibility timing, baseline covariate timing, and post-treatment variable exclusion are validated before execution.
+- Remaining propensity gap: add multiple-imputation or missingness-sensitivity branches; current complete-case/drop accounting warns but does not repair missing-data bias.
+- Remaining propensity gap: run one real MIMIC/NHANES propensity packet after this synthetic hardening suite, with phenotype/codebook review and no extra cloud spend unless explicitly budgeted.

@@ -1,0 +1,28 @@
+{
+  "method": "propensity-score-matching",
+  "rowCount": 460,
+  "completeCaseN": 460,
+  "variables": [
+    "outcome",
+    "treated",
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site",
+    "renal"
+  ],
+  "parameters": {
+    "alpha": 0.05,
+    "estimand": "ATT",
+    "matchRatio": 2,
+    "caliper": 0.35,
+    "replacement": false,
+    "trimThreshold": 0.01,
+    "stabilizeWeights": true,
+    "treatmentPositiveLevel": 1,
+    "treatmentNegativeLevel": 0
+  },
+  "warnings": []
+}

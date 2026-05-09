@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5336637012299647570",
+    "method": "propensity-score-weighting",
+    "status": "succeeded",
+    "rowCount": 360,
+    "completeCaseN": 360,
+    "variables": [
+      "outcome",
+      "treated",
+      "age",
+      "bmi",
+      "severity",
+      "frailty",
+      "sex",
+      "site"
+    ],
+    "parameters": {
+      "alpha": 0.05,
+      "estimand": "ATE",
+      "matchRatio": 1,
+      "caliper": 0.2,
+      "replacement": false,
+      "trimThreshold": 0,
+      "stabilizeWeights": true,
+      "treatmentPositiveLevel": 1,
+      "treatmentNegativeLevel": 0
+    },
+    "estimates": [
+      {
+        "term": "treated",
+        "method": "inverse-probability treatment weighting",
+        "estimand": "ATE",
+        "effect_measure": "risk difference and odds ratio",
+        "estimate": 0.21870466823589813,
+        "risk_difference": 0.21870466823589813,
+        "treated_risk": 0.6905630331625835,
+        "control_risk": 0.47185836492668537,
+        "log_odds_ratio": 0.9154384745605437,
+        "odds_ratio": 2.497870264386258,
+        "or_ci_low": 1.6349566084081095,
+        "or_ci_high": 3.8162210700992727,
+        "p_value": 0.000023014228860353286,
+        "treated_n": 206,
+        "control_n": 154
+      }
+    ],
+    "diagnostics": {
+      "weighting": {
+        "estimand": "ATE",
+        "stabilized": true,
+        "trim_threshold": 0,
+        "trimmed_rows": 0,
+        "min_weight": 0.4360185330380814,
+        "max_weight": 68.65964385769493,
+        "mean_weight": 1.102115767254901,
+        "effective_sample_size": 29.017122190456448
+      },
+      "test": "propensity-score-weighting",
+      "treatment_column": "treated",
+      "treatment_positive_level": 1,
+      "treatment_negative_level": 0,
+      "covariates": [
+        "age",
+        "bmi",
+        "severity",
+        "frailty",
+        "sex",
+        "site"
+      ],
+      "exact_covariates": [],
+      "propensity_model": {
+        "family": "logistic",
+        "n_parameters": 9,
+        "aic": 290.09388523253466,
+        "converged": true,
+        "propensity_min": 0.008334185703150733,
+        "propensity_max": 0.9986472345178897
+      },
+      "missingness": {
+        "input_rows": 360,
+        "complete_case_rows": 360,
+        "excluded_missing_rows": 0,
+        "complete_case_fraction": 1,
+        "missing_counts": {
+          "outcome": 0,
+          "treated": 0,
+          "age": 0,
+          "bmi": 0,
+          "severity": 0,
+          "frailty": 0,
+          "sex": 0,
+          "site": 0
+        }
+      },
+      "balance": {
+        "max_abs_smd_before": 1.7402216938770148,
+        "max_abs_smd_after": 0.44584338122266454,
+        "mean_abs_smd_before": 0.3607343261903786,
+        "mean_abs_smd_after": 0.2537155552326614,
+        "covariates_over_0_1_before": 4,
+        "covariates_over_0_1_after": 8,
+        "covariate_terms": 8
+      },
+      "positivity": {
+        "treated_min": 0.008334185703150733,
+        "treated_max": 0.9986472345178897,
+        "control_min": 0.018900011435027383,
+        "control_max": 0.9575923988145344,
+        "common_support_lower": 0.018900011435027383,
+        "common_support_upper": 0.9575923988145344,
+        "common_support_fraction": 0.8361111111111111
+      },
+      "artifacts": {
+        "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/propensity-scores.csv",
+        "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/propensity-overlap.csv",
+        "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/balance.csv",
+        "matched_pairs": null,
+        "weights": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/weights.csv"
+      }
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_EXTREME_WEIGHTS",
+        "message": "Maximum inverse-probability weight exceeded 10; review positivity and stabilization.",
+        "evidenceRefs": [
+          "diagnostics.weighting"
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_RESIDUAL_IMBALANCE",
+        "message": "8 covariate terms have post-adjustment absolute SMD above 0.10.",
+        "evidenceRefs": [
+          "balance.csv"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/stats-config.json",
+        "sha256": "1068b5cf140cfe2910162138ea8e467d7e7fb079d29968c9e45d43c19707fa4c"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/stats-summary.json",
+        "sha256": "4f4099d1888fd771f7c883a281b8ea3fb5dee0ae9667c04b2bd57194c0d0df5f"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/estimates.csv",
+        "sha256": "8daa851c03507283bb49a86c3776fadd256b051c4b6a6fab5693f54fd7c23ed8"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/diagnostics.json",
+        "sha256": "63b6b8ece4c4598c94743f4bf5455703792c6cd0076242369a4cc951d44ef4fd"
+      },
+      {
+        "kind": "balance",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/balance.csv",
+        "sha256": "3a6dc2ed88080e59fcb9d41f9a8ba718efd0c46bdb5614f0cfab665e1f1b4f3f"
+      },
+      {
+        "kind": "propensity-scores",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/propensity-scores.csv",
+        "sha256": "85bfa9d968f74ee4b4a015e99abc281f9191d754a7564cb29c2df34d6ab44f12"
+      },
+      {
+        "kind": "propensity-overlap",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/propensity-overlap.csv",
+        "sha256": "20f110965c2bc91e668fb4129d2be66d992a8f2f599fcef1874d2abc9686f532"
+      },
+      {
+        "kind": "weights",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/weights.csv",
+        "sha256": "f60d9b80bfbf1508d93a1cb83718c0c2676098540a0bce463bc1ccdb76320009"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/stats-report.md",
+        "sha256": "5bfb2879a515e00811dc985574420542efb9e45df3321e92827fd89de770c1e9"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/stats-qa.json",
+        "sha256": "87c44ae25ba20ae6a6eb1afe06eed5585724e946e9b1ffa621bf1849c19ec9c3"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run",
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/method-selection.json",
+      "methodSelectionId": "method_selection_b402bf9ab9dc",
+      "methodId": "propensity-score-weighting",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "bound"
+    },
+    "resultPosture": {
+      "status": "causal_design_review_required",
+      "label": "Causal design review required",
+      "interpretationBoundary": "This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect.",
+      "supports": [
+        "propensity score diagnostics",
+        "balance review",
+        "overlap/positivity review",
+        "local treatment-contrast estimation under declared assumptions"
+      ],
+      "cannotSupport": [
+        "causal claims without target-trial/DAG review",
+        "unmeasured-confounding control",
+        "clinical recommendations",
+        "external validity"
+      ],
+      "nextAction": "Review the target trial, confounding set, positivity, balance, missingness, and sensitivity plan before using causal language."
+    }
+  }
+}

@@ -4,7 +4,7 @@
 
 A greenfield agentic framework whose pitch is that every piece of state — context, evidence, permission decisions — is inspectable, replayable, and bounded by an explicit capability grammar. Nodes compose via returned intents, sessions pause and resume on disk, and community packages ship through npm under a strict `@<scope>/node-<name>` convention.
 
-Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `@agenteer/*` scope. M1 → M6 implemented, plus three v1.0 gate items (dynamic-actions install hard-stop, parent-slice bounds on child spawn, ajv JSON-Schema bridge). The full suite (`npm test`) is green on every merge; see [CHANGELOG.md](./CHANGELOG.md) for per-release numbers.
+Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.2` under the `@agenteer/*` scope, with an unscoped `agenteer` convenience package prepared for the same release line. M1 → M6 implemented, plus three v1.0 gate items (dynamic-actions install hard-stop, parent-slice bounds on child spawn, ajv JSON-Schema bridge). The full suite (`npm test`) is green on every merge; see [CHANGELOG.md](./CHANGELOG.md) for per-release numbers.
 
 ## Packages
 
@@ -14,6 +14,7 @@ Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.1` under the `
 - **`@agenteer/cli`** — `agenteer run / resume / ctx / inspect / publish / install / search`, plus Anthropic + OpenAI `ProviderLike` adapters.
 - **`@agenteer/registry`** — publishing, installing, permission-diff, `framework.lock`, ajv bridge.
 - **`@agenteer/create-node`** — `npx @agenteer/create-node @scope/node-name` scaffold.
+- **`agenteer`** — unscoped convenience package that installs the scoped packages together, exposes the CLI bins, and provides namespace/subpath exports.
 
 ## Quickstart
 
@@ -21,6 +22,12 @@ Install from npm:
 
 ```bash
 npm install @agenteer/core @agenteer/stdlib @agenteer/trust zod
+```
+
+Or use the all-in-one convenience package after publishing:
+
+```bash
+npm install agenteer
 ```
 
 Run a two-node workflow end to end:
@@ -181,6 +188,7 @@ If you patch one package locally for a bugfix PR, bump all six versions together
 
 ```
 packages/
+  agenteer/     — unscoped convenience package + CLI bin wrappers
   core/         — @agenteer/core
   trust/        — @agenteer/trust
   stdlib/       — @agenteer/stdlib

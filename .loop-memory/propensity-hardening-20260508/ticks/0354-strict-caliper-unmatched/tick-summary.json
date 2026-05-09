@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "tick": 354,
+  "slug": "strict-caliper-unmatched",
+  "axis": "more-robust",
+  "method": "propensity-score-matching",
+  "question": "Does a strict caliper record unmatched treated rows instead of hiding loss of comparability?",
+  "expected": "success_with_warning",
+  "expectationMet": true,
+  "analysisExitCode": 0,
+  "statsStatus": "succeeded",
+  "posture": "causal_design_review_required",
+  "issues": [
+    "PROPENSITY_UNMATCHED_TREATED",
+    "PROPENSITY_RESIDUAL_IMBALANCE"
+  ],
+  "errors": [],
+  "methodQaStatus": "fail",
+  "inspectionReadiness": null,
+  "paperQaStatus": "pass",
+  "completeCaseFraction": 1,
+  "maxAbsSmdBefore": 0.4983919654611846,
+  "maxAbsSmdAfter": 0.12568943527102597,
+  "commonSupportFraction": 0.9027777777777778,
+  "rerunComparison": null,
+  "artifactChecks": {
+    "paper": true,
+    "paperQa": true,
+    "balance": true,
+    "propensityScores": true,
+    "overlap": true,
+    "adjustmentArtifact": true
+  },
+  "paths": {
+    "tickDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched",
+    "data": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/synthetic-propensity.csv",
+    "methodSelection": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/method-selection.json",
+    "analysisRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/analysis-run",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0354-strict-caliper-unmatched/tick-summary.json"
+  }
+}

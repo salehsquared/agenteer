@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_failed",
+  "method": "propensity-score-matching",
+  "status": "failed",
+  "rowCount": 0,
+  "completeCaseN": 0,
+  "variables": [],
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/method-selection.json",
+    "methodSelectionId": "method_selection_4609ee25110d",
+    "methodId": "propensity-score-matching",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "parameters": {},
+  "estimates": [],
+  "diagnostics": {},
+  "issues": [],
+  "warnings": [],
+  "errors": [
+    "Propensity methods require at least one baseline covariate.",
+    "Traceback (most recent call last):\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 814, in main\n    print(json.dumps(run(req)))\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 595, in run\n    ps, x_cov, ps_model = fit_propensity_scores(data, \"_agenteer_treatment\", covariates)\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 130, in fit_propensity_scores\n    x = covariate_matrix(data, covariates)\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 102, in covariate_matrix\n    raise ValueError(\"Propensity methods require at least one baseline covariate.\")\nValueError: Propensity methods require at least one baseline covariate.\n"
+  ],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/analysis-run/stats-run/stats-config.json",
+      "sha256": "3f68c4332a0b7eb8da254f6376aa3c9e87e68454f907ac7e3f1dbdb267553c30"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/analysis-run/stats-run/stats-report.md",
+      "sha256": "05fe583a9105442645227ba5cd4809163cd85dd7b84a930c02bffd88e0d7e9a3"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/analysis-run/stats-run/stats-qa.json",
+      "sha256": "95644391a52a2340f1e6105324041e6ff54d3070a3e3b815765fd6d0eac6243d"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/analysis-run/stats-run",
+  "resultPosture": {
+    "status": "failed",
+    "label": "Failed execution",
+    "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+    "supports": [
+      "failure attribution",
+      "repair planning"
+    ],
+    "cannotSupport": [
+      "effect estimates",
+      "confidence intervals",
+      "p-values",
+      "paper-ready inference"
+    ],
+    "nextAction": "Resolve blocker issues and rerun the stats method."
+  }
+}

@@ -1,5 +1,25 @@
 # Improvements
 
+## Ticks 0378-0387
+
+- Built `.loop-memory/mimic-dialysis-cardiac-papers-20260509/run_mimic_paper_series.py`, a bounded MIMIC paper-series runner for dialysis and cardiac-surgery ICU studies.
+- Generated 10 real local-review papers under `.loop-memory/mimic-dialysis-cardiac-papers-20260509/papers/`, each with `paper.md`, `analysis-results.json`, `paper-qa.json`, `qa.json`, `table-one.csv`, `model-coefficients.csv`, `missingness.csv`, matched diagnosis/procedure code CSVs, cost receipt, run manifest, artifact index, critique, and run inspection.
+- Added propensity matching throughout the series: 10/10 final papers now include `propensity-balance.csv`, `matched-pairs.csv`, and `propensity-scores.csv`.
+- Hardened sparse derived-table merges by zero-filling binary exposure flags after left joins and adding exposure-denominator QA.
+- Hardened cardiac-surgery models with event-count-aware predictor caps so sparse mortality outcomes do not create low-events-per-predictor blockers.
+- Added bounded retry behavior for idempotent GCS table reads after a transient copy failure.
+- Final batch status: 10/10 paper QA pass, 10/10 packet QA pass, 10/10 propensity fits, 0 inspection blockers, estimated GCS-read cost `$0.2958` of `$10.00`.
+
+## Ticks 358-377
+
+- Added a MedBrevia literature context layer: search packets now become planning-grade evidence with source strength, design signals, method signals, follow-up searches, and issue records.
+- `modeling-plan --literature` now consumes raw literature search packets or derived context packets and can route broad study classes such as diagnostic accuracy from literature signals.
+- `analysis-run --literature` now persists literature search, literature context, literature context report, literature QA, and literature QA report into the run packet.
+- Analysis manifests now expose literature context artifacts, not only search and QA files.
+- `run-inspect` now surfaces literature status, source counts, cited source counts, blocker/warning counts, and literature next action; failed literature blocks readiness and warning-level literature downgrades readiness.
+- Added deterministic mock MedBrevia SSE and local mock-packet tests so the connector can be exercised without localhost, cloud, or domain-repo writes.
+- Updated research docs and command catalog so future agents use the connector as a cross-cutting evidence layer rather than a standalone search command.
+
 ## Tick 178
 
 - Added `agenteer research modeling-plan`, a modeling decision layer that ranks statistical methods, ML adapters, and workflow policies before execution.
@@ -129,6 +149,96 @@ Web grounding:
 - Executed 22 MIMIC study packets across orthopedic, cardiology, pulmonary, renal, endocrine, neurologic, GI/liver, hematologic, cognitive, metabolic, and toxicology domains.
 - Added runner QA guards for sparse binary outcomes, low events per predictor, small cohorts, and non-finite LOS percent-change estimates.
 - Wrote final executed-study index and audit with cumulative estimated cost `$0.2704` under the `$1.00` ceiling.
+
+## Tick 323
+
+- Hardened the new trust-layer artifact collector to resolve canonical artifacts from nested packet roots, such as `analysis-run/stats-run/stats-run.json` and `analysis-run/paper.md`.
+- Added source-path tracking for JSON and text artifacts so `run-inspect` and method QA evidence references point to the actual nested file rather than only the packet root.
+- Added regression coverage proving nested analysis-run packet roots expose stats-run kind, paper QA, rerun stability, complete-case N, and missingness evidence.
+
+## Tick 324
+
+- Wrote a capability-rave audit at `.loop-memory/malleability/0324.md`.
+- Method QA now treats diagnostic accuracy sensitivity, specificity, PPV, NPV, likelihood ratio, accuracy, and prevalence records as estimate evidence when paired with diagnostic counts or intervals.
+- Added targeted regression coverage and manually re-smoked the threshold diagnostic golden route.
+
+## Tick 326
+
+- Added route-specific QA applicability to the trust layer so diagnostic accuracy does not inherit regression-only collinearity and influence warnings.
+- Split sparse diagnostic-cell messaging from broad clinical coding / semantic plausibility wording.
+- `run-inspect` next actions now prioritize the dominant unresolved issue, such as sparse diagnostic cell stability.
+
+## Tick 327
+
+- Continuous benchmark discovery now collapses nested candidate directories so packet roots are benchmarked instead of both parent packet folders and child runner folders.
+- Added regression coverage for `analysis-run/stats-run` collapsing.
+- Saved a diagnostic golden benchmark smoke at `.loop-memory/golden/0327-trust-benchmark-smoke/`.
+
+## Tick 328
+
+- Started `.loop-memory/real-study-series-20260506/`, a five-specialty real MIMIC packet validation series.
+- Selected cardiology, pulmonary/critical care, nephrology, neurology, and hepatology/gastroenterology packets from the executed MIMIC corpus.
+- Wrote a common validation contract and the first cardiology design note without new cloud reads or domain repo edits.
+
+## Tick 329
+
+- Web search:
+  - Query: `MIMIC-IV critical care database official documentation diagnosis codes limitations observational ICU study`
+    - Source: https://www.nature.com/articles/s41597-022-01899-x
+    - Finding: MIMIC-IV is routine-care EHR data with modular hospital/ICU tables; clinical data can be sporadic/noisy and ICD interpretation depends on versioned coding references.
+    - Applicability: real MIMIC packets must disclose routine-care data limits, diagnosis-code phenotype boundaries, and local EHR generalizability.
+  - Query: `TRIPOD AI reporting clinical prediction model checklist 2024 official PDF calibration discrimination intended use`
+    - Source: https://www.tripod-statement.org/wp-content/uploads/2024/04/TRIPODAI-Supplement.pdf
+    - Finding: prediction-model reports should state performance measures, prediction calculation, class imbalance handling, model output, thresholds, and development/evaluation differences.
+    - Applicability: ICU mortality modeling should carry diagnostics and intended-use limits before being treated as prediction evidence.
+  - Query: `STROBE observational studies reporting guideline cohort cross sectional case control official checklist`
+    - Source: https://www.strobe-statement.org/
+    - Finding: observational reports should make clear what was planned, done, found, and meant; the checklist is reporting guidance, not proof of study quality.
+    - Applicability: generated manuscripts should be reader-facing and should not confuse reporting completeness with methodological validity.
+- Validated the heart failure MIMIC packet with `method-qa`, `run-inspect`, and `manuscript`.
+- Fixed manuscript generation so internal readiness enums are translated into scientific-reader language.
+- Manuscripts now prefer run-artifact study titles and avoid arbitrary nested `status` fields such as ICD verification statuses in result bullets.
+- Added regression coverage for a `needs_methods_review` manuscript path.
+
+## Tick 331
+
+- Validated the real MIMIC COPD/respiratory-failure packet with `method-qa`, `run-inspect`, and `manuscript`.
+- Fixed trust-layer method summaries to prefer model-specific denominators, event counts, and predictor counts over broad nested table counts.
+- Missingness QA now downgrades model complete-case denominator shrinkage relative to cohort size and surfaces high-missingness variables.
+- Model-family detection now infers logistic routes from odds-ratio/risk-ratio/hazard-ratio estimates.
+- Added regression coverage for denominator shrinkage and logistic-family inference.
+
+## Tick 333
+
+- Validated the real MIMIC AKI packet with `method-qa`, `run-inspect`, and `manuscript`.
+- Runner `qa.json` string warnings are now collected as method-QA issue records.
+- Semantic-plausibility QA now recognizes unprofiled required tables and diagnosis-code timing / phenotype review warnings.
+- Added regression coverage proving runner warning strings surface as semantic-plausibility warnings.
+- Wrote `.loop-memory/malleability/0333.md` documenting trust-layer malleability found during real-packet validation.
+
+## Tick 336
+
+- Web search:
+  - Query: `cirrhosis ICU mortality prediction MELD SOFA observational study methods limitations primary source`
+    - Source: https://pubmed.ncbi.nlm.nih.gov/28240612/
+    - Finding: ICU cirrhosis prognostic studies commonly compare MELD/MELD-Na and organ-failure scores with development/validation and AUROC-style performance.
+    - Applicability: internal cirrhosis model discrimination should not be treated as validated prognosis.
+  - Query: `AASLD cirrhosis acute decompensation ICU outcomes prognostic scores MELD official guidance`
+    - Source: https://www.aasld.org/practice-guidelines/acute-chronic-liver-failure-and-management
+    - Finding: cirrhosis/ACLF critical illness prognosis is organ-failure-context dependent.
+    - Applicability: MELD-like and first-day lab findings should be framed as severity/prognostic markers.
+  - Query: `transparent reporting prediction model cirrhosis MELD calibration validation study reporting`
+    - Source: https://www.tripod-statement.org/wp-content/uploads/2024/04/TRIPODAI-Supplement.pdf
+    - Finding: prediction reports should explain performance, model output, validation/evaluation differences, and calibration where applicable.
+    - Applicability: cirrhosis mortality packets need validation/calibration evidence before prediction claims.
+- Wrote the hepatology/cirrhosis design note for tick 0337 validation.
+
+## Tick 337
+
+- Validated the real MIMIC cirrhosis packet with `method-qa`, `run-inspect`, and `manuscript`.
+- Completed `.loop-memory/real-study-series-20260506/SERIES_SUMMARY.md`.
+- The five-study series now contains design notes, validation artifacts, and issue ledgers for cardiology, pulmonary, nephrology, neurology, and hepatology packets.
+- Cross-study result: original runner QA pass consistently means execution success, while trust-layer readiness correctly stays at `needs_methods_review`.
 
 ## Tick 253
 
@@ -981,3 +1091,14 @@ Sources:
 - Added `analysisSpecCandidate` to exploration handoffs.
 - The candidate records route intent, research question, estimand boundary, source population, outcome/exposure, excluded variables pending review, design requirements, suggested model family, required pre-execution checks, and provenance.
 - Regenerated the actual NHANES handoff and modeling-plan artifacts with the pre-spec bridge.
+
+# Ticks 0338-0357
+
+- Ran a 20-scenario full propensity hardening suite covering matching, weighting, exact matching, 2:1 matching, replacement, continuous outcomes, missingness, poor overlap, extreme weights, categorical burden, wide covariate sets, threshold-derived exposure, no-covariate refusal, tiny treated groups, ATT weighting, loose/strict calipers, rerun stability, and method-binding mismatch.
+- Added required propensity manifest artifacts: `propensity-scores.csv`, `propensity-overlap.csv`, `balance.csv`, and either `matched-pairs.csv` or `weights.csv`.
+- Added complete-case/drop accounting to propensity diagnostics and QA, including high complete-case exclusion warnings.
+- Added `propensity-overlap.csv` with treated/control bin counts so overlap can be audited without opening model internals.
+- Added reader-facing propensity `paper.md` and `paper-qa.json` from `analysis-run` for successful propensity runs.
+- Prevented failed/invalid propensity runs from generating reader-facing papers.
+- Added automated coverage for full propensity `analysis-run` paper generation and manifest visibility.
+- Saved all tick artifacts under `.loop-memory/propensity-hardening-20260508/`; the suite passed 20/20 expectations.

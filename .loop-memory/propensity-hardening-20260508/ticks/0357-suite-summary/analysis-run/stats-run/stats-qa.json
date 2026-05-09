@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "status": "warning",
+  "summary": "11/13 stats QA checks passed; status=warning.",
+  "checks": [
+    {
+      "id": "execution-status",
+      "status": "pass",
+      "detail": "Stats runner completed."
+    },
+    {
+      "id": "effect-estimate-table",
+      "status": "pass",
+      "detail": "1 estimate row(s) produced."
+    },
+    {
+      "id": "uncertainty-and-pvalue-context",
+      "status": "pass",
+      "detail": "Report includes ASA-style caution that p-values are not effect size or practical importance."
+    },
+    {
+      "id": "binding-status",
+      "status": "pass",
+      "detail": "Stats run binding is bound."
+    },
+    {
+      "id": "standard-table-boundary",
+      "status": "pass",
+      "detail": "Standard-table runner is not a complex-survey variance engine."
+    },
+    {
+      "id": "result-posture",
+      "status": "pass",
+      "detail": "causal_design_review_required: This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect."
+    },
+    {
+      "id": "propensity-treatment-model",
+      "status": "pass",
+      "detail": "Propensity scores were estimated and recorded with model diagnostics."
+    },
+    {
+      "id": "propensity-balance",
+      "status": "warning",
+      "detail": "Maximum absolute SMD changed from 0.539 to 0.164; 3 covariate term(s) remain above 0.10."
+    },
+    {
+      "id": "propensity-positivity-overlap",
+      "status": "pass",
+      "detail": "91.5% of complete cases lie inside the observed cross-arm propensity support."
+    },
+    {
+      "id": "propensity-unmatched-treated",
+      "status": "warning",
+      "detail": "223 treated row(s) were unmatched under the declared caliper and exact-match policy."
+    },
+    {
+      "id": "propensity-effective-sample-size",
+      "status": "pass",
+      "detail": "Not applicable or not recorded for this method."
+    },
+    {
+      "id": "propensity-complete-case-retention",
+      "status": "pass",
+      "detail": "100.0% of rows were retained after requiring treatment, outcome, and propensity covariates."
+    },
+    {
+      "id": "propensity-causal-claim-boundary",
+      "status": "pass",
+      "detail": "The result posture requires target-trial, DAG/confounder, positivity, missingness, and sensitivity review before causal claims."
+    }
+  ]
+}

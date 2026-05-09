@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_1778287651859",
+    "method": "propensity-score-weighting",
+    "status": "failed",
+    "rowCount": 0,
+    "completeCaseN": 0,
+    "variables": [
+      "outcome",
+      "treated",
+      "age",
+      "bmi",
+      "severity",
+      "sex",
+      "site"
+    ],
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/method-selection.json",
+      "methodSelectionId": "method_selection_4609ee25110d",
+      "methodId": "propensity-score-matching",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "mismatch"
+    },
+    "parameters": {},
+    "estimates": [],
+    "diagnostics": {},
+    "issues": [
+      {
+        "severity": "blocker",
+        "code": "METHOD_SELECTION_STATS_MISMATCH",
+        "message": "Method selection primary propensity-score-matching maps to propensity-score-matching, not requested propensity-score-weighting.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/method-selection.json"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [
+      "Stats run binding validation failed."
+    ],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-config.json",
+        "sha256": "ad49077e1a1331aa3061627835501f2409260195d439c9072c6e956576aed17c"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-report.md",
+        "sha256": "e46439a1086a72c4830acb34e280aface22371bbd72c8e650e493c578ce637ea"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json",
+        "sha256": "8ea54a38d55da4ab0766793d9542680c521d6148f15f3bf110c2e86f998623de"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run",
+    "resultPosture": {
+      "status": "invalid_binding",
+      "label": "Blocked: method binding invalid",
+      "interpretationBoundary": "This run cannot be interpreted because the executable method does not match or cannot read the selected method/spec evidence.",
+      "supports": [
+        "binding failure diagnosis",
+        "repair planning"
+      ],
+      "cannotSupport": [
+        "method-governed estimates",
+        "paper-ready inference"
+      ],
+      "nextAction": "Repair the method-selection or AnalysisSpec binding and rerun before reviewing estimates."
+    }
+  }
+}

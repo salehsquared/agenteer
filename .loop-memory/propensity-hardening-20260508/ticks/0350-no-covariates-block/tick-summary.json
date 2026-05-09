@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "tick": 350,
+  "slug": "no-covariates-block",
+  "axis": "challenge/full-run-QA",
+  "method": "propensity-score-matching",
+  "question": "Does the runner refuse propensity matching without measured baseline covariates?",
+  "expected": "expected_failure",
+  "expectationMet": true,
+  "analysisExitCode": 1,
+  "statsStatus": "failed",
+  "posture": "failed",
+  "issues": [],
+  "errors": [
+    "Propensity methods require at least one baseline covariate.",
+    "Traceback (most recent call last):\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 814, in main\n    print(json.dumps(run(req)))\n  File \"/var/folders/tx/ktqqcdmn4ydf6s3zl97nsswm0000gn/T/agenteer-stats-L0jjcA/stats_bridge.py\", line 595, in run\n    "
+  ],
+  "methodQaStatus": "warning",
+  "inspectionReadiness": null,
+  "paperQaStatus": null,
+  "completeCaseFraction": null,
+  "maxAbsSmdBefore": null,
+  "maxAbsSmdAfter": null,
+  "commonSupportFraction": null,
+  "rerunComparison": null,
+  "artifactChecks": {
+    "paper": false,
+    "paperQa": false,
+    "balance": false,
+    "propensityScores": false,
+    "overlap": false,
+    "adjustmentArtifact": false
+  },
+  "paths": {
+    "tickDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block",
+    "data": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/synthetic-propensity.csv",
+    "methodSelection": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/method-selection.json",
+    "analysisRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/analysis-run",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0350-no-covariates-block/tick-summary.json"
+  }
+}

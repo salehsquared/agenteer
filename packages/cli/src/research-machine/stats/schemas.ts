@@ -12,6 +12,8 @@ export const statsMethodSchema = z.enum([
   "logistic-regression",
   "poisson-regression",
   "diagnostic-accuracy",
+  "propensity-score-matching",
+  "propensity-score-weighting",
 ]);
 export type StatsMethod = z.infer<typeof statsMethodSchema>;
 
@@ -27,6 +29,13 @@ export const statsRunRequestSchema = z.object({
   variables: z.array(z.string().min(1)).default([]),
   covariates: z.array(z.string().min(1)).default([]),
   weight: z.string().min(1).optional(),
+  exactCovariates: z.array(z.string().min(1)).default([]),
+  estimand: z.enum(["ATE", "ATT"]).default("ATT"),
+  matchRatio: z.number().int().min(1).max(10).default(1),
+  caliper: z.number().positive().max(10).optional(),
+  replacement: z.boolean().default(false),
+  trimThreshold: z.number().min(0).max(0.49).default(0.01),
+  stabilizeWeights: z.boolean().default(true),
   surveyDesign: z.boolean().default(false),
   allowSurveyApproximation: z.boolean().default(false),
   methodSelectionPath: z.string().min(1).optional(),
@@ -38,7 +47,7 @@ export const statsRunRequestSchema = z.object({
 export type StatsRunRequest = z.infer<typeof statsRunRequestSchema>;
 
 export const statsArtifactSchema = z.object({
-  kind: z.enum(["config", "summary", "table", "diagnostics", "report", "qa"]),
+  kind: z.enum(["config", "summary", "table", "diagnostics", "report", "qa", "balance", "propensity-scores", "propensity-overlap", "matched-pairs", "weights"]),
   path: z.string().min(1),
   sha256: z.string().optional(),
 });
@@ -60,6 +69,7 @@ export const statsResultPostureSchema = z.object({
     "exploratory_survey_approximation",
     "exploratory_standard_table",
     "bound_standard_table",
+    "causal_design_review_required",
   ]),
   label: z.string().min(1),
   interpretationBoundary: z.string().min(1),

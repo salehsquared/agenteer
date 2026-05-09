@@ -12,6 +12,8 @@ const analysisMethodToStatsMethod: Readonly<Record<string, StatsMethod>> = {
   "binary-logistic-regression": "logistic-regression",
   "poisson-regression": "poisson-regression",
   "diagnostic-accuracy-basic": "diagnostic-accuracy",
+  "propensity-score-matching": "propensity-score-matching",
+  "propensity-score-weighting": "propensity-score-weighting",
 };
 
 export function statsRunMethodForAnalysisMethod(methodId: string): StatsMethod | null {

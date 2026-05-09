@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "method": "propensity-score-matching",
+  "dataPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0357-suite-summary/synthetic-propensity.csv",
+  "outcome": "los_days",
+  "exposure": "treated",
+  "variables": [],
+  "covariates": [
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site",
+    "renal",
+    "diabetes"
+  ],
+  "exactCovariates": [
+    "sex",
+    "site"
+  ],
+  "estimand": "ATT",
+  "matchRatio": 1,
+  "caliper": 0.35,
+  "replacement": false,
+  "trimThreshold": 0.01,
+  "stabilizeWeights": true,
+  "surveyDesign": false,
+  "allowSurveyApproximation": false,
+  "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0357-suite-summary/method-selection.json",
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0357-suite-summary/analysis-run/stats-run",
+  "alpha": 0.05,
+  "python": "/Users/saleh/TechProjects/agenteer/.research-runtime/python/bin/python"
+}

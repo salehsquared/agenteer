@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2869675398698197466",
+  "method": "propensity-score-matching",
+  "status": "succeeded",
+  "rowCount": 340,
+  "completeCaseN": 340,
+  "variables": [
+    "outcome",
+    "treated",
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site"
+  ],
+  "parameters": {
+    "alpha": 0.05,
+    "estimand": "ATT",
+    "matchRatio": 1,
+    "caliper": 0.2,
+    "replacement": false,
+    "trimThreshold": 0.01,
+    "stabilizeWeights": true,
+    "treatmentPositiveLevel": 1,
+    "treatmentNegativeLevel": 0
+  },
+  "estimates": [
+    {
+      "term": "treated",
+      "method": "nearest-neighbor propensity score matching",
+      "estimand": "ATT",
+      "effect_measure": "risk difference and odds ratio",
+      "estimate": 0.125,
+      "risk_difference": 0.125,
+      "treated_risk": 0.59375,
+      "control_risk": 0.46875,
+      "log_odds_ratio": 0.5046527646589094,
+      "odds_ratio": 1.6564102564102559,
+      "or_ci_low": 0.615594033685286,
+      "or_ci_high": 4.456987539524735,
+      "p_value": 0.3176622120368938,
+      "treated_n": 32,
+      "control_n": 32
+    }
+  ],
+  "diagnostics": {
+    "matching": {
+      "match_ratio": 1,
+      "replacement": false,
+      "caliper_logit_sd": 0.2,
+      "caliper_logit_width": 0.871845265656895,
+      "treated_total": 189,
+      "control_total": 151,
+      "matched_treated": 32,
+      "matched_controls": 32,
+      "matched_pairs": 32,
+      "unmatched_treated": 157,
+      "control_reuse_max": 1
+    },
+    "test": "propensity-score-matching",
+    "treatment_column": "treated",
+    "treatment_positive_level": 1,
+    "treatment_negative_level": 0,
+    "covariates": [
+      "age",
+      "bmi",
+      "severity",
+      "frailty",
+      "sex",
+      "site"
+    ],
+    "exact_covariates": [],
+    "propensity_model": {
+      "family": "logistic",
+      "n_parameters": 9,
+      "aic": 180.2719739267112,
+      "converged": true,
+      "propensity_min": 0.00025396288012404015,
+      "propensity_max": 0.9999945012310821
+    },
+    "missingness": {
+      "input_rows": 340,
+      "complete_case_rows": 340,
+      "excluded_missing_rows": 0,
+      "complete_case_fraction": 1,
+      "missing_counts": {
+        "outcome": 0,
+        "treated": 0,
+        "age": 0,
+        "bmi": 0,
+        "severity": 0,
+        "frailty": 0,
+        "sex": 0,
+        "site": 0
+      }
+    },
+    "balance": {
+      "max_abs_smd_before": 1.9553319315291837,
+      "max_abs_smd_after": 0.18623669383489092,
+      "mean_abs_smd_before": 0.4919262932927706,
+      "mean_abs_smd_after": 0.11590953124720735,
+      "covariates_over_0_1_before": 7,
+      "covariates_over_0_1_after": 5,
+      "covariate_terms": 8
+    },
+    "positivity": {
+      "treated_min": 0.00025396288012404015,
+      "treated_max": 0.9999945012310821,
+      "control_min": 0.0006448099286950601,
+      "control_max": 0.9684859444951353,
+      "common_support_lower": 0.0006448099286950601,
+      "common_support_upper": 0.9684859444951353,
+      "common_support_fraction": 0.7029411764705882
+    },
+    "artifacts": {
+      "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/propensity-scores.csv",
+      "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/propensity-overlap.csv",
+      "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/balance.csv",
+      "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/matched-pairs.csv",
+      "weights": null
+    }
+  },
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "PROPENSITY_UNMATCHED_TREATED",
+      "message": "157 treated rows were unmatched under the caliper/exact-match policy.",
+      "evidenceRefs": [
+        "matched-pairs.csv"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "PROPENSITY_RESIDUAL_IMBALANCE",
+      "message": "5 covariate terms have post-adjustment absolute SMD above 0.10.",
+      "evidenceRefs": [
+        "balance.csv"
+      ]
+    },
+    {
+      "severity": "blocker",
+      "code": "PROPENSITY_POOR_OVERLAP",
+      "message": "Less than 75% of complete cases lie in common propensity-score support.",
+      "evidenceRefs": [
+        "diagnostics.positivity"
+      ]
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/stats-config.json",
+      "sha256": "13039191447699222efbf462a67542a78b13fa0f550662d4110098cc71479001"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/stats-summary.json",
+      "sha256": "9f639005f313086400a51d0fc409ca84e88e114b177b2b4aa2b8bf0688ef9159"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/estimates.csv",
+      "sha256": "af42c8102aeafba2b4ea173fdf4c4143bcbea25ae72424cd44df50d0b0e49c90"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/diagnostics.json",
+      "sha256": "f72838bf077bc972c17d2857384807955f637ded063c01c808fd87a2517dd507"
+    },
+    {
+      "kind": "balance",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/balance.csv",
+      "sha256": "ed0058c4f68f31bcea29f0449e687af2be17a2e3e08152363b6210531b4ecc37"
+    },
+    {
+      "kind": "propensity-scores",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/propensity-scores.csv",
+      "sha256": "7bdb65c075f6c25c0913a015a41e73f7985a89b571cf582e1f31271ff7c4dca1"
+    },
+    {
+      "kind": "propensity-overlap",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/propensity-overlap.csv",
+      "sha256": "6816cac20afcdc56cbd078b2d65eb8604cfb6d02867a18bd06bb131eef225e66"
+    },
+    {
+      "kind": "matched-pairs",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/matched-pairs.csv",
+      "sha256": "0702983cc1df0f20c0a5dc6bd49dc57fee6eb6a9940c5ff64797e0ab171ff278"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/stats-report.md",
+      "sha256": "013fdd8d02bb26e7b4da20d4d84a923b97fbcd5565db3b1828a99edc9c2eeca3"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run/stats-qa.json",
+      "sha256": "1b5c5ced590dc7b54ae67100a298ed43deb40e7ee021484a716070a7a3b87b49"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/analysis-run/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0345-poor-overlap/method-selection.json",
+    "methodSelectionId": "method_selection_4609ee25110d",
+    "methodId": "propensity-score-matching",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "failed",
+    "label": "Failed execution",
+    "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+    "supports": [
+      "failure attribution",
+      "repair planning"
+    ],
+    "cannotSupport": [
+      "effect estimates",
+      "confidence intervals",
+      "p-values",
+      "paper-ready inference"
+    ],
+    "nextAction": "Resolve blocker issues and rerun the stats method."
+  }
+}

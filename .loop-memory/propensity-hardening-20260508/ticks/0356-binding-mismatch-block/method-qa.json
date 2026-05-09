@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "methodQa": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T00:47:32.078Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run",
+    "overallStatus": "warning",
+    "readiness": "needs_methods_review",
+    "checks": [
+      {
+        "id": "artifact_integrity_01",
+        "category": "artifact_integrity",
+        "status": "pass",
+        "severity": "info",
+        "message": "Run directory contains 8 artifact(s).",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run"
+        ],
+        "recommendedAction": "Continue with artifact-level QA."
+      },
+      {
+        "id": "artifact_integrity_02",
+        "category": "artifact_integrity",
+        "status": "warning",
+        "severity": "major",
+        "message": "No reader-facing paper/manuscript artifact was found.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/paper.md",
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/manuscript.md"
+        ],
+        "recommendedAction": "Generate a publication-grade manuscript before promotion."
+      },
+      {
+        "id": "convergence_03",
+        "category": "convergence",
+        "status": "pass",
+        "severity": "info",
+        "message": "No model estimate artifact was available to check convergence.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json"
+        ],
+        "recommendedAction": "Preserve convergence evidence with the run artifacts."
+      },
+      {
+        "id": "separation_04",
+        "category": "separation",
+        "status": "pass",
+        "severity": "info",
+        "message": "No logistic separation-sensitive model was detected.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json"
+        ],
+        "recommendedAction": "Record separation diagnostics for logistic models before publication."
+      },
+      {
+        "id": "overfitting_05",
+        "category": "overfitting",
+        "status": "pass",
+        "severity": "info",
+        "message": "No events-per-predictor issue was detected.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-run.json"
+        ],
+        "recommendedAction": "Keep event counts and predictor counts in the report supplement."
+      },
+      {
+        "id": "missingness_06",
+        "category": "missingness",
+        "status": "pass",
+        "severity": "info",
+        "message": "Missingness/complete-case evidence is present.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json"
+        ],
+        "recommendedAction": "Report complete-case N and per-variable missingness."
+      },
+      {
+        "id": "collinearity_07",
+        "category": "collinearity",
+        "status": "pass",
+        "severity": "info",
+        "message": "Collinearity diagnostics are not applicable to this route family.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json"
+        ],
+        "recommendedAction": "For adjusted regression, record VIF/condition-number or justify why collinearity is not material."
+      },
+      {
+        "id": "influence_08",
+        "category": "influence",
+        "status": "pass",
+        "severity": "info",
+        "message": "Influence diagnostics are not applicable to this route family.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json"
+        ],
+        "recommendedAction": "Record influential-point review for model-based papers, especially small cohorts."
+      },
+      {
+        "id": "effect_size_09",
+        "category": "effect_size",
+        "status": "warning",
+        "severity": "minor",
+        "message": "No estimate-like records were available for p-value/effect-size checks.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-run.json"
+        ],
+        "recommendedAction": "Report effect sizes with intervals; avoid p-value-only conclusions."
+      },
+      {
+        "id": "claim_alignment_10",
+        "category": "claim_alignment",
+        "status": "warning",
+        "severity": "major",
+        "message": "No reader-facing report was available for claim alignment.",
+        "evidenceRefs": [],
+        "recommendedAction": "Keep internal framework details in companion artifacts, not the manuscript."
+      },
+      {
+        "id": "semantic_plausibility_11",
+        "category": "semantic_plausibility",
+        "status": "pass",
+        "severity": "info",
+        "message": "No dataset-specific semantic plausibility issue was detected in available artifacts.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/analysis-run/stats-run/stats-qa.json"
+        ],
+        "recommendedAction": "For clinical/public-health datasets, attach semantic QA evidence before share/export."
+      },
+      {
+        "id": "survey_design_12",
+        "category": "survey_design",
+        "status": "pass",
+        "severity": "info",
+        "message": "No complex survey design requirement was detected.",
+        "evidenceRefs": [],
+        "recommendedAction": "If the source dataset is a complex survey, encode survey design before inference."
+      }
+    ],
+    "blockerCount": 0,
+    "warningCount": 3,
+    "methodSummary": {
+      "detectedRunKind": "stats-run",
+      "detectedModelFamilies": [],
+      "completeCaseN": 0,
+      "eventCount": null,
+      "predictorCount": null,
+      "resultPosture": "blocked"
+    },
+    "nextAction": "Keep internal framework details in companion artifacts, not the manuscript.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0356-binding-mismatch-block/method-qa.json",
+    "reportPath": null
+  }
+}

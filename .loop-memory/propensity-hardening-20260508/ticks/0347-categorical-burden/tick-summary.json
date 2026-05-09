@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "tick": 347,
+  "slug": "categorical-burden",
+  "axis": "more-robust",
+  "method": "propensity-score-matching",
+  "question": "Does matching tolerate multiple categorical baseline covariates without artifact loss?",
+  "expected": "success",
+  "expectationMet": true,
+  "analysisExitCode": 0,
+  "statsStatus": "succeeded",
+  "posture": "causal_design_review_required",
+  "issues": [
+    "PROPENSITY_UNMATCHED_TREATED",
+    "PROPENSITY_RESIDUAL_IMBALANCE"
+  ],
+  "errors": [],
+  "methodQaStatus": "fail",
+  "inspectionReadiness": null,
+  "paperQaStatus": "pass",
+  "completeCaseFraction": 1,
+  "maxAbsSmdBefore": 0.5261980114966756,
+  "maxAbsSmdAfter": 0.1630339741415421,
+  "commonSupportFraction": 0.938,
+  "rerunComparison": null,
+  "artifactChecks": {
+    "paper": true,
+    "paperQa": true,
+    "balance": true,
+    "propensityScores": true,
+    "overlap": true,
+    "adjustmentArtifact": true
+  },
+  "paths": {
+    "tickDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0347-categorical-burden",
+    "data": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0347-categorical-burden/synthetic-propensity.csv",
+    "methodSelection": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0347-categorical-burden/method-selection.json",
+    "analysisRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0347-categorical-burden/analysis-run",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0347-categorical-burden/tick-summary.json"
+  }
+}

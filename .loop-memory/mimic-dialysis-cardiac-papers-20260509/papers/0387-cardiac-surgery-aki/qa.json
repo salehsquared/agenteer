@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T01:58:32.901352+00:00",
+  "status": "pass",
+  "checks": [
+    {
+      "code": "cohort-nonempty",
+      "passed": true,
+      "message": "Cohort has at least one first ICU stay."
+    },
+    {
+      "code": "row-cache-removed",
+      "passed": true,
+      "message": "Temporary row-level cache was removed."
+    },
+    {
+      "code": "mortality-model-fit-or-justified",
+      "passed": true,
+      "message": "Mortality model either fit or recorded why it did not fit."
+    },
+    {
+      "code": "los-model-fit-or-justified",
+      "passed": true,
+      "message": "LOS model either fit or recorded why it did not fit."
+    },
+    {
+      "code": "exposure-recorded",
+      "passed": true,
+      "message": "Primary exposure is present in predictors or Table 1."
+    },
+    {
+      "code": "exposure-denominator-complete",
+      "passed": true,
+      "message": "Primary exposure denominator equals cohort rows."
+    },
+    {
+      "code": "artifact-csvs-written",
+      "passed": true,
+      "message": "CSV review artifacts exist."
+    },
+    {
+      "code": "propensity-artifacts-written",
+      "passed": true,
+      "message": "Propensity artifacts exist when matching fits."
+    },
+    {
+      "code": "section-##-abstract",
+      "passed": true,
+      "message": "Required section ## Abstract present."
+    },
+    {
+      "code": "section-##-introduction",
+      "passed": true,
+      "message": "Required section ## Introduction present."
+    },
+    {
+      "code": "section-##-methods",
+      "passed": true,
+      "message": "Required section ## Methods present."
+    },
+    {
+      "code": "section-##-results",
+      "passed": true,
+      "message": "Required section ## Results present."
+    },
+    {
+      "code": "section-##-discussion",
+      "passed": true,
+      "message": "Required section ## Discussion present."
+    },
+    {
+      "code": "section-##-limitations",
+      "passed": true,
+      "message": "Required section ## Limitations present."
+    },
+    {
+      "code": "section-##-reproducibility-and-artifacts",
+      "passed": true,
+      "message": "Required section ## Reproducibility And Artifacts present."
+    },
+    {
+      "code": "section-##-what-this-does-and-does-not-show",
+      "passed": true,
+      "message": "Required section ## What This Does And Does Not Show present."
+    },
+    {
+      "code": "reader-facing-language",
+      "passed": true,
+      "message": "Internal jargon hits: none."
+    },
+    {
+      "code": "has-data-density",
+      "passed": true,
+      "message": "Paper contains multiple concrete cohort/model statements."
+    },
+    {
+      "code": "causal-boundary",
+      "passed": true,
+      "message": "Paper states non-causal boundary."
+    },
+    {
+      "code": "propensity-section",
+      "passed": true,
+      "message": "Paper includes a propensity-matched exposure section."
+    }
+  ],
+  "typedIssues": [
+    {
+      "code": "PROPENSITY_UNMATCHED_TREATED",
+      "severity": "warning",
+      "message": "178 treated rows were unmatched after caliper matching."
+    }
+  ],
+  "warnings": [
+    "178 treated rows were unmatched after caliper matching."
+  ],
+  "nextAction": "Review typed methods warnings, phenotype definitions, and complete-case diagnostics before external sharing."
+}

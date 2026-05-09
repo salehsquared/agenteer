@@ -1,0 +1,93 @@
+{
+  "name": "agenteer",
+  "version": "1.0.0-rc.2",
+  "description": "Convenience package for Agenteer: core runtime, trust layer, stdlib, registry, CLI, and node scaffolding.",
+  "keywords": [
+    "agenteer",
+    "agent",
+    "agents",
+    "agentic",
+    "runtime",
+    "workflow",
+    "orchestration",
+    "llm",
+    "cli"
+  ],
+  "author": "salehsquared (https://github.com/salehsquared)",
+  "license": "MIT",
+  "homepage": "https://github.com/salehsquared/agenteer#readme",
+  "bugs": {
+    "url": "https://github.com/salehsquared/agenteer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salehsquared/agenteer.git",
+    "directory": "packages/agenteer"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "agenteer": "dist/bin/agenteer.js",
+    "create-agenteer-node": "dist/bin/create-agenteer-node.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "default": "./dist/core.js"
+    },
+    "./create-node": {
+      "types": "./dist/create-node.d.ts",
+      "default": "./dist/create-node.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "default": "./dist/registry.js"
+    },
+    "./stdlib": {
+      "types": "./dist/stdlib.d.ts",
+      "default": "./dist/stdlib.js"
+    },
+    "./trust": {
+      "types": "./dist/trust.d.ts",
+      "default": "./dist/trust.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -b && chmod +x dist/bin/agenteer.js dist/bin/create-agenteer-node.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@agenteer/cli": "1.0.0-rc.2",
+    "@agenteer/core": "1.0.0-rc.2",
+    "@agenteer/create-node": "1.0.0-rc.2",
+    "@agenteer/registry": "1.0.0-rc.2",
+    "@agenteer/stdlib": "1.0.0-rc.2",
+    "@agenteer/trust": "1.0.0-rc.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "vitest": "^3.2.4"
+  }
+}

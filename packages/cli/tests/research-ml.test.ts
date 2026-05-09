@@ -746,6 +746,134 @@ describe("research ML modeling layer", () => {
     }
   }, 30_000);
 
+  it("runs propensity score matching with balance diagnostics and matched-pair artifacts", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-propensity-match-"));
+    try {
+      const data = path.join(dir, "propensity.csv");
+      const selectionPath = path.join(dir, "propensity-selection.json");
+      await writeFile(data, propensityCsv());
+      const selection = await researchMethodSelectCommand({
+        question: "What is the causal effect of treatment on a binary outcome using propensity score matching?",
+        goal: "causal",
+        outcomeType: "binary",
+        studyDesign: "cohort",
+        dataStructures: ["single_table"],
+        outPath: selectionPath,
+      });
+      expect(selection.primary?.method.id).toBe("propensity-score-matching");
+      expect(statsRunMethodForAnalysisMethod("propensity-score-matching")).toBe("propensity-score-matching");
+      const result = await researchStatsRunCommand({
+        method: "propensity-score-matching",
+        dataPath: data,
+        outcome: "outcome",
+        exposure: "treated",
+        covariates: ["age", "bmi", "severity", "sex", "site"],
+        exactCovariates: ["sex"],
+        estimand: "ATT",
+        matchRatio: 1,
+        caliper: 0.25,
+        methodSelectionPath: selectionPath,
+        variables: [],
+        outDir: path.join(dir, "matching"),
+        alpha: 0.05,
+        python,
+      });
+
+      expect(result.status).toBe("succeeded");
+      expect(result.binding.status).toBe("bound");
+      expect(result.resultPosture?.status).toBe("causal_design_review_required");
+      expect(result.estimates[0]?.effect_measure).toContain("risk difference");
+      expect(result.diagnostics.balance).toMatchObject({ covariate_terms: expect.any(Number) });
+      expect((result.diagnostics.balance as { max_abs_smd_after: number }).max_abs_smd_after).toBeLessThan(0.6);
+      expect(result.diagnostics.matching).toMatchObject({ matched_pairs: expect.any(Number), unmatched_treated: expect.any(Number) });
+      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "matched-pairs", "report", "qa"]));
+      const balance = await readFile(path.join(dir, "matching", "balance.csv"), "utf-8");
+      expect(balance).toContain("smd_before");
+      expect(balance).toContain("smd_after");
+      const report = await readFile(path.join(dir, "matching", "stats-report.md"), "utf-8");
+      expect(report).toContain("Propensity Design Diagnostics");
+      expect(report).toContain("nearest-neighbor greedy matching");
+      expect(report).toContain("do not address unmeasured confounding");
+      const qa = JSON.parse(await readFile(path.join(dir, "matching", "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+      expect(qa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
+        "propensity-treatment-model",
+        "propensity-balance",
+        "propensity-positivity-overlap",
+        "propensity-causal-claim-boundary",
+      ]));
+      const manifest = await researchAnalysisManifestCommand({ runDir: path.join(dir, "matching") });
+      expect(manifest.readiness).toBe("exploratory_only");
+      expect(manifest.resultPosture.status).toBe("causal_design_review_required");
+      expect(manifest.artifactCompleteness.status).toBe("pass");
+      expect(manifest.artifacts.filter(artifact => artifact.required).map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "matched-pairs"]));
+      const analysisRun = await researchAnalysisRunCommand({
+        question: "What is the causal effect of treatment on a binary outcome using propensity score matching?",
+        method: "propensity-score-matching",
+        dataPath: data,
+        outcome: "outcome",
+        exposure: "treated",
+        covariates: ["age", "bmi", "severity", "sex", "site"],
+        exactCovariates: ["sex"],
+        estimand: "ATT",
+        matchRatio: 1,
+        caliper: 0.25,
+        methodSelectionPath: selectionPath,
+        requireBound: true,
+        outDir: path.join(dir, "matching-analysis-run"),
+        python,
+      });
+      expect(analysisRun.generatedFiles.propensityPaper).toBeTruthy();
+      expect(analysisRun.generatedFiles.propensityPaperQa).toBeTruthy();
+      expect(analysisRun.analysisRunManifest.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["propensity-paper", "propensity-paper-qa"]));
+      const paper = await readFile(analysisRun.generatedFiles.propensityPaper!, "utf-8");
+      expect(paper).toContain("Propensity Score Matching Analysis");
+      expect(paper).toContain("balance diagnostics");
+      expect(paper).not.toContain("AnalysisSpec");
+      const paperQa = JSON.parse(await readFile(analysisRun.generatedFiles.propensityPaperQa!, "utf-8")) as { status: string };
+      expect(["pass", "warning"]).toContain(paperQa.status);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it("runs propensity score weighting with IPTW diagnostics and weight artifacts", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-propensity-weight-"));
+    try {
+      const data = path.join(dir, "propensity.csv");
+      await writeFile(data, propensityCsv());
+      const result = await researchStatsRunCommand({
+        method: "propensity-score-weighting",
+        dataPath: data,
+        outcome: "outcome",
+        exposure: "treated",
+        covariates: ["age", "bmi", "severity", "sex", "site"],
+        estimand: "ATE",
+        trimThreshold: 0.02,
+        stabilizeWeights: true,
+        variables: [],
+        outDir: path.join(dir, "weighting"),
+        alpha: 0.05,
+        python,
+      });
+
+      expect(result.status).toBe("succeeded");
+      expect(result.resultPosture?.status).toBe("causal_design_review_required");
+      expect(result.diagnostics.weighting).toMatchObject({
+        estimand: "ATE",
+        stabilized: true,
+        effective_sample_size: expect.any(Number),
+      });
+      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "weights"]));
+      const weights = await readFile(path.join(dir, "weighting", "weights.csv"), "utf-8");
+      expect(weights).toContain("analysis_weight");
+      expect(result.issues.map(issue => issue.code)).not.toContain("PROPENSITY_POOR_OVERLAP");
+      const manifest = await researchAnalysisManifestCommand({ runDir: path.join(dir, "weighting") });
+      expect(manifest.artifacts.filter(artifact => artifact.required).map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "weights"]));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
   it("runs a bounded stats analysis route with manifest and post-run planning", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-analysis-run-"));
     try {
@@ -1072,6 +1200,26 @@ function statsCsv(): string {
     const hba1c = 4.8 + bmi * 0.045 + age * 0.006 + (sex === "M" ? 0.08 : 0);
     const elevated = hba1c >= 6.0 ? 1 : 0;
     rows.push(`${age},${sex},${bmi.toFixed(2)},${group},${hba1c.toFixed(3)},${elevated}`);
+  }
+  return `${rows.join("\n")}\n`;
+}
+
+function propensityCsv(): string {
+  const rows = ["age,bmi,severity,sex,site,treated,outcome,continuous_outcome"];
+  for (let i = 0; i < 240; i++) {
+    const age = 35 + (i % 45);
+    const bmi = 20 + ((i * 7) % 35) * 0.45;
+    const severity = ((i * 11) % 20) / 4;
+    const sex = i % 2 === 0 ? "F" : "M";
+    const site = i % 3 === 0 ? "A" : i % 3 === 1 ? "B" : "C";
+    const linearTreatment = -4.2 + age * 0.035 + bmi * 0.07 + severity * 0.28 + (sex === "M" ? 0.25 : -0.1) + (site === "C" ? 0.25 : 0);
+    const propensity = 1 / (1 + Math.exp(-linearTreatment));
+    const treated = ((i * 37) % 100) / 100 < propensity ? 1 : 0;
+    const outcomeScore = -3.4 + treated * 0.75 + age * 0.025 + bmi * 0.045 + severity * 0.22 + (sex === "M" ? 0.15 : 0);
+    const outcomeProb = 1 / (1 + Math.exp(-outcomeScore));
+    const outcome = ((i * 53 + 7) % 100) / 100 < outcomeProb ? 1 : 0;
+    const continuous = 10 + treated * 1.8 + age * 0.04 + bmi * 0.12 + severity * 0.5 + (site === "B" ? 0.4 : 0);
+    rows.push(`${age},${bmi.toFixed(2)},${severity.toFixed(2)},${sex},${site},${treated},${outcome},${continuous.toFixed(3)}`);
   }
   return `${rows.join("\n")}\n`;
 }

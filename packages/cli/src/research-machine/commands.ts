@@ -1,5 +1,5 @@
 import path from "node:path";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import {
   archetypeCatalog,
   backendCatalog,
@@ -36,6 +36,20 @@ import {
   type ModelingDecisionRequest,
 } from "./modeling.js";
 import { buildAnalysisRunManifest, type AnalysisRunManifest } from "./analysis-manifest.js";
+import {
+  researchLiteratureContextCommand,
+  researchLiteratureQaCommand,
+  researchMedbreviaLiteratureSearchCommand,
+  renderResearchLiteratureContext,
+  renderResearchLiteratureContextJson,
+  renderResearchLiteratureQa,
+  renderResearchLiteratureQaJson,
+  renderResearchMedbreviaLiteratureSearch,
+  renderResearchMedbreviaLiteratureSearchJson,
+  type ResearchLiteratureContext,
+  type ResearchLiteratureQaResult,
+  type ResearchLiteratureSearchResult,
+} from "./medbrevia-literature.js";
 import {
   renderDatasetRun,
   renderDatasetRunIndex,
@@ -78,6 +92,49 @@ import {
   type ResearchBackendManifest,
   type DatasetAdapterManifest,
 } from "./schemas.js";
+
+export {
+  researchBenchmarkSuiteRunCommand,
+  researchBenchmarkTrendCommand,
+  researchExplorePlanCommand,
+  researchManuscriptCommand,
+  researchMethodQaCommand,
+  researchRunInspectCommand,
+  renderResearchBenchmarkSuiteRun,
+  renderResearchBenchmarkSuiteRunJson,
+  renderResearchBenchmarkTrend,
+  renderResearchBenchmarkTrendJson,
+  renderResearchExplorePlan,
+  renderResearchExplorePlanJson,
+  renderResearchManuscript,
+  renderResearchManuscriptJson,
+  renderResearchMethodQa,
+  renderResearchMethodQaJson,
+  renderResearchRunInspect,
+  renderResearchRunInspectJson,
+  type ContinuousBenchmarkSuiteResult,
+  type ContinuousBenchmarkTrendResult,
+  type ExplorationPlanResult,
+  type ManuscriptQaResult,
+  type ManuscriptResult,
+  type MethodQaResult,
+  type RunInspectionResult,
+} from "./trust.js";
+
+export {
+  researchLiteratureContextCommand,
+  researchLiteratureQaCommand,
+  researchMedbreviaLiteratureSearchCommand,
+  renderResearchLiteratureContext,
+  renderResearchLiteratureContextJson,
+  renderResearchLiteratureQa,
+  renderResearchLiteratureQaJson,
+  renderResearchMedbreviaLiteratureSearch,
+  renderResearchMedbreviaLiteratureSearchJson,
+  type ResearchLiteratureContext,
+  type ResearchLiteratureQaResult,
+  type ResearchLiteratureSearchResult,
+} from "./medbrevia-literature.js";
 
 export type { DatasetAdapterInspection, MachineBenchmarkResult, SpecV2Result } from "./runtime.js";
 export {
@@ -199,6 +256,7 @@ export function researchModelingPlanCommand(opts: {
   backendStatus?: ModelingDecisionRequest["backendStatus"];
   priorRuns?: ModelingDecisionRequest["priorRuns"];
   explorationHandoff?: ModelingDecisionRequest["explorationHandoff"];
+  literatureEvidence?: ModelingDecisionRequest["literatureEvidence"];
   highMissingness?: boolean;
   smallSample?: boolean;
   requiresInference?: boolean;
@@ -248,6 +306,13 @@ export interface ResearchAnalysisRunResult {
     postRunModelingPlan: string;
     diagnosticPaper?: string;
     diagnosticPaperQa?: string;
+    propensityPaper?: string;
+    propensityPaperQa?: string;
+    literatureEvidence?: string;
+    literatureContext?: string;
+    literatureContextReport?: string;
+    literatureQa?: string;
+    literatureQaReport?: string;
   };
   nextAction: string;
 }
@@ -265,10 +330,18 @@ export async function researchAnalysisRunCommand(opts: {
   variables?: string[];
   covariates?: string[];
   weight?: string;
+  exactCovariates?: string[];
+  estimand?: "ATE" | "ATT";
+  matchRatio?: number;
+  caliper?: number;
+  replacement?: boolean;
+  trimThreshold?: number;
+  stabilizeWeights?: boolean;
   surveyDesign?: boolean;
   allowSurveyApproximation?: boolean;
   methodSelectionPath?: string;
   analysisSpecPath?: string;
+  literaturePath?: string;
   requireBound?: boolean;
   alpha?: number;
   python?: string;
@@ -281,6 +354,9 @@ export async function researchAnalysisRunCommand(opts: {
   const initialGoal = goalForStatsAnalysisRun(opts.method, opts.group, opts.exposure);
   const initialOutcomeType = outcomeTypeForStatsAnalysisRun(opts.method);
   const initialStudyDesign = opts.method === "diagnostic-accuracy" ? "diagnostic" : undefined;
+  const initialLiteratureContext = opts.literaturePath
+    ? await researchLiteratureContextCommand({ literaturePath: opts.literaturePath, question: opts.question })
+    : null;
   const modelingPlan = buildModelingDecisionPlan({
     question: opts.question,
     goal: initialGoal,
@@ -290,6 +366,7 @@ export async function researchAnalysisRunCommand(opts: {
     surveyDesign: opts.surveyDesign ?? false,
     target: opts.outcome,
     requiresInference: true,
+    literatureEvidence: initialLiteratureContext ? literatureContextToModelingEvidence(initialLiteratureContext) : undefined,
     priorRuns: [],
   });
   const modelingPlanPath = path.join(outDir, "modeling-plan.json");
@@ -307,6 +384,13 @@ export async function researchAnalysisRunCommand(opts: {
     variables: opts.variables ?? [],
     covariates: opts.covariates ?? [],
     weight: opts.weight,
+    exactCovariates: opts.exactCovariates ?? [],
+    estimand: opts.estimand ?? "ATT",
+    matchRatio: opts.matchRatio ?? 1,
+    caliper: opts.caliper,
+    replacement: opts.replacement ?? false,
+    trimThreshold: opts.trimThreshold ?? 0.01,
+    stabilizeWeights: opts.stabilizeWeights ?? true,
     surveyDesign: opts.surveyDesign ?? false,
     allowSurveyApproximation: opts.allowSurveyApproximation ?? false,
     methodSelectionPath: opts.methodSelectionPath,
@@ -318,10 +402,30 @@ export async function researchAnalysisRunCommand(opts: {
   const statsEnvelopePath = path.join(outDir, "stats-run-envelope.json");
   await writeFile(statsEnvelopePath, `${JSON.stringify({ schemaVersion: 1, statsRun }, null, 2)}\n`);
   const analysisRunManifest = await buildAnalysisRunManifest({ runDir: statsOutDir });
-  const diagnosticPaperFiles = opts.method === "diagnostic-accuracy"
+  const canWriteReaderPaper = statsRun.status === "succeeded";
+  const diagnosticPaperFiles = canWriteReaderPaper && opts.method === "diagnostic-accuracy"
     ? await writeDiagnosticAnalysisPaper({ outDir, question: opts.question, statsRun, analysisRunManifest })
     : {};
-  const finalAnalysisRunManifest = opts.method === "diagnostic-accuracy"
+  const propensityPaperFiles = canWriteReaderPaper && (opts.method === "propensity-score-matching" || opts.method === "propensity-score-weighting")
+    ? await writePropensityAnalysisPaper({ outDir, question: opts.question, statsRun, analysisRunManifest })
+    : {};
+  const readerPaperPath: string | undefined = typeof (diagnosticPaperFiles as { diagnosticPaper?: unknown }).diagnosticPaper === "string"
+    ? (diagnosticPaperFiles as { diagnosticPaper: string }).diagnosticPaper
+    : typeof (propensityPaperFiles as { propensityPaper?: unknown }).propensityPaper === "string"
+      ? (propensityPaperFiles as { propensityPaper: string }).propensityPaper
+      : undefined;
+  const literatureFiles = opts.literaturePath
+    ? await attachLiteratureEvidenceToAnalysisRun({
+      outDir,
+      question: opts.question,
+      literaturePath: opts.literaturePath,
+      paperPath: readerPaperPath,
+    })
+    : {};
+  const localLiteratureContextPath = typeof (literatureFiles as { literatureContext?: unknown }).literatureContext === "string"
+    ? (literatureFiles as { literatureContext: string }).literatureContext
+    : undefined;
+  const finalAnalysisRunManifest = opts.method === "diagnostic-accuracy" || opts.method === "propensity-score-matching" || opts.method === "propensity-score-weighting"
     ? await buildAnalysisRunManifest({ runDir: statsOutDir })
     : analysisRunManifest;
   const postRunModelingPlan = buildModelingDecisionPlan({
@@ -333,6 +437,7 @@ export async function researchAnalysisRunCommand(opts: {
     surveyDesign: opts.surveyDesign ?? false,
     target: opts.outcome,
     requiresInference: true,
+    literatureEvidence: initialLiteratureContext ? literatureContextToModelingEvidence(initialLiteratureContext, localLiteratureContextPath) : undefined,
     priorRuns: [{
       path: path.join(statsOutDir, "stats-run.json"),
       kind: "stats",
@@ -359,8 +464,58 @@ export async function researchAnalysisRunCommand(opts: {
       analysisManifest: finalAnalysisRunManifest.outPath,
       postRunModelingPlan: postRunPath,
       ...diagnosticPaperFiles,
+      ...propensityPaperFiles,
+      ...literatureFiles,
     },
     nextAction: postRunModelingPlan.nextAction,
+  };
+}
+
+async function attachLiteratureEvidenceToAnalysisRun(opts: {
+  outDir: string;
+  question: string;
+  literaturePath: string;
+  paperPath?: string;
+}): Promise<{ literatureEvidence: string; literatureContext: string; literatureContextReport: string; literatureQa: string; literatureQaReport: string }> {
+  const literatureEvidence = path.join(opts.outDir, "literature-search.json");
+  const literatureContext = path.join(opts.outDir, "literature-context.json");
+  const literatureContextReport = path.join(opts.outDir, "literature-context.md");
+  const literatureQa = path.join(opts.outDir, "literature-qa.json");
+  const literatureQaReport = path.join(opts.outDir, "literature-qa.md");
+  await writeFile(literatureEvidence, await readFile(path.resolve(opts.literaturePath), "utf-8"), "utf-8");
+  await researchLiteratureContextCommand({
+    literaturePath: literatureEvidence,
+    question: opts.question,
+    outPath: literatureContext,
+    reportPath: literatureContextReport,
+  });
+  await researchLiteratureQaCommand({
+    question: opts.question,
+    literaturePath: literatureEvidence,
+    paperPath: opts.paperPath,
+    outPath: literatureQa,
+    reportPath: literatureQaReport,
+  });
+  return { literatureEvidence, literatureContext, literatureContextReport, literatureQa, literatureQaReport };
+}
+
+function literatureContextToModelingEvidence(
+  context: ResearchLiteratureContext,
+  artifactPath?: string,
+): ModelingDecisionRequest["literatureEvidence"] {
+  return {
+    path: artifactPath ?? context.outPath ?? context.literaturePath,
+    status: context.status,
+    evidenceStrength: context.evidenceStrength,
+    sourceCount: context.sourceSummary.sourceCount,
+    highQualitySourceCount: context.sourceSummary.highQualitySourceCount,
+    latestPublicationYear: context.sourceSummary.latestPublicationYear,
+    questionTokenCoverage: context.quality.questionTokenCoverage,
+    designSignals: context.designSignals,
+    methodSignals: context.methodSignals,
+    planningImplications: context.planningImplications,
+    followUpSearches: context.followUpSearches,
+    issueCodes: context.issues.filter(issue => issue.status !== "pass").map(issue => issue.id),
   };
 }
 
@@ -451,6 +606,89 @@ async function writeDiagnosticAnalysisPaper(opts: {
   return { diagnosticPaper: paperPath, diagnosticPaperQa: qaPath };
 }
 
+async function writePropensityAnalysisPaper(opts: {
+  outDir: string;
+  question: string;
+  statsRun: StatsRunResult;
+  analysisRunManifest: AnalysisRunManifest;
+}): Promise<{ propensityPaper: string; propensityPaperQa: string }> {
+  const paperPath = path.join(opts.outDir, "paper.md");
+  const qaPath = path.join(opts.outDir, "paper-qa.json");
+  const first = opts.statsRun.estimates[0] ?? {};
+  const diagnostics = opts.statsRun.diagnostics as Record<string, unknown>;
+  const balance = diagnostics.balance as Record<string, unknown>;
+  const positivity = diagnostics.positivity as Record<string, unknown>;
+  const missingness = diagnostics.missingness as Record<string, unknown>;
+  const matching = diagnostics.matching as Record<string, unknown> | undefined;
+  const weighting = diagnostics.weighting as Record<string, unknown> | undefined;
+  const treatment = String(diagnostics.treatment_column ?? first.term ?? "the treatment/exposure");
+  const covariates = Array.isArray(diagnostics.covariates) ? diagnostics.covariates.map(String) : [];
+  const exactCovariates = Array.isArray(diagnostics.exact_covariates) ? diagnostics.exact_covariates.map(String) : [];
+  const paper = [
+    `# Propensity Score ${opts.statsRun.method === "propensity-score-matching" ? "Matching" : "Weighting"} Analysis`,
+    "",
+    "## Summary",
+    "",
+    `This local observational analysis evaluated whether ${treatment} differed in the outcome after balancing measured baseline covariates. It is intended for causal-design review, not as proof of a treatment effect.`,
+    "",
+    `Main finding: the ${String(first.estimand ?? "declared")} contrast estimated ${String(first.effect_measure ?? "a treatment contrast")} of ${formatValue(first.estimate)} in ${formatValue(first.treated_n)} treated and ${formatValue(first.control_n)} control records used by the adjusted analysis.`,
+    "",
+    "## Research Question",
+    "",
+    opts.question,
+    "",
+    "## Methods",
+    "",
+    `The treatment or exposure was ${treatment}. The propensity model used the following measured baseline covariates: ${covariates.join(", ") || "(none recorded)"}.`,
+    exactCovariates.length ? `Matching also required exact agreement on: ${exactCovariates.join(", ")}.` : "No exact-match covariates were declared.",
+    opts.statsRun.method === "propensity-score-matching"
+      ? `The analysis used nearest-neighbor propensity score matching. Matching diagnostics recorded ${formatValue(matching?.matched_treated)} matched treated records, ${formatValue(matching?.matched_controls)} matched controls, and ${formatValue(matching?.unmatched_treated)} unmatched treated records.`
+      : `The analysis used inverse-probability treatment weighting. Weight diagnostics recorded an effective sample size of ${formatValue(weighting?.effective_sample_size)} and weight range ${formatValue(weighting?.min_weight)} to ${formatValue(weighting?.max_weight)}.`,
+    `Complete-case retention for treatment, outcome, and propensity covariates was ${formatValue(missingness?.complete_case_fraction)}.`,
+    "",
+    "## Results",
+    "",
+    `- Estimated contrast: ${formatValue(first.estimate)}.`,
+    typeof first.odds_ratio === "number" ? `- Odds ratio: ${formatEstimateWithCi(first.odds_ratio, first.or_ci_low, first.or_ci_high)}.` : null,
+    typeof first.risk_difference === "number" ? `- Risk difference: ${formatValue(first.risk_difference)}.` : null,
+    typeof first.mean_difference === "number" ? `- Mean difference: ${formatEstimateWithCi(first.mean_difference, first.ci_low, first.ci_high)}.` : null,
+    `- Maximum absolute standardized mean difference before adjustment: ${formatValue(balance?.max_abs_smd_before)}.`,
+    `- Maximum absolute standardized mean difference after adjustment: ${formatValue(balance?.max_abs_smd_after)}.`,
+    `- Covariate terms above absolute SMD 0.10 after adjustment: ${formatValue(balance?.covariates_over_0_1_after)}.`,
+    `- Common-support fraction: ${formatValue(positivity?.common_support_fraction)}.`,
+    "",
+    "## Interpretation",
+    "",
+    "The balance diagnostics describe measured baseline covariate balance after matching or weighting. They do not remove unmeasured confounding, guarantee correct treatment timing, or establish causality without a reviewed target-trial design, exchangeability argument, positivity review, and sensitivity analysis.",
+    "",
+    "## Limitations",
+    "",
+    "This analysis uses complete cases and only the measured covariates supplied to the propensity model. Covariates measured after treatment, unmeasured confounding, poor overlap, missingness, and model misspecification can bias the contrast. P-values and intervals from this standard route should be reviewed as local model-based summaries, not definitive causal uncertainty.",
+    "",
+    "## Reproducibility Note",
+    "",
+    "The companion files include propensity scores, overlap bins, balance diagnostics, matched pairs or weights, run metadata, quality checks, and file hashes.",
+    "",
+  ].filter(line => line !== null && line !== undefined).join("\n");
+  await writeFile(paperPath, paper, "utf-8");
+  const forbiddenTerms = readerFacingPaperJargonHits(paper);
+  const checks = [
+    { id: "reader-facing-summary", status: paper.includes("## Summary") && /Main finding:/i.test(paper) ? "pass" : "fail" },
+    { id: "balance-diagnostics", status: typeof balance?.max_abs_smd_after === "number" ? "pass" : "fail" },
+    { id: "positivity-overlap", status: typeof positivity?.common_support_fraction === "number" ? "pass" : "fail" },
+    { id: "causal-boundary", status: /not as proof of a treatment effect|do not remove unmeasured confounding/i.test(paper) ? "pass" : "fail" },
+    { id: "reader-facing-language", status: forbiddenTerms.length === 0 ? "pass" : "fail", hits: forbiddenTerms },
+    { id: "manifest-readiness", status: opts.analysisRunManifest.artifactCompleteness.status === "pass" ? "pass" : "warning" },
+  ] as Array<{ id: string; status: "pass" | "warning" | "fail"; hits?: string[] }>;
+  const qa = {
+    schemaVersion: 1,
+    status: checks.some(check => check.status === "fail") ? "fail" : checks.some(check => check.status === "warning") ? "warning" : "pass",
+    checks,
+  };
+  await writeFile(qaPath, `${JSON.stringify(qa, null, 2)}\n`, "utf-8");
+  return { propensityPaper: paperPath, propensityPaperQa: qaPath };
+}
+
 function readerFacingPaperJargonHits(text: string): string[] {
   const forbidden = [
     /\bAgenteer\b/i,
@@ -504,6 +742,7 @@ export function renderResearchAnalysisRunJson(result: ResearchAnalysisRunResult)
 }
 
 function goalForStatsAnalysisRun(method: StatsRunRequest["method"], group?: string, exposure?: string): ModelingGoal {
+  if (method === "propensity-score-matching" || method === "propensity-score-weighting") return "causal";
   if (method === "diagnostic-accuracy") return "diagnose";
   if (method === "descriptive") return "describe";
   if (method === "t-test" || method === "mann-whitney" || group) return "compare_groups";
@@ -513,6 +752,7 @@ function goalForStatsAnalysisRun(method: StatsRunRequest["method"], group?: stri
 
 function outcomeTypeForStatsAnalysisRun(method: StatsRunRequest["method"]): OutcomeType {
   if (method === "logistic-regression" || method === "diagnostic-accuracy") return "binary";
+  if (method === "propensity-score-matching" || method === "propensity-score-weighting") return "binary";
   if (method === "chi-square" || method === "fisher-exact") return "categorical";
   if (method === "poisson-regression") return "count";
   return "continuous";
@@ -909,6 +1149,7 @@ export function renderResearchModelingPlan(result: ModelingDecisionPlan): string
     `  evidence: ${result.dataEvidence.source}; rows=${result.dataEvidence.rowCount ?? "?"}; features=${result.dataEvidence.featureCount ?? "?"}; target classes=${result.dataEvidence.targetClassCount ?? "?"}; max missing=${result.dataEvidence.maxMissingFraction === null ? "?" : `${(result.dataEvidence.maxMissingFraction * 100).toFixed(1)}%`}`,
     `  backend evidence: ${result.backendEvidence.source}; available=${result.backendEvidence.available.join(",") || "(none)"}; missing=${result.backendEvidence.missing.join(",") || "(none)"}`,
     `  prior runs: ${result.priorRunEvidence.source}; actions=${result.priorRunEvidence.runs.map(run => run.action).join(",") || "(none)"}`,
+    `  literature: ${result.literatureEvidence.source}; status=${result.literatureEvidence.status ?? "(none)"}; strength=${result.literatureEvidence.evidenceStrength ?? "(none)"}; sources=${result.literatureEvidence.sourceCount ?? "?"}`,
     `  exploration handoff: ${result.request.explorationHandoff ? `${result.request.explorationHandoff.status}; clearance=${result.request.explorationHandoff.clearanceLevel}; question=${result.request.explorationHandoff.questionId ?? "(unknown)"}` : "(none)"}`,
     `  method selection: ${result.methodSelectionEvidence.selectionId}; primary=${result.methodSelectionEvidence.primaryMethodId ?? "(none)"}; backend=${result.methodSelectionEvidence.recommendedBackend}; review=${result.methodSelectionEvidence.stopForHumanReview ? "required" : "not-required"}`,
     `  route: ${result.routeRecommendation.route}; ${result.routeRecommendation.reason}`,

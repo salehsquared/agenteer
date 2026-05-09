@@ -1,0 +1,74 @@
+{
+  "weighting": {
+    "estimand": "ATE",
+    "stabilized": true,
+    "trim_threshold": 0.0,
+    "trimmed_rows": 0,
+    "min_weight": 0.4360185330380814,
+    "max_weight": 68.65964385769493,
+    "mean_weight": 1.102115767254901,
+    "effective_sample_size": 29.017122190456448
+  },
+  "test": "propensity-score-weighting",
+  "treatment_column": "treated",
+  "treatment_positive_level": 1,
+  "treatment_negative_level": 0,
+  "covariates": [
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site"
+  ],
+  "exact_covariates": [],
+  "propensity_model": {
+    "family": "logistic",
+    "n_parameters": 9,
+    "aic": 290.09388523253466,
+    "converged": true,
+    "propensity_min": 0.008334185703150733,
+    "propensity_max": 0.9986472345178897
+  },
+  "missingness": {
+    "input_rows": 360,
+    "complete_case_rows": 360,
+    "excluded_missing_rows": 0,
+    "complete_case_fraction": 1.0,
+    "missing_counts": {
+      "outcome": 0,
+      "treated": 0,
+      "age": 0,
+      "bmi": 0,
+      "severity": 0,
+      "frailty": 0,
+      "sex": 0,
+      "site": 0
+    }
+  },
+  "balance": {
+    "max_abs_smd_before": 1.7402216938770148,
+    "max_abs_smd_after": 0.44584338122266454,
+    "mean_abs_smd_before": 0.3607343261903786,
+    "mean_abs_smd_after": 0.2537155552326614,
+    "covariates_over_0_1_before": 4,
+    "covariates_over_0_1_after": 8,
+    "covariate_terms": 8
+  },
+  "positivity": {
+    "treated_min": 0.008334185703150733,
+    "treated_max": 0.9986472345178897,
+    "control_min": 0.018900011435027383,
+    "control_max": 0.9575923988145344,
+    "common_support_lower": 0.018900011435027383,
+    "common_support_upper": 0.9575923988145344,
+    "common_support_fraction": 0.8361111111111111
+  },
+  "artifacts": {
+    "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/propensity-scores.csv",
+    "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/propensity-overlap.csv",
+    "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/balance.csv",
+    "matched_pairs": null,
+    "weights": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0346-extreme-weights/analysis-run/stats-run/weights.csv"
+  }
+}

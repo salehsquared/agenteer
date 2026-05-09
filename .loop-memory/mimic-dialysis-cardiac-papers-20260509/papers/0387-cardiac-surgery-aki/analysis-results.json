@@ -1,0 +1,1043 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T01:58:32.896368+00:00",
+  "study": {
+    "id": "0387-cardiac-surgery-aki",
+    "title": "Acute Kidney Injury Diagnosis Codes After Cardiac Surgery",
+    "domain": "cardiac surgery/nephrology",
+    "question": "Among ICU admissions after CABG or open heart valve procedure codes, how are acute kidney injury diagnosis codes associated with mortality and ICU length of stay?",
+    "cohort": {
+      "procedure_any": [
+        "cabg",
+        "valve_open"
+      ]
+    },
+    "primary_exposure": "any_aki",
+    "exposure_label": "Any acute kidney injury diagnosis code"
+  },
+  "cohortSummary": {
+    "baseFirstIcuRows": 85242,
+    "firstIcuStayRows": 9261,
+    "uniquePatients": 9189,
+    "diagnosisFlags": {
+      "aki": 1609,
+      "esrd": 237,
+      "sepsis": 199,
+      "heart_failure": 2490,
+      "ckd": 1396
+    },
+    "procedureFlags": {
+      "cabg": 6529,
+      "valve_open": 3913,
+      "dialysis_procedure": 415
+    }
+  },
+  "tableOne": {
+    "continuous": {
+      "admission_age": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 67.23831119749487,
+        "sd": 11.39162023486053,
+        "median": 68.0,
+        "iqr": [
+          60.0,
+          75.0
+        ],
+        "min": 21.0,
+        "max": 93.0
+      },
+      "los_icu": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 3.0648504481157546,
+        "sd": 4.41724444413615,
+        "median": 1.96,
+        "iqr": [
+          1.25,
+          3.25
+        ],
+        "min": 0.0,
+        "max": 91.04
+      },
+      "los_hospital": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 9.406327610409242,
+        "sd": 7.537737952087781,
+        "median": 7.0,
+        "iqr": [
+          5.0,
+          11.0
+        ],
+        "min": 0.0,
+        "max": 140.0
+      },
+      "apsiii": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 38.21131627254076,
+        "sd": 18.468440929679772,
+        "median": 33.0,
+        "iqr": [
+          26.0,
+          44.0
+        ],
+        "min": 3.0,
+        "max": 142.0
+      },
+      "oasis": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 31.88672929489256,
+        "sd": 7.379618325763619,
+        "median": 32.0,
+        "iqr": [
+          27.0,
+          37.0
+        ],
+        "min": 6.0,
+        "max": 60.0
+      },
+      "sofa": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 5.236475542597992,
+        "sd": 2.7462937632944477,
+        "median": 5.0,
+        "iqr": [
+          3.0,
+          7.0
+        ],
+        "min": 0.0,
+        "max": 17.0
+      },
+      "charlson_comorbidity_index": {
+        "n": 9261,
+        "missing": 0,
+        "mean": 4.29618831659648,
+        "sd": 2.2641099559930313,
+        "median": 4.0,
+        "iqr": [
+          3.0,
+          6.0
+        ],
+        "min": 0.0,
+        "max": 14.0
+      },
+      "creatinine_max": {
+        "n": 9250,
+        "missing": 11,
+        "mean": 1.1840864864864866,
+        "sd": 1.088645212065105,
+        "median": 1.0,
+        "iqr": [
+          0.8,
+          1.2
+        ],
+        "min": 0.3,
+        "max": 20.1
+      },
+      "bun_max": {
+        "n": 9250,
+        "missing": 11,
+        "mean": 19.821297297297296,
+        "sd": 11.046249817667567,
+        "median": 17.0,
+        "iqr": [
+          14.0,
+          22.0
+        ],
+        "min": 3.0,
+        "max": 150.0
+      },
+      "heart_rate_max": {
+        "n": 9253,
+        "missing": 8,
+        "mean": 96.37447314384524,
+        "sd": 13.556934476144095,
+        "median": 94.0,
+        "iqr": [
+          88.0,
+          104.0
+        ],
+        "min": 50.0,
+        "max": 189.0
+      },
+      "sbp_min": {
+        "n": 9251,
+        "missing": 10,
+        "mean": 86.07298310092602,
+        "sd": 11.111556772665063,
+        "median": 87.0,
+        "iqr": [
+          80.0,
+          93.0
+        ],
+        "min": 12.0,
+        "max": 165.0
+      }
+    },
+    "binary": {
+      "hospital_expire_flag": {
+        "n": 9261,
+        "positive": 144,
+        "proportion": 0.015549076773566569
+      },
+      "male": {
+        "n": 9261,
+        "positive": 6752,
+        "proportion": 0.7290789331605658
+      },
+      "prolonged_icu_los": {
+        "n": 9261,
+        "positive": 1835,
+        "proportion": 0.19814274916315733
+      },
+      "any_aki": {
+        "n": 9261,
+        "positive": 1609,
+        "proportion": 0.17373933700464314
+      },
+      "dialysis_present": {
+        "n": 9261,
+        "positive": 148,
+        "proportion": 0.015980995572832307
+      },
+      "dialysis_active": {
+        "n": 9261,
+        "positive": 100,
+        "proportion": 0.010797969981643452
+      },
+      "any_crrt_record": {
+        "n": 9261,
+        "positive": 210,
+        "proportion": 0.022675736961451247
+      },
+      "any_esrd": {
+        "n": 9261,
+        "positive": 237,
+        "proportion": 0.02559118885649498
+      }
+    },
+    "byExposure": {
+      "unexposed": {
+        "n": 7652,
+        "mortality": {
+          "n": 7652,
+          "positive": 38,
+          "proportion": 0.004966021955044433
+        },
+        "losIcu": {
+          "n": 7652,
+          "missing": 0,
+          "mean": 2.4308037114479877,
+          "sd": 2.78114888960435,
+          "median": 1.5,
+          "iqr": [
+            1.21,
+            2.92
+          ],
+          "min": 0.0,
+          "max": 91.04
+        }
+      },
+      "exposed": {
+        "n": 1609,
+        "mortality": {
+          "n": 1609,
+          "positive": 106,
+          "proportion": 0.06587942821628341
+        },
+        "losIcu": {
+          "n": 1609,
+          "missing": 0,
+          "mean": 6.0802175264139215,
+          "sd": 8.03431472339386,
+          "median": 3.42,
+          "iqr": [
+            1.83,
+            6.25
+          ],
+          "min": 0.04,
+          "max": 63.83
+        }
+      }
+    }
+  },
+  "predictors": [
+    "any_aki",
+    "admission_age",
+    "male",
+    "apsiii",
+    "oasis",
+    "sofa",
+    "charlson_comorbidity_index",
+    "hemoglobin_min",
+    "wbc_max",
+    "creatinine_max",
+    "bun_max",
+    "glucose_max"
+  ],
+  "missingness": [
+    {
+      "column": "glucose_max",
+      "missing": 190,
+      "missingFraction": 0.020516142965122556
+    },
+    {
+      "column": "hemoglobin_min",
+      "missing": 12,
+      "missingFraction": 0.0012957563977972141
+    },
+    {
+      "column": "creatinine_max",
+      "missing": 11,
+      "missingFraction": 0.0011877766979807797
+    },
+    {
+      "column": "bun_max",
+      "missing": 11,
+      "missingFraction": 0.0011877766979807797
+    },
+    {
+      "column": "wbc_max",
+      "missing": 10,
+      "missingFraction": 0.001079796998164345
+    },
+    {
+      "column": "any_aki",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "admission_age",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "male",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "apsiii",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "oasis",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "sofa",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "charlson_comorbidity_index",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "hospital_expire_flag",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_icu",
+      "missing": 0,
+      "missingFraction": 0.0
+    },
+    {
+      "column": "los_hospital",
+      "missing": 0,
+      "missingFraction": 0.0
+    }
+  ],
+  "models": {
+    "mortality": {
+      "status": "fit",
+      "n": 9070,
+      "events": 138,
+      "predictors": [
+        "any_aki",
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "sofa",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 67.24112458654906,
+          "sd": 11.387837296805452
+        },
+        "apsiii": {
+          "mean": 38.303307607497246,
+          "sd": 18.512302015696573
+        },
+        "oasis": {
+          "mean": 31.882910694597573,
+          "sd": 7.381986962891958
+        },
+        "sofa": {
+          "mean": 5.242227122381477,
+          "sd": 2.750210790187743
+        },
+        "charlson_comorbidity_index": {
+          "mean": 4.3002205071664825,
+          "sd": 2.2680524996676845
+        },
+        "hemoglobin_min": {
+          "mean": 9.203803748621828,
+          "sd": 1.6595237421278834
+        },
+        "wbc_max": {
+          "mean": 16.429922822491733,
+          "sd": 7.272158498071953
+        },
+        "creatinine_max": {
+          "mean": 1.188577728776185,
+          "sd": 1.0966833514908105
+        },
+        "bun_max": {
+          "mean": 19.88500551267916,
+          "sd": 11.10100114169746
+        },
+        "glucose_max": {
+          "mean": 132.0864388092613,
+          "sd": 51.26369792870119
+        }
+      },
+      "metrics": {
+        "auroc": 0.9039652251796181,
+        "averagePrecision": 0.15986532921996438,
+        "brierScore": 0.013828915143128175
+      },
+      "coefficients": [
+        {
+          "term": "any_aki",
+          "oddsRatio": 7.744815764671557,
+          "ci95": [
+            4.981279678429665,
+            12.041518465314178
+          ],
+          "pValue": 9.833851904336443e-20,
+          "scale": "per unit"
+        },
+        {
+          "term": "admission_age",
+          "oddsRatio": 1.0091921042451355,
+          "ci95": [
+            0.8033111221436189,
+            1.2678384192577365
+          ],
+          "pValue": 0.9373498876374258,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "oddsRatio": 0.697551394957254,
+          "ci95": [
+            0.4731631938713625,
+            1.028351221965704
+          ],
+          "pValue": 0.06894330433587698,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "oddsRatio": 1.6002553162562059,
+          "ci95": [
+            1.3050160140889582,
+            1.9622878566696946
+          ],
+          "pValue": 6.233057810503435e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "oddsRatio": 0.8232151664168601,
+          "ci95": [
+            0.6656764640778933,
+            1.018036909502993
+          ],
+          "pValue": 0.07265071741515132,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sofa",
+          "oddsRatio": 1.2389215017345854,
+          "ci95": [
+            1.0112328444714433,
+            1.5178764177330137
+          ],
+          "pValue": 0.038661211060634186,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "oddsRatio": 1.5182406024146962,
+          "ci95": [
+            1.2391887203668337,
+            1.8601319467612494
+          ],
+          "pValue": 5.587821728579829e-05,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "oddsRatio": 0.9855004210455592,
+          "ci95": [
+            0.8170037688425049,
+            1.1887473680286
+          ],
+          "pValue": 0.8786577722695229,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "oddsRatio": 0.9718463870627667,
+          "ci95": [
+            0.8057366240208671,
+            1.172201153441044
+          ],
+          "pValue": 0.765237581372415,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "oddsRatio": 1.3330042672133384,
+          "ci95": [
+            1.1778389675859007,
+            1.508610621068944
+          ],
+          "pValue": 5.306667959778181e-06,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "oddsRatio": 0.8579354943554557,
+          "ci95": [
+            0.7355611894952678,
+            1.000669044243634
+          ],
+          "pValue": 0.05100400420557562,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "oddsRatio": 1.2143948637307937,
+          "ci95": [
+            1.1065461203561453,
+            1.332755009417121
+          ],
+          "pValue": 4.2471501207070984e-05,
+          "scale": "per 1 SD"
+        }
+      ],
+      "diagnostics": {
+        "vif": [
+          {
+            "term": "any_aki",
+            "vif": 1.255525412024747
+          },
+          {
+            "term": "admission_age",
+            "vif": 1.6902905293724615
+          },
+          {
+            "term": "male",
+            "vif": 1.1503834210312596
+          },
+          {
+            "term": "apsiii",
+            "vif": 1.8784930249002338
+          },
+          {
+            "term": "oasis",
+            "vif": 1.453101209542652
+          },
+          {
+            "term": "sofa",
+            "vif": 1.6217649853475693
+          },
+          {
+            "term": "charlson_comorbidity_index",
+            "vif": 1.9926861638577114
+          },
+          {
+            "term": "hemoglobin_min",
+            "vif": 1.272703403673097
+          },
+          {
+            "term": "wbc_max",
+            "vif": 1.034837953557956
+          },
+          {
+            "term": "creatinine_max",
+            "vif": 1.8963713470610586
+          },
+          {
+            "term": "bun_max",
+            "vif": 2.136102345562724
+          },
+          {
+            "term": "glucose_max",
+            "vif": 1.0869780250574668
+          }
+        ],
+        "influence": {
+          "maxCookDistance": 0.36143899105878535,
+          "cookDistanceGt1Count": 0
+        }
+      }
+    },
+    "los": {
+      "status": "fit",
+      "n": 9069,
+      "predictors": [
+        "any_aki",
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "sofa",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 67.23960745396406,
+          "sd": 11.3875484985801
+        },
+        "apsiii": {
+          "mean": 38.307090087109934,
+          "sd": 18.509817356338164
+        },
+        "oasis": {
+          "mean": 31.8844415040247,
+          "sd": 7.380954152191964
+        },
+        "sofa": {
+          "mean": 5.24225383173448,
+          "sd": 2.7503612533237636
+        },
+        "charlson_comorbidity_index": {
+          "mean": 4.300143345462565,
+          "sd": 2.268165648609824
+        },
+        "hemoglobin_min": {
+          "mean": 9.20435549674716,
+          "sd": 1.6587830810167734
+        },
+        "wbc_max": {
+          "mean": 16.430466424082038,
+          "sd": 7.272375174899724
+        },
+        "creatinine_max": {
+          "mean": 1.1886426287352518,
+          "sd": 1.0967264012311582
+        },
+        "bun_max": {
+          "mean": 19.885874958650348,
+          "sd": 11.101304384657922
+        },
+        "glucose_max": {
+          "mean": 132.0874407321645,
+          "sd": 51.2664356675847
+        }
+      },
+      "rSquared": 0.21927827314946413,
+      "coefficients": [
+        {
+          "term": "any_aki",
+          "percentChangeInLos": 40.87517973680783,
+          "ci95PercentChange": [
+            35.44748245567777,
+            46.52037753726446
+          ],
+          "pValue": 1.6025424930769458e-65,
+          "scale": "per unit"
+        },
+        {
+          "term": "admission_age",
+          "percentChangeInLos": -1.9923699141787266,
+          "ci95PercentChange": [
+            -3.3793203707160546,
+            -0.5855103494021519
+          ],
+          "pValue": 0.005648707406944069,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "male",
+          "percentChangeInLos": -10.417422956419497,
+          "ci95PercentChange": [
+            -12.691248555441026,
+            -8.084378977004015
+          ],
+          "pValue": 5.014580358199782e-17,
+          "scale": "per unit"
+        },
+        {
+          "term": "apsiii",
+          "percentChangeInLos": 2.1108677672952325,
+          "ci95PercentChange": [
+            0.597139249777956,
+            3.6473740103207364
+          ],
+          "pValue": 0.006120422769116894,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "oasis",
+          "percentChangeInLos": 1.29872487730478,
+          "ci95PercentChange": [
+            0.12587291495660402,
+            2.485315363827967
+          ],
+          "pValue": 0.029880253893333906,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "sofa",
+          "percentChangeInLos": 10.085563589051837,
+          "ci95PercentChange": [
+            8.512963998993172,
+            11.680953723018916
+          ],
+          "pValue": 3.804140243083276e-39,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "charlson_comorbidity_index",
+          "percentChangeInLos": 7.944445351629703,
+          "ci95PercentChange": [
+            6.224899470631939,
+            9.691826872402999
+          ],
+          "pValue": 1.0526436193712227e-20,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "hemoglobin_min",
+          "percentChangeInLos": -1.0556569143292616,
+          "ci95PercentChange": [
+            -2.3382720493194786,
+            0.2438031159851306
+          ],
+          "pValue": 0.11089538316774973,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "wbc_max",
+          "percentChangeInLos": 1.0632927056486663,
+          "ci95PercentChange": [
+            -0.3275318263038396,
+            2.4735247321092
+          ],
+          "pValue": 0.13466618068872657,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "creatinine_max",
+          "percentChangeInLos": 2.162530013687225,
+          "ci95PercentChange": [
+            0.47618539701330675,
+            3.8771774381852087
+          ],
+          "pValue": 0.011756456021151983,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "bun_max",
+          "percentChangeInLos": 0.16876900231732606,
+          "ci95PercentChange": [
+            -1.6534942019790666,
+            2.024796936319051
+          ],
+          "pValue": 0.8571386808316411,
+          "scale": "per 1 SD"
+        },
+        {
+          "term": "glucose_max",
+          "percentChangeInLos": 2.9728461453093047,
+          "ci95PercentChange": [
+            0.6417151730840898,
+            5.357972338108041
+          ],
+          "pValue": 0.012159676244984412,
+          "scale": "per 1 SD"
+        }
+      ],
+      "diagnostics": {
+        "vif": [
+          {
+            "term": "any_aki",
+            "vif": 1.2555085660868734
+          },
+          {
+            "term": "admission_age",
+            "vif": 1.6901889652506776
+          },
+          {
+            "term": "male",
+            "vif": 1.1501033123441664
+          },
+          {
+            "term": "apsiii",
+            "vif": 1.8781509935506562
+          },
+          {
+            "term": "oasis",
+            "vif": 1.4530792905954075
+          },
+          {
+            "term": "sofa",
+            "vif": 1.621927945164955
+          },
+          {
+            "term": "charlson_comorbidity_index",
+            "vif": 1.992683680254165
+          },
+          {
+            "term": "hemoglobin_min",
+            "vif": 1.272581032922885
+          },
+          {
+            "term": "wbc_max",
+            "vif": 1.0348087209649481
+          },
+          {
+            "term": "creatinine_max",
+            "vif": 1.896313550459783
+          },
+          {
+            "term": "bun_max",
+            "vif": 2.1359901545245736
+          },
+          {
+            "term": "glucose_max",
+            "vif": 1.0869936258896604
+          }
+        ]
+      }
+    },
+    "propensityMatch": {
+      "status": "fit",
+      "n": 9070,
+      "treated": 1586,
+      "control": 7484,
+      "matchedPairs": 1408,
+      "unmatchedTreated": 178,
+      "caliper": 0.03543317504097906,
+      "covariates": [
+        "admission_age",
+        "male",
+        "apsiii",
+        "oasis",
+        "sofa",
+        "charlson_comorbidity_index",
+        "hemoglobin_min",
+        "wbc_max",
+        "creatinine_max",
+        "bun_max",
+        "glucose_max"
+      ],
+      "scalers": {
+        "admission_age": {
+          "mean": 67.24112458654906,
+          "sd": 11.387837296805452
+        },
+        "apsiii": {
+          "mean": 38.303307607497246,
+          "sd": 18.512302015696573
+        },
+        "oasis": {
+          "mean": 31.882910694597573,
+          "sd": 7.381986962891958
+        },
+        "sofa": {
+          "mean": 5.242227122381477,
+          "sd": 2.750210790187743
+        },
+        "charlson_comorbidity_index": {
+          "mean": 4.3002205071664825,
+          "sd": 2.2680524996676845
+        },
+        "hemoglobin_min": {
+          "mean": 9.203803748621828,
+          "sd": 1.6595237421278834
+        },
+        "wbc_max": {
+          "mean": 16.429922822491733,
+          "sd": 7.272158498071953
+        },
+        "creatinine_max": {
+          "mean": 1.188577728776185,
+          "sd": 1.0966833514908105
+        },
+        "bun_max": {
+          "mean": 19.88500551267916,
+          "sd": 11.10100114169746
+        },
+        "glucose_max": {
+          "mean": 132.0864388092613,
+          "sd": 51.26369792870119
+        }
+      },
+      "maxAbsSmdBefore": 0.8329002449705255,
+      "maxAbsSmdAfter": 0.05498249495581691,
+      "balanceStatus": "pass",
+      "effects": {
+        "mortalityRiskDifference": 0.04332386363636364,
+        "mortalityMatchedOddsRatio": 4.128205128205129,
+        "discordantTreatedDeaths": 80,
+        "discordantControlDeaths": 19,
+        "icuLosMeanDifferenceDays": 2.4846803977272724
+      },
+      "artifacts": {
+        "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-dialysis-cardiac-papers-20260509/papers/0387-cardiac-surgery-aki/propensity-balance.csv",
+        "pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-dialysis-cardiac-papers-20260509/papers/0387-cardiac-surgery-aki/matched-pairs.csv",
+        "scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-dialysis-cardiac-papers-20260509/papers/0387-cardiac-surgery-aki/propensity-scores.csv"
+      }
+    }
+  },
+  "cost": {
+    "actualBytes": 126037420,
+    "estimatedUsd": 0.014085779339075087,
+    "cumulativeEstimatedUsd": 0.1972009107470513,
+    "sessionCeilingUsd": 10.0
+  },
+  "qa": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T01:58:32.901352+00:00",
+    "status": "pass",
+    "checks": [
+      {
+        "code": "cohort-nonempty",
+        "passed": true,
+        "message": "Cohort has at least one first ICU stay."
+      },
+      {
+        "code": "row-cache-removed",
+        "passed": true,
+        "message": "Temporary row-level cache was removed."
+      },
+      {
+        "code": "mortality-model-fit-or-justified",
+        "passed": true,
+        "message": "Mortality model either fit or recorded why it did not fit."
+      },
+      {
+        "code": "los-model-fit-or-justified",
+        "passed": true,
+        "message": "LOS model either fit or recorded why it did not fit."
+      },
+      {
+        "code": "exposure-recorded",
+        "passed": true,
+        "message": "Primary exposure is present in predictors or Table 1."
+      },
+      {
+        "code": "exposure-denominator-complete",
+        "passed": true,
+        "message": "Primary exposure denominator equals cohort rows."
+      },
+      {
+        "code": "artifact-csvs-written",
+        "passed": true,
+        "message": "CSV review artifacts exist."
+      },
+      {
+        "code": "propensity-artifacts-written",
+        "passed": true,
+        "message": "Propensity artifacts exist when matching fits."
+      },
+      {
+        "code": "section-##-abstract",
+        "passed": true,
+        "message": "Required section ## Abstract present."
+      },
+      {
+        "code": "section-##-introduction",
+        "passed": true,
+        "message": "Required section ## Introduction present."
+      },
+      {
+        "code": "section-##-methods",
+        "passed": true,
+        "message": "Required section ## Methods present."
+      },
+      {
+        "code": "section-##-results",
+        "passed": true,
+        "message": "Required section ## Results present."
+      },
+      {
+        "code": "section-##-discussion",
+        "passed": true,
+        "message": "Required section ## Discussion present."
+      },
+      {
+        "code": "section-##-limitations",
+        "passed": true,
+        "message": "Required section ## Limitations present."
+      },
+      {
+        "code": "section-##-reproducibility-and-artifacts",
+        "passed": true,
+        "message": "Required section ## Reproducibility And Artifacts present."
+      },
+      {
+        "code": "section-##-what-this-does-and-does-not-show",
+        "passed": true,
+        "message": "Required section ## What This Does And Does Not Show present."
+      },
+      {
+        "code": "reader-facing-language",
+        "passed": true,
+        "message": "Internal jargon hits: none."
+      },
+      {
+        "code": "has-data-density",
+        "passed": true,
+        "message": "Paper contains multiple concrete cohort/model statements."
+      },
+      {
+        "code": "causal-boundary",
+        "passed": true,
+        "message": "Paper states non-causal boundary."
+      },
+      {
+        "code": "propensity-section",
+        "passed": true,
+        "message": "Paper includes a propensity-matched exposure section."
+      }
+    ],
+    "typedIssues": [
+      {
+        "code": "PROPENSITY_UNMATCHED_TREATED",
+        "severity": "warning",
+        "message": "178 treated rows were unmatched after caliper matching."
+      }
+    ],
+    "warnings": [
+      "178 treated rows were unmatched after caliper matching."
+    ],
+    "nextAction": "Review typed methods warnings, phenotype definitions, and complete-case diagnostics before external sharing."
+  }
+}

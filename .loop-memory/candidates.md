@@ -2,6 +2,9 @@
 
 ## High Priority
 
+- Promote `.loop-memory/mimic-dialysis-cardiac-papers-20260509/run_mimic_paper_series.py` into a reusable Agenteer paper-series or dataset-adapter runner after deciding the general contract for study lists, code families, cost ceilings, and aggregate-only artifact policies.
+- Add lifecycle, rerun-stability, and MedBrevia-literature artifact generation to MIMIC paper-series runs so the current `needs_methods_review` status becomes more actionable.
+- Extend propensity outputs with matched-pair/robust variance, bootstrap intervals, and unmeasured-confounding sensitivity summaries before using matched contrasts in a flagship demo.
 - Promote `.loop-memory/mimic-executed-studies-20260506/run_mimic_study.py` into a reusable Agenteer `research` command with typed packet schema, tests, and configurable dataset manifest.
 - Add MIMIC phenotype sensitivity contracts: include/exclude code-family variants, admission-primary diagnosis option, broad-vs-narrow phenotype comparison, and coding review notes.
 - Add MIMIC packet lifecycle/index command analogous to NHANES paper lifecycle so QA review/pass status, cost, cache cleanup, and paper paths are not only in loop memory.

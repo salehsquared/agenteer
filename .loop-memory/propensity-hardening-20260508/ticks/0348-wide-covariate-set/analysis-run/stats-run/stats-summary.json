@@ -1,0 +1,32 @@
+{
+  "method": "propensity-score-weighting",
+  "rowCount": 520,
+  "completeCaseN": 520,
+  "variables": [
+    "outcome",
+    "treated",
+    "age",
+    "bmi",
+    "severity",
+    "frailty",
+    "sex",
+    "site",
+    "renal",
+    "diabetes",
+    "albumin",
+    "hemoglobin",
+    "heart_rate"
+  ],
+  "parameters": {
+    "alpha": 0.05,
+    "estimand": "ATE",
+    "matchRatio": 1,
+    "caliper": 0.2,
+    "replacement": false,
+    "trimThreshold": 0.02,
+    "stabilizeWeights": true,
+    "treatmentPositiveLevel": 1,
+    "treatmentNegativeLevel": 0
+  },
+  "warnings": []
+}

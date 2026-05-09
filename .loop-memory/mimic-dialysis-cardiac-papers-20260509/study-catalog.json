@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T04:37:21.391234+00:00",
+  "studies": [
+    {
+      "id": "0378-dialysis-aki-first-day-rrt",
+      "title": "First-Day Renal Replacement Therapy and ICU Outcomes in Acute Kidney Injury",
+      "domain": "nephrology/critical care",
+      "question": "Among ICU admissions with acute kidney injury diagnosis codes, how is first-day renal replacement therapy associated with mortality and ICU length of stay?",
+      "cohort": {
+        "diagnosis_any": [
+          "aki"
+        ]
+      },
+      "primary_exposure": "dialysis_present",
+      "exposure_label": "First-day renal replacement therapy present"
+    },
+    {
+      "id": "0379-dialysis-aki-crrt",
+      "title": "Continuous Renal Replacement Therapy and Outcomes in Acute Kidney Injury",
+      "domain": "nephrology/critical care",
+      "question": "Among ICU admissions with acute kidney injury diagnosis codes, how are CRRT records associated with mortality and ICU length of stay?",
+      "cohort": {
+        "diagnosis_any": [
+          "aki"
+        ]
+      },
+      "primary_exposure": "any_crrt_record",
+      "exposure_label": "Any CRRT record during ICU stay"
+    },
+    {
+      "id": "0380-dialysis-esrd-icu",
+      "title": "End-Stage Kidney Disease and ICU Outcomes",
+      "domain": "nephrology",
+      "question": "Among ICU admissions with end-stage kidney disease or dialysis-status diagnosis codes, what first-day features are associated with mortality and ICU length of stay?",
+      "cohort": {
+        "diagnosis_any": [
+          "esrd"
+        ]
+      },
+      "primary_exposure": "dialysis_present",
+      "exposure_label": "First-day renal replacement therapy present"
+    },
+    {
+      "id": "0381-dialysis-sepsis-rrt",
+      "title": "Renal Replacement Therapy in Sepsis-Associated ICU Admissions",
+      "domain": "nephrology/infectious diseases",
+      "question": "Among ICU admissions with sepsis diagnosis codes, how is first-day renal replacement therapy associated with mortality and ICU length of stay?",
+      "cohort": {
+        "diagnosis_any": [
+          "sepsis"
+        ]
+      },
+      "primary_exposure": "dialysis_present",
+      "exposure_label": "First-day renal replacement therapy present"
+    },
+    {
+      "id": "0382-dialysis-heart-failure-rrt",
+      "title": "Renal Replacement Therapy in Heart Failure ICU Admissions",
+      "domain": "cardiorenal critical care",
+      "question": "Among ICU admissions with heart failure diagnosis codes, how is first-day renal replacement therapy associated with mortality and ICU length of stay?",
+      "cohort": {
+        "diagnosis_any": [
+          "heart_failure"
+        ]
+      },
+      "primary_exposure": "dialysis_present",
+      "exposure_label": "First-day renal replacement therapy present"
+    },
+    {
+      "id": "0383-cardiac-surgery-cabg",
+      "title": "ICU Outcomes After Coronary Artery Bypass Grafting",
+      "domain": "cardiac surgery",
+      "question": "Among ICU admissions after coronary artery bypass graft procedure codes, what first-day features are associated with mortality and ICU length of stay?",
+      "cohort": {
+        "procedure_any": [
+          "cabg"
+        ]
+      },
+      "primary_exposure": "any_aki",
+      "exposure_label": "Any acute kidney injury diagnosis code"
+    },
+    {
+      "id": "0384-cardiac-surgery-valve",
+      "title": "ICU Outcomes After Open Heart Valve Procedures",
+      "domain": "cardiac surgery",
+      "question": "Among ICU admissions after open heart valve procedure codes, what first-day features are associated with mortality and ICU length of stay?",
+      "cohort": {
+        "procedure_any": [
+          "valve_open"
+        ]
+      },
+      "primary_exposure": "any_aki",
+      "exposure_label": "Any acute kidney injury diagnosis code"
+    },
+    {
+      "id": "0385-cardiac-surgery-cabg-rrt",
+      "title": "Renal Replacement Therapy After Coronary Artery Bypass Grafting",
+      "domain": "cardiac surgery/nephrology",
+      "question": "Among ICU admissions after coronary artery bypass graft procedure codes, how is first-day renal replacement therapy associated with mortality and ICU length of stay?",
+      "cohort": {
+        "procedure_any": [
+          "cabg"
+        ]
+      },
+      "primary_exposure": "dialysis_present",
+      "exposure_label": "First-day renal replacement therapy present"
+    },
+    {
+      "id": "0386-cardiac-surgery-valve-rrt",
+      "title": "Renal Replacement Therapy After Open Heart Valve Procedures",
+      "domain": "cardiac surgery/nephrology",
+      "question": "Among ICU admissions after open heart valve procedure codes, how is first-day renal replacement therapy associated with mortality and ICU length of stay?",
+      "cohort": {
+        "procedure_any": [
+          "valve_open"
+        ]
+      },
+      "primary_exposure": "dialysis_present",
+      "exposure_label": "First-day renal replacement therapy present"
+    },
+    {
+      "id": "0387-cardiac-surgery-aki",
+      "title": "Acute Kidney Injury Diagnosis Codes After Cardiac Surgery",
+      "domain": "cardiac surgery/nephrology",
+      "question": "Among ICU admissions after CABG or open heart valve procedure codes, how are acute kidney injury diagnosis codes associated with mortality and ICU length of stay?",
+      "cohort": {
+        "procedure_any": [
+          "cabg",
+          "valve_open"
+        ]
+      },
+      "primary_exposure": "any_aki",
+      "exposure_label": "Any acute kidney injury diagnosis code"
+    }
+  ]
+}

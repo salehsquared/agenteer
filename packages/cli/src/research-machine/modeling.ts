@@ -85,6 +85,20 @@ export const modelingDecisionRequestSchema = z.object({
     blockers: z.array(z.string()).default([]),
     methodsReviewNote: z.string().min(1).nullable().optional(),
   }).optional(),
+  literatureEvidence: z.object({
+    path: z.string().min(1).optional(),
+    status: z.enum(["ready", "needs_more_evidence", "failed"]),
+    evidenceStrength: z.enum(["none", "sparse", "adequate", "strong"]),
+    sourceCount: z.number().int().nonnegative(),
+    highQualitySourceCount: z.number().int().nonnegative(),
+    latestPublicationYear: z.number().int().nullable().optional(),
+    questionTokenCoverage: z.number().min(0).max(1),
+    designSignals: z.array(z.string()).default([]),
+    methodSignals: z.array(z.string()).default([]),
+    planningImplications: z.array(z.string()).default([]),
+    followUpSearches: z.array(z.string()).default([]),
+    issueCodes: z.array(z.string()).default([]),
+  }).optional(),
   highMissingness: z.boolean().default(false),
   smallSample: z.boolean().default(false),
   requiresInference: z.boolean().default(true),
@@ -154,6 +168,21 @@ export interface ModelingDecisionPlan {
     warnings: MachineIssue[];
     recommendedAction: string;
   };
+  literatureEvidence: {
+    source: "not-supplied" | "literature-context";
+    path: string | null;
+    status: "ready" | "needs_more_evidence" | "failed" | null;
+    evidenceStrength: "none" | "sparse" | "adequate" | "strong" | null;
+    sourceCount: number | null;
+    highQualitySourceCount: number | null;
+    latestPublicationYear: number | null;
+    questionTokenCoverage: number | null;
+    designSignals: string[];
+    methodSignals: string[];
+    planningImplications: string[];
+    followUpSearches: string[];
+    warnings: MachineIssue[];
+  };
   methodSelectionEvidence: {
     selectionId: string;
     selectionHash: string;
@@ -204,6 +233,7 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   const dataEvidence = deriveDataEvidence(request);
   const backendEvidence = deriveBackendEvidence(request);
   const priorRunEvidence = derivePriorRunEvidence(request);
+  const literatureEvidence = deriveLiteratureEvidence(request);
   const evidenceAdjustedRequest = {
     ...request,
     rowCount: dataEvidence.rowCount ?? request.rowCount,
@@ -217,7 +247,7 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   const inferredOutcomeType = inferOutcomeType(evidenceAdjustedRequest);
   const inferredStudyDesign = inferStudyDesign(evidenceAdjustedRequest);
   const inferredDataStructures = inferDataStructures(evidenceAdjustedRequest);
-  const issues: MachineIssue[] = [...dataEvidence.warnings, ...backendEvidence.warnings, ...priorRunEvidence.warnings];
+  const issues: MachineIssue[] = [...dataEvidence.warnings, ...backendEvidence.warnings, ...priorRunEvidence.warnings, ...literatureEvidence.warnings];
   if (evidenceAdjustedRequest.explorationHandoff) {
     const handoff = evidenceAdjustedRequest.explorationHandoff;
     if (handoff.status === "blocked" || handoff.clearanceLevel === "stop") {
@@ -303,7 +333,7 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
   });
   return {
     schemaVersion: 1,
-    decisionId: `modeling_${stableHash({ request, primary: primary?.id ?? null, methodSelectionId: methodSelection.selectionId }).slice(0, 16)}`,
+    decisionId: `modeling_${stableHash({ request, primary: primary?.id ?? null, methodSelectionId: methodSelection.selectionId, literature: { path: literatureEvidence.path, status: literatureEvidence.status, strength: literatureEvidence.evidenceStrength } }).slice(0, 16)}`,
     request: evidenceAdjustedRequest,
     inferredGoal,
     inferredOutcomeType,
@@ -312,6 +342,7 @@ export function buildModelingDecisionPlan(raw: Partial<ModelingDecisionRequest> 
     dataEvidence,
     backendEvidence,
     priorRunEvidence,
+    literatureEvidence,
     methodSelectionEvidence,
     routeRecommendation,
     primary,
@@ -784,9 +815,65 @@ function policyCandidate(id: string, label: string, tier: ModelingCandidate["tie
   };
 }
 
+function deriveLiteratureEvidence(request: ModelingDecisionRequest): ModelingDecisionPlan["literatureEvidence"] {
+  const context = request.literatureEvidence;
+  if (!context) {
+    return {
+      source: "not-supplied",
+      path: null,
+      status: null,
+      evidenceStrength: null,
+      sourceCount: null,
+      highQualitySourceCount: null,
+      latestPublicationYear: null,
+      questionTokenCoverage: null,
+      designSignals: [],
+      methodSignals: [],
+      planningImplications: [],
+      followUpSearches: [],
+      warnings: [],
+    };
+  }
+  const warnings: MachineIssue[] = [];
+  if (context.status === "failed") {
+    warnings.push(issue("blocker", "LITERATURE_CONTEXT_FAILED", "Literature context failed; repair or rerun MedBrevia search before using it to justify planning decisions.", ["request.literatureEvidence"]));
+  } else if (context.status === "needs_more_evidence" || context.evidenceStrength === "sparse" || context.evidenceStrength === "none") {
+    warnings.push(issue("warning", "LITERATURE_CONTEXT_INCOMPLETE", "Literature context is incomplete; keep background and claim boundaries conservative and run follow-up searches before promotion.", ["request.literatureEvidence"]));
+  }
+  if (context.questionTokenCoverage < 0.2) {
+    warnings.push(issue("warning", "LITERATURE_QUESTION_LOW_OVERLAP", `Literature evidence has low question overlap (${(context.questionTokenCoverage * 100).toFixed(1)}%).`, ["request.literatureEvidence.questionTokenCoverage"]));
+  }
+  if (context.highQualitySourceCount === 0) {
+    warnings.push(issue("warning", "LITERATURE_NO_HIGH_QUALITY_SOURCE", "No high-quality literature source was detected; do not use this pass to support strong clinical or causal framing.", ["request.literatureEvidence.highQualitySourceCount"]));
+  }
+  const latest = context.latestPublicationYear ?? null;
+  if (latest != null && new Date().getUTCFullYear() - latest > 10) {
+    warnings.push(issue("warning", "LITERATURE_STALE", `Latest literature source appears to be from ${latest}; run a current search before promotion.`, ["request.literatureEvidence.latestPublicationYear"]));
+  }
+  return {
+    source: "literature-context",
+    path: context.path ?? null,
+    status: context.status,
+    evidenceStrength: context.evidenceStrength,
+    sourceCount: context.sourceCount,
+    highQualitySourceCount: context.highQualitySourceCount,
+    latestPublicationYear: latest,
+    questionTokenCoverage: context.questionTokenCoverage,
+    designSignals: context.designSignals,
+    methodSignals: context.methodSignals,
+    planningImplications: context.planningImplications,
+    followUpSearches: context.followUpSearches,
+    warnings,
+  };
+}
+
 function inferGoal(request: ModelingDecisionRequest): ModelingGoal {
   if (request.goal) return request.goal;
   const q = request.question.toLowerCase();
+  const literatureSignals = request.literatureEvidence?.designSignals ?? [];
+  if (literatureSignals.includes("diagnostic-accuracy")) return "diagnose";
+  if (literatureSignals.includes("prediction-validation")) return "classify";
+  if (literatureSignals.includes("causal-inference")) return "causal";
   if (request.requiresPrediction || /\bpredict|prediction|risk score|classify|forecast\b/.test(q)) return request.outcomeType === "continuous" ? "predict" : "classify";
   if (/\bcaus|effect of|impact of|treatment|intervention\b/.test(q)) return "causal";
   if (/\bdiagnos|sensitivity|specificity|auc|roc\b/.test(q)) return "diagnose";
@@ -814,6 +901,11 @@ function inferOutcomeType(request: ModelingDecisionRequest): OutcomeType {
 function inferStudyDesign(request: ModelingDecisionRequest): StudyDesign {
   if (request.studyDesign) return request.studyDesign;
   const q = request.question.toLowerCase();
+  const literatureSignals = request.literatureEvidence?.designSignals ?? [];
+  if (literatureSignals.includes("diagnostic-accuracy")) return "diagnostic";
+  if (literatureSignals.includes("prediction-validation")) return "prediction";
+  if (literatureSignals.includes("randomized-trial")) return "randomized_trial";
+  if (literatureSignals.includes("observational-cohort")) return "cohort";
   if (request.timeToEvent || /\bcohort|follow-up|incident|readmission|survival\b/.test(q)) return "cohort";
   if (/\brandom|trial|assigned\b/.test(q)) return "randomized_trial";
   if (/\bdiagnos|test performance|sensitivity|specificity\b/.test(q)) return "diagnostic";

@@ -1,0 +1,1506 @@
+{
+  "schemaVersion": 1,
+  "methodSelection": {
+    "schemaVersion": 1,
+    "selectionId": "method_selection_0019bde230d7",
+    "request": {
+      "question": "Use IPTW ATT inverse probability weighting to estimate the observational treatment effect.",
+      "outcomeType": "binary",
+      "studyDesign": "cohort",
+      "dataStructures": [
+        "single_table"
+      ],
+      "goal": "causal",
+      "surveyDesign": false,
+      "repeatedMeasures": false,
+      "clustered": false,
+      "timeToEvent": false,
+      "highDimensional": false,
+      "text": false,
+      "image": false,
+      "spatial": false,
+      "network": false,
+      "maxCandidates": 10
+    },
+    "primary": {
+      "method": {
+        "schemaVersion": 1,
+        "id": "propensity-score-weighting",
+        "label": "Propensity score weighting/IPTW",
+        "category": "causal_inference",
+        "modelFamily": "propensity_weighting",
+        "purpose": "Balance measured confounders between exposure groups for observational causal effect estimation.",
+        "aliases": [],
+        "outcomeTypes": [
+          "continuous",
+          "binary",
+          "time_to_event"
+        ],
+        "exposureTypes": [
+          "continuous",
+          "binary",
+          "categorical"
+        ],
+        "studyDesigns": [
+          "cohort",
+          "case_control"
+        ],
+        "dataStructures": [
+          "single_table",
+          "longitudinal"
+        ],
+        "compatibleBackends": [
+          "python-statsmodels"
+        ],
+        "implementationStatus": "executable",
+        "requiredFields": [
+          "treatment",
+          "outcome",
+          "confounders",
+          "positivity diagnostics"
+        ],
+        "assumptions": [
+          "Exchangeability",
+          "positivity",
+          "consistency",
+          "correct treatment model"
+        ],
+        "diagnostics": [
+          "standardized mean differences",
+          "weight distribution",
+          "overlap"
+        ],
+        "effectMeasures": [
+          "ATE",
+          "ATT",
+          "risk difference",
+          "risk ratio"
+        ],
+        "artifactExpectations": [
+          "analysis.json",
+          "method-report.md",
+          "diagnostics.json"
+        ],
+        "qaGates": [
+          "dag-review",
+          "balance",
+          "positivity",
+          "causal-claim-review"
+        ],
+        "missingDataRequirements": [
+          "missingness summary",
+          "complete-case count"
+        ],
+        "multiplicityRequirements": [],
+        "commonFailureModes": [
+          "unmeasured confounding",
+          "extreme weights",
+          "post-treatment covariates"
+        ],
+        "stopForHumanReviewWhen": [
+          "any causal claim is made"
+        ],
+        "selection": {
+          "keywords": [
+            "propensity",
+            "iptw",
+            "causal",
+            "treatment effect",
+            "balance"
+          ],
+          "antiKeywords": [],
+          "minScore": 0.35
+        }
+      },
+      "score": 0.83,
+      "rank": 1,
+      "fitReasons": [
+        "question keyword match: iptw, treatment effect",
+        "supports outcome type binary",
+        "supports study design cohort",
+        "supports data structure single_table",
+        "matches goal causal"
+      ],
+      "cautions": [
+        {
+          "severity": "note",
+          "code": "HUMAN_REVIEW_GATE",
+          "message": "any causal claim is made",
+          "evidenceRefs": []
+        }
+      ],
+      "requiredBeforeExecution": [
+        "provide treatment",
+        "provide outcome",
+        "provide confounders",
+        "provide positivity diagnostics",
+        "confirm assumption: Exchangeability",
+        "confirm assumption: positivity",
+        "confirm assumption: consistency",
+        "confirm assumption: correct treatment model",
+        "produce diagnostic: standardized mean differences",
+        "produce diagnostic: weight distribution",
+        "produce diagnostic: overlap"
+      ]
+    },
+    "candidates": [
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "propensity-score-weighting",
+          "label": "Propensity score weighting/IPTW",
+          "category": "causal_inference",
+          "modelFamily": "propensity_weighting",
+          "purpose": "Balance measured confounders between exposure groups for observational causal effect estimation.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "time_to_event"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cohort",
+            "case_control"
+          ],
+          "dataStructures": [
+            "single_table",
+            "longitudinal"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels"
+          ],
+          "implementationStatus": "executable",
+          "requiredFields": [
+            "treatment",
+            "outcome",
+            "confounders",
+            "positivity diagnostics"
+          ],
+          "assumptions": [
+            "Exchangeability",
+            "positivity",
+            "consistency",
+            "correct treatment model"
+          ],
+          "diagnostics": [
+            "standardized mean differences",
+            "weight distribution",
+            "overlap"
+          ],
+          "effectMeasures": [
+            "ATE",
+            "ATT",
+            "risk difference",
+            "risk ratio"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "dag-review",
+            "balance",
+            "positivity",
+            "causal-claim-review"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "unmeasured confounding",
+            "extreme weights",
+            "post-treatment covariates"
+          ],
+          "stopForHumanReviewWhen": [
+            "any causal claim is made"
+          ],
+          "selection": {
+            "keywords": [
+              "propensity",
+              "iptw",
+              "causal",
+              "treatment effect",
+              "balance"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.83,
+        "rank": 1,
+        "fitReasons": [
+          "question keyword match: iptw, treatment effect",
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "any causal claim is made",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide treatment",
+          "provide outcome",
+          "provide confounders",
+          "provide positivity diagnostics",
+          "confirm assumption: Exchangeability",
+          "confirm assumption: positivity",
+          "confirm assumption: consistency",
+          "confirm assumption: correct treatment model",
+          "produce diagnostic: standardized mean differences",
+          "produce diagnostic: weight distribution",
+          "produce diagnostic: overlap"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "propensity-score-matching",
+          "label": "Propensity score matching",
+          "category": "causal_inference",
+          "modelFamily": "propensity_weighting",
+          "purpose": "Construct a matched comparison set with similar measured baseline covariates before estimating an observational treatment contrast.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cohort",
+            "case_control"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels"
+          ],
+          "implementationStatus": "executable",
+          "requiredFields": [
+            "binary treatment/exposure",
+            "outcome",
+            "baseline confounders",
+            "match ratio",
+            "caliper policy"
+          ],
+          "assumptions": [
+            "Exchangeability conditional on measured baseline covariates",
+            "positivity/overlap",
+            "consistency",
+            "no post-treatment covariates in the propensity model"
+          ],
+          "diagnostics": [
+            "standardized mean differences before/after matching",
+            "propensity overlap",
+            "caliper unmatched count",
+            "matched treated/control counts"
+          ],
+          "effectMeasures": [
+            "ATT mean difference",
+            "ATT risk difference",
+            "ATT odds ratio"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "dag-review",
+            "balance",
+            "positivity",
+            "causal-claim-review",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "unmeasured confounding",
+            "poor overlap",
+            "many unmatched treated rows",
+            "post-treatment covariates",
+            "residual imbalance"
+          ],
+          "stopForHumanReviewWhen": [
+            "any causal claim is made",
+            "post-match absolute SMD remains above threshold",
+            "positivity is weak"
+          ],
+          "selection": {
+            "keywords": [
+              "propensity",
+              "matching",
+              "nearest neighbor",
+              "caliper",
+              "causal",
+              "treatment effect",
+              "balance"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.74,
+        "rank": 2,
+        "fitReasons": [
+          "question keyword match: treatment effect",
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "any causal claim is made",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide binary treatment/exposure",
+          "provide outcome",
+          "provide baseline confounders",
+          "provide match ratio",
+          "provide caliper policy",
+          "confirm assumption: Exchangeability conditional on measured baseline covariates",
+          "confirm assumption: positivity/overlap",
+          "confirm assumption: consistency",
+          "confirm assumption: no post-treatment covariates in the propensity model",
+          "produce diagnostic: standardized mean differences before/after matching",
+          "produce diagnostic: propensity overlap",
+          "produce diagnostic: caliper unmatched count",
+          "produce diagnostic: matched treated/control counts"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "mediation-analysis",
+          "label": "Mediation analysis",
+          "category": "mediation_moderation_path",
+          "modelFamily": "mediation",
+          "purpose": "Estimate whether an exposure-outcome association operates through a mediator.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cohort",
+            "cross_sectional"
+          ],
+          "dataStructures": [
+            "single_table",
+            "longitudinal"
+          ],
+          "compatibleBackends": [
+            "causal",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "exposure",
+            "mediator",
+            "outcome",
+            "confounders"
+          ],
+          "assumptions": [
+            "Temporal ordering",
+            "no unmeasured exposure-mediator/outcome confounding"
+          ],
+          "diagnostics": [
+            "path estimates",
+            "sensitivity to mediator-outcome confounding"
+          ],
+          "effectMeasures": [
+            "natural direct effect",
+            "natural indirect effect",
+            "proportion mediated"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "temporal-order",
+            "causal-mediation-assumptions",
+            "sensitivity-analysis"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "cross-sectional mediation overclaim",
+            "post-treatment confounding"
+          ],
+          "stopForHumanReviewWhen": [
+            "mechanistic causal claim is requested"
+          ],
+          "selection": {
+            "keywords": [
+              "mediation",
+              "mediator",
+              "indirect effect",
+              "path"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 3,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "mediation-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "mechanistic causal claim is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide exposure",
+          "provide mediator",
+          "provide outcome",
+          "provide confounders",
+          "confirm assumption: Temporal ordering",
+          "confirm assumption: no unmeasured exposure-mediator/outcome confounding",
+          "produce diagnostic: path estimates",
+          "produce diagnostic: sensitivity to mediator-outcome confounding"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "regression-discontinuity",
+          "label": "Regression discontinuity",
+          "category": "causal_inference",
+          "modelFamily": "glm",
+          "purpose": "Estimate causal effects near an assignment cutoff.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cohort"
+          ],
+          "dataStructures": [
+            "single_table"
+          ],
+          "compatibleBackends": [
+            "causal",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "running variable",
+            "cutoff",
+            "treatment assignment",
+            "outcome"
+          ],
+          "assumptions": [
+            "No manipulation around cutoff",
+            "local continuity"
+          ],
+          "diagnostics": [
+            "density test",
+            "bandwidth sensitivity",
+            "covariate continuity"
+          ],
+          "effectMeasures": [
+            "local average treatment effect"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "cutoff-validity",
+            "bandwidth-sensitivity",
+            "causal-claim-review"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "manipulated running variable",
+            "arbitrary bandwidth"
+          ],
+          "stopForHumanReviewWhen": [
+            "assignment mechanism is not deterministic or fuzzy RD not specified"
+          ],
+          "selection": {
+            "keywords": [
+              "regression discontinuity",
+              "cutoff",
+              "threshold assigned"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 4,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "regression-discontinuity is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "assignment mechanism is not deterministic or fuzzy RD not specified",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide running variable",
+          "provide cutoff",
+          "provide treatment assignment",
+          "provide outcome",
+          "confirm assumption: No manipulation around cutoff",
+          "confirm assumption: local continuity",
+          "produce diagnostic: density test",
+          "produce diagnostic: bandwidth sensitivity",
+          "produce diagnostic: covariate continuity"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "tmle-doubly-robust",
+          "label": "Targeted maximum likelihood / doubly robust estimation",
+          "category": "causal_inference",
+          "modelFamily": "propensity_weighting",
+          "purpose": "Estimate causal effects with doubly robust outcome and treatment modeling.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cohort"
+          ],
+          "dataStructures": [
+            "single_table",
+            "longitudinal"
+          ],
+          "compatibleBackends": [
+            "causal"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "outcome",
+            "treatment",
+            "confounders",
+            "identification assumptions"
+          ],
+          "assumptions": [
+            "Exchangeability",
+            "positivity",
+            "consistency",
+            "correct nuisance-model strategy"
+          ],
+          "diagnostics": [
+            "positivity",
+            "nuisance model performance",
+            "influence curve"
+          ],
+          "effectMeasures": [
+            "ATE",
+            "risk difference",
+            "risk ratio"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "identification",
+            "positivity",
+            "causal-claim-review"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "positivity violation",
+            "unmeasured confounding"
+          ],
+          "stopForHumanReviewWhen": [
+            "causal estimand not explicitly reviewed"
+          ],
+          "selection": {
+            "keywords": [
+              "tmle",
+              "doubly robust",
+              "g-computation",
+              "causal"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.57,
+        "rank": 5,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "tmle-doubly-robust is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "blocker",
+            "code": "METHOD_NO_PRODUCTION_BACKEND",
+            "message": "tmle-doubly-robust has no production-ready backend yet.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "causal estimand not explicitly reviewed",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide outcome",
+          "provide treatment",
+          "provide confounders",
+          "provide identification assumptions",
+          "confirm assumption: Exchangeability",
+          "confirm assumption: positivity",
+          "confirm assumption: consistency",
+          "confirm assumption: correct nuisance-model strategy",
+          "produce diagnostic: positivity",
+          "produce diagnostic: nuisance model performance",
+          "produce diagnostic: influence curve"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "binary-logistic-regression",
+          "label": "Binary logistic regression",
+          "category": "logistic_regression",
+          "modelFamily": "logistic",
+          "purpose": "Model a binary outcome using exposure and covariates.",
+          "aliases": [],
+          "outcomeTypes": [
+            "binary"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "case_control",
+            "cohort",
+            "randomized_trial"
+          ],
+          "dataStructures": [
+            "single_table",
+            "complex_survey"
+          ],
+          "compatibleBackends": [
+            "r-survey",
+            "python-linearized",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "executable",
+          "requiredFields": [
+            "binary outcome",
+            "exposure",
+            "covariates"
+          ],
+          "assumptions": [
+            "Outcome threshold is justified",
+            "adequate events per parameter",
+            "linearity in logit for continuous predictors"
+          ],
+          "diagnostics": [
+            "event count",
+            "separation",
+            "calibration if predictive",
+            "influence"
+          ],
+          "effectMeasures": [
+            "odds ratio",
+            "marginal risk difference"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "threshold-provenance",
+            "sparse-cells",
+            "odds-ratio-consistency",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "complete separation",
+            "rare outcome bias",
+            "threshold without provenance"
+          ],
+          "stopForHumanReviewWhen": [
+            "diagnostic or causal language is requested"
+          ],
+          "selection": {
+            "keywords": [
+              "logistic",
+              "odds",
+              "binary",
+              "yes no",
+              "elevated",
+              "disease status"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.51,
+        "rank": 6,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "diagnostic or causal language is requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide binary outcome",
+          "provide exposure",
+          "provide covariates",
+          "confirm assumption: Outcome threshold is justified",
+          "confirm assumption: adequate events per parameter",
+          "confirm assumption: linearity in logit for continuous predictors",
+          "produce diagnostic: event count",
+          "produce diagnostic: separation",
+          "produce diagnostic: calibration if predictive",
+          "produce diagnostic: influence"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "difference-in-differences",
+          "label": "Difference-in-differences",
+          "category": "causal_inference",
+          "modelFamily": "difference_in_differences",
+          "purpose": "Estimate policy or intervention effects using treated and comparison groups over time.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "count",
+            "rate"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "time_series",
+            "cohort"
+          ],
+          "dataStructures": [
+            "longitudinal",
+            "time_series"
+          ],
+          "compatibleBackends": [
+            "causal",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "treatment group",
+            "comparison group",
+            "pre period",
+            "post period"
+          ],
+          "assumptions": [
+            "Parallel trends",
+            "no spillover",
+            "stable composition"
+          ],
+          "diagnostics": [
+            "pretrend plot",
+            "event study",
+            "placebo tests"
+          ],
+          "effectMeasures": [
+            "average treatment effect on treated"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "parallel-trends",
+            "cointervention",
+            "causal-claim-review"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "parallel trends violation",
+            "differential composition change"
+          ],
+          "stopForHumanReviewWhen": [
+            "policy causal conclusion requested"
+          ],
+          "selection": {
+            "keywords": [
+              "difference in differences",
+              "did",
+              "policy",
+              "treated control",
+              "pre post"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.49,
+        "rank": 7,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "difference-in-differences is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "policy causal conclusion requested",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide treatment group",
+          "provide comparison group",
+          "provide pre period",
+          "provide post period",
+          "confirm assumption: Parallel trends",
+          "confirm assumption: no spillover",
+          "confirm assumption: stable composition",
+          "produce diagnostic: pretrend plot",
+          "produce diagnostic: event study",
+          "produce diagnostic: placebo tests"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "clinical-trial-itt-analysis",
+          "label": "Clinical trial ITT/superiority analysis",
+          "category": "clinical_trial",
+          "modelFamily": "glm",
+          "purpose": "Analyze randomized trials by assigned group with superiority, safety, or repeated-measure endpoints.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "time_to_event",
+            "repeated_continuous"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "randomized_trial"
+          ],
+          "dataStructures": [
+            "single_table",
+            "repeated_measures",
+            "survival"
+          ],
+          "compatibleBackends": [
+            "python-statsmodels",
+            "r-survival",
+            "r-lme4"
+          ],
+          "implementationStatus": "design-only",
+          "requiredFields": [
+            "randomization group",
+            "analysis population",
+            "endpoint",
+            "protocol deviations"
+          ],
+          "assumptions": [
+            "Randomization is preserved",
+            "ITT population is defined"
+          ],
+          "diagnostics": [
+            "CONSORT flow",
+            "baseline balance",
+            "missing endpoints",
+            "adverse events"
+          ],
+          "effectMeasures": [
+            "mean difference",
+            "risk difference",
+            "hazard ratio"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "itt-definition",
+            "protocol-deviation",
+            "safety-reporting"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "post-randomization exclusions",
+            "unblinded interim analysis"
+          ],
+          "stopForHumanReviewWhen": [
+            "noninferiority/equivalence margin is involved"
+          ],
+          "selection": {
+            "keywords": [
+              "trial",
+              "randomized",
+              "itt",
+              "per protocol",
+              "noninferiority",
+              "safety"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.45,
+        "rank": 8,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports data structure single_table",
+          "matches goal causal"
+        ],
+        "cautions": [
+          {
+            "severity": "blocker",
+            "code": "METHOD_DESIGN_ONLY",
+            "message": "clinical-trial-itt-analysis is design-only until a verified runner is available.",
+            "evidenceRefs": []
+          },
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "noninferiority/equivalence margin is involved",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide randomization group",
+          "provide analysis population",
+          "provide endpoint",
+          "provide protocol deviations",
+          "confirm assumption: Randomization is preserved",
+          "confirm assumption: ITT population is defined",
+          "produce diagnostic: CONSORT flow",
+          "produce diagnostic: baseline balance",
+          "produce diagnostic: missing endpoints",
+          "produce diagnostic: adverse events"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "bootstrap-uncertainty",
+          "label": "Bootstrap uncertainty estimation",
+          "category": "nonparametric_resampling",
+          "modelFamily": "nonparametric",
+          "purpose": "Estimate uncertainty through resampling when analytic variance is weak or complex.",
+          "aliases": [],
+          "outcomeTypes": [
+            "continuous",
+            "binary",
+            "count"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "cohort",
+            "prediction"
+          ],
+          "dataStructures": [
+            "single_table",
+            "clustered"
+          ],
+          "compatibleBackends": [
+            "python-scipy",
+            "python-statsmodels"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "statistic",
+            "resampling unit",
+            "number of replicates"
+          ],
+          "assumptions": [
+            "Resampling respects clustering and design",
+            "sample is representative"
+          ],
+          "diagnostics": [
+            "bootstrap distribution",
+            "replicate failures",
+            "CI method"
+          ],
+          "effectMeasures": [
+            "bootstrap confidence interval",
+            "standard error"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "resampling-unit",
+            "replicate-count",
+            "stability"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "wrong resampling unit",
+            "unstable replicates"
+          ],
+          "stopForHumanReviewWhen": [
+            "complex survey bootstrap is requested without replicate design"
+          ],
+          "selection": {
+            "keywords": [
+              "bootstrap",
+              "resampling",
+              "permutation",
+              "uncertainty"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.43,
+        "rank": 9,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "complex survey bootstrap is requested without replicate design",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide statistic",
+          "provide resampling unit",
+          "provide number of replicates",
+          "confirm assumption: Resampling respects clustering and design",
+          "confirm assumption: sample is representative",
+          "produce diagnostic: bootstrap distribution",
+          "produce diagnostic: replicate failures",
+          "produce diagnostic: CI method"
+        ]
+      },
+      {
+        "method": {
+          "schemaVersion": 1,
+          "id": "chi-square-independence",
+          "label": "Chi-square test of independence",
+          "category": "group_comparison",
+          "modelFamily": "hypothesis_test",
+          "purpose": "Test association between two categorical variables.",
+          "aliases": [],
+          "outcomeTypes": [
+            "binary",
+            "categorical"
+          ],
+          "exposureTypes": [
+            "continuous",
+            "binary",
+            "categorical"
+          ],
+          "studyDesigns": [
+            "cross_sectional",
+            "case_control",
+            "cohort",
+            "randomized_trial"
+          ],
+          "dataStructures": [
+            "single_table",
+            "complex_survey"
+          ],
+          "compatibleBackends": [
+            "python-scipy",
+            "r-survey"
+          ],
+          "implementationStatus": "contract-ready",
+          "requiredFields": [
+            "categorical outcome",
+            "categorical exposure"
+          ],
+          "assumptions": [
+            "Expected cell counts are adequate or exact test is selected",
+            "independence or survey design is handled"
+          ],
+          "diagnostics": [
+            "cell counts",
+            "expected counts",
+            "sparse cells"
+          ],
+          "effectMeasures": [
+            "risk difference",
+            "risk ratio",
+            "odds ratio",
+            "Cramer's V"
+          ],
+          "artifactExpectations": [
+            "analysis.json",
+            "method-report.md",
+            "diagnostics.json"
+          ],
+          "qaGates": [
+            "sparse-cell-check",
+            "effect-size-reporting",
+            "claim-safety",
+            "effect-size-reporting",
+            "methods-disclosure"
+          ],
+          "missingDataRequirements": [
+            "missingness summary",
+            "complete-case count"
+          ],
+          "multiplicityRequirements": [],
+          "commonFailureModes": [
+            "expected cell count too small",
+            "survey design ignored"
+          ],
+          "stopForHumanReviewWhen": [
+            "small expected counts require exact or suppressed analysis"
+          ],
+          "selection": {
+            "keywords": [
+              "chi-square",
+              "categorical",
+              "cross-tab",
+              "crosstab",
+              "proportions"
+            ],
+            "antiKeywords": [],
+            "minScore": 0.35
+          }
+        },
+        "score": 0.43,
+        "rank": 10,
+        "fitReasons": [
+          "supports outcome type binary",
+          "supports study design cohort",
+          "supports data structure single_table"
+        ],
+        "cautions": [
+          {
+            "severity": "note",
+            "code": "HUMAN_REVIEW_GATE",
+            "message": "small expected counts require exact or suppressed analysis",
+            "evidenceRefs": []
+          }
+        ],
+        "requiredBeforeExecution": [
+          "provide categorical outcome",
+          "provide categorical exposure",
+          "confirm assumption: Expected cell counts are adequate or exact test is selected",
+          "confirm assumption: independence or survey design is handled",
+          "produce diagnostic: cell counts",
+          "produce diagnostic: expected counts",
+          "produce diagnostic: sparse cells"
+        ]
+      }
+    ],
+    "excluded": [
+      {
+        "methodId": "survey-weighted-descriptive-summary",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "two-sample-t-test",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "paired-t-test",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "anova-one-way",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "fisher-exact-test",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "mann-whitney-u",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "pearson-correlation",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "spearman-correlation",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "multiple-linear-regression",
+        "reason": "score 0.33 below threshold 0.35"
+      },
+      {
+        "methodId": "ordinal-logistic-regression",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "poisson-regression",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "negative-binomial-regression",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "kaplan-meier-log-rank",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "cox-proportional-hazards",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "fine-gray-competing-risks",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "linear-mixed-effects-model",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "generalized-estimating-equations",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "gamma-glm",
+        "reason": "score 0.25 below threshold 0.35"
+      },
+      {
+        "methodId": "diagnostic-accuracy-basic",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "cross-validation-bootstrap-validation",
+        "reason": "score 0.31 below threshold 0.35"
+      },
+      {
+        "methodId": "pca-dimensionality-reduction",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "factor-analysis",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "kmeans-clustering",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "arima-time-series",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "interrupted-time-series",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "random-effects-meta-analysis",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "cohens-kappa-icc",
+        "reason": "score 0.23 below threshold 0.35"
+      },
+      {
+        "methodId": "cronbach-alpha-scale",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "cost-effectiveness-icer",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "spatial-autocorrelation-moran",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "network-centrality-community",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "topic-modeling-text",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "qualitative-thematic-analysis",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "mixed-methods-triangulation",
+        "reason": "score 0.05 below threshold 0.35"
+      },
+      {
+        "methodId": "structural-equation-model",
+        "reason": "score 0.13 below threshold 0.35"
+      },
+      {
+        "methodId": "omics-differential-expression",
+        "reason": "score 0.17 below threshold 0.35"
+      },
+      {
+        "methodId": "image-signal-feature-analysis",
+        "reason": "score 0.05 below threshold 0.35"
+      }
+    ],
+    "recommendedArchetype": "target-trial-emulation-sketch",
+    "recommendedBackend": "python-statsmodels",
+    "stopForHumanReview": true,
+    "issues": [
+      {
+        "severity": "note",
+        "code": "HUMAN_REVIEW_GATE",
+        "message": "any causal claim is made",
+        "evidenceRefs": []
+      }
+    ],
+    "nextAction": "Promote propensity-score-weighting into AnalysisSpec V2, then build an execution contract with python-statsmodels."
+  },
+  "outPath": null
+}

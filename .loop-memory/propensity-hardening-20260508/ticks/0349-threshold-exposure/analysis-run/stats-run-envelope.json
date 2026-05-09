@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_9040859868576384860",
+    "method": "propensity-score-matching",
+    "status": "succeeded",
+    "rowCount": 400,
+    "completeCaseN": 400,
+    "variables": [
+      "outcome",
+      "high_biomarker",
+      "age",
+      "bmi",
+      "severity",
+      "frailty",
+      "sex",
+      "site",
+      "renal"
+    ],
+    "parameters": {
+      "alpha": 0.05,
+      "estimand": "ATT",
+      "matchRatio": 1,
+      "caliper": 0.25,
+      "replacement": false,
+      "trimThreshold": 0.01,
+      "stabilizeWeights": true,
+      "treatmentPositiveLevel": 1,
+      "treatmentNegativeLevel": 0
+    },
+    "estimates": [
+      {
+        "term": "high_biomarker",
+        "method": "nearest-neighbor propensity score matching",
+        "estimand": "ATT",
+        "effect_measure": "risk difference and odds ratio",
+        "estimate": 0.18181818181818177,
+        "risk_difference": 0.18181818181818177,
+        "treated_risk": 0.5454545454545454,
+        "control_risk": 0.36363636363636365,
+        "log_odds_ratio": 0.7419373447293585,
+        "odds_ratio": 2.0999999999999606,
+        "or_ci_low": 0.627578197762679,
+        "or_ci_high": 7.027012754301403,
+        "p_value": 0.2286055900338364,
+        "treated_n": 22,
+        "control_n": 22
+      }
+    ],
+    "diagnostics": {
+      "matching": {
+        "match_ratio": 1,
+        "replacement": false,
+        "caliper_logit_sd": 0.25,
+        "caliper_logit_width": 2.206479053102313,
+        "treated_total": 261,
+        "control_total": 139,
+        "matched_treated": 22,
+        "matched_controls": 22,
+        "matched_pairs": 22,
+        "unmatched_treated": 239,
+        "control_reuse_max": 1
+      },
+      "test": "propensity-score-matching",
+      "treatment_column": "high_biomarker",
+      "treatment_positive_level": 1,
+      "treatment_negative_level": 0,
+      "covariates": [
+        "age",
+        "bmi",
+        "severity",
+        "frailty",
+        "sex",
+        "site",
+        "renal"
+      ],
+      "exact_covariates": [
+        "sex"
+      ],
+      "propensity_model": {
+        "family": "logistic",
+        "n_parameters": 10,
+        "aic": 104.46621184689096,
+        "converged": true,
+        "propensity_min": 0.000001,
+        "propensity_max": 0.999999
+      },
+      "missingness": {
+        "input_rows": 400,
+        "complete_case_rows": 400,
+        "excluded_missing_rows": 0,
+        "complete_case_fraction": 1,
+        "missing_counts": {
+          "outcome": 0,
+          "high_biomarker": 0,
+          "age": 0,
+          "bmi": 0,
+          "severity": 0,
+          "frailty": 0,
+          "sex": 0,
+          "site": 0,
+          "renal": 0
+        }
+      },
+      "balance": {
+        "max_abs_smd_before": 2.849720870611597,
+        "max_abs_smd_after": 0.20846212854239615,
+        "mean_abs_smd_before": 0.3928172657762538,
+        "mean_abs_smd_after": 0.08136432260058014,
+        "covariates_over_0_1_before": 2,
+        "covariates_over_0_1_after": 5,
+        "covariate_terms": 9
+      },
+      "positivity": {
+        "treated_min": 0.012813172681890526,
+        "treated_max": 0.999999,
+        "control_min": 0.000001,
+        "control_max": 0.8448980061879028,
+        "common_support_lower": 0.012813172681890526,
+        "common_support_upper": 0.8448980061879028,
+        "common_support_fraction": 0.235
+      },
+      "artifacts": {
+        "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/propensity-scores.csv",
+        "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/propensity-overlap.csv",
+        "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/balance.csv",
+        "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/matched-pairs.csv",
+        "weights": null
+      }
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_UNMATCHED_TREATED",
+        "message": "239 treated rows were unmatched under the caliper/exact-match policy.",
+        "evidenceRefs": [
+          "matched-pairs.csv"
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_RESIDUAL_IMBALANCE",
+        "message": "5 covariate terms have post-adjustment absolute SMD above 0.10.",
+        "evidenceRefs": [
+          "balance.csv"
+        ]
+      },
+      {
+        "severity": "blocker",
+        "code": "PROPENSITY_POOR_OVERLAP",
+        "message": "Less than 75% of complete cases lie in common propensity-score support.",
+        "evidenceRefs": [
+          "diagnostics.positivity"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/stats-config.json",
+        "sha256": "0b24b7001a3163a1e8eb84d4a98e89f46e51970ade82645ff0da63088efa2a20"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/stats-summary.json",
+        "sha256": "552d41a2ca49cb5265fc3743bb1eb90d287a5e6266c164c8a3ca61ce8b87921c"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/estimates.csv",
+        "sha256": "c58c1b2c07607673d281a79572eb7056966d28170d0eac19a99d1696cdd3c188"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/diagnostics.json",
+        "sha256": "3babfc8aa1e041ffeb8d8ed43d7ace3142b75c00798f462af12e78578121bf42"
+      },
+      {
+        "kind": "balance",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/balance.csv",
+        "sha256": "ee40499b55634bdc2c8603fe7a092900a79f49e870cebaae1779b142a96e1868"
+      },
+      {
+        "kind": "propensity-scores",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/propensity-scores.csv",
+        "sha256": "09c85f19403e84eda33e2135d9dd3039bde4fee12ab6d33a74cd40d1bf0e3142"
+      },
+      {
+        "kind": "propensity-overlap",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/propensity-overlap.csv",
+        "sha256": "c7da508bc12e6e85b2cf6a45cfbeef51d68e98503506a3c8f82ad2eec73f782b"
+      },
+      {
+        "kind": "matched-pairs",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/matched-pairs.csv",
+        "sha256": "02ced62da48a7f408fffb75561f704cb864dcba2e0bdaae79e0b2de733308214"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/stats-report.md",
+        "sha256": "705bd88e54193a023bd28ff05c77afc13c68e9f50bfe92663c7cd0514ab8c284"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run/stats-qa.json",
+        "sha256": "e31d26554958782baa67624a3fec735c8214050ad2ee1f55cc5d678a6f4be526"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/analysis-run/stats-run",
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0349-threshold-exposure/method-selection.json",
+      "methodSelectionId": "method_selection_4609ee25110d",
+      "methodId": "propensity-score-matching",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "bound"
+    },
+    "resultPosture": {
+      "status": "failed",
+      "label": "Failed execution",
+      "interpretationBoundary": "This run failed before producing a locally reviewable statistical result.",
+      "supports": [
+        "failure attribution",
+        "repair planning"
+      ],
+      "cannotSupport": [
+        "effect estimates",
+        "confidence intervals",
+        "p-values",
+        "paper-ready inference"
+      ],
+      "nextAction": "Resolve blocker issues and rerun the stats method."
+    }
+  }
+}

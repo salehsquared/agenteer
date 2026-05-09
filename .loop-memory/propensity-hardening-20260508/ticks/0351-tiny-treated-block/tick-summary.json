@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "tick": 351,
+  "slug": "tiny-treated-block",
+  "axis": "question-the-research-question",
+  "method": "propensity-score-matching",
+  "question": "Does the runner refuse propensity analysis when treated rows are too sparse?",
+  "expected": "success_with_blocker",
+  "expectationMet": true,
+  "analysisExitCode": 0,
+  "statsStatus": "succeeded",
+  "posture": "failed",
+  "issues": [
+    "PROPENSITY_GROUP_TOO_SMALL",
+    "PROPENSITY_MATCHED_SAMPLE_TOO_SMALL",
+    "PROPENSITY_RESIDUAL_IMBALANCE",
+    "PROPENSITY_POOR_OVERLAP"
+  ],
+  "errors": [],
+  "methodQaStatus": "fail",
+  "inspectionReadiness": null,
+  "paperQaStatus": "pass",
+  "completeCaseFraction": 1,
+  "maxAbsSmdBefore": 2.1364263410355533,
+  "maxAbsSmdAfter": 0.9056579822940144,
+  "commonSupportFraction": 0.05,
+  "rerunComparison": null,
+  "artifactChecks": {
+    "paper": true,
+    "paperQa": true,
+    "balance": true,
+    "propensityScores": true,
+    "overlap": true,
+    "adjustmentArtifact": true
+  },
+  "paths": {
+    "tickDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block",
+    "data": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/synthetic-propensity.csv",
+    "methodSelection": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/method-selection.json",
+    "analysisRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/analysis-run",
+    "summary": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/tick-summary.json"
+  }
+}

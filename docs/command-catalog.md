@@ -209,6 +209,9 @@ Use `dataset-spec` and `dataset-run` when the study depends on multiple manifest
 | `research method-select` | Rank method candidates from question/outcome/design/data flags. |
 | `research method-apply` | Merge method requirements into AnalysisSpec v2. |
 | `research method-validate` | Validate that a spec can support a method. |
+| `research literature-search` | Query the local MedBrevia `/api/search` endpoint, normalize literature/trial/guideline/drug evidence, and write an auditable search packet. |
+| `research literature-context` | Convert a literature search packet into planning evidence: evidence strength, design/method signals, issues, and follow-up searches. |
+| `research literature-qa` | Check retrieved literature against a generated paper for source sufficiency, citation/use, topical overlap, and claim boundaries. |
 | `research modeling-plan` | Choose route, candidate methods/models, baselines, policies, artifacts, and next command; can consume `--exploration-handoff` artifacts from dataset exploration. |
 | `research execution-contract` | Bind AnalysisSpec v2 to backend/dataset/archetype/runner/policy. |
 | `research archetypes` | List or inspect study archetype manifests. |
@@ -221,8 +224,8 @@ The modeling plan is the front door after a research proposal exists.
 
 | Command | Purpose |
 |---|---|
-| `research stats-run` | Execute standard table statistics such as descriptive, t-test, chi-square, correlations, linear/logistic/Poisson regression. |
-| `research analysis-run` | Compose method/spec-bound stats execution into a golden route with manifest and prior-run planning. |
+| `research stats-run` | Execute standard table statistics such as descriptive, t-test, chi-square, correlations, linear/logistic/Poisson regression, diagnostic accuracy, propensity score matching, and IPTW. |
+| `research analysis-run` | Compose method/spec-bound stats execution into a golden route with manifest, prior-run planning, and optional MedBrevia literature context + QA via `--literature`. |
 | `research analysis-manifest` | Create readiness/hash manifest for stats, ML, or ML comparison runs. |
 | `research analysis-benchmark` | Evaluate one or more analysis run directories through manifest readiness gates. |
 | `research ml-models` | List ML adapters by task and optional dependency status. |
@@ -233,6 +236,7 @@ The modeling plan is the front door after a research proposal exists.
 | `research paper-runner-record` | Record runner provenance for a paper. |
 | `research explore` | Explore a table, rank unadjusted associations, map variable roles, and generate bounded candidate research questions. |
 | `research explore-promote` | Convert one exploration question into a modeling-plan handoff while enforcing promotion clearance and methods-review requirements. |
+| `research explore-plan` | Convert one exploration question into a formal planning artifact with an AnalysisSpec V2 draft, pre-execution gates, and promotion blockers. |
 
 Use `analysis-manifest --require-ready` in scripts when a run must be promotion-ready.
 
@@ -240,6 +244,9 @@ Use `analysis-manifest --require-ready` in scripts when a run must be promotion-
 
 | Command | Purpose |
 |---|---|
+| `research method-qa` | Run methods-aware QA over a run directory: convergence, separation, overfitting, missingness, collinearity, influence, effect/p-value consistency, claims, semantic plausibility, survey design, and artifact integrity. |
+| `research manuscript` | Generate a reader-facing publication-style manuscript and `manuscript-qa.json` from existing run artifacts. |
+| `research run-inspect` | Produce a unified readiness view across method QA, literature QA, paper/manuscript QA, lifecycle, cost, provenance, rerun stability, blockers, and next action. |
 | `research paper-qa` | QA a paper against evidence, claims, reader-facing language, readability, and known overclaim risks. |
 | `research paper-index` | Build an index over generated papers, including reader-facing language status for legacy/current paper separation. |
 | `research paper-lifecycle` | Summarize paper lifecycle, provenance, envelopes, and remaining review needs. |
@@ -248,6 +255,19 @@ Use `analysis-manifest --require-ready` in scripts when a run must be promotion-
 | `research benchmark-run` | Run validators for one benchmark. |
 | `research benchmark-score` | Score benchmark output. |
 | `research benchmark-suite` | Build a suite over golden packet directories. |
+| `research benchmark-suite-run` | Run continuous benchmark scoring over research packets/runs using unified inspection, method QA, report readiness, cost, rerun stability, and artifact integrity. |
+| `research benchmark-trend` | Read benchmark-suite-run history and report score deltas, regressions, and next action. |
+
+Trust-layer golden path:
+
+```bash
+agenteer research method-qa --run-dir ./run --out ./run/method-qa.json --report ./run/method-qa.md
+agenteer research manuscript --run-dir ./run
+agenteer research run-inspect --run-dir ./run --out ./run/run-inspection.json --report ./run/run-inspection.md
+agenteer research benchmark-suite-run --suite ./.loop-memory/golden --out-dir ./.loop-memory/benchmark-history
+```
+
+These commands deliberately distinguish technical execution from scientific readiness. A run can succeed and still be `needs_methods_review` or `blocked`.
 | `research qa-dashboard` | Summarize packet QA status. |
 | `research workflow-scorecard` | Score workflow quality. |
 | `research evidence-gap` | Identify missing evidence. |

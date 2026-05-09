@@ -1,0 +1,73 @@
+{
+  "matching": {
+    "match_ratio": 1,
+    "replacement": false,
+    "caliper_logit_sd": 0.4,
+    "caliper_logit_width": 1.7181357072536494,
+    "treated_total": 4,
+    "control_total": 176,
+    "matched_treated": 4,
+    "matched_controls": 4,
+    "matched_pairs": 4,
+    "unmatched_treated": 0,
+    "control_reuse_max": 1
+  },
+  "test": "propensity-score-matching",
+  "treatment_column": "treated",
+  "treatment_positive_level": 1,
+  "treatment_negative_level": 0,
+  "covariates": [
+    "age",
+    "bmi",
+    "severity",
+    "sex"
+  ],
+  "exact_covariates": [],
+  "propensity_model": {
+    "family": "logistic",
+    "n_parameters": 5,
+    "aic": 26.735947749274565,
+    "converged": true,
+    "propensity_min": 1e-06,
+    "propensity_max": 0.6845630195021268
+  },
+  "missingness": {
+    "input_rows": 180,
+    "complete_case_rows": 180,
+    "excluded_missing_rows": 0,
+    "complete_case_fraction": 1.0,
+    "missing_counts": {
+      "outcome": 0,
+      "treated": 0,
+      "age": 0,
+      "bmi": 0,
+      "severity": 0,
+      "sex": 0
+    }
+  },
+  "balance": {
+    "max_abs_smd_before": 2.1364263410355533,
+    "max_abs_smd_after": 0.9056579822940144,
+    "mean_abs_smd_before": 0.8602741500595343,
+    "mean_abs_smd_after": 0.32333068360315936,
+    "covariates_over_0_1_before": 3,
+    "covariates_over_0_1_after": 2,
+    "covariate_terms": 4
+  },
+  "positivity": {
+    "treated_min": 0.10072230320602528,
+    "treated_max": 0.6845630195021268,
+    "control_min": 1e-06,
+    "control_max": 0.4590304752591801,
+    "common_support_lower": 0.10072230320602528,
+    "common_support_upper": 0.4590304752591801,
+    "common_support_fraction": 0.05
+  },
+  "artifacts": {
+    "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/analysis-run/stats-run/propensity-scores.csv",
+    "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/analysis-run/stats-run/propensity-overlap.csv",
+    "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/analysis-run/stats-run/balance.csv",
+    "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0351-tiny-treated-block/analysis-run/stats-run/matched-pairs.csv",
+    "weights": null
+  }
+}

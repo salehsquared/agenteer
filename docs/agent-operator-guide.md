@@ -120,6 +120,7 @@ agenteer research analysis-run \
   --data ./rows.csv \
   --outcome outcome \
   --exposure exposure \
+  --literature ./literature-search.json \
   --method-selection ./method-selection.json \
   --analysis-spec ./analysis-spec.json \
   --require-bound \
@@ -204,7 +205,7 @@ Prefer durable JSON artifacts over prose-only progress:
 - Node execution: `node-contract.json`, `node-execution-record.json`.
 - Repairs: `repair-run.json`, `repair-provenance.json`.
 - Tasks: `task.json`, evidence receipts, MCP/A2A exports.
-- Research: `method-selection.json`, `modeling-plan.json`, `analysis-spec-v2.json`, `execution-contract.json`, `stats-run.json`, `ml-run.json`, `comparison.json`, `analysis-run-manifest.json`, `benchmark-eval.json`.
+- Research: `method-selection.json`, `modeling-plan.json`, `analysis-spec-v2.json`, `execution-contract.json`, `literature-search.json`, `literature-qa.json`, `stats-run.json`, `ml-run.json`, `comparison.json`, `analysis-run-manifest.json`, `benchmark-eval.json`.
 - Papers: `paper.md` for reader-facing scientific prose; `analysis.json`, `critique.md`, `paper-qa.json`, runner record, lifecycle files, and receipts for audit/provenance.
 - Specializations: `specialization.json`, candidate/evaluation/critique/repair/promotion records, report JSON/Markdown.
 

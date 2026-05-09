@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_6104135842249013599",
+    "method": "propensity-score-matching",
+    "status": "succeeded",
+    "rowCount": 360,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome",
+      "treated",
+      "age",
+      "bmi",
+      "severity",
+      "frailty",
+      "sex",
+      "site"
+    ],
+    "parameters": {
+      "alpha": 0.05,
+      "estimand": "ATT",
+      "matchRatio": 1,
+      "caliper": 0.25,
+      "replacement": false,
+      "trimThreshold": 0.01,
+      "stabilizeWeights": true,
+      "treatmentPositiveLevel": 1,
+      "treatmentNegativeLevel": 0
+    },
+    "estimates": [
+      {
+        "term": "treated",
+        "method": "nearest-neighbor propensity score matching",
+        "estimand": "ATT",
+        "effect_measure": "risk difference and odds ratio",
+        "estimate": 0.07692307692307693,
+        "risk_difference": 0.07692307692307693,
+        "treated_risk": 0.49230769230769234,
+        "control_risk": 0.4153846153846154,
+        "log_odds_ratio": 0.31097763505530335,
+        "odds_ratio": 1.3647586980920319,
+        "or_ci_low": 0.6826907658258871,
+        "or_ci_high": 2.7282722972891147,
+        "p_value": 0.37890861362505246,
+        "treated_n": 65,
+        "control_n": 65
+      }
+    ],
+    "diagnostics": {
+      "matching": {
+        "match_ratio": 1,
+        "replacement": false,
+        "caliper_logit_sd": 0.25,
+        "caliper_logit_width": 0.27183382931197814,
+        "treated_total": 167,
+        "control_total": 73,
+        "matched_treated": 65,
+        "matched_controls": 65,
+        "matched_pairs": 65,
+        "unmatched_treated": 102,
+        "control_reuse_max": 1
+      },
+      "test": "propensity-score-matching",
+      "treatment_column": "treated",
+      "treatment_positive_level": 1,
+      "treatment_negative_level": 0,
+      "covariates": [
+        "age",
+        "bmi",
+        "severity",
+        "frailty",
+        "sex",
+        "site"
+      ],
+      "exact_covariates": [
+        "sex"
+      ],
+      "propensity_model": {
+        "family": "logistic",
+        "n_parameters": 9,
+        "aic": 266.810728087814,
+        "converged": true,
+        "propensity_min": 0.1896092472934533,
+        "propensity_max": 0.9759403187693445
+      },
+      "missingness": {
+        "input_rows": 360,
+        "complete_case_rows": 240,
+        "excluded_missing_rows": 120,
+        "complete_case_fraction": 0.6666666666666666,
+        "missing_counts": {
+          "outcome": 0,
+          "treated": 0,
+          "age": 0,
+          "bmi": 120,
+          "severity": 30,
+          "frailty": 24,
+          "sex": 0,
+          "site": 0
+        }
+      },
+      "balance": {
+        "max_abs_smd_before": 0.617537913886921,
+        "max_abs_smd_after": 0.07809241932951796,
+        "mean_abs_smd_before": 0.2761518902059155,
+        "mean_abs_smd_after": 0.044356957978760485,
+        "covariates_over_0_1_before": 8,
+        "covariates_over_0_1_after": 0,
+        "covariate_terms": 8
+      },
+      "positivity": {
+        "treated_min": 0.24564487665793777,
+        "treated_max": 0.9759403187693445,
+        "control_min": 0.1896092472934533,
+        "control_max": 0.9206394105749208,
+        "common_support_lower": 0.24564487665793777,
+        "common_support_upper": 0.9206394105749208,
+        "common_support_fraction": 0.8666666666666667
+      },
+      "artifacts": {
+        "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/propensity-scores.csv",
+        "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/propensity-overlap.csv",
+        "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/balance.csv",
+        "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/matched-pairs.csv",
+        "weights": null
+      }
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_HIGH_COMPLETE_CASE_EXCLUSION",
+        "message": "120 of 360 rows were excluded before propensity estimation because of missing treatment, outcome, or covariates.",
+        "evidenceRefs": [
+          "diagnostics.missingness"
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "PROPENSITY_UNMATCHED_TREATED",
+        "message": "102 treated rows were unmatched under the caliper/exact-match policy.",
+        "evidenceRefs": [
+          "matched-pairs.csv"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/stats-config.json",
+        "sha256": "00e201acaef5871b82c19968b1b8bb189cb6534e573cb6160d17697832467e16"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/stats-summary.json",
+        "sha256": "c80d88200b01ca4d2dbf16f6cd5c30946dc3b239da07f196dbf42e90d3b7bb18"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/estimates.csv",
+        "sha256": "767dead323445ef1d3ac92786e080755d48f56d042a94fe19c8f840f0949bfc0"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/diagnostics.json",
+        "sha256": "f69be4c1f2ef062cf92f9fe53b35c750e09a377c5919b370e3f86c6860cec1cc"
+      },
+      {
+        "kind": "balance",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/balance.csv",
+        "sha256": "70d58928b79276712ab9c43b29ac447d7bd2df1b0e1de17f1dc395b57fa4fd4b"
+      },
+      {
+        "kind": "propensity-scores",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/propensity-scores.csv",
+        "sha256": "18896b899d61abae624e0f8322211025b443afb85fbc599bed5663cd9bff0277"
+      },
+      {
+        "kind": "propensity-overlap",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/propensity-overlap.csv",
+        "sha256": "629d2934576fd2d241d7932db1301aeca02333a518c453d170b6382fe8305ccc"
+      },
+      {
+        "kind": "matched-pairs",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/matched-pairs.csv",
+        "sha256": "cac15d6e5974961a1b6e87d103e34efbbe50ee9bd0174b84694e3e25cc786dd0"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/stats-report.md",
+        "sha256": "08db9da0e6c38244cbe0c8f544f2610d045eb71d40a32d86d8e11c594170ab54"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run/stats-qa.json",
+        "sha256": "aaeee210f473bc9d850011efae49fb52db5aab269b9c673f4ac16f626bf2692e"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/analysis-run/stats-run",
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/propensity-hardening-20260508/ticks/0344-missingness-stress/method-selection.json",
+      "methodSelectionId": "method_selection_4609ee25110d",
+      "methodId": "propensity-score-matching",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "bound"
+    },
+    "resultPosture": {
+      "status": "causal_design_review_required",
+      "label": "Causal design review required",
+      "interpretationBoundary": "This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect.",
+      "supports": [
+        "propensity score diagnostics",
+        "balance review",
+        "overlap/positivity review",
+        "local treatment-contrast estimation under declared assumptions"
+      ],
+      "cannotSupport": [
+        "causal claims without target-trial/DAG review",
+        "unmeasured-confounding control",
+        "clinical recommendations",
+        "external validity"
+      ],
+      "nextAction": "Review the target trial, confounding set, positivity, balance, missingness, and sensitivity plan before using causal language."
+    }
+  }
+}

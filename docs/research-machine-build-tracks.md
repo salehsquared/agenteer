@@ -100,15 +100,24 @@ MIMIC is now a partial first-class adapter rather than a design-only placeholder
 
 The platform should be evaluated against golden packets, not only unit tests. Golden cases should declare expected artifacts, expected failures, method requirements, rerun stability thresholds, paper QA rubrics, claim QA, and share/export policy.
 
-Current progress includes a formal golden packet, paper QA, manifest verification, lifecycle summaries, rerun stability, and real NHANES paper packets.
+Current progress includes a formal golden packet, paper QA, manifest verification, lifecycle summaries, rerun stability, real NHANES paper packets, methods-aware QA, publication-style manuscript generation, unified run inspection, exploration-to-formal-plan promotion, and continuous benchmark suite/trend commands.
 
 Next work:
 
-- promote the R-survey NHANES packet into a formal benchmark case
+- promote the strongest R-survey NHANES packet and strongest MIMIC run into formal benchmark cases
 - add five archetype benchmark packets
-- score runner correctness, artifact completeness, claim safety, and reproducibility separately
-- store score trends over time
+- expand `benchmark-suite-run` cases so runner correctness, artifact completeness, claim safety, methods correctness, report readability, cost discipline, rerun stability, and reproducibility are scored separately against declared expectations
+- store score trends over time with `benchmark-trend`
 - make benchmark failures emit typed repair plans
+
+The intended trust-layer sequence for a run is:
+
+```bash
+agenteer research method-qa --run-dir ./run --out ./run/method-qa.json --report ./run/method-qa.md
+agenteer research manuscript --run-dir ./run
+agenteer research run-inspect --run-dir ./run --out ./run/run-inspection.json --report ./run/run-inspection.md
+agenteer research benchmark-suite-run --suite ./.loop-memory/golden --out-dir ./.loop-memory/benchmark-history
+```
 
 ## 7. Planner / Product Layer
 

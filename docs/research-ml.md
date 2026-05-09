@@ -89,7 +89,7 @@ Use `research analysis-manifest --run-dir <dir>` after `stats-run` or `ml-run` t
 The same manifest command also accepts an `ml-compare` directory containing `comparison.json` and `model-review-card.md`; `--require-ready` then requires `baseline_comparison_ready` plus the review-card artifact.
 Use `research analysis-benchmark --run-dir <dir> --run-dir <dir> --require-ready --out benchmark.json --report benchmark.md` to check multiple stats, ML, or ML-comparison directories through the same manifest readiness gate. The benchmark reports route coverage across `stats`, `ml`, and `ml-comparison`, per-route readiness, artifact completeness, interpretation-boundary checks, and an explicit narrow-versus-multi-route coverage posture. Add `--require-multi-route` in promotion scripts when a single passing route should not count as benchmark maturity. This is the preferred gate for golden stats/ML route promotion.
 
-For standard-table statistics, `research analysis-run` composes the golden route in one bounded command while preserving intermediate artifacts: initial `modeling-plan.json`, `stats-run/`, `analysis-run-manifest.json`, and `modeling-plan-after-prior.json`. It accepts `--method-selection` and `--analysis-spec` and can enforce `--require-bound` so benchmark or paper-like runs fail unless execution is tied to upstream method/spec evidence. It is intentionally limited to the stats route for now; survey-aware paper generation remains under `paper-run`.
+For standard-table statistics, `research analysis-run` composes the golden route in one bounded command while preserving intermediate artifacts: initial `modeling-plan.json`, `stats-run/`, `analysis-run-manifest.json`, and `modeling-plan-after-prior.json`. It accepts `--method-selection` and `--analysis-spec` and can enforce `--require-bound` so benchmark or paper-like runs fail unless execution is tied to upstream method/spec evidence. It also accepts `--literature <literature-search.json>` to copy MedBrevia search evidence into the run and produce `literature-qa.json` / `literature-qa.md` against the generated reader-facing paper when one exists. It is intentionally limited to the stats route for now; survey-aware paper generation remains under `paper-run`.
 For `diagnostic-accuracy`, `analysis-run` also writes a concise `paper.md` and `paper-qa.json` at the analysis-run root. This diagnostic paper wrapper consumes the stats-run estimates, thresholds, intervals, QA posture, and manifest readiness; it is intended for local review and does not replace a full survey-aware or externally validated diagnostic paper workflow.
 
 When `--table` or `--table-summary` is supplied, the planner derives row count, feature count, target class count, maximum missingness, small-sample status, and high-dimensional status. These evidence fields affect ranking: small or high-missingness tables downgrade high-capacity ML, and high missingness emits a blocking policy for diagnostics/sensitivity before interpretation.
@@ -143,6 +143,43 @@ The planner reads the candidate question, target/outcome seed, table path when a
 
 The handoff also includes an `analysisSpecCandidate`. This is not executable by itself. It is the pre-spec bridge that records route intent, research question, estimand boundary, source population, outcome/exposure, excluded variables pending review, design requirements, suggested model family, required pre-execution checks, and exploration provenance. Use it to author or validate a real AnalysisSpec before runner execution.
 
+`explore-plan` is the stricter bridge when the next step should be a formal planning artifact rather than a loose handoff:
+
+```bash
+agenteer research explore-plan \
+  --exploration ./exploration/exploration.json \
+  --question question_01_abcd1234 \
+  --dataset mimic \
+  --methods-review-note "Reviewed exploratory multiplicity and proxy-variable risk; planning only." \
+  --out ./exploration/formal-plan.json \
+  --json
+```
+
+The output contains a formal plan, an AnalysisSpec V2 draft, validation status, blockers, warnings, required pre-execution checks, and recommended next commands. This makes exploration useful for hypothesis generation without letting unadjusted correlation search become an executable study by accident.
+
+## Trust Layer And Continuous Benchmarks
+
+Use the trust layer after `stats-run`, `ml-run`, `analysis-run`, `paper-run`, or manifest-backed `dataset-run`:
+
+```bash
+agenteer research method-qa --run-dir ./run --out ./run/method-qa.json --report ./run/method-qa.md
+agenteer research manuscript --run-dir ./run
+agenteer research run-inspect --run-dir ./run --out ./run/run-inspection.json --report ./run/run-inspection.md
+```
+
+`method-qa` is intentionally methods-aware rather than only artifact-aware. It checks numerical stability, separation, sparse or overfit models, missingness, regression diagnostics, effect-size consistency, claims, semantic plausibility, survey design, and artifact completeness.
+
+`run-inspect` is the preferred single status command for a run. It summarizes readiness, blockers, cost, provenance, paper/manuscript paths, QA, lifecycle state, rerun stability, and next action.
+
+For regression pressure over the whole research machine, use:
+
+```bash
+agenteer research benchmark-suite-run --suite ./.loop-memory/golden --out-dir ./.loop-memory/benchmark-history
+agenteer research benchmark-trend --history ./.loop-memory/benchmark-history
+```
+
+This continuous benchmark path scores packet completeness, methods correctness, QA pass/fail, rerun stability, cost discipline, report readability, and artifact integrity. It should run before major changes to the research-machine layer are promoted.
+
 ## Adapters
 
 Classification adapters include logistic regression, k-nearest neighbors, SVM, decision tree, random forest, extra trees, gradient boosting, AdaBoost, and MLP. XGBoost, LightGBM, and CatBoost are registered as optional adapters and report the missing package instead of breaking the registry.
@@ -172,6 +209,8 @@ Dimensionality reduction adapters include PCA, truncated SVD, NMF, and t-SNE. UM
 - `logistic-regression`
 - `poisson-regression`
 - `diagnostic-accuracy`
+- `propensity-score-matching`
+- `propensity-score-weighting`
 
 Example:
 
@@ -190,8 +229,31 @@ agenteer research stats-run \
 Each run writes `stats-run.json`, `stats-summary.json`, `estimates.csv`, `diagnostics.json`, `stats-report.md`, and `stats-qa.json` with artifact hashes. The run also declares a typed `resultPosture` such as `exploratory_standard_table`, `bound_standard_table`, `exploratory_survey_approximation`, `blocked_survey_required`, or `invalid_binding`. The report includes the posture, interpretation boundary, local-review safety header, and p-value/effect-size interpretation cautions. This runner is for standard table methods and does not replace survey-aware `paper-run --backend r-survey` when complex survey variance is required.
 `diagnostic-accuracy` expects a binary reference outcome in `--outcome` and a binary test/screen indicator in `--exposure` or `--group`. If the reference or index-test columns are continuous, pass `--outcome-threshold <n>` and/or `--exposure-threshold <n>` to derive positive indicators using `>= threshold`. It reports a confusion matrix, sensitivity, specificity, PPV, NPV, likelihood ratios, accuracy, prevalence, and Wilson intervals for sensitivity/specificity/PPV/NPV. Treat PPV/NPV as prevalence-dependent and local to the analyzed table unless external validation is supplied.
 Diagnostic accuracy planning follows the STARD framing: keep the reference standard and index test explicit, preserve participant/sampling context, and do not promote screening recommendations from local accuracy estimates alone. STARD-AI adds additional dataset-practice, algorithmic-bias, and fairness disclosure pressure for AI-centered diagnostic tests; Agenteer's current diagnostic route is a classical standard-table route, not a deployment-ready AI diagnostic workflow.
+
+`propensity-score-matching` and `propensity-score-weighting` are executable causal-design-review routes. Use `--exposure` or `--group` for the binary treatment/exposure, `--outcome` for the endpoint, and repeat `--covariate` for baseline confounders. Matching supports `--match-ratio`, `--caliper` in standard deviations of the logit propensity score, `--replacement`, and repeated `--exact-covariate` constraints. Weighting supports `--estimand ATE|ATT`, `--trim-threshold`, and `--no-stabilize-weights`. Both routes estimate propensity scores with a logistic treatment model and write standardized mean-difference balance diagnostics before and after adjustment.
+
+Example:
+
+```bash
+agenteer research stats-run \
+  --method propensity-score-matching \
+  --data ./rows.csv \
+  --outcome mortality \
+  --exposure treatment \
+  --covariate age \
+  --covariate sex \
+  --covariate severity_score \
+  --exact-covariate sex \
+  --match-ratio 1 \
+  --caliper 0.2 \
+  --out-dir ./psm-run \
+  --json
+```
+
+Propensity runs write the standard stats artifacts plus `propensity-scores.csv`, `propensity-overlap.csv`, `balance.csv`, and either `matched-pairs.csv` or `weights.csv`. Their `resultPosture` is `causal_design_review_required`, not `bound_standard_table`, because a successful match or IPTW run still cannot prove a causal effect by itself. Before causal language, review the target-trial framing, treatment time zero, measured confounder set, post-treatment variable exclusion, positivity/overlap, residual imbalance, missingness, and sensitivity to unmeasured confounding.
+
 If `--survey` is supplied, `stats-run` refuses execution unless `--allow-survey-approximation` is also supplied. The approximation flag records a warning issue and should be treated as exploratory, not paper-ready inference.
-The runner emits typed issues such as sparse expected cells, low complete-case N, possible logistic separation/extreme log-odds, regression non-convergence, and Poisson overdispersion.
+The runner emits typed issues such as sparse expected cells, low complete-case N, possible logistic separation/extreme log-odds, regression non-convergence, Poisson overdispersion, poor propensity overlap, residual imbalance, unmatched treated rows, extreme IPTW weights, and trimmed non-overlap rows.
 Use `--method-selection <selection.json>` and `--analysis-spec <spec.json>` to bind a stats run back to upstream planning evidence. A method-selection mismatch, such as trying to run logistic regression from a t-test selection, fails before execution.
 
 ## Preprocessing
