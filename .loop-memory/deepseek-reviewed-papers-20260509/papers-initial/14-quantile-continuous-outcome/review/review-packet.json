@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:28:00.399Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome",
+  "packetHash": "4338ab19f3bebde46105fd776056036363e5417569695656a2f3076f2c57ea10",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 7,
+    "totalBytes": 129858,
+    "includedBytes": 20032
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 4141,
+      "sha256": "764de82431fff10346487a2a6f22ca994242cdc09ebfff6c108d65dfad3b9e29",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was linear. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was linear. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the estimate was 7.7715 (95% CI 6.2047 to 9.3383); p=0.0000.\n- For treatment, the estimate was 1.3071 (95% CI 0.6441 to 1.9701); p=0.0001.\n- For age, the estimate was 0.1362 (95% CI 0.1140 to 0.1583); p=0.0000.\n- For severity, the estimate was 1.9534 (95% CI 1.5716 to 2.3352); p=0.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is b750127a785a1e4e2997dcbf64f9a7862111227d44cedc82887959ca90cbd1a4. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 5400,
+      "sha256": "3457c1b77de8ec71a1bfc0d7fa42a72ac117b70311964745a58dd8d894bc39d0",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_7000043416299763698\",\n  \"method\": \"quantile-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_cont\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": 7.77147538337158,\n      \"std_error\": 0.7953120408562215,\n      \"p_value\": 3.714334661542577e-19,\n      \"ci_low\": 6.204657493808534,\n      \"ci_high\": 9.338293272934626\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 1.307090856054856,\n      \"std_error\": 0.3365364815376296,\n      \"p_value\": 0.0001334962565484341,\n      \"ci_low\": 0.6440914889182945,\n      \"ci_high\": 1.9700902231914175\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.1361755905436297,\n      \"std_error\": 0.011239023698154174,\n      \"p_value\": 1.3567268053559856e-26,\n      \"ci_low\": 0.11403396249467819,\n      \"ci_high\": 0.15831721859258122\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 1.9533899710331752,\n      \"std_error\": 0.19379397033494308,\n      \"p_value\": 4.203725724663876e-20,\n      \"ci_low\": 1.571602893745442,\n      \"ci_high\": 2.3351770483209084\n    }\n  ],\n  \"diagnostics\": {\n    \"model_family\": \"quantile-regression\",\n    \"aic\": null,\n    \"bic\": null,\n    \"df_resid\": 236,\n    \"residual_mean\": -0.10200159780451092,\n    \"residual_sd\": 1.9317492341797067,\n    \"shapiro_p_value\": 0.3929115908747711,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.1266739538918475\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0808383501003018\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.146630084030013\n      }\n    ],\n    \"max_vif\": 1.146630084030013,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-config.json\",\n      \"sha256\": \"25afe6f1cf71413889a0472e2dd84d35ac61110ee70051f2d0fe46fd8bf2477a\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-summary.json\",\n      \"sha256\": \"9bfa616990db9001c9d5419a42ccd34df3a47bad1842be0af6ae3a1b9d20981c\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/estimates.csv\",\n      \"sha256\": \"1ec7cc04a15d97a4fca1fb67088dd3ce3b582ac51acdb64e5a6da9efbdd47d51\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/diagnostics.json\",\n      \"sha256\": \"400d5a8ffe0356078b247ad88fe9bf6226dba9d9afcf2f166485fc6b553d505a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figures.json\",\n      \"sha256\": \"41070aac76847cb18339bb418b4e24c20cbe1fdf9e621dffe849350d53b5a016\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/model-residuals.png\",\n      \"sha256\": \"d275359e6866d43850523b1f2b3969b9db589eb40db47ff68680ec00e05880a3\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figure-qa.json\",\n      \"sha256\": \"436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-report.md\",\n      \"sha256\": \"0ff005464a20f5e6378ddb8574eb50b39e149f80b3e952b566b796a3628fb73c\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-qa.json\",\n      \"sha256\": \"ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 489,
+      "sha256": "400d5a8ffe0356078b247ad88fe9bf6226dba9d9afcf2f166485fc6b553d505a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"model_family\": \"quantile-regression\",\n  \"aic\": null,\n  \"bic\": null,\n  \"df_resid\": 236.0,\n  \"residual_mean\": -0.10200159780451092,\n  \"residual_sd\": 1.9317492341797067,\n  \"shapiro_p_value\": 0.3929115908747711,\n  \"vif\": [\n    {\n      \"term\": \"treatment\",\n      \"vif\": 1.1266739538918475\n    },\n    {\n      \"term\": \"age\",\n      \"vif\": 1.0808383501003018\n    },\n    {\n      \"term\": \"severity\",\n      \"vif\": 1.146630084030013\n    }\n  ],\n  \"max_vif\": 1.146630084030013,\n  \"weighted\": false\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"4 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend bloc"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3617,
+      "sha256": "436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3617,
+      "sha256": "436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1231,
+      "sha256": "41070aac76847cb18339bb418b4e24c20cbe1fdf9e621dffe849350d53b5a016",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2220,
+      "sha256": "6c7a3933d83be140d9e5972286a28fa8cf1abd3a8d8662872694b2ba8a1babd5",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9828,
+      "sha256": "bf2823793756d7926806c414ff03f182c3c9580e95ce1e0c1c522947223ec1e8",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1532,
+      "sha256": "d42c81d8e75c189e3817afccf0471a47c6c7006ea2b524ae1b127021a70dfabc",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4191,
+      "sha256": "1b05289e68e9f98cf6338ee24a56b091dbd61d6f88da2eed8885454f0d1ca25e",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14950,
+      "sha256": "c2e9908f0a9b18a1b69fc8e8f6738581f939d149c20d1d59165a9ba76361f79a",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4318,
+      "sha256": "3ca5c4e5425666b257b6467a96741683cab199c577015229a7c4df8240ff93bf",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 814,
+      "sha256": "747d6c871d342fd76119165b54d87ddc33581a9c25562d9a89de7376a9dd0593",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9964,
+      "sha256": "c20bb09ff1bcda59d49ce1a34017cc8495df19c6a47ab86ff43a5c2b4ed10214",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 999,
+      "sha256": "d37006f600c6454b4491c987c702e1287309d858bd5556ca29ca03b7a915fb0f",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 5741,
+      "sha256": "51e5e59a794787c9fdbab96c090ab1999c8a8ded3be4df15ea15524c96d32d14",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 468,
+      "sha256": "1ec7cc04a15d97a4fca1fb67088dd3ce3b582ac51acdb64e5a6da9efbdd47d51",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/model-residuals.png",
+      "relativePath": "stats-run/model-residuals.png",
+      "bytes": 52147,
+      "sha256": "d275359e6866d43850523b1f2b3969b9db589eb40db47ff68680ec00e05880a3",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 668,
+      "sha256": "25afe6f1cf71413889a0472e2dd84d35ac61110ee70051f2d0fe46fd8bf2477a",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1762,
+      "sha256": "0ff005464a20f5e6378ddb8574eb50b39e149f80b3e952b566b796a3628fb73c",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 224,
+      "sha256": "9bfa616990db9001c9d5419a42ccd34df3a47bad1842be0af6ae3a1b9d20981c",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 4141 bytes, sha256=764de82431fff10346487a2a6f22ca994242cdc09ebfff6c108d65dfad3b9e29) ---\n# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was linear. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was linear. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the estimate was 7.7715 (95% CI 6.2047 to 9.3383); p=0.0000.\n- For treatment, the estimate was 1.3071 (95% CI 0.6441 to 1.9701); p=0.0001.\n- For age, the estimate was 0.1362 (95% CI 0.1140 to 0.1583); p=0.0000.\n- For severity, the estimate was 1.9534 (95% CI 1.5716 to 2.3352); p=0.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is b750127a785a1e4e2997dcbf64f9a7862111227d44cedc82887959ca90cbd1a4. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 5400 bytes, sha256=3457c1b77de8ec71a1bfc0d7fa42a72ac117b70311964745a58dd8d894bc39d0) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_7000043416299763698\",\n  \"method\": \"quantile-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_cont\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": 7.77147538337158,\n      \"std_error\": 0.7953120408562215,\n      \"p_value\": 3.714334661542577e-19,\n      \"ci_low\": 6.204657493808534,\n      \"ci_high\": 9.338293272934626\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 1.307090856054856,\n      \"std_error\": 0.3365364815376296,\n      \"p_value\": 0.0001334962565484341,\n      \"ci_low\": 0.6440914889182945,\n      \"ci_high\": 1.9700902231914175\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.1361755905436297,\n      \"std_error\": 0.011239023698154174,\n      \"p_value\": 1.3567268053559856e-26,\n      \"ci_low\": 0.11403396249467819,\n      \"ci_high\": 0.15831721859258122\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 1.9533899710331752,\n      \"std_error\": 0.19379397033494308,\n      \"p_value\": 4.203725724663876e-20,\n      \"ci_low\": 1.571602893745442,\n      \"ci_high\": 2.3351770483209084\n    }\n  ],\n  \"diagnostics\": {\n    \"model_family\": \"quantile-regression\",\n    \"aic\": null,\n    \"bic\": null,\n    \"df_resid\": 236,\n    \"residual_mean\": -0.10200159780451092,\n    \"residual_sd\": 1.9317492341797067,\n    \"shapiro_p_value\": 0.3929115908747711,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.1266739538918475\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0808383501003018\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.146630084030013\n      }\n    ],\n    \"max_vif\": 1.146630084030013,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-config.json\",\n      \"sha256\": \"25afe6f1cf71413889a0472e2dd84d35ac61110ee70051f2d0fe46fd8bf2477a\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-summary.json\",\n      \"sha256\": \"9bfa616990db9001c9d5419a42ccd34df3a47bad1842be0af6ae3a1b9d20981c\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/estimates.csv\",\n      \"sha256\": \"1ec7cc04a15d97a4fca1fb67088dd3ce3b582ac51acdb64e5a6da9efbdd47d51\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/diagnostics.json\",\n      \"sha256\": \"400d5a8ffe0356078b247ad88fe9bf6226dba9d9afcf2f166485fc6b553d505a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figures.json\",\n      \"sha256\": \"41070aac76847cb18339bb418b4e24c20cbe1fdf9e621dffe849350d53b5a016\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/model-residuals.png\",\n      \"sha256\": \"d275359e6866d43850523b1f2b3969b9db589eb40db47ff68680ec00e05880a3\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figure-qa.json\",\n      \"sha256\": \"436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-report.md\",\n      \"sha256\": \"0ff005464a20f5e6378ddb8574eb50b39e149f80b3e952b566b796a3628fb73c\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-qa.json\",\n      \"sha256\": \"ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 489 bytes, sha256=400d5a8ffe0356078b247ad88fe9bf6226dba9d9afcf2f166485fc6b553d505a) ---\n{\n  \"model_family\": \"quantile-regression\",\n  \"aic\": null,\n  \"bic\": null,\n  \"df_resid\": 236.0,\n  \"residual_mean\": -0.10200159780451092,\n  \"residual_sd\": 1.9317492341797067,\n  \"shapiro_p_value\": 0.3929115908747711,\n  \"vif\": [\n    {\n      \"term\": \"treatment\",\n      \"vif\": 1.1266739538918475\n    },\n    {\n      \"term\": \"age\",\n      \"vif\": 1.0808383501003018\n    },\n    {\n      \"term\": \"severity\",\n      \"vif\": 1.146630084030013\n    }\n  ],\n  \"max_vif\": 1.146630084030013,\n  \"weighted\": false\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"4 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend bloc\n\n--- ARTIFACT figure-qa.json (json, 3617 bytes, sha256=436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1) ---\n\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3617 bytes, sha256=436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1231 bytes, sha256=41070aac76847cb18339bb418b4e24c20cbe1fdf9e621dffe849350d53b5a016) ---\n"
+}

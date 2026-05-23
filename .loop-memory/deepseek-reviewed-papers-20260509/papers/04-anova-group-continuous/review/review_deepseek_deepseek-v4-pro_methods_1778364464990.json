@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:07:44.990Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778364464990",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:methods",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "clinical methods and study-design reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "revise",
+    "summary": "The ANOVA analysis is methodologically sound in terms of basic execution, but critical reporting gaps and missing assumption checks undermine interpretability and reproducibility. Specifically, no effect size is reported despite available sums of squares, the homogeneity of variance assumption is unverified, the cohort is inadequately described, and there are contradictory statements about available estimates. These issues must be resolved before the manuscript can be promoted.",
+    "findings": [
+      {
+        "id": "F01",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "No effect size reported despite available data",
+        "evidenceRefs": [
+          "manuscript.md: \"No estimate-like records were available for p-value/effect-size checks.\"",
+          "stats-run.json: estimates include sum_sq (37.556 for group, 3093.747 residual)"
+        ],
+        "whyItMatters": "The ASA statement discourages sole reliance on p-values. An effect size (e.g., eta-squared) is essential to interpret practical importance, especially with a non-significant p-value and a sample of 240.",
+        "actionableFix": "Compute and report eta-squared (or partial eta-squared) from the provided sums of squares: eta_sq = 37.556 / (37.556 + 3093.747). Also report a confidence interval if possible.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "eta_sq = 37.556 / (37.556 + 3093.747) = 0.0120",
+        "confidence": 0.95
+      },
+      {
+        "id": "F02",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Homogeneity of variance assumption not checked",
+        "evidenceRefs": [
+          "diagnostics.json: only Shapiro-Wilk, VIF, leverage, Cook's D; no Levene's or Bartlett's test",
+          "manuscript.md: no mention of equal variance check"
+        ],
+        "whyItMatters": "ANOVA assumes equal variances across groups. Without verification, the F-test may be invalid, especially if group sizes are unbalanced (unknown). A non-significant Shapiro-Wilk does not address this.",
+        "actionableFix": "Run Levene's test (or Bartlett's) on the residuals or original outcome by group, and report the result. If violated, consider Welch's ANOVA or transformation.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.9
+      },
+      {
+        "id": "F03",
+        "severity": "major",
+        "category": "cohort",
+        "title": "Cohort definition insufficiently described",
+        "evidenceRefs": [
+          "manuscript.md: only states \"240 complete-case records\", no eligibility, group sizes, demographics, or source population"
+        ],
+        "whyItMatters": "The lack of cohort detail makes it impossible to assess generalizability, potential confounding, or selection biases. It also hinders reproducibility and clinical interpretation.",
+        "actionableFix": "Add a clear cohort description: inclusion/exclusion criteria, how groups were defined, number per group, any relevant baseline characteristics (age, sex, etc.), and handling of missing data beyond complete-case exclusion.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9
+      },
+      {
+        "id": "F04",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Inconsistent statement about estimate availability",
+        "evidenceRefs": [
+          "manuscript.md: \"No estimate-like records were available for p-value/effect-size checks.\"",
+          "stats-run.json: contains F_statistic, p_value, and sum_sq"
+        ],
+        "whyItMatters": "This contradictory statement misleads readers about the depth of available analysis and undermines trust in the quality control process.",
+        "actionableFix": "Update the limitations section to accurately reflect that effect size could have been computed but was not, or remove the incorrect sentence.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95
+      },
+      {
+        "id": "F05",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Vague reference to unresolved advisory issues",
+        "evidenceRefs": [
+          "manuscript.md: \"The methods review found advisory issues that need human review.\""
+        ],
+        "whyItMatters": "Readers cannot evaluate whether these issues affect the conclusion. Transparency requires specifying what advisory issues remain.",
+        "actionableFix": "Either list the specific advisory issues in the limitations or remove the statement if they have been resolved.",
+        "reentryPoint": "human_review",
+        "deterministicVerification": null,
+        "confidence": 0.8
+      },
+      {
+        "id": "F06",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Group variable categories not described",
+        "evidenceRefs": [
+          "diagnostics.json: VIF terms \"group_enhanced\" and \"group_standard\""
+        ],
+        "whyItMatters": "Without naming the groups, the clinical question \"Does the continuous outcome differ across clinical groups?\" is ambiguous.",
+        "actionableFix": "Define the group variable and its levels (e.g., control, enhanced treatment, standard treatment) in the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.85
+      },
+      {
+        "id": "F07",
+        "severity": "minor",
+        "category": "missingness",
+        "title": "No exploration of missing data patterns",
+        "evidenceRefs": [
+          "manuscript.md: acknowledges complete-case exclusion may affect result, but no quantification"
+        ],
+        "whyItMatters": "If missingness is non-trivial and related to outcome or group, bias may be introduced. The absence of any missingness analysis weakens the robustness of findings.",
+        "actionableFix": "Report the number of excluded records, compare demographics between included and excluded if data allow, or state that missingness was minimal (<5%) and presumed random.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": null,
+        "confidence": 0.8
+      }
+    ],
+    "missingEvidence": [
+      "manuscript-qa.json content not provided in artifact packet",
+      "Raw data not available to verify group sizes, actual variable coding, or missingness patterns",
+      "No post-hoc power analysis or justification for sample size"
+    ],
+    "recommendedNextStage": "manuscript",
+    "costEstimate": {
+      "inputTokens": 3032,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026156,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778364464990.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778364464990.json"
+  }
+}

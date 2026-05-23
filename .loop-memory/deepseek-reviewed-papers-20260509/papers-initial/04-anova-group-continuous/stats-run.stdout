@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_8210848328934684610",
+    "method": "anova",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "group"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "C(group)",
+        "sum_sq": 37.55615773333331,
+        "df": 2,
+        "f_statistic": 1.4385158270118084,
+        "p_value": 0.23934374159285068
+      },
+      {
+        "term": "Residual",
+        "sum_sq": 3093.7474637625,
+        "df": 237,
+        "f_statistic": null,
+        "p_value": null
+      }
+    ],
+    "diagnostics": {
+      "model_family": "anova",
+      "aic": 1300.6503719016189,
+      "bic": 1311.0922886716448,
+      "df_resid": 237,
+      "residual_mean": -1.0894988614988204e-14,
+      "residual_sd": 3.597853534759813,
+      "shapiro_p_value": 0.38269057489017577,
+      "max_leverage": 0.012500000000000016,
+      "max_cooks_distance": 0.0535285941879534,
+      "vif": [
+        {
+          "term": "group_enhanced",
+          "vif": 1.3333333333333337
+        },
+        {
+          "term": "group_standard",
+          "vif": 1.3333333333333337
+        }
+      ],
+      "max_vif": 1.3333333333333337,
+      "test": "ANOVA"
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-config.json",
+        "sha256": "fefac82a2883c39c68a62b59ca47ab96e2da5660a1e4a008ff2d61f9996f29a8"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-summary.json",
+        "sha256": "52be04761101605dfefb5176cefcea1315d89361ee8e7dc5a2fdf00d91274864"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/estimates.csv",
+        "sha256": "474b468daca6ce560a3aaa65345e691e8bd6ef81c17d3f70f3e1b3ae841d0afc"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/diagnostics.json",
+        "sha256": "a7dfb9928a22332a3d708b7dd6f25a5a68ec41101f2715c25d182507e4450738"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/figures.json",
+        "sha256": "9c9ab830cde4746c153df38f523b320dc8f580a60ba91665a951f3750cf7cf4f"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/anova-group-distribution.png",
+        "sha256": "06b2ac5cca3af4f4d1a796b421f2e1a1caf5669eb81f40281d0cd19f5fb7edbf"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/figure-qa.json",
+        "sha256": "f4f079d1b5b02b410d9a46bec2db8421fc658aac0322eef202f46f2f3f4bd401"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-report.md",
+        "sha256": "3bd5331d18c9f27c9575dc5c0b0f208e01e80d25f1a0424035969100c90bacb5"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-qa.json",
+        "sha256": "2e3be47c87c4e72e4831714eaef1bf144f3301dd0cbf233af2899d387818f9ed"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}
+

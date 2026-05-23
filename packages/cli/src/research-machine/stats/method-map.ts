@@ -34,6 +34,7 @@ const analysisMethodToStatsMethod: Readonly<Record<string, StatsMethod>> = {
   "kaplan-meier-log-rank": "kaplan-meier",
   "cox-proportional-hazards": "cox-proportional-hazards",
   "fine-gray-competing-risks": "fine-gray",
+  "aalen-johansen-cumulative-incidence": "aalen-johansen-cif",
   "linear-mixed-model": "linear-mixed-model",
   "generalized-estimating-equations": "gee",
   "repeated-measures-anova": "repeated-measures-anova",
@@ -51,6 +52,8 @@ const analysisMethodToStatsMethod: Readonly<Record<string, StatsMethod>> = {
   "diagnostic-accuracy-basic": "diagnostic-accuracy",
   "propensity-score-matching": "propensity-score-matching",
   "propensity-score-weighting": "propensity-score-weighting",
+  "prediction-performance-evaluation": "prediction-evaluation",
+  "cross-validation-bootstrap-validation": "prediction-evaluation",
 };
 
 export function statsRunMethodForAnalysisMethod(methodId: string): StatsMethod | null {

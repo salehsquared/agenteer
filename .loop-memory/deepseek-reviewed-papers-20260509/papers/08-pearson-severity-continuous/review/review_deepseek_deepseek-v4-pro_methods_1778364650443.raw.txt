@@ -1,0 +1,103 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript is a placeholder that lacks the core numeric result, variable definitions, assumptions checks, and necessary methodological details. The analysis (Pearson correlation) is not adequately reported and the claims cannot be evaluated.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Primary result omitted from manuscript",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The manuscript fails to state the correlation coefficient (r=0.658) and p-value, making it impossible to assess the study's main finding. This omission prevents any meaningful review or interpretation.",
+      "actionableFix": "Add the Pearson correlation coefficient, its 95% confidence interval, p-value, and sample size to the Results section and Abstract.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the manuscript now contains numeric output from stats-run.json (correlation=0.6579, p=3.87e-31, n=240).",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No verification of Pearson correlation assumptions",
+      "evidenceRefs": [
+        "diagnostics.json",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Pearson correlation assumes linearity, bivariate normality, and absence of influential outliers. Without checks, the estimated r=0.658 may be misleading.",
+      "actionableFix": "Provide a scatterplot with LOESS smoother, test for normality (Shapiro-Wilk), and report outlier diagnostics. If assumptions fail, consider Spearman correlation or transformation.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variable definitions and measurement missing",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without knowing what 'severity' and 'outcome_cont' represent (e.g., clinical scale, units, range), the clinical relevance and potential floor/ceiling effects cannot be judged.",
+      "actionableFix": "Describe each variable: what it measures, how it was collected, its possible range, and any known validation. Provide summary statistics (mean, SD, min, max).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "study_design",
+      "title": "No adjustment for potential confounders",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Observational association can be confounded. Even if no causal claim is made, the raw correlation may over- or underestimate the true relationship and limits the interpretation of the strength of linear association.",
+      "actionableFix": "Either adjust for known confounders (if available) or explicitly state that no confounders were measured and discuss this as a key limitation in the Discussion.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "missingness",
+      "title": "Missing data handling not described",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The analysis uses 240 complete cases, but the original sample size and proportion of missingness are unknown. Non-random missingness could bias the correlation.",
+      "actionableFix": "Report the initial sample size, number excluded for missing data, and compare demographics of excluded vs. included subjects if possible. If not, acknowledge as limitation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "info",
+      "category": "reporting",
+      "title": "Ethical approval and data provenance not stated",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Medical/public-health studies must disclose ethical review and data source per reporting guidelines (e.g., STROBE).",
+      "actionableFix": "Add a statement on institutional review board (IRB) approval or exemption, and source of the dataset.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions and measurement properties",
+    "Assumptions checks for Pearson correlation (linearity, normality, outliers)",
+    "Scatterplot and its interpretation",
+    "Confounding variables and adjusted analysis",
+    "Missing data proportion and handling",
+    "Ethical approval and data provenance"
+  ],
+  "recommendedNextStage": "manuscript"
+}

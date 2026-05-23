@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:25:10.961Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment",
+  "packetHash": "a477eb802d4af39d2bfbbf35b9b099ced4ef7cb8d0cc8fa557f9c629944573ec",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 6,
+    "totalBytes": 148602,
+    "includedBytes": 20321
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 4243,
+      "sha256": "06588d58058dc9b475a9f255637ced867a1d0070a1c277e61e36658e15118e5a",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was logistic. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was logistic. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the odds ratio was 0.0178 (95% CI -7.6513 to -0.4046); p=0.0293.\n- For treatment, the odds ratio was 1.6092 (95% CI -0.1786 to 1.1301); p=0.1541.\n- For age, the odds ratio was 1.0442 (95% CI 0.0210 to 0.0656); p=0.0001.\n- For severity, the odds ratio was 2.3020 (95% CI 0.4172 to 1.2504); p=0.0001.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- Logistic-type model detected; explicit separation diagnostic evidence was not found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 96c037b0e9987f378d0116ce8c9f93165696b728ae76158168b81638945fbc75. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 6515,
+      "sha256": "2c02796ea35ca12dbe7b2d87a7e71c58b9aa3f3c370f841f1e0a37a6e9575296",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_9129202269560836722\",\n  \"method\": \"logistic-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\",\n    \"age\",\n    \"severity\",\n    \"albumin\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": -4.027949563869277,\n      \"std_error\": 1.8486773765870437,\n      \"p_value\": 0.029344466851205203,\n      \"ci_low\": -7.651290641013873,\n      \"ci_high\": -0.4046084867246811,\n      \"odds_ratio\": 0.01781081247175052,\n      \"or_ci_low\": 0.00047543012326068133,\n      \"or_ci_high\": 0.6672379922589119\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 0.4757562688242516,\n      \"std_error\": 0.3338524176897034,\n      \"p_value\": 0.15414285140348566,\n      \"ci_low\": -0.17858244599918993,\n      \"ci_high\": 1.1300949836476932,\n      \"odds_ratio\": 1.6092307484540973,\n      \"or_ci_low\": 0.836455091658669,\n      \"or_ci_high\": 3.095950550835882\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.04326312675821376,\n      \"std_error\": 0.01137437975846303,\n      \"p_value\": 0.0001426318886337378,\n      \"ci_low\": 0.020969752085144823,\n      \"ci_high\": 0.0655565014312827,\n      \"odds_ratio\": 1.0442126189867118,\n      \"or_ci_low\": 1.0211911622670344,\n      \"or_ci_high\": 1.067753065185616\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 0.8337884943009074,\n      \"std_error\": 0.21256252401927272,\n      \"p_value\": 0.00008761436594307729,\n      \"ci_low\": 0.4171736027602027,\n      \"ci_high\": 1.2504033858416121,\n      \"odds_ratio\": 2.3020234436901754,\n      \"or_ci_low\": 1.5176659610666685,\n      \"or_ci_high\": 3.4917511964059824\n    },\n    {\n      \"term\": \"albumin\",\n      \"estimate\": -0.5576783461621193,\n      \"std_error\": 0.44310315220151747,\n      \"p_value\": 0.20818404772561372,\n      \"ci_low\": -1.4261445659132637,\n      \"ci_high\": 0.31078787358902493,\n      \"odds_ratio\": 0.572536754186453,\n      \"or_ci_low\": 0.24023334289620277,\n      \"or_ci_high\": 1.3644997440508921\n    }\n  ],\n  \"diagnostics\": {\n    \"outcome_levels\": [\n      0,\n      1\n    ],\n    \"model_family\": \"logistic-regression\",\n    \"aic\": 265.0746533802754,\n    \"bic\": -1032.8754936050925,\n    \"df_resid\": 235,\n    \"residual_mean\": -2.986129861900129e-14,\n    \"residual_sd\": 0.424457050745109,\n    \"shapiro_p_value\": 5.624175292591292e-8,\n    \"max_leverage\": 0.07232260818528582,\n    \"max_cooks_distance\": 0.04521966749444961,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.153746929736106\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0812043670722995\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.2046947030591237\n      },\n      {\n        \"term\": \"albumin\",\n        \"vif\": 1.1134517131321229\n      }\n    ],\n    \"max_vif\": 1.2046947030591237,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-config.json\",\n      \"sha256\": \"f98315f3723d92a9223cfa05fd48e8fe6f8b425d08b3f52a67a570c7d724bdd5\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-summary.json\",\n      \"sha256\": \"bed898d95cff9d5b142bffe690328043ad263a2be3b3b07529f2b254218bed72\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/estimates.csv\",\n      \"sha256\": \"b2f0a9c3464d7c421272ae669fff15de2f85b29f367e7215fbd0a6f4da0e972e\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/diagnostics.json\",\n      \"sha256\": \"d53bd54ccc6b4d4cc10d026821fae63e16a6195b3dcf215579c56b20d5f8021d\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figures.json\",\n      \"sha256\": \"bb74b366baa681236a727e4096a8b1658fda0b42e003e1986482a0d57498eea5\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/model-residuals.png\",\n      \"sha256\": \"3ee736d1ec35df25f9249eb6f27df84e66b8326e3e00d6dda97b9ba7df40541b\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figure-qa.json\",\n      \"sha256\": \"384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-report.md\",\n      \"sha256\": \"2a6b0f8cd9e160576338a226b0299dc6b06e7e7018f2383c753ea755a34db768\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-qa.json\",\n      \"sha256\": \"a9b9295e52cc44ef37561c555f80975c3a54e4edbaf92b45dd112d1329d93519\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 714,
+      "sha256": "d53bd54ccc6b4d4cc10d026821fae63e16a6195b3dcf215579c56b20d5f8021d",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"outcome_levels\": [\n    0,\n    1\n  ],\n  \"model_family\": \"logistic-regression\",\n  \"aic\": 265.0746533802754,\n  \"bic\": -1032.8754936050925,\n  \"df_resid\": 235,\n  \"residual_mean\": -2.986129861900129e-14,\n  \"residual_sd\": 0.424457050745109,\n  \"shapiro_p_value\": 5.624175292591292e-08,\n  \"max_leverage\": 0.07232260818528582,\n  \"max_cooks_distan"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "a9b9295e52cc44ef37561c555f80975c3a54e4edbaf92b45dd112d1329d93519",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3656,
+      "sha256": "384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3656,
+      "sha256": "384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1254,
+      "sha256": "bb74b366baa681236a727e4096a8b1658fda0b42e003e1986482a0d57498eea5",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2242,
+      "sha256": "824848e2b178a37fd64488509b1f012b0f0ffbed3fa5e5cc172fdccb4306f544",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 10002,
+      "sha256": "c04036a33a75a8d308c55b4da5d50d0350c5439ef648947ccd711ad3a57aa409",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1549,
+      "sha256": "a2d69f820fc1a7b167bc7a85682fc69f22f9666b5581ee052afb2b58be09543d",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4236,
+      "sha256": "841eabde84ef26ac63032a07709e8416ad39ba98adb9ccce7094da12f4804c23",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 15153,
+      "sha256": "045499fbd03802bcb2019705a0fbe51ff2c19fba34f473ba905ec2d593da1840",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4322,
+      "sha256": "2fda1eaeae0af4a509e516afc5a4b830e44758ac64e8f75e84a8ddf9cfd9f295",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 803,
+      "sha256": "ba73e343a3581542ac97f0bf2e94d5959f161ddd5e9481c1f96d59e456a3de62",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 10140,
+      "sha256": "238212cf35ddca8bbdb9dada70ff4b59c60df53693196daa92fd46c8cca8fa96",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1088,
+      "sha256": "c86f350cc314e1098324daebe76c96381f6dea39b4751b0b5d4d3ac86475cd91",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 6924,
+      "sha256": "b615c8566c956272f65834b9b632e658eb0d593c5b2c6e05187e24669fefebe2",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 900,
+      "sha256": "b2f0a9c3464d7c421272ae669fff15de2f85b29f367e7215fbd0a6f4da0e972e",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/model-residuals.png",
+      "relativePath": "stats-run/model-residuals.png",
+      "bytes": 66911,
+      "sha256": "3ee736d1ec35df25f9249eb6f27df84e66b8326e3e00d6dda97b9ba7df40541b",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "larger than maxArtifactBytes 60000",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 687,
+      "sha256": "f98315f3723d92a9223cfa05fd48e8fe6f8b425d08b3f52a67a570c7d724bdd5",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1829,
+      "sha256": "2a6b0f8cd9e160576338a226b0299dc6b06e7e7018f2383c753ea755a34db768",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 241,
+      "sha256": "bed898d95cff9d5b142bffe690328043ad263a2be3b3b07529f2b254218bed72",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 4243 bytes, sha256=06588d58058dc9b475a9f255637ced867a1d0070a1c277e61e36658e15118e5a) ---\n# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was logistic. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was logistic. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the odds ratio was 0.0178 (95% CI -7.6513 to -0.4046); p=0.0293.\n- For treatment, the odds ratio was 1.6092 (95% CI -0.1786 to 1.1301); p=0.1541.\n- For age, the odds ratio was 1.0442 (95% CI 0.0210 to 0.0656); p=0.0001.\n- For severity, the odds ratio was 2.3020 (95% CI 0.4172 to 1.2504); p=0.0001.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- Logistic-type model detected; explicit separation diagnostic evidence was not found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 96c037b0e9987f378d0116ce8c9f93165696b728ae76158168b81638945fbc75. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 6515 bytes, sha256=2c02796ea35ca12dbe7b2d87a7e71c58b9aa3f3c370f841f1e0a37a6e9575296) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_9129202269560836722\",\n  \"method\": \"logistic-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\",\n    \"age\",\n    \"severity\",\n    \"albumin\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": -4.027949563869277,\n      \"std_error\": 1.8486773765870437,\n      \"p_value\": 0.029344466851205203,\n      \"ci_low\": -7.651290641013873,\n      \"ci_high\": -0.4046084867246811,\n      \"odds_ratio\": 0.01781081247175052,\n      \"or_ci_low\": 0.00047543012326068133,\n      \"or_ci_high\": 0.6672379922589119\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 0.4757562688242516,\n      \"std_error\": 0.3338524176897034,\n      \"p_value\": 0.15414285140348566,\n      \"ci_low\": -0.17858244599918993,\n      \"ci_high\": 1.1300949836476932,\n      \"odds_ratio\": 1.6092307484540973,\n      \"or_ci_low\": 0.836455091658669,\n      \"or_ci_high\": 3.095950550835882\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.04326312675821376,\n      \"std_error\": 0.01137437975846303,\n      \"p_value\": 0.0001426318886337378,\n      \"ci_low\": 0.020969752085144823,\n      \"ci_high\": 0.0655565014312827,\n      \"odds_ratio\": 1.0442126189867118,\n      \"or_ci_low\": 1.0211911622670344,\n      \"or_ci_high\": 1.067753065185616\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 0.8337884943009074,\n      \"std_error\": 0.21256252401927272,\n      \"p_value\": 0.00008761436594307729,\n      \"ci_low\": 0.4171736027602027,\n      \"ci_high\": 1.2504033858416121,\n      \"odds_ratio\": 2.3020234436901754,\n      \"or_ci_low\": 1.5176659610666685,\n      \"or_ci_high\": 3.4917511964059824\n    },\n    {\n      \"term\": \"albumin\",\n      \"estimate\": -0.5576783461621193,\n      \"std_error\": 0.44310315220151747,\n      \"p_value\": 0.20818404772561372,\n      \"ci_low\": -1.4261445659132637,\n      \"ci_high\": 0.31078787358902493,\n      \"odds_ratio\": 0.572536754186453,\n      \"or_ci_low\": 0.24023334289620277,\n      \"or_ci_high\": 1.3644997440508921\n    }\n  ],\n  \"diagnostics\": {\n    \"outcome_levels\": [\n      0,\n      1\n    ],\n    \"model_family\": \"logistic-regression\",\n    \"aic\": 265.0746533802754,\n    \"bic\": -1032.8754936050925,\n    \"df_resid\": 235,\n    \"residual_mean\": -2.986129861900129e-14,\n    \"residual_sd\": 0.424457050745109,\n    \"shapiro_p_value\": 5.624175292591292e-8,\n    \"max_leverage\": 0.07232260818528582,\n    \"max_cooks_distance\": 0.04521966749444961,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.153746929736106\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0812043670722995\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.2046947030591237\n      },\n      {\n        \"term\": \"albumin\",\n        \"vif\": 1.1134517131321229\n      }\n    ],\n    \"max_vif\": 1.2046947030591237,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-config.json\",\n      \"sha256\": \"f98315f3723d92a9223cfa05fd48e8fe6f8b425d08b3f52a67a570c7d724bdd5\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-summary.json\",\n      \"sha256\": \"bed898d95cff9d5b142bffe690328043ad263a2be3b3b07529f2b254218bed72\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/estimates.csv\",\n      \"sha256\": \"b2f0a9c3464d7c421272ae669fff15de2f85b29f367e7215fbd0a6f4da0e972e\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/diagnostics.json\",\n      \"sha256\": \"d53bd54ccc6b4d4cc10d026821fae63e16a6195b3dcf215579c56b20d5f8021d\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figures.json\",\n      \"sha256\": \"bb74b366baa681236a727e4096a8b1658fda0b42e003e1986482a0d57498eea5\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/model-residuals.png\",\n      \"sha256\": \"3ee736d1ec35df25f9249eb6f27df84e66b8326e3e00d6dda97b9ba7df40541b\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figure-qa.json\",\n      \"sha256\": \"384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-report.md\",\n      \"sha256\": \"2a6b0f8cd9e160576338a226b0299dc6b06e7e7018f2383c753ea755a34db768\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-qa.json\",\n      \"sha256\": \"a9b9295e52cc44ef37561c555f80975c3a54e4edbaf92b45dd112d1329d93519\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 714 bytes, sha256=d53bd54ccc6b4d4cc10d026821fae63e16a6195b3dcf215579c56b20d5f8021d) ---\n{\n  \"outcome_levels\": [\n    0,\n    1\n  ],\n  \"model_family\": \"logistic-regression\",\n  \"aic\": 265.0746533802754,\n  \"bic\": -1032.8754936050925,\n  \"df_resid\": 235,\n  \"residual_mean\": -2.986129861900129e-14,\n  \"residual_sd\": 0.424457050745109,\n  \"shapiro_p_value\": 5.624175292591292e-08,\n  \"max_leverage\": 0.07232260818528582,\n  \"max_cooks_distan\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=a9b9295e52cc44ef37561c555f80975c3a54e4edbaf92b45dd112d1329d93519) ---\n\n\n--- ARTIFACT figure-qa.json (json, 3656 bytes, sha256=384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e) ---\n\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3656 bytes, sha256=384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e) ---\n"
+}

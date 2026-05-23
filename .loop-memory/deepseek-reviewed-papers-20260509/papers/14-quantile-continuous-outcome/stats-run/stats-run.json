@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2798134779628570889",
+  "method": "quantile-regression",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment",
+    "age",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "const",
+      "estimate": 7.77147538337158,
+      "std_error": 0.7953120408562215,
+      "p_value": 3.714334661542577e-19,
+      "ci_low": 6.204657493808534,
+      "ci_high": 9.338293272934626
+    },
+    {
+      "term": "treatment",
+      "estimate": 1.307090856054856,
+      "std_error": 0.3365364815376296,
+      "p_value": 0.0001334962565484341,
+      "ci_low": 0.6440914889182945,
+      "ci_high": 1.9700902231914175
+    },
+    {
+      "term": "age",
+      "estimate": 0.1361755905436297,
+      "std_error": 0.011239023698154174,
+      "p_value": 1.3567268053559856e-26,
+      "ci_low": 0.11403396249467819,
+      "ci_high": 0.15831721859258122
+    },
+    {
+      "term": "severity",
+      "estimate": 1.9533899710331752,
+      "std_error": 0.19379397033494308,
+      "p_value": 4.203725724663876e-20,
+      "ci_low": 1.571602893745442,
+      "ci_high": 2.3351770483209084
+    }
+  ],
+  "diagnostics": {
+    "model_family": "quantile-regression",
+    "aic": null,
+    "bic": null,
+    "df_resid": 236,
+    "residual_mean": -0.10200159780451092,
+    "residual_sd": 1.9317492341797067,
+    "shapiro_p_value": 0.3929115908747711,
+    "vif": [
+      {
+        "term": "treatment",
+        "vif": 1.1266739538918475
+      },
+      {
+        "term": "age",
+        "vif": 1.0808383501003018
+      },
+      {
+        "term": "severity",
+        "vif": 1.146630084030013
+      }
+    ],
+    "max_vif": 1.146630084030013,
+    "weighted": false
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-config.json",
+      "sha256": "db28f2ab7bbbb113a3698c775277614ffe2a2ed05945df2cc871a41ed2d71318"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-summary.json",
+      "sha256": "9bfa616990db9001c9d5419a42ccd34df3a47bad1842be0af6ae3a1b9d20981c"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/estimates.csv",
+      "sha256": "1ec7cc04a15d97a4fca1fb67088dd3ce3b582ac51acdb64e5a6da9efbdd47d51"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/diagnostics.json",
+      "sha256": "400d5a8ffe0356078b247ad88fe9bf6226dba9d9afcf2f166485fc6b553d505a"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figures.json",
+      "sha256": "41070aac76847cb18339bb418b4e24c20cbe1fdf9e621dffe849350d53b5a016"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/model-residuals.png",
+      "sha256": "d275359e6866d43850523b1f2b3969b9db589eb40db47ff68680ec00e05880a3"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/figure-qa.json",
+      "sha256": "436d980872c6991b7edd30aa8ac42769b1bc6ad5dd86218de4406a18f982c0c1"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-report.md",
+      "sha256": "c0b437f245180d17832986fcd81c417d5c60175aa264794173c338e680813d5a"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-qa.json",
+      "sha256": "643504496cf98455bda3c19f91cbd0ad2fcc5c7ee3f1a99391140bc2b722b2b7"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/method-selection.json",
+    "methodSelectionId": "method_selection_14_quantile_continuous_outcome",
+    "methodId": "quantile-regression",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

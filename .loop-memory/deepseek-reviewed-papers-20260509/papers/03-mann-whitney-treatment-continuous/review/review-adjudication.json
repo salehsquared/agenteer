@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:08:25.757Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Missing clinical context and substantive interpretation",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without defining what the treatment groups and outcome represent, the study has no clinical meaning and cannot be interpreted by readers.",
+        "actionableFix": "Add a clear description of the treatment groups, the outcome variable, and the clinical or public-health setting. Provide a substantive interpretation of the result, including direction and practical significance.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Search for definitions of 'treatment' and 'outcome_cont' in the manuscript; none provided beyond labels.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "study_design",
+        "title": "Unadjusted observational comparison ignores confounding",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "Even if the study is descriptive, the observed difference may be confounded. Without discussing or adjusting for potential confounders, the result is misleading as a basis for any inference.",
+        "actionableFix": "Either limit the claim to a purely unadjusted dataset description and explicitly warn that confounding is unaccounted, or incorporate confounders in the analysis. At minimum, list key possible confounders and why they were not addressed.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Missingness handling not described and potentially absent",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "Complete-case analysis may introduce selection bias if missingness is non-random. The original sample size and exclusions are not reported.",
+        "actionableFix": "Report the total eligible records before exclusion, the number and reasons for exclusions, and assess whether missingness could be related to treatment or outcome. If no missingness occurred, state that explicitly.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "In stats-run.json, rowCount equals completeCaseN (240), suggesting no missing data in the provided dataset, but no documentation of the original cohort.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No effect size or confidence interval reported",
+        "evidenceRefs": [
+          "stats-run/stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "A p-value alone does not convey the magnitude or precision of the difference. Clinical interpretation requires an effect size (e.g., median difference with 95% CI).",
+        "actionableFix": "Report the median difference between groups with a confidence interval, or compute a common language effect size (e.g., probability that a random observation from group B exceeds group A).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check 'estimates' in stats-run.json: only provides medians separately and a test statistic; no effect size or CI.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Lack of diagnostic reporting on distributional assumptions",
+        "evidenceRefs": [
+          "stats-run/figures.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The Mann-Whitney test assumes that the two distributions have the same shape under the null, and is sensitive to extreme outliers. The manuscript does not present any examination of the distributions (e.g., histograms, Q-Q plots) or discuss whether this assumption holds.",
+        "actionableFix": "Include a diagnostic analysis (e.g., side-by-side histograms or density plots) and comment on whether the distributions appear similarly shaped. If not, interpret cautiously.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Data source not documented",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "For the study to be reproducible, the origin and nature of the dataset must be described. Without this, the findings cannot be verified or even properly contextualized.",
+        "actionableFix": "Describe the dataset: where it came from, time period, inclusion criteria, data collection methods. If the data are synthetic or proprietary, state that and any access restrictions.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "major",
+        "category": "reporting",
+        "title": "P-value misreported as zero in manuscript",
+        "evidenceRefs": [
+          "manuscript.md Results section: 'p=0.0000'",
+          "stats-run.json estimates: p_value=1.8599038046060571e-9"
+        ],
+        "whyItMatters": "Reporting a p-value as zero distorts evidence and violates statistical reporting standards. It exaggerates evidence against the null and may mislead readers about the strength of the association.",
+        "actionableFix": "Report the p-value as p < 0.001 or provide the exact small p-value with appropriate decimal places (e.g., p = 1.86e-9).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Manuscript states 'p=0.0000'; actual computed p is 1.8599e-9 per stats-run.json.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No effect size reported for Mann-Whitney test",
+        "evidenceRefs": [
+          "manuscript.md Results: only medians and U statistic given",
+          "stats-run.json estimates: median_a, median_b, statistic, p_value but no effect size"
+        ],
+        "whyItMatters": "P-value and group medians alone do not convey the magnitude or practical importance of the difference. Effect size (e.g., rank-biserial correlation, Cliff's delta, or Hodges-Lehmann estimate) is essential for interpretability and reproducibility.",
+        "actionableFix": "Compute and report a standardized effect size with confidence interval, such as the Hodges-Lehmann median difference or Cliff's delta, along with its interpretation.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Mann-Whitney shape assumption not verified",
+        "evidenceRefs": [
+          "diagnostics.json: only ties_possible indicated",
+          "stats-qa.json: no check for distribution shape similarity",
+          "figure-qa.json: boxplot passed basic quality but no shape analysis"
+        ],
+        "whyItMatters": "The Mann-Whitney test assumes identical distributions under the null; a significant result can be driven by differences in spread or shape, not just location. Without verifying this, the interpretation as a shift in location may be misleading.",
+        "actionableFix": "Provide density curves or violin plots, compare variances or shapes, and discuss whether the assumption holds. If violated, report the test as a general test of stochastic equality and consider alternative effect size measures.",
+        "reentryPoint": "qa",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Incomplete documentation of missing data handling",
+        "evidenceRefs": [
+          "manuscript.md Cohort Construction: 'complete-case sample size was 240' without details on exclusions",
+          "stats-run.json: rowCount=240, completeCaseN=240, but no original cohort size or missingness pattern"
+        ],
+        "whyItMatters": "Complete-case analysis can bias results if missingness is non-random. Without information on the amount and mechanism of missing data, the generalizability of the local evidence is questionable.",
+        "actionableFix": "Report the original cohort size, number and proportion of exclusions, reasons for missingness, and consider sensitivity analyses (e.g., multiple imputation) if missingness is substantial.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "minor",
+        "category": "method_choice",
+        "title": "Handling of ties not specified",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json",
+          "stats-run/stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The diagnostic indicates ties are possible. The manuscript should state the method used for p-value computation (e.g., exact, asymptotic with correction) and verify its appropriateness.",
+        "actionableFix": "Document the tie-handling method in the Methods section and, if asymptotic, confirm the approximation is adequate for the sample size and tie distribution.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "data_plausibility",
+        "title": "Overly precise medians may be inappropriate",
+        "evidenceRefs": [
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "Medians are reported with four decimal places (e.g., 20.0565). For a continuous outcome measured in typical units, such precision is unusual and may indicate rounding errors or inappropriate digit retention.",
+        "actionableFix": "Round medians to a meaningful number of decimal places consistent with the measurement precision of the outcome variable.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.7,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "minor",
+        "category": "method_choice",
+        "title": "Mann-Whitney test variant not specified",
+        "evidenceRefs": [
+          "manuscript.md Methods: only 'mann-whitney' stated",
+          "stats-run.json: no parameter for exact/approximate, ties correction, or sidedness"
+        ],
+        "whyItMatters": "Reproducibility requires clear specification of whether the test was two-tailed, how ties were handled (e.g., exact, asymptotic with correction), and which software/or algorithm version was used.",
+        "actionableFix": "Add details: test used (e.g., 'two-tailed Mann-Whitney U test with continuity correction'), software package, and version.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "No confidence interval for the difference",
+        "evidenceRefs": [
+          "manuscript.md Results: only point estimates (medians, statistic)",
+          "stats-run.json estimates: no CI"
+        ],
+        "whyItMatters": "Confidence intervals provide essential information on the precision of the estimated effect, complementing the p-value. Their absence limits the ability to assess practical significance.",
+        "actionableFix": "Compute and report the 95% confidence interval for the Hodges-Lehmann median difference or corresponding effect size.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "info",
+        "category": "reporting",
+        "title": "Vague statement about 'estimate-like records' in limitations",
+        "evidenceRefs": [
+          "manuscript.md Limitations: 'No estimate-like records were available for p-value/effect-size checks.'"
+        ],
+        "whyItMatters": "This ambiguous phrase obscures whether meaningful effect-size verification was performed; it could be interpreted as an admission that the analysis is incomplete.",
+        "actionableFix": "Clarify what 'estimate-like records' means and either perform the missing checks or explicitly state that no effect-size verification was carried out.",
+        "reentryPoint": "qa",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [],
+    "reentryPoint": "analysis_spec",
+    "nextAction": "Route back to analysis_spec with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-adjudication.json"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript is a placeholder with critical omissions: no predictive metrics reported, exploratory unbound analysis, potential figure defect, and insufficient model evaluation. Blocked for thorough revision.",
+  "findings": [
+    {
+      "id": "unbound_exploratory_run",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Stats run is unbound and exploratory, not prespecified",
+      "evidenceRefs": [
+        "stats-run.json",
+        "stats-qa.json"
+      ],
+      "whyItMatters": "Without binding to a pre-registered method-selection or analysis spec, the analysis is post-hoc and cannot support confirmatory claims. Risk of p-hacking and overoptimistic performance metrics is high.",
+      "actionableFix": "Clearly label as exploratory, downgrade conclusions, or obtain a prespecified analysis plan and re-run.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "missing_estimates_reporting",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Paper fails to report the primary predictive metrics (AUROC, Brier score)",
+      "evidenceRefs": [
+        "paper.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The paper's Results section only states sample size, omitting the actual outcome of the analysis (AUROC 0.718, Brier 0.213). This makes the paper unreviewable and useless for interpretation.",
+      "actionableFix": "Add a table with AUROC, Brier score, and their 95% confidence intervals.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare reported numbers to stats-run.json estimates.",
+      "confidence": 1.0
+    },
+    {
+      "id": "no_confidence_intervals",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No confidence intervals for predictive metrics",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "AUROC and Brier score are point estimates; without CIs, the uncertainty is unquantified, making it impossible to assess the precision of the discrimination and calibration estimates.",
+      "actionableFix": "Report 95% CIs (e.g., DeLong for AUROC, bootstrap for Brier) or provide in stats-run output.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if CI computation method is documented and results plausible.",
+      "confidence": 1.0
+    },
+    {
+      "id": "figure_low_nonblank_ratio",
+      "severity": "major",
+      "category": "figures",
+      "title": "ROC curve figure has extremely low non-blank ratio (0.024), likely empty or misrendered",
+      "evidenceRefs": [
+        "figure-qa.json"
+      ],
+      "whyItMatters": "A non-blank ratio of 2.4% suggests the plot area is mostly white; the ROC curve may not be visible, undermining the figure's utility.",
+      "actionableFix": "Regenerate the figure, ensure proper axis ranges and data plotting, verify visually.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Examine roc-curve.png file and compare with data dimensions.",
+      "confidence": 0.95
+    },
+    {
+      "id": "incomplete_calibration_assessment",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Limited calibration evaluation: only Brier score, no calibration plot or slope/intercept",
+      "evidenceRefs": [
+        "stats-run.json",
+        "paper.md"
+      ],
+      "whyItMatters": "Brier score is a combined measure; calibration intercept and slope, calibration plot, and decision curve analysis are standard for risk model evaluation. Without them, calibration quality cannot be fully judged.",
+      "actionableFix": "Include calibration plot, expected/observed table, and ideally calibration slope and intercept in the analysis.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "no_risk_score_derivation",
+      "severity": "major",
+      "category": "variables",
+      "title": "Risk score variable source and computation not described",
+      "evidenceRefs": [
+        "stats-run.json",
+        "paper.md"
+      ],
+      "whyItMatters": "The evaluation is contingent on the risk score; without describing how it was derived (model, coefficients, predictors), the analysis is irreproducible and opaque.",
+      "actionableFix": "Document the risk score derivation, including the underlying model, predictors, and validation steps before evaluating performance.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "paper_template_errors",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Paper contains stale template statements that contradict available evidence",
+      "evidenceRefs": [
+        "paper.md"
+      ],
+      "whyItMatters": "The paper claims 'No reader-facing paper/manuscript artifact was found' and 'No estimate-like records were available', suggesting it was not updated after stats run. This undermines the credibility of the manuscript as a final product.",
+      "actionableFix": "Remove or update generic meta-commentary to reflect actual artifacts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "no_baseline_data_or_outcome_prevalence",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No baseline characteristics, outcome prevalence, or risk score distribution reported",
+      "evidenceRefs": [
+        "paper.md"
+      ],
+      "whyItMatters": "To interpret predictive performance, one needs to know outcome prevalence and the spread of the risk score. Without these, the clinical context is missing.",
+      "actionableFix": "Provide a Table 1 with cohort demographics, outcome frequency, and summary statistics of risk score.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Pre-specified analysis plan or method-selection artifact",
+    "Confidence intervals for AUROC and Brier score",
+    "Calibration plot and calibration-in-the-large metrics",
+    "Derivation details for the risk score",
+    "Table of baseline characteristics and outcome prevalence",
+    "Reproducible analysis code or pipeline specification"
+  ],
+  "recommendedNextStage": "manuscript"
+}

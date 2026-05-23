@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:52:03.646Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "split",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "model_diagnostics",
+        "title": "Overdispersion not assessed for Poisson regression",
+        "evidenceRefs": [
+          "stats-run.json",
+          "diagnostics.json"
+        ],
+        "whyItMatters": "Poisson regression assumes mean equals variance. Overdispersion inflates Type I error and biases standard errors, leading to spurious significance.",
+        "actionableFix": "Conduct an overdispersion test (e.g., dispersion parameter from Pearson chi-square / df) and switch to negative binomial or quasi-Poisson if present.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Check if dispersion parameter >1.5 in model output.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reproducibility",
+        "title": "No code, raw data, or computational environment provided",
+        "evidenceRefs": [
+          "manuscript.md (mentions 13 artifacts, none include analysis script or data)",
+          "stats-run/stats-run.json (no script hash or code repository)"
+        ],
+        "whyItMatters": "Without the analysis code and data, the results cannot be independently verified, rebuilt, or extended, violating fundamental reproducibility standards.",
+        "actionableFix": "Include the exact analysis script, raw (or synthetic) data, and environment specification (e.g., Dockerfile, renv.lock) in the run directory or a public repository.",
+        "reentryPoint": "method_selection",
+        "deterministicVerification": null,
+        "confidence": 0.99,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No reporting of missing data or cohort attrition",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Complete-case analysis can introduce selection bias if missingness is related to outcome or exposure. Without reporting initial sample size, exclusions, and missingness patterns, bias cannot be assessed.",
+        "actionableFix": "Provide a flow chart from initial target population to final analytic sample, describing missing data mechanisms and considering sensitivity analyses or multiple imputation.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "study_design",
+        "title": "Analysis is unbound and not governed by a pre-specified plan",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Results are exploratory and do not support confirmatory claims. The manuscript’s cautious language partially acknowledges this, but the presentation of estimates and p-values without binding to an analysis spec risks misinterpretation.",
+        "actionableFix": "Either bind the analysis to a prior protocol or analysis spec as specified in the result posture, or rename the entire manuscript as an exploratory report with explicit statement that no hypothesis testing is conducted.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Inappropriate use of Shapiro-Wilk test on Poisson residuals",
+        "evidenceRefs": [
+          "diagnostics.json"
+        ],
+        "whyItMatters": "Poisson residuals are not expected to be normally distributed; the Shapiro test is meaningless and may mislead reviewers. Proper diagnostics include deviance residual plots, Q-Q plots against theoretical quantiles, or standardized Pearson residuals.",
+        "actionableFix": "Remove Shapiro test. Replace with visualization of deviance residuals versus fitted values, scale-location plots, and check for influential observations using Cook’s distance.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "Zero-inflation not examined for count outcome",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Count outcomes often exhibit excess zeros (e.g., patients with no events), which violates Poisson distributional assumptions. Ignoring zero-inflation biases parameter estimates and inflates model fit.",
+        "actionableFix": "Test for zero-inflation (e.g., Vuong test, likelihood ratio test for zero-inflated vs. Poisson) and consider zero-inflated Poisson (ZIP) or hurdle models if present.",
+        "reentryPoint": "method_selection",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "causal_claims",
+        "title": "Potential omitted confounders and no causal justification",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Only age and severity were adjusted for; the study is observational and lacks a causal identification strategy (e.g., DAG, propensity scores, instrumental variable). Residual confounding is likely.",
+        "actionableFix": "Either develop a causal diagram to justify included covariates, or perform a sensitivity analysis (e.g., E-value) to quantify potential unmeasured confounding. Alternatively, reframe the analysis purely as a prediction model without causal language.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "major",
+        "category": "data_plausibility",
+        "title": "No assessment of outcome distribution or model fit beyond AIC/BIC",
+        "evidenceRefs": [
+          "stats-run.json",
+          "diagnostics.json"
+        ],
+        "whyItMatters": "Without distribution plots (histogram of count_events) or goodness-of-fit tests (e.g., deviance, Hosmer-Lemeshow adapted for Poisson), model adequacy cannot be judged. AIC/BIC alone do not guarantee appropriate specification.",
+        "actionableFix": "Provide summary statistics of the outcome (mean, variance, proportion of zeros), histogram, and a formal goodness-of-fit test (e.g., deviance-based test, rootogram).",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "data_plausibility",
+        "title": "Implausible negative BIC value indicates computation error",
+        "evidenceRefs": [
+          "stats-run/stats-run.json (BIC: -1066.8941693222591, AIC: 710.381549998833, n=240, k=3)"
+        ],
+        "whyItMatters": "A negative BIC for a Poisson regression with 240 observations is impossible; this suggests a mistake in model fitting or reporting that undermines model selection and credibility.",
+        "actionableFix": "Recalculate BIC correctly (expected BIC ≈ AIC + k*(log(n)-2) ≈ 720.8) and verify all model statistics. If the error is in diagnostics output, fix the computation.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "Using AIC=710.38, k=3, n=240 → log(n)=5.48 → BIC = AIC + 3*(5.48-2) = 710.38+10.44 = 720.82. Reported BIC -1066.89 is far off, likely a sign error or incorrect formula.",
+        "confidence": 0.99,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No descriptive statistics, variable definitions, or cohort flow diagram",
+        "evidenceRefs": [
+          "manuscript.md (no table of sample characteristics, no unit definitions for age, severity, treatment; no eligibility criteria)",
+          "stats-run/stats-run.json (variables listed only as count_events, treatment, age, severity without metadata)"
+        ],
+        "whyItMatters": "Readers cannot assess confounding, population applicability, or even basic interpretation of effect sizes without knowing how variables were measured and the baseline distribution of exposures.",
+        "actionableFix": "Add a standard Table 1 with summary statistics by treatment group, define all variables (units, coding), and include a STROBE-style flow diagram showing inclusion/exclusion.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Overdispersion not assessed; Poisson may be inappropriate",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json (no dispersion parameter, deviance, or test for overdispersion)",
+          "stats-run/stats-run.json (residual SD 1.07, but no link to mean-variance relationship)"
+        ],
+        "whyItMatters": "Poisson assumes variance equals mean. Count data often exhibit overdispersion, leading to underestimated standard errors and inflated false positive rate. Without checking, the p-values and CIs may be misleading.",
+        "actionableFix": "Compute the dispersion statistic (e.g., sum of squared Pearson residuals / df) and test for overdispersion. If present, consider negative binomial or quasi-Poisson. Report the dispersion estimate and its implications.",
+        "reentryPoint": "method_selection",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Shapiro-Wilk test on raw residuals is meaningless for Poisson",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json (shapiro_p_value: 8.09e-05, using presumably raw residuals)"
+        ],
+        "whyItMatters": "Poisson residuals are not expected to be normally distributed; the appropriate diagnostic is inspection of deviance or Pearson residuals for heteroscedasticity and patterns, not Normality. Relying on this test may mask other issues.",
+        "actionableFix": "Remove the Shapiro-Wilk result. Instead, provide residual vs fitted plots, assess influential points with Cook's distance (already max 0.04, but discuss), and check for zero-inflation if relevant.",
+        "reentryPoint": "qa",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Complete-case analysis without description of missing data mechanism or sensitivity",
+        "evidenceRefs": [
+          "manuscript.md (states 'complete-case sample size was 240', but no information on original sample, missingness proportion, or predictors of missingness)",
+          "stats-run/stats-run.json (completeCaseN=240, no missingness pattern report)"
+        ],
+        "whyItMatters": "If missingness is not completely at random, complete-case estimates may be biased. The lack of any exploration makes the results untrustworthy.",
+        "actionableFix": "Report the amount and pattern of missing data for each variable. Consider multiple imputation or sensitivity analysis, or at minimum discuss the potential biases.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "major",
+        "category": "causal_claims",
+        "title": "Covariate adjustment without causal framework invites misinterpretation",
+        "evidenceRefs": [
+          "manuscript.md (treats 'treatment' as exposure, adjusts for age and severity, but no DAG, no justification of confounders, and no statement that estimates are conditional)"
+        ],
+        "whyItMatters": "Readers may interpret the treatment coefficient as a causal effect despite the observational design. The adjustment set may be insufficient or include mediators, leading to biased estimates.",
+        "actionableFix": "Embed the analysis in a directed acyclic graph (DAG) to identify a minimal sufficient adjustment set. Explicitly state that the estimates are associational and sensitive to unmeasured confounding. Use language like 'associated with' consistently.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript lacks explicit link function and rate ratio interpretation",
+        "evidenceRefs": [
+          "manuscript.md (reports coefficients on log scale without stating it, mentions p-values but not rate ratios, though stats-run provides them)"
+        ],
+        "whyItMatters": "Clinically relevant interpretation requires rate ratios and 95% CIs. Reporting only log-scale coefficients obscures the magnitude of effects.",
+        "actionableFix": "Report rate ratios (e.g., e˄), their confidence intervals, and interpret them in practical terms. State that the model used a log link and Poisson distribution.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Variable definitions, coding, and measurement missing from manuscript",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Reproducibility and clinical interpretability require explicit operational definitions for treatment, severity, age (continuous? cut-offs?), and how count events were ascertained.",
+        "actionableFix": "Add a variables table with definitions, type, range, and source. Include whether ‘treatment’ is a binary indicator and how severity was scored.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [
+      "Reviewer verdicts differed: revise, block."
+    ],
+    "reentryPoint": "protocol",
+    "nextAction": "Route back to protocol with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-adjudication.json"
+  }
+}

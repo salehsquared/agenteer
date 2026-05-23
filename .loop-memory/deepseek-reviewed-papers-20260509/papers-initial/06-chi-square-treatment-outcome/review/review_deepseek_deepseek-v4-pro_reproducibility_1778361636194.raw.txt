@@ -1,0 +1,243 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript contains a critical factual error regarding the availability of statistical estimates. The analysis is unbound and exploratory, with missing variable definitions and a lack of missingness assessment. These issues must be resolved before publication.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript falsely claims no estimate records available",
+      "evidenceRefs": ["manuscript.md: 'No estimate-like records were available for p-value/effect-size checks.'", "stats-run.json: contains estimates array with chi_square, p_value, cramers_v"],
+      "whyItMatters": "This misrepresents the analysis output and undermines reader trust. The estimate is indeed available and should be reported.",
+      "actionableFix": "Correct the Limitations section to report the available chi-square, p-value, and Cramér's V, and remove the false statement.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare stats-run.json estimates array against manuscript text: the stats-run.json contains p_value 0.00083 and cramers_v 0.216; the manuscript says no estimate-like records exist. Direct contradiction.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Statistical analysis is unbound and purely exploratory",
+      "evidenceRefs": ["stats-run.json: resultPosture.status='exploratory_standard_table', binding.status='unbound'", "stats-qa.json: binding-status warning"],
+      "whyItMatters": "Without pre-specification, the analysis cannot support confirmatory claims and is prone to selective reporting. The manuscript should state this explicitly.",
+      "actionableFix": "Highlight the exploratory nature in Methods and Limitations, or rerun under a bound analysis spec before making any inferences.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Primary exposure and outcome definitions are missing",
+      "evidenceRefs": ["manuscript.md: 'The primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.'", "stats-config.json not included in the review packet"],
+      "whyItMatters": "Without variable definitions, the study cannot be interpreted or reproduced. This violates basic reporting standards.",
+      "actionableFix": "Include variable definitions in the manuscript or ensure the companion artifact is publicly accessible and referenced.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No assessment of missing data or selection bias",
+      "evidenceRefs": ["manuscript.md: 'Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.' but no review provided", "stats-run.json: completeCaseN=240, no missingness diagnostics"],
+      "whyItMatters": "Complete-case analysis can be biased if missingness is related to exposure or outcome. The manuscript acknowledges this but provides no evaluation.",
+      "actionableFix": "Report the number of excluded records, patterns of missing data, and a sensitivity analysis (e.g., Table 1 comparison) or justify why missingness is ignorable.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Effect size not reported in manuscript",
+      "evidenceRefs": ["stats-run.json: cramers_v=0.21576341497425194", "manuscript.md: mentions only sample size in Results"],
+      "whyItMatters": "Reporting p-values without effect size leads to misinterpretation of practical significance, especially since Cramér's V indicates a small association.",
+      "actionableFix": "Include Cramér's V with interpretation in the Results section.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Self-contradictory statement about missing paper artifact",
+      "evidenceRefs": ["manuscript.md: 'No reader-facing paper/manuscript artifact was found.'", "The manuscript itself is a reader-facing artifact."],
+      "whyItMatters": "This appears to be a template leftover and may confuse readers about the status of documentation.",
+      "actionableFix": "Remove or rephrase the sentence to accurately reflect the artifact situation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "category": "figures",
+      "title": "Contingency heatmap figure not discussed in text",
+      "evidenceRefs": ["figures.json: contingency-heatmap.png exists", "manuscript.md: no reference to any figure"],
+      "whyItMatters": "Figures are part of the evidence; omitting discussion reduces reader comprehension.",
+      "actionableFix": "Reference the figure in the Results section and describe what it shows.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Unadjusted bivariate association with 'treatment' may invite causal misinterpretation",
+      "evidenceRefs": ["manuscript.md: 'treatment' variable in analysis, no covariates controlled", "stats-run.json: variables=['outcome_binary','treatment'], only chi-square"],
+      "whyItMatters": "The term 'treatment' implies an intervention, but without adjustment for confounders or a randomized design, any association cannot be interpreted causally. The disclaimer is present but may be overlooked by readers.",
+      "actionableFix": "Either rename the variable to avoid causal connotation or emphasize the confounding limitation more prominently and present adjusted analyses if data permit.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "stats-config.json (variable definitions and coding)",
+    "Missingness diagnostics (proportion excluded, group comparisons)",
+    "Pre-analysis plan or binding documentation"
+  ],
+  "recommendedNextStage": "manuscript"
+}
+
+Note: We must ensure all required fields are present. Confidence numbers are reasonable.
+
+Now output JSON.<｜end▁of▁thinking｜>{
+  "verdict": "block",
+  "summary": "The manuscript contains a critical factual error regarding the availability of statistical estimates. The analysis is unbound and exploratory, with missing variable definitions and a lack of missingness assessment. These issues must be resolved before publication.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript falsely claims no estimate records available",
+      "evidenceRefs": [
+        "manuscript.md: 'No estimate-like records were available for p-value/effect-size checks.'",
+        "stats-run.json: contains estimates array with chi_square, p_value, cramers_v"
+      ],
+      "whyItMatters": "This misrepresents the analysis output and undermines reader trust. The estimate is indeed available and should be reported.",
+      "actionableFix": "Correct the Limitations section to report the available chi-square, p-value, and Cramér's V, and remove the false statement.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare stats-run.json estimates array against manuscript text: the stats-run.json contains p_value 0.00083 and cramers_v 0.216; the manuscript says no estimate-like records exist. Direct contradiction.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Statistical analysis is unbound and purely exploratory",
+      "evidenceRefs": [
+        "stats-run.json: resultPosture.status='exploratory_standard_table', binding.status='unbound'",
+        "stats-qa.json: binding-status warning"
+      ],
+      "whyItMatters": "Without pre-specification, the analysis cannot support confirmatory claims and is prone to selective reporting. The manuscript should state this explicitly.",
+      "actionableFix": "Highlight the exploratory nature in Methods and Limitations, or rerun under a bound analysis spec before making any inferences.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Primary exposure and outcome definitions are missing",
+      "evidenceRefs": [
+        "manuscript.md: 'The primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.'",
+        "stats-config.json not included in the review packet"
+      ],
+      "whyItMatters": "Without variable definitions, the study cannot be interpreted or reproduced. This violates basic reporting standards.",
+      "actionableFix": "Include variable definitions in the manuscript or ensure the companion artifact is publicly accessible and referenced.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No assessment of missing data or selection bias",
+      "evidenceRefs": [
+        "manuscript.md: 'Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.' but no review provided",
+        "stats-run.json: completeCaseN=240, no missingness diagnostics"
+      ],
+      "whyItMatters": "Complete-case analysis can be biased if missingness is related to exposure or outcome. The manuscript acknowledges this but provides no evaluation.",
+      "actionableFix": "Report the number of excluded records, patterns of missing data, and a sensitivity analysis (e.g., Table 1 comparison) or justify why missingness is ignorable.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Effect size not reported in manuscript",
+      "evidenceRefs": [
+        "stats-run.json: cramers_v=0.21576341497425194",
+        "manuscript.md: mentions only sample size in Results"
+      ],
+      "whyItMatters": "Reporting p-values without effect size leads to misinterpretation of practical significance, especially since Cramér's V indicates a small association.",
+      "actionableFix": "Include Cramér's V with interpretation in the Results section.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Self-contradictory statement about missing paper artifact",
+      "evidenceRefs": [
+        "manuscript.md: 'No reader-facing paper/manuscript artifact was found.'",
+        "The manuscript itself is a reader-facing artifact."
+      ],
+      "whyItMatters": "This appears to be a template leftover and may confuse readers about the status of documentation.",
+      "actionableFix": "Remove or rephrase the sentence to accurately reflect the artifact situation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "category": "figures",
+      "title": "Contingency heatmap figure not discussed in text",
+      "evidenceRefs": [
+        "figures.json: contingency-heatmap.png exists",
+        "manuscript.md: no reference to any figure"
+      ],
+      "whyItMatters": "Figures are part of the evidence; omitting discussion reduces reader comprehension.",
+      "actionableFix": "Reference the figure in the Results section and describe what it shows.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Unadjusted bivariate association with 'treatment' may invite causal misinterpretation",
+      "evidenceRefs": [
+        "manuscript.md: 'treatment' variable in analysis, no covariates controlled",
+        "stats-run.json: variables=['outcome_binary','treatment'], only chi-square"
+      ],
+      "whyItMatters": "The term 'treatment' implies an intervention, but without adjustment for confounders or a randomized design, any association cannot be interpreted causally. The disclaimer is present but may be overlooked by readers.",
+      "actionableFix": "Either rename the variable to avoid causal connotation or emphasize the confounding limitation more prominently and present adjusted analyses if data permit.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "stats-config.json (variable definitions and coding)",
+    "Missingness diagnostics (proportion excluded, group comparisons)",
+    "Pre-analysis plan or binding documentation"
+  ],
+  "recommendedNextStage": "manuscript"
+}

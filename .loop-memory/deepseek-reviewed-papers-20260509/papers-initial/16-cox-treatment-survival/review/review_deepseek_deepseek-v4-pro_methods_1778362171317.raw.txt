@@ -1,0 +1,116 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is presented as testing a prespecified question but is unbound and explicitly exploratory. Key model diagnostics are missing, study design and cohort details are insufficient, and missing data is not evaluated. The manuscript must be retracted until a protocol is registered and the analysis is re-run with proper diagnostics and reporting.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Unsubstantiated claim of prespecified analysis",
+      "evidenceRefs": [
+        "stats-run.json binding.status = unbound",
+        "stats-run.json resultPosture.status = exploratory_standard_table"
+      ],
+      "whyItMatters": "Frames exploratory analysis as confirmatory, misleading readers about the strength of evidence.",
+      "actionableFix": "Label the analysis as exploratory; create and bind a preregistered protocol before making any prespecified claim.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json binding.status exactly equals 'unbound' AND resultPosture.status equals 'exploratory_standard_table'.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No proportional hazards diagnostics reported",
+      "evidenceRefs": [
+        "diagnostics.json lacks Schoenfeld test",
+        "stats-run.json estimates"
+      ],
+      "whyItMatters": "Violation of the proportional hazards assumption can bias hazard ratios and confidence intervals, invalidating inference.",
+      "actionableFix": "Report Schoenfeld residuals test (global and per covariate) with chi-squared and p-value; include diagnostic plots.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "diagnostics.json does not contain any key related to 'proportional_hazards_test' or 'schoenfeld'.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing essential study design and cohort details",
+      "evidenceRefs": [
+        "manuscript.md Methods section"
+      ],
+      "whyItMatters": "Prevents assessment of internal and external validity, confounding control, and selection bias.",
+      "actionableFix": "Add a STROBE-compliant table describing setting, participants, eligibility, variables, and statistical methods.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md lacks explicit sections on study design, data source, inclusion/exclusion criteria, and variable definitions.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without missing data evaluation",
+      "evidenceRefs": [
+        "manuscript.md Limitations",
+        "stats-run.json completeCaseN=240 only"
+      ],
+      "whyItMatters": "Missingness related to outcome or covariates can bias Cox estimates; complete-case assumes MCAR, usually unrealistic.",
+      "actionableFix": "Report missingness patterns, compare complete vs. incomplete baseline characteristics, and conduct a sensitivity analysis (e.g., multiple imputation).",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "No missingness report artifact exists in the run directory.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Misleading conclusion of 'interpretable local evidence' from unbound exploratory output",
+      "evidenceRefs": [
+        "manuscript.md Conclusion",
+        "stats-run.json resultPosture.cannotSupport"
+      ],
+      "whyItMatters": "The phrase 'interpretable local evidence' implies valid inference, but the run’s own posture states it cannot support paper-ready conclusions or causal claims.",
+      "actionableFix": "Revise conclusion to explicitly state results are exploratory and not suitable for clinical or policy interpretation without further validation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare manuscript Conclusion text with stats-run.json resultPosture.cannotSupport array.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "figures",
+      "title": "No diagnostic figures produced or checked",
+      "evidenceRefs": [
+        "figure-qa.json status=warning, 0/0 figures passed",
+        "figures.json empty"
+      ],
+      "whyItMatters": "Diagnostic plots (e.g., log‑cumulative hazard, residuals) could reveal model violations; their absence reduces transparency.",
+      "actionableFix": "Generate standard diagnostic plots and include them as supplementary material.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "figures.json contains an empty list and figure-qa.json figures array is empty.",
+      "confidence": 0.7
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Variable definitions not provided in manuscript",
+      "evidenceRefs": [
+        "manuscript.md Methods: 'not fully encoded in the text report'"
+      ],
+      "whyItMatters": "Variables are central to interpretation; without definitions, results remain ambiguous.",
+      "actionableFix": "Include a table defining each variable (name, description, type, coding).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Search manuscript.md for a variable definition table; confirm its absence.",
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "manuscript-qa.json content",
+    "variable definitions and coding artifact",
+    "cohort definition and flowchart",
+    "pre-specified analysis plan or protocol"
+  ],
+  "recommendedNextStage": "protocol"
+}

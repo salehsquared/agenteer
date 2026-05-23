@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_5458237143050399260",
+    "method": "negative-binomial-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "count_events",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": -0.8309992744861459,
+        "std_error": 0.4373434915326194,
+        "p_value": 0.05741912582943826,
+        "ci_low": -1.688176766763078,
+        "ci_high": 0.02617821779078633,
+        "rate_ratio": 0.4356137710309118,
+        "rr_ci_low": 0.18485625299647082,
+        "rr_ci_high": 1.0265238769899465
+      },
+      {
+        "term": "treatment",
+        "estimate": 0.25292560928794716,
+        "std_error": 0.18352833616775804,
+        "p_value": 0.16816365357298435,
+        "ci_low": -0.10678331974341843,
+        "ci_high": 0.6126345383193128,
+        "rate_ratio": 1.2877874738440962,
+        "rr_ci_low": 0.8987203868582379,
+        "rr_ci_high": 1.8452864784643532
+      },
+      {
+        "term": "age",
+        "estimate": 0.011268940601765804,
+        "std_error": 0.006030799573696979,
+        "p_value": 0.061683368323949515,
+        "ci_low": -0.0005512093606597854,
+        "ci_high": 0.023089090564191395,
+        "rate_ratio": 1.011332674291643,
+        "rr_ci_low": 0.9994489425273112,
+        "rr_ci_high": 1.0233577070015636
+      },
+      {
+        "term": "severity",
+        "estimate": 0.1354058568852481,
+        "std_error": 0.10493146056961561,
+        "p_value": 0.19690420521586116,
+        "ci_low": -0.07025602667638328,
+        "ci_high": 0.3410677404468795,
+        "rate_ratio": 1.1450013967623587,
+        "rr_ci_low": 0.9321551327715981,
+        "rr_ci_high": 1.4064485110859628
+      }
+    ],
+    "diagnostics": {
+      "model_family": "negative-binomial-regression",
+      "aic": 817.3626981317952,
+      "bic": -1176.5376279397344,
+      "df_resid": 236,
+      "residual_mean": -0.0006937159453536789,
+      "residual_sd": 1.0705991276588052,
+      "shapiro_p_value": 0.0000816800404523377,
+      "max_leverage": 0.05262748588255761,
+      "max_cooks_distance": 0.052838758422188166,
+      "vif": [
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "severity",
+          "vif": 1.146630084030013
+        }
+      ],
+      "max_vif": 1.146630084030013,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [
+      "/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/families/family.py:1367: ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.\n  warnings.warn(\"Negative binomial dispersion parameter alpha not \""
+    ],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-config.json",
+        "sha256": "5498ea84a021fa6e45523450359c765965d27f8d5c4f416df950b89abaf319a5"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-summary.json",
+        "sha256": "638ecb1ab07f0dc7c8520f7c3064234c016c6424d9808bcfa91116b36deaa75f"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/estimates.csv",
+        "sha256": "40ba58edc8ce98cdb88f1388419dff49c37ad7165542776d8af1ee6cda29dd89"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/diagnostics.json",
+        "sha256": "13db3bbc0be490a5567ece025903335f80ae70ac00e2e3bb68294f03ff4bdf9a"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figures.json",
+        "sha256": "4356312d14186fe75809c57155ae9e5fc6f68eb0aacdacf715c932557123d9e8"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/model-residuals.png",
+        "sha256": "d5d410bb0f2c534b4dc17e57a070e4016841b7d31f72331de21f5547b0725332"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figure-qa.json",
+        "sha256": "47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-report.md",
+        "sha256": "829356c611d3ab7dbfc06ac22a38fe2f9e324e9bf1ad9c2e1a0f27bd2055f041"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-qa.json",
+        "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}
+

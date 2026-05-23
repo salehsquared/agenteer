@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:22:37.909Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "F01",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Complete omission of ANCOVA results",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "A research article must present its main findings: F‑test for group effect, p‑value, adjusted means, and confidence intervals. Without these, the study is unreportable.",
+        "actionableFix": "Report the full ANCOVA table from stats-run.json in the manuscript, including sum of squares, F‑statistic, p‑value, and adjusted group means with their standard errors.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Manuscript text contains only the sample size; no mention of the ANCOVA p‑value (0.114) or any effect estimates. Compare with stats-run.json which holds all computed values.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F02",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Missing study design, data source, and eligibility criteria",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Readers cannot assess generalizability, selection bias, or reproducibility. The cohort construction process (e.g., exclusions, missing data handling) is entirely opaque.",
+        "actionableFix": "Add a detailed Methods section describing the data source (origin, time frame, sampling), inclusion/exclusion criteria, and how 240 complete cases were obtained from the larger dataset.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Manuscript only states 'cohort definition was read from available run artifacts' without any actual description; the required details are absent.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F03",
+        "severity": "blocker",
+        "category": "variables",
+        "title": "Variables undefined",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "No definition of outcome_cont, group, age, or severity is provided. Units, measurement method, and reference category for group are unknown, making the study impossible to interpret clinically.",
+        "actionableFix": "Provide a table or text defining each variable, including its role (outcome, exposure, covariate), how it was measured, its range, and for group, specify the categories and which is the reference level.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Manuscript notes that variables were 'not fully encoded' and defers to a companion artifact that is not supplied; no variable definitions appear.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Results section contains no statistical output",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "The manuscript does not answer the study question; critical model estimates, p-values, and effect sizes are absent, rendering it useless for interpretation.",
+        "actionableFix": "Report all ANCOVA terms: group effect (F(2,235)=2.19, p=0.114), covariate effects, model fit, and ideally adjusted means and contrasts.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Prespecified study question is never stated",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Readers cannot assess whether the analysis addresses a meaningful hypothesis or aligns with the objective.",
+        "actionableFix": "Explicitly state the study question in the Introduction, and explain how the ANCOVA model was chosen to answer it.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F04",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No baseline characteristics table",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without a table of covariate means (or medians) by group, readers cannot judge covariate imbalance or justify the need for adjustment. This is standard practice in observational studies.",
+        "actionableFix": "Add Table 1 showing demographic and clinical characteristics (age, severity, and outcome) stratified by group, with appropriate summary statistics.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F05",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Model diagnostics not reported in manuscript",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "ANCOVA relies on assumptions of normality, homoscedasticity, and absence of influential points. Although diagnostics exist in companion files, the manuscript must describe and discuss them.",
+        "actionableFix": "Include a paragraph or table summarizing residual diagnostics (Shapiro‑Wilk p‑value, maximum leverage, maximum Cook’s distance, VIF) and state that assumptions were met.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Diagnostics in stats-run/diagnostics.json show Shapiro p=0.79, max leverage 0.052, max Cook’s d 0.054, max VIF 1.35; none of this appears in the manuscript.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F06",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Missing data not quantified or discussed",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The analysis uses 240 complete cases, but the original sample size, pattern of missingness, and any potential for informative missingness are unreported. This threatens validity.",
+        "actionableFix": "Report the initial number of records, how many were excluded and why, and perform a sensitivity analysis (e.g., pattern‑mixture model or multiple imputation) if missingness is non‑trivial.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F07",
+        "severity": "major",
+        "category": "literature",
+        "title": "No literature context",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The study lacks any reference to prior work on the relationship between the group and outcome, or the role of the covariates. This prevents situating the findings.",
+        "actionableFix": "Add a brief literature review citing relevant studies, and discuss how the current results align or contrast with existing evidence.",
+        "reentryPoint": "literature",
+        "deterministicVerification": "Manuscript contains zero references.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "Analysis is unbound and exploratory, but claims imply confirmatory strength",
+        "evidenceRefs": [
+          "stats-run/stats-run.json (binding.status, resultPosture)"
+        ],
+        "whyItMatters": "Unbound analyses have inflated false-positive risk; the manuscript's 'interpretable local evidence' statement is overconfident.",
+        "actionableFix": "Bind the analysis to a pre-registered specification or downgrade all claims to explicitly exploratory language, acknowledging inflated Type I error.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Contradictory statements about missing artifacts and estimates",
+        "evidenceRefs": [
+          "manuscript.md (Limitations)",
+          "stats-run/stats-run.json (estimates)"
+        ],
+        "whyItMatters": "The manuscript says 'No reader-facing paper/manuscript artifact' and 'No estimate-like records', yet both exist; this undermines trust in the report's accuracy.",
+        "actionableFix": "Remove or correct these limitations statements after verifying that the manuscript reflects the actual artifacts.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "cohort",
+        "title": "No participant flow or baseline characteristics reported",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Complete-case analysis may be biased; without details on initial cohort, exclusions, and group demographics, selection bias and generalizability cannot be assessed.",
+        "actionableFix": "Provide a STROBE flow diagram and a table of baseline characteristics by group, comparing complete-case to excluded records.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F08",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Reference category for group not specified",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "The group variable has three levels (likely control, enhanced, standard) but the reference is unnamed, making the reported contrasts ambiguous.",
+        "actionableFix": "Explicitly state the reference category in the Methods and in footnotes of result tables.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "VIF terms in diagnostics.json include 'group_enhanced' and 'group_standard', implying a third reference level, but manuscript never names it.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Statistical method is described vaguely",
+        "evidenceRefs": [
+          "manuscript.md (Methods)"
+        ],
+        "whyItMatters": "Reproducibility requires a clear statement of the model; readers should not need to infer from artifacts.",
+        "actionableFix": "Explicitly state: ANCOVA with outcome_cont as dependent variable, group as a three-level factor, and age and severity as covariates, using type III SS.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "No effect sizes or clinical significance reported",
+        "evidenceRefs": [
+          "stats-run/stats-run.json (only sum_sq, df, f, p)"
+        ],
+        "whyItMatters": "P-values alone do not convey magnitude of effects; readers cannot judge practical importance.",
+        "actionableFix": "Compute and report partial eta-squared for each effect (sum_sq_effect / (sum_sq_effect + sum_sq_residual)).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "info",
+        "category": "literature",
+        "title": "No literature context or references provided",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The study lacks scientific framing; readers cannot gauge importance or compare with prior work.",
+        "actionableFix": "Add a brief background with references or explicitly state this is an internal-only analysis.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [],
+    "reentryPoint": "execution",
+    "nextAction": "Route back to execution with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-adjudication.json"
+  }
+}

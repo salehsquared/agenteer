@@ -1,0 +1,117 @@
+{
+  "verdict": "revise",
+  "summary": "The manuscript misrepresents the analysis: it claims no p-value or effect-size estimates, but the stats run artifact contains a significant p-value (1.86e-9) and group medians. The analysis is unbound and postured as exploratory, yet the presented conclusion ('interpretable local evidence') downplays this limitation. Incomplete reporting of cohort, variables, and confounders further weakens the paper.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript inaccurately claims no p-value/effect-size estimates",
+      "evidenceRefs": [
+        "manuscript.md line: 'No estimate-like records were available for p-value/effect-size checks.'",
+        "stats-run.json: estimates array includes p_value=1.86e-9, median_a=20.06, median_b=23.08"
+      ],
+      "whyItMatters": "Directly contradicts the actual results, misleads readers about the presence of inferential statistics.",
+      "actionableFix": "Update the manuscript to accurately reflect the available estimates (including p-value and effect sizes) and discuss their interpretation under the exploratory design.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check if the manuscript 'Limitations' section still contains the contradictory statement after the stats-run.json estimates are confirmed.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Analysis is unbound and exploratory, but conclusion implies more certainty",
+      "evidenceRefs": [
+        "stats-qa.json: binding-status warning, resultPosture = exploratory_standard_table",
+        "stats-run.json: binding.status = unbound"
+      ],
+      "whyItMatters": "Without a pre-specified analysis plan, the risk of overinterpretation is high. The conclusion 'interpretable local evidence' does not adequately convey that the result is a post-hoc exploration.",
+      "actionableFix": "Explicitly label the result as exploratory and unvalidated. Add a statement that the findings cannot support clinical or causal inferences without a predetermined protocol and confounding control.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify that the manuscript's Discussion or Limitations section includes phrases like 'exploratory' and 'not pre-registered'.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without description of missing data pattern or sensitivity",
+      "evidenceRefs": [
+        "manuscript.md: 240 complete-case records, no mention of total eligible or reasons for exclusion.",
+        "stats-run.json: completeCaseN = 240, no missingness diagnostics."
+      ],
+      "whyItMatters": "If missingness is non-ignorable, the estimates could be biased. The reader cannot judge selectability of the sample.",
+      "actionableFix": "Report the number of records excluded, reasons for missingness, and consider a sensitivity analysis (e.g., pattern-mixture or multiple imputation) or at minimum discuss potential bias.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Check for presence of a flow diagram and missing-indicator table in the revised manuscript.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "variables",
+      "title": "No definitions or operationalization of outcome, treatment, or confounders",
+      "evidenceRefs": [
+        "manuscript.md: only mentions 'outcome_cont' and 'treatment'; stats-run.json variables array has only these two."
+      ],
+      "whyItMatters": "Without clinical context, the reader cannot assess measurement validity, relevance, or potential confounding. Any observed difference may be due to uncontrolled confounding.",
+      "actionableFix": "Provide variable dictionary, data provenance, and list potential confounders (or state why they are not needed). If no confounders are available, acknowledge that as a major limitation.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "Confirm that the manuscript includes a table describing variables with their units, coding, and collection methods.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "category": "method_choice",
+      "title": "Mann-Whitney test with ties reported but no tie adjustment mentioned",
+      "evidenceRefs": [
+        "diagnostics.json: ties_possible = true",
+        "No description of how ties were handled."
+      ],
+      "whyItMatters": "Ties affect the test statistic distribution; failure to document the tie-breaking method undermines reproducibility.",
+      "actionableFix": "Specify the tie-handling method used (e.g., average ranks) in the Methods section. If the software default is used, state that explicitly.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Search for 'ties' in the revised manuscript; should be mentioned in the statistical analysis paragraph.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "category": "study_design",
+      "title": "Imbalanced group sizes not discussed",
+      "evidenceRefs": [
+        "stats-run.json: n_a=96, n_b=144."
+      ],
+      "whyItMatters": "Imbalance can affect power and the robustness of the rank test if distribution shapes differ. May hint at selection bias.",
+      "actionableFix": "Comment on the imbalance, test for shape differences (e.g., Kolmogorov-Smirnov), and consider reporting standardized effect sizes.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Look for a sentence about group sizes and any diagnostics on distribution shape differences.",
+      "confidence": 0.75
+    },
+    {
+      "id": "F07",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript claims missing artifacts that actually exist",
+      "evidenceRefs": [
+        "manuscript.md: 'No reader-facing paper/manuscript artifact was found.' and 'No reader-facing report was available for claim alignment.'",
+        "stats-run/artifacts: includes stats-report.md (kind: report) and other reader-facing outputs."
+      ],
+      "whyItMatters": "Provokes confusion and undermines credibility of the review process.",
+      "actionableFix": "Remove the incorrect statements and ensure the artifacts listed match the actual run directory. If the statements refer to a separate paper artifact, clarify.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The 'Limitations' section should no longer contain those bullet points.",
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions: operationalization, measurement scale, and clinical meaning of 'outcome_cont' and 'treatment'.",
+    "Cohort flow: number of records screened, exclusions, and missingness patterns.",
+    "Confounding plan: list of covariates considered, rationale for unadjusted analysis.",
+    "Pre-specification document: method-selection and AnalysisSpec binding (run is currently unbound).",
+    "External validation or population-design correction if generalization is desired."
+  ],
+  "recommendedNextStage": "manuscript"
+}

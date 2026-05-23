@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:23:01.546Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Study question not specified",
+        "evidenceRefs": [
+          "manuscript.md Abstract",
+          "manuscript.md Introduction"
+        ],
+        "whyItMatters": "Without a defined research question, the analysis has no clear objective, and the manuscript's claim of answering a 'prespecified study question' is unfounded.",
+        "actionableFix": "Define the precise clinical or public-health question, including population, intervention/exposure, comparison, outcome (PICO). Update the manuscript accordingly.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "Verify that manuscript.md contains a sentence ending with a question mark or a clearly labeled 'Objective' section that states a specific research question.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Statistical results absent from manuscript",
+        "evidenceRefs": [
+          "manuscript.md Results",
+          "stats-run.json estimates"
+        ],
+        "whyItMatters": "The manuscript reports only the sample size and contains no results of the ANOVA, such as F-statistic, p-value, or group means, making it impossible to interpret the findings.",
+        "actionableFix": "Report the ANOVA table, effect sizes, group means with standard deviations, p-value, and confidence intervals in the Results section.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that the manuscript Results section includes numeric values for the ANOVA F-statistic, p-value, and group descriptive statistics.",
+        "confidence": 0.99,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Primary ANOVA result not reported",
+        "evidenceRefs": [
+          "stats-run.json::estimates",
+          "manuscript.md::Results"
+        ],
+        "whyItMatters": "The manuscript claims to answer a prespecified question but the Results section only states the sample size, omitting the F-test, p-value, and group differences. This makes the report essentially empty.",
+        "actionableFix": "Add a concise Results section reporting the F-statistic, degrees of freedom, p-value, and descriptive statistics by group. Include a table or text.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Compare stats-run.json estimate for 'C(group)' with reported text.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "variables",
+        "title": "Variables not defined",
+        "evidenceRefs": [
+          "manuscript.md Methods: Variables",
+          "stats-run.json variables"
+        ],
+        "whyItMatters": "The 'outcome_cont' and 'group' variables lack any description (units, possible values, clinical meaning). Readers cannot understand what was measured.",
+        "actionableFix": "Provide explicit definitions for each variable, including measurement units and coding for categorical variables (e.g., group levels: 'enhanced', 'standard', 'control').",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that manuscript.md Methods: Variables includes a table or list describing each variable's meaning, type, and range.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "Unbound exploratory analysis without pre-specification",
+        "evidenceRefs": [
+          "stats-run.json resultPosture",
+          "stats-run.json binding"
+        ],
+        "whyItMatters": "The analysis is not bound to a method-selection or analysis spec, so it is purely exploratory. The manuscript does not acknowledge this limitation, risking overinterpretation as confirmatory.",
+        "actionableFix": "Either bind the analysis to a pre-specified protocol and re-run, or explicitly label the analysis as exploratory and avoid any inferential language.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Check that the binding.status in stats-run.json is 'bound' and refers to a valid protocol artifact, or that the manuscript explicitly uses the term 'exploratory' and cites the 'resultPosture'.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "cohort",
+        "title": "Cohort construction unreported",
+        "evidenceRefs": [
+          "manuscript.md Methods: Cohort Construction"
+        ],
+        "whyItMatters": "The manuscript does not describe how the 240 records were selected, eligibility criteria, or any exclusion steps. This prevents assessment of selection bias and generalizability.",
+        "actionableFix": "Provide a detailed cohort flow diagram and text describing inclusion/exclusion criteria, data source, and any filtering applied.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that the manuscript Methods: Cohort Construction section includes a description of data source, inclusion/exclusion rules, and a count of excluded records.",
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No covariate adjustment or confounder consideration",
+        "evidenceRefs": [
+          "stats-run.json variables",
+          "stats-run.json parameters"
+        ],
+        "whyItMatters": "ANOVA compares groups on outcome_cont with no adjustment for potential confounders, even though the analysis is observational. This severely limits the usefulness of any comparison.",
+        "actionableFix": "Identify possible confounders (e.g., demographics, baseline characteristics) and include them in an ANCOVA or regression model, or justify why none are needed.",
+        "reentryPoint": "method_selection",
+        "deterministicVerification": "Check if the model includes a list of covariates beyond the group factor. In stats-run.json, variables includes only outcome and group; no covariates.",
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Contradictory limitations statements",
+        "evidenceRefs": [
+          "manuscript.md::Limitations",
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The Limitations section claims 'No reader-facing paper/manuscript artifact was found' and 'No estimate-like records were available for p-value/effect-size checks', yet the manuscript and stats-run.json clearly exist. These false statements undermine credibility.",
+        "actionableFix": "Remove or correct these statements. If the limitations refer to missing external artifacts, clarify.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that the limitations are consistent with the accompanying artifacts.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No descriptive statistics by group",
+        "evidenceRefs": [
+          "manuscript.md::Results",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Without group means, SDs, and sample sizes, readers cannot interpret the ANOVA result or assess effect sizes.",
+        "actionableFix": "Provide a table with N, mean, SD, and possibly CI per group.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Request the table; existence can be checked in output.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No effect size reported",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "ANOVA output includes sum of squares but no proportion of variance explained (eta-squared) or other effect size. This limits interpretation.",
+        "actionableFix": "Compute and report eta-squared or omega-squared.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Eta-squared = 37.556 / (37.556+3093.747) = 0.012. Verify.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Unbound exploratory analysis posture not clearly communicated",
+        "evidenceRefs": [
+          "stats-qa.json::binding-status",
+          "stats-qa.json::result-posture",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The analysis was not pre-registered or bound to a method-selection artifact, so it is exploratory. The manuscript's title and abstract imply a prespecified question, which conflicts with this posture.",
+        "actionableFix": "Explicitly label the analysis as exploratory and unregistered in the abstract and conclusions, and adjust claim language accordingly.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that abstract and conclusion mention unbound/exploratory status.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "No power or sample size justification",
+        "evidenceRefs": [
+          "manuscript.md Methods: Statistical Analysis"
+        ],
+        "whyItMatters": "With a non-significant result, it is unclear if the study had adequate power to detect a clinically meaningful effect. This omission weakens any interpretation.",
+        "actionableFix": "Report a power analysis for the given sample size and effect size of interest, or explain why it was not performed.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if the manuscript mentions 'power' or 'sample size calculation' in the Methods.",
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "missingness",
+        "title": "Incomplete missing data reporting",
+        "evidenceRefs": [
+          "manuscript.md::Cohort Construction",
+          "manuscript.md::Limitations"
+        ],
+        "whyItMatters": "Complete-case analysis can bias results if missingness is not random; no information on missingness patterns or sensitivity analysis is provided.",
+        "actionableFix": "Report number and characteristics of excluded cases, and consider multiple imputation or sensitivity analysis.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "No confidence intervals for group means",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Confidence intervals convey precision better than p-values alone.",
+        "actionableFix": "Compute and report 95% CIs for group means or for differences, if post-hoc tests are planned.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Verify CIs match model output.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "info",
+        "category": "data_plausibility",
+        "title": "Data plausibility checks not discussed",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json",
+          "manuscript.md Limitations"
+        ],
+        "whyItMatters": "While diagnostics appear acceptable, the manuscript does not mention checks for outliers, distributional assumptions, or data quality, which are important for trustworthiness.",
+        "actionableFix": "Summarize the key diagnostic checks (e.g., residuals normality, leverage, Cook's distance) in a brief paragraph in the Results or Supplement.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if the manuscript includes text about residual diagnostics or model checks.",
+        "confidence": 0.7,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [
+      {
+        "finding": {
+          "id": "F8",
+          "severity": "minor",
+          "category": "literature",
+          "title": "No literature review or context",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "An exploratory local analysis does not require extensive literature, but a brief mention of prior similar studies or expected effects would help interpretation.",
+          "actionableFix": "Add a short paragraph referencing any known literature on the outcome-group relationship, or state that no prior studies were found.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.5
+        },
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "reason": "Low-severity single-reviewer finding kept as advisory but not accepted for automatic repair."
+      }
+    ],
+    "conflictNotes": [],
+    "reentryPoint": "protocol",
+    "nextAction": "Route back to protocol with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-adjudication.json"
+  }
+}

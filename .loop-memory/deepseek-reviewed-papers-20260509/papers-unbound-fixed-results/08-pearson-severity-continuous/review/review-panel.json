@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "reviewPanel": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:49:52.336Z",
+    "panelId": "review_panel_a90e243b18a3",
+    "stage": "final",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous",
+    "autonomy": "aggressive",
+    "budget": {
+      "maxPerCallUsd": 0.12,
+      "maxPanelUsd": 0.3,
+      "maxStudyLoopUsd": 5
+    },
+    "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-packet.json",
+    "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-redaction-report.json",
+    "reviewers": [
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T21:47:03.787Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778363223787",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:methods",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "clinical methods and study-design reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The manuscript fails to report the primary result (correlation coefficient and p-value) and contains a false statement that no estimates were available. Additionally, key methodological details (cohort construction, variable definitions, assumption checks) are missing, and the analysis is unregistered and unadjusted for confounders. These issues prevent any meaningful interpretation and must be resolved before the paper can proceed.",
+        "findings": [
+          {
+            "id": "missing-main-result",
+            "severity": "blocker",
+            "category": "reporting",
+            "title": "Primary result not reported in manuscript",
+            "evidenceRefs": [
+              "manuscript.md:Results",
+              "stats-run.json:estimates"
+            ],
+            "whyItMatters": "The manuscript fails to report the correlation coefficient and p-value, the core findings. Readers cannot assess the association without these numbers.",
+            "actionableFix": "Report the Pearson r=0.658, p<0.001, and n=240 in the Results section. Include confidence interval and effect size interpretation.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Verify manuscript now contains the numeric correlation and p-value.",
+            "confidence": 1
+          },
+          {
+            "id": "no-assumption-checks",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "No diagnostics for Pearson correlation assumptions",
+            "evidenceRefs": [
+              "stats-run/diagnostics.json",
+              "stats-run/stats-run.json:diagnostics"
+            ],
+            "whyItMatters": "Pearson correlation assumes linearity, homoscedasticity, and bivariate normality. Without checks, the reported correlation may be misleading if assumptions are violated.",
+            "actionableFix": "Add diagnostic plots (residuals vs fitted, Q-Q plot) and tests (e.g., Shapiro-Wilk) to the run. Include these outputs in the manuscript or supplementary.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check if diagnostics.json contains more than just 'test' and 'n'; look for skew, kurtosis, outlier detection.",
+            "confidence": 0.9
+          },
+          {
+            "id": "unbound-analysis",
+            "severity": "major",
+            "category": "study_design",
+            "title": "No pre-specified analysis plan; exploratory posture",
+            "evidenceRefs": [
+              "stats-run/stats-run.json:resultPosture",
+              "stats-run/stats-qa.json:checks"
+            ],
+            "whyItMatters": "Without a pre-registered analysis, the risk of p-hacking is high. The result may be cherry-picked from multiple exploratory tests.",
+            "actionableFix": "Create and bind an AnalysisSpec or method-selection artifact before claiming confirmatory findings. Or clearly label as exploratory and limit inference.",
+            "reentryPoint": "method_selection",
+            "deterministicVerification": "Check if binding artifact exists and is referenced.",
+            "confidence": 0.9
+          },
+          {
+            "id": "missing-cohort-details",
+            "severity": "major",
+            "category": "cohort",
+            "title": "No description of cohort construction or variable definitions",
+            "evidenceRefs": [
+              "manuscript.md:Cohort Construction, Variables"
+            ],
+            "whyItMatters": "Readers cannot assess selection bias, measurement validity, or generalizability. The complete-case approach is mentioned but not quantified.",
+            "actionableFix": "Provide inclusion/exclusion criteria, missing data patterns, and definitions of severity and outcome_cont. Report descriptive statistics.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Presence of a table 1 with demographics and clinical characteristics.",
+            "confidence": 0.95
+          },
+          {
+            "id": "confounding-ignored",
+            "severity": "major",
+            "category": "causal_claims",
+            "title": "Association not adjusted for confounders",
+            "evidenceRefs": [
+              "stats-run/stats-run.json:estimates[0].adjusted_for\":\"\""
+            ],
+            "whyItMatters": "The observed correlation may be confounded by other variables, leading to spurious inference. This limits any practical interpretation.",
+            "actionableFix": "Either acknowledge unadjusted association, or perform multivariable analysis if confounders available. Report adjusted estimates.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": "Check if the analysis spec includes covariate adjustment.",
+            "confidence": 0.85
+          },
+          {
+            "id": "claims-contradict-factual",
+            "severity": "blocker",
+            "category": "reporting",
+            "title": "Manuscript incorrectly claims no estimates available",
+            "evidenceRefs": [
+              "manuscript.md:Limitations: No estimate-like records were available...",
+              "stats-run/stats-run.json:estimates"
+            ],
+            "whyItMatters": "This false statement misleads reviewers and readers about the existence of numerical results. It indicates a flawed automated generation.",
+            "actionableFix": "Correct the limitation to reflect that estimates exist but were not reported. Alternatively, remove the incorrect sentence.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Search for 'No estimate-like records were available' in manuscript.md.",
+            "confidence": 1
+          },
+          {
+            "id": "figure-not-available",
+            "severity": "minor",
+            "category": "figures",
+            "title": "Scatterplot not available for reviewer inspection",
+            "evidenceRefs": [
+              "stats-run/figure-qa.json",
+              "stats-run/figures.json"
+            ],
+            "whyItMatters": "We cannot visually assess the linearity and potential outliers. The figure-qa only checks technical rendering, not data patterns.",
+            "actionableFix": "Include the scatterplot in the manuscript or provide direct access. Overlay a loess smoother to check linearity.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Presence of scatterplot with smooth line in the report.",
+            "confidence": 0.7
+          },
+          {
+            "id": "reproducibility-weak",
+            "severity": "minor",
+            "category": "reproducibility",
+            "title": "No code or dependency information for full reproducibility",
+            "evidenceRefs": [
+              "stats-run/stats-run.json:artifacts"
+            ],
+            "whyItMatters": "Without code, the exact computation may differ; artifact hashes ensure fidelity only if the pipeline is shared.",
+            "actionableFix": "Provide the execution script or container specification. For now, the artifacts are sufficient for audit but not for recomputation.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check for a code artifact (e.g., .py, .R, Dockerfile) in the run directory.",
+            "confidence": 0.6
+          }
+        ],
+        "missingEvidence": [
+          "Scatterplot (correlation-scatter.png) not directly viewable",
+          "Normality/linearity assumption checks (e.g., Shapiro-Wilk, residual plots)",
+          "Data dictionary for severity and outcome_cont",
+          "Study protocol or pre-registration record",
+          "Code or script used to generate the analysis"
+        ],
+        "recommendedNextStage": "manuscript",
+        "costEstimate": {
+          "inputTokens": 3032,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026156,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778363223787.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778363223787.json"
+      },
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T21:47:03.806Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778363223806",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:reproducibility",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "statistical reporting and reproducibility reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The analysis is severely inadequate for any substantive interpretation. Pearson correlation was performed without checking linearity, normality, or homoscedasticity; the scatterplot appears degenerate (only 6% non-blank); variables are undefined; the result is unbound and exploratory but framed as a confirmatory finding; and confounders are ignored. These flaws block any reliable inference.",
+        "findings": [
+          {
+            "id": "pearson-assumptions-unchecked",
+            "severity": "blocker",
+            "category": "model_diagnostics",
+            "title": "Pearson correlation assumptions (linearity, normality, homoscedasticity) not verified prior to use",
+            "evidenceRefs": [
+              "diagnostics.json only reports test=pearson and n=240",
+              "figure-qa.json reports scatterplot nonBlankRatio=0.06 suggesting visualization problems",
+              "no normality or residual diagnostics provided"
+            ],
+            "whyItMatters": "The reported correlation (r=0.66, p≈0) may be invalid if the relationship is non-linear or if outliers influence the coefficient. Without diagnostic plots and tests, the inference is unsupported.",
+            "actionableFix": "Produce and inspect a scatterplot with a LOWESS smoother; examine Q–Q plots of both variables; check for heteroscedasticity; if assumptions are violated, switch to Spearman rank correlation or robust regression.",
+            "reentryPoint": "qa",
+            "deterministicVerification": "Open correlation-scatter.png and inspect for an elliptical point cloud; any curvature or fanning invalidates Pearson.",
+            "confidence": 0.95
+          },
+          {
+            "id": "exploratory-posture-misleading",
+            "severity": "major",
+            "category": "reporting",
+            "title": "Exploratory analysis presented as a confirmatory question",
+            "evidenceRefs": [
+              "stats-run.json: resultPosture.status = exploratory_standard_table",
+              "stats-qa.json: binding unbound and result-posture warning",
+              "manuscript.md title and abstract pose a definite research question"
+            ],
+            "whyItMatters": "An unregistered, post-hoc analysis cannot support confirmatory claims. Presenting it as such risks over-interpretation and false discoveries.",
+            "actionableFix": "Label the entire analysis as 'Exploratory' in the title and abstract. Explicitly state that no pre-specified analysis plan exists and that results should not be treated as hypothesis tests.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "stats-run.json binding.status = 'unbound'; confirm no AnalysisSpec or method-selection artifact.",
+            "confidence": 0.9
+          },
+          {
+            "id": "undefined-variables",
+            "severity": "major",
+            "category": "variables",
+            "title": "Variables 'severity' and 'outcome_cont' lack operational definitions",
+            "evidenceRefs": [
+              "stats-run.json lists variables without metadata",
+              "manuscript.md contains no variable descriptions"
+            ],
+            "whyItMatters": "Without knowing the measurement scale, units, and clinical meaning of severity and the continuous outcome, the correlation of 0.66 is uninterpretable.",
+            "actionableFix": "Provide a data dictionary detailing scale, range, coding, and clinical interpretation for both variables. If severity is ordinal, reconsider the choice of Pearson.",
+            "reentryPoint": "dataset_feasibility",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "degenerate-scatterplot",
+            "severity": "major",
+            "category": "figures",
+            "title": "Scatterplot nonBlankRatio of 0.06 indicates a nearly blank figure",
+            "evidenceRefs": [
+              "figure-qa.json: nonBlankRatio=0.06003602920261686 for correlation-scatter.png"
+            ],
+            "whyItMatters": "A scatterplot that is 94% white space cannot serve its purpose of visually confirming the bivariate relationship; it may indicate a rendering error or data points outside the axis limits.",
+            "actionableFix": "Manually inspect the PNG file. If blank or truncated, regenerate with appropriate axis limits encompassing all data points and re-check nonBlankRatio.",
+            "reentryPoint": "qa",
+            "deterministicVerification": "Open the file directly and confirm that data points are visible and axis scales match the data range.",
+            "confidence": 0.8
+          },
+          {
+            "id": "complete-case-sensitivity",
+            "severity": "minor",
+            "category": "missingness",
+            "title": "Complete‑case analysis without assessment of missing‑data mechanism",
+            "evidenceRefs": [
+              "manuscript.md: '240 complete‑case records'",
+              "stats-run.json: completeCaseN=240"
+            ],
+            "whyItMatters": "If missingness is related to severity or outcome, the correlation may be biased. Even if the dataset is full, this must be documented.",
+            "actionableFix": "Report the proportion of missing values per variable and the missing‑data pattern. Justify why complete‑case analysis is appropriate or add multiple imputation as a sensitivity analysis.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": null,
+            "confidence": 0.7
+          },
+          {
+            "id": "no-literature-context",
+            "severity": "minor",
+            "category": "literature",
+            "title": "No reference to prior estimates or clinical relevance of the correlation magnitude",
+            "evidenceRefs": [
+              "manuscript.md contains no citations or literature comparison"
+            ],
+            "whyItMatters": "A correlation of 0.66 may be strong or weak depending on the research field; without external context, the practical importance cannot be judged.",
+            "actionableFix": "Add a brief discussion of comparable effect sizes from published studies and the clinical meaning of the observed association.",
+            "reentryPoint": "literature",
+            "deterministicVerification": null,
+            "confidence": 0.8
+          },
+          {
+            "id": "manuscript-self-contradiction",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "Limitation says 'No reader‑facing paper/manuscript artifact was found' yet the document is a manuscript",
+            "evidenceRefs": [
+              "manuscript.md Limitations section"
+            ],
+            "whyItMatters": "This templated error diminishes trust in the manuscript’s version control and accuracy.",
+            "actionableFix": "Remove or correct this limitation to reflect the actual artifact status.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "unadjusted-bivariate",
+            "severity": "major",
+            "category": "method_choice",
+            "title": "Bivariate Pearson ignores potential confounders",
+            "evidenceRefs": [
+              "stats-run.json: only severity and outcome_cont, adjusted_for empty"
+            ],
+            "whyItMatters": "Without adjusting for demographic or clinical covariates, the estimated correlation may reflect confounding rather than the direct association of interest.",
+            "actionableFix": "Either add relevant covariates in a partial correlation or regression model, or explicitly discuss plausible confounders and the limitation of the unadjusted estimate.",
+            "reentryPoint": "method_selection",
+            "deterministicVerification": null,
+            "confidence": 0.85
+          }
+        ],
+        "missingEvidence": [
+          "Scatterplot image file (correlation-scatter.png) for visual inspection",
+          "Variable definitions and measurement details for severity and outcome_cont",
+          "Missingness pattern and rationale for complete‑case analysis",
+          "Pre‑registration or analysis plan binding (currently absent)",
+          "Literature grounding or comparable effect sizes"
+        ],
+        "recommendedNextStage": "method_selection",
+        "costEstimate": {
+          "inputTokens": 3032,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026156,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363223806.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363223806.json"
+      }
+    ],
+    "status": "block",
+    "costEstimateUsd": 0.052312,
+    "failureCount": 0,
+    "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-panel.json"
+  }
+}

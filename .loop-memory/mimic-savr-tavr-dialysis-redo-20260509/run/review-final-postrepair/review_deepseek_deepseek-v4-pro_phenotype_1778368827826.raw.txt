@@ -1,0 +1,80 @@
+{
+  "verdict": "block",
+  "summary": "The ICD-9 procedure code list for SAVR is incomplete (only 35.21, 35.22), missing standard codes such as 35.23, 35.24. This likely misclassifies many SAVR patients, potentially invalidating all valve-strategy comparisons and dialysis-specific estimates. This must be resolved before the analysis can be considered credible. Other major issues include incomplete documentation of the ICD-10-PCS phenotype rule, possible under-ascertainment of valve reinterventions in ICD-9 era, and lack of competing-risk analysis for nonfatal outcomes.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "Incomplete ICD-9 SAVR procedure code list",
+      "evidenceRefs": [
+        "The user-supplied SAVR ICD-9 procedure codes were 35.21 and 35.22."
+      ],
+      "whyItMatters": "Standard ICD-9 aortic valve replacement also includes 35.23 (bioprosthetic) and 35.24 (prosthetic), among others. Excluding these codes can lead to substantial misclassification of valve strategy, biasing all subsequent comparisons and making the cohort non‑representative of true SAVR patients.",
+      "actionableFix": "Expand the ICD-9 SAVR code list to all relevant codes (35.21–35.24, possibly 35.20 for endoscopic replacement) and validate against procedure text. Reconstruct the cohort and rerun all analyses.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check the MIMIC procedure tables for codes 35.23 and 35.24; if present, patients currently excluded should be reclassified.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "ICD-10-PCS valve phenotype rule not documented",
+      "evidenceRefs": [
+        "ICD-10-PCS aortic-valve replacement classification was derived from code-axis/title logic and should be treated as a reviewed phenotype rule, not a raw exact-code list."
+      ],
+      "whyItMatters": "Without the actual rule or code list, the ICD-10‑PCS part of the cohort definition is not reproducible and cannot be independently validated.",
+      "actionableFix": "Provide the explicit logic (e.g., which axis values were used) or the final mapped ICD-10-PCS codes in an appendix/supplementary file.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "variables",
+      "title": "Valve reintervention phenotype missing ICD-9 revision codes",
+      "evidenceRefs": [
+        "Valve reintervention combined later TAVR, later SAVR, and ICD-10-PCS title-based revision/explant proxy evidence."
+      ],
+      "whyItMatters": "MIMIC contains both ICD‑9 and ICD‑10 eras. Ignoring ICD‑9 revision/explant codes (e.g., 35.13, 35.23) underestimates reintervention rates and may bias comparisons, especially for earlier years where follow‑up is longer.",
+      "actionableFix": "Incorporate standard ICD‑9 procedure codes for aortic valve revision/replacement into the reintervention definition.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Query MIMIC for ICD‑9 procedure codes that are clearly aortic valve revisions and compare counts with the current definition.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Cox models for nonfatal outcomes ignore competing risks",
+      "evidenceRefs": [
+        "Nonfatal readmission/reintervention Cox models censor deaths before nonfatal events; Fine-Gray competing-risk models were not estimated."
+      ],
+      "whyItMatters": "In this population, early death is a strong competing risk. Cause‑specific hazard ratios may be misleading if one does not recognise they are conditional on survival. Reported HR e.g. 0.95 for HF readmission in dialysis patients may be distorted.",
+      "actionableFix": "Either reframe the interpretation as cause‑specific HRs and stress the conditional interpretation, or supplement with subdistribution hazard models (Fine‑Gray) for the primary nonfatal outcomes.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No quantification of bias from same-hospital-only outcomes",
+      "evidenceRefs": [
+        "Same-hospital readmission and reintervention outcomes may miss outside-hospital events."
+      ],
+      "whyItMatters": "Differential loss to follow‑up (e.g., dialysis patients more likely to be readmitted elsewhere) could bias the estimated associations. The lack of any sensitivity analysis weakens the conclusions.",
+      "actionableFix": "Provide a sensitivity analysis bounding the potential impact, or at minimum a detailed discussion referencing external data on readmission patterns for these patient groups.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "valve-phenotype-code-list.csv and outcome-phenotypes.json not available for inspection; full ICD-10-PCS rule not documented."
+  ],
+  "recommendedNextStage": "execution"
+}

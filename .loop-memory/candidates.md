@@ -18,6 +18,9 @@
 - Add stricter readability heuristics beyond forbidden jargon: variable-label substitution, awkward question echo detection, and a short plain-language main finding requirement.
 - Promote figure QA into higher-level readiness/benchmark checks so `analysis-manifest`, `run-inspect`, and future paper-series runs can block or downgrade blank/poorly labeled figures automatically.
 - Add source-data CSV sidecars for every generated figure, not only source-column metadata.
+- Add a `research review-apply` or `research study-repair-loop` command that consumes `review-adjudication.json`, chooses accepted findings by category/severity, regenerates the appropriate artifact, reruns deterministic QA, and optionally re-enters `study-critic`.
+- Add method-specific manuscript sections for the highest-friction routes exposed by DeepSeek: descriptive Table 1, correlation assumptions, ANOVA/ANCOVA diagnostics/effect sizes, survival risk tables/log-rank, competing-risk uncertainty, propensity balance tables, prediction calibration/validation.
+- Add dataset-level variable dictionaries/units into paper generation so reviewers stop blocking for undefined `outcome_binary`, `pred_score`, `severity`, and synthetic validation-column names.
 - Make `modeling-plan` consume backend status and prior run outcome evidence.
 - Generate a complete stats-backed packet wrapper from `StatsRunResult`.
 - Add AnalysisSpec V2 fields for model family, estimand, diagnostics, sensitivity analyses, and backend requirements.

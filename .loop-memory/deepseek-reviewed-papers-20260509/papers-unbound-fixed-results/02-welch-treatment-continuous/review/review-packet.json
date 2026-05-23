@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:41:37.374Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous",
+  "packetHash": "decddd366aec7e985ee3c13c33017ba4e4e22e4e6c9b75d883005a26adafd8dd",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 8,
+    "totalBytes": 101483,
+    "includedBytes": 20730
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 4063,
+      "sha256": "7d56675229e7af5f4eb2e692b3c2d22f91d677e2f1c8de20741bd026bacefa9c",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# Does the continuous outcome differ by treatment group using Welch's t-test\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: Does the continuous outcome differ by treatment group using Welch's t-test?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was inferred from the available run artifacts and should be confirmed during review. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: Does the continuous outcome differ by treatment group using Welch's t-test? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe statistical method was inferred from the available run artifacts and should be confirmed during review. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the mean difference was 2.9137; p=0.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No estimate-like records were available for p-value/effect-size checks.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is db8d1606fbab861e45ba8e3079efe0e323b1ff333e0422ce1293297897aa5761. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4382,
+      "sha256": "a61d28fdf1b921cc84704fca76f0407285e557ee8e66b6c2afe5daadec54c1ae",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_4118891866729538648\",\n  \"method\": \"welch-t-test\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_cont\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"group_a\": 0,\n      \"group_b\": 1,\n      \"n_a\": 96,\n      \"n_b\": 144,\n      \"mean_a\": 20.48651041666667,\n      \"mean_b\": 23.400236111111113,\n      \"mean_difference\": 2.9137256944444445,\n      \"cohen_d\": 0.8744737870141851,\n      \"statistic\": 6.5913481275746815,\n      \"p_value\": 3.8287252527457425e-10\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"two-sample t-test\",\n    \"equal_variance_assumed\": false,\n    \"levene_p_value\": 0.7081745345644388\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-config.json\",\n      \"sha256\": \"1d2fc027fdc5df77cd5e751cfbd0ca14636c61a0427b16aefe45c1d0e0efd1b0\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-summary.json\",\n      \"sha256\": \"3e7e78d2d7ba28af3fd6ac56732859f6186c0d5cb27cb87a449263d52c801915\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/estimates.csv\",\n      \"sha256\": \"5a2b8c3cd242726190f500298a36d7cef403350e4410950037dd510706694d89\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/diagnostics.json\",\n      \"sha256\": \"25466afadf328893d04e17f805a9c28d9a2909a971c37d36d6db0a532ec4bbda\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figures.json\",\n      \"sha256\": \"e362459caa7cb16466ed3e3ec070dd95b30414f354224dd61026b7301b8bd873\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/group-distribution.png\",\n      \"sha256\": \"6dc4519d39f21c5683a8b0a0d6f79b50bda142f7a5740e8ce899939556cb84ca\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figure-qa.json\",\n      \"sha256\": \"dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-report.md\",\n      \"sha256\": \"4c651adb7d5902d9ce64b8bcf01b155dd24baa9966d26593aac56a68e13893b2\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-qa.json\",\n      \"sha256\": \"b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 108,
+      "sha256": "25466afadf328893d04e17f805a9c28d9a2909a971c37d36d6db0a532ec4bbda",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"two-sample t-test\",\n  \"equal_variance_assumed\": false,\n  \"levene_p_value\": 0.7081745345644388\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3598,
+      "sha256": "dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"group-distribution.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/group-distribution.png\",\n      \"title\": \"Outcome Distribution By Group\",\n      \"caption\": \"Boxplot of the numeric outcome by comparison group.\",\n      \"altText\": \"Boxplot of the numeric outcome by comparison group.\",\n      \"xLabel\": \"treatment\",\n      \"yLabel\": \"outcome_co"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3598,
+      "sha256": "dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1215,
+      "sha256": "e362459caa7cb16466ed3e3ec070dd95b30414f354224dd61026b7301b8bd873",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2229,
+      "sha256": "db93390866b6c0b12059791749bf2fa38ab31514ea91dfa777ab7e31dfd7a623",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9822,
+      "sha256": "d952811609d53a572b8c15baf8afe582dc36310a131b06214e497b3c9585d392",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1546,
+      "sha256": "cb2f1537cac4f871085a360bece3c38c6f8a8e57649cae6f7c372c9b5a8e5ba1",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4166,
+      "sha256": "6744424af59df246221a3ab22d9392f948bec2e24517adbb1964c889f4c02613",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14854,
+      "sha256": "75ca4f3895494937489e613703ece37e504ea03213e148bed2297f8e4d428342",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4316,
+      "sha256": "421bb06e37a4e1c9d6077b12dc17f84ef4f633d1c6366fe0c904dea7164b9731",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 809,
+      "sha256": "a0a689096fc65889e4aa0126f59ddf08ce680ebe2e5d4b9efeb3a02110e676e2",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9957,
+      "sha256": "d113d7914a65fa27773c7fd775c047a7291634fdf7058f5de18d366efa96e2d5",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1017,
+      "sha256": "bf435d0359fb637ea8952f9357d6c1eddd4226ea422abf0159ed896cfad8ef48",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 4641,
+      "sha256": "e63699b0e7e99f2b0be4b5e54f795a1211d802c88afc7275c91e8231223de24f",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 223,
+      "sha256": "5a2b8c3cd242726190f500298a36d7cef403350e4410950037dd510706694d89",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/group-distribution.png",
+      "relativePath": "stats-run/group-distribution.png",
+      "bytes": 26997,
+      "sha256": "6dc4519d39f21c5683a8b0a0d6f79b50bda142f7a5740e8ce899939556cb84ca",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 628,
+      "sha256": "1d2fc027fdc5df77cd5e751cfbd0ca14636c61a0427b16aefe45c1d0e0efd1b0",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1587,
+      "sha256": "4c651adb7d5902d9ce64b8bcf01b155dd24baa9966d26593aac56a68e13893b2",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 190,
+      "sha256": "3e7e78d2d7ba28af3fd6ac56732859f6186c0d5cb27cb87a449263d52c801915",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 4063 bytes, sha256=7d56675229e7af5f4eb2e692b3c2d22f91d677e2f1c8de20741bd026bacefa9c) ---\n# Does the continuous outcome differ by treatment group using Welch's t-test\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: Does the continuous outcome differ by treatment group using Welch's t-test?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was inferred from the available run artifacts and should be confirmed during review. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: Does the continuous outcome differ by treatment group using Welch's t-test? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe statistical method was inferred from the available run artifacts and should be confirmed during review. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the mean difference was 2.9137; p=0.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No estimate-like records were available for p-value/effect-size checks.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is db8d1606fbab861e45ba8e3079efe0e323b1ff333e0422ce1293297897aa5761. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4382 bytes, sha256=a61d28fdf1b921cc84704fca76f0407285e557ee8e66b6c2afe5daadec54c1ae) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_4118891866729538648\",\n  \"method\": \"welch-t-test\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_cont\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"group_a\": 0,\n      \"group_b\": 1,\n      \"n_a\": 96,\n      \"n_b\": 144,\n      \"mean_a\": 20.48651041666667,\n      \"mean_b\": 23.400236111111113,\n      \"mean_difference\": 2.9137256944444445,\n      \"cohen_d\": 0.8744737870141851,\n      \"statistic\": 6.5913481275746815,\n      \"p_value\": 3.8287252527457425e-10\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"two-sample t-test\",\n    \"equal_variance_assumed\": false,\n    \"levene_p_value\": 0.7081745345644388\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-config.json\",\n      \"sha256\": \"1d2fc027fdc5df77cd5e751cfbd0ca14636c61a0427b16aefe45c1d0e0efd1b0\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-summary.json\",\n      \"sha256\": \"3e7e78d2d7ba28af3fd6ac56732859f6186c0d5cb27cb87a449263d52c801915\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/estimates.csv\",\n      \"sha256\": \"5a2b8c3cd242726190f500298a36d7cef403350e4410950037dd510706694d89\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/diagnostics.json\",\n      \"sha256\": \"25466afadf328893d04e17f805a9c28d9a2909a971c37d36d6db0a532ec4bbda\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figures.json\",\n      \"sha256\": \"e362459caa7cb16466ed3e3ec070dd95b30414f354224dd61026b7301b8bd873\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/group-distribution.png\",\n      \"sha256\": \"6dc4519d39f21c5683a8b0a0d6f79b50bda142f7a5740e8ce899939556cb84ca\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figure-qa.json\",\n      \"sha256\": \"dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-report.md\",\n      \"sha256\": \"4c651adb7d5902d9ce64b8bcf01b155dd24baa9966d26593aac56a68e13893b2\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-qa.json\",\n      \"sha256\": \"b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 108 bytes, sha256=25466afadf328893d04e17f805a9c28d9a2909a971c37d36d6db0a532ec4bbda) ---\n{\n  \"test\": \"two-sample t-test\",\n  \"equal_variance_assumed\": false,\n  \"levene_p_value\": 0.7081745345644388\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3598 bytes, sha256=dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"group-distribution.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/group-distribution.png\",\n      \"title\": \"Outcome Distribution By Group\",\n      \"caption\": \"Boxplot of the numeric outcome by comparison group.\",\n      \"altText\": \"Boxplot of the numeric outcome by comparison group.\",\n      \"xLabel\": \"treatment\",\n      \"yLabel\": \"outcome_co\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3598 bytes, sha256=dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1215 bytes, sha256=e362459caa7cb16466ed3e3ec070dd95b30414f354224dd61026b7301b8bd873) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2229 bytes, sha256=db93390866b6c0b12059791749bf2fa38ab31514ea91dfa777ab7e31dfd7a623) ---\n"
+}

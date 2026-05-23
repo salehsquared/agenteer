@@ -1,0 +1,132 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript is inconsistent with generated artifacts (claims no estimates exist), lacks essential study design elements (question, variable definitions, confounding control), and is positioned as an unbound exploratory analysis. These issues prevent any substantive interpretation or promotion.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript claims no estimate records, but they exist in artifacts",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "Indicates manuscript not updated to reflect analysis output; undermines credibility.",
+      "actionableFix": "Update the limitations section to accurately reflect that estimate records are available and report key results like mean difference, p-value, and effect size.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the limitations section no longer says 'No estimate-like records were available...'",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "study_design",
+      "title": "No specific research question or clinical context stated",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without a clear question, the analysis cannot be evaluated for appropriateness or clinical utility.",
+      "actionableFix": "Explicitly state the research question (PICO elements) in the Introduction and link it to the analysis.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Presence of a clearly stated question in the manuscript.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Observational comparison lacks any confounding adjustment or balance assessment",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "The observed difference could be due to confounders; a simple t-test is insufficient for causal inference or even association without covariate control.",
+      "actionableFix": "Either incorporate covariates in a regression model or clearly state that the analysis is purely descriptive and cannot distinguish confounding. Provide baseline characteristics table.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Existence of a table of baseline characteristics by group and a causal diagram or covariate adjustment plan.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Cohort construction, eligibility criteria, and variable definitions are missing",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Reproducibility and interpretation require knowing how the sample was derived and what the variables represent.",
+      "actionableFix": "Describe data source, inclusion/exclusion criteria, and operational definitions of treatment and outcome (e.g., treatment type, outcome measurement).",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Presence of a detailed cohort flow diagram and variable dictionary.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Manuscript does not clearly convey the exploratory and unbound nature of the analysis",
+      "evidenceRefs": [
+        "stats-run/stats-qa.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Readers may overinterpret the results; the 'result posture' explicitly warns against inference.",
+      "actionableFix": "Add a prominent statement that this is an exploratory analysis not governed by a pre-specified protocol or analysis plan, and that claims are local.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Presence of the phrase 'exploratory' and 'unbound' in the limitations or abstract.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "missingness",
+      "title": "Complete-case analysis with no missing data exploration",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "If missingness is non-random, the complete-case analysis may be biased; the manuscript acknowledges the risk but provides no diagnostics.",
+      "actionableFix": "Report the proportion of missing data, compare characteristics of complete vs. incomplete cases, and consider sensitivity analysis or multiple imputation.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Presence of a missing data analysis section or justification for complete-case.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "category": "figures",
+      "title": "Figure QA artifact appears truncated, and figure content not described in text",
+      "evidenceRefs": [
+        "figure-qa.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The boxplot is not referenced or interpreted in the manuscript; its quality cannot be fully assessed.",
+      "actionableFix": "Ensure the figure QA is complete and the manuscript includes a reference to the figure, with interpretation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Figure referenced in manuscript and QA complete.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "literature",
+      "title": "No comparison to existing literature or clinical significance",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without context, the effect size cannot be interpreted (e.g., is d=0.87 meaningful?).",
+      "actionableFix": "Discuss the observed effect relative to known minimal clinically important differences or prior studies.",
+      "reentryPoint": "literature",
+      "deterministicVerification": "Presence of a discussion paragraph linking results to literature.",
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Prespecified study question (PICO)",
+    "Variable definitions (treatment, outcome, covariates)",
+    "Cohort eligibility criteria and data source",
+    "Baseline characteristics table",
+    "Missing data analysis or rationale for complete-case",
+    "Covariate information (if collected)"
+  ],
+  "recommendedNextStage": "protocol"
+}

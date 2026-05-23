@@ -1,0 +1,132 @@
+{
+  "verdict": "block",
+  "summary": "The study presents an unbound exploratory Kaplan-Meier analysis as a prespecified investigation. Critical elements are missing: no log-rank test or CIs, arbitrary survival time reporting, zero survival in one group without plausibility discussion, absent variable definitions and ethics, no missing data handling, and irreproducible design due to lack of analysis plan. The manuscript is a placeholder and cannot support any claims beyond exploratory data exploration.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Unsubstantiated claim of prespecification in an exploratory analysis",
+      "evidenceRefs": [
+        "stats-run.json: resultPosture.status == 'exploratory_standard_table' && binding.status == 'unbound'",
+        "manuscript.md: Abstract states 'prespecified study question' and 'prespecified clinical or public-health question'"
+      ],
+      "whyItMatters": "Claiming prespecification when the analysis was conducted post-hoc without a protocol inflates evidential rigor and misleads readers about the confirmatory nature of the work.",
+      "actionableFix": "Either remove all prespecification language and clearly label the analysis as exploratory, or re-run the analysis under a governed, pre-registered protocol with an AnalysisSpec.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json: resultPosture.status == 'exploratory_standard_table' AND manuscript.md contains 'prespecified'",
+      "confidence": 0.95
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "No log-rank test or confidence intervals for survival comparison",
+      "evidenceRefs": [
+        "stats-run.json: estimates lack CI fields; no log-rank test mentioned",
+        "diagnostics.json: only contains test name and curve path"
+      ],
+      "whyItMatters": "Without a formal hypothesis test, the difference between survival curves cannot be statistically evaluated, and point estimates alone are insufficient for interpretation.",
+      "actionableFix": "Perform a log-rank test and compute confidence intervals for the survival curves or survival probabilities at clinically relevant time points.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "stats-run.json lacks 'logrank' key and no CI fields in estimates; diagnostics.json lacks 'p_value'",
+      "confidence": 0.9
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Survival probabilities reported at arbitrary time points without context",
+      "evidenceRefs": [
+        "manuscript.md: Results list survival probability 0.3672 at time not given; stats-run.json estimates show time = 493.146 and 354.29"
+      ],
+      "whyItMatters": "The time points appear to be the maximum observed times, which can be misleading; conventional reporting uses predefined landmark times or medians, and the lack of time indicates obscures interpretation.",
+      "actionableFix": "Report survival at clinically meaningful times (e.g., 30-day, 1-year) or provide median survival with interquartile range. Include the estimated curve figure in the manuscript.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md Results section mentions survival probabilities without specifying the time; stats-run.json estimates have time field with values 493.146 and 354.29 but none correspond to standard landmarks",
+      "confidence": 0.9
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "Group 1 shows zero survival, suggesting complete censoring or data issue",
+      "evidenceRefs": [
+        "stats-run.json: estimate for term='1' shows survival=0.0000",
+        "manuscript.md: Results states 'For 1, the survival probability was 0.0000' without comment"
+      ],
+      "whyItMatters": "A survival probability of zero typically means all events occurred before the last observation time, which may be implausible for many clinical contexts and could point to data errors, small sample, or follow-up length issues.",
+      "actionableFix": "Inspect raw data for group 1: number of events, censoring pattern, and time range. Discuss the biological/clinical plausibility of zero survival and consider alternative explanations (e.g., administrative censoring at a fixed time).",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "stats-run.json: estimates[1].survival == 0.0",
+      "confidence": 0.85
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Essential study details missing: variable definitions, data source, ethics, cohort eligibility",
+      "evidenceRefs": [
+        "manuscript.md: lacks any description of what 'treatment' codes represent, how 'survival_time' and 'event' were defined, the source of the data, inclusion/exclusion criteria, or ethical oversight"
+      ],
+      "whyItMatters": "Without these elements, the study is unreproducible and its clinical relevance cannot be assessed; any human-subject research requires ethics disclosure.",
+      "actionableFix": "Add a comprehensive Methods section detailing the dataset origin, enrollment period, operational definitions of variables, eligibility rules, and ethics committee approval or waiver.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md does not contain 'variable', 'data source', 'ethics', 'inclusion', or 'exclusion' in any substantial descriptive context",
+      "confidence": 0.95
+    },
+    {
+      "id": "F06",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Only complete-case analysis reported, no information on missing data",
+      "evidenceRefs": [
+        "manuscript.md: states 'The complete-case analytic sample included 240 records' but no prior count or missingness pattern described",
+        "stats-run.json: completeCaseN=240, but no mention of initial N"
+      ],
+      "whyItMatters": "Selective inclusion of complete cases can bias results if missingness is related to exposure or outcome; the absence of any missing-data description prevents assessment.",
+      "actionableFix": "Report the number of records excluded due to missing data, describe missingness patterns for each variable, and consider sensitivity analyses (e.g., multiple imputation) or justify the complete-case approach.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "manuscript.md mentions 'complete-case' but no number of excluded records; stats-run.json has no field for initialN",
+      "confidence": 0.9
+    },
+    {
+      "id": "F07",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analysis not bound to method-selection or analysis spec, compromising reproducibility",
+      "evidenceRefs": [
+        "stats-run.json: binding.status = 'unbound'",
+        "stats-qa.json: binding-status check warning"
+      ],
+      "whyItMatters": "Reproducibility and trust in the results require that the analytical choices were made prior to seeing the outcomes; an unbound run is indistinguishable from ad-hoc data dredging.",
+      "actionableFix": "Create a method-selection artifact and an AnalysisSpec that declares the hypothesis, variables, and pre-specified analyses, then re-execute the pipeline in a governed environment.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json: binding.status == 'unbound'",
+      "confidence": 0.95
+    },
+    {
+      "id": "F08",
+      "severity": "info",
+      "category": "literature",
+      "title": "No literature review to contextualize findings",
+      "evidenceRefs": [
+        "manuscript.md: contains no references to prior studies"
+      ],
+      "whyItMatters": "The survival probabilities cannot be interpreted in isolation; similar patient cohorts may have known survival rates that would validate or challenge the present results.",
+      "actionableFix": "Include a brief literature review citing comparable Kaplan-Meier estimates for the same condition, and discuss how the present local sample compares.",
+      "reentryPoint": "literature",
+      "deterministicVerification": "manuscript.md text does not contain any citation markers (e.g., 'et al.', '[1]') or a reference list",
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "stats-run/stats-report.md (contains details on computed p-values, test results, and CI if any)",
+    "stats-run/kaplan-meier.png (the Kaplan-Meier curve figure, to verify readability and correct labeling)",
+    "stats-run/estimates.csv or raw data to inspect event counts per group and time distribution",
+    "AnalysisSpec or protocol document defining the prespecified question, hypothesis, and planned analyses",
+    "Data dictionary or README explaining variable coding (treatment levels, event indicator meaning)",
+    "Ethics documentation if human subjects data were used"
+  ],
+  "recommendedNextStage": "exploration"
+}

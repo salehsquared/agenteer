@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_1345338895503450776",
+  "method": "prediction-evaluation",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_binary",
+    "pred_score"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "pred_score",
+      "auroc": 0.7451159951159951,
+      "brier_score": 0.1924638645,
+      "n": 240
+    }
+  ],
+  "diagnostics": {
+    "test": "prediction evaluation",
+    "roc_points": 100
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-config.json",
+      "sha256": "e165d741de0bf18cc7cbfffed35d79fb77922149d1b869e459788ef3cfdc6300"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-summary.json",
+      "sha256": "097fb22718a2a74fcb58610ae5c928d4fff0d778adac2a927b78c1f1d435f1f2"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/estimates.csv",
+      "sha256": "e246dc10906b5e41ceb91d8cba4e6af7024726528c5e38c97dc783968525e87c"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/diagnostics.json",
+      "sha256": "77a6832db264165ed885b6f514cf86cc2039fc6320f783475205a8558eec786e"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json",
+      "sha256": "284f01271efe2c32d7e721f5ad3a83ba4ea3cd10972404e8f081f3eabc924aca"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png",
+      "sha256": "327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figure-qa.json",
+      "sha256": "f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-report.md",
+      "sha256": "b64332c333f8b5c6bef6e377e9527865fdfd28b51eb862f8fc7ae68c3ecf7ca6"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-qa.json",
+      "sha256": "7a36163973c375aa39128b644ab7f58a88e93cd56aef71019cd62478ab897cba"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/method-selection.json",
+    "methodSelectionId": "method_selection_20_prediction_risk_score",
+    "methodId": "prediction-performance-evaluation",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

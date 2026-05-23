@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "reviewPanel": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:46:39.893Z",
+    "panelId": "review_panel_b75e5d4bcaf2",
+    "stage": "final",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous",
+    "autonomy": "aggressive",
+    "budget": {
+      "maxPerCallUsd": 0.12,
+      "maxPanelUsd": 0.3,
+      "maxStudyLoopUsd": 5
+    },
+    "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-packet.json",
+    "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-redaction-report.json",
+    "reviewers": [
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T21:44:15.859Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778363055859",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:methods",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "clinical methods and study-design reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "Inadequate documentation of cohort definition, variables, missing data handling, and effect sizes prevents any assessment of internal validity. The analysis is exploratory and unbound, and lacks the necessary supporting information for even cautious interpretation.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "cohort",
+            "title": "Cohort definition missing: no eligibility criteria, data source, or inclusion/exclusion rules",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run/stats-run.json"
+            ],
+            "whyItMatters": "Without a cohort definition, the study population is unknown, making it impossible to assess representativeness, selection bias, or generalizability. The entire interpretation hinges on knowing who was analyzed.",
+            "actionableFix": "Provide a complete cohort specification artifact including data source, study design, eligibility criteria, and case-selection flow. The manuscript must reference this definition.",
+            "reentryPoint": "dataset_feasibility",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "variables",
+            "title": "Variables not defined: outcome, exposure, and covariates lack operational descriptions",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run/stats-run.json"
+            ],
+            "whyItMatters": "The ANCOVA results are meaningless unless the reader knows what 'outcome_cont', 'group', 'age', and 'severity' represent, including units, coding, and measurement procedures. This impedes replication and clinical interpretation.",
+            "actionableFix": "Provide a data dictionary artifact with variable definitions, allowable values, and collection methods. The manuscript must summarize key variables or point to the artifact.",
+            "reentryPoint": "dataset_feasibility",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "missingness",
+            "title": "Complete-case analysis without justification or missing data assessment",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run/stats-run.json"
+            ],
+            "whyItMatters": "Using complete cases (N=240) when missingness may be related to exposure or outcome can bias estimates. No information is provided on amount or pattern of missing data, preventing evaluation of potential selection bias.",
+            "actionableFix": "Report the total initial sample, number excluded due to missing data, and compare complete and incomplete cases on key variables. Perform sensitivity analysis or justify why complete-case analysis is sufficient.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "reporting",
+            "title": "No effect size or confidence intervals for the group comparison",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run/stats-run.json",
+              "stats-run/estimates.csv"
+            ],
+            "whyItMatters": "The p-value (0.114) alone does not indicate practical importance or precision. Readers cannot gauge the magnitude of group differences or the width of uncertainty. Adjusted means, partial eta-squared, or mean differences with CIs are standard in ANCOVA reporting.",
+            "actionableFix": "Compute and report effect sizes (e.g., partial eta-squared, Cohen's d for pairwise contrasts) and 95% confidence intervals for adjusted group means or contrasts. Include these in the results section and table.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F5",
+            "severity": "minor",
+            "category": "model_diagnostics",
+            "title": "Homogeneity of variance assumption not explicitly tested",
+            "evidenceRefs": [
+              "stats-run/diagnostics.json"
+            ],
+            "whyItMatters": "ANCOVA assumes constant variance across groups. While residual normality is satisfied (Shapiro p=0.79), unequal variances can still inflate type I error. The diagnostics file only reports normality and leverage.",
+            "actionableFix": "Add Levene’s test or Breusch–Pagan test, and inspect residual vs. fitted plots. Document the result in diagnostics artifact.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.85
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "study_design",
+            "title": "Analysis is unbound and exploratory",
+            "evidenceRefs": [
+              "stats-run/stats-run.json",
+              "stats-run/stats-qa.json"
+            ],
+            "whyItMatters": "The run is not tied to a pre-registered analysis plan or method-selection artifact, which limits the strength of evidence and opens the door to selective reporting. The resultPosture label 'exploratory_standard_table' warns against formal inference.",
+            "actionableFix": "Either bind the run to an AnalysisSpec after defining it, or explicitly restrict language to 'exploratory' in all claims. This is already partially done, but the manuscript’s objective question and framing still suggest a confirmatory aim.",
+            "reentryPoint": "protocol",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F7",
+            "severity": "major",
+            "category": "reproducibility",
+            "title": "Reproducibility not achievable: raw data and analysis code are not provided",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run/stats-run.json"
+            ],
+            "whyItMatters": "The manuscript claims reproducibility through artifact hashes, but without the actual data and execution code, independent verification is impossible. The provided artifacts are outputs only.",
+            "actionableFix": "Include the raw dataset (de-identified), the analysis script, and environment details in the run directory. Alternatively, state clearly that reproduction requires contacting authors for data.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F8",
+            "severity": "info",
+            "category": "data_plausibility",
+            "title": "Unusually large F-statistics for covariates age (212) and severity (208) warrant scrutiny",
+            "evidenceRefs": [
+              "stats-run/stats-run.json"
+            ],
+            "whyItMatters": "While not impossible, such extreme F-values could stem from near-perfect prediction, data errors, or very strong confounding. Without descriptive statistics or outlier checks beyond Cook’s D, it is unclear whether the covariate effects are credible.",
+            "actionableFix": "Provide summary statistics for age, severity, and outcome by group; inspect partial-regression plots; and verify no collinearity or data entry mistakes.",
+            "reentryPoint": "qa",
+            "deterministicVerification": null,
+            "confidence": 0.7
+          }
+        ],
+        "missingEvidence": [
+          "Cohort definition artifact (eligibility, source, inclusion/exclusion)",
+          "Data dictionary with variable definitions, units, and coding",
+          "Amount and pattern of missing data, and comparison of complete vs incomplete cases",
+          "Effect size estimates (e.g., partial eta-squared, adjusted means, contrasts with CI)",
+          "Raw dataset used for analysis (to verify plausibility, distribution, and diagnostics)",
+          "Analysis code and environment specification (for full reproducibility)",
+          "Homogeneity of variance test results (e.g., Levene’s test or residual plots)"
+        ],
+        "recommendedNextStage": "dataset_feasibility",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778363055859.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778363055859.json"
+      },
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T21:44:15.877Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778363055877",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:reproducibility",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "statistical reporting and reproducibility reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "revise",
+        "summary": "The ANCOVA analysis suffers from unaddressed model assumptions (homogeneity of regression slopes), lacks key estimates (adjusted means, effect sizes, CIs), and the unbound analysis status undercuts confirmatory claims. Reporting contains boilerplate contradictions and no description of available figures. These must be remedied before any claims beyond local exploration.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "Homogeneity of regression slopes not tested",
+            "evidenceRefs": [
+              "stats-run/diagnostics.json",
+              "stats-run/stats-run.json"
+            ],
+            "whyItMatters": "ANCOVA assumes the relationship between covariate and outcome is the same across groups. Failure to test this assumption can invalidate the group comparison and produce biased estimates.",
+            "actionableFix": "Add an interaction term (group × covariate) to the model, report its p-value, and if significant, reconsider the analysis or use alternative approaches (e.g., regression models per group).",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check if the ANCOVA model includes group:covariate interaction terms.",
+            "confidence": 0.9
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "reporting",
+            "title": "No effect sizes, adjusted means, or confidence intervals reported",
+            "evidenceRefs": [
+              "stats-run/stats-run.json",
+              "manuscript.md"
+            ],
+            "whyItMatters": "An F-test and p-value alone do not convey practical importance, direction, or precision. Readers cannot interpret the magnitude of group differences or the clinical relevance.",
+            "actionableFix": "Report adjusted group means with standard errors, the difference between groups with 95% CIs, and an effect size measure (e.g., partial eta-squared or Cohen’s d).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "study_design",
+            "title": "Analysis is unbound (exploratory) but framed as a hypothesis test",
+            "evidenceRefs": [
+              "stats-run/stats-run.json",
+              "manuscript.md"
+            ],
+            "whyItMatters": "The run’s binding status is 'unbound', meaning no pre-specified analysis plan exists. P-values from unplanned tests risk inflated false-positive rates and cannot support confirmatory claims.",
+            "actionableFix": "Either (a) rebind the analysis to a preregistered AnalysisSpec and rerun, or (b) revise the manuscript to explicitly state the analysis is purely exploratory and p-values are not inferential.",
+            "reentryPoint": "protocol",
+            "deterministicVerification": "Check if stats-run.json binding.status equals 'unbound'.",
+            "confidence": 1
+          },
+          {
+            "id": "F4",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "Manuscript contains contradictory boilerplate statements",
+            "evidenceRefs": [
+              "manuscript.md"
+            ],
+            "whyItMatters": "The Limitations section says 'No reader-facing paper/manuscript artifact was found' while the manuscript itself exists. This confuses readers and suggests incomplete customization of the report.",
+            "actionableFix": "Remove or correct all generic boilerplate that does not match the actual artifacts present.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F5",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "No descriptive statistics or covariate distributions provided",
+            "evidenceRefs": [
+              "manuscript.md"
+            ],
+            "whyItMatters": "Without means, SDs, or histograms per group, readers cannot assess baseline comparability, outcome scale, or potential outliers.",
+            "actionableFix": "Add a table of descriptive statistics (e.g., mean, SD, N, range) for outcome and covariates by group, and mention any notable differences.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "figures",
+            "title": "Figures present but not described or referenced in manuscript",
+            "evidenceRefs": [
+              "stats-run/figures.json",
+              "manuscript.md"
+            ],
+            "whyItMatters": "A figure file exists (anova-group-distribution.png) but the manuscript text never mentions it. This omission wastes a valuable visual check and reduces transparency.",
+            "actionableFix": "Incorporate the figure with a caption (e.g., 'Distribution of outcome by group after adjustment'), and discuss any patterns visible.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "missingness",
+            "title": "Complete-case analysis without missingness characterization",
+            "evidenceRefs": [
+              "stats-run/stats-run.json",
+              "manuscript.md"
+            ],
+            "whyItMatters": "If missingness is not random, the complete-case estimates may be biased. The criteria and proportion of excluded rows are not reported.",
+            "actionableFix": "Report the number and proportion of records excluded, compare characteristics of excluded vs. included, and consider sensitivity analysis (e.g., multiple imputation if appropriate).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.8
+          }
+        ],
+        "missingEvidence": [
+          "Test for homogeneity of regression slopes (group × covariate interaction terms)",
+          "Adjusted group means, group differences, and 95% confidence intervals",
+          "Descriptive statistics table for outcome and covariates by group",
+          "Description and interpretation of the figure anova-group-distribution.png",
+          "Missingness report (proportion, patterns, comparison of included vs. excluded)",
+          "Pre-registration or analysis protocol binding",
+          "Scale/units of outcome and covariates"
+        ],
+        "recommendedNextStage": "protocol",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363055877.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363055877.json"
+      }
+    ],
+    "status": "block",
+    "costEstimateUsd": 0.052314,
+    "failureCount": 0,
+    "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-panel.json"
+  }
+}

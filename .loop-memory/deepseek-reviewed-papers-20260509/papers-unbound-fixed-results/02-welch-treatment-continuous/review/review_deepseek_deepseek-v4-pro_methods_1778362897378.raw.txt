@@ -1,0 +1,132 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is unacceptably incomplete for any research claim: it confuses association with causation in the title, reports a p-value rounded to zero (0.0000), omits the confidence interval for the mean difference, lacks any covariate adjustment despite an observational design, and is not bound to a pre-specified analysis plan. These issues make the result uninterpretable for publication or external sharing.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Unadjusted comparison in observational data with causal phrasing",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The title asks 'Does the continuous outcome differ by treatment group' which implies a causal question, but the analysis is an unadjusted Welch t-test on observational data with no confounding control. This cannot answer whether the outcome differs *because* of treatment; only an association is estimable. The difference may be entirely due to selection bias or confounding.",
+      "actionableFix": "Reframe the question as an association and either adjust for confounders using a multivariable model or explicitly state that no causal conclusion is intended and discuss confounding as a major limitation. If causal intent, redesign with a target trial framework and confounder control.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Verify that the analysis plan includes confounding control or acknowledges the absence of it. Check that title and abstract reflect associational language.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "P-value rounded to zero and reported as 'p=0.0000'",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The exact p-value is 3.83e-10, which should be reported as p<0.001 (or p=3.8×10^{-10}). Writing p=0.0000 is a rounding error that suggests a zero probability, which is scientifically and statistically incorrect. It misleads readers about the strength of evidence and is contrary to standard reporting guidelines.",
+      "actionableFix": "Report p-value using scientific notation (e.g., p=3.8×10^{-10}) or, if less precise, p<0.001. Never round a p-value to zero.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Confirm that the printed p-value in the manuscript matches the stats-run output (3.8287252527457425e-10) and that the rounded version is not zero.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Missing confidence interval for the mean difference",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "A p-value alone does not convey the precision of the estimate. The manuscript reports only the mean difference (2.9137) and p-value, but no 95% CI. The reader cannot assess the practical significance or the range of effect sizes compatible with the data.",
+      "actionableFix": "Calculate and report a 95% Welch confidence interval for the difference in means. Include it in the abstract and results.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "The CI can be derived from the means, standard deviations, and sample sizes; re-run the t-test to obtain the interval and confirm it appears in the manuscript.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F4",
+      "severity": "blocker",
+      "category": "model_diagnostics",
+      "title": "No pre-specified analysis plan (unbound run)",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "stats-run/stats-qa.json"
+      ],
+      "whyItMatters": "The result posture is 'exploratory_standard_table' and cannot support method-governed inference. Presenting this as a confirmatory 'does differ' question risks p-hacking and overinterpretation. Without a pre-registered analysis, the p-value has no confirmatory meaning.",
+      "actionableFix": "Either relegate the analysis to a purely exploratory stage and remove inferential language, or create a formal analysis specification that pre-defines the comparison, outcomes, handling of missing data, and sensitivity checks, then re-run under binding.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Check that the stats-run binding.status field is 'bound' and references a valid spec; verify that the manuscript states the binding.",
+      "confidence": 0.98
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Assumption verification incomplete (normality, outliers)",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json",
+        "figure-qa.json"
+      ],
+      "whyItMatters": "Although the Welch t-test is robust to moderate non-normality with these sample sizes, no formal check of normality or outlier inspection is documented. Levene's test alone is insufficient. Garbage in, garbage out: if the data are contaminated with outliers or a heavy-tailed distribution, the p-value and effect size may be misleading.",
+      "actionableFix": "Provide summary statistics (per-group mean, SD, median, IQR), a boxplot (already generated but not discussed), and a normality diagnostic (e.g., Shapiro-Wilk for each group or Q-Q plots). Address extreme values.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Confirm the figures/diagnostics artifact includes distribution plots and that the manuscript comments on them.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Cohort flow and missingness not described",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The manuscript claims 240 complete cases but does not state the initial sample size, number excluded, or reasons. Without this, selection bias cannot be assessed. If missing data are non-random, the results could be biased.",
+      "actionableFix": "Provide a STROBE-like flow diagram showing eligibility criteria, exclusions, and missingness. If no missing data, state that all records had complete outcome and treatment variables.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the counts reconcile with the raw data: sum of excluded + complete-case equals starting N.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "Data availability and provenance not declared",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript references 'local research dataset' and includes artifact hashes, but does not state whether the data itself is available, what restrictions apply, or how a reader could obtain it. For a local analysis this may be acceptable, but a data availability statement is expected.",
+      "actionableFix": "Add a Data Availability section that clarifies that the dataset is not publicly shared (e.g., due to institutional policy) and describes how methodological materials can be accessed.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "No raw data file is present in the run directory; confirm that the statement matches the actual access policy.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "Extremely small p-value warrants sensitivity check",
+      "evidenceRefs": [
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "A p-value of 3.8e-10 with only 240 observations and a moderate Cohen's d (0.87) is unusual and could indicate mis-specified standard errors, data entry error, or a degenerate distribution. Without inspecting the raw data, this result is not credible enough to publish.",
+      "actionableFix": "Verify the data: compute per-group standard deviations, check for constant outcomes or near-constant clusters. If the data are grouped in a way that violates independence, use alternative methods. Report per-group SD in the manuscript.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": "The t-statistic is (mean_diff) / (pooled SE). From given n's and d, we can back-calculate: pooled SD = mean_diff / (d * sqrt((1/n_a + 1/n_b)))? Actually standard formula: d = (mean_a - mean_b) / Spooled, where Spooled = sqrt(((n_a-1)*var_a + (n_b-1)*var_b)/(n_a+n_b-2)). With d=0.874, mean_diff=2.914, so Spooled = 2.914/0.874 = 3.335. Then SE = Spooled * sqrt(1/n_a + 1/n_b) = 3.335 * sqrt(1/96+1/144) = 3.335*0.130 = 0.433. t = 2.914/0.433 = 6.73 (close to 6.59). p from t=6.59 with df approx 178 (Welch) is indeed extremely small. Check raw SDs from data to ensure they are not artificially low.",
+      "confidence": 0.75
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or per-group summary statistics (SD, min, max, median, IQR)",
+    "Cohort construction details (inclusion/exclusion flow, missing data patterns)",
+    "Confidence interval for the mean difference",
+    "Data availability statement",
+    "Pre-registered analysis specification"
+  ],
+  "recommendedNextStage": "analysis_spec"
+}

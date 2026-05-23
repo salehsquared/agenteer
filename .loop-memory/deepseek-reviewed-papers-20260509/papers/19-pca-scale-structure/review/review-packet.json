@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T22:19:56.940Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure",
+  "packetHash": "2b5f8972daf46a2a28845315f9db472542af011493be48304ed0b5d7ee7f8828",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 29,
+    "includedFiles": 7,
+    "totalBytes": 137108,
+    "includedBytes": 19378
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3681,
+      "sha256": "08a906e3118a3b2c00998dee8d6496aba74b78014790bdadac0a0186cd7b5956",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What latent component structure is suggested by correlated scale items and severity\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: What latent component structure is suggested by correlated scale items and severity?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was pca. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What latent component structure is suggested by correlated scale items and severity? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nAnalyzed variables: scale_item_1, scale_item_2, scale_item_3, severity.\n\n### Statistical Analysis\n\nThe statistical method was pca. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 15 artifact(s). The artifact inventory hash is 3f2a7bdd871706be5ade965a061be7f259f3def53888ea08f7d5dc72645024a5. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 5081,
+      "sha256": "7c080c5bdbd8fec00c131c83c6b668952ae2ca7f997dc68ceeca941191003089",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_718197717031605873\",\n  \"method\": \"pca\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"scale_item_1\",\n    \"scale_item_2\",\n    \"scale_item_3\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"PC1\",\n      \"explained_variance_ratio\": 0.7906732079539086\n    },\n    {\n      \"term\": \"PC2\",\n      \"explained_variance_ratio\": 0.1548962615871217\n    },\n    {\n      \"term\": \"PC3\",\n      \"explained_variance_ratio\": 0.029717894140227685\n    },\n    {\n      \"term\": \"PC4\",\n      \"explained_variance_ratio\": 0.024712636318741907\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"PCA\",\n    \"transformed\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-transformed.csv\",\n    \"components\": [\n      [\n        0.5751351345669089,\n        0.5771858167751387,\n        0.5629763723327298,\n        0.1383246691497918\n      ],\n      [\n        -0.037666031232208144,\n        -0.08994585968604857,\n        -0.11227484769157117,\n        0.9888808679473915\n      ],\n      [\n        -0.1887137771566446,\n        0.7760992044741372,\n        -0.6016917987484595,\n        -0.0049106460600013835\n      ],\n      [\n        0.7951024823185943,\n        -0.23756325484713453,\n        -0.5553547893822086,\n        -0.05437646979611294\n      ]\n    ]\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-config.json\",\n      \"sha256\": \"47b722a3e8826dab224d63d4be3c3f70b2bd600d9b78e3dad657e68be0b4b6ed\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-summary.json\",\n      \"sha256\": \"2024e0b1b4a75873663a46f5af97b0b1da9c1b18182bdac8fa7e79e0964433e4\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/estimates.csv\",\n      \"sha256\": \"a101665aa6e302b9868749f2d3ecb803b15938d6edfa48d9a70ef0f20b4f8fa2\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/diagnostics.json\",\n      \"sha256\": \"4e1958104140e20cf5563c66b9c36033acd6a45856bb93f5d3731ba3564a0609\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figures.json\",\n      \"sha256\": \"7f7330714d53f7fd5363e961582cb14d3c6a7959d7c24647f8ec77f80dc1817a\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-scree.png\",\n      \"sha256\": \"9e2cecdba390de69e80da4e54937c3c96a8ba34b165c0c7bebcfac0831b0351a\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figure-qa.json\",\n      \"sha256\": \"f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-report.md\",\n      \"sha256\": \"4697436ac07c0614f9fcf58ab1c2c0ee51b8c4cce7d22c3d84886f7b662e35db\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-qa.json\",\n      \"sha256\": \"c40c72f9ded8bf1bbc4088e2a626ec37df253cc496f34283cd47c1b8e3a70cc8\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_19_pca_scale_structure\",\n    \"methodId\": \"principal-component-analysis\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 685,
+      "sha256": "4e1958104140e20cf5563c66b9c36033acd6a45856bb93f5d3731ba3564a0609",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"PCA\",\n  \"transformed\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-transformed.csv\",\n  \"components\": [\n    [\n      0.5751351345669089,\n      0.5771858167751387,\n      0.5629763723327298,\n      0.1383246691497918\n    ],\n    [\n      -0.037666031232208144,\n      -0.08994585968604857,\n      -0.11227484769157117,\n      0.9888808679473915\n    ],\n    [\n      -0.1887137771566446,\n      0.7760992044741372,\n      -0.6016917987484595,\n      -0.0049106460600013835\n    ],\n    [\n      0.7951024823185943,\n      -0.23756325484713453,\n      -0.5553547893822086,\n      -0.05437646979611294\n    ]\n  ]\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1512,
+      "sha256": "c40c72f9ded8bf1bbc4088e2a626ec37df253cc496f34283cd47c1b8e3a70cc8",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"4 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3596,
+      "sha256": "f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3596,
+      "sha256": "f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1227,
+      "sha256": "7f7330714d53f7fd5363e961582cb14d3c6a7959d7c24647f8ec77f80dc1817a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2202,
+      "sha256": "03f4320a3747a9e6b5df6ad1eac04084456e7f3ae43cc89f02a198ae682886d5",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9675,
+      "sha256": "8dff80ccc773e0dda47f5c49560262be02ae89bd85c5288720be89d4a8131efa",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1512,
+      "sha256": "4ec38b32654977cc56d7700e338113353184f67f093b0456ef0129caa3e84fb5",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4154,
+      "sha256": "338a6ea124ff6c0d71267a05bd1d9b71c6debbb82a2587339295a4ac770cc86e",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14302,
+      "sha256": "894c403b8426bbabbe068404d8829818b141012ab993c613fc78a2068fab5aa4",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/method-selection.json",
+      "relativePath": "method-selection.json",
+      "bytes": 872,
+      "sha256": "6f8fcfdce2e75fd0470cbee1d5f6e5890e79a38c369c68693575d6070200c6c9",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4299,
+      "sha256": "33e496f100b32e8bc068956d483f0bcf3c695341be4fb64385599af80b0977c2",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 818,
+      "sha256": "398f960bddc879c4670beab9ac41c0c67102add71a8e93ad7f125eb56f7c1fa9",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9803,
+      "sha256": "75f41c36ac4636d1ece256231efe3e72622c033b59c0b93af757d7f782f546a5",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1010,
+      "sha256": "a11084415f2b34e27ca8eb6e598cb1391dd9647ef88af2b72c64981c056d5a30",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 5398,
+      "sha256": "d35f4ed34cdcacb79540d42f874c7e3c92edada8f723e301c60e7b0dd965974f",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 126,
+      "sha256": "a101665aa6e302b9868749f2d3ecb803b15938d6edfa48d9a70ef0f20b4f8fa2",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-scree.png",
+      "relativePath": "stats-run/pca-scree.png",
+      "bytes": 41924,
+      "sha256": "9e2cecdba390de69e80da4e54937c3c96a8ba34b165c0c7bebcfac0831b0351a",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-transformed.csv",
+      "relativePath": "stats-run/pca-transformed.csv",
+      "bytes": 19040,
+      "sha256": "1ddf8a4a41dfcf3507a0fdb155bdd143980c39c478147d1dc26a23c6949c755d",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 799,
+      "sha256": "47b722a3e8826dab224d63d4be3c3f70b2bd600d9b78e3dad657e68be0b4b6ed",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1576,
+      "sha256": "4697436ac07c0614f9fcf58ab1c2c0ee51b8c4cce7d22c3d84886f7b662e35db",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 220,
+      "sha256": "2024e0b1b4a75873663a46f5af97b0b1da9c1b18182bdac8fa7e79e0964433e4",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3681 bytes, sha256=08a906e3118a3b2c00998dee8d6496aba74b78014790bdadac0a0186cd7b5956) ---\n# What latent component structure is suggested by correlated scale items and severity\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: What latent component structure is suggested by correlated scale items and severity?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was pca. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What latent component structure is suggested by correlated scale items and severity? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nAnalyzed variables: scale_item_1, scale_item_2, scale_item_3, severity.\n\n### Statistical Analysis\n\nThe statistical method was pca. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 15 artifact(s). The artifact inventory hash is 3f2a7bdd871706be5ade965a061be7f259f3def53888ea08f7d5dc72645024a5. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 5081 bytes, sha256=7c080c5bdbd8fec00c131c83c6b668952ae2ca7f997dc68ceeca941191003089) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_718197717031605873\",\n  \"method\": \"pca\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"scale_item_1\",\n    \"scale_item_2\",\n    \"scale_item_3\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"PC1\",\n      \"explained_variance_ratio\": 0.7906732079539086\n    },\n    {\n      \"term\": \"PC2\",\n      \"explained_variance_ratio\": 0.1548962615871217\n    },\n    {\n      \"term\": \"PC3\",\n      \"explained_variance_ratio\": 0.029717894140227685\n    },\n    {\n      \"term\": \"PC4\",\n      \"explained_variance_ratio\": 0.024712636318741907\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"PCA\",\n    \"transformed\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-transformed.csv\",\n    \"components\": [\n      [\n        0.5751351345669089,\n        0.5771858167751387,\n        0.5629763723327298,\n        0.1383246691497918\n      ],\n      [\n        -0.037666031232208144,\n        -0.08994585968604857,\n        -0.11227484769157117,\n        0.9888808679473915\n      ],\n      [\n        -0.1887137771566446,\n        0.7760992044741372,\n        -0.6016917987484595,\n        -0.0049106460600013835\n      ],\n      [\n        0.7951024823185943,\n        -0.23756325484713453,\n        -0.5553547893822086,\n        -0.05437646979611294\n      ]\n    ]\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-config.json\",\n      \"sha256\": \"47b722a3e8826dab224d63d4be3c3f70b2bd600d9b78e3dad657e68be0b4b6ed\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-summary.json\",\n      \"sha256\": \"2024e0b1b4a75873663a46f5af97b0b1da9c1b18182bdac8fa7e79e0964433e4\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/estimates.csv\",\n      \"sha256\": \"a101665aa6e302b9868749f2d3ecb803b15938d6edfa48d9a70ef0f20b4f8fa2\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/diagnostics.json\",\n      \"sha256\": \"4e1958104140e20cf5563c66b9c36033acd6a45856bb93f5d3731ba3564a0609\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figures.json\",\n      \"sha256\": \"7f7330714d53f7fd5363e961582cb14d3c6a7959d7c24647f8ec77f80dc1817a\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-scree.png\",\n      \"sha256\": \"9e2cecdba390de69e80da4e54937c3c96a8ba34b165c0c7bebcfac0831b0351a\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figure-qa.json\",\n      \"sha256\": \"f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-report.md\",\n      \"sha256\": \"4697436ac07c0614f9fcf58ab1c2c0ee51b8c4cce7d22c3d84886f7b662e35db\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-qa.json\",\n      \"sha256\": \"c40c72f9ded8bf1bbc4088e2a626ec37df253cc496f34283cd47c1b8e3a70cc8\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_19_pca_scale_structure\",\n    \"methodId\": \"principal-component-analysis\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 685 bytes, sha256=4e1958104140e20cf5563c66b9c36033acd6a45856bb93f5d3731ba3564a0609) ---\n{\n  \"test\": \"PCA\",\n  \"transformed\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-transformed.csv\",\n  \"components\": [\n    [\n      0.5751351345669089,\n      0.5771858167751387,\n      0.5629763723327298,\n      0.1383246691497918\n    ],\n    [\n      -0.037666031232208144,\n      -0.08994585968604857,\n      -0.11227484769157117,\n      0.9888808679473915\n    ],\n    [\n      -0.1887137771566446,\n      0.7760992044741372,\n      -0.6016917987484595,\n      -0.0049106460600013835\n    ],\n    [\n      0.7951024823185943,\n      -0.23756325484713453,\n      -0.5553547893822086,\n      -0.05437646979611294\n    ]\n  ]\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1512 bytes, sha256=c40c72f9ded8bf1bbc4088e2a626ec37df253cc496f34283cd47c1b8e3a70cc8) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"4 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3596 bytes, sha256=f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8) ---\n\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3596 bytes, sha256=f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1227 bytes, sha256=7f7330714d53f7fd5363e961582cb14d3c6a7959d7c24647f8ec77f80dc1817a) ---\n"
+}

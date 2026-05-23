@@ -51,6 +51,16 @@
 - Generated 10 study papers under `.loop-memory/figure-study-suite-20260509/studies/`, spanning descriptive, Welch t-test, chi-square, Pearson correlation, adjusted linear regression, Kaplan-Meier, Aalen-Johansen CIF, PCA, Bland-Altman, and ROC/prediction evaluation.
 - All 10 study-level figure QA runs passed; the suite index is `.loop-memory/figure-study-suite-20260509/STUDY_INDEX.md`.
 
+## Ticks 0409-0428
+
+- Added `deepseek-dual` as a first-class external-review panel: two DeepSeek v4 Pro reviewers with distinct methods and reproducibility/reporting roles.
+- Ran 20 generated manuscripts through 40 final DeepSeek reviewer calls; all 40 calls succeeded, with estimated final panel cost `$1.046148`.
+- Preserved two earlier audit batches (`papers-initial`, `papers-unbound-fixed-results`) before the final bound batch.
+- Bound all final batch stats runs to method-selection artifacts so they are no longer classified as ungoverned exploratory runs.
+- Hardened reviewer reliability: parallel execution after budget checks, lower DeepSeek prompt/output settings, raw response preservation, near-valid JSON normalization, and tests for the dual panel/parser.
+- Hardened manuscript generation from reviewer feedback: `stats-config.json` discovery, prediction metric extraction, correlation extraction, tiny p-value formatting as `p<0.0001`, stable title/question selection from reviewer context, and removal of self-referential no-paper warnings from generated limitations.
+- Recorded the resulting stress-suite index at `.loop-memory/deepseek-reviewed-papers-20260509/DEEPSEEK_REVIEWED_PAPER_INDEX.md` and the post-review repair summary at `.loop-memory/deepseek-reviewed-papers-20260509/POST_REVIEW_REPAIR_SUMMARY.md`.
+
 ## Tick 0388
 
 - Committed and pushed prior research-machine progress to `origin/main` as `f37215a8`.
@@ -1160,3 +1170,11 @@ Sources:
 - Prevented failed/invalid propensity runs from generating reader-facing papers.
 - Added automated coverage for full propensity `analysis-run` paper generation and manifest visibility.
 - Saved all tick artifacts under `.loop-memory/propensity-hardening-20260508/`; the suite passed 20/20 expectations.
+
+# Tick 0429
+
+- Added `deepseek-triple` and tightened reviewer prompts so a three-role DeepSeek panel can complete with valid structured output.
+- Rebuilt the MIMIC SAVR/TAVR dialysis redo packet with deterministic paper QA pass, figure QA pass, reviewer context, outcome phenotype artifact, valve code-list artifact, missingness summary, propensity balance, propensity intervals, and post-repair review records.
+- Accepted and implemented reviewer repairs for admission-time mortality horizons, descriptive-only tiny strata, expanded stroke phenotype, and reviewer-visible phenotype/provenance artifacts.
+- Remaining gap: reviewer-accepted repairs are still manually enacted by the orchestrating agent; the state machine should automatically convert accepted findings into executable repair branches.
+- Remaining gap: phenotype sensitivity should become first-class. The reviewer flagged additional SAVR ICD-9 codes beyond the user-supplied primary set; the right implementation is primary-vs-expanded phenotype comparison, not silent replacement.

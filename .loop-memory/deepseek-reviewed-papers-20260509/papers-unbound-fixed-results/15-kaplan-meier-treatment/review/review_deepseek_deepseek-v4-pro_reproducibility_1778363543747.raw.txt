@@ -1,0 +1,132 @@
+{
+  "verdict": "block",
+  "summary": "The analysis fails to answer the stated question because it lacks any formal comparison of survival curves and reports invalid point estimates at different times. The manuscript contains contradictory statements, and essential methodological details are missing. The analysis is unbound and exploratory, yet results are presented without appropriate caveats.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "method_choice",
+      "title": "Missing formal comparison of survival curves",
+      "evidenceRefs": [
+        "manuscript.md Results",
+        "stats-run/stats-run.json estimates",
+        "stats-run/stats-qa.json warnings"
+      ],
+      "whyItMatters": "Without a statistical test (e.g., log-rank) we cannot determine if the observed difference between groups is due to chance. The primary question 'How does event-free survival differ by treatment group?' is not addressed.",
+      "actionableFix": "Compute log-rank test (or Cox proportional hazards model) and report p-value, possibly with a figure showing both curves and a table of comparisons.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if a p-value for treatment effect is present in the stats-run or manuscript outputs.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript contains false claims about missing estimates and report availability",
+      "evidenceRefs": [
+        "manuscript.md Limitations section",
+        "stats-run/stats-run.json estimates"
+      ],
+      "whyItMatters": "Undermines credibility of the manuscript: statements like 'No estimate-like records were available for p-value/effect-size checks' and 'No reader-facing report was available for claim alignment' contradict the presence of estimates and a generated manuscript.",
+      "actionableFix": "Remove or correct these statements after verifying consistency between the manuscript generator and the actual artifact outputs.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Inspect the Limitations section against the stats-run.json and the manuscript itself; ensure no false denials exist.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "blocker",
+      "category": "method_choice",
+      "title": "Survival probabilities reported at different follow-up times for each group",
+      "evidenceRefs": [
+        "manuscript.md Results",
+        "stats-run/stats-run.json estimates"
+      ],
+      "whyItMatters": "The comparison is invalid: group 0 survival (0.367) at time 493.1 vs group 1 survival (0.000) at time 354.3. Different time points make the difference uninterpretable; the shape of the curves matters.",
+      "actionableFix": "Report survival probabilities at clinically meaningful, fixed time points (e.g., 1-year) or present entire curves with a log-rank test. Summarize with median survival times if appropriate.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that the reported times for both groups are identical or within a narrow, prespecified window.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No confidence intervals for survival estimates",
+      "evidenceRefs": [
+        "stats-run/stats-run.json estimates",
+        "stats-run/stats-qa.json warning about p-value context"
+      ],
+      "whyItMatters": "Point estimates without uncertainty measures are misleading. Readers cannot assess precision or compare groups properly.",
+      "actionableFix": "Compute 95% confidence intervals for each survival estimate (e.g., Greenwood method) and display them in text/tables.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Verify presence of CI columns in the estimates output.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Missing cohort derivation and missingness details",
+      "evidenceRefs": [
+        "manuscript.md Cohort Construction section",
+        "stats-run/stats-run.json rowCount and completeCaseN"
+      ],
+      "whyItMatters": "The sample size of 240 complete cases suggests exclusion of records with missing data. Without describing initial N, missingness patterns, and reasons for exclusion, results may be biased and are not reproducible.",
+      "actionableFix": "Provide a flow chart of inclusion/exclusion, report missingness frequency by variable, and consider sensitivity analysis (e.g., multiple imputation) if missingness is substantial.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "Check for a table or narrative detailing participants excluded and the final analytic N derivation.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variables not defined; unclear treatment groups and event definition",
+      "evidenceRefs": [
+        "manuscript.md Variables section",
+        "stats-run/stats-run.json variables list"
+      ],
+      "whyItMatters": "The meaning of treatment groups 0/1, the event type, and survival time metric are unknown, preventing clinical interpretation and external validity assessment.",
+      "actionableFix": "Add a variables table with definitions, coding, units, and source of each variable (e.g., 'treatment: 0=standard, 1=experimental'; 'survival_time: days from randomization to event/censor'; 'event: 1=death, 0=censored').",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check for a codebook or variable dictionary artifact.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Analysis is unbound and exploratory, not governed by a pre-specified protocol",
+      "evidenceRefs": [
+        "stats-run/stats-run.json binding and resultPosture"
+      ],
+      "whyItMatters": "The risk of p-hacking and selective reporting is high; results should not be interpreted as confirmatory evidence. The manuscript does not clearly convey this exploratory status.",
+      "actionableFix": "Either label the analysis as 'exploratory' with strong caveats, or create/bind a method-selection artifact and analysis specification before rerunning to elevate to a confirmatory posture.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Check that the binding fields in stats-run.json are populated and that a pre-registered analysis plan exists.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "Absence of literature review or external context",
+      "evidenceRefs": [
+        "manuscript.md (no references section)"
+      ],
+      "whyItMatters": "Readers cannot assess how these findings fit within existing evidence; the clinical or public health significance is not established.",
+      "actionableFix": "Add a brief background section with relevant citations and discuss how the local results compare to published outcomes.",
+      "reentryPoint": "literature",
+      "deterministicVerification": "Check for a references or introduction with citations in the manuscript.",
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or descriptive summary of variables (codebook)",
+    "Log-rank test and/or Cox model output",
+    "Confidence intervals for survival estimates",
+    "Flow diagram of cohort construction and missingness"
+  ],
+  "recommendedNextStage": "protocol"
+}

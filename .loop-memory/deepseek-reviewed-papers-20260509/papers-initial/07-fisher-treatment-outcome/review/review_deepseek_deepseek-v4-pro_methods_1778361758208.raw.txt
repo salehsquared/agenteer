@@ -1,0 +1,129 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript contains critical inconsistencies, missing variable definitions, no confounding control, and overclaims exploratory findings. It lacks essential components and does not meet standards for reproducibility or clinical inference.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript contradicts available data artifacts",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The manuscript states 'No estimate-like records were available for p-value/effect-size checks', yet the stats-run artifact contains an odds_ratio (2.78) and p_value (0.00054), rendering the manuscript inaccurate and untrustworthy.",
+      "actionableFix": "Regenerate the manuscript from current artifacts and ensure all statements are consistent with the run output.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check if the manuscript reports an odds ratio = 2.78 and p = 0.0005; it does not mention them, contradicting the stats-run estimates.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "Variable definitions missing for outcome_binary and treatment",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without clinical definitions of the exposure and outcome, the findings are uninterpretable and cannot inform any decision.",
+      "actionableFix": "Provide a data dictionary or companion variable artifact defining the variables in clinical terms (e.g., what treatment, what outcome).",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "The manuscript admits variables were not encoded; no variable artifact is included in the review packet.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "No confounding control in observational analysis",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Even strictly associative claims require consideration of confounding. Presenting a univariate odds ratio from a 2×2 table without any adjustment or matching can be misleading and does not support any meaningful inference.",
+      "actionableFix": "Either restrict the report to purely descriptive statistics (without odds ratio) or conduct an adjusted analysis with prespecified covariates and state limitations regarding residual confounding.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "The only test performed is Fisher's exact on two binary variables; no other covariates or adjustment methods are present in artifacts.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Insufficient documentation of study design and cohort construction",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Readers cannot assess selection bias, eligibility criteria, or generalizability, which are essential to interpreting any association.",
+      "actionableFix": "Describe the data source, sampling method, eligibility criteria, and how the complete-case cohort of 240 was derived. Include a flow chart if possible.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "The manuscript mentions 'Cohort Construction' but provides no details beyond the complete-case N; no definition of the source population.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "claim_safety",
+      "title": "Exploratory result presented as interpretable local evidence",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-qa.json"
+      ],
+      "whyItMatters": "The stats-qa explicitly marks the run as exploratory and unbound, warning that it cannot support paper-ready conclusions. The manuscript’s assertion that it produced 'interpretable local evidence' overstates the certainty and misleads readers.",
+      "actionableFix": "Align the conclusion with the result posture: clearly state that this is an exploratory analysis not yet ready for inference, and downgrade any claims.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare manuscript discussion (e.g., 'The analysis produced interpretable local evidence') with stats-qa resultPosture.status = 'exploratory_standard_table' and its 'cannotSupport' list.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "missingness",
+      "title": "Missingness and complete-case assumptions not examined",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Complete-case analysis can introduce bias if missingness is related to exposure, outcome, or covariates. No missing-data diagnostics or sensitivity analysis is provided.",
+      "actionableFix": "Report the number of excluded records, reasons, and patterns of missingness. Consider multiple imputation or, at minimum, a discussion of possible bias.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Artifacts show only a complete-case N=240; no documentation of initial sample size or missingness patterns.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "No code or full data provided for independent reproduction",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Although the contingency table allows recomputation of the Fisher test, the data processing steps (filtering, variable coding) are absent, limiting full reproducibility.",
+      "actionableFix": "Include the analysis script (e.g., R/Python) and a de‑identified dataset or a data‑generating seed, or clearly state that only summary statistics can be shared.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "No code files (.R, .py, .do) are listed in the artifact manifest; only summary artifacts.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "literature",
+      "title": "No reference to existing literature",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Contextualising findings within prior work is standard for external dissemination; its absence limits the ability to judge novelty or consistency.",
+      "actionableFix": "Add a brief literature review or, if intended for internal use only, state that no literature comparison is performed.",
+      "reentryPoint": "literature",
+      "confidence": 0.5
+    }
+  ],
+  "missingEvidence": [
+    "manuscript-qa.json (QA artifact for the manuscript, not provided)",
+    "Variable definition artifact (referenced as 'companion variable artifact' but absent)",
+    "Analysis specification or protocol documenting pre-specified methods",
+    "Method-selection evidence binding this analysis to a governed workflow"
+  ],
+  "recommendedNextStage": "manuscript"
+}

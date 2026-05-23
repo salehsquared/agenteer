@@ -1,0 +1,139 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is unbound to any pre-specified protocol, relies on unexplained cohort construction, fails to report effect size or confidence intervals, ignores key assumptions, and contains internal contradictions. These issues render the results unreliable for any final or causal interpretation. The study must be downgraded to exploratory status or substantially revised with a formal analysis plan and methodological rigor.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reproducibility",
+      "title": "Unbound analysis prevents any confirmatory or causal interpretation",
+      "evidenceRefs": [
+        "stats-run.json: binding.status=unbound",
+        "stats-run.json: resultPosture.status=exploratory_standard_table",
+        "stats-qa.json: check binding-status warning",
+        "stats-qa.json: result-posture warning"
+      ],
+      "whyItMatters": "Without a binding to a method-selection artifact or AnalysisSpec, the analysis lacks a pre-registered protocol, making it purely exploratory and unsuitable for paper-ready claims or promotion.",
+      "actionableFix": "Either create and bind a retrospective analysis specification with appropriate caveats, or reclassify the entire output as exploratory and remove any language suggesting confirmatory findings.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 1
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Cohort construction is opaque and unverifiable",
+      "evidenceRefs": [
+        "manuscript.md: \"The cohort definition was read from available run artifacts\"",
+        "absence of any cohort specification artifact"
+      ],
+      "whyItMatters": "Without explicit inclusion/exclusion criteria, missingness handling, and a flow diagram, the sample's representativeness and potential selection biases cannot be evaluated.",
+      "actionableFix": "Document the cohort assembly process, including all eligibility rules, how missing data were handled, and the final sample derivation. Provide a STROBE-style flow chart if applicable.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No effect size or confidence interval reported",
+      "evidenceRefs": [
+        "stats-run.json: estimates array contains only medians, test statistic, and p-value",
+        "manuscript.md: reports only p-value"
+      ],
+      "whyItMatters": "Reporting only a p-value overstates the role of statistical significance and ignores practical importance. For Mann-Whitney, common effect sizes (e.g., Cliff's delta, rank-biserial correlation) are essential.",
+      "actionableFix": "Compute and report appropriate effect sizes with confidence intervals, such as the Hodges-Lehmann shift estimate or probability of superiority, alongside the p-value.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 1
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Mann-Whitney assumptions and ties handling not addressed",
+      "evidenceRefs": [
+        "diagnostics.json: ties_possible=true, no further detail",
+        "stats-run.json: no assumption parameters"
+      ],
+      "whyItMatters": "The test assumes independent samples and, for a location shift interpretation, similar distribution shapes. Ties inflate p-values unless properly corrected. Ignoring these can lead to spurious significance.",
+      "actionableFix": "Check and report independence, shape similarity (e.g., via visual diagnostics), and explicitly state the method used to handle ties (exact or continuity correction). If assumptions are violated, consider alternative analyses.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Verify that diagnostics.json includes shape and independence checks; otherwise consider test invalid.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript contains internal contradictions and self-undermining statements",
+      "evidenceRefs": [
+        "manuscript.md: Limitations section states \"No reader-facing paper/manuscript artifact was found\" and \"No reader-facing report was available for claim alignment\" while the manuscript itself is present"
+      ],
+      "whyItMatters": "These contradictions make the manuscript appear uncurated and confuse readers about what evidence is being presented. They undermine trust in the reporting process.",
+      "actionableFix": "Edit the manuscript to remove contradictory statements and ensure a single, coherent narrative that accurately reflects the available artifacts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "No access to underlying data impedes reproducibility",
+      "evidenceRefs": [
+        "absence of data file or link in artifact list",
+        "manuscript.md: mentions row-level data allowed but no provision of de-identified copy"
+      ],
+      "whyItMatters": "Without data, independent verification of results is impossible. Even with PHI concerns, a synthetic or de-identified dataset should be supplied.",
+      "actionableFix": "Provide a de-identified or synthetic dataset with a data dictionary, or detailed instructions and ethics approvals for accessing the original data.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 1
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "Extremely small p-value (1.86e-9) lacks plausibility scrutiny",
+      "evidenceRefs": [
+        "stats-run.json: p_value=1.8599038046060571e-9",
+        "absence of data distribution plots or outlier analysis"
+      ],
+      "whyItMatters": "Such a small p-value with moderate sample sizes (N=240) is rare and could indicate data artifacts, extreme non-normality, or coding errors. Without diagnostic checks, the result may be spurious.",
+      "actionableFix": "Produce histograms, boxplots, and summary statistics per group. Check for data entry errors, extreme outliers, or clustering. If the result is valid, explain the clinical or biological basis for such a strong separation.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": "Recompute test after randomly perturbing a few values to see if p-value remains stable; if it changes drastically, suspect data issues.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No context from prior literature",
+      "evidenceRefs": [
+        "manuscript.md: no references or background beyond general statement",
+        "absence of any literature review artifact"
+      ],
+      "whyItMatters": "Without relating findings to existing knowledge, the study's contribution and external validity cannot be assessed. This relegates the report to a local data summary only.",
+      "actionableFix": "Add a brief literature review comparing the effect size and direction to previous studies, or explicitly limit claims to the dataset at hand without generalization.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Analysis specification/protocol binding",
+    "Cohort inclusion/exclusion criteria",
+    "Missingness report and handling",
+    "Effect size and confidence interval",
+    "Distribution shape and independence diagnostics",
+    "Ties-handling method",
+    "De-identified dataset or data access plan",
+    "Literature references",
+    "Figure references within manuscript"
+  ],
+  "recommendedNextStage": "protocol"
+}

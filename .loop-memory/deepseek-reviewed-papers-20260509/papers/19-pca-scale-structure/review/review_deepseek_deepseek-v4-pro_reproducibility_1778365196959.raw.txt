@@ -1,0 +1,131 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript does not report the PCA results or interpret the components, making the study fundamentally incomplete. Critical methodological and reporting gaps prevent any evaluation of the claimed latent structure.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript does not report PCA outcomes or answer the research question",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without any results or interpretation, the study is fundamentally incomplete and cannot be evaluated.",
+      "actionableFix": "Update the manuscript to include the proportion of variance explained, component loadings, and an interpretation of the latent components. Reference the scree plot and discuss component retention.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Variables not described",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The reader cannot assess the meaning or quality of the variables, undermining the interpretability of the PCA.",
+      "actionableFix": "Add variable descriptions: what do scale items 1-3 and severity measure? What are the units, possible ranges, and reliability estimates?",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No PCA suitability diagnostics reported",
+      "evidenceRefs": [
+        "diagnostics.json",
+        "stats-qa.json"
+      ],
+      "whyItMatters": "Without checks like KMO, Bartlett's test, or determinant of correlation matrix, it is unclear if PCA is appropriate for these data.",
+      "actionableFix": "Run and report standard PCA diagnostics (KMO measure of sampling adequacy, Bartlett's test of sphericity, communalities, check for multicollinearity). Include them in the diagnostics file and manuscript.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "No descriptive statistics or distribution checks",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "PCA is affected by outliers, skewness, and variable scaling. Without summary statistics, the plausibility of the input data cannot be assessed.",
+      "actionableFix": "Provide univariate summary statistics (mean, SD, range, skewness) for each variable. Report any transformations or scaling applied before PCA.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Data not available for reproducibility",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The analysis is based on a local dataset that is not shared, making independent verification impossible.",
+      "actionableFix": "Deposit a de-identified minimal dataset or synthetic data with the analysis artifacts, or clearly state data availability restrictions.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Figure QA file is empty",
+      "evidenceRefs": [
+        "figure-qa.json",
+        "stats-run/figure-qa.json"
+      ],
+      "whyItMatters": "The scree plot may have quality issues not automatically checked, potentially misleading component selection.",
+      "actionableFix": "Populate figure-qa.json with checks for axis labels, title, legibility, and verify that the scree plot is correctly referenced in the manuscript.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "No interpretation of components provided",
+      "evidenceRefs": [
+        "manuscript.md",
+        "diagnostics.json"
+      ],
+      "whyItMatters": "The primary output of PCA is the component structure; without interpretation, the research question remains unanswered.",
+      "actionableFix": "In the discussion, interpret the loadings: PC1 appears to load heavily on the three scale items, suggesting a general factor; PC2 is dominated by severity. Discuss what this implies about the latent structure.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "reporting",
+      "title": "Manuscript is overly generic and lacks study-specific content",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Most of the text is boilerplate that does not reflect the specific analysis, reducing clarity and specificity.",
+      "actionableFix": "Replace generic placeholder text with details tailored to this PCA analysis, including the specific research context and findings.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or data dictionary",
+    "Scree plot image",
+    "Detailed analysis plan",
+    "Descriptive statistics",
+    "PCA diagnostics (KMO, Bartlett's test)"
+  ],
+  "recommendedNextStage": "manuscript"
+}

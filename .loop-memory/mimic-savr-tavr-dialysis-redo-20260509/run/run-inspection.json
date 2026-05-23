@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "runInspection": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T23:20:19.004Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run",
+    "readiness": "needs_methods_review",
+    "blockers": [],
+    "warnings": [
+      "No model estimate artifact was available to check convergence.",
+      "Logistic-type model detected; explicit separation diagnostic evidence was not found.",
+      "No explicit collinearity diagnostic evidence was found.",
+      "No explicit influence diagnostic evidence was found.",
+      "No estimate-like records were available for p-value/effect-size checks."
+    ],
+    "cost": {
+      "estimatedUsd": 0.01250845469534397,
+      "hardStopUsd": null,
+      "source": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/cost-receipt.json"
+    },
+    "provenance": {
+      "analysisSpecPath": null,
+      "analysisSpecHash": null,
+      "runnerRecordPath": null,
+      "manifestPaths": [
+        "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/cost-receipt.json",
+        "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/run-inspection-cli.json",
+        "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/run-inspection.json",
+        "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/run-inspection.md"
+      ],
+      "artifactCount": 36,
+      "artifactHash": "4f69ee72e905b442cdf974b2f961f93dad5d96823fbad23c0279a419d98451ee"
+    },
+    "qa": {
+      "methodQaStatus": "warning",
+      "paperQaStatus": "pass",
+      "literatureQaStatus": null,
+      "manuscriptQaStatus": null,
+      "lifecycleStatus": null,
+      "rerunStabilityStatus": null,
+      "reviewerPanelStatus": null,
+      "reviewerAdjudicationVerdict": null
+    },
+    "literature": {
+      "searchPath": null,
+      "qaPath": null,
+      "contextPath": null,
+      "status": null,
+      "sourceCount": null,
+      "highQualitySourceCount": null,
+      "citedSourceCount": null,
+      "blockerCount": 0,
+      "warningCount": 0,
+      "nextAction": null
+    },
+    "paperPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/paper.md",
+    "manuscriptPath": null,
+    "nextRecommendedAction": "Complete method-review warnings, regenerate the manuscript if needed, and rerun inspection.",
+    "methodQa": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T23:20:19.002Z",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run",
+      "overallStatus": "warning",
+      "readiness": "needs_methods_review",
+      "checks": [
+        {
+          "id": "artifact_integrity_01",
+          "category": "artifact_integrity",
+          "status": "pass",
+          "severity": "info",
+          "message": "Run directory contains 36 artifact(s).",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run"
+          ],
+          "recommendedAction": "Continue with artifact-level QA."
+        },
+        {
+          "id": "artifact_integrity_02",
+          "category": "artifact_integrity",
+          "status": "pass",
+          "severity": "info",
+          "message": "A reader-facing report artifact is present.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/paper.md",
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/manuscript.md"
+          ],
+          "recommendedAction": "Run manuscript QA before promotion."
+        },
+        {
+          "id": "convergence_03",
+          "category": "convergence",
+          "status": "warning",
+          "severity": "minor",
+          "message": "No model estimate artifact was available to check convergence.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "Preserve convergence evidence with the run artifacts."
+        },
+        {
+          "id": "separation_04",
+          "category": "separation",
+          "status": "warning",
+          "severity": "minor",
+          "message": "Logistic-type model detected; explicit separation diagnostic evidence was not found.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "Record separation diagnostics for logistic models before publication."
+        },
+        {
+          "id": "overfitting_05",
+          "category": "overfitting",
+          "status": "pass",
+          "severity": "info",
+          "message": "No events-per-predictor issue was detected.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "Keep event counts and predictor counts in the report supplement."
+        },
+        {
+          "id": "missingness_06",
+          "category": "missingness",
+          "status": "pass",
+          "severity": "info",
+          "message": "Missingness/complete-case evidence is present.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "Report complete-case N and per-variable missingness."
+        },
+        {
+          "id": "collinearity_07",
+          "category": "collinearity",
+          "status": "warning",
+          "severity": "minor",
+          "message": "No explicit collinearity diagnostic evidence was found.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "For adjusted regression, record VIF/condition-number or justify why collinearity is not material."
+        },
+        {
+          "id": "influence_08",
+          "category": "influence",
+          "status": "warning",
+          "severity": "minor",
+          "message": "No explicit influence diagnostic evidence was found.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "Record influential-point review for model-based papers, especially small cohorts."
+        },
+        {
+          "id": "effect_size_09",
+          "category": "effect_size",
+          "status": "warning",
+          "severity": "minor",
+          "message": "No estimate-like records were available for p-value/effect-size checks.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json"
+          ],
+          "recommendedAction": "Report effect sizes with intervals; avoid p-value-only conclusions."
+        },
+        {
+          "id": "claim_alignment_10",
+          "category": "claim_alignment",
+          "status": "pass",
+          "severity": "info",
+          "message": "Reader-facing report avoids obvious framework jargon and causal overclaiming.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/paper.md"
+          ],
+          "recommendedAction": "Keep internal framework details in companion artifacts, not the manuscript."
+        },
+        {
+          "id": "semantic_plausibility_11",
+          "category": "semantic_plausibility",
+          "status": "pass",
+          "severity": "info",
+          "message": "No dataset-specific semantic plausibility issue was detected in available artifacts.",
+          "evidenceRefs": [
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/analysis-results.json",
+            "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/qa.json"
+          ],
+          "recommendedAction": "For clinical/public-health datasets, attach semantic QA evidence before share/export."
+        },
+        {
+          "id": "survey_design_12",
+          "category": "survey_design",
+          "status": "pass",
+          "severity": "info",
+          "message": "No complex survey design requirement was detected.",
+          "evidenceRefs": [],
+          "recommendedAction": "If the source dataset is a complex survey, encode survey design before inference."
+        }
+      ],
+      "blockerCount": 0,
+      "warningCount": 5,
+      "methodSummary": {
+        "detectedRunKind": "unknown",
+        "detectedModelFamilies": [
+          "logistic"
+        ],
+        "completeCaseN": 4238,
+        "eventCount": 92,
+        "predictorCount": null,
+        "resultPosture": null
+      },
+      "nextAction": "Complete method-review warnings, regenerate the manuscript if needed, and rerun inspection.",
+      "outPath": null,
+      "reportPath": null
+    },
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/run-inspection.json",
+    "reportPath": null
+  }
+}

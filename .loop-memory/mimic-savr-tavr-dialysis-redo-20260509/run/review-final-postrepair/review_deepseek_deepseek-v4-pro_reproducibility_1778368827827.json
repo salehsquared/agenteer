@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T23:20:27.827Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778368827827",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "revise",
+    "summary": "The manuscript reports a comprehensive same-hospital analysis of dialysis status and AVR outcomes using MIMIC-IV, but key statistical reporting and reproducibility elements are absent or incomplete. Proportional hazards assumptions were not tested, propensity score matching details are insufficient, some models risk overfitting, and supporting phenotype/balance files are not available for verification. These issues prevent full confidence in the reported estimates and transparency.",
+    "findings": [
+      {
+        "id": "F01",
+        "severity": "blocker",
+        "category": "model_diagnostics",
+        "title": "Cox proportional hazards assumption not assessed",
+        "evidenceRefs": [
+          "Cox model results for death, HF readmission, cardiac readmission, MACE, valve reintervention"
+        ],
+        "whyItMatters": "If the proportional hazards assumption is violated, hazard ratios are biased and their interpretation is invalid. Dialysis status and valve type may exhibit non-proportional effects over time, especially for mortality where risk likely varies with post-operative phase.",
+        "actionableFix": "Test each Cox model using scaled Schoenfeld residuals (global and per covariate). Report results. If violated, adopt time-dependent coefficients, landmark analyses, or restricted mean survival times. At minimum, graphically assess log-minus-log plots.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Compute cox.zph(model) for each survival model and report p-values and plots.",
+        "confidence": 0.95
+      },
+      {
+        "id": "F02",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Incomplete reporting of propensity score matching",
+        "evidenceRefs": [
+          "Propensity-Score Sensitivity section",
+          "propensity-balance.csv"
+        ],
+        "whyItMatters": "Readers cannot assess match quality without full balance diagnostics (standardized differences for all covariates before and after matching), clear description of matching ratio (1:1? with replacement?), number of controls used, exact caliper scale (logit of propensity), and whether greedy or optimal matching was performed.",
+        "actionableFix": "Provide a comprehensive balance table with pre- and post-matching standardized mean differences for every covariate, specify the matching ratio, whether matching was with replacement, the number of discarded treated subjects (only 1 untreated?), and confirm caliper definition. Include a Love plot (already referenced as Figure 4) with all covariates labeled.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that for each covariate listed in propensity model, the SMD before and after appears in the paper or balance table.",
+        "confidence": 0.9
+      },
+      {
+        "id": "F03",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "Potential overfitting in valve reintervention Cox model",
+        "evidenceRefs": [
+          "cox valve_reintervention model: events=96, n=4238"
+        ],
+        "whyItMatters": "With only 96 events and multiple adjustment variables (dialysis, valve strategy, age, sex, Charlson, insurance categories, anchor-year groups), the events-per-variable ratio may be too low (likely <10) to yield stable estimates. This increases the risk of spurious findings and unreliable confidence intervals.",
+        "actionableFix": "Either simplify the model (e.g., use Firth’s penalized likelihood for logistic, or reduce covariates) or explicitly state that this analysis is underpowered and should be interpreted with caution. Alternatively, Firth’s logistic or exact methods could be applied for rare events.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Count the number of degrees of freedom in the valve reintervention Cox model and confirm the events-per-variable ratio is ≥10; if not, adjust model complexity.",
+        "confidence": 0.85
+      },
+      {
+        "id": "F04",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Key data artifacts not available in the review packet",
+        "evidenceRefs": [
+          "outcome-phenotypes.json",
+          "valve-phenotype-code-list.csv",
+          "propensity-balance.csv",
+          "Figures 1-4"
+        ],
+        "whyItMatters": "Without these files, the exact phenotype definitions, code lists, balance statistics, and graphical summaries cannot be verified against the paper claims. The study's transparency and reproducibility are undermined.",
+        "actionableFix": "Include all referenced supporting files (at minimum the outcome phenotype JSON, valve code list CSV, propensity balance CSV, and the figures) in the final manuscript supplement or as an appendix. Ensure they exactly match the versions used in the analysis.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Confirm that every file path referenced in the paper exists and matches its description; MD5 checksums could be provided.",
+        "confidence": 1
+      },
+      {
+        "id": "F05",
+        "severity": "minor",
+        "category": "model_diagnostics",
+        "title": "No discrimination or calibration reported for logistic models",
+        "evidenceRefs": [
+          "Adjusted Model Findings section"
+        ],
+        "whyItMatters": "While logistic regression is common, reporting only odds ratios and p-values without model fit statistics (e.g., C-statistic, Hosmer-Lemeshow test) obscures the predictive performance of the models. Poor calibration could bias odds ratios if the model is misspecified.",
+        "actionableFix": "Add C-statistics and calibration metrics (e.g., Brier score, Hosmer-Lemeshow test) for each logistic model. Mention if any variable exhibited collinearity (VIF).",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Compute and report C-statistic and Hosmer-Lemeshow p-value for each logistic outcome model.",
+        "confidence": 0.8
+      }
+    ],
+    "missingEvidence": [
+      "outcome-phenotypes.json",
+      "valve-phenotype-code-list.csv",
+      "propensity-balance.csv",
+      "Figures 1–4",
+      "Complete model diagnostic outputs (proportional hazards tests, VIF, calibration plots)"
+    ],
+    "recommendedNextStage": "manuscript",
+    "costEstimate": {
+      "inputTokens": 4500,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.02871,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/review-final-postrepair/review_deepseek_deepseek-v4-pro_reproducibility_1778368827827.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/review-final-postrepair/review_deepseek_deepseek-v4-pro_reproducibility_1778368827827.json"
+  }
+}

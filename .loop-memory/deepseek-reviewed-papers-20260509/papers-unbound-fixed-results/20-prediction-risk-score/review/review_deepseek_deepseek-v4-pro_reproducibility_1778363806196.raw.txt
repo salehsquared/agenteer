@@ -1,0 +1,134 @@
+{
+  "verdict": "revise",
+  "summary": "The analysis provides only point estimates of AUROC and Brier score without confidence intervals, lacks variable definitions, and contains no calibration assessment. The run is unbound and exploratory, figure quality is suspect, and methods issues are vaguely referenced. These gaps prevent even local-evidence claims.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Missing uncertainty intervals for discrimination and Brier scores",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json",
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "Point estimates alone cannot convey precision; without confidence intervals, the reported AUROC of 0.745 and Brier of 0.192 cannot be interpreted as stable or replicable, undermining any discrimination claims.",
+      "actionableFix": "Compute and report 95% confidence intervals for AUROC and Brier score using bootstrapping or DeLong’s method, and include them in the manuscript and table.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.98
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "variables",
+      "title": "Risk score variable undefined and uncharacterized",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The pred_score’s scale, range, origin, and interpretation are missing. Without this metadata, the score’s applicability and the validity of its evaluation cannot be assessed, and reproducibility is impossible.",
+      "actionableFix": "Provide a data dictionary or variable description that defines pred_score (e.g., probability, log-odds, externally derived), its possible range, and its intended use.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.93
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No calibration assessment beyond Brier score",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json",
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "A risk score can have good discrimination (AUROC) but poor calibration, leading to misleading probability estimates. Reporting only Brier score is insufficient; calibration slope, intercept, or a calibration plot are standard.",
+      "actionableFix": "Add calibration-in-the-large and calibration slope estimates, or produce a loess-smoothed calibration curve, and discuss calibration performance.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.92
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "figures",
+      "title": "ROC curve figure has extremely low non-blank pixel ratio (0.0246)",
+      "evidenceRefs": [
+        "figure-qa.json"
+      ],
+      "whyItMatters": "A near-blank figure likely contains no readable content, failing its purpose of visualizing discrimination and undermining trust in the generated outputs.",
+      "actionableFix": "Inspect the generated ROC curve image; regenerate it ensuring it contains a proper plot, labeled axes, and reference line. Re-run QA checks with a non-blank threshold.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analysis unbound and exploratory; no pre-specification governance",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "stats-run/stats-qa.json"
+      ],
+      "whyItMatters": "The result posture is explicitly exploratory and unbound to a method-selection or AnalysisSpec. This undermines any confirmatory interpretation and allows analyst degrees of freedom, compromising reproducibility.",
+      "actionableFix": "Create a formal analysis plan (AnalysisSpec) that binds the method, declares variables, and pre-specifies evaluation metrics before re-running, then update the run binding status.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.97
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Vague reference to unresolved methods issues",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The limitations section states ‘deterministic methods checks identified issues that require review’, but no details or references are given. Readers cannot judge severity or impact, eroding transparency.",
+      "actionableFix": "List the specific advisory issues or warnings from the QA artifacts, and indicate whether they have been resolved or why they remain open.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Missingness handling undocumented",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The manuscript uses only complete cases (N=240) but does not report the original sample size, exclusion counts, or pattern of missingness. This bias cannot be assessed without that information.",
+      "actionableFix": "Report the number of records with missing outcome or pred_score, reason for exclusion, and provide a table or note on missingness patterns if any exist.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.90
+    },
+    {
+      "id": "F8",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No description of data source or study population",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Even for local evidence, the context (e.g., clinical setting, participant demographics, period of data collection) is necessary to interpret performance and potential applicability.",
+      "actionableFix": "Add a brief statement in Methods about the cohort’s origin, inclusion criteria, and the clinical/public-health problem the score intends to address.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Variable metadata artifact for pred_score and outcome_binary",
+    "Raw data for independent review (not provided in packet, though row-level access is allowed)",
+    "Confidence intervals for AUROC and Brier score",
+    "Calibration curve or calibration metrics",
+    "Full contents of stats-run/figures.json (provided snippet truncated)",
+    "manuscript-qa.json artifact (not supplied in packet)"
+  ],
+  "recommendedNextStage": "analysis_spec"
+}

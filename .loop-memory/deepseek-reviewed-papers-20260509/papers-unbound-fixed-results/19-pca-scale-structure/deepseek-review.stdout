@@ -1,0 +1,461 @@
+{
+  "schemaVersion": 1,
+  "studyCritic": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:59:58.665Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure",
+    "stage": "final",
+    "autonomy": "aggressive",
+    "generatedFiles": {
+      "reviewPacket": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-packet.json",
+      "redactionReport": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-redaction-report.json",
+      "panel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json",
+      "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json",
+      "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-response.json",
+      "stateReentry": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/state-reentry.json"
+    },
+    "panel": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:59:58.660Z",
+      "panelId": "review_panel_c86be09a2597",
+      "stage": "final",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure",
+      "autonomy": "aggressive",
+      "budget": {
+        "maxPerCallUsd": 0.12,
+        "maxPanelUsd": 0.3,
+        "maxStudyLoopUsd": 5
+      },
+      "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-packet.json",
+      "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-redaction-report.json",
+      "reviewers": [
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T21:56:29.646Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778363789646",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:methods",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "clinical methods and study-design reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "failed",
+          "verdict": "unavailable",
+          "summary": "Reviewer call failed; deterministic QA and other reviewers should continue.",
+          "findings": [],
+          "missingEvidence": [],
+          "recommendedNextStage": "human_review",
+          "costEstimate": {
+            "inputTokens": 3033,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026157,
+            "maxPerCallUsd": 0.5
+          },
+          "error": "Unexpected end of JSON input",
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_methods_1778363789646.raw.txt",
+          "outPath": null
+        },
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T21:56:29.664Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778363789664",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:reproducibility",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "statistical reporting and reproducibility reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "block",
+          "summary": "The manuscript is a boilerplate with no reported results. The PCA analysis is ungoverned (unbound), scaling is not documented, missing data handling is opaque, and no literature context is provided. These issues prevent publication.",
+          "findings": [
+            {
+              "id": "F1",
+              "severity": "blocker",
+              "category": "reporting",
+              "title": "Manuscript contains no substantive results",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "The paper fails to communicate any findings from the PCA, leaving the reader with only a statement of sample size. This makes the manuscript unpublishable.",
+              "actionableFix": "Rewrite the manuscript to include the explained variance ratios, component loadings, interpretation, and a discussion of the latent structure, with appropriate caution given the exploratory nature.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "Verify that the manuscript includes a Results section describing the PCA output (e.g., variance explained, loadings table) and an interpretation tied to the research question.",
+              "confidence": 1
+            },
+            {
+              "id": "F2",
+              "severity": "major",
+              "category": "method_choice",
+              "title": "PCA scaling/standardization not addressed",
+              "evidenceRefs": [
+                "stats-run.json",
+                "diagnostics.json"
+              ],
+              "whyItMatters": "If variables are on different scales (e.g., severity vs. scale items), unstandardized PCA can be dominated by variables with larger variance, producing artefactual component loadings. The loadings suggest severity contributes little to PC1, which may be a scale artefact.",
+              "actionableFix": "Clarify whether PCA was performed on the correlation matrix or on standardized variables; if not, re-run with appropriate standardization and document the choice.",
+              "reentryPoint": "execution",
+              "deterministicVerification": "Inspect the stats-config.json or analysis code to confirm standardization; re-run PCA with scaling if absent.",
+              "confidence": 0.9
+            },
+            {
+              "id": "F3",
+              "severity": "major",
+              "category": "reproducibility",
+              "title": "Analysis is unbound and purely exploratory, yet presented as a paper",
+              "evidenceRefs": [
+                "stats-run.json"
+              ],
+              "whyItMatters": "The stats-run indicates 'unbound' binding and a result posture of 'exploratory_standard_table', which states it cannot support paper-ready conclusions. Publishing ungoverned exploratory results risks overinterpretation and p-hacking.",
+              "actionableFix": "Create a pre-specified analysis protocol (AnalysisSpec) and bind it to the run. Re-run the analysis within that binding before considering promotion to a paper.",
+              "reentryPoint": "protocol",
+              "deterministicVerification": "Check that future stats-run JSON shows a non-null methodSelectionPath and AnalysisSpec binding.",
+              "confidence": 1
+            },
+            {
+              "id": "F4",
+              "severity": "major",
+              "category": "missingness",
+              "title": "Missing data handling not documented",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "The manuscript uses a complete-case sample (N=240) but provides no information on initial sample size, missingness patterns, or reasons for exclusion. Non-random missingness can bias the component structure.",
+              "actionableFix": "Report a flow diagram or table of missing data, including number of records dropped, missingness by variable, and any sensitivity analysis (e.g., multiple imputation) if justified.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "Verify presence of a missingness report artifact or a description in the revised manuscript.",
+              "confidence": 0.85
+            },
+            {
+              "id": "F5",
+              "severity": "major",
+              "category": "literature",
+              "title": "No literature review or method justification",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "The paper lacks references, comparison to prior work, or a rationale for choosing PCA over other latent variable methods (e.g., factor analysis). This undermines scientific grounding.",
+              "actionableFix": "Add a literature review, justify PCA as the appropriate technique, discuss alternative methods (e.g., parallel analysis for component retention), and cite relevant studies.",
+              "reentryPoint": "literature",
+              "deterministicVerification": "Check for a References section and a discussion of PCA versus factor analysis in the revised manuscript.",
+              "confidence": 1
+            },
+            {
+              "id": "F6",
+              "severity": "minor",
+              "category": "variables",
+              "title": "Variable descriptions absent",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Readers cannot interpret the components without knowing what scale_item_1-3 and severity measure, their measurement scales, or their clinical/public-health meaning.",
+              "actionableFix": "Provide a data dictionary or description of each variable, including range, meaning, and provenance, in the manuscript or a companion artifact.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "Check for a Variable Description table or section in the revised manuscript.",
+              "confidence": 0.9
+            },
+            {
+              "id": "F7",
+              "severity": "minor",
+              "category": "figures",
+              "title": "Scree plot generated but not referenced or interpreted in text",
+              "evidenceRefs": [
+                "figures.json",
+                "manuscript.md"
+              ],
+              "whyItMatters": "The scree plot exists in the run artifacts but is not discussed; it could support decisions about the number of components to retain.",
+              "actionableFix": "Include the scree plot in the manuscript, reference it in the Results, and discuss how it informs the number of meaningful components.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "Check that the revised manuscript contains a figure callout for the scree plot and a note on component retention.",
+              "confidence": 0.9
+            },
+            {
+              "id": "F8",
+              "severity": "info",
+              "category": "reporting",
+              "title": "QA checks show warning status due to unbound analysis and incomplete uncertainty context",
+              "evidenceRefs": [
+                "stats-qa.json"
+              ],
+              "whyItMatters": "The automated QA flagged that the analysis is unbound and that uncertainty/p-value context is incomplete, indicating that the run does not meet internal quality standards for promotion.",
+              "actionableFix": "Address the binding warning and ensure that the manuscript includes appropriate uncertainty statements (e.g., confidence intervals for loadings, if available) or acknowledges the exploratory nature.",
+              "reentryPoint": "qa",
+              "deterministicVerification": "Check that stats-qa.json shows a 'pass' status after binding and manuscript improvements.",
+              "confidence": 1
+            }
+          ],
+          "missingEvidence": [
+            "Full stats-qa.json (truncated in provided artifact)",
+            "stats-report.md (generated run report not included)",
+            "pca-transformed.csv (transformed data)",
+            "Raw data or data dictionary",
+            "stats-config.json (to verify PCA parameters like scaling, number of components)",
+            "Missingness report or attrition flow",
+            "AnalysisSpec or protocol binding artifact"
+          ],
+          "recommendedNextStage": "protocol",
+          "costEstimate": {
+            "inputTokens": 3033,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026157,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363789664.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363789664.json"
+        }
+      ],
+      "status": "block",
+      "costEstimateUsd": 0.052314,
+      "failureCount": 1,
+      "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json"
+    },
+    "adjudication": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:59:58.662Z",
+      "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json",
+      "verdict": "block",
+      "consensus": "single_reviewer",
+      "acceptedFindings": [
+        {
+          "id": "F1",
+          "severity": "blocker",
+          "category": "reporting",
+          "title": "Manuscript contains no substantive results",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "The paper fails to communicate any findings from the PCA, leaving the reader with only a statement of sample size. This makes the manuscript unpublishable.",
+          "actionableFix": "Rewrite the manuscript to include the explained variance ratios, component loadings, interpretation, and a discussion of the latent structure, with appropriate caution given the exploratory nature.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "Verify that the manuscript includes a Results section describing the PCA output (e.g., variance explained, loadings table) and an interpretation tied to the research question.",
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F2",
+          "severity": "major",
+          "category": "method_choice",
+          "title": "PCA scaling/standardization not addressed",
+          "evidenceRefs": [
+            "stats-run.json",
+            "diagnostics.json"
+          ],
+          "whyItMatters": "If variables are on different scales (e.g., severity vs. scale items), unstandardized PCA can be dominated by variables with larger variance, producing artefactual component loadings. The loadings suggest severity contributes little to PC1, which may be a scale artefact.",
+          "actionableFix": "Clarify whether PCA was performed on the correlation matrix or on standardized variables; if not, re-run with appropriate standardization and document the choice.",
+          "reentryPoint": "execution",
+          "deterministicVerification": "Inspect the stats-config.json or analysis code to confirm standardization; re-run PCA with scaling if absent.",
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F3",
+          "severity": "major",
+          "category": "reproducibility",
+          "title": "Analysis is unbound and purely exploratory, yet presented as a paper",
+          "evidenceRefs": [
+            "stats-run.json"
+          ],
+          "whyItMatters": "The stats-run indicates 'unbound' binding and a result posture of 'exploratory_standard_table', which states it cannot support paper-ready conclusions. Publishing ungoverned exploratory results risks overinterpretation and p-hacking.",
+          "actionableFix": "Create a pre-specified analysis protocol (AnalysisSpec) and bind it to the run. Re-run the analysis within that binding before considering promotion to a paper.",
+          "reentryPoint": "protocol",
+          "deterministicVerification": "Check that future stats-run JSON shows a non-null methodSelectionPath and AnalysisSpec binding.",
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F4",
+          "severity": "major",
+          "category": "missingness",
+          "title": "Missing data handling not documented",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "The manuscript uses a complete-case sample (N=240) but provides no information on initial sample size, missingness patterns, or reasons for exclusion. Non-random missingness can bias the component structure.",
+          "actionableFix": "Report a flow diagram or table of missing data, including number of records dropped, missingness by variable, and any sensitivity analysis (e.g., multiple imputation) if justified.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "Verify presence of a missingness report artifact or a description in the revised manuscript.",
+          "confidence": 0.85,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F5",
+          "severity": "major",
+          "category": "literature",
+          "title": "No literature review or method justification",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "The paper lacks references, comparison to prior work, or a rationale for choosing PCA over other latent variable methods (e.g., factor analysis). This undermines scientific grounding.",
+          "actionableFix": "Add a literature review, justify PCA as the appropriate technique, discuss alternative methods (e.g., parallel analysis for component retention), and cite relevant studies.",
+          "reentryPoint": "literature",
+          "deterministicVerification": "Check for a References section and a discussion of PCA versus factor analysis in the revised manuscript.",
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F6",
+          "severity": "minor",
+          "category": "variables",
+          "title": "Variable descriptions absent",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Readers cannot interpret the components without knowing what scale_item_1-3 and severity measure, their measurement scales, or their clinical/public-health meaning.",
+          "actionableFix": "Provide a data dictionary or description of each variable, including range, meaning, and provenance, in the manuscript or a companion artifact.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "Check for a Variable Description table or section in the revised manuscript.",
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F7",
+          "severity": "minor",
+          "category": "figures",
+          "title": "Scree plot generated but not referenced or interpreted in text",
+          "evidenceRefs": [
+            "figures.json",
+            "manuscript.md"
+          ],
+          "whyItMatters": "The scree plot exists in the run artifacts but is not discussed; it could support decisions about the number of components to retain.",
+          "actionableFix": "Include the scree plot in the manuscript, reference it in the Results, and discuss how it informs the number of meaningful components.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "Check that the revised manuscript contains a figure callout for the scree plot and a note on component retention.",
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F8",
+          "severity": "info",
+          "category": "reporting",
+          "title": "QA checks show warning status due to unbound analysis and incomplete uncertainty context",
+          "evidenceRefs": [
+            "stats-qa.json"
+          ],
+          "whyItMatters": "The automated QA flagged that the analysis is unbound and that uncertainty/p-value context is incomplete, indicating that the run does not meet internal quality standards for promotion.",
+          "actionableFix": "Address the binding warning and ensure that the manuscript includes appropriate uncertainty statements (e.g., confidence intervals for loadings, if available) or acknowledges the exploratory nature.",
+          "reentryPoint": "qa",
+          "deterministicVerification": "Check that stats-qa.json shows a 'pass' status after binding and manuscript improvements.",
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        }
+      ],
+      "rejectedFindings": [],
+      "conflictNotes": [],
+      "reentryPoint": "protocol",
+      "nextAction": "Route back to protocol with review-response decisions.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json"
+    },
+    "response": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:59:58.664Z",
+      "adjudicationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json",
+      "autonomy": "aggressive",
+      "decisions": [
+        {
+          "findingId": "F1",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Rewrite the manuscript to include the explained variance ratios, component loadings, interpretation, and a discussion of the latent structure, with appropriate caution given the exploratory nature.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F2",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Clarify whether PCA was performed on the correlation matrix or on standardized variables; if not, re-run with appropriate standardization and document the choice.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F3",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Create a pre-specified analysis protocol (AnalysisSpec) and bind it to the run. Re-run the analysis within that binding before considering promotion to a paper.",
+          "reentryPoint": "protocol"
+        },
+        {
+          "findingId": "F4",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Report a flow diagram or table of missing data, including number of records dropped, missingness by variable, and any sensitivity analysis (e.g., multiple imputation) if justified.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F5",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Add a literature review, justify PCA as the appropriate technique, discuss alternative methods (e.g., parallel analysis for component retention), and cite relevant studies.",
+          "reentryPoint": "literature"
+        },
+        {
+          "findingId": "F6",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide a data dictionary or description of each variable, including range, meaning, and provenance, in the manuscript or a companion artifact.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F7",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include the scree plot in the manuscript, reference it in the Results, and discuss how it informs the number of meaningful components.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F8",
+          "decision": "modified",
+          "reason": "Finding is actionable but should be translated into a bounded deterministic repair before execution.",
+          "repairAction": "Address the binding warning and ensure that the manuscript includes appropriate uncertainty statements (e.g., confidence intervals for loadings, if available) or acknowledges the exploratory nature.",
+          "reentryPoint": "qa"
+        }
+      ],
+      "stateReentry": {
+        "status": "blocked",
+        "reentryPoint": "protocol",
+        "suggestedCommands": [
+          "agenteer research protocol-candidates --question <revised-question> --json",
+          "agenteer research method-select --question <revised-question> --json"
+        ],
+        "rerunReviewAfterRepair": true
+      },
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-response.json",
+      "stateReentryPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/state-reentry.json"
+    }
+  }
+}
+

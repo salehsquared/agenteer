@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "reviewPanel": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:11:08.795Z",
+    "panelId": "review_panel_13bdef20b60e",
+    "stage": "final",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous",
+    "autonomy": "aggressive",
+    "budget": {
+      "maxPerCallUsd": 0.12,
+      "maxPanelUsd": 0.3,
+      "maxStudyLoopUsd": 5
+    },
+    "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-packet.json",
+    "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-redaction-report.json",
+    "reviewers": [
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T22:08:10.700Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778364490700",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:methods",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "clinical methods and study-design reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "revise",
+        "summary": "The ANCOVA analysis has major methodological and reporting gaps that prevent reliable interpretation. Key issues include failure to test the homogeneity of regression slopes assumption, lack of effect size reporting, absence of covariate balance checks, undocumented missing data handling, and insufficient covariate adjustment justification. These must be addressed before the analysis can support even local claims.",
+        "findings": [
+          {
+            "id": "M1",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "Homogeneity of regression slopes not checked",
+            "evidenceRefs": [
+              "manuscript.md: Methods section lists only main effects",
+              "stats-run.json: estimates array contains no group*covariate interaction terms"
+            ],
+            "whyItMatters": "ANCOVA assumes the relationship between covariates and outcome is identical across groups. If this assumption is violated, the group effect estimate may be biased, and p-values could be misleading.",
+            "actionableFix": "Add group*age and group*severity interaction terms to the model and test their significance. If non-significant, report and proceed; if significant, present stratified analyses or alternative models.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check if stats-run.json diagnostics or estimates include interaction terms and corresponding p-values.",
+            "confidence": 0.95
+          },
+          {
+            "id": "M2",
+            "severity": "major",
+            "category": "reporting",
+            "title": "No effect size measures reported",
+            "evidenceRefs": [
+              "manuscript.md: Results section only contains F and p-values",
+              "stats-run.json: estimates array lacks partial eta-squared, omega-squared, or adjusted means"
+            ],
+            "whyItMatters": "F and p-values do not convey the magnitude or practical importance of differences. Clinical interpretation requires effect sizes (e.g., partial eta-squared, Cohen's f) and adjusted group means with confidence intervals.",
+            "actionableFix": "Compute and report partial eta-squared or omega-squared for each term, and provide adjusted marginal means per group with 95% CIs. Add to manuscript and stats-run.json estimates.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Verify that stats-run.json or an updated estimates file contains at least one effect size metric per term.",
+            "confidence": 1
+          },
+          {
+            "id": "M3",
+            "severity": "major",
+            "category": "cohort",
+            "title": "No baseline characteristics or covariate balance reported",
+            "evidenceRefs": [
+              "manuscript.md: No table of demographics or covariate distribution by group",
+              "stats-run.json: no descriptive statistics output"
+            ],
+            "whyItMatters": "Without baseline comparisons, readers cannot judge whether groups differ meaningfully on covariates and whether the observed (non-significant) group effect is masked by imbalance. Report group sizes, means, SDs for age, severity, and outcome.",
+            "actionableFix": "Add a Table 1 with group‑wise summaries and appropriate balance checks (e.g., standardized mean differences). Include in manuscript and companion data.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check for a new artifact containing descriptive statistics grouped by 'group' variable.",
+            "confidence": 1
+          },
+          {
+            "id": "M4",
+            "severity": "major",
+            "category": "missingness",
+            "title": "Missing data handling not described; complete-case analysis may be biased",
+            "evidenceRefs": [
+              "manuscript.md: only mentions '240 complete-case records'",
+              "stats-run.json: completeCaseN=240, no missingness pattern or auxiliary variables"
+            ],
+            "whyItMatters": "If missingness is related to exposure, outcome, or covariates, complete-case analysis can yield biased estimates. The absence of any missing data description precludes assessment.",
+            "actionableFix": "Describe the initial sample size, exclusion criteria, and amount/pattern of missingness. Conduct a sensitivity analysis (e.g., using multiple imputation) or at minimum compare complete cases to excluded cases on available variables.",
+            "reentryPoint": "exploration",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "M5",
+            "severity": "major",
+            "category": "study_design",
+            "title": "Covariate selection lacks justification; risk of unmeasured confounding",
+            "evidenceRefs": [
+              "manuscript.md: Methods only list 'age, severity' without rationale",
+              "stats-run.json: no mention of confounder selection process"
+            ],
+            "whyItMatters": "Adjustment for only two covariates may be insufficient if unmeasured confounders exist. Without a directed acyclic graph (DAG) or clinical reasoning, residual confounding could bias the group effect estimate.",
+            "actionableFix": "Discuss the rationale for including age and severity. Either provide a DAG or justify why critical confounders are measured. Acknowledge remaining confounding in limitations.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.85
+          },
+          {
+            "id": "M6",
+            "severity": "minor",
+            "category": "reproducibility",
+            "title": "Software and version not reported",
+            "evidenceRefs": [
+              "manuscript.md: no mention of statistical software",
+              "stats-run.json: no 'software' field"
+            ],
+            "whyItMatters": "Reproducibility requires specifying the software, version, and packages used. Without this, exact re-execution is uncertain.",
+            "actionableFix": "Add the software name, version, and relevant package citations (e.g., R, Python statsmodels) to the manuscript and artifacts.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check if manuscript or stats-run artifacts contain a 'software' field.",
+            "confidence": 0.9
+          },
+          {
+            "id": "M7",
+            "severity": "minor",
+            "category": "figures",
+            "title": "Model diagnostic plots not presented or referenced",
+            "evidenceRefs": [
+              "stats-run/figures.json: references a figure but no diagnostic plots mentioned",
+              "manuscript.md: no discussion of residual diagnostics beyond Shapiro-Wilk"
+            ],
+            "whyItMatters": "Visual inspection of residuals (e.g., Q-Q plot, residuals vs fitted) is crucial to confirm normality, homoscedasticity, and identify outliers. Shapiro-Wilk test alone is insufficient.",
+            "actionableFix": "Generate and include in the manuscript or supplementary materials a panel of standard diagnostic plots: residuals vs fitted, Q-Q plot, scale-location plot, and residuals vs leverage.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check for existence of residual diagnostic figure files in the run directory.",
+            "confidence": 0.8
+          }
+        ],
+        "missingEvidence": [
+          "Raw data or sufficient summary to externally validate covariate distributions and outcome range",
+          "Detailed missing data analysis (pattern, mechanisms, imputation models)",
+          "DAG or explicit confounder selection process",
+          "Group-specific sample sizes in manuscript (only total N=240 given)",
+          "Any sensitivity analysis (e.g., alternative covariance structures, propensity score adjustment)",
+          "Clear documentation of figure-qa results (figure-qa.json content missing)"
+        ],
+        "recommendedNextStage": "execution",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778364490700.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_methods_1778364490700.json"
+      },
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T22:08:10.717Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778364490717",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:reproducibility",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "statistical reporting and reproducibility reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The analysis is not reproducible due to missing raw data and code. The manuscript omits essential statistical details (effect sizes, missingness handling, diagnostics) and contains inaccurate reporting of p-values. These issues prevent final acceptance.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "reproducibility",
+            "title": "No raw data or analysis code provided; analysis not reproducible",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run/stats-run.json (no data file)"
+            ],
+            "whyItMatters": "Without access to the raw data and the exact code used to produce the analysis, independent verification of results is impossible, undermining the scientific value of the report.",
+            "actionableFix": "Provide the raw dataset (anonymized if needed) and the complete analysis pipeline (code, configuration, environment) in the run directory or a public repository. Ensure the manuscript states data availability.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.99
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "reporting",
+            "title": "Effect sizes not reported for ANCOVA",
+            "evidenceRefs": [
+              "manuscript.md Results section",
+              "stats-run/stats-run.json estimates table"
+            ],
+            "whyItMatters": "P-values alone do not convey the magnitude or practical importance of group differences. Readers cannot assess whether the group effect is negligible or potentially meaningful despite non-significance.",
+            "actionableFix": "Report appropriate effect size measures (e.g., partial eta-squared, omega-squared) with confidence intervals for the group term. Discuss the observed effect size in the context of clinical/public-health relevance.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "missingness",
+            "title": "Missing data handling not described; complete-case analysis may be biased",
+            "evidenceRefs": [
+              "manuscript.md Methods section 'Cohort Construction'",
+              "manuscript.md mentions 'complete-case records' but no details"
+            ],
+            "whyItMatters": "If missingness depends on variables in the model or unmeasured confounders, complete-case analysis can yield biased estimates. Readers cannot evaluate the risk of selection bias.",
+            "actionableFix": "Describe the extent and pattern of missing data: how many records were excluded per variable, reasons for missingness, and sensitivity analyses (if feasible). Compare baseline characteristics of included vs. excluded records.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "Model diagnostics not presented in manuscript",
+            "evidenceRefs": [
+              "manuscript.md lacks diagnostic results",
+              "diagnostics.json exists but not referenced"
+            ],
+            "whyItMatters": "Assumptions of ANCOVA (normality of residuals, homoscedasticity, linearity, influential points) must be verified for valid inference. The manuscript should confirm that assumptions were checked and met.",
+            "actionableFix": "Incorporate a paragraph in Methods/Results summarizing diagnostic checks: Shapiro-Wilk test for normality of residuals (p=0.79), max leverage (0.05), max Cook's distance (0.05), and VIF (<1.35) indicating no severe violations. Discuss any potential issues.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "F5",
+            "severity": "major",
+            "category": "reporting",
+            "title": "P-values for covariates inappropriately reported as '0.0000'",
+            "evidenceRefs": [
+              "manuscript.md: 'For age, the F statistic was 212.0550; p=0.0000.'",
+              "stats-run.json: p_value = 1.1453978378314278e-34"
+            ],
+            "whyItMatters": "Reporting very small p-values as 0.0000 misrepresents the uncertainty and precision; it implies a probability of exactly zero, which is incorrect. This is a violation of standard reporting guidelines.",
+            "actionableFix": "Report p-values to a consistent number of significant digits, e.g., p < 0.0001, or use scientific notation (p = 1.1e-34). Avoid reporting exactly zero.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.99
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "Inconsistency between QA status and manuscript advisory issues statement",
+            "evidenceRefs": [
+              "stats-qa.json status=pass, no issues",
+              "manuscript.md: 'The methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed.'"
+            ],
+            "whyItMatters": "The manuscript suggests unresolved methodological concerns, but the automated QA found no errors. This discrepancy may confuse readers and implies potential hidden problems that are not specified.",
+            "actionableFix": "Either remove the advisory-issues statement if no real issues exist, or clearly list the specific methodological concerns (e.g., missingness, effect size) so they can be addressed.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.8
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "literature",
+            "title": "No literature context or comparison",
+            "evidenceRefs": [
+              "manuscript.md Introduction and Discussion"
+            ],
+            "whyItMatters": "Even for a local analysis, situating findings within existing knowledge helps assess consistency and novelty. The complete absence of any reference to prior work weakens the scientific contribution.",
+            "actionableFix": "Add a brief literature review or at least note that no comparable studies exist. If the analysis is purely exploratory, state that explicitly and discuss how results align with known effects of age, severity, etc.",
+            "reentryPoint": "literature",
+            "deterministicVerification": null,
+            "confidence": 0.85
+          },
+          {
+            "id": "F8",
+            "severity": "info",
+            "category": "figures",
+            "title": "Figure content not verifiable in review package",
+            "evidenceRefs": [
+              "figure-qa.json and anova-group-distribution.png only referenced by hash"
+            ],
+            "whyItMatters": "Without seeing the actual figure and its QA report, the reviewer cannot assess whether the figure accurately represents the data and is free of distortions or misleading elements.",
+            "actionableFix": "Include the rendered figure image (e.g., png) and the full figure QA JSON content in the review packet. Ensure the figure adequately displays group differences with appropriate error bars or confidence intervals.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.7
+          }
+        ],
+        "missingEvidence": [
+          "raw_data",
+          "cohort_construction_and_eligibility_rules",
+          "figure_image_and_qa_content",
+          "analysis_code/pipeline"
+        ],
+        "recommendedNextStage": "execution",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364490717.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364490717.json"
+      }
+    ],
+    "status": "block",
+    "costEstimateUsd": 0.052314,
+    "failureCount": 0,
+    "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-panel.json"
+  }
+}

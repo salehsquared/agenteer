@@ -1,0 +1,131 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript reports a propensity score matching analysis but contains major deficiencies: an unclear research question, mischaracterization of the method, a high unmatched treated rate and poor covariate balance not discussed, missing diagnostic details, and an overinterpreted conclusion. These issues make the results unreliable and the manuscript not ready for dissemination.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Unclear research question",
+      "evidenceRefs": [
+        "manuscript.md: Abstract, Introduction, Conclusion"
+      ],
+      "whyItMatters": "The study repeatedly refers to a 'prespecified study question' but never states it. Without a clear PICO/PECOT, the analysis cannot be evaluated for appropriateness or bias.",
+      "actionableFix": "Explicitly state the research question, including target population, exposure (treatment), comparator (control), outcome (outcome_binary), and time horizon if relevant.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Method mischaracterization",
+      "evidenceRefs": [
+        "manuscript.md: Methods, results sections",
+        "stats-run.json: method=propensity-score-matching"
+      ],
+      "whyItMatters": "The manuscript describes the analysis as a 'logistic model', but the actual method is nearest-neighbor propensity score matching. This inconsistency misleads readers and undermines the validity of the report.",
+      "actionableFix": "Correct the methods section to accurately describe the propensity score modeling, matching algorithm, caliper, exact matching on sex, and estimand (ATT).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "category": "cohort",
+      "title": "High proportion of unmatched treated subjects (53%) not disclosed",
+      "evidenceRefs": [
+        "stats-run.json: diagnostics.matching.unmatched_treated=77 of 144"
+      ],
+      "whyItMatters": "Loss of 53% of treated subjects likely introduces selection bias and limits generalizability to the subgroup that could be matched. The manuscript does not mention this critical limitation.",
+      "actionableFix": "Report the number and proportion of unmatched treated, compare their baseline characteristics to matched subjects, discuss potential bias, and consider relaxing caliper or using alternative methods.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.98
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Post-matching covariate imbalance not reported or addressed",
+      "evidenceRefs": [
+        "stats-run.json: diagnostics.balance.max_abs_smd_after=0.233, covariates_over_0_1_after=3"
+      ],
+      "whyItMatters": "Residual standardized mean differences up to 0.233 indicate that confounding remains, biasing the effect estimate. The manuscript omits all balance assessment.",
+      "actionableFix": "Present pre- and post-matching balance (e.g., love plot or table of SMDs), discuss whether residual imbalance is acceptable, and consider additional modeling or matching refinement.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.97
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing essential methods detail",
+      "evidenceRefs": [
+        "manuscript.md: entire methods",
+        "stats-run.json: covariates, caliper, exact_covariates"
+      ],
+      "whyItMatters": "The manuscript lacks a description of the propensity model, variables included (age, severity, albumin), exact matching on sex, caliper width, matching ratio, and model diagnostics. This makes it impossible for readers to assess validity.",
+      "actionableFix": "Provide a complete methods section describing all analytical choices, including how the propensity score was estimated, matching specifications, and how balance was evaluated.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Overly precise p-value and missing confidence interval",
+      "evidenceRefs": [
+        "manuscript.md: Results p=1.0000",
+        "stats-run.json: estimates.p_value=0.9999999999999992, or_ci_low, or_ci_high"
+      ],
+      "whyItMatters": "Reporting p=1.0000 is unnecessarily precise and may be a rounding artifact. The odds ratio is given without its confidence interval, obscuring the precision of the estimate.",
+      "actionableFix": "Report p > 0.99, and always present the 95% CI (0.48, 2.08) alongside the OR. Also include the risk difference and group sample sizes.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F07",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Limitations section is generic and ignores actual problems",
+      "evidenceRefs": [
+        "manuscript.md: Limitations",
+        "stats-run.json: issues, unmatched, imbalance"
+      ],
+      "whyItMatters": "The limitations mention missingness and complete-case analysis (non-issues here) but fail to address the large proportion of unmatched subjects, residual confounding, and absence of sensitivity analyses. This misguides readers.",
+      "actionableFix": "Revise the limitations to focus on the specific threats identified in the analysis: selection from unmatched treated, imbalance, unmeasured confounding, and limited sample size.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.98
+    },
+    {
+      "id": "F08",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "No sensitivity analysis for unmeasured confounding",
+      "evidenceRefs": [
+        "manuscript.md: Conclusion 'interpretable local evidence'",
+        "stats-run.json: no sensitivity analysis artifacts"
+      ],
+      "whyItMatters": "Propensity score matching only adjusts for measured covariates. Without a quantitative bias analysis (e.g., E-value), the claim of 'interpretable' may overstate certainty.",
+      "actionableFix": "Either perform a sensitivity analysis (Rosenbaum bounds or E-value) or explicitly downgrade the conclusion to 'unadjusted for unmeasured confounders'.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.96
+    }
+  ],
+  "missingEvidence": [
+    "Specification of the prespecified research question (PECOT)",
+    "Detailed balance tables (pre- and post-matching) and love plot",
+    "Characteristics of matched versus unmatched treated subjects",
+    "Propensity model coefficients and model fit diagnostics (AUC, calibration)",
+    "Sensitivity analysis for unobserved confounding (e.g., E-value)"
+  ],
+  "recommendedNextStage": "protocol"
+}

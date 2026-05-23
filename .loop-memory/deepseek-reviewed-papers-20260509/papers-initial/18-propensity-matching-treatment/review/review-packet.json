@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:30:58.802Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment",
+  "packetHash": "e61dd5dfdd12a946fc8e8aaa20d64d36419501c6dfb1964b8788da5a60c6587f",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 30,
+    "includedFiles": 4,
+    "totalBytes": 96229,
+    "includedBytes": 18560
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3982,
+      "sha256": "633ef4038af72acb0fe207d4bc8c146b5116d714297c0677b3d6e1797e28abd2",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was logistic. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was logistic. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the odds ratio was 1.0000; p=1.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- Logistic-type model detected; explicit separation diagnostic evidence was not found.\n- No explicit collinearity diagnostic evidence was found.\n- No explicit influence diagnostic evidence was found.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 16 artifact(s). The artifact inventory hash is 7c43558692339fbdd544297fe32927bd8d6010b73ca10f20af9e17a7e952f5dc. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 9257,
+      "sha256": "67b386e82e44b94596642aa1e2cade7afdcc8ff7beae85b1900a9cdccbcdedaf",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_4994835730023099325\",\n  \"method\": \"propensity-score-matching\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\",\n    \"age\",\n    \"severity\",\n    \"albumin\",\n    \"sex\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05,\n    \"estimand\": \"ATT\",\n    \"matchRatio\": 1,\n    \"caliper\": 0.4,\n    \"replacement\": false,\n    \"trimThreshold\": 0.01,\n    \"stabilizeWeights\": true,\n    \"treatmentPositiveLevel\": 1,\n    \"treatmentNegativeLevel\": 0\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"method\": \"nearest-neighbor propensity score matching\",\n      \"estimand\": \"ATT\",\n      \"effect_measure\": \"risk difference and odds ratio\",\n      \"estimate\": 0,\n      \"risk_difference\": 0,\n      \"treated_risk\": 0.31343283582089554,\n      \"control_risk\": 0.31343283582089554,\n      \"log_odds_ratio\": 3.885780586188048e-16,\n      \"odds_ratio\": 1.0000000000000004,\n      \"or_ci_low\": 0.4819179677260444,\n      \"or_ci_high\": 2.0750419510576754,\n      \"p_value\": 0.9999999999999992,\n      \"treated_n\": 67,\n      \"control_n\": 67\n    }\n  ],\n  \"diagnostics\": {\n    \"matching\": {\n      \"match_ratio\": 1,\n      \"replacement\": false,\n      \"caliper_logit_sd\": 0.4,\n      \"caliper_logit_width\": 0.3391734340100101,\n      \"treated_total\": 144,\n      \"control_total\": 96,\n      \"matched_treated\": 67,\n      \"matched_controls\": 67,\n      \"matched_pairs\": 67,\n      \"unmatched_treated\": 77,\n      \"control_reuse_max\": 1\n    },\n    \"test\": \"propensity-score-matching\",\n    \"treatment_column\": \"treatment\",\n    \"treatment_positive_level\": 1,\n    \"treatment_negative_level\": 0,\n    \"covariates\": [\n      \"age\",\n      \"severity\",\n      \"albumin\"\n    ],\n    \"exact_covariates\": [\n      \"sex\"\n    ],\n    \"propensity_model\": {\n      \"family\": \"logistic\",\n      \"n_parameters\": 4,\n      \"aic\": 297.07484020817895,\n      \"converged\": true,\n      \"propensity_min\": 0.16469513196238075,\n      \"propensity_max\": 0.9395750181570478\n    },\n    \"missingness\": {\n      \"input_rows\": 240,\n      \"complete_case_rows\": 240,\n      \"excluded_missing_rows\": 0,\n      \"complete_case_fraction\": 1,\n      \"missing_counts\": {\n        \"outcome_binary\": 0,\n        \"treatment\": 0,\n        \"age\": 0,\n        \"severity\": 0,\n        \"albumin\": 0,\n        \"sex\": 0\n      }\n    },\n    \"balance\": {\n      \"max_abs_smd_before\": 0.6509123873374751,\n      \"max_abs_smd_after\": 0.2331414533603148,\n      \"mean_abs_smd_before\": 0.5146556918029893,\n      \"mean_abs_smd_after\": 0.18723542084001188,\n      \"covariates_over_0_1_before\": 3,\n      \"covariates_over_0_1_after\": 3,\n      \"covariate_terms\": 3\n    },\n    \"positivity\": {\n      \"treated_min\": 0.21024702376374668,\n      \"treated_max\": 0.9395750181570478,\n      \"control_min\": 0.16469513196238075,\n      \"control_max\": 0.8821848697024102,\n      \"common_support_lower\": 0.21024702376374668,\n      \"common_support_upper\": 0.8821848697024102,\n      \"common_support_fraction\": 0.9458333333333333\n    },\n    \"artifacts\": {\n      \"propensity_scores\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-scores.csv\",\n      \"propensity_overlap\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-overlap.csv\",\n      \"balance\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/balance.csv\",\n      \"matched_pairs\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/matched-pairs.csv\",\n      \"weights\": null\n    }\n  },\n  \"issues\": [\n    {\n      \"severity\": \"warning\",\n      \"code\": \"PROPENSITY_UNMATCHED_TREATED\",\n      \"message\": \"77 treated rows were unmatched under the caliper/exact-match policy.\",\n      \"evidenceRefs\": [\n        \"matched-pairs.csv\"\n      ]\n    },\n    {\n      \"severity\": \"warning\",\n      \"code\": \"PROPENSITY_RESIDUAL_IMBALANCE\",\n      \"message\": \"3 covariate terms have post-adjustment absolute SMD above 0.10.\",\n      \"evidenceRefs\": [\n        \"balance.csv\"\n      ]\n    },\n    {\n      \"severity\": \"warning\",\n      \"code\": \"FIGURE_QA_WARNING\",\n      \"message\": \"0/0 figure(s) passed; status=warning.\",\n      \"evidenceRefs\": [\n        \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/figure-qa.json\"\n      ]\n    }\n  ],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-config.json\",\n      \"sha256\": \"9416ae1ae6c6fcacd6732a328afbca80b6ca690d9535c0b6c8f17997750ad1f0\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-summary.json\",\n      \"sha256\": \"dfc3c9571e6c137f189a9d07a62a9afd96078cf0cd6945ec71c8c09d03850d08\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/estimates.csv\",\n      \"sha256\": \"062c9507193d7920ced6d9a45ebecdba5e3e57647233390fb5539d73f1d8d361\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/diagnostics.json\",\n      \"sha256\": \"d19812f7c64ee1d3f4e5589a4d28418bcc80c50ff38ee0e35c2e66bdec41d083\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/figures.json\",\n      \"sha256\": \"5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300\"\n    },\n    {\n      \"kind\": \"balance\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/balance.csv\",\n      \"sha256\": \"e0544883cab59fe33c013d7347ecc952f63b3b2aa9a51fdb03e4c97d9201e0b4\"\n    },\n    {\n      \"kind\": \"propensity-scores\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-scores.csv\",\n      \"sha256\": \"dba7b122c1afc9b4aff0458e0eb4fdb19957f0b546f8ee263c6ef3e1a632506b\"\n    },\n    {\n      \"kind\": \"propensity-overlap\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-overlap.csv\",\n      \"sha256\": \"b92beeb73441cc5f77962da1df3be16b022519e534ea77b0ea814567648bf015\"\n    },\n    {\n      \"kind\": \"matched-pairs\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/matched-pairs.csv\",\n      \"sha256\": \"45ae005424354a7f39a262c7774c20a975a1609ef0b31bcbd8226b701a855eef\"\n    },\n    {\n      \"ki"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 2464,
+      "sha256": "d19812f7c64ee1d3f4e5589a4d28418bcc80c50ff38ee0e35c2e66bdec41d083",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 2857,
+      "sha256": "8f826ba995108f22f2f9dfcf6faaa5c4cc6f596f392ce954c980176eb0b525e8",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 798,
+      "sha256": "c2ad2203ab80d62161d651e55346fa97e6172acc43e5f2abef92f16a01fb9823",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 798,
+      "sha256": "c2ad2203ab80d62161d651e55346fa97e6172acc43e5f2abef92f16a01fb9823",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 41,
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2242,
+      "sha256": "62385d95c0a1d5cc206c091815f40d5135109100590f4007b82373b21fe425af",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 10083,
+      "sha256": "b91e5b9241390e1b7736c3f02c775fbaa4ab8241ae0b614fae4894d0599c5868",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 224,
+      "sha256": "2fcede498c213321f22a698e3d1d9d35c46721ef141b26f50595ceb94cfcb9ee",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 1196,
+      "sha256": "e300100c162d5afd3a36c9fa547e82dff0016988eaccdd2f02c3f4294a7d5319",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14905,
+      "sha256": "334df3f644adb84381ac8f9083634adcd8f31fe1a1bc699244275b1f9a29477d",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4319,
+      "sha256": "5804e0f8c972ca57c9834723bc1931434150783bad708d90e27eaa8ff95b02e6",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 812,
+      "sha256": "c7cdf89587a97aad143a7f1949147f526af3673a863bfa3c4a9fdce9976d0d73",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 10221,
+      "sha256": "4b312cb448b4268e2360e7b62ea49a1d1096b60ea3c69b7ce7c4dc4c7956a2c6",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1146,
+      "sha256": "d4c989fd4268cd09b11b1dafd8343440ac3181a93805972f110c8d4b475fcf11",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 9770,
+      "sha256": "5716d3cce979eddd9d7fa94516283942166f530429f0fc6a2201db28d4f2524c",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/balance.csv",
+      "relativePath": "stats-run/balance.csv",
+      "bytes": 541,
+      "sha256": "e0544883cab59fe33c013d7347ecc952f63b3b2aa9a51fdb03e4c97d9201e0b4",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 402,
+      "sha256": "062c9507193d7920ced6d9a45ebecdba5e3e57647233390fb5539d73f1d8d361",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/matched-pairs.csv",
+      "relativePath": "stats-run/matched-pairs.csv",
+      "bytes": 4627,
+      "sha256": "45ae005424354a7f39a262c7774c20a975a1609ef0b31bcbd8226b701a855eef",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-overlap.csv",
+      "relativePath": "stats-run/propensity-overlap.csv",
+      "bytes": 349,
+      "sha256": "b92beeb73441cc5f77962da1df3be16b022519e534ea77b0ea814567648bf015",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-scores.csv",
+      "relativePath": "stats-run/propensity-scores.csv",
+      "bytes": 10594,
+      "sha256": "dba7b122c1afc9b4aff0458e0eb4fdb19957f0b546f8ee263c6ef3e1a632506b",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 724,
+      "sha256": "9416ae1ae6c6fcacd6732a328afbca80b6ca690d9535c0b6c8f17997750ad1f0",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 3406,
+      "sha256": "44a7a17810b08199166b441e86a2668b845a6e939be45c6eb7c6a7ec228fc585",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 471,
+      "sha256": "dfc3c9571e6c137f189a9d07a62a9afd96078cf0cd6945ec71c8c09d03850d08",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3982 bytes, sha256=633ef4038af72acb0fe207d4bc8c146b5116d714297c0677b3d6e1797e28abd2) ---\n# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was logistic. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was logistic. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the odds ratio was 1.0000; p=1.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- Logistic-type model detected; explicit separation diagnostic evidence was not found.\n- No explicit collinearity diagnostic evidence was found.\n- No explicit influence diagnostic evidence was found.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 16 artifact(s). The artifact inventory hash is 7c43558692339fbdd544297fe32927bd8d6010b73ca10f20af9e17a7e952f5dc. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 9257 bytes, sha256=67b386e82e44b94596642aa1e2cade7afdcc8ff7beae85b1900a9cdccbcdedaf) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_4994835730023099325\",\n  \"method\": \"propensity-score-matching\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\",\n    \"age\",\n    \"severity\",\n    \"albumin\",\n    \"sex\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05,\n    \"estimand\": \"ATT\",\n    \"matchRatio\": 1,\n    \"caliper\": 0.4,\n    \"replacement\": false,\n    \"trimThreshold\": 0.01,\n    \"stabilizeWeights\": true,\n    \"treatmentPositiveLevel\": 1,\n    \"treatmentNegativeLevel\": 0\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"method\": \"nearest-neighbor propensity score matching\",\n      \"estimand\": \"ATT\",\n      \"effect_measure\": \"risk difference and odds ratio\",\n      \"estimate\": 0,\n      \"risk_difference\": 0,\n      \"treated_risk\": 0.31343283582089554,\n      \"control_risk\": 0.31343283582089554,\n      \"log_odds_ratio\": 3.885780586188048e-16,\n      \"odds_ratio\": 1.0000000000000004,\n      \"or_ci_low\": 0.4819179677260444,\n      \"or_ci_high\": 2.0750419510576754,\n      \"p_value\": 0.9999999999999992,\n      \"treated_n\": 67,\n      \"control_n\": 67\n    }\n  ],\n  \"diagnostics\": {\n    \"matching\": {\n      \"match_ratio\": 1,\n      \"replacement\": false,\n      \"caliper_logit_sd\": 0.4,\n      \"caliper_logit_width\": 0.3391734340100101,\n      \"treated_total\": 144,\n      \"control_total\": 96,\n      \"matched_treated\": 67,\n      \"matched_controls\": 67,\n      \"matched_pairs\": 67,\n      \"unmatched_treated\": 77,\n      \"control_reuse_max\": 1\n    },\n    \"test\": \"propensity-score-matching\",\n    \"treatment_column\": \"treatment\",\n    \"treatment_positive_level\": 1,\n    \"treatment_negative_level\": 0,\n    \"covariates\": [\n      \"age\",\n      \"severity\",\n      \"albumin\"\n    ],\n    \"exact_covariates\": [\n      \"sex\"\n    ],\n    \"propensity_model\": {\n      \"family\": \"logistic\",\n      \"n_parameters\": 4,\n      \"aic\": 297.07484020817895,\n      \"converged\": true,\n      \"propensity_min\": 0.16469513196238075,\n      \"propensity_max\": 0.9395750181570478\n    },\n    \"missingness\": {\n      \"input_rows\": 240,\n      \"complete_case_rows\": 240,\n      \"excluded_missing_rows\": 0,\n      \"complete_case_fraction\": 1,\n      \"missing_counts\": {\n        \"outcome_binary\": 0,\n        \"treatment\": 0,\n        \"age\": 0,\n        \"severity\": 0,\n        \"albumin\": 0,\n        \"sex\": 0\n      }\n    },\n    \"balance\": {\n      \"max_abs_smd_before\": 0.6509123873374751,\n      \"max_abs_smd_after\": 0.2331414533603148,\n      \"mean_abs_smd_before\": 0.5146556918029893,\n      \"mean_abs_smd_after\": 0.18723542084001188,\n      \"covariates_over_0_1_before\": 3,\n      \"covariates_over_0_1_after\": 3,\n      \"covariate_terms\": 3\n    },\n    \"positivity\": {\n      \"treated_min\": 0.21024702376374668,\n      \"treated_max\": 0.9395750181570478,\n      \"control_min\": 0.16469513196238075,\n      \"control_max\": 0.8821848697024102,\n      \"common_support_lower\": 0.21024702376374668,\n      \"common_support_upper\": 0.8821848697024102,\n      \"common_support_fraction\": 0.9458333333333333\n    },\n    \"artifacts\": {\n      \"propensity_scores\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-scores.csv\",\n      \"propensity_overlap\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-overlap.csv\",\n      \"balance\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/balance.csv\",\n      \"matched_pairs\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/matched-pairs.csv\",\n      \"weights\": null\n    }\n  },\n  \"issues\": [\n    {\n      \"severity\": \"warning\",\n      \"code\": \"PROPENSITY_UNMATCHED_TREATED\",\n      \"message\": \"77 treated rows were unmatched under the caliper/exact-match policy.\",\n      \"evidenceRefs\": [\n        \"matched-pairs.csv\"\n      ]\n    },\n    {\n      \"severity\": \"warning\",\n      \"code\": \"PROPENSITY_RESIDUAL_IMBALANCE\",\n      \"message\": \"3 covariate terms have post-adjustment absolute SMD above 0.10.\",\n      \"evidenceRefs\": [\n        \"balance.csv\"\n      ]\n    },\n    {\n      \"severity\": \"warning\",\n      \"code\": \"FIGURE_QA_WARNING\",\n      \"message\": \"0/0 figure(s) passed; status=warning.\",\n      \"evidenceRefs\": [\n        \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/figure-qa.json\"\n      ]\n    }\n  ],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-config.json\",\n      \"sha256\": \"9416ae1ae6c6fcacd6732a328afbca80b6ca690d9535c0b6c8f17997750ad1f0\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-summary.json\",\n      \"sha256\": \"dfc3c9571e6c137f189a9d07a62a9afd96078cf0cd6945ec71c8c09d03850d08\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/estimates.csv\",\n      \"sha256\": \"062c9507193d7920ced6d9a45ebecdba5e3e57647233390fb5539d73f1d8d361\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/diagnostics.json\",\n      \"sha256\": \"d19812f7c64ee1d3f4e5589a4d28418bcc80c50ff38ee0e35c2e66bdec41d083\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/figures.json\",\n      \"sha256\": \"5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300\"\n    },\n    {\n      \"kind\": \"balance\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/balance.csv\",\n      \"sha256\": \"e0544883cab59fe33c013d7347ecc952f63b3b2aa9a51fdb03e4c97d9201e0b4\"\n    },\n    {\n      \"kind\": \"propensity-scores\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-scores.csv\",\n      \"sha256\": \"dba7b122c1afc9b4aff0458e0eb4fdb19957f0b546f8ee263c6ef3e1a632506b\"\n    },\n    {\n      \"kind\": \"propensity-overlap\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-overlap.csv\",\n      \"sha256\": \"b92beeb73441cc5f77962da1df3be16b022519e534ea77b0ea814567648bf015\"\n    },\n    {\n      \"kind\": \"matched-pairs\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/matched-pairs.csv\",\n      \"sha256\": \"45ae005424354a7f39a262c7774c20a975a1609ef0b31bcbd8226b701a855eef\"\n    },\n    {\n      \"ki\n\n--- ARTIFACT stats-run/diagnostics.json (json, 2464 bytes, sha256=d19812f7c64ee1d3f4e5589a4d28418bcc80c50ff38ee0e35c2e66bdec41d083) ---\n\n\n--- ARTIFACT stats-run/stats-qa.json (json, 2857 bytes, sha256=8f826ba995108f22f2f9dfcf6faaa5c4cc6f596f392ce954c980176eb0b525e8) ---\n"
+}

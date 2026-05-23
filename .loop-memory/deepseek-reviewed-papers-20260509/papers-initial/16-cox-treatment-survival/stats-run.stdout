@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_887636953586609742",
+    "method": "cox-proportional-hazards",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "survival_time",
+      "event",
+      "treatment",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "treatment",
+        "log_hazard_ratio": 0.5235880733030501,
+        "hazard_ratio": 1.688073728604348,
+        "ci_low": 1.14230438397738,
+        "ci_high": 2.4946003474855027,
+        "p_value": 0.008597037671281815
+      },
+      {
+        "term": "age",
+        "log_hazard_ratio": 0.019957010016070732,
+        "hazard_ratio": 1.0201574825302668,
+        "ci_low": 1.0080635564797984,
+        "ci_high": 1.0323965016617953,
+        "p_value": 0.0010385557581535374
+      },
+      {
+        "term": "severity",
+        "log_hazard_ratio": 0.25500854526179956,
+        "hazard_ratio": 1.2904726482523985,
+        "ci_low": 1.0521414698656202,
+        "ci_high": 1.5827906261505438,
+        "p_value": 0.014370523118791481
+      }
+    ],
+    "diagnostics": {
+      "test": "cox-proportional-hazards",
+      "events": 140,
+      "n_predictors": 3,
+      "strata": null
+    },
+    "issues": [
+      {
+        "severity": "warning",
+        "code": "FIGURE_QA_WARNING",
+        "message": "0/0 figure(s) passed; status=warning.",
+        "evidenceRefs": [
+          "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json"
+        ]
+      }
+    ],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-config.json",
+        "sha256": "c42dbb1ddf8150dab484f932c924e8a85a46bdce32b6c5393c82641bbb0d297e"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-summary.json",
+        "sha256": "11b3d978ae97346d403d3c2769cbc2f59e417e641568d44fcc2ff5a0a68f5af8"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/estimates.csv",
+        "sha256": "59d4404f5d5a15c30b2624d7cadfb0d880aafbdfc8a97fea58c9ec1d0c9a269d"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/diagnostics.json",
+        "sha256": "ec44ff5012196168c543caba4be081d84bc022782e107f254ea24eaf70ac6cd1"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figures.json",
+        "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json",
+        "sha256": "d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-report.md",
+        "sha256": "5624688546bdc196c49db837be2ca4aa4219201300b9a12fcc0c0fafae25c317"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-qa.json",
+        "sha256": "59df60b98e9a57f544017b636d60f5a0616a6f2d2805518af17593bf453752df"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}
+

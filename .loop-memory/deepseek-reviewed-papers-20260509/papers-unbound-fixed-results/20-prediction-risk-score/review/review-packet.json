@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:56:46.174Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score",
+  "packetHash": "a1b6a1bd1611fbf4ebdcaad4669e72c77813352960a131a24cbdd77aedfdd558",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 8,
+    "totalBytes": 113287,
+    "includedBytes": 19929
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3843,
+      "sha256": "9433c68b98ea283e085a11720ac42979ff1350e0757d39fac72056c4a2a18b71",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# How well does the risk score discriminate the binary outcome\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How well does the risk score discriminate the binary outcome?\n\nDesign: This was a local prediction-modeling analysis with performance metrics interpreted as internal evidence.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was prediction. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How well does the risk score discriminate the binary outcome? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was a local prediction-modeling analysis with performance metrics interpreted as internal evidence The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was prediction. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For pred_score, AUROC was 0.7451 and Brier score was 0.1925.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is ee078ff1cac291bc9146a70a60fc60dfca69032116e0c1a314d43b00f1dcb6e8. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4062,
+      "sha256": "a31f9246b4d1dac902e08cf9f6b118ab96d26915d97ef1b7fc77310e47cd56ba",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_2902107760555097202\",\n  \"method\": \"prediction-evaluation\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"pred_score\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"pred_score\",\n      \"auroc\": 0.7451159951159951,\n      \"brier_score\": 0.1924638645,\n      \"n\": 240\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"prediction evaluation\",\n    \"roc_points\": 100\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-config.json\",\n      \"sha256\": \"147a1757f98f55246804cb60aa743aba83a1debdf5f88bbc0cbd6ef69b5a0a24\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-summary.json\",\n      \"sha256\": \"097fb22718a2a74fcb58610ae5c928d4fff0d778adac2a927b78c1f1d435f1f2\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/estimates.csv\",\n      \"sha256\": \"e246dc10906b5e41ceb91d8cba4e6af7024726528c5e38c97dc783968525e87c\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/diagnostics.json\",\n      \"sha256\": \"77a6832db264165ed885b6f514cf86cc2039fc6320f783475205a8558eec786e\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json\",\n      \"sha256\": \"284f01271efe2c32d7e721f5ad3a83ba4ea3cd10972404e8f081f3eabc924aca\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png\",\n      \"sha256\": \"327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figure-qa.json\",\n      \"sha256\": \"f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-report.md\",\n      \"sha256\": \"3526ec32bd527482fcd192cf164ff4bc12257fccd868faa5cc418e47c1eb94f7\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-qa.json\",\n      \"sha256\": \"e947c936d346f3ab9d525e325cb27328618718f4ff1c13f038bb30c9f5715260\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 58,
+      "sha256": "77a6832db264165ed885b6f514cf86cc2039fc6320f783475205a8558eec786e",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"prediction evaluation\",\n  \"roc_points\": 100\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1540,
+      "sha256": "e947c936d346f3ab9d525e325cb27328618718f4ff1c13f038bb30c9f5715260",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"6/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3519,
+      "sha256": "f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"roc-curve.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png\",\n      \"title\": \"ROC Curve\",\n      \"caption\": \"Receiver operating characteristic curve.\",\n      \"altText\": \"Receiver operating characteristic curve.\",\n      \"xLabel\": \"False positive rate\",\n      \"yLabel\": \"True positive rate\",\n      \"sourceColumns\": [\n        \"outcome_binary\",\n        \"pred_score\"\n      ],\n      \"byteSize\": 41029,\n      \"sha256\": \"327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521\",\n      \"width\": 1125,\n      \"height\": 750,\n      \"nonBlankRatio\": 0.02459467147056035,\n      \"sampledColorBuckets\": 39,\n      \"status\": \"pass\",\n      \"checks\": [\n        {\n          \"id\": \"path-recorded\",\n          \"status\": \"pass\",\n          \"detail\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png\"\n        },\n        {\n          \"id\": \"file-exists\",\n        "
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3519,
+      "sha256": "f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1178,
+      "sha256": "284f01271efe2c32d7e721f5ad3a83ba4ea3cd10972404e8f081f3eabc924aca",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2210,
+      "sha256": "4bc2d59d4a1277178e1abe6a50db4ae1098398b78a9c2bc26da1afc935ea0f88",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9630,
+      "sha256": "691a6b3db1cab0463915d29ab39895c53e4c48ea1734390664f3632d33f15434",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1478,
+      "sha256": "3f8d483981c90e3a34093a9030f4bbe8c898c3a8ce57a1821a051dded9d2a9fd",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4077,
+      "sha256": "f4ffd82ed89b37317c18a7195a80bd54e79b30d15a1114959d0756254baac1e3",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14550,
+      "sha256": "ceaa85498ce859e72509b8ae21eeed63ae9bc4de3b4403d2ee63acb75c52bd09",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4310,
+      "sha256": "786db014f60ecaafefe60d403f75ff7556609e003cdea7a43143a09e487d57aa",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 795,
+      "sha256": "7d9da13bafb7bb1a5c7176fff7436f0bee708a990039a2943b2249fef4d85747",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9760,
+      "sha256": "41a723311ed3b5adfc4a662f7712c8fbde8bd3515c3d6eb9ed65d0b0a506ac1e",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 926,
+      "sha256": "22ebca8045231b39f769a1c99b2cc8e1ea24b10bd850c8de04c29cde6b556135",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 4305,
+      "sha256": "346ab4607110994365ca22a8f6c351b6fe8871c74d9f5036703f2d6562303b02",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 72,
+      "sha256": "e246dc10906b5e41ceb91d8cba4e6af7024726528c5e38c97dc783968525e87c",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png",
+      "relativePath": "stats-run/roc-curve.png",
+      "bytes": 41029,
+      "sha256": "327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 638,
+      "sha256": "147a1757f98f55246804cb60aa743aba83a1debdf5f88bbc0cbd6ef69b5a0a24",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1586,
+      "sha256": "3526ec32bd527482fcd192cf164ff4bc12257fccd868faa5cc418e47c1eb94f7",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 202,
+      "sha256": "097fb22718a2a74fcb58610ae5c928d4fff0d778adac2a927b78c1f1d435f1f2",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3843 bytes, sha256=9433c68b98ea283e085a11720ac42979ff1350e0757d39fac72056c4a2a18b71) ---\n# How well does the risk score discriminate the binary outcome\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How well does the risk score discriminate the binary outcome?\n\nDesign: This was a local prediction-modeling analysis with performance metrics interpreted as internal evidence.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was prediction. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How well does the risk score discriminate the binary outcome? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was a local prediction-modeling analysis with performance metrics interpreted as internal evidence The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was prediction. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For pred_score, AUROC was 0.7451 and Brier score was 0.1925.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is ee078ff1cac291bc9146a70a60fc60dfca69032116e0c1a314d43b00f1dcb6e8. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4062 bytes, sha256=a31f9246b4d1dac902e08cf9f6b118ab96d26915d97ef1b7fc77310e47cd56ba) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_2902107760555097202\",\n  \"method\": \"prediction-evaluation\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"pred_score\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"pred_score\",\n      \"auroc\": 0.7451159951159951,\n      \"brier_score\": 0.1924638645,\n      \"n\": 240\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"prediction evaluation\",\n    \"roc_points\": 100\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-config.json\",\n      \"sha256\": \"147a1757f98f55246804cb60aa743aba83a1debdf5f88bbc0cbd6ef69b5a0a24\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-summary.json\",\n      \"sha256\": \"097fb22718a2a74fcb58610ae5c928d4fff0d778adac2a927b78c1f1d435f1f2\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/estimates.csv\",\n      \"sha256\": \"e246dc10906b5e41ceb91d8cba4e6af7024726528c5e38c97dc783968525e87c\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/diagnostics.json\",\n      \"sha256\": \"77a6832db264165ed885b6f514cf86cc2039fc6320f783475205a8558eec786e\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json\",\n      \"sha256\": \"284f01271efe2c32d7e721f5ad3a83ba4ea3cd10972404e8f081f3eabc924aca\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png\",\n      \"sha256\": \"327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figure-qa.json\",\n      \"sha256\": \"f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-report.md\",\n      \"sha256\": \"3526ec32bd527482fcd192cf164ff4bc12257fccd868faa5cc418e47c1eb94f7\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-qa.json\",\n      \"sha256\": \"e947c936d346f3ab9d525e325cb27328618718f4ff1c13f038bb30c9f5715260\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 58 bytes, sha256=77a6832db264165ed885b6f514cf86cc2039fc6320f783475205a8558eec786e) ---\n{\n  \"test\": \"prediction evaluation\",\n  \"roc_points\": 100\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1540 bytes, sha256=e947c936d346f3ab9d525e325cb27328618718f4ff1c13f038bb30c9f5715260) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"6/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3519 bytes, sha256=f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"roc-curve.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png\",\n      \"title\": \"ROC Curve\",\n      \"caption\": \"Receiver operating characteristic curve.\",\n      \"altText\": \"Receiver operating characteristic curve.\",\n      \"xLabel\": \"False positive rate\",\n      \"yLabel\": \"True positive rate\",\n      \"sourceColumns\": [\n        \"outcome_binary\",\n        \"pred_score\"\n      ],\n      \"byteSize\": 41029,\n      \"sha256\": \"327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521\",\n      \"width\": 1125,\n      \"height\": 750,\n      \"nonBlankRatio\": 0.02459467147056035,\n      \"sampledColorBuckets\": 39,\n      \"status\": \"pass\",\n      \"checks\": [\n        {\n          \"id\": \"path-recorded\",\n          \"status\": \"pass\",\n          \"detail\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png\"\n        },\n        {\n          \"id\": \"file-exists\",\n        \n\n--- ARTIFACT stats-run/figure-qa.json (json, 3519 bytes, sha256=f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1178 bytes, sha256=284f01271efe2c32d7e721f5ad3a83ba4ea3cd10972404e8f081f3eabc924aca) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2210 bytes, sha256=4bc2d59d4a1277178e1abe6a50db4ae1098398b78a9c2bc26da1afc935ea0f88) ---\n"
+}

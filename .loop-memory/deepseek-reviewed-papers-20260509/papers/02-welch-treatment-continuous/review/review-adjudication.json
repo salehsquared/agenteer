@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:07:44.691Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "split",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "P-value reported as 0.0000 is inaccurate and misleading",
+        "evidenceRefs": [
+          "manuscript.md (Results: p=0.0000)",
+          "stats-run.json (p_value: 3.8287252527457425e-10)"
+        ],
+        "whyItMatters": "Rounding a very small p-value to 0.0000 erases the actual strength of evidence and violates statistical reporting standards (e.g., ASA statement).",
+        "actionableFix": "Report the exact p-value in scientific notation (e.g., p = 3.83e-10) or use p < 0.001 if a threshold reporting is preferred, and explain the choice.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "p-value from stats-run is 3.8287252527457425e-10, not 0.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "major",
+        "category": "study_design",
+        "title": "Observational design lacks any confounder control or treatment-assignment description",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without documentation of how treatment was assigned, whether there was randomization or which confounders were measured, the mean difference cannot be attributed to the treatment. Observational studies require at least a discussion of potential confounding, if not formal adjustment.",
+        "actionableFix": "Add a detailed description of the data source, treatment definition, eligibility criteria, and measured covariates. If confounding is plausible, either adjust for it or explicitly state that the unadjusted difference is purely descriptive and cannot support causal inference.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "literature",
+        "title": "No clinical or scientific context and zero literature citations",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "A standalone analysis without reference to prior work cannot place the findings in a meaningful context. This omission prevents assessment of novelty, plausibility, or clinical relevance.",
+        "actionableFix": "Add a background section with citations to relevant studies, explain the clinical significance of the outcome and treatment, and discuss expected effect sizes.",
+        "reentryPoint": "literature",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "figures",
+        "title": "Boxplot figure has extremely low nonBlankRatio (0.0278), likely unusable",
+        "evidenceRefs": [
+          "figure-qa.json"
+        ],
+        "whyItMatters": "A nonBlankRatio of 0.028 means only 2.8% of the image contains ink. The plot may be illegible, missing, or rendered incorrectly. This undermines the ability to visually assess distributions and potential outliers.",
+        "actionableFix": "Regenerate the figure ensuring the boxplot occupies a substantial portion of the canvas. Set appropriate figure dimensions and scaling. Verify visually that the output is informative.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Group-distribution.png nonBlankRatio=0.027872860635",
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No reporting of missing data or cohort flow from source to analytic sample",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "The manuscript only mentions '240 complete-case records' without describing the original dataset size, exclusion criteria, or missingness patterns. Unreported missingness can introduce selection bias.",
+        "actionableFix": "Provide a cohort flow chart or table showing the number of records at each step (e.g., initial size, exclusions for missing outcome/treatment, other eligibility). Report the proportion missing and any exploration of missingness mechanisms.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "causal_claims",
+        "title": "Incomplete claim‑safety: manuscript does not explicitly state that the difference may be entirely confounded",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The abstract and results sections present the mean difference and p-value without a strong, upfront caveat that confounding is uncontrolled. Readers may misinterpret the result as evidence of a treatment effect.",
+        "actionableFix": "Add a prominent statement in the abstract and results clarifying that the study design does not support causal interpretation and that unmeasured confounders could explain the observed difference.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No confidence interval for the mean difference",
+        "evidenceRefs": [
+          "manuscript.md (Results only reports mean difference and p)",
+          "stats-run.json (no CI field in estimates)"
+        ],
+        "whyItMatters": "A point estimate without a confidence interval prevents assessment of precision and clinical/practical significance.",
+        "actionableFix": "Compute and report the 95% confidence interval for the mean difference (e.g., from the t-distribution or by bootstrapping).",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Raw data not provided; analysis cannot be independently reproduced",
+        "evidenceRefs": [
+          "manuscript.md (claims reproducibility but no data)",
+          "stats-run directory (only summary artifacts, no raw row-level file)"
+        ],
+        "whyItMatters": "Full reproducibility requires access to the raw dataset or a synthetic equivalent, especially when PHI-sensitive content is allowed.",
+        "actionableFix": "Include the raw data file (or a de-identified/synthetic version) in the run directory, or provide a script that generates the exact same data and results.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Cohort construction and variable definitions not described",
+        "evidenceRefs": [
+          "manuscript.md (no details on eligibility, source, or definition of treatment and outcome_cont)"
+        ],
+        "whyItMatters": "Without a clear description of the population, inclusion/exclusion criteria, and variable coding, the analysis cannot be properly interpreted or generalized.",
+        "actionableFix": "Add a subsection under Methods describing the data source, how the cohort of 240 records was obtained, and definitions of the treatment and outcome variables.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "P-value is reported as 0.0000 instead of exact value or <0.0001",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Reporting p=0.0000 misrepresents the statistical result (actual p=3.83e-10). This violates standard reporting guidelines and could imply rounding to zero, which is inaccurate.",
+        "actionableFix": "Report the exact p-value to a few significant digits (e.g., p < 0.0001) or use the scientific notation 3.8e-10.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "stats-run.json estimates[0].p_value = 3.8287252527457425e-10",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Group means reported without standard deviations",
+        "evidenceRefs": [
+          "manuscript.md (no SDs)",
+          "stats-run.json (only means, no SDs)"
+        ],
+        "whyItMatters": "Standard deviations are needed to judge variability, effect size, and potential outliers.",
+        "actionableFix": "Include standard deviations for each group alongside the means, and consider adding the pooled SD or group-specific SDs.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "minor",
+        "category": "data_plausibility",
+        "title": "Boxplot may be unreadable due to extremely low non-blank pixel ratio",
+        "evidenceRefs": [
+          "figure-qa.json (group-distribution.png nonBlankRatio: 0.027872860635)"
+        ],
+        "whyItMatters": "A figure that is 97% blank likely fails to convey the distribution of the outcome, undermining its intended purpose.",
+        "actionableFix": "Inspect the figure visually; if blank, regenerate the boxplot with correct scaling and layout. If the ratio is a false alarm, document the QA heuristic and its limitations.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "Open the image and verify that the plot occupies a reasonable portion of the canvas.",
+        "confidence": 0.7,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Inconsistency: manuscript claims unresolved methods review issues, but QA passes",
+        "evidenceRefs": [
+          "manuscript.md (Limitations: 'deterministic methods checks identified issues that require review')",
+          "stats-qa.json (status: pass, 9/9 passed)",
+          "stats-run.json (issues: [], warnings: [], errors: [])"
+        ],
+        "whyItMatters": "The contradictory statements create confusion about the trustworthiness of the analysis.",
+        "actionableFix": "Align the manuscript text with the actual QA status. If no issues remain, remove the boilerplate about unresolved issues.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "info",
+        "category": "reproducibility",
+        "title": "No accessible raw data, analysis code, or containerization for external reproducibility",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "The run directory contains local artifacts, but without code and data sharing, independent verification is impossible. For a final‑stage manuscript, this limits trust in the results.",
+        "actionableFix": "Provide the analysis script, data (or synthetic version), and environment specification. At minimum, include a computational supplement with enough detail to rerun the analysis.",
+        "reentryPoint": "qa",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [
+      "Reviewer verdicts differed: block, revise."
+    ],
+    "reentryPoint": "dataset_feasibility",
+    "nextAction": "Route back to dataset_feasibility with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/review/review-adjudication.json"
+  }
+}

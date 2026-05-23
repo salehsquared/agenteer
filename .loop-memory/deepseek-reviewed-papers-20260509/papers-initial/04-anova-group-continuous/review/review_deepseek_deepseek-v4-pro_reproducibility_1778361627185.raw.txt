@@ -1,0 +1,133 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript fails to report the primary ANOVA results, contains false contradictory statements, and lacks essential descriptive statistics and effect sizes. The analysis is unbound and exploratory, which must be clearly stated. These are blocking issues for publication.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Primary ANOVA result not reported",
+      "evidenceRefs": [
+        "stats-run.json::estimates",
+        "manuscript.md::Results"
+      ],
+      "whyItMatters": "The manuscript claims to answer a prespecified question but the Results section only states the sample size, omitting the F-test, p-value, and group differences. This makes the report essentially empty.",
+      "actionableFix": "Add a concise Results section reporting the F-statistic, degrees of freedom, p-value, and descriptive statistics by group. Include a table or text.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare stats-run.json estimate for 'C(group)' with reported text.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Contradictory limitations statements",
+      "evidenceRefs": [
+        "manuscript.md::Limitations",
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The Limitations section claims 'No reader-facing paper/manuscript artifact was found' and 'No estimate-like records were available for p-value/effect-size checks', yet the manuscript and stats-run.json clearly exist. These false statements undermine credibility.",
+      "actionableFix": "Remove or correct these statements. If the limitations refer to missing external artifacts, clarify.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the limitations are consistent with the accompanying artifacts.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No descriptive statistics by group",
+      "evidenceRefs": [
+        "manuscript.md::Results",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without group means, SDs, and sample sizes, readers cannot interpret the ANOVA result or assess effect sizes.",
+      "actionableFix": "Provide a table with N, mean, SD, and possibly CI per group.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Request the table; existence can be checked in output.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No effect size reported",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "ANOVA output includes sum of squares but no proportion of variance explained (eta-squared) or other effect size. This limits interpretation.",
+      "actionableFix": "Compute and report eta-squared or omega-squared.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Eta-squared = 37.556 / (37.556+3093.747) = 0.012. Verify.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Unbound exploratory analysis posture not clearly communicated",
+      "evidenceRefs": [
+        "stats-qa.json::binding-status",
+        "stats-qa.json::result-posture",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The analysis was not pre-registered or bound to a method-selection artifact, so it is exploratory. The manuscript's title and abstract imply a prespecified question, which conflicts with this posture.",
+      "actionableFix": "Explicitly label the analysis as exploratory and unregistered in the abstract and conclusions, and adjust claim language accordingly.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that abstract and conclusion mention unbound/exploratory status.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "missingness",
+      "title": "Incomplete missing data reporting",
+      "evidenceRefs": [
+        "manuscript.md::Cohort Construction",
+        "manuscript.md::Limitations"
+      ],
+      "whyItMatters": "Complete-case analysis can bias results if missingness is not random; no information on missingness patterns or sensitivity analysis is provided.",
+      "actionableFix": "Report number and characteristics of excluded cases, and consider multiple imputation or sensitivity analysis.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "No confidence intervals for group means",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Confidence intervals convey precision better than p-values alone.",
+      "actionableFix": "Compute and report 95% CIs for group means or for differences, if post-hoc tests are planned.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify CIs match model output.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No literature review or context",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "An exploratory local analysis does not require extensive literature, but a brief mention of prior similar studies or expected effects would help interpretation.",
+      "actionableFix": "Add a short paragraph referencing any known literature on the outcome-group relationship, or state that no prior studies were found.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.5
+    }
+  ],
+  "missingEvidence": [
+    "Full figure-qa.json content (truncated in provided artifacts)",
+    "Raw data and analysis script for full reproducibility assessment",
+    "Descriptive statistics by group (N, mean, SD) not found in any artifact"
+  ],
+  "recommendedNextStage": "manuscript"
+}

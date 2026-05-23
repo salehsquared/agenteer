@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "reviewPanel": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:08:10.404Z",
+    "panelId": "review_panel_7046968d8742",
+    "stage": "final",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile",
+    "autonomy": "aggressive",
+    "budget": {
+      "maxPerCallUsd": 0.12,
+      "maxPanelUsd": 0.3,
+      "maxStudyLoopUsd": 5
+    },
+    "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-packet.json",
+    "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-redaction-report.json",
+    "reviewers": [
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T22:05:22.194Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778364322194",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:methods",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "clinical methods and study-design reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The manuscript fails to report the distributions it aims to describe, lacking key results in text. Variables are undefined, no literature context, empty diagnostics, and missing figure integration. These issues prevent any interpretation and must be addressed before resubmission.",
+        "findings": [
+          {
+            "id": "R1",
+            "severity": "blocker",
+            "category": "reporting",
+            "title": "Distributions not reported in the manuscript",
+            "evidenceRefs": [
+              "manuscript.md results section"
+            ],
+            "whyItMatters": "The primary study objective is to report distributions, but the results section only states the sample size, making the manuscript incomplete and non-contributory.",
+            "actionableFix": "In the Results section, include a table or text summarizing the mean, SD, median, IQR, and range for each variable, as found in stats-run.json. Also provide a narrative description of the distributions.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check that Results section contains summary statistics for each variable.",
+            "confidence": 0.99
+          },
+          {
+            "id": "R2",
+            "severity": "blocker",
+            "category": "variables",
+            "title": "Variables lack clinical definitions and units",
+            "evidenceRefs": [
+              "manuscript.md variables section",
+              "stats-run.json variables list"
+            ],
+            "whyItMatters": "Severity, outcome_cont, albumin, and BMI are not defined. Without units and clinical meaning (e.g., albumin in g/dL, severity scale used, outcome_cont described), readers cannot interpret the numeric ranges. This prevents any use of the data.",
+            "actionableFix": "Define each variable: specify units (e.g., BMI in kg/m², albumin in g/dL), describe the severity scale and its clinical interpretation, and explain what outcome_cont measures (e.g., hospital length of stay, lab value).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check that each variable has a clear definition and units in the manuscript.",
+            "confidence": 0.99
+          },
+          {
+            "id": "R3",
+            "severity": "major",
+            "category": "literature",
+            "title": "No literature context or comparison",
+            "evidenceRefs": [
+              "manuscript.md no citations"
+            ],
+            "whyItMatters": "Descriptive statistics are more meaningful when compared to known norms or previous studies. The manuscript provides no references to clinical literature, so the novelty and relevance of these distributions are unclear.",
+            "actionableFix": "Add a literature review section or discussion that references expected values for these variables in the target population. Compare the observed distributions to published norms.",
+            "reentryPoint": "literature",
+            "deterministicVerification": "Verify that at least one external reference is cited and compared.",
+            "confidence": 0.95
+          },
+          {
+            "id": "R4",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "Empty diagnostics file conflicts with claimed quality control",
+            "evidenceRefs": [
+              "stats-run/diagnostics.json empty",
+              "manuscript.md quality control section"
+            ],
+            "whyItMatters": "The manuscript claims 'Model diagnostics... were reviewed' but the diagnostics.json is empty. This suggests the claimed review either did not occur or the artifact is missing. The integrity of the quality control is questionable.",
+            "actionableFix": "Either perform and document relevant diagnostic checks (e.g., distribution summaries, outlier checks) and populate diagnostics.json, or remove the unsupported claim from the manuscript.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Inspect diagnostics.json: if non-empty, document; if still empty, remove claim.",
+            "confidence": 1
+          },
+          {
+            "id": "R5",
+            "severity": "major",
+            "category": "figures",
+            "title": "Figure QA missing and figures not integrated into manuscript",
+            "evidenceRefs": [
+              "stats-run/figure-qa.json empty",
+              "stats-run/figures.json",
+              "manuscript.md no figure mention"
+            ],
+            "whyItMatters": "Two figures (histograms and missingness bar) were generated but the figure QA file is empty, meaning we cannot assess their quality, proper labeling, or accessibility. Moreover, the manuscript does not reference or describe them, so they are orphaned artifacts.",
+            "actionableFix": "Run figure QA checks (readability, labeling, alt text) and fill figure-qa.json. Reference and discuss the figures in the manuscript, and ensure the histograms are described in the Results.",
+            "reentryPoint": "qa",
+            "deterministicVerification": "Check that figure-qa.json contains results of checks, and manuscript includes figure references and captions.",
+            "confidence": 0.9
+          },
+          {
+            "id": "R6",
+            "severity": "minor",
+            "category": "cohort",
+            "title": "Complete-case labeling is inconsistent with zero missingness",
+            "evidenceRefs": [
+              "stats-run.json missing fractions are 0",
+              "manuscript.md cohort construction"
+            ],
+            "whyItMatters": "The manuscript refers to a 'complete-case analytic sample' but all analyzed variables have 0% missingness. Either there were exclusions based on other variables or no exclusions occurred. This inconsistency may indicate undisclosed exclusion criteria.",
+            "actionableFix": "Clarify whether any records were excluded before analysis and if so, on what basis. If no exclusions, just state the sample size without 'complete-case' unless the dataset inherently had missing values elsewhere.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check that cohort description matches the data's missingness pattern.",
+            "confidence": 0.8
+          },
+          {
+            "id": "R7",
+            "severity": "minor",
+            "category": "reproducibility",
+            "title": "Analysis method description is too vague to replicate dataset-independent",
+            "evidenceRefs": [
+              "manuscript.md methods",
+              "stats-run.json method"
+            ],
+            "whyItMatters": "The method is described only as 'descriptive, within the descriptive method family'. For someone to repeat this analysis on a different dataset or even to understand the exact computations (e.g., how medians, IQRs were computed, software used), more detail is needed.",
+            "actionableFix": "Specify the software and functions used, and list the exact statistics computed. Even for descriptive, include details like 'summary statistics computed using Python pandas .describe()' or equivalent.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check that a future user could reproduce the table without ambiguity.",
+            "confidence": 0.85
+          },
+          {
+            "id": "R8",
+            "severity": "info",
+            "category": "data_plausibility",
+            "title": "Potential extreme values in distributions not discussed",
+            "evidenceRefs": [
+              "stats-run.json min/max values, low and high ends"
+            ],
+            "whyItMatters": "Variables like severity (min 0, max 4.298) and outcome_cont (min 13.415, max 35.25) show wide ranges; their distributions might have outliers. No comment on plausibility or clinical significance of extremes, which is important for descriptive analysis.",
+            "actionableFix": "Add a brief outlier check (e.g., IQR rule) and comment on whether these extremes are clinically plausible or warrant further investigation.",
+            "reentryPoint": "exploration",
+            "deterministicVerification": "Verify that the manuscript mentions any extreme values and their handling.",
+            "confidence": 0.7
+          }
+        ],
+        "missingEvidence": [
+          "Actual descriptive statistics in manuscript body (table or text)",
+          "Variable definitions and units",
+          "Literature references for clinical context",
+          "Diagnostic check documentation (non-empty diagnostics.json)",
+          "Figure QA details (figure-qa.json non-empty)",
+          "Data source description and inclusion/exclusion criteria"
+        ],
+        "recommendedNextStage": "manuscript",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review_deepseek_deepseek-v4-pro_methods_1778364322194.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review_deepseek_deepseek-v4-pro_methods_1778364322194.json"
+      },
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T22:05:22.220Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778364322220",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:reproducibility",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "statistical reporting and reproducibility reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The manuscript fails to present the descriptive statistics that are the study's primary objective. The Results section contains only sample size; no means, SDs, medians, or ranges are reported. The abstract likewise omits these. Cohort construction is not documented, diagnostics are absent, figures are not accessible, and unsupported claims about methods review persist. The manuscript cannot be promoted in its current state.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "reporting",
+            "title": "Manuscript does not report descriptive statistics for any variable",
+            "evidenceRefs": [
+              "manuscript.md: Results section",
+              "stats-run/stats-run.json: estimates array"
+            ],
+            "whyItMatters": "The research question is 'What are the distributions of age, severity, BMI, albumin, and continuous outcome?'. The manuscript does not answer it, making the study uninformative and unpromotable.",
+            "actionableFix": "Add a table or text summarising the distributional characteristics (mean, SD, median, IQR, range) for each variable in the Results section and update the Abstract to reflect key numbers.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "The stats-run.json contains the required numbers; cross-check that the manuscript reproduces them exactly.",
+            "confidence": 0.99
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "cohort",
+            "title": "No documentation of cohort construction or exclusion criteria",
+            "evidenceRefs": [
+              "manuscript.md: Cohort Construction paragraph",
+              "stats-run/stats-run.json: no record of initial N or exclusion steps"
+            ],
+            "whyItMatters": "Without knowing how the 240 complete-case observations were derived, reproducibility and assessment of selection bias are impossible.",
+            "actionableFix": "Provide a cohort flowchart or table listing initial record counts, exclusion counts per criterion, and final analytic N. Include this in the manuscript or an appendix.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": "Compare the final N=240 against a data provenance log.",
+            "confidence": 0.95
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "Claim of reviewed diagnostics is unsupported; diagnostics file is empty",
+            "evidenceRefs": [
+              "manuscript.md: Quality Control section",
+              "stats-run/diagnostics.json: {}"
+            ],
+            "whyItMatters": "The manuscript states that model diagnostics, missingness checks, and plausibility checks were reviewed, but no diagnostic output exists. This is misleading and may hide data issues.",
+            "actionableFix": "Either present the diagnostic outputs (e.g., distribution plots, missing data patterns, extreme value checks) or remove the claim that such checks were performed.",
+            "reentryPoint": "qa",
+            "deterministicVerification": "Check that diagnostics.json is non-empty and contains interpretable results.",
+            "confidence": 0.99
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "figures",
+            "title": "Figures not accessible for review; figure QA file appears empty",
+            "evidenceRefs": [
+              "stats-run/figures.json",
+              "stats-run/figure-qa.json"
+            ],
+            "whyItMatters": "The package includes three figure artifacts, but the image files and their QA results were not supplied in a reviewable form. Figure correctness cannot be verified.",
+            "actionableFix": "Include the actual image files in the review packet and ensure figure-qa.json contains actionable quality checks (e.g., readability, axis labeling, caption presence).",
+            "reentryPoint": "qa",
+            "deterministicVerification": "Examine image files for blankness, axis labels, and consistency with stats-run.json estimates.",
+            "confidence": 0.9
+          },
+          {
+            "id": "F5",
+            "severity": "major",
+            "category": "reporting",
+            "title": "Unsubstantiated mention of 'advisory issues' from methods review",
+            "evidenceRefs": [
+              "manuscript.md: Quality Control section",
+              "stats-run/stats-qa.json: only one warning (unrelated to advisory issues)"
+            ],
+            "whyItMatters": "Stating that 'methods review found advisory issues' without listing them undermines transparency and may mask actual problems.",
+            "actionableFix": "Either enumerate the specific advisory issues found or delete the sentence. If issues exist, they must be described and their impact assessed.",
+            "reentryPoint": "human_review",
+            "deterministicVerification": "Check that the manuscript's claim matches a documented list of issues in a QA file.",
+            "confidence": 0.99
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "Abstract wording is generic and does not reflect actual numeric findings",
+            "evidenceRefs": [
+              "manuscript.md: Abstract"
+            ],
+            "whyItMatters": "An abstract should succinctly convey key results. The current abstract mentions no statistics, making it inaccurate.",
+            "actionableFix": "Rewrite the abstract to include selected descriptive statistics (e.g., mean age, mean BMI) that answer the research question.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "QA warning about p-values is irrelevant for a purely descriptive study",
+            "evidenceRefs": [
+              "stats-run/stats-qa.json: check id='uncertainty-and-pvalue-context'"
+            ],
+            "whyItMatters": "The presence of a warning about p-value interpretation in a study that computes no p-values suggests a misapplied QA check, potentially confusing readers.",
+            "actionableFix": "Review the QA check logic; for descriptive studies, the check should not fire or should clarify that no p-values were produced.",
+            "reentryPoint": "qa",
+            "deterministicVerification": "Confirm that the stats-run output contains no p‑values.",
+            "confidence": 0.85
+          },
+          {
+            "id": "F8",
+            "severity": "minor",
+            "category": "literature",
+            "title": "No clinical or literature context for the reported distributions",
+            "evidenceRefs": [
+              "manuscript.md: Discussion, Limitations"
+            ],
+            "whyItMatters": "Without any reference to typical values or prior studies, readers cannot assess whether the observed distributions are plausible or noteworthy.",
+            "actionableFix": "Add a brief literature comparison (e.g., expected albumin ranges in this population) or state that no comparable benchmarks exist.",
+            "reentryPoint": "literature",
+            "deterministicVerification": null,
+            "confidence": 0.7
+          }
+        ],
+        "missingEvidence": [
+          "Cohort construction details (inclusion/exclusion criteria, flow chart)",
+          "Actual image files for generated figures",
+          "Content of diagnostics (currently empty)",
+          "List of advisory issues identified by methods review",
+          "Any external validation or context for observed variable ranges"
+        ],
+        "recommendedNextStage": "manuscript",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364322220.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364322220.json"
+      }
+    ],
+    "status": "block",
+    "costEstimateUsd": 0.052314,
+    "failureCount": 0,
+    "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-panel.json"
+  }
+}

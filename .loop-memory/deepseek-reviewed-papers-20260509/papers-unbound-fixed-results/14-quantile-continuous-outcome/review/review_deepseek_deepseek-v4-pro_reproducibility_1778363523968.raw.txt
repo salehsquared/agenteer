@@ -1,0 +1,111 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is unbound and exploratory but reported with confirmatory language, missing variable definitions, missingness handling, and model description. These issues preclude interpretation and publication.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Unbound exploratory analysis presented as confirmatory",
+      "evidenceRefs": ["stats-run.json (binding.status, resultPosture)", "stats-qa.json (binding-status)"],
+      "whyItMatters": "The run is not bound to a method-selection artifact or analysis spec, so p-values and CIs cannot be interpreted as confirmatory. Presenting them as precise (p=0.0000) misleads about the strength of evidence.",
+      "actionableFix": "Either bind the analysis to a pre-specified protocol (method-selection + AnalysisSpec) and rerun, or clearly label the entire report as exploratory and suppress p-values/overinterpretation.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json binding.status is 'unbound'; resultPosture.supports includes only 'local data debugging', not paper-ready conclusions.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Model family misreported as 'linear' instead of quantile regression",
+      "evidenceRefs": ["manuscript.md (Methods: 'The detected model family was linear.')", "stats-run.json (method: 'quantile-regression')"],
+      "whyItMatters": "Readers may assume ordinary least squares regression, leading to misinterpretation of assumptions, estimates, and standard errors.",
+      "actionableFix": "Replace 'linear' with 'quantile regression (median)' in the manuscript's methods and specify the quantile estimated.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Manuscript says 'linear', stats-run.json says 'quantile-regression'.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Missingness handling not reported",
+      "evidenceRefs": ["manuscript.md (Cohort Construction, Limitations)", "stats-run.json (rowCount: 240, completeCaseN: 240)"],
+      "whyItMatters": "Complete-case analysis may introduce bias if missingness is non-random. No information on exclusion counts or patterns is provided.",
+      "actionableFix": "Add a missing data flow diagram or table, report missingness per variable, consider sensitivity analysis (e.g., multiple imputation).",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "No missingness table or counts found in artifacts.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variable definitions and units missing",
+      "evidenceRefs": ["manuscript.md (Variables)", "stats-run.json (variables list only)"],
+      "whyItMatters": "Interpretation of effect sizes (e.g., treatment estimate 1.31, age 0.14) is impossible without knowing measurement units and variable meanings.",
+      "actionableFix": "Provide explicit definitions, units, and coding schemes for outcome, treatment, age, severity. Include descriptive statistics.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Manuscript states 'The primary outcome, exposure, and covariates were not fully encoded in the text report'.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Standard error estimation method and model assumptions unstated",
+      "evidenceRefs": ["diagnostics.json", "stats-run.json (no SE method field)"],
+      "whyItMatters": "Quantile regression inference requires correct standard error estimation (e.g., bootstrap, rank inversion). Without knowing the method, the validity of p-values and CIs cannot be assessed.",
+      "actionableFix": "Document the standard error computation method used (e.g., from statsmodels default), justify its appropriateness, and consider providing bootstrap confidence intervals as sensitivity.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "No parameter or documentation in diagnostics.json or stats-run.json describing the SE method.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "P-values reported as exactly 0.0000",
+      "evidenceRefs": ["manuscript.md (Results: p=0.0000 for const and severity)"],
+      "whyItMatters": "P-values are never exactly zero; reporting '0.0000' suggests perfect certainty, which is misleading. Scientific notation or 'p < 0.0001' is more accurate.",
+      "actionableFix": "Replace 'p=0.0000' with actual p-value in scientific notation (e.g., p = 3.7e-19) or p < 0.0001 as appropriate.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json shows p_value: 3.714334661542577e-19 for const, not zero.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Self-referential limitations contain placeholder/inaccurate statements",
+      "evidenceRefs": ["manuscript.md (Limitations)"],
+      "whyItMatters": "The document says 'No reader-facing paper/manuscript artifact was found' and 'No reader-facing report was available for claim alignment' while being the manuscript itself. This undermines credibility.",
+      "actionableFix": "Remove or revise those sentences to reflect the actual presence of the manuscript. Ensure limitations are about the study, not metadata of the review process.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Manifestly contradictory: manuscript.md exists but the text denies its existence.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No literature context or references provided",
+      "evidenceRefs": ["manuscript.md (no citations)"],
+      "whyItMatters": "A complete research report should situate the analysis within existing knowledge, even if only to note it is a local exploration without comparative benchmarks.",
+      "actionableFix": "Add a brief introduction or discussion referencing prior work on similar outcomes or treatments, or explicitly state the analysis is not compared to external literature.",
+      "reentryPoint": "literature",
+      "deterministicVerification": "No references section or in-text citations found.",
+      "confidence": 0.99
+    }
+  ],
+  "missingEvidence": [
+    "Missingness table or flow diagram showing exclusions",
+    "Variable definitions, units, and coding",
+    "Method for standard error estimation in quantile regression",
+    "Pre-specified analysis plan (method-selection + AnalysisSpec)",
+    "Influence diagnostics or outlier analysis",
+    "Comparison to ordinary linear regression for reader context"
+  ],
+  "recommendedNextStage": "protocol"
+}

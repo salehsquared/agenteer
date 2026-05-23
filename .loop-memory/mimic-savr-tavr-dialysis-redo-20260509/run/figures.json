@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T23:19:46.369031+00:00",
+  "figures": [
+    {
+      "figureId": "figure-1-mace-by-group",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/figure-1-mace-by-group.png",
+      "kind": "bar",
+      "title": "One-year MACE by valve strategy and dialysis group",
+      "caption": "MACE is death, MI, or stroke within 365 days in available same-hospital/death-date follow-up.",
+      "altText": "Horizontal bar chart of one-year MACE proportions by valve strategy and dialysis group.",
+      "xLabel": "MACE proportion",
+      "yLabel": "Valve/dialysis group",
+      "sourceColumns": [
+        "mace_n",
+        "n",
+        "valve_strategy",
+        "dialysis_group"
+      ]
+    },
+    {
+      "figureId": "figure-2-mortality-horizons",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/figure-2-mortality-horizons.png",
+      "kind": "line",
+      "title": "Mortality horizons by dialysis group",
+      "caption": "Mortality horizons use MIMIC death-date availability and are not national follow-up.",
+      "altText": "Line chart of death proportions at 30 days, 1 year, 3 years, 5 years, and 10 years by dialysis group.",
+      "xLabel": "Days after index discharge",
+      "yLabel": "Mortality proportion",
+      "sourceColumns": [
+        "death_n",
+        "n",
+        "dialysis_group",
+        "horizon_days"
+      ]
+    },
+    {
+      "figureId": "figure-3-cox-forest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/figure-3-cox-forest.png",
+      "kind": "forest",
+      "title": "Adjusted dialysis-group hazard ratios",
+      "caption": "Cox models use available same-hospital/death-date timelines and complete-case covariates.",
+      "altText": "Forest plot of dialysis-group hazard ratios for time-to-event outcomes.",
+      "xLabel": "Hazard ratio",
+      "yLabel": "Outcome and dialysis term",
+      "sourceColumns": [
+        "hazard_ratio",
+        "ci_low",
+        "ci_high",
+        "term",
+        "outcome"
+      ]
+    },
+    {
+      "figureId": "figure-4-propensity-love-plot",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run/figure-4-propensity-love-plot.png",
+      "kind": "love_plot",
+      "title": "Propensity balance for HD/unspecified vs non-dialysis",
+      "caption": "Balance is shown for numeric covariates only in the matched sensitivity analysis.",
+      "altText": "Love plot comparing absolute standardized mean differences before and after matching.",
+      "xLabel": "Absolute standardized mean difference",
+      "yLabel": "Covariate",
+      "sourceColumns": [
+        "smd_before",
+        "smd_after",
+        "covariate"
+      ]
+    }
+  ]
+}

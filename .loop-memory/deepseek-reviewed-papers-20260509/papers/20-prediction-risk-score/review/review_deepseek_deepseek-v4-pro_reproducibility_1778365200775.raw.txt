@@ -1,0 +1,135 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript inadequately describes the risk score derivation, lacks uncertainty estimates, calibration, handling of missing data, and reproducibility; performance claims are not supported without these details.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "method_choice",
+      "title": "Risk score derivation not described; possible apparent performance evaluation",
+      "evidenceRefs": [
+        "manuscript.md Variables section: 'Exposure or predictor: pred_score' with no origin",
+        "stats-run.json estimates only show term 'pred_score' without origin"
+      ],
+      "whyItMatters": "If pred_score is from a model fit to these same 240 records, the reported AUROC is apparent and overoptimistic, invalidating generalizability and internal evidence claims.",
+      "actionableFix": "Clarify whether pred_score is an external pre-existing score or derived from the same data. If derived, use cross-validation or an independent test set and report validated performance. If pre-existing, state source.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No confidence intervals or standard errors for AUROC and Brier score",
+      "evidenceRefs": [
+        "stats-run.json estimates: only point values for auroc and brier_score",
+        "manuscript results: 'AUROC was 0.7451 and Brier score was 0.1925'"
+      ],
+      "whyItMatters": "Without CIs, the precision of performance estimates is unknown; the point estimate alone cannot support robust conclusions.",
+      "actionableFix": "Compute and report 95% confidence intervals for AUROC (e.g., DeLong method) and Brier score (e.g., bootstrap). Include in manuscript results.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No calibration plot or calibration metrics beyond Brier",
+      "evidenceRefs": [
+        "diagnostics.json: only 'roc_points: 100'; no calibration items",
+        "manuscript no mention of calibration"
+      ],
+      "whyItMatters": "A risk score may discriminate well but be miscalibrated; Brier alone is insufficient. Calibration is essential for clinical utility.",
+      "actionableFix": "Provide calibration plot, calibration-in-the-large, calibration slope, and ideally a calibration test (e.g., Hosmer-Lemeshow or Spiegelhalter). Add to diagnostics or manuscript.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Outcome prevalence and pred_score distribution not reported",
+      "evidenceRefs": [
+        "manuscript results: only sample size and metrics",
+        "no summary statistics for outcome_binary or pred_score"
+      ],
+      "whyItMatters": "Prevalence affects interpretation of Brier score (e.g., null model Brier) and clinical context. Distribution of pred_score influences calibration interpretation.",
+      "actionableFix": "Report the proportion of positive outcomes and summary statistics (min, max, mean, sd) of pred_score.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No description of missing data mechanism or completeness pattern",
+      "evidenceRefs": [
+        "manuscript: 'complete-case sample size was 240' but no missingness analysis",
+        "stats-run.json: rowCount=240, completeCaseN=240, no missingness info"
+      ],
+      "whyItMatters": "If missing data are non-ignorable, complete-case analysis can bias performance estimates. The limitation statement is generic and not evidence-based.",
+      "actionableFix": "Describe original sample size, missingness per variable, pattern, and either justify complete-case (e.g., low missingness <5%) or use appropriate handling (multiple imputation), with sensitivity analysis.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "No analysis code or software details to reproduce the evaluation",
+      "evidenceRefs": [
+        "manuscript Methods: only 'prediction-evaluation' method family, no code/software",
+        "stats-run.json lists artifacts but no source code files"
+      ],
+      "whyItMatters": "Without code, the results are not verifiable, undermining the reproducibility claim in the manuscript.",
+      "actionableFix": "Provide the exact computational script (e.g., R/Python) with seeds (if any) and report software versions (e.g., pROC, scikit-learn). Include as supplementary artifact or appendix.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No comparison to existing risk scores or benchmarks",
+      "evidenceRefs": [
+        "manuscript Introduction and Discussion lack any references"
+      ],
+      "whyItMatters": "Even internal evidence should be contextualized to show its novelty and validity relative to known scores for the same outcome.",
+      "actionableFix": "Add a brief literature review of relevant risk scores and their reported performance; discuss how the local finding compares.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "No checks reported for predictor distribution or outcome coding",
+      "evidenceRefs": [
+        "stats-qa.json checks do not include data range or coding verification",
+        "manuscript no data description beyond variable list"
+      ],
+      "whyItMatters": "Unusual values (e.g., negative probabilities, non-0/1 outcome) could distort performance metrics.",
+      "actionableFix": "Perform and report basic data quality checks: range of pred_score, count of outcome levels, missingness, and any irregularities.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Derivation or source of the risk score (pred_score)",
+    "Confidence intervals for AUROC and Brier score",
+    "Calibration plot and calibration metrics (intercept, slope)",
+    "Outcome prevalence and distribution of pred_score",
+    "Original dataset size and missing data pattern",
+    "Analysis code and software version",
+    "Literature references for relevant risk scores"
+  ],
+  "recommendedNextStage": "manuscript"
+}

@@ -1,0 +1,98 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript contains critical omissions (missing covariate results), inappropriate diagnostic tests, a mismatch between exploratory posture and presented conclusions, and a suspicious BIC value. These must be resolved before the manuscript can be considered for further review.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Omitted covariate 'albumin' from results",
+      "evidenceRefs": [
+        "manuscript.md Results section",
+        "stats-run.json estimates array"
+      ],
+      "whyItMatters": "The model included albumin as a covariate (as per stats-run.json), but the manuscript fails to report its coefficient, odds ratio, confidence interval, or p-value. This omission prevents readers from assessing the full model and could indicate selective reporting.",
+      "actionableFix": "Add the albumin results to the manuscript's results section and discuss its role in adjustment. If albumin was excluded from the final model, justify the model reduction and report it transparently.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare estimates list in stats-run.json (which contains an 'albumin' term) with the manuscript's results section (which lists only const, treatment, age, severity). Albumin is present in the model outputs but absent from the manuscript.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "model_diagnostics",
+      "title": "Inappropriate normality test applied to logistic regression residuals",
+      "evidenceRefs": [
+        "stats-run.json diagnostics.shapiro_p_value"
+      ],
+      "whyItMatters": "The Shapiro-Wilk test (p=5.6e-8) is applied to logistic regression residuals, which do not assume normality. This indicates a fundamental misunderstanding of the model class and may mask more relevant diagnostics.",
+      "actionableFix": "Replace the Shapiro-Wilk test with appropriate logistic regression diagnostics such as Hosmer-Lemeshow goodness-of-fit, calibration plots, or discrimination metrics. Remove misleading normality p-values.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Exploratory posture mismatch with manuscript claims",
+      "evidenceRefs": [
+        "stats-run.json resultPosture"
+      ],
+      "whyItMatters": "The stats-run.json explicitly marks the result as 'exploratory_standard_table' and states it cannot support 'paper-ready conclusions' or 'causal claims'. The manuscript presents the analysis as a definitive local study, overreaching the evidence level.",
+      "actionableFix": "Either downgrade the manuscript's conclusions to explicitly match the exploratory posture, or provide a bound analysis specification and rerun the analysis to upgrade the posture before presenting it as a final study.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check resultPosture.cannotSupport in stats-run.json: it lists 'paper-ready conclusions' and 'causal claims'. The manuscript's Discussion and Conclusion imply applicability beyond exploration.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "Implausible negative BIC value",
+      "evidenceRefs": [
+        "stats-run.json diagnostics.bic"
+      ],
+      "whyItMatters": "The BIC is reported as -1032.88. For logistic regression with moderate sample size, BIC should be positive (e.g., around AIC+log(n)*k). A negative BIC suggests a computational error or a mislabelled statistic, undermining trust in the entire model output.",
+      "actionableFix": "Verify the BIC calculation against standard formulas (e.g., BIC = -2*logLik + log(n)*k). If corrected, update the diagnostics and manuscript. If the negative value persists, document the formula used and explain the discrepancy.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Missing separation diagnostic evidence",
+      "evidenceRefs": [
+        "manuscript.md Limitations: 'explicit separation diagnostic evidence was not found'"
+      ],
+      "whyItMatters": "Logistic regression is prone to separation, especially with sparse data or multiple predictors. Without evidence that separation was checked (e.g., large standard errors, infinite estimates, or Firth's method), the validity of parameter estimates is uncertain.",
+      "actionableFix": "Perform separation diagnostics: inspect for large coefficient variances, add a penalized likelihood option, or report confidence intervals for odds ratios that are finite and plausible. Include these results in the manuscript.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Incomplete model specification in manuscript",
+      "evidenceRefs": [
+        "manuscript.md Variables section"
+      ],
+      "whyItMatters": "The manuscript states the primary outcome, exposure, and covariates were not fully encoded in the text report. For reproducibility, a clear declaration of all variables and model form (e.g., logistic regression of outcome_binary ~ treatment + age + severity + albumin) is essential.",
+      "actionableFix": "Explicitly list all variables included in the final model and the regression formula within the Methods section.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The variables section lacks the model formula; compare with stats-run.json variables array which lists outcome_binary, treatment, age, severity, albumin.",
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Detailed cohort construction and missingness flow (e.g., consort diagram, number of excluded records per step)",
+    "Ethics statement or institutional review board approval for use of patient data",
+    "Separation diagnostic steps and results (e.g., profile likelihood CI inspection, Firth's penalty)",
+    "Full diagnostic report including influence assessment (Cook's distance interpretation) and calibration plot"
+  ],
+  "recommendedNextStage": "qa"
+}

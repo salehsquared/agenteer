@@ -1,0 +1,119 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript reports a Fisher's exact test on an uninterpretable binary outcome and treatment. Critical reporting omissions include lack of variable definitions, undisclosed ungoverned exploratory status, no confounding consideration, missingness not quantified, no literature context, and data source not described. These issues prevent any meaningful interpretation and violate reporting standards. A thorough revision with rigorous pre‑specification and contextualization is required before the report can be considered statistically or clinically meaningful.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "Variable definitions and clinical meaning are absent",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "Without a clear definition of ‘outcome_binary’ and ‘treatment’, readers cannot assess clinical relevance, direction of effect, or potential for misclassification. The abstract’s question (‘Is binary outcome frequency associated with treatment group?’) is content‑free and the analysis remains opaque.",
+      "actionableFix": "Add a Variables section that defines each variable, its coding (e.g., 0 = control, 1 = active; 0 = good outcome, 1 = poor outcome), measurement method, timing, and data source. Include a table of baseline characteristics by treatment group.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Ungoverned exploratory analysis not disclosed",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "stats-run/stats-qa.json"
+      ],
+      "whyItMatters": "The stats-run binding status is ‘unbound’ and the result posture is ‘exploratory_standard_table’. The manuscript presents the p‑value (0.0005) without acknowledging that the test was not pre‑registered or governed by a pre‑analysis plan. This inflates the perceived confirmatory weight of the result.",
+      "actionableFix": "Explicitly state that the analysis is exploratory and was not governed by a pre‑registered protocol. In the Limitations, note that the p‑value is not confirmatory and that multiplicity or data‑dependent choices could inflate error rates. If the work is meant to be confirmatory, create a method‑selection artifact (AnalysisSpec) and re‑run under binding.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check stats-run.json: binding.status = \"unbound\"",
+      "confidence": 1.0
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "No confounding control in an observational comparison",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "The study compares two groups on a binary outcome but includes only ‘treatment’ and ‘outcome_binary’. No confounders are measured or adjusted for. The odds ratio (2.78) cannot be interpreted as a treatment effect; it may be entirely driven by selection or confounding. The manuscript’s conservative language does not excuse the absence of any confounding discussion.",
+      "actionableFix": "At minimum, discuss potential confounders and why they cannot be addressed with available data. If the dataset contains covariates, add a multivariable model or propensity‑score analysis. If not, state this as a fatal limitation and refrain from using the term ‘associated with treatment group’ without qualifiers.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Missingness process and complete‑case impact not quantified",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The report states 240 complete‑case records but provides no information on the number of records with missing data, which variables were affected, or whether missingness is related to exposure/outcome. This prevents assessment of selection bias and violates STROBE guidelines.",
+      "actionableFix": "Provide a flow diagram showing initial cohort size, number excluded for each reason, and final analytic sample. Perform a comparison of characteristics between complete‑case and excluded subjects if possible, or at least discuss the plausible direction of bias.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "category": "literature",
+      "title": "No literature context or reference to existing evidence",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript contains zero references. Without situating the result in prior work, the reader cannot gauge whether the odds ratio of 2.78 is expected, large, small, or clinically trivial. The discussion cannot justify the analysis or its meaning.",
+      "actionableFix": "Add a brief literature review (even a few key references) that establishes the clinical background, expected effect sizes, and how this analysis contributes. Revise the Discussion to compare and contrast with prior findings.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F06",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "Data source and external plausibility are not discussed",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript does not state where the data come from, the population, time period, or any quality‑assurance steps. The plausibility of the counts (e.g., outcome prevalence of 60% overall) cannot be assessed. This undermines trust in the data integrity and the generalisability of the findings.",
+      "actionableFix": "Provide a Data Source subsection describing the dataset, its provenance, and any known limitations (e.g., sampling method, potential errors, external validity). Compare the observed prevalence to known benchmarks if available.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F07",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Odds ratio lacks confidence interval and p‑value over‑precise",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The manuscript reports only the point estimate (2.7778) and a p‑value (0.0005) with excessive decimal precision but no confidence interval. Fisher’s exact test can produce exact CIs, which are more informative than a p‑value alone.",
+      "actionableFix": "Report the 95% exact confidence interval for the odds ratio (e.g., from the same test). State p‑value as e.g., 0.0005 or <0.001 without implying more precision than warranted. Include ASA interpretation statement.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions (coding, measurement) and baseline characteristics table.",
+    "Pre‑analysis plan or method‑selection artifact (currently unbound).",
+    "Cohort flow diagram and missingness analysis.",
+    "Data source description (population, setting, dates, validation).",
+    "Literature references and contextualisation.",
+    "Confidence interval for odds ratio.",
+    "Sensitivity analysis for confounding (or at least acknowledgement of unmeasured confounders)."
+  ],
+  "recommendedNextStage": "protocol"
+}

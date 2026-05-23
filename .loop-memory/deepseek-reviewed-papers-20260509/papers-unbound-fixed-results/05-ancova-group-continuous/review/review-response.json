@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "reviewResponse": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:46:39.898Z",
+    "adjudicationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-adjudication.json",
+    "autonomy": "aggressive",
+    "decisions": [
+      {
+        "findingId": "F1",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Provide a complete cohort specification artifact including data source, study design, eligibility criteria, and case-selection flow. The manuscript must reference this definition.",
+        "reentryPoint": "dataset_feasibility"
+      },
+      {
+        "findingId": "F2",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Provide a data dictionary artifact with variable definitions, allowable values, and collection methods. The manuscript must summarize key variables or point to the artifact.",
+        "reentryPoint": "dataset_feasibility"
+      },
+      {
+        "findingId": "F3",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Report the total initial sample, number excluded due to missing data, and compare complete and incomplete cases on key variables. Perform sensitivity analysis or justify why complete-case analysis is sufficient.",
+        "reentryPoint": "analysis_spec"
+      },
+      {
+        "findingId": "F4",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Compute and report effect sizes (e.g., partial eta-squared, Cohen's d for pairwise contrasts) and 95% confidence intervals for adjusted group means or contrasts. Include these in the results section and table.",
+        "reentryPoint": "analysis_spec"
+      },
+      {
+        "findingId": "F7",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Include the raw dataset (de-identified), the analysis script, and environment details in the run directory. Alternatively, state clearly that reproduction requires contacting authors for data.",
+        "reentryPoint": "execution"
+      },
+      {
+        "findingId": "F1",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Add an interaction term (group × covariate) to the model, report its p-value, and if significant, reconsider the analysis or use alternative approaches (e.g., regression models per group).",
+        "reentryPoint": "execution"
+      },
+      {
+        "findingId": "F2",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Report adjusted group means with standard errors, the difference between groups with 95% CIs, and an effect size measure (e.g., partial eta-squared or Cohen’s d).",
+        "reentryPoint": "manuscript"
+      },
+      {
+        "findingId": "F3",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Either (a) rebind the analysis to a preregistered AnalysisSpec and rerun, or (b) revise the manuscript to explicitly state the analysis is purely exploratory and p-values are not inferential.",
+        "reentryPoint": "protocol"
+      },
+      {
+        "findingId": "F5",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Add Levene’s test or Breusch–Pagan test, and inspect residual vs. fitted plots. Document the result in diagnostics artifact.",
+        "reentryPoint": "execution"
+      },
+      {
+        "findingId": "F6",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Either bind the run to an AnalysisSpec after defining it, or explicitly restrict language to 'exploratory' in all claims. This is already partially done, but the manuscript’s objective question and framing still suggest a confirmatory aim.",
+        "reentryPoint": "protocol"
+      },
+      {
+        "findingId": "F4",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Remove or correct all generic boilerplate that does not match the actual artifacts present.",
+        "reentryPoint": "manuscript"
+      },
+      {
+        "findingId": "F5",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Add a table of descriptive statistics (e.g., mean, SD, N, range) for outcome and covariates by group, and mention any notable differences.",
+        "reentryPoint": "manuscript"
+      },
+      {
+        "findingId": "F6",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Incorporate the figure with a caption (e.g., 'Distribution of outcome by group after adjustment'), and discuss any patterns visible.",
+        "reentryPoint": "manuscript"
+      },
+      {
+        "findingId": "F7",
+        "decision": "accepted",
+        "reason": "Finding is actionable under the selected autonomy policy.",
+        "repairAction": "Report the number and proportion of records excluded, compare characteristics of excluded vs. included, and consider sensitivity analysis (e.g., multiple imputation if appropriate).",
+        "reentryPoint": "manuscript"
+      },
+      {
+        "findingId": "F8",
+        "decision": "modified",
+        "reason": "Finding is actionable but should be translated into a bounded deterministic repair before execution.",
+        "repairAction": "Provide summary statistics for age, severity, and outcome by group; inspect partial-regression plots; and verify no collinearity or data entry mistakes.",
+        "reentryPoint": "qa"
+      }
+    ],
+    "stateReentry": {
+      "status": "blocked",
+      "reentryPoint": "protocol",
+      "suggestedCommands": [
+        "agenteer research protocol-candidates --question <revised-question> --json",
+        "agenteer research method-select --question <revised-question> --json"
+      ],
+      "rerunReviewAfterRepair": true
+    },
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-response.json",
+    "stateReentryPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/state-reentry.json"
+  }
+}

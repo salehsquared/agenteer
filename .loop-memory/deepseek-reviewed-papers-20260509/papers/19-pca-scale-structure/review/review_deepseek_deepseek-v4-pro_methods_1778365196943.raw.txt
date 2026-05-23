@@ -1,0 +1,133 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript reports a PCA on 240 records with no sufficient description of variables, data source, cohort construction, pre-processing, or model diagnostics. The analysis is unreproducible and the interpretation is absent or misleading (e.g., 'latent component structure' from PCA). These issues prevent any meaningful evaluation and warrant blocking until core methodological and reporting deficiencies are addressed.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reproducibility",
+      "title": "Data and code not provided, analysis unreproducible",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without access to the underlying data (raw or synthetic), the exact analytic steps, and the complete environment, the results cannot be independently verified, which is essential for scientific integrity and external validation.",
+      "actionableFix": "Provide the dataset in a repository or as supplementary material, along with a fully executable analysis script and a codebook that defines all variables.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Variable definitions and data source missing",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Readers cannot interpret the PCA loadings or assess the validity of the measures without knowing what 'scale_item_1–3' and 'severity' represent, their scales, and their provenance.",
+      "actionableFix": "Include a detailed description of each variable (type, range, units), the instrument or source they were derived from, and any relevant psychometric properties in the Methods.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Cohort construction not described",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The generalizability and internal validity depend on how participants were selected and which exclusions were applied. The statement 'read from available run artifacts' is opaque.",
+      "actionableFix": "Specify inclusion/exclusion criteria, the total eligible pool, how missing data were handled, and any thresholds for complete-case analysis. Report a participant flow diagram.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "PCA pre-processing (scaling/centering) not specified",
+      "evidenceRefs": [
+        "stats-run.json",
+        "diagnostics.json"
+      ],
+      "whyItMatters": "PCA is sensitive to variable variances; loadings and explained variance depend on whether the correlation or covariance matrix was used. Without documentation, interpretation is unreliable.",
+      "actionableFix": "State explicitly whether variables were standardized (z-scored) before PCA, and justify the choice (e.g., correlation matrix used because variables have different scales).",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No assessment of data suitability for PCA",
+      "evidenceRefs": [
+        "diagnostics.json",
+        "stats-qa.json"
+      ],
+      "whyItMatters": "PCA requires adequate correlations among variables. Without KMO, Bartlett's test, or checking for ordinal structures, the analysis may be inappropriate, especially if items are binary or ordinal.",
+      "actionableFix": "Report Kaiser-Meyer-Olkin measure, Bartlett's test of sphericity, and consider whether polychoric correlations are needed for ordinal items. Discuss sample size adequacy.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "PCA misrepresented as latent variable analysis",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "PCA is not a latent variable model; it does not account for measurement error and assumes components are linear combinations of observed variables, not latent constructs. This mischaracterization may lead to incorrect clinical interpretation.",
+      "actionableFix": "Change terminology to 'component structure' or switch to an exploratory factor analysis model. If latent constructs are intended, use EFA with an appropriate extraction method and rotation.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No interpretation of PCA results provided",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The manuscript merely lists variance explained and loadings without any discussion of what the components represent, their clinical or research meaning, or how they relate to the original research question.",
+      "actionableFix": "Interpret each retained component based on loadings (>0.4 or 0.3), label them meaningfully, and relate them to the study objective. Include the scree plot with a description of retention criteria (e.g., Kaiser rule, parallel analysis).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No uncertainty measures or formal component retention criteria",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "Component emphasis (e.g., PC1 explains 79%) is presented without confidence intervals, and the number of components to retain is not justified, making the solution appear more stable than it may be.",
+      "actionableFix": "Include bootstrap confidence intervals for eigenvalues or explained variance, report parallel analysis results, and discuss the rationale for retaining components (e.g., scree plot, >1 eigenvalue, cumulative variance).",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or anonymized dataset",
+    "Detailed variable codebook (including scale definitions and ranges)",
+    "Cohort derivation flow (inclusion/exclusion counts, missingness patterns)",
+    "Pre-processing steps (mean-centering, scaling)",
+    "Scree plot and retention criteria (Kaiser criterion, parallel analysis)",
+    "KMO and Bartlett's test of sphericity results",
+    "PCA loadings interpretation and component naming",
+    "Uncertainty estimates for variance explained (e.g., bootstrap CIs)"
+  ],
+  "recommendedNextStage": "dataset_feasibility"
+}

@@ -1,0 +1,134 @@
+{
+  "verdict": "block",
+  "summary": "Severe reporting, methodological, and reproducibility gaps prevent promotion. The analysis remains exploratory and the manuscript is not ready for external sharing.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reproducibility",
+      "title": "No code, raw data, or computational environment provided",
+      "evidenceRefs": [
+        "manuscript.md (mentions 13 artifacts, none include analysis script or data)",
+        "stats-run/stats-run.json (no script hash or code repository)"
+      ],
+      "whyItMatters": "Without the analysis code and data, the results cannot be independently verified, rebuilt, or extended, violating fundamental reproducibility standards.",
+      "actionableFix": "Include the exact analysis script, raw (or synthetic) data, and environment specification (e.g., Dockerfile, renv.lock) in the run directory or a public repository.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "Implausible negative BIC value indicates computation error",
+      "evidenceRefs": [
+        "stats-run/stats-run.json (BIC: -1066.8941693222591, AIC: 710.381549998833, n=240, k=3)"
+      ],
+      "whyItMatters": "A negative BIC for a Poisson regression with 240 observations is impossible; this suggests a mistake in model fitting or reporting that undermines model selection and credibility.",
+      "actionableFix": "Recalculate BIC correctly (expected BIC ≈ AIC + k*(log(n)-2) ≈ 720.8) and verify all model statistics. If the error is in diagnostics output, fix the computation.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Using AIC=710.38, k=3, n=240 → log(n)=5.48 → BIC = AIC + 3*(5.48-2) = 710.38+10.44 = 720.82. Reported BIC -1066.89 is far off, likely a sign error or incorrect formula.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No descriptive statistics, variable definitions, or cohort flow diagram",
+      "evidenceRefs": [
+        "manuscript.md (no table of sample characteristics, no unit definitions for age, severity, treatment; no eligibility criteria)",
+        "stats-run/stats-run.json (variables listed only as count_events, treatment, age, severity without metadata)"
+      ],
+      "whyItMatters": "Readers cannot assess confounding, population applicability, or even basic interpretation of effect sizes without knowing how variables were measured and the baseline distribution of exposures.",
+      "actionableFix": "Add a standard Table 1 with summary statistics by treatment group, define all variables (units, coding), and include a STROBE-style flow diagram showing inclusion/exclusion.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Overdispersion not assessed; Poisson may be inappropriate",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json (no dispersion parameter, deviance, or test for overdispersion)",
+        "stats-run/stats-run.json (residual SD 1.07, but no link to mean-variance relationship)"
+      ],
+      "whyItMatters": "Poisson assumes variance equals mean. Count data often exhibit overdispersion, leading to underestimated standard errors and inflated false positive rate. Without checking, the p-values and CIs may be misleading.",
+      "actionableFix": "Compute the dispersion statistic (e.g., sum of squared Pearson residuals / df) and test for overdispersion. If present, consider negative binomial or quasi-Poisson. Report the dispersion estimate and its implications.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Shapiro-Wilk test on raw residuals is meaningless for Poisson",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json (shapiro_p_value: 8.09e-05, using presumably raw residuals)"
+      ],
+      "whyItMatters": "Poisson residuals are not expected to be normally distributed; the appropriate diagnostic is inspection of deviance or Pearson residuals for heteroscedasticity and patterns, not Normality. Relying on this test may mask other issues.",
+      "actionableFix": "Remove the Shapiro-Wilk result. Instead, provide residual vs fitted plots, assess influential points with Cook's distance (already max 0.04, but discuss), and check for zero-inflation if relevant.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without description of missing data mechanism or sensitivity",
+      "evidenceRefs": [
+        "manuscript.md (states 'complete-case sample size was 240', but no information on original sample, missingness proportion, or predictors of missingness)",
+        "stats-run/stats-run.json (completeCaseN=240, no missingness pattern report)"
+      ],
+      "whyItMatters": "If missingness is not completely at random, complete-case estimates may be biased. The lack of any exploration makes the results untrustworthy.",
+      "actionableFix": "Report the amount and pattern of missing data for each variable. Consider multiple imputation or sensitivity analysis, or at minimum discuss the potential biases.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Covariate adjustment without causal framework invites misinterpretation",
+      "evidenceRefs": [
+        "manuscript.md (treats 'treatment' as exposure, adjusts for age and severity, but no DAG, no justification of confounders, and no statement that estimates are conditional)"
+      ],
+      "whyItMatters": "Readers may interpret the treatment coefficient as a causal effect despite the observational design. The adjustment set may be insufficient or include mediators, leading to biased estimates.",
+      "actionableFix": "Embed the analysis in a directed acyclic graph (DAG) to identify a minimal sufficient adjustment set. Explicitly state that the estimates are associational and sensitive to unmeasured confounding. Use language like 'associated with' consistently.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript lacks explicit link function and rate ratio interpretation",
+      "evidenceRefs": [
+        "manuscript.md (reports coefficients on log scale without stating it, mentions p-values but not rate ratios, though stats-run provides them)"
+      ],
+      "whyItMatters": "Clinically relevant interpretation requires rate ratios and 95% CIs. Reporting only log-scale coefficients obscures the magnitude of effects.",
+      "actionableFix": "Report rate ratios (e.g., e˄), their confidence intervals, and interpret them in practical terms. State that the model used a log link and Poisson distribution.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or synthetic dataset",
+    "Analysis code/script",
+    "Variable codebook (definitions, units, coding)",
+    "Table 1: baseline characteristics by treatment",
+    "Missing data handling report",
+    "Overdispersion test results",
+    "Residual diagnostic plots",
+    "DAG or causal framework",
+    "Deterministic verification details mentioned in manuscript"
+  ],
+  "recommendedNextStage": "method_selection"
+}

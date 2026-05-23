@@ -176,6 +176,41 @@ export async function researchMedbreviaLiteratureSearchCommand(opts: {
 
   if (opts.mockResponsePath) {
     const raw = JSON.parse(await readFile(path.resolve(opts.mockResponsePath), "utf-8")) as Record<string, unknown>;
+    if (raw.literatureSearch && typeof raw.literatureSearch === "object" && Array.isArray((raw.literatureSearch as Record<string, unknown>).sources)) {
+      const existing = raw.literatureSearch as ResearchLiteratureSearchResult;
+      const result: ResearchLiteratureSearchResult = {
+        ...existing,
+        generatedAtIso: new Date().toISOString(),
+        request: {
+          ...existing.request,
+          question: opts.question,
+          baseUrl,
+          endpoint,
+          responseDepth,
+          dateRange,
+          highImpact: opts.highImpact ?? existing.request.highImpact ?? false,
+          prefersList: opts.prefersList ?? existing.request.prefersList ?? true,
+          topK,
+          timeoutMs,
+          authMode: auth.mode,
+        },
+        outPath: null,
+        reportPath: null,
+      };
+      if (opts.outPath) {
+        const outPath = path.resolve(opts.outPath);
+        await mkdir(path.dirname(outPath), { recursive: true });
+        result.outPath = outPath;
+        await writeFile(outPath, renderResearchMedbreviaLiteratureSearchJson(result), "utf-8");
+      }
+      if (opts.reportPath) {
+        const reportPath = path.resolve(opts.reportPath);
+        await mkdir(path.dirname(reportPath), { recursive: true });
+        result.reportPath = reportPath;
+        await writeFile(reportPath, renderResearchMedbreviaLiteratureSearch(result), "utf-8");
+      }
+      return result;
+    }
     events = Array.isArray(raw.events) ? raw.events.map(normalizeSseEvent).filter(Boolean) as SseEvent[] : [];
     if (!events.length && raw.literatureSearch && typeof raw.literatureSearch === "object") {
       const existing = raw.literatureSearch as ResearchLiteratureSearchResult;

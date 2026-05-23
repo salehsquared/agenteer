@@ -1,0 +1,120 @@
+{
+  "verdict": "revise",
+  "summary": "The ANCOVA analysis has major methodological and reporting gaps that prevent reliable interpretation. Key issues include failure to test the homogeneity of regression slopes assumption, lack of effect size reporting, absence of covariate balance checks, undocumented missing data handling, and insufficient covariate adjustment justification. These must be addressed before the analysis can support even local claims.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Homogeneity of regression slopes not checked",
+      "evidenceRefs": [
+        "manuscript.md: Methods section lists only main effects",
+        "stats-run.json: estimates array contains no group*covariate interaction terms"
+      ],
+      "whyItMatters": "ANCOVA assumes the relationship between covariates and outcome is identical across groups. If this assumption is violated, the group effect estimate may be biased, and p-values could be misleading.",
+      "actionableFix": "Add group*age and group*severity interaction terms to the model and test their significance. If non-significant, report and proceed; if significant, present stratified analyses or alternative models.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if stats-run.json diagnostics or estimates include interaction terms and corresponding p-values.",
+      "confidence": 0.95
+    },
+    {
+      "id": "M2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No effect size measures reported",
+      "evidenceRefs": [
+        "manuscript.md: Results section only contains F and p-values",
+        "stats-run.json: estimates array lacks partial eta-squared, omega-squared, or adjusted means"
+      ],
+      "whyItMatters": "F and p-values do not convey the magnitude or practical importance of differences. Clinical interpretation requires effect sizes (e.g., partial eta-squared, Cohen's f) and adjusted group means with confidence intervals.",
+      "actionableFix": "Compute and report partial eta-squared or omega-squared for each term, and provide adjusted marginal means per group with 95% CIs. Add to manuscript and stats-run.json estimates.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Verify that stats-run.json or an updated estimates file contains at least one effect size metric per term.",
+      "confidence": 1.0
+    },
+    {
+      "id": "M3",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No baseline characteristics or covariate balance reported",
+      "evidenceRefs": [
+        "manuscript.md: No table of demographics or covariate distribution by group",
+        "stats-run.json: no descriptive statistics output"
+      ],
+      "whyItMatters": "Without baseline comparisons, readers cannot judge whether groups differ meaningfully on covariates and whether the observed (non-significant) group effect is masked by imbalance. Report group sizes, means, SDs for age, severity, and outcome.",
+      "actionableFix": "Add a Table 1 with group‑wise summaries and appropriate balance checks (e.g., standardized mean differences). Include in manuscript and companion data.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check for a new artifact containing descriptive statistics grouped by 'group' variable.",
+      "confidence": 1.0
+    },
+    {
+      "id": "M4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Missing data handling not described; complete-case analysis may be biased",
+      "evidenceRefs": [
+        "manuscript.md: only mentions '240 complete-case records'",
+        "stats-run.json: completeCaseN=240, no missingness pattern or auxiliary variables"
+      ],
+      "whyItMatters": "If missingness is related to exposure, outcome, or covariates, complete-case analysis can yield biased estimates. The absence of any missing data description precludes assessment.",
+      "actionableFix": "Describe the initial sample size, exclusion criteria, and amount/pattern of missingness. Conduct a sensitivity analysis (e.g., using multiple imputation) or at minimum compare complete cases to excluded cases on available variables.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "M5",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Covariate selection lacks justification; risk of unmeasured confounding",
+      "evidenceRefs": [
+        "manuscript.md: Methods only list 'age, severity' without rationale",
+        "stats-run.json: no mention of confounder selection process"
+      ],
+      "whyItMatters": "Adjustment for only two covariates may be insufficient if unmeasured confounders exist. Without a directed acyclic graph (DAG) or clinical reasoning, residual confounding could bias the group effect estimate.",
+      "actionableFix": "Discuss the rationale for including age and severity. Either provide a DAG or justify why critical confounders are measured. Acknowledge remaining confounding in limitations.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "M6",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "Software and version not reported",
+      "evidenceRefs": [
+        "manuscript.md: no mention of statistical software",
+        "stats-run.json: no 'software' field"
+      ],
+      "whyItMatters": "Reproducibility requires specifying the software, version, and packages used. Without this, exact re-execution is uncertain.",
+      "actionableFix": "Add the software name, version, and relevant package citations (e.g., R, Python statsmodels) to the manuscript and artifacts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check if manuscript or stats-run artifacts contain a 'software' field.",
+      "confidence": 0.9
+    },
+    {
+      "id": "M7",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Model diagnostic plots not presented or referenced",
+      "evidenceRefs": [
+        "stats-run/figures.json: references a figure but no diagnostic plots mentioned",
+        "manuscript.md: no discussion of residual diagnostics beyond Shapiro-Wilk"
+      ],
+      "whyItMatters": "Visual inspection of residuals (e.g., Q-Q plot, residuals vs fitted) is crucial to confirm normality, homoscedasticity, and identify outliers. Shapiro-Wilk test alone is insufficient.",
+      "actionableFix": "Generate and include in the manuscript or supplementary materials a panel of standard diagnostic plots: residuals vs fitted, Q-Q plot, scale-location plot, and residuals vs leverage.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check for existence of residual diagnostic figure files in the run directory.",
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or sufficient summary to externally validate covariate distributions and outcome range",
+    "Detailed missing data analysis (pattern, mechanisms, imputation models)",
+    "DAG or explicit confounder selection process",
+    "Group-specific sample sizes in manuscript (only total N=240 given)",
+    "Any sensitivity analysis (e.g., alternative covariance structures, propensity score adjustment)",
+    "Clear documentation of figure-qa results (figure-qa.json content missing)"
+  ],
+  "recommendedNextStage": "execution"
+}

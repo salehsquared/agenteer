@@ -1,0 +1,57 @@
+# Stats Run Report
+
+## Local Review Safety Header
+
+- This is a standard-table statistical run, not proof of causal effect or clinical validity.
+- Interpret estimates with uncertainty, diagnostics, data quality, and study design context.
+- P-values are reported as compatibility measures under a model; they are not effect sizes or practical importance.
+- Binding status: unbound.
+- Result posture: causal_design_review_required (Causal design review required).
+- Interpretation boundary: This run produces propensity-score balance and treatment-contrast artifacts for local causal-design review; it does not by itself establish a causal effect.
+- No complex survey design was declared for this standard-table run.
+
+## Methods
+
+- Method: propensity-score-matching
+- Rows: 240
+- Complete-case N: 240
+- Variables: outcome_binary, treatment, age, severity, albumin, sex
+- Weight: (none)
+- Supports: propensity score diagnostics; balance review; overlap/positivity review; local treatment-contrast estimation under declared assumptions
+- Cannot support: causal claims without target-trial/DAG review; unmeasured-confounding control; clinical recommendations; external validity
+- Next action: Review the target trial, confounding set, positivity, balance, missingness, and sensitivity plan before using causal language.
+
+## Results
+
+| contrast | estimand | effect measure | estimate | ci_low | ci_high | p_value | treated n | control n |
+|---|---|---|---:|---:|---:|---:|---:|---:|
+| treatment | ATT | risk difference and odds ratio | 0 | 0.4819 | 2.075 | 1.000 | 67 | 67 |
+## Propensity Design Diagnostics
+- Treatment/exposure: treatment.
+- Outcome: outcome_binary.
+- Estimand: ATT; method: propensity-score-matching.
+- Covariates in propensity model: age, severity, albumin.
+- Exact-match covariates: sex.
+- Matching: nearest-neighbor greedy matching, ratio 1:1, without replacement, caliper 0.4 SD of the logit propensity score.
+- Maximum absolute standardized mean difference before adjustment: 0.6509.
+- Maximum absolute standardized mean difference after adjustment: 0.2331.
+- Covariate terms above absolute SMD 0.10 after adjustment: 3.
+- Common-support fraction: 0.9458.
+- Complete-case fraction for treatment, outcome, and propensity covariates: 1.
+- Matched treated rows: 67; matched control rows: 67; unmatched treated rows: 77.
+- These diagnostics address measured-covariate balance only. They do not address unmeasured confounding, treatment timing, immortal time, consistency, or causal transportability.
+
+## Diagnostics And QA
+
+- Stats QA: warning (12/16 stats QA checks passed; status=warning.)
+- Issues: PROPENSITY_UNMATCHED_TREATED, PROPENSITY_RESIDUAL_IMBALANCE, FIGURE_QA_WARNING
+- Warnings: (none)
+- Errors: (none)
+
+## References
+
+- American Statistical Association. Statement on Statistical Significance and P-Values. 2016.
+- ASA President's Task Force Statement on Statistical Significance and Replicability. 2021.
+- Austin PC. An Introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies. Multivariate Behavioral Research. 2011.
+- Austin PC. Balance diagnostics for comparing the distribution of baseline covariates between treatment groups in propensity-score matched samples. Statistics in Medicine. 2009.
+- MatchIt and cobalt documentation informed the balance-table and Love-plot-style standardized mean-difference artifact conventions.

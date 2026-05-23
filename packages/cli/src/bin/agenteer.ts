@@ -61,6 +61,7 @@ import {
 } from "../specialize/runtime.js";
 import {
   parseBackendId,
+  parseControllerModel,
   parseDataStructures,
   parseDatasetAdapterId,
   parseMethodCategory,
@@ -99,6 +100,28 @@ import {
   researchMachineStatusCommand,
   researchBenchmarkSuiteRunCommand,
   researchBenchmarkTrendCommand,
+  researchControllerAgendaCommand,
+  researchControllerAuditCommand,
+  researchControllerCapabilitiesCommand,
+  researchControllerCompletionAuditCommand,
+  researchControllerDoctorCommand,
+  researchControllerEnvironmentCommand,
+  researchControllerFollowAgendaCommand,
+  researchControllerFollowLoopCommand,
+  researchControllerGoalAuditCommand,
+  researchControllerInitCommand,
+  researchControllerInspectCommand,
+  researchControllerOperateCommand,
+  researchControllerPatchCommand,
+  researchControllerRepairCycleCommand,
+  researchControllerResumeCommand,
+  researchControllerRunbookCommand,
+  researchControllerRunnerPacketCommand,
+  researchControllerRunCommand,
+  researchControllerSelfTestCommand,
+  researchControllerStepCommand,
+  researchControllerSupervisorCommand,
+  researchControllerToolCommand,
   researchSpecV2Command,
   researchExplorePlanCommand,
   researchManuscriptCommand,
@@ -151,6 +174,38 @@ import {
   renderResearchBenchmarkSuiteRunJson,
   renderResearchBenchmarkTrend,
   renderResearchBenchmarkTrendJson,
+  renderResearchControllerAgenda,
+  renderResearchControllerAgendaJson,
+  renderResearchControllerAudit,
+  renderResearchControllerAuditJson,
+  renderResearchControllerCapabilities,
+  renderResearchControllerCapabilitiesJson,
+  renderResearchControllerCompletionAudit,
+  renderResearchControllerCompletionAuditJson,
+  renderResearchControllerDoctor,
+  renderResearchControllerDoctorJson,
+  renderResearchControllerEnvironment,
+  renderResearchControllerEnvironmentJson,
+  renderResearchControllerFollowAgenda,
+  renderResearchControllerFollowAgendaJson,
+  renderResearchControllerFollowLoop,
+  renderResearchControllerFollowLoopJson,
+  renderResearchControllerGoalAudit,
+  renderResearchControllerGoalAuditJson,
+  renderResearchControllerOperate,
+  renderResearchControllerOperateJson,
+  renderResearchControllerRepairCycle,
+  renderResearchControllerRepairCycleJson,
+  renderResearchControllerRunbook,
+  renderResearchControllerRunbookJson,
+  renderResearchControllerRunnerPacket,
+  renderResearchControllerRunnerPacketJson,
+  renderResearchControllerSelfTest,
+  renderResearchControllerSelfTestJson,
+  renderResearchControllerState,
+  renderResearchControllerStateJson,
+  renderResearchControllerSupervisor,
+  renderResearchControllerSupervisorJson,
   renderResearchExplorePlan,
   renderResearchExplorePlanJson,
   renderResearchManuscript,
@@ -800,8 +855,31 @@ Usage:
   agenteer research method-qa --run-dir <dir> [--out <method-qa.json>] [--report <method-qa.md>] [--json]
   agenteer research manuscript --run-dir <dir> [--out <manuscript.md>] [--qa-out <manuscript-qa.json>] [--json]
   agenteer research run-inspect --run-dir <dir> [--out <run-inspection.json>] [--report <run-inspection.md>] [--json]
+  agenteer research controller-init --question <text> --out-dir <dir> [--data <rows.csv|json|parquet>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--covariate <col>]* [--controller openai:gpt-5.4] [--use-model] [--context] [--literature] [--json]
+  agenteer research controller-step --state <controller-state.json> [--env-file <path>] [--json]
+  agenteer research controller-patch --state <controller-state.json> --patch <json|file.json> [--reason <text>] [--json]
+  agenteer research controller-resume --state <controller-state.json> [--force] [--reason <text>] [--json]
+  agenteer research controller-tool --state <controller-state.json> --tool npm-build|npm-test|controller-inspect|controller-read-artifact|controller-read-file|controller-search-repo|controller-run-agenteer|controller-git-diff|controller-propose-patch|controller-apply-patch|controller-verify-patch|controller-rollback-patch [--arg <test-file|artifact-kind|repo-path|query|agenteer-arg|proposal-json|proposal-selector|apply-selector>] --reason <text> [--json]
+  agenteer research controller-agenda --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-audit --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-capabilities --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-env --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-doctor --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-goal-audit --state <controller-state.json> [--objective <text>] [--reason <text>] [--json]
+  agenteer research controller-completion-audit --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-repair-cycle --state <controller-state.json> [--max-steps <n>] [--force] [--reason <text>] [--json]
+  agenteer research controller-runbook --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-runner-packet --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-self-test --out-dir <dir> [--objective <text>] [--json]
+  agenteer research controller-follow-agenda --state <controller-state.json> [--max-steps <n>] [--force] [--reason <text>] [--json]
+  agenteer research controller-follow-loop --state <controller-state.json> [--max-iterations <n>] [--max-steps-per-run <n>] [--force] [--reason <text>] [--json]
+  agenteer research controller-operate --state <controller-state.json> [--max-cycles <n>] [--max-rounds <n>] [--max-iterations-per-round <n>] [--max-steps-per-run <n>] [--force] [--reason <text>] [--json]
+  agenteer research controller-supervise --state <controller-state.json> [--max-rounds <n>] [--max-iterations-per-round <n>] [--max-steps-per-run <n>] [--force] [--reason <text>] [--json]
+  agenteer research controller-run (--state <controller-state.json> | --question <text> --out-dir <dir>) [--data <rows.csv|json|parquet>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--covariate <col>]* [--controller openai:gpt-5.4] [--use-model] [--require-controller-model] [--context] [--require-context] [--context-repo <dir>] [--context-target <file|symbol>] [--context-bin <path>] [--context-budget <tokens>] [--literature] [--literature-mock-response <json>] [--external-review] [--mock-review] [--no-auto-repair] [--max-auto-repairs <n>] [--max-steps <n>] [--json]
+  agenteer research controller-inspect --state <controller-state.json> [--json]
+  agenteer research run-autonomous --question <text> --out-dir <dir> [same options as controller-run]
   agenteer research reviewer-providers [--env-file <path>] [--json]
-  agenteer research study-critic --run-dir <dir> [--stage protocol|analysis_spec|feasibility|method|execution|manuscript|final] [--panel default|cheap|strict|all] [--reviewer provider:model]* [--autonomy conservative|balanced|aggressive] [--env-file <path>] [--mock] [--json]
+  agenteer research study-critic --run-dir <dir> [--stage protocol|analysis_spec|feasibility|method|execution|manuscript|final] [--panel default|cheap|strict|all|deepseek-dual|deepseek-triple] [--reviewer provider:model]* [--autonomy conservative|balanced|aggressive] [--env-file <path>] [--mock] [--json]
   agenteer research review-adjudicate --panel <review-panel.json> [--out <json>] [--json]
   agenteer research review-response --adjudication <review-adjudication.json> [--run-dir <dir>] [--autonomy conservative|balanced|aggressive] [--out <json>] [--state-reentry <json>] [--json]
   agenteer research benchmark-suite-run --suite <dir> [--out-dir <dir>] [--out <json>] [--report <md>] [--json]
@@ -2464,6 +2542,215 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchRunInspectJson(result) : renderResearchRunInspect(result));
       return result.readiness === "blocked" ? 1 : 0;
     }
+    case "controller-init": {
+      const result = await researchControllerInitCommand(controllerOptionsFromFlags(flags, { requireQuestion: true, requireOutDir: true }));
+      console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
+      return 0;
+    }
+    case "controller-step": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerStepCommand({
+        statePath: requireFlagString(flags, "state"),
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
+      return result.status === "blocked" || result.status === "failed" ? 1 : 0;
+    }
+    case "controller-patch": {
+      const patch = JSON.parse(await readArgOrFile(requireFlagString(flags, "patch"))) as Parameters<typeof researchControllerPatchCommand>[0]["patch"];
+      const result = await researchControllerPatchCommand({
+        statePath: requireFlagString(flags, "state"),
+        patch,
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
+      return result.status === "blocked" || result.status === "failed" ? 1 : 0;
+    }
+    case "controller-resume": {
+      const result = await researchControllerResumeCommand({
+        statePath: requireFlagString(flags, "state"),
+        force: flags.force === true,
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? `${JSON.stringify(result, null, 2)}\n` : renderResearchControllerState(result.state));
+      return result.resumed ? 0 : 1;
+    }
+    case "controller-tool": {
+      const result = await researchControllerToolCommand({
+        statePath: requireFlagString(flags, "state"),
+        request: {
+          toolId: parseControllerToolId(requireFlagString(flags, "tool")),
+          args: flagList(flags, "arg"),
+          reason: flagString(flags, "reason") ?? "Manual bounded controller tool invocation.",
+        },
+      });
+      console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
+      return result.status === "blocked" || result.status === "failed" ? 1 : 0;
+    }
+    case "controller-agenda": {
+      const result = await researchControllerAgendaCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerAgendaJson(result) : renderResearchControllerAgenda(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "controller-audit": {
+      const result = await researchControllerAuditCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerAuditJson(result) : renderResearchControllerAudit(result));
+      return result.status === "fail" ? 1 : 0;
+    }
+    case "controller-capabilities": {
+      const result = await researchControllerCapabilitiesCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerCapabilitiesJson(result) : renderResearchControllerCapabilities(result));
+      return result.summary.missing > 0 ? 1 : 0;
+    }
+    case "controller-env": {
+      const result = await researchControllerEnvironmentCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerEnvironmentJson(result) : renderResearchControllerEnvironment(result));
+      return result.readiness === "blocked" ? 1 : 0;
+    }
+    case "controller-doctor": {
+      const result = await researchControllerDoctorCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerDoctorJson(result) : renderResearchControllerDoctor(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "controller-goal-audit": {
+      const result = await researchControllerGoalAuditCommand({
+        statePath: requireFlagString(flags, "state"),
+        objective: flagString(flags, "objective") ?? undefined,
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerGoalAuditJson(result) : renderResearchControllerGoalAudit(result));
+      return result.readiness === "blocked" ? 1 : 0;
+    }
+    case "controller-completion-audit": {
+      const result = await researchControllerCompletionAuditCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerCompletionAuditJson(result) : renderResearchControllerCompletionAudit(result));
+      return result.status === "fail" ? 1 : 0;
+    }
+    case "controller-repair-cycle": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerRepairCycleCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+        maxSteps: parseOptionalNumberFlag(flags, "max-steps") ?? undefined,
+        force: flags.force === true,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerRepairCycleJson(result) : renderResearchControllerRepairCycle(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "controller-runbook": {
+      const result = await researchControllerRunbookCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerRunbookJson(result) : renderResearchControllerRunbook(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "controller-runner-packet": {
+      const result = await researchControllerRunnerPacketCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerRunnerPacketJson(result) : renderResearchControllerRunnerPacket(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "controller-self-test": {
+      const result = await researchControllerSelfTestCommand({
+        outDir: requireFlagString(flags, "out-dir"),
+        objective: flagString(flags, "objective") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerSelfTestJson(result) : renderResearchControllerSelfTest(result));
+      return result.status === "fail" ? 1 : 0;
+    }
+    case "controller-follow-agenda": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerFollowAgendaCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+        maxSteps: parseOptionalNumberFlag(flags, "max-steps") ?? undefined,
+        forceReviewRequired: flags.force === true,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerFollowAgendaJson(result) : renderResearchControllerFollowAgenda(result));
+      return result.refused || result.state.status === "blocked" || result.state.status === "failed" ? 1 : 0;
+    }
+    case "controller-follow-loop": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerFollowLoopCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+        maxIterations: parseOptionalNumberFlag(flags, "max-iterations") ?? undefined,
+        maxStepsPerRun: parseOptionalNumberFlag(flags, "max-steps-per-run") ?? undefined,
+        forceReviewRequired: flags.force === true,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerFollowLoopJson(result) : renderResearchControllerFollowLoop(result));
+      return result.state.status === "blocked" || result.state.status === "failed" ? 1 : 0;
+    }
+    case "controller-operate": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerOperateCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+        maxCycles: parseOptionalNumberFlag(flags, "max-cycles") ?? undefined,
+        maxRounds: parseOptionalNumberFlag(flags, "max-rounds") ?? undefined,
+        maxIterationsPerRound: parseOptionalNumberFlag(flags, "max-iterations-per-round") ?? undefined,
+        maxStepsPerRun: parseOptionalNumberFlag(flags, "max-steps-per-run") ?? undefined,
+        forceReviewRequired: flags.force === true,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerOperateJson(result) : renderResearchControllerOperate(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
+    case "controller-supervise": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerSupervisorCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+        maxRounds: parseOptionalNumberFlag(flags, "max-rounds") ?? undefined,
+        maxIterationsPerRound: parseOptionalNumberFlag(flags, "max-iterations-per-round") ?? undefined,
+        maxStepsPerRun: parseOptionalNumberFlag(flags, "max-steps-per-run") ?? undefined,
+        forceReviewRequired: flags.force === true,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerSupervisorJson(result) : renderResearchControllerSupervisor(result));
+      return result.state.status === "blocked" || result.state.status === "failed" || result.rounds.some(item => /did not authorize/.test(item.reason)) ? 1 : 0;
+    }
+    case "controller-run":
+    case "run-autonomous": {
+      const env = await reviewerEnv(flags);
+      const statePath = flagString(flags, "state");
+      const result = await researchControllerRunCommand({
+        ...controllerOptionsFromFlags(flags, { requireQuestion: !statePath, requireOutDir: !statePath }),
+        statePath,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
+      return result.state.status === "blocked" || result.state.status === "failed" ? 1 : 0;
+    }
+    case "controller-inspect": {
+      const result = await researchControllerInspectCommand({ statePath: requireFlagString(flags, "state") });
+      console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
+      return result.state.status === "blocked" || result.state.status === "failed" ? 1 : 0;
+    }
     case "reviewer-providers": {
       const env = await reviewerEnv(flags);
       const result = await researchReviewerProvidersCommand(env);
@@ -2477,7 +2764,7 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         outDir: flagString(flags, "out-dir") ?? undefined,
         stage: parseReviewStage(flagString(flags, "stage") ?? undefined),
         autonomy: parseReviewAutonomy(flagString(flags, "autonomy") ?? undefined),
-        panel: (flagString(flags, "panel") as "default" | "cheap" | "strict" | "all" | undefined) ?? undefined,
+        panel: (flagString(flags, "panel") as "default" | "cheap" | "strict" | "all" | "deepseek-dual" | "deepseek-triple" | undefined) ?? undefined,
         reviewers: flagList(flags, "reviewer"),
         budget: {
           maxPerCallUsd: parseOptionalNumberFlag(flags, "max-per-call-usd") ?? undefined,
@@ -2835,6 +3122,125 @@ function parseOptionalIntegerFlag(
   const value = Number.parseInt(raw, 10);
   if (!Number.isFinite(value) || value < 1) throw new Error(`--${key} must be a positive integer`);
   return value;
+}
+
+function controllerOptionsFromFlags(
+  flags: Parameters<typeof flagString>[0],
+  requirements: { requireQuestion: boolean; requireOutDir: boolean },
+): Parameters<typeof researchControllerInitCommand>[0] {
+  const question = requirements.requireQuestion ? requireFlagString(flags, "question") : (flagString(flags, "question") ?? "");
+  const outDir = requirements.requireOutDir ? requireFlagString(flags, "out-dir") : (flagString(flags, "out-dir") ?? ".");
+  const methodRaw = flagString(flags, "method");
+  const controllerRequested = flagString(flags, "controller") !== undefined
+    || flags["use-model"] === true
+    || flags["require-controller-model"] === true
+    || flagString(flags, "controller-max-input-chars") !== undefined
+    || flagString(flags, "controller-max-output-tokens") !== undefined
+    || flagString(flags, "controller-timeout-ms") !== undefined;
+  const controller = controllerRequested
+    ? {
+        ...parseControllerModel(flagString(flags, "controller"), flags["use-model"] === true || flags["require-controller-model"] === true),
+        maxInputChars: parseOptionalIntegerFlag(flags, "controller-max-input-chars"),
+        maxOutputTokens: parseOptionalIntegerFlag(flags, "controller-max-output-tokens"),
+        timeoutMs: parseOptionalIntegerFlag(flags, "controller-timeout-ms"),
+      }
+    : undefined;
+  return {
+    question,
+    outDir,
+    dataPath: flagString(flags, "data") ?? undefined,
+    datasetDir: flagString(flags, "dataset-dir") ?? undefined,
+    runDir: flagString(flags, "run-dir") ?? undefined,
+    method: methodRaw ? parseStatsMethod(methodRaw) : undefined,
+    outcome: flagString(flags, "outcome") ?? undefined,
+    exposure: flagString(flags, "exposure") ?? undefined,
+    group: flagString(flags, "group") ?? undefined,
+    time: flagString(flags, "time") ?? undefined,
+    event: flagString(flags, "event") ?? undefined,
+    id: flagString(flags, "id") ?? undefined,
+    strata: flagString(flags, "strata") ?? undefined,
+    cluster: flagString(flags, "cluster") ?? undefined,
+    period: flagString(flags, "period") ?? undefined,
+    post: flagString(flags, "post") ?? undefined,
+    runningVariable: flagString(flags, "running-variable") ?? undefined,
+    cutoff: parseOptionalNumberFlag(flags, "cutoff"),
+    instrument: flagString(flags, "instrument") ?? undefined,
+    variables: flagList(flags, "variable"),
+    covariates: flagList(flags, "covariate"),
+    exactCovariates: flagList(flags, "exact-covariate"),
+    surveyDesign: flags.survey === true ? true : undefined,
+    allowSurveyApproximation: flags["allow-survey-approximation"] === true ? true : undefined,
+    python: flagString(flags, "python") ?? undefined,
+    autonomy: parseReviewAutonomy(flagString(flags, "autonomy") ?? undefined),
+    maxSteps: parseOptionalIntegerFlag(flags, "max-steps"),
+    minRows: parseOptionalIntegerFlag(flags, "min-rows"),
+    maxRequiredVariableMissingness: parseOptionalNumberFlag(flags, "max-required-missingness"),
+    allowExecution: flags["no-execution"] === true ? false : undefined,
+    allowExternalReview: flags["external-review"] === true ? true : undefined,
+    requireExternalReviewForPromotion: flags["require-external-review"] === true ? true : undefined,
+    mockExternalReview: flags["mock-review"] === true ? true : undefined,
+    allowAutoRepair: flags["no-auto-repair"] === true ? false : undefined,
+    maxAutoRepairs: parseOptionalIntegerFlag(flags, "max-auto-repairs"),
+    allowInputPatches: flags["no-input-patches"] === true ? false : undefined,
+    maxInputPatches: parseOptionalIntegerFlag(flags, "max-input-patches"),
+    allowToolActions: flags["no-tool-actions"] === true ? false : undefined,
+    maxToolActions: parseOptionalIntegerFlag(flags, "max-tool-actions"),
+    allowedToolIds: parseControllerToolIds(flagList(flags, "allowed-tool")),
+    toolTimeoutMs: parseOptionalIntegerFlag(flags, "tool-timeout-ms"),
+    allowContext: flags.context === true || flags["context-preflight"] === true ? true : undefined,
+    requireContext: flags["require-context"] === true ? true : undefined,
+    contextRepo: flagString(flags, "context-repo") ?? undefined,
+    contextTarget: flagString(flags, "context-target") ?? undefined,
+    contextBin: flagString(flags, "context-bin") ?? undefined,
+    autocontextRoot: flagString(flags, "autocontext-root") ?? undefined,
+    contextBudgetTokens: parseOptionalIntegerFlag(flags, "context-budget") ?? parseOptionalIntegerFlag(flags, "context-budget-tokens"),
+    allowLiterature: flags.literature === true || flags["literature-search"] === true ? true : undefined,
+    literatureBaseUrl: flagString(flags, "literature-base-url") ?? undefined,
+    literatureEndpoint: flagString(flags, "literature-endpoint") ?? undefined,
+    literatureDepth: parseControllerLiteratureDepth(flagString(flags, "literature-depth") ?? undefined),
+    literatureTopK: parseOptionalIntegerFlag(flags, "literature-top-k"),
+    literatureTimeoutMs: parseOptionalIntegerFlag(flags, "literature-timeout-ms"),
+    literatureMockResponsePath: flagString(flags, "literature-mock-response") ?? undefined,
+    reviewPanel: parseControllerReviewPanel(flagString(flags, "panel")),
+    reviewStage: parseReviewStage(flagString(flags, "stage") ?? undefined),
+    reviewerBudget: {
+      maxPerCallUsd: parseOptionalNumberFlag(flags, "max-per-call-usd"),
+      maxPanelUsd: parseOptionalNumberFlag(flags, "max-panel-usd"),
+      maxStudyLoopUsd: parseOptionalNumberFlag(flags, "max-study-loop-usd"),
+    },
+    controllerBudget: {
+      maxPerCallUsd: parseOptionalNumberFlag(flags, "controller-max-per-call-usd"),
+      maxPanelUsd: parseOptionalNumberFlag(flags, "controller-max-panel-usd"),
+      maxStudyLoopUsd: parseOptionalNumberFlag(flags, "controller-max-study-loop-usd"),
+    },
+    requireControllerModel: flags["require-controller-model"] === true ? true : undefined,
+    controller,
+  };
+}
+
+function parseControllerReviewPanel(raw: string | undefined): "default" | "cheap" | "strict" | "all" | "deepseek-dual" | "deepseek-triple" | undefined {
+  if (raw === undefined) return undefined;
+  const allowed = new Set(["default", "cheap", "strict", "all", "deepseek-dual", "deepseek-triple"]);
+  if (!allowed.has(raw)) throw new Error("--panel must be default, cheap, strict, all, deepseek-dual, or deepseek-triple");
+  return raw as "default" | "cheap" | "strict" | "all" | "deepseek-dual" | "deepseek-triple";
+}
+
+function parseControllerToolId(raw: string): Parameters<typeof researchControllerToolCommand>[0]["request"]["toolId"] {
+  if (raw !== "npm-build" && raw !== "npm-test" && raw !== "controller-inspect" && raw !== "controller-read-artifact" && raw !== "controller-read-file" && raw !== "controller-search-repo" && raw !== "controller-run-agenteer" && raw !== "controller-git-diff" && raw !== "controller-propose-patch" && raw !== "controller-apply-patch" && raw !== "controller-verify-patch" && raw !== "controller-rollback-patch") {
+    throw new Error("--tool must be npm-build, npm-test, controller-inspect, controller-read-artifact, controller-read-file, controller-search-repo, controller-run-agenteer, controller-git-diff, controller-propose-patch, controller-apply-patch, controller-verify-patch, or controller-rollback-patch");
+  }
+  return raw;
+}
+
+function parseControllerToolIds(raw: string[]): Parameters<typeof researchControllerInitCommand>[0]["allowedToolIds"] {
+  if (!raw.length) return undefined;
+  return raw.map(parseControllerToolId);
+}
+
+function parseControllerLiteratureDepth(raw: string | undefined): "quick" | "standard" | "long" | undefined {
+  if (raw === undefined) return undefined;
+  if (raw !== "quick" && raw !== "standard" && raw !== "long") throw new Error("--literature-depth must be quick, standard, or long");
+  return raw;
 }
 
 function parseEstimand(raw: string | undefined): "ATE" | "ATT" | undefined {

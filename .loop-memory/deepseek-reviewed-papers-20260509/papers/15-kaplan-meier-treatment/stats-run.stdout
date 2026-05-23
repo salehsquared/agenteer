@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_3519104374464545063",
+    "method": "kaplan-meier",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "survival_time",
+      "event",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "0",
+        "time": 493.146,
+        "survival": 0.3672338485262714
+      },
+      {
+        "term": "1",
+        "time": 354.29,
+        "survival": 0
+      }
+    ],
+    "diagnostics": {
+      "test": "Kaplan-Meier",
+      "curve_path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier-curve.csv",
+      "groups": [
+        0,
+        1
+      ]
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-config.json",
+        "sha256": "9aee49d9cb2368337a1acc5d9e11badc5844dcc200768fb2ad834a43a39b3246"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-summary.json",
+        "sha256": "e7678346428f0393a58c7208e5863061453228fa62badfc208afef1c900012ce"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/estimates.csv",
+        "sha256": "b433af86993d86a0707adb326936419849b2c389e7c9db99b4fa9731e2f9a8d4"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/diagnostics.json",
+        "sha256": "6decfcd879f8c01125c72a1be2b14e85b1a8adefc33381218b084a27e9026e26"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figures.json",
+        "sha256": "b0840b893ea4d65ba95904b9a6059b40beed8247b0b777fdff16dfc6cbc7ee8d"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier.png",
+        "sha256": "d1db847d98e7503a28b1f0d13f684724cf8ef07db354ba5d3315caa71de7e576"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figure-qa.json",
+        "sha256": "738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-report.md",
+        "sha256": "01395d12f8ceb3fd0de0cc11c27d64ef1cf3570dff0117af5d7b7d64e526c0b6"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-qa.json",
+        "sha256": "5bce1658e4ee131451431066555043071d051575557cab9a05930bcbe1056720"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run",
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/method-selection.json",
+      "methodSelectionId": "method_selection_15_kaplan_meier_treatment",
+      "methodId": "kaplan-meier-log-rank",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "bound"
+    },
+    "resultPosture": {
+      "status": "bound_standard_table",
+      "label": "Bound standard-table result",
+      "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+      "supports": [
+        "method-bound estimates",
+        "standard-table diagnostics",
+        "local methods review"
+      ],
+      "cannotSupport": [
+        "causal claims without design support",
+        "clinical recommendations"
+      ],
+      "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+    }
+  }
+}
+

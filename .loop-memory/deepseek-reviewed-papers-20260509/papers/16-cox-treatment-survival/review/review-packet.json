@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T22:17:44.578Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival",
+  "packetHash": "e3df4b59e36c3252d1be0705a25b6ecff554fb461629f6fbb8c34165c9f96d7c",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 8,
+    "totalBytes": 65128,
+    "includedBytes": 14244
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3911,
+      "sha256": "1fef0f2ed62b68dbece20871c4b25fa19648656cbea3dac6db8d04062d8c4b02",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# How is treatment associated with time-to-event outcome after adjustment\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How is treatment associated with time-to-event outcome after adjustment?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was cox-proportional-hazards. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How is treatment associated with time-to-event outcome after adjustment? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nGrouping variable: treatment. Covariates: age, severity.\n\n### Statistical Analysis\n\nThe statistical method was cox-proportional-hazards. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the hazard ratio was 1.6881 (95% CI 1.1423 to 2.4946); p=0.0086.\n- For age, the hazard ratio was 1.0202 (95% CI 1.0081 to 1.0324); p=0.0010.\n- For severity, the hazard ratio was 1.2905 (95% CI 1.0521 to 1.5828); p=0.0144.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 6905a825088de00198c191c67ab328e8eb36e4e8023d32deee813ca34946a241. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4902,
+      "sha256": "fcc3145971434a9f03a9c19115f5675fc3d7afbbcd144281e31c645f2523907f",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_5567455566847447858\",\n  \"method\": \"cox-proportional-hazards\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"survival_time\",\n    \"event\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"log_hazard_ratio\": 0.5235880733030501,\n      \"hazard_ratio\": 1.688073728604348,\n      \"ci_low\": 1.14230438397738,\n      \"ci_high\": 2.4946003474855027,\n      \"p_value\": 0.008597037671281815\n    },\n    {\n      \"term\": \"age\",\n      \"log_hazard_ratio\": 0.019957010016070732,\n      \"hazard_ratio\": 1.0201574825302668,\n      \"ci_low\": 1.0080635564797984,\n      \"ci_high\": 1.0323965016617953,\n      \"p_value\": 0.0010385557581535374\n    },\n    {\n      \"term\": \"severity\",\n      \"log_hazard_ratio\": 0.25500854526179956,\n      \"hazard_ratio\": 1.2904726482523985,\n      \"ci_low\": 1.0521414698656202,\n      \"ci_high\": 1.5827906261505438,\n      \"p_value\": 0.014370523118791481\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"cox-proportional-hazards\",\n    \"events\": 140,\n    \"n_predictors\": 3,\n    \"strata\": null\n  },\n  \"issues\": [\n    {\n      \"severity\": \"warning\",\n      \"code\": \"FIGURE_QA_WARNING\",\n      \"message\": \"0/0 figure(s) passed; status=warning.\",\n      \"evidenceRefs\": [\n        \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json\"\n      ]\n    }\n  ],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-config.json\",\n      \"sha256\": \"c58eefca6fbd7f7939d0a9863e4af2c5bd87f80a1fabc5243817701a98c74336\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-summary.json\",\n      \"sha256\": \"11b3d978ae97346d403d3c2769cbc2f59e417e641568d44fcc2ff5a0a68f5af8\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/estimates.csv\",\n      \"sha256\": \"59d4404f5d5a15c30b2624d7cadfb0d880aafbdfc8a97fea58c9ec1d0c9a269d\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/diagnostics.json\",\n      \"sha256\": \"ec44ff5012196168c543caba4be081d84bc022782e107f254ea24eaf70ac6cd1\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figures.json\",\n      \"sha256\": \"5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json\",\n      \"sha256\": \"d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-report.md\",\n      \"sha256\": \"61cba4a2885abfd9a05160c419fb10212aa9de0b38393b778530256b40d6976d\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-qa.json\",\n      \"sha256\": \"edcd1de2ad2db1e532c7f0c7454ae72fcfae663a4f5cdab55423d1d6bce11a4a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_16_cox_treatment_survival\",\n    \"methodId\": \"cox-proportional-hazards\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 96,
+      "sha256": "ec44ff5012196168c543caba4be081d84bc022782e107f254ea24eaf70ac6cd1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"cox-proportional-hazards\",\n  \"events\": 140,\n  \"n_predictors\": 3,\n  \"strata\": null\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1512,
+      "sha256": "edcd1de2ad2db1e532c7f0c7454ae72fcfae663a4f5cdab55423d1d6bce11a4a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"3 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"0 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"warning\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 784,
+      "sha256": "d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figures.json\",\n  \"status\": \"warning\",\n  \"summary\": \"0/0 figure(s) passed; status=warning.\",\n  \"figures\": [],\n  \"checks\": [\n    {\n      \"id\": \"manifest-readable\",\n      \"status\": \"pass\",\n      \"detail\": \"Read figure manifest: /Users/saleh/TechProj"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 784,
+      "sha256": "d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 41,
+      "sha256": "5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2214,
+      "sha256": "da47951bc6d50c4e0ce0c0c9cebaa14ac94a137da4390aad2409272213d97f59",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9737,
+      "sha256": "80240f278aca92c6fd2afbf0e1924a8e0f2a2942d9b02c864a4c8f0380465af2",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 217,
+      "sha256": "4a0b958b2093fa7dcb63d653a15e9f3d229bea7b01e8a5f2d346159ac938c563",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 1168,
+      "sha256": "04ec237d023f101400492ce60c3aef2ef29b0d103a00071e1c9fa8eee39b0b3c",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14606,
+      "sha256": "c9877003ffad3483c87534e01a3cdf9a77021a00a3645f33447ade72a3c72e5d",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/method-selection.json",
+      "relativePath": "method-selection.json",
+      "bytes": 855,
+      "sha256": "0940b819136b049a3ba73d43267093e2f62e2d68acd23954abfd5cc7b8c72747",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4305,
+      "sha256": "81498b379cb2a5edfa49a61464ede9421c8bf871b32905a53035ee7224e7e5ba",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 806,
+      "sha256": "cee3f98bf7dbee993e2235c04640ce3933e0b23d822a2c6aba34f32690a341b0",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9868,
+      "sha256": "ced05baa556e1d84510e4b644c4c1565b821f002f3513c7813f451f6ccc3a530",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1013,
+      "sha256": "5e23d04a4da4b6d5beba9084f58689fc852c57aec2204088b196ba6771d1d591",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 5197,
+      "sha256": "a6f38f9f6113c840470541c71cf1217dfdc937f608dfa1a654ff594ff28826e9",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 373,
+      "sha256": "59d4404f5d5a15c30b2624d7cadfb0d880aafbdfc8a97fea58c9ec1d0c9a269d",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 848,
+      "sha256": "c58eefca6fbd7f7939d0a9863e4af2c5bd87f80a1fabc5243817701a98c74336",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1648,
+      "sha256": "61cba4a2885abfd9a05160c419fb10212aa9de0b38393b778530256b40d6976d",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 243,
+      "sha256": "11b3d978ae97346d403d3c2769cbc2f59e417e641568d44fcc2ff5a0a68f5af8",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3911 bytes, sha256=1fef0f2ed62b68dbece20871c4b25fa19648656cbea3dac6db8d04062d8c4b02) ---\n# How is treatment associated with time-to-event outcome after adjustment\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How is treatment associated with time-to-event outcome after adjustment?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was cox-proportional-hazards. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How is treatment associated with time-to-event outcome after adjustment? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nGrouping variable: treatment. Covariates: age, severity.\n\n### Statistical Analysis\n\nThe statistical method was cox-proportional-hazards. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the hazard ratio was 1.6881 (95% CI 1.1423 to 2.4946); p=0.0086.\n- For age, the hazard ratio was 1.0202 (95% CI 1.0081 to 1.0324); p=0.0010.\n- For severity, the hazard ratio was 1.2905 (95% CI 1.0521 to 1.5828); p=0.0144.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 6905a825088de00198c191c67ab328e8eb36e4e8023d32deee813ca34946a241. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4902 bytes, sha256=fcc3145971434a9f03a9c19115f5675fc3d7afbbcd144281e31c645f2523907f) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_5567455566847447858\",\n  \"method\": \"cox-proportional-hazards\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"survival_time\",\n    \"event\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"log_hazard_ratio\": 0.5235880733030501,\n      \"hazard_ratio\": 1.688073728604348,\n      \"ci_low\": 1.14230438397738,\n      \"ci_high\": 2.4946003474855027,\n      \"p_value\": 0.008597037671281815\n    },\n    {\n      \"term\": \"age\",\n      \"log_hazard_ratio\": 0.019957010016070732,\n      \"hazard_ratio\": 1.0201574825302668,\n      \"ci_low\": 1.0080635564797984,\n      \"ci_high\": 1.0323965016617953,\n      \"p_value\": 0.0010385557581535374\n    },\n    {\n      \"term\": \"severity\",\n      \"log_hazard_ratio\": 0.25500854526179956,\n      \"hazard_ratio\": 1.2904726482523985,\n      \"ci_low\": 1.0521414698656202,\n      \"ci_high\": 1.5827906261505438,\n      \"p_value\": 0.014370523118791481\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"cox-proportional-hazards\",\n    \"events\": 140,\n    \"n_predictors\": 3,\n    \"strata\": null\n  },\n  \"issues\": [\n    {\n      \"severity\": \"warning\",\n      \"code\": \"FIGURE_QA_WARNING\",\n      \"message\": \"0/0 figure(s) passed; status=warning.\",\n      \"evidenceRefs\": [\n        \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json\"\n      ]\n    }\n  ],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-config.json\",\n      \"sha256\": \"c58eefca6fbd7f7939d0a9863e4af2c5bd87f80a1fabc5243817701a98c74336\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-summary.json\",\n      \"sha256\": \"11b3d978ae97346d403d3c2769cbc2f59e417e641568d44fcc2ff5a0a68f5af8\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/estimates.csv\",\n      \"sha256\": \"59d4404f5d5a15c30b2624d7cadfb0d880aafbdfc8a97fea58c9ec1d0c9a269d\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/diagnostics.json\",\n      \"sha256\": \"ec44ff5012196168c543caba4be081d84bc022782e107f254ea24eaf70ac6cd1\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figures.json\",\n      \"sha256\": \"5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figure-qa.json\",\n      \"sha256\": \"d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-report.md\",\n      \"sha256\": \"61cba4a2885abfd9a05160c419fb10212aa9de0b38393b778530256b40d6976d\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-qa.json\",\n      \"sha256\": \"edcd1de2ad2db1e532c7f0c7454ae72fcfae663a4f5cdab55423d1d6bce11a4a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_16_cox_treatment_survival\",\n    \"methodId\": \"cox-proportional-hazards\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 96 bytes, sha256=ec44ff5012196168c543caba4be081d84bc022782e107f254ea24eaf70ac6cd1) ---\n{\n  \"test\": \"cox-proportional-hazards\",\n  \"events\": 140,\n  \"n_predictors\": 3,\n  \"strata\": null\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1512 bytes, sha256=edcd1de2ad2db1e532c7f0c7454ae72fcfae663a4f5cdab55423d1d6bce11a4a) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"3 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"0 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"warning\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 784 bytes, sha256=d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/figures.json\",\n  \"status\": \"warning\",\n  \"summary\": \"0/0 figure(s) passed; status=warning.\",\n  \"figures\": [],\n  \"checks\": [\n    {\n      \"id\": \"manifest-readable\",\n      \"status\": \"pass\",\n      \"detail\": \"Read figure manifest: /Users/saleh/TechProj\n\n--- ARTIFACT stats-run/figure-qa.json (json, 784 bytes, sha256=d3e1cc0faca4f57c42bae2743012858a161289d233176ec42319996e7de4f267) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 41 bytes, sha256=5acc2783a133d986d44c74bc268d41f703253a49c7c639fcf73e020acd0a4300) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2214 bytes, sha256=da47951bc6d50c4e0ce0c0c9cebaa14ac94a137da4390aad2409272213d97f59) ---\n"
+}

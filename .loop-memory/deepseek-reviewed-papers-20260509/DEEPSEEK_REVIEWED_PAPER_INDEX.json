@@ -1,0 +1,606 @@
+{
+  "schemaVersion": 1,
+  "dataPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/stats-method-validation-20260509/validation-data.csv",
+  "studies": [
+    {
+      "number": 1,
+      "studyId": "01-descriptive-clinical-profile",
+      "question": "What are the distributions of age, severity, BMI, albumin, and continuous outcome?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "01-descriptive-clinical-profile",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "exploration",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 16,
+        "topFindings": [
+          "Distributions not reported in the manuscript",
+          "Variables lack clinical definitions and units",
+          "Manuscript does not report descriptive statistics for any variable"
+        ],
+        "estimatedUsd": 0.052314
+      }
+    },
+    {
+      "number": 2,
+      "studyId": "02-welch-treatment-continuous",
+      "question": "Does the continuous outcome differ by treatment group using Welch's t-test?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "02-welch-treatment-continuous",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "dataset_feasibility",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "P-value reported as 0.0000 is inaccurate and misleading",
+          "Observational design lacks any confounder control or treatment-assignment description",
+          "No clinical or scientific context and zero literature citations"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 3,
+      "studyId": "03-mann-whitney-treatment-continuous",
+      "question": "Does the continuous outcome differ by treatment group using a rank-based test?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "03-mann-whitney-treatment-continuous",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "revise",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 15,
+        "topFindings": [
+          "Missing clinical context and substantive interpretation",
+          "Unadjusted observational comparison ignores confounding",
+          "Missingness handling not described and potentially absent"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 4,
+      "studyId": "04-anova-group-continuous",
+      "question": "Does the continuous outcome differ across clinical groups?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "04-anova-group-continuous",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "revise",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 15,
+        "topFindings": [
+          "No effect size reported despite available data",
+          "No test for homogeneity of variances is reported",
+          "Homogeneity of variance assumption not checked"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 5,
+      "studyId": "05-ancova-group-continuous",
+      "question": "Does the continuous outcome differ across groups after age and severity adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "05-ancova-group-continuous",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "exploration",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 15,
+        "topFindings": [
+          "No raw data or analysis code provided; analysis not reproducible",
+          "Homogeneity of regression slopes not checked",
+          "No effect size measures reported"
+        ],
+        "estimatedUsd": 0.052314
+      }
+    },
+    {
+      "number": 6,
+      "studyId": "06-chi-square-treatment-outcome",
+      "question": "Is binary outcome frequency associated with treatment group?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "06-chi-square-treatment-outcome",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "protocol",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "Study design and cohort definition are absent",
+          "No adjustment for confounders; chi-square alone is inadequate for association inference",
+          "Missing data handling not described; complete-case analysis is unjustified"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 7,
+      "studyId": "07-fisher-treatment-outcome",
+      "question": "Is binary outcome frequency associated with treatment group using exact testing?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "07-fisher-treatment-outcome",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "protocol",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "No confounder control in observational design",
+          "Missing odds ratio confidence interval",
+          "No report on missing data"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 8,
+      "studyId": "08-pearson-severity-continuous",
+      "question": "How strongly is severity linearly associated with the continuous outcome?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "08-pearson-severity-continuous",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "Primary result omitted from manuscript",
+          "No diagnostic checks for Pearson correlation assumptions",
+          "No verification of Pearson correlation assumptions"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 9,
+      "studyId": "09-partial-correlation-severity",
+      "question": "How strongly is severity associated with the continuous outcome after age and treatment adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "09-partial-correlation-severity",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "Partial correlation inapplicable when adjusting for a categorical variable",
+          "Primary analysis result absent from manuscript",
+          "No diagnostic checks for partial correlation assumptions"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 10,
+      "studyId": "10-linear-regression-severity",
+      "question": "How is severity associated with the continuous outcome after adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "10-linear-regression-severity",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "protocol",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 8,
+        "topFindings": [
+          "P-values reported as 0.0000 violate ASA guidelines and are misleading",
+          "Outcome, exposure, and covariate variables are not defined",
+          "No confounding adjustment plan or rationale for covariates"
+        ],
+        "estimatedUsd": 0.052314
+      }
+    },
+    {
+      "number": 11,
+      "studyId": "11-logistic-regression-treatment",
+      "question": "How is treatment associated with the binary outcome after adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "11-logistic-regression-treatment",
+        "returnCode": 0,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "revise",
+        "verdict": "revise",
+        "reentryPoint": "protocol",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 15,
+        "topFindings": [
+          "Complete-case analysis without reporting of missing data patterns",
+          "Absence of descriptive statistics (Table\u202f1)",
+          "Model fit and diagnostics not reported"
+        ],
+        "estimatedUsd": 0.052318
+      }
+    },
+    {
+      "number": 12,
+      "studyId": "12-poisson-count-events",
+      "question": "How is treatment associated with count-event burden after adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "12-poisson-count-events",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "dataset_feasibility",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "Overdispersion not assessed",
+          "No assessment of overdispersion in Poisson regression",
+          "Complete-case analysis without description of missing data"
+        ],
+        "estimatedUsd": 0.052314
+      }
+    },
+    {
+      "number": 13,
+      "studyId": "13-negative-binomial-count-events",
+      "question": "How is treatment associated with overdispersed count-event burden after adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "13-negative-binomial-count-events",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 14,
+        "topFindings": [
+          "Negative binomial model used default dispersion parameter alpha=1.0 without estimation; standard errors and p-values may be invalid.",
+          "Negative binomial model misspecified: dispersion parameter not estimated; default alpha=1.0 used",
+          "No evidence of overdispersion testing or model comparison (e.g., against Poisson) to justify negative binomial choice."
+        ],
+        "estimatedUsd": 0.052318
+      }
+    },
+    {
+      "number": 14,
+      "studyId": "14-quantile-continuous-outcome",
+      "question": "How is treatment associated with the median continuous outcome after adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "14-quantile-continuous-outcome",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/14-quantile-continuous-outcome/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "protocol",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 16,
+        "topFindings": [
+          "Inappropriate diagnostics applied to quantile regression",
+          "Missing data handling not reported",
+          "Standard error computation method unclear, potentially invalid"
+        ],
+        "estimatedUsd": 0.052314
+      }
+    },
+    {
+      "number": 15,
+      "studyId": "15-kaplan-meier-treatment",
+      "question": "How does event-free survival differ by treatment group?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "15-kaplan-meier-treatment",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 15,
+        "topFindings": [
+          "No statistical test of difference between groups",
+          "Interpretation overstates the evidence",
+          "Survival estimates lack confidence intervals and standard errors"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 16,
+      "studyId": "16-cox-treatment-survival",
+      "question": "How is treatment associated with time-to-event outcome after adjustment?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "16-cox-treatment-survival",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/16-cox-treatment-survival/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "protocol",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 13,
+        "topFindings": [
+          "Missing proportional hazards assumption testing",
+          "Variable definitions and coding are missing",
+          "Insufficient adjustment for confounding"
+        ],
+        "estimatedUsd": 0.052308
+      }
+    },
+    {
+      "number": 17,
+      "studyId": "17-cif-competing-risk",
+      "question": "How does cumulative incidence of the target event differ by treatment when competing events are present?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "17-cif-competing-risk",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "dataset_feasibility",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 12,
+        "topFindings": [
+          "No uncertainty estimates provided for cumulative incidence",
+          "Missing uncertainty measures for cumulative incidence estimates",
+          "Missing group sizes and event counts"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    },
+    {
+      "number": 18,
+      "studyId": "18-propensity-matching-treatment",
+      "question": "What is the matched treated-control contrast for treatment and binary outcome?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "18-propensity-matching-treatment",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 15,
+        "topFindings": [
+          "Residual imbalance after propensity-score matching violates balance guidelines",
+          "Manuscript content is an automated template devoid of scientific interpretation",
+          "Implausible exact null effect with p=1.0 and identical risks"
+        ],
+        "estimatedUsd": 0.05221
+      }
+    },
+    {
+      "number": 19,
+      "studyId": "19-pca-scale-structure",
+      "question": "What latent component structure is suggested by correlated scale items and severity?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "19-pca-scale-structure",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 16,
+        "topFindings": [
+          "Data and code not provided, analysis unreproducible",
+          "Manuscript does not report PCA outcomes or answer the research question",
+          "No interpretation of components provided"
+        ],
+        "estimatedUsd": 0.052304
+      }
+    },
+    {
+      "number": 20,
+      "studyId": "20-prediction-risk-score",
+      "question": "How well does the risk score discriminate the binary outcome?",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score",
+      "manuscript": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/manuscript.md",
+      "statsRun": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-run.json",
+      "review": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/review/review-panel.json",
+      "reviewRun": {
+        "studyId": "20-prediction-risk-score",
+        "returnCode": 1,
+        "reviewPanel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/review/review-panel.json",
+        "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/review/review-adjudication.json",
+        "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/review/review-response.json"
+      },
+      "reviewSummary": {
+        "panelStatus": "block",
+        "verdict": "block",
+        "reentryPoint": "analysis_spec",
+        "reviewersSucceeded": 2,
+        "reviewersFailed": 0,
+        "acceptedFindings": 16,
+        "topFindings": [
+          "Predictor and outcome are undefined",
+          "Risk score derivation not described; possible apparent performance evaluation",
+          "No calibration assessment performed"
+        ],
+        "estimatedUsd": 0.052312
+      }
+    }
+  ]
+}

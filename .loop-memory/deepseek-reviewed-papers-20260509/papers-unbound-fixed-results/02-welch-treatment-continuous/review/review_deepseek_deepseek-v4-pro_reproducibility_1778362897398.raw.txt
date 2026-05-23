@@ -1,0 +1,129 @@
+{
+  "verdict": "block",
+  "summary": "This manuscript reports an unbound exploratory Welch's t-test as if it were a confirmatory study. The analysis lacks pre-specification, cohort definitions, variable documentation, literature context, and contains reporting errors. Without these, it is not suitable for publication or claim. Major revisions are needed, including binding the analysis to a protocol and providing full data provenance.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Exploratory analysis presented as confirmatory test",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "The analysis is unbound (exploratory_standard_table) and lacks a pre-specified analysis plan. P-values and effect sizes from such an analysis are not reliable for inference and cannot support paper-ready conclusions.",
+      "actionableFix": "Clearly label the analysis as exploratory and remove definitive p-value language, or bind the run to a pre-registered analysis spec and re-run under governance before making any confirmatory claims.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "P-value reported as 0.0000 instead of exact or <0.001 notation",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Reporting p=0.0000 erroneously implies a probability of zero and obscures the true extreme value (3.83e-10). This misleads readers about the strength of evidence.",
+      "actionableFix": "Report the exact p-value (e.g., 3.83×10⁻¹⁰) or use standard notation such as p<0.001. Never round to zero.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Missing cohort eligibility criteria and variable definitions",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without inclusion/exclusion rules, definition of treatment groups, and outcome measurement details, the study cannot be reproduced or externally validated.",
+      "actionableFix": "Add a detailed cohort construction section, including data source, eligibility rules, missingness handling, and a data dictionary defining all variables (units, coding).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "literature",
+      "title": "No literature review or clinical context provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The study lacks any reference to prior work, clinical relevance, or the research gap it addresses. This prevents readers from assessing the importance and novelty of the findings.",
+      "actionableFix": "Include a brief literature review and explicitly state the research question in the context of existing evidence.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript contains self-contradictory placeholder text",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The Limitations section states 'No reader-facing paper/manuscript artifact was found.' while the manuscript itself exists. This indicates incomplete editing and generic template remnants, undermining credibility.",
+      "actionableFix": "Remove all boilerplate and irrelevant statements; tailor every statement to the actual analysis and artifacts present.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "No normality or distributional check reported",
+      "evidenceRefs": [
+        "stats-run.json",
+        "diagnostics.json"
+      ],
+      "whyItMatters": "Although Welch’s t-test is robust with large samples, reporting diagnostic checks (e.g., normality, outliers) increases transparency and helps readers assess assumptions.",
+      "actionableFix": "Include a histogram, Q-Q plot, and Shapiro-Wilk test per group, with appropriate caveats if violations are found.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "No information on data provenance or outcome plausibility",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without knowing what 'outcome_cont' represents, its measurement units, or how data were collected, the mean difference of 2.91 is uninterpretable and data quality cannot be assessed.",
+      "actionableFix": "Provide a clear description of the data source, collection methods, outcome definition, units, and any data cleaning steps.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Abstract and results omit group sizes and imbalance",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The unequal group sizes (96 vs. 144) may affect generalizability and interpretation of effect size. Readers need this information to assess the study.",
+      "actionableFix": "Report n for each group in the abstract and results section, including any comment on imbalance if relevant.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Pre-registered analysis protocol or AnalysisSpec artifact",
+    "Raw data or data dictionary with variable definitions and units",
+    "Cohort eligibility criteria and missing data handling report",
+    "Literature review or background section",
+    "Documentation of data source and ethical approvals"
+  ],
+  "recommendedNextStage": "protocol"
+}

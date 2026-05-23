@@ -1,0 +1,25 @@
+{
+  "method": "propensity-score-matching",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_binary",
+    "treatment",
+    "age",
+    "severity",
+    "albumin",
+    "sex"
+  ],
+  "parameters": {
+    "alpha": 0.05,
+    "estimand": "ATT",
+    "matchRatio": 1,
+    "caliper": 0.4,
+    "replacement": false,
+    "trimThreshold": 0.01,
+    "stabilizeWeights": true,
+    "treatmentPositiveLevel": 1,
+    "treatmentNegativeLevel": 0
+  },
+  "warnings": []
+}

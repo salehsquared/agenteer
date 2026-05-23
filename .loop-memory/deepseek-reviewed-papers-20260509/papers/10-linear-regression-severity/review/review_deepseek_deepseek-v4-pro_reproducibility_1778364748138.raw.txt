@@ -1,0 +1,133 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript reports an observational linear regression model with critical methodological and reporting flaws. Key variables are undefined, p-values are misreported as 0.0000, no confounding control plan is provided, model assumptions (linearity, homoscedasticity) are unchecked, missing data handling is absent, and reproducibility evidence is insufficient. These issues make the reported claims unsafe for interpretation or promotion.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "major",
+      "category": "reporting",
+      "title": "P-values reported as 0.0000 violate ASA guidelines and are misleading",
+      "evidenceRefs": [
+        "manuscript.md Results: 'p=0.0000' for all predictors",
+        "stats-run.json estimates: extremely small actual p-values (e.g., 1.97e-30)"
+      ],
+      "whyItMatters": "Reporting p-values as 0.0000 gives a false impression of zero probability, overstates precision, and deviates from standard scientific reporting. ASA guidelines recommend reporting exact p-values or a threshold (e.g., <0.001).",
+      "actionableFix": "Replace all 'p=0.0000' with the exact p-values (e.g., <0.001 or scientific notation) and add a note about p-value interpretation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that no p-value is literally displayed as 0.0000 in the manuscript or tables.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Outcome, exposure, and covariate variables are not defined",
+      "evidenceRefs": [
+        "manuscript.md Methods/Variables: 'Outcome: outcome_cont. Exposure or predictor: severity. Covariates: age, treatment.'"
+      ],
+      "whyItMatters": "Without operational definitions, measurement scales, or coding, the results cannot be interpreted, replicated, or compared to other studies. Readers do not know what a 1-unit change in severity or outcome_cont represents.",
+      "actionableFix": "Add a Variables section defining each variable: its role, measurement units, continuous/categorical nature, and any transformation. Describe 'treatment' coding (e.g., 0/1).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "study_design",
+      "title": "No confounding adjustment plan or rationale for covariates",
+      "evidenceRefs": [
+        "manuscript.md Methods/Covariates: only age and treatment",
+        "manuscript.md Limitations: 'causal design... explicitly reviewed'"
+      ],
+      "whyItMatters": "Observational studies with arbitrary covariate selection produce biased adjusted estimates. Without a directed acyclic graph (DAG) or subject-matter justification, the adjusted coefficient for severity may be confounded, and the claim of 'association after adjustment' is potentially misleading.",
+      "actionableFix": "Provide a minimally sufficient adjustment set based on domain knowledge or a DAG, or explicitly state that the model is purely descriptive with no causal interpretation and discuss likely residual confounding.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Key regression assumptions (linearity, homoscedasticity) not checked",
+      "evidenceRefs": [
+        "diagnostics.json includes Shapiro-Wilk, VIF, Cook's D, but no Breusch-Pagan test or residual-vs-fitted plot inspection",
+        "figures.json lists 'model-residuals.png' but not evaluated"
+      ],
+      "whyItMatters": "The linear regression model assumes linear relationships and constant error variance. Violations can invalidate standard errors, confidence intervals, and p-values. The reported diagnostics are insufficient to confirm model appropriateness.",
+      "actionableFix": "Report tests for heteroscedasticity (e.g., Breusch-Pagan) and linearity checks (e.g., partial residual plots). If violations exist, consider robust standard errors, transformations, or non-linear terms.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that diagnostics include at least one formal test for homoscedasticity and a comment on linearity for continuous predictors.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without missing data investigation",
+      "evidenceRefs": [
+        "manuscript.md Cohort: 'complete-case sample size was 240'",
+        "manuscript.md Limitations: 'missingness may affect the result'"
+      ],
+      "whyItMatters": "If missingness is non-ignorable or related to exposure/outcome, complete-case estimates can be biased. No report of missing proportions, patterns, or sensitivity analysis is provided.",
+      "actionableFix": "Describe the amount and pattern of missing data for all variables. Perform sensitivity analysis (e.g., multiple imputation as a supplementary analysis) or justify why complete cases are defensible.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Require a missingness table or figure in supplementary material.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Artifact count mismatch and lack of analysis code or data",
+      "evidenceRefs": [
+        "manuscript.md Reproducibility: '14 artifact(s)'",
+        "stats-run.json artifacts array: 9 items listed"
+      ],
+      "whyItMatters": "The discrepancy undermines the claimed reproducibility. Essential elements (analysis code, raw data) are not included in the artifacts, so independent verification is impossible.",
+      "actionableFix": "Reconcile the artifact inventory; include all relevant scripts, data dictionaries, and a README. Ensure the artifact count matches the actual files.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Count files in the run directory and verify they match the reported number.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Model fit (R-squared) not reported",
+      "evidenceRefs": [
+        "manuscript.md Results only shows coefficient estimates",
+        "diagnostics.json includes AIC/BIC but no R-squared"
+      ],
+      "whyItMatters": "Without an overall measure of explained variance, the practical significance of the model is unclear. R-squared helps assess whether the model captures meaningful signal in the outcome.",
+      "actionableFix": "Report R-squared (or adjusted R-squared) and comment on its magnitude relative to typical benchmarks in the domain.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Incorrect statement about influence diagnostics",
+      "evidenceRefs": [
+        "manuscript.md Limitations: 'No explicit influence diagnostic evidence was found.'",
+        "stats-run.json diagnostics.max_cooks_distance = 0.0776"
+      ],
+      "whyItMatters": "The manuscript falsely claims no influence diagnostics exist, but Cook's distance values are present. This erodes trust in the carefulness of the reporting.",
+      "actionableFix": "Correct the statement to reflect that influence diagnostics were examined (max Cook's D = 0.078) and no influential observations were identified.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the limitation text acknowledges the available Cook's distance.",
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Advisory methods issues referenced in the manuscript (Deterministic methods checks identified issues that require review) are not supplied in the artifacts.",
+    "Residual diagnostic plots (model-residuals.png) and Figure QA details not provided for independent review.",
+    "Analysis code (e.g., R/Python script) and raw data are not included, preventing full reproducibility verification.",
+    "Missing data summary (counts, patterns) absent.",
+    "No information on outcome scale or clinical relevance."
+  ],
+  "recommendedNextStage": "manuscript"
+}

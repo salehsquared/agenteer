@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:18:13.379Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361493379",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "The manuscript is a form template that omits the statistical test, effect-size estimate, p-value, and variable definitions. The analysis is unbound (no pre-registered method or analysis plan), yet the study question is presented as prespecified. The lack of reporting and reproducibility artifacts makes the work unpublishable in its current state.",
+    "findings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Manuscript omits all key statistical results (test name, statistic, p-value, effect size)",
+        "evidenceRefs": [
+          "manuscript.md Results section",
+          "stats-run/stats-run.json estimates block"
+        ],
+        "whyItMatters": "Readers cannot evaluate the analysis or reproduce the findings; the central quantitative evidence is absent from the report.",
+        "actionableFix": "Explicitly state the Mann-Whitney U test, U = 10079, p < 0.001 (from estimate), group medians (20.06 vs 23.08), group sizes, and an effect-size measure (e.g., Hodges-Lehmann shift). Note the interpretation appropriate for a rank-based test.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Text search for 'Mann-Whitney' or 'p_value' in manuscript.md returns no matches.",
+        "confidence": 1
+      },
+      {
+        "id": "F2",
+        "severity": "blocker",
+        "category": "reproducibility",
+        "title": "Analysis is unbound (no method-selection artifact or AnalysisSpec) but presented as if prespecified",
+        "evidenceRefs": [
+          "stats-run/stats-run.json binding.status = 'unbound'",
+          "stats-run/stats-qa.json checks: binding-status warning, result-posture warning",
+          "manuscript.md title claims 'prespecified study question'"
+        ],
+        "whyItMatters": "Without a pre-registered plan, the p-value is just an exploratory figure; presenting it as confirmatory inflates false-positive risk and misleads readers.",
+        "actionableFix": "Clearly label all results as exploratory and non-confirmatory. Remove the word 'prespecified' from title/abstract unless a pre-analysis plan is provided. Alternatively, create a method-selection artifact and re-run under binding.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "Binding status string 'unbound' is present in stats-run.json.",
+        "confidence": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "study_design",
+        "title": "No covariate adjustment for an observational comparison – potential confounding ignored",
+        "evidenceRefs": [
+          "stats-run/stats-run.json variables = ['outcome_cont','treatment'] only",
+          "manuscript.md mentions 'exposure, and covariates' but none are defined or used"
+        ],
+        "whyItMatters": "Observed group difference cannot be attributed to treatment without controlling for confounders; the naive comparison is prone to bias.",
+        "actionableFix": "Either declare the analysis purely unadjusted and discuss the risk of confounding, or include key covariates (if available) and use a regression or matched design. At minimum, provide a table of baseline characteristics by group.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Variable list in stats-run.json contains no covariate names.",
+        "confidence": 0.95
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "variables",
+        "title": "Variable definitions, units, and data source completely missing",
+        "evidenceRefs": [
+          "manuscript.md Methods: 'primary outcome, exposure, and covariates were not fully encoded'",
+          "No companion variable artifact or data dictionary provided"
+        ],
+        "whyItMatters": "Impossible to assess construct validity, measurement error, or external generalisability; the result is uninterpretable.",
+        "actionableFix": "Provide a data dictionary with variable names, descriptions, units, coding (e.g., 0=control, 1=treated), and a statement of data provenance (e.g., institutional registry, trial, survey).",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "No artifact with 'variable' or 'data dictionary' in manifest; manuscript explicitly says 'not fully encoded'.",
+        "confidence": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Template limitations contain false statements about missing artifacts",
+        "evidenceRefs": [
+          "manuscript.md Limitations: 'No reader-facing paper/manuscript artifact was found' (but manuscript.md exists)",
+          "'No estimate-like records were available for p-value/effect-size checks' (but stats-run.json contains estimates)"
+        ],
+        "whyItMatters": "Indicates the manuscript was not updated after analysis; such template errors erode trust in the reporting process.",
+        "actionableFix": "Rewrite limitations to reflect actual artifacts: state that estimates exist but are not yet embedded in the manuscript, and that binding is missing. Remove spurious negative claims.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Presence of estimates in stats-run.json vs. text claim of 'No estimate-like records'; presence of manuscript.md vs. claim of 'No reader-facing paper'.",
+        "confidence": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "model_diagnostics",
+        "title": "Mann-Whitney ties handling not reported",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json: 'ties_possible': true",
+          "stats-run/stats-run.json diagnostics section"
+        ],
+        "whyItMatters": "Ties affect the p-value calculation; with continuous data they are usually rare, but failure to report handling leaves uncertainty about the reported p-value’s accuracy.",
+        "actionableFix": "State whether any ties were present (e.g., exact vs. approximate p-value), and if so, what correction (e.g., continuity correction, random jitter, exact permutation test) was applied.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "Check diagnostic artifact for ties handling code – none present.",
+        "confidence": 0.9
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "figures",
+        "title": "Generated boxplot not referenced or discussed in manuscript",
+        "evidenceRefs": [
+          "stats-run/figure-qa.json: figure 'group-distribution.png' exists",
+          "manuscript.md contains no figure reference"
+        ],
+        "whyItMatters": "Visual evidence of group distributions is available but wasted; the figure could illustrate skew, outliers, and overlap, supporting the choice of a non-parametric test.",
+        "actionableFix": "Insert the boxplot with caption and brief interpretation in the Results section. Mention that the distributions suggest a location shift and any notable features (e.g., outliers, skew).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Image file hash listed, but text search for 'figure' or 'boxplot' in manuscript.md yields no relevant matches.",
+        "confidence": 0.95
+      }
+    ],
+    "missingEvidence": [
+      "Companion variable artifact (data dictionary, coding scheme)",
+      "Data provenance statement (origin, selection criteria, ethics)",
+      "Consort-style flow chart or missing-data description (complete-case N=240, but no denominator or exclusion counts)",
+      "Pre-specified analysis plan (method-selection artifact or AnalysisSpec)",
+      "Baseline characteristics table by group"
+    ],
+    "recommendedNextStage": "manuscript",
+    "costEstimate": {
+      "inputTokens": 3032,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026156,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361493379.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361493379.json"
+  }
+}

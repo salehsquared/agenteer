@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:23:38.423Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361818423",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "Manuscript omits primary result, contradicts run artifacts, lacks model diagnostics, and the analysis is ungoverned. Critical reporting and reproducibility issues mandate blocking.",
+    "findings": [
+      {
+        "id": "missing-primary-result",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Manuscript does not report the primary partial correlation estimate or p-value",
+        "evidenceRefs": [
+          "manuscript.md#Results",
+          "stats-run/stats-run.json#estimates"
+        ],
+        "whyItMatters": "Readers cannot assess the main finding; the manuscript misleadingly claims no estimate records exist.",
+        "actionableFix": "Update the Results section to include the partial correlation coefficient (0.654), p-value (1.12e-30), the variables involved, and an appropriate ASA interpretation.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Search manuscript.md for '0.654' – absent.",
+        "confidence": 1
+      },
+      {
+        "id": "figure-empty-or-near-empty",
+        "severity": "major",
+        "category": "figures",
+        "title": "Correlation scatterplot has extremely low non-blank ratio (0.06), indicating likely blank or unusable figure",
+        "evidenceRefs": [
+          "stats-run/figure-qa.json#figures[0].nonBlankRatio"
+        ],
+        "whyItMatters": "The figure intended to visualise the relationship may be unusable, undermining visual diagnostics.",
+        "actionableFix": "Regenerate the scatterplot ensuring data is correctly plotted; verify that the figure shows points with axes labelled.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Open correlation-scatter.png and confirm it is blank or nearly blank.",
+        "confidence": 0.9
+      },
+      {
+        "id": "no-model-diagnostics",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "No diagnostics for partial correlation assumptions (linearity, outliers, normality) beyond sample size",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "Without checking assumptions, the correlation estimate may be invalid.",
+        "actionableFix": "Include residual plots, Q-Q plots, influence measures, and comment on assumption validity.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Check that diagnostics.json contains only 'n' and test name.",
+        "confidence": 0.95
+      },
+      {
+        "id": "unbound-analysis",
+        "severity": "major",
+        "category": "study_design",
+        "title": "Analysis lacks pre-specification; run is unbound to method-selection or AnalysisSpec",
+        "evidenceRefs": [
+          "stats-run/stats-run.json#binding",
+          "stats-run/stats-qa.json#checks[3,8]"
+        ],
+        "whyItMatters": "Results are inherently exploratory and cannot support confirmatory claims; risk of data dredging.",
+        "actionableFix": "If designed as exploratory, revise manuscript to explicitly state that no hypothesis testing can be done, and results are hypothesis-generating only. Alternatively, register analysis plan and re-run bound.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json binding status is 'unbound'.",
+        "confidence": 1
+      },
+      {
+        "id": "manuscript-contradictions",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript states no paper artifact or estimate records found, but both are provided",
+        "evidenceRefs": [
+          "manuscript.md#Limitations",
+          "stats-run/stats-run.json#estimates",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Indicates manuscript is out-of-sync with run artifacts, eroding trust in reporting.",
+        "actionableFix": "Align manuscript text with actual artifacts; remove false statements.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Compare manuscript Limitation lines with presence of manuscript.md and estimates.",
+        "confidence": 1
+      },
+      {
+        "id": "variable-definitions-missing",
+        "severity": "minor",
+        "category": "variables",
+        "title": "No definitions or measurement details for severity, outcome_cont, age, treatment",
+        "evidenceRefs": [
+          "manuscript.md#Variables"
+        ],
+        "whyItMatters": "Without definitions, interpretability and clinical relevance are unclear.",
+        "actionableFix": "Include a Variables table describing each variable's source, units, and coding.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8
+      },
+      {
+        "id": "missing-missingness-report",
+        "severity": "minor",
+        "category": "missingness",
+        "title": "No reporting of missing data patterns or reasons for complete-case analysis",
+        "evidenceRefs": [
+          "stats-run/stats-run.json#rowCount",
+          "manuscript.md#Cohort Construction"
+        ],
+        "whyItMatters": "Complete-case analysis may introduce bias if missingness is non-ignorable; readers cannot assess.",
+        "actionableFix": "Provide flowchart from eligible to analyzed, and discuss missingness mechanism.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8
+      },
+      {
+        "id": "no-confidence-interval",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Partial correlation reported without confidence interval",
+        "evidenceRefs": [
+          "stats-run/stats-run.json#estimates"
+        ],
+        "whyItMatters": "Point estimate alone is insufficient for inference; confidence interval conveys precision.",
+        "actionableFix": "Compute and report a 95% CI for the partial correlation coefficient.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Check if estimates.csv includes CI; from stats-run summary it's not reported.",
+        "confidence": 0.9
+      }
+    ],
+    "missingEvidence": [
+      "Data dictionary with variable definitions",
+      "Analysis protocol or pre-registration",
+      "Assumption diagnostics (residual plots, etc.)",
+      "Missing data flowchart"
+    ],
+    "recommendedNextStage": "protocol",
+    "costEstimate": {
+      "inputTokens": 3032,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026156,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361818423.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361818423.json"
+  }
+}

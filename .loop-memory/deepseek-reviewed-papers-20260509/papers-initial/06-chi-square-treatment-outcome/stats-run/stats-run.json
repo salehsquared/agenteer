@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_3936536226102445019",
+  "method": "chi-square",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_binary",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "chi_square": 11.172924297924299,
+      "degrees_of_freedom": 1,
+      "p_value": 0.0008299970166527486,
+      "cramers_v": 0.21576341497425194
+    }
+  ],
+  "diagnostics": {
+    "test": "Chi-square independence",
+    "table": {
+      "0": {
+        "0": 75,
+        "1": 81
+      },
+      "1": {
+        "0": 21,
+        "1": 63
+      }
+    },
+    "min_expected": 33.6
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-config.json",
+      "sha256": "de16e0bff9849af56e9eda0e522c231926b84c1d3403e467d80310f6e0bac9ab"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-summary.json",
+      "sha256": "6a9d6133e80a123cc0bf65864f61472bb389c88c86b65eaecb433886cf81c927"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/estimates.csv",
+      "sha256": "a680ba05f93cbf9c23a2dd7d43139ea12f62fee04c15cc344220d1c4838e4d8a"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/diagnostics.json",
+      "sha256": "34718d3f3ea024bd2f1339def45a77b9014f9385892ef3284aa1a9be219483c5"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figures.json",
+      "sha256": "d2b21a86e346b75ca1781249b040080192681d518a2a6d8c5d7869d51f4d8f7f"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/contingency-heatmap.png",
+      "sha256": "b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figure-qa.json",
+      "sha256": "862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-report.md",
+      "sha256": "90c0c4605daf1b32fc70e5eacb2629b20f17614bc87fa7ad16df2532fc65edae"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-qa.json",
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

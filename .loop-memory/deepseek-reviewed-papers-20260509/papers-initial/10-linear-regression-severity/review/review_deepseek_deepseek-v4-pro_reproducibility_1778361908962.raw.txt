@@ -1,0 +1,130 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript lacks a stated research question, variable definitions, and sufficient acknowledgment of its exploratory nature. Critical reporting gaps prevent meaningful interpretation and reproducibility.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Prespecified study question not stated",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without the research question, the analysis cannot be interpreted, and the manuscript fails to meet basic reporting standards.",
+      "actionableFix": "Specify the exact study question, including the exposure, outcome, and hypothesis.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Check if a protocol or analysis spec artifact exists and contains a hypothesis statement; if not, flag as missing.",
+      "confidence": 1
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "variables",
+      "title": "Outcome and predictor variables not defined",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The outcome 'outcome_cont' and predictors are unlabeled, preventing readers from understanding what was measured. This renders the analysis unreproducible.",
+      "actionableFix": "Provide clear definitions of all variables, including measurement units and coding.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify variable names against data dictionary in run directory; if dictionary absent, request from data provider.",
+      "confidence": 1
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Analysis status is unbound exploratory, not acknowledged",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The stats-run.json explicitly states the run is unbound and exploratory ('exploratory_standard_table'), but the manuscript does not clearly label the results as exploratory. This could mislead readers into thinking it is a confirmatory analysis.",
+      "actionableFix": "Add an explicit statement in the abstract and methods that this is an exploratory analysis without a pre-registered protocol, and results should be treated as hypothesis-generating.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check artifact 'stats-run.json' field 'resultPosture.status' for 'exploratory_standard_table' and confirm it's disclosed in manuscript.",
+      "confidence": 1
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No reporting of missing data patterns or justification for complete-case analysis",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript uses complete cases (N=240) but does not report the original sample size, amount of missingness, or patterns. If missingness is not MCAR, bias may result. This is a critical gap in transparency.",
+      "actionableFix": "Report the number and proportion of missing values for each variable, any patterns (e.g., monotone), and consider sensitivity analyses (e.g., MI, or at least discuss potential bias).",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Inspect raw data to compute missingness proportions; if data not available, request.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "p-values reported as 0.0000",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Displaying p-values as 0.0000 suggests zero probability when the actual values are extremely small but non-zero. This misrepresents the uncertainty and violates reporting guidelines.",
+      "actionableFix": "Report exact p-values in scientific notation (e.g., p < 1e-28) or as p < 0.001 if rounded, using appropriate significant digits.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that p-values in manuscript match those in stats-run.json but should not be formatted as 0.0000.",
+      "confidence": 1
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Linearity assumption not explicitly assessed",
+      "evidenceRefs": [
+        "diagnostics.json"
+      ],
+      "whyItMatters": "The model is linear, but no diagnostics for linearity (e.g., component-plus-residual plots, or tests for non-linearity) are presented. Without this, the adequacy of the linear model is unverified.",
+      "actionableFix": "Include residual vs. predictor plots or partial residual plots; consider adding higher-order terms or splines if departure is evident.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Review residual vs. fitted plot and component residual plots from stats-run/figures.json; if not present, request.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "No data distribution or summary statistics provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Readers cannot assess the range, outliers, or distribution of variables, which is necessary to interpret regression coefficients and ensure plausibility.",
+      "actionableFix": "Add a table of descriptive statistics (mean, SD, min, max, etc.) for all variables.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Generate summary statistics from raw data; if data not provided, request.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "reproducibility",
+      "title": "Companion variable artifact not found",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript directs readers to a 'companion variable artifact' for variable definitions, but this artifact is not provided in the packet. This hampers reproducibility.",
+      "actionableFix": "Include the variable definition file in the supplementary materials or directly in the manuscript.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "Look for a file likely named something like 'variables.json' in the run directory; if not found, note.",
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Original sample size and missing data summary",
+    "Variable definitions artifact",
+    "Figure QA details (figure-qa.json appears empty/incomplete)",
+    "Full stats-qa.json (only partial contents provided)",
+    "Residual plot and other diagnostic plots (model-residuals.png not viewable)",
+    "Study protocol or analysis plan (if exists)"
+  ],
+  "recommendedNextStage": "protocol"
+}

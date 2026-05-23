@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:20:36.173Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome",
+  "packetHash": "26a88928d898d18be952dbece8d1d7eaf148ddcfb63785b7fe7dcd61047bbdab",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 8,
+    "totalBytes": 98631,
+    "includedBytes": 20681
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3999,
+      "sha256": "d40da4c6f429870213e745f6648a7c1f3b412f5a21fbe2437318f7a5189862c8",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was inferred from the available run artifacts and should be confirmed during review. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe statistical method was inferred from the available run artifacts and should be confirmed during review. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No estimate-like records were available for p-value/effect-size checks.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 151b65a4301e5b58d1b0691c2cef1246c860667fa656d4f6b8628228d2d2f0de. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4330,
+      "sha256": "025e33bd28f1571d2ca4d9ec36438a8f986740d96c0a03a4dda58e31294d1b29",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_3936536226102445019\",\n  \"method\": \"chi-square\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"chi_square\": 11.172924297924299,\n      \"degrees_of_freedom\": 1,\n      \"p_value\": 0.0008299970166527486,\n      \"cramers_v\": 0.21576341497425194\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"Chi-square independence\",\n    \"table\": {\n      \"0\": {\n        \"0\": 75,\n        \"1\": 81\n      },\n      \"1\": {\n        \"0\": 21,\n        \"1\": 63\n      }\n    },\n    \"min_expected\": 33.6\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-config.json\",\n      \"sha256\": \"de16e0bff9849af56e9eda0e522c231926b84c1d3403e467d80310f6e0bac9ab\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-summary.json\",\n      \"sha256\": \"6a9d6133e80a123cc0bf65864f61472bb389c88c86b65eaecb433886cf81c927\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/estimates.csv\",\n      \"sha256\": \"a680ba05f93cbf9c23a2dd7d43139ea12f62fee04c15cc344220d1c4838e4d8a\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/diagnostics.json\",\n      \"sha256\": \"34718d3f3ea024bd2f1339def45a77b9014f9385892ef3284aa1a9be219483c5\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figures.json\",\n      \"sha256\": \"d2b21a86e346b75ca1781249b040080192681d518a2a6d8c5d7869d51f4d8f7f\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"sha256\": \"b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figure-qa.json\",\n      \"sha256\": \"862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-report.md\",\n      \"sha256\": \"90c0c4605daf1b32fc70e5eacb2629b20f17614bc87fa7ad16df2532fc65edae\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-qa.json\",\n      \"sha256\": \"b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 174,
+      "sha256": "34718d3f3ea024bd2f1339def45a77b9014f9385892ef3284aa1a9be219483c5",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"Chi-square independence\",\n  \"table\": {\n    \"0\": {\n      \"0\": 75,\n      \"1\": 81\n    },\n    \"1\": {\n      \"0\": 21,\n      \"1\": 63\n    }\n  },\n  \"min_expected\": 33.6\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3601,
+      "sha256": "862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"contingency-heatmap.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"title\": \"Contingency Table\",\n      \"caption\": \"Observed counts for the categorical association test.\",\n      \"altText\": \"Observed counts for the categorical association test.\",\n      \"xLabel\": \"treatment\",\n      \"yLabel\": \"outcome_binary\",\n      \"sourceColumns\": [\n        \"outcome_b"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3601,
+      "sha256": "862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1214,
+      "sha256": "d2b21a86e346b75ca1781249b040080192681d518a2a6d8c5d7869d51f4d8f7f",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2225,
+      "sha256": "cf704c37d4e634830363f65bf7ede87f3f2d28b0da148ff40755350615f56fc1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9864,
+      "sha256": "17dec43a79477ce4b811148552566286969fcf66b279622aa99a079facd388d4",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1545,
+      "sha256": "d607246c8d772b06792f4f4d95acb9fde3ec96bde9268afccf6f8c3b814d60d5",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4173,
+      "sha256": "94f083fc6068e3d7529a4ab88be1e3ab16c75525ff2b5a60ce666e2c62f96278",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14825,
+      "sha256": "a039ccf1dca8b22b0ec61a99273e64999c8f07be6fd038e865e0cff8d3e41ef5",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4320,
+      "sha256": "90fc6eb076140721450038653a3818a562138eb0532e843de1b967b0e988358b",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 794,
+      "sha256": "7ab58a1e3d3a771098379a209bae688d80d33fc6067c1427ac8c6b894c299958",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 10001,
+      "sha256": "4ce066d763b3dd0e6880639a1a537429794f68fbb5648213085f681f36d2a756",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1019,
+      "sha256": "01f8cf99b369864258b327320202e8d1841a34539ea75a2ebd1a136e82f50c2c",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 4595,
+      "sha256": "5ff8ab95337424a8df89671ffb86801b6cb843615b68ade501018586fb6fd57a",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/contingency-heatmap.png",
+      "relativePath": "stats-run/contingency-heatmap.png",
+      "bytes": 24278,
+      "sha256": "b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 126,
+      "sha256": "a680ba05f93cbf9c23a2dd7d43139ea12f62fee04c15cc344220d1c4838e4d8a",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 633,
+      "sha256": "de16e0bff9849af56e9eda0e522c231926b84c1d3403e467d80310f6e0bac9ab",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1587,
+      "sha256": "90c0c4605daf1b32fc70e5eacb2629b20f17614bc87fa7ad16df2532fc65edae",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 190,
+      "sha256": "6a9d6133e80a123cc0bf65864f61472bb389c88c86b65eaecb433886cf81c927",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3999 bytes, sha256=d40da4c6f429870213e745f6648a7c1f3b412f5a21fbe2437318f7a5189862c8) ---\n# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was inferred from the available run artifacts and should be confirmed during review. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe statistical method was inferred from the available run artifacts and should be confirmed during review. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No estimate-like records were available for p-value/effect-size checks.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 151b65a4301e5b58d1b0691c2cef1246c860667fa656d4f6b8628228d2d2f0de. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4330 bytes, sha256=025e33bd28f1571d2ca4d9ec36438a8f986740d96c0a03a4dda58e31294d1b29) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_3936536226102445019\",\n  \"method\": \"chi-square\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"chi_square\": 11.172924297924299,\n      \"degrees_of_freedom\": 1,\n      \"p_value\": 0.0008299970166527486,\n      \"cramers_v\": 0.21576341497425194\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"Chi-square independence\",\n    \"table\": {\n      \"0\": {\n        \"0\": 75,\n        \"1\": 81\n      },\n      \"1\": {\n        \"0\": 21,\n        \"1\": 63\n      }\n    },\n    \"min_expected\": 33.6\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-config.json\",\n      \"sha256\": \"de16e0bff9849af56e9eda0e522c231926b84c1d3403e467d80310f6e0bac9ab\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-summary.json\",\n      \"sha256\": \"6a9d6133e80a123cc0bf65864f61472bb389c88c86b65eaecb433886cf81c927\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/estimates.csv\",\n      \"sha256\": \"a680ba05f93cbf9c23a2dd7d43139ea12f62fee04c15cc344220d1c4838e4d8a\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/diagnostics.json\",\n      \"sha256\": \"34718d3f3ea024bd2f1339def45a77b9014f9385892ef3284aa1a9be219483c5\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figures.json\",\n      \"sha256\": \"d2b21a86e346b75ca1781249b040080192681d518a2a6d8c5d7869d51f4d8f7f\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"sha256\": \"b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figure-qa.json\",\n      \"sha256\": \"862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-report.md\",\n      \"sha256\": \"90c0c4605daf1b32fc70e5eacb2629b20f17614bc87fa7ad16df2532fc65edae\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/stats-qa.json\",\n      \"sha256\": \"b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 174 bytes, sha256=34718d3f3ea024bd2f1339def45a77b9014f9385892ef3284aa1a9be219483c5) ---\n{\n  \"test\": \"Chi-square independence\",\n  \"table\": {\n    \"0\": {\n      \"0\": 75,\n      \"1\": 81\n    },\n    \"1\": {\n      \"0\": 21,\n      \"1\": 63\n    }\n  },\n  \"min_expected\": 33.6\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3601 bytes, sha256=862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"contingency-heatmap.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/06-chi-square-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"title\": \"Contingency Table\",\n      \"caption\": \"Observed counts for the categorical association test.\",\n      \"altText\": \"Observed counts for the categorical association test.\",\n      \"xLabel\": \"treatment\",\n      \"yLabel\": \"outcome_binary\",\n      \"sourceColumns\": [\n        \"outcome_b\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3601 bytes, sha256=862b781916ed818c05fb08d7547ef4feec6343b275fd012568f628a8805295d1) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1214 bytes, sha256=d2b21a86e346b75ca1781249b040080192681d518a2a6d8c5d7869d51f4d8f7f) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2225 bytes, sha256=cf704c37d4e634830363f65bf7ede87f3f2d28b0da148ff40755350615f56fc1) ---\n"
+}

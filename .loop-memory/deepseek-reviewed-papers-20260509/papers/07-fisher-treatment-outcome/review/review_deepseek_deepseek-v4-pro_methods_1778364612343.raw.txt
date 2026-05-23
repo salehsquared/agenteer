@@ -1,0 +1,114 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is a bivariate Fisher exact test in an observational dataset without any adjustment for confounding, incomplete reporting of key statistical outputs, and insufficient cohort and variable description. The study cannot support even local descriptive claims with reasonable validity.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "No confounder control in observational design",
+      "evidenceRefs": [
+        "manuscript.md: Methods section mentions only fisher-exact test, no covariates",
+        "stats-run.json: parameters and estimates show only bivariate analysis"
+      ],
+      "whyItMatters": "Without confounder adjustment, any association is likely biased and cannot be interpreted as even a local association. Causal inference is impossible.",
+      "actionableFix": "Redesign the analysis to include multivariable adjustment or use a causal design (e.g., propensity score matching, instrumental variables) if data and design permit. If confounding variables are unavailable, explicitly state that the association is unadjusted and cannot distinguish causal effects.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing odds ratio confidence interval",
+      "evidenceRefs": [
+        "stats-run.json: estimates array contains odds_ratio and p_value but no confidence interval"
+      ],
+      "whyItMatters": "A confidence interval conveys precision and clinical significance; its absence hampers interpretation of the effect size.",
+      "actionableFix": "Compute and report the exact Fisher confidence interval (e.g., using unconditional exact method). Include it in both stats-run output and manuscript.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if stats-run.json includes a 'ci_lower' and 'ci_upper' field; currently missing.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No report on missing data",
+      "evidenceRefs": [
+        "manuscript.md: 'complete-case sample included 240 records' without missingness description"
+      ],
+      "whyItMatters": "If missingness is related to exposure or outcome, complete-case analysis can produce biased results. Readers cannot evaluate potential selection bias.",
+      "actionableFix": "Report the proportion of missing observations, compare characteristics of complete vs. incomplete cases, consider multiple imputation or sensitivity analysis, and discuss potential bias.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Insufficient cohort description",
+      "evidenceRefs": [
+        "manuscript.md: Participants section lacks demographics, eligibility, data source, any contextual information."
+      ],
+      "whyItMatters": "Without cohort characteristics, the applicability of findings is unknown, and selection bias cannot be assessed.",
+      "actionableFix": "Describe the data source (e.g., registry, clinic, survey), inclusion/exclusion criteria, recruitment period, and key demographics (age, sex, etc.).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Ambiguous study design and temporality",
+      "evidenceRefs": [
+        "manuscript.md: Design merely says 'observational dataset analysis'"
+      ],
+      "whyItMatters": "Without specifying whether data are cross-sectional or longitudinal, the direction of association cannot be inferred. This prohibits any causal interpretation.",
+      "actionableFix": "Explicitly state design (e.g., cross-sectional, retrospective cohort, etc.) and clarify the temporal relationship between treatment and outcome. If temporality is absent, acknowledge this limitation.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "variables",
+      "title": "No variable definitions",
+      "evidenceRefs": [
+        "manuscript.md: Variables section only lists generic names 'outcome_binary' and 'treatment'"
+      ],
+      "whyItMatters": "Without clear operational definitions, the clinical or public-health meaning of the variables is unknown, making the study uninterpretable.",
+      "actionableFix": "Define what the treatment and outcome represent (e.g., drug vs. placebo, disease present/absent), including measurement methods and coding.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Undisclosed advisory issues from QA",
+      "evidenceRefs": [
+        "manuscript.md: Limitations mention 'Deterministic methods checks identified issues that require review before publication' but does not list them"
+      ],
+      "whyItMatters": "Readers and reviewers need to know the specific issues to assess study reliability; hidden issues undermine trust.",
+      "actionableFix": "Either resolve the identified issues or explicitly list them in the limitations, along with their potential impact.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or data dictionary for plausibility checks",
+    "Description of source data (registry, trial, etc.)",
+    "List of potential confounders considered or available",
+    "Missing data report (proportion missing, pattern, comparison)",
+    "Operational definitions of outcome and treatment",
+    "Temporal relationship between exposure and outcome"
+  ],
+  "recommendedNextStage": "protocol"
+}

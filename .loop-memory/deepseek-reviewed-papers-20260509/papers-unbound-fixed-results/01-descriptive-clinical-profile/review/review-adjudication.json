@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:44:19.064Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "missing-results",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Manuscript omits the descriptive statistics that constitute the main results",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The stated objective is to present distributions, but only sample size is provided, making the manuscript incomplete and failing to answer the research question.",
+        "actionableFix": "Add a table or in-text summary of the distributions (means, medians, IQRs, min, max, SDs) for each variable from stats-run.json, and reference the histograms.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that manuscript.md contains at least the mean or median for each variable.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "undefined-variables-cohort",
+        "severity": "blocker",
+        "category": "variables",
+        "title": "Variables and cohort definition are not described, preventing interpretation",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Without definitions of severity, outcome_cont, and the cohort inclusion/exclusion criteria, readers cannot assess validity, clinical relevance, or generalizability.",
+        "actionableFix": "Provide explicit definitions for each variable (including units and clinical scales), and describe how the 240 complete cases were selected from the original dataset, including any eligibility filters.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Search for definitions of 'severity' and 'outcome_cont' in manuscript.md; also check for a cohort flow diagram or description.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Results section fails to report the primary descriptive statistics that answer the declared objective",
+        "evidenceRefs": [
+          "manuscript.md Results section",
+          "stats-run.json estimates"
+        ],
+        "whyItMatters": "The abstract and objective ask for distributions of five variables, but the Results section only states the sample size. Readers cannot evaluate whether the study answered its own question.",
+        "actionableFix": "Populate the Results section with a table or text summarizing means, medians, SDs, IQRs, and ranges for all variables, and reference the generated histogram figures.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "If added, the reported statistics should match the estimates in stats-run.json exactly.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "no-literature-context",
+        "severity": "major",
+        "category": "literature",
+        "title": "No comparison with prior literature or clinical benchmarks",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Descriptive distributions are more meaningful when placed in context; e.g., is a mean BMI of 29 typical for this patient population? The manuscript lacks any discussion of clinical plausibility or comparison with known norms.",
+        "actionableFix": "Add a paragraph in Discussion contextualizing the observed distributions with references to established clinical studies or population norms, and note any deviations.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check for citations in manuscript.md.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "empty-diagnostics-and-unreviewed-issues",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Diagnostics are empty and claimed advisory issues are not detailed",
+        "evidenceRefs": [
+          "diagnostics.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript states 'methods review found advisory issues', but diagnostics.json is empty, and no issues are listed. This undermines credibility and violates transparent reporting.",
+        "actionableFix": "Either populate diagnostics with meaningful checks (e.g., distribution shape, outliers) or explicitly state that no issues were found. Remove unreviewed generic claims.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "Check that diagnostics.json or manuscript includes specific findings.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "unbound-analysis-no-reproducibility-plan",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Analysis is unbound and lacks reproducibility elements",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The stats run is not bound to a method-selection or analysis specification, meaning the analysis path is ad-hoc. The manuscript does not provide code, data access information, or versioned environment details, hindering verification and reuse.",
+        "actionableFix": "Bind the analysis to a pre-specified plan or provide a reproducible workflow (e.g., code, Dockerfile, dataset identifier) in the run artifacts. The manuscript should cite the reproducibility artifacts.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Search for 'methodSelectionPath' or 'analysisSpec' in stats-run.json and note unbound status.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "manuscript-boilerplate-not-informative",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript text is generic boilerplate that does not reflect the actual analysis",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript contains generic placeholders about methods review and limitations but fails to describe the actual analytic steps, software, or specific findings. It reads like a template, not a completed clinical research report.",
+        "actionableFix": "Replace generic text with concrete descriptions of the analysis: software used, how descriptive statistics were computed, handling of missing data (if any), and any figure generation. Ensure the discussion is tailored to the observed data.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if manuscript.md contains unique content beyond template phrases.",
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No documentation of pre-complete-case missingness or eligibility filtering",
+        "evidenceRefs": [
+          "manuscript.md Cohort Construction",
+          "stats-run.json missing fields"
+        ],
+        "whyItMatters": "The sample was filtered to 240 complete cases, but the original number of records, number excluded for missing data, and patterns of missingness are undisclosed. This opacity can mask selection bias.",
+        "actionableFix": "Provide a flow diagram or table showing initial N, exclusions at each step, per-variable missing counts, and the final N. Include the fraction of missing data overall.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "causal_claims",
+        "title": "Analysis is explicitly flagged as exploratory (unbound) but the manuscript uses confirmatory language",
+        "evidenceRefs": [
+          "stats-run.json resultPosture",
+          "manuscript.md Abstract conclusion"
+        ],
+        "whyItMatters": "The resultPosture states the analysis is exploratory and cannot support paper-ready conclusions, yet the manuscript presents itself as a final research report. This mismatch can mislead readers about the strength of evidence.",
+        "actionableFix": "Either bind the analysis to a pre-registered method/analysis spec to justify confirmatory claims, or downgrade all language to 'pilot', 'exploratory', or 'hypothesis-generating' and clearly state the exploratory nature in the title and limitations.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Diagnostics artifact is empty; no checks for distributional shape, outliers, or data quality were performed",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "Even a descriptive summary should verify that the mean is not unduly influenced by extreme values, or that variables meet assumptions for intended reporting (e.g., normality for parametric intervals). The empty diagnostics block signals zero verification.",
+        "actionableFix": "Run and document standard diagnostics: skewness, kurtosis, outlier counts, Normality tests (if relevant), and visual inspection of distributions. Populate diagnostics.json.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "missing-figures-description",
+        "severity": "minor",
+        "category": "figures",
+        "title": "Figures exist but are not referenced or explained in the manuscript",
+        "evidenceRefs": [
+          "figures.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Histograms and missingness bar were generated, but no mention in text means readers cannot assess the visual evidence. Standard reporting requires including key figures and describing them.",
+        "actionableFix": "Include a note or description of the histograms and missingness plot, perhaps embedding them or referencing them in the results.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if manuscript.md contains references to 'descriptive-histograms.png' or 'missingness-bar.png'.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "no-data-plausibility-check",
+        "severity": "minor",
+        "category": "data_plausibility",
+        "title": "No explicit data plausibility checks were performed or reported",
+        "evidenceRefs": [
+          "stats-run.json",
+          "diagnostics.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without verifying that values fall within plausible clinical ranges (e.g., BMI >0, age not negative), data errors could propagate silently. The presented ranges are plausible but undocumented.",
+        "actionableFix": "Add a note confirming that all variables fall within expected clinical ranges and note any outliers. This could be part of the results or a supplement.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "Check diagnostics.json for any range check entries.",
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "minor",
+        "category": "reproducibility",
+        "title": "No analytic code or software environment details provided",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md Reproducibility section"
+        ],
+        "whyItMatters": "Reproducibility requires knowing the exact computational steps, not just output artifacts. Without code or a detailed specification, the analysis cannot be independently verified.",
+        "actionableFix": "Include a script or Markdown notebook with package versions in the run directory, and reference its SHA in the manuscript.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "literature",
+        "title": "No literature review or clinical context to justify variable selection or interpret findings",
+        "evidenceRefs": [
+          "manuscript.md (no references)"
+        ],
+        "whyItMatters": "Readers cannot assess the novelty or clinical relevance of the descriptive results without a frame of reference. Variable choices appear arbitrary.",
+        "actionableFix": "Add a brief background section citing typical values, prior ranges, or clinical relevance for the chosen variables (age, severity, BMI, albumin, outcome_cont) and define the context (e.g., a specific disease population).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "data_plausibility",
+        "title": "Variable definitions and units are unclear",
+        "evidenceRefs": [
+          "manuscript.md Variables section",
+          "stats-run.json variables list"
+        ],
+        "whyItMatters": "Interpretability of means and ranges (e.g., 22.2 for outcome_cont) depends on knowing the clinical measurement and units. Severity without scale is also meaningless.",
+        "actionableFix": "Provide a variable dictionary specifying clinical meaning, units, and feasible ranges for each of the five variables.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "info",
+        "category": "reporting",
+        "title": "Limitations section contains irrelevant boilerplate (e.g., 'No reader-facing paper/manuscript artifact was found')",
+        "evidenceRefs": [
+          "manuscript.md Limitations"
+        ],
+        "whyItMatters": "Auto-generated limitations confuse readers and may obscure genuine study weaknesses.",
+        "actionableFix": "Remove or replace the two irrelevant items with substantive limitations such as single-center design, small sample, and lack of external validation.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [],
+    "reentryPoint": "execution",
+    "nextAction": "Route back to execution with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review-adjudication.json"
+  }
+}

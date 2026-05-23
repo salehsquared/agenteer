@@ -1,0 +1,798 @@
+{
+  "schemaVersion": 1,
+  "studyCritic": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:28:00.041Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events",
+    "stage": "final",
+    "autonomy": "aggressive",
+    "generatedFiles": {
+      "reviewPacket": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-packet.json",
+      "redactionReport": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-redaction-report.json",
+      "panel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-panel.json",
+      "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-adjudication.json",
+      "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-response.json",
+      "stateReentry": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/state-reentry.json"
+    },
+    "panel": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:28:00.035Z",
+      "panelId": "review_panel_a7f1d7ccee16",
+      "stage": "final",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events",
+      "autonomy": "aggressive",
+      "budget": {
+        "maxPerCallUsd": 0.12,
+        "maxPanelUsd": 0.3,
+        "maxStudyLoopUsd": 5
+      },
+      "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-packet.json",
+      "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-redaction-report.json",
+      "reviewers": [
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T21:25:49.874Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778361949874",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:methods",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "clinical methods and study-design reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "block",
+          "summary": "The analysis is critically flawed: it fails to specify the research question, models count data without addressing overdispersion or offset, ignores missing data handling, and provides insufficient reporting for evaluation. The result posture is exploratory, contradicting any claim of local evidence.",
+          "findings": [
+            {
+              "id": "F01",
+              "severity": "blocker",
+              "category": "study_design",
+              "title": "Prespecified research question and clinical context absent",
+              "evidenceRefs": [
+                "manuscript.md: title, abstract, introduction"
+              ],
+              "whyItMatters": "Without a clear question, the analytic choices (variables, model, confounding control) cannot be judged for appropriateness, and the findings lack clinical interpretation.",
+              "actionableFix": "Explicitly define the population, intervention/exposure, comparison, outcome, and time frame (PICOT), along with a prespecified analysis plan.",
+              "reentryPoint": "protocol",
+              "deterministicVerification": "Check that the manuscript contains a sentence starting with 'The primary objective was to assess the association between...' with specific variables.",
+              "confidence": 0.99
+            },
+            {
+              "id": "F02",
+              "severity": "major",
+              "category": "method_choice",
+              "title": "Poisson model likely misspecified: no offset or exposure variable for count events",
+              "evidenceRefs": [
+                "manuscript.md: Methods - Statistical Analysis",
+                "stats-run.json: variables"
+              ],
+              "whyItMatters": "Count outcomes (e.g., number of events per subject) typically require an offset term (log of follow-up time) to model rates correctly. Omitting it biases incidence rate ratios if follow-up varies.",
+              "actionableFix": "Include an offset variable (e.g., log(person-years)) in the Poisson regression, or justify its absence (e.g., all subjects have equal follow-up).",
+              "reentryPoint": "method_selection",
+              "deterministicVerification": "Inspect the stats-config.json for an offset term; if absent, flag as incomplete.",
+              "confidence": 0.9
+            },
+            {
+              "id": "F03",
+              "severity": "major",
+              "category": "model_diagnostics",
+              "title": "No overdispersion assessment or check for zero-inflation",
+              "evidenceRefs": [
+                "stats-run.json: diagnostics",
+                "diagnostics.json"
+              ],
+              "whyItMatters": "Poisson regression assumes equidispersion; real-world count data often exhibit overdispersion, leading to underestimated standard errors and inflated type I error. Zero-inflation further biases estimates.",
+              "actionableFix": "Report the deviance/df ratio, perform a dispersion test (e.g., dispersiontest in R), and consider negative binomial or zero-inflated models if needed.",
+              "reentryPoint": "execution",
+              "deterministicVerification": "Check if deviance/df > 1.5; if so, overdispersion likely.",
+              "confidence": 0.85
+            },
+            {
+              "id": "F04",
+              "severity": "major",
+              "category": "missingness",
+              "title": "Missing data handling unreported, complete-case analysis only",
+              "evidenceRefs": [
+                "manuscript.md: Limitations",
+                "stats-run.json: completeCaseN"
+              ],
+              "whyItMatters": "Complete-case analysis can introduce bias if missingness is related to outcome or covariates. The proportion and pattern of missingness are not disclosed, making results unreliable.",
+              "actionableFix": "Provide a missing data table, describe the missingness mechanism (MCAR/MAR/MNAR), and conduct sensitivity analyses (e.g., multiple imputation).",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": "Inspect raw data for missingness rates; verify that no additional rows were excluded beyond those already removed.",
+              "confidence": 0.95
+            },
+            {
+              "id": "F05",
+              "severity": "major",
+              "category": "data_plausibility",
+              "title": "No descriptive statistics for study variables",
+              "evidenceRefs": [
+                "manuscript.md: Results"
+              ],
+              "whyItMatters": "Without summary statistics (Table 1), it is impossible to assess balance, range, outliers, or distribution of count_events, treatment, age, severity, which are essential for model interpretation.",
+              "actionableFix": "Include a table with n, mean, sd, median, IQR, min/max for continuous variables and counts/frequencies for categorical variables, stratified by exposure if relevant.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "Presence of a Table 1 block in the manuscript with the above statistics.",
+              "confidence": 0.95
+            },
+            {
+              "id": "F06",
+              "severity": "minor",
+              "category": "reporting",
+              "title": "Incomplete quality-assurance reporting",
+              "evidenceRefs": [
+                "stats-qa.json (truncated)",
+                "manuscript.md: QC section"
+              ],
+              "whyItMatters": "Only 7/9 QA checks passed; the nature of the failures is hidden, undermining confidence in the analysis reliability.",
+              "actionableFix": "Publish the full stats-qa.json and discuss any failed checks. If failures are trivial, justify; otherwise, rerun analysis with corrections.",
+              "reentryPoint": "qa",
+              "deterministicVerification": "Verify that stats-qa.json is complete and its status is not 'warning' at final promotion.",
+              "confidence": 0.8
+            },
+            {
+              "id": "F07",
+              "severity": "major",
+              "category": "reproducibility",
+              "title": "Analysis not fully reproducible due to missing raw data and code",
+              "evidenceRefs": [
+                "manuscript.md: Reproducibility section",
+                "stats-run.json: binding"
+              ],
+              "whyItMatters": "The manuscript mentions only artifact hashes but does not provide the raw dataset, data dictionary, or analysis scripts. This prevents independent verification.",
+              "actionableFix": "Include a data availability statement, deposit de-identified data and code in a public repository, or document the exact software environment and seed.",
+              "reentryPoint": "execution",
+              "deterministicVerification": "Check that a 'reproduce.sh' script or README exists in the run directory that regenerates all artifacts from raw data.",
+              "confidence": 0.9
+            },
+            {
+              "id": "F08",
+              "severity": "minor",
+              "category": "causal_claims",
+              "title": "Exploratory analysis presented as 'local evidence' with p-values",
+              "evidenceRefs": [
+                "stats-run.json: resultPosture",
+                "manuscript.md: Abstract, Discussion"
+              ],
+              "whyItMatters": "The result posture explicitly states the analysis is exploratory and cannot support 'paper-ready conclusions'. Yet the manuscript frames p-values and estimates as 'local evidence', risking overinterpretation.",
+              "actionableFix": "Downgrade the language to 'exploratory findings only' and remove p-values or clearly label them as unadjusted, hypothesis-generating.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "Check that the Discussion begins with a statement matching the resultPosture label.",
+              "confidence": 0.85
+            }
+          ],
+          "missingEvidence": [
+            "Prespecified research question (PICOT)",
+            "Definition and unit of count_events (e.g., number of events, follow-up time)",
+            "Exposure/offset variable configuration",
+            "Overdispersion test results",
+            "Missing data table and sensitivity analysis",
+            "Descriptive statistics (Table 1)",
+            "Full stats-qa.json content",
+            "Data availability statement and analysis code"
+          ],
+          "recommendedNextStage": "protocol",
+          "costEstimate": {
+            "inputTokens": 3033,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026157,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review_deepseek_deepseek-v4-pro_methods_1778361949874.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review_deepseek_deepseek-v4-pro_methods_1778361949874.json"
+        },
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T21:25:49.893Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361949893",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:reproducibility",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "statistical reporting and reproducibility reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "block",
+          "summary": "The study material is insufficient for a final manuscript. The research question is not specified, variable definitions are missing, Poisson model diagnostics are inadequate (no overdispersion or zero-inflation check), missing data handling is incomplete, reproducibility is compromised without analysis code, data plausibility is unverified, claims exceed the exploratory posture, and literature context is absent. Foundational methodological and reporting issues must be resolved before promotion.",
+          "findings": [
+            {
+              "id": "F1",
+              "severity": "blocker",
+              "category": "reporting",
+              "title": "Unspecified research question",
+              "evidenceRefs": [
+                "manuscript.md",
+                "stats-run.json"
+              ],
+              "whyItMatters": "Without a clear question (PICO), the analysis lacks direction, and results cannot be interpreted meaningfully or assessed for relevance.",
+              "actionableFix": "Explicitly state the primary research question, including population, intervention/exposure, comparator, and outcome.",
+              "reentryPoint": "protocol",
+              "deterministicVerification": null,
+              "confidence": 0.99
+            },
+            {
+              "id": "F2",
+              "severity": "blocker",
+              "category": "variables",
+              "title": "Missing variable definitions",
+              "evidenceRefs": [
+                "manuscript.md",
+                "stats-run.json"
+              ],
+              "whyItMatters": "Interpretation of effect sizes, replication, and clinical relevance depend on understanding variable coding, units, and measurement.",
+              "actionableFix": "Provide a codebook detailing each variable, its type, coding scheme, and units (e.g., count_events as number of events per patient).",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": null,
+              "confidence": 0.99
+            },
+            {
+              "id": "F3",
+              "severity": "major",
+              "category": "model_diagnostics",
+              "title": "Inadequate Poisson regression diagnostics",
+              "evidenceRefs": [
+                "stats-run.json",
+                "diagnostics.json"
+              ],
+              "whyItMatters": "The Shapiro–Wilk test on residuals is inappropriate for Poisson models. No overdispersion assessment (e.g., dispersion parameter) or zero-inflation test is performed, risking invalid standard errors and p-values.",
+              "actionableFix": "Compute the dispersion statistic (deviance/df) and, if >1, use robust standard errors or a negative binomial model. Test for zero-inflation (e.g., Vuong test) and specify a zero-inflated model if needed.",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F4",
+              "severity": "major",
+              "category": "missingness",
+              "title": "No handling of missing data beyond complete-case analysis",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Complete-case exclusion can bias results if missingness is related to exposure or outcome; the extent and pattern of missing data are unreported.",
+              "actionableFix": "Report the number and proportion of missing values per variable, compare baseline characteristics of included vs. excluded records, and consider multiple imputation or sensitivity analyses.",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F5",
+              "severity": "major",
+              "category": "reproducibility",
+              "title": "No analysis code or data preprocessing script provided",
+              "evidenceRefs": [
+                "stats-run.json"
+              ],
+              "whyItMatters": "The analysis cannot be independently verified or rerun without the exact computational steps.",
+              "actionableFix": "Include the complete analysis script (R/Python) with data loading, cleaning, and model fitting, along with a seed for reproducibility.",
+              "reentryPoint": "qa",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F6",
+              "severity": "major",
+              "category": "data_plausibility",
+              "title": "No data plausibility checks",
+              "evidenceRefs": [
+                "stats-run.json"
+              ],
+              "whyItMatters": "Without summary statistics or distributions, impossible values or extreme outliers may distort the model.",
+              "actionableFix": "Provide descriptive statistics (mean, median, range) and visualizations (histograms, boxplots) for all variables. Flag any biologically implausible values.",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F7",
+              "severity": "major",
+              "category": "causal_claims",
+              "title": "Overinterpretation given unbound exploratory posture",
+              "evidenceRefs": [
+                "stats-run.json",
+                "manuscript.md"
+              ],
+              "whyItMatters": "The result posture is explicitly exploratory and 'cannot support paper-ready conclusions', yet the manuscript presents p-values and suggests interpretable evidence without adequate caveats.",
+              "actionableFix": "Downgrade language to explicitly state the exploratory nature, omit p-value interpretations unless a prespecified analysis plan exists, and avoid any implication of clinical actionability.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F8",
+              "severity": "minor",
+              "category": "literature",
+              "title": "No literature contextualization",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Scientific contribution and interpretation require comparison with existing evidence.",
+              "actionableFix": "Add a brief literature review, citing prior studies on similar exposures/outcomes, and compare direction and magnitude of effects.",
+              "reentryPoint": "literature",
+              "deterministicVerification": null,
+              "confidence": 0.8
+            }
+          ],
+          "missingEvidence": [
+            "Variable definitions / codebook",
+            "Descriptive statistics and data distributions",
+            "Analysis code (R/Python) from raw data to model output",
+            "Overdispersion test and zero-inflation diagnostics",
+            "Missing data report (extent, pattern, comparison of included/excluded)",
+            "Study protocol specifying research question and analysis plan"
+          ],
+          "recommendedNextStage": "protocol",
+          "costEstimate": {
+            "inputTokens": 3033,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026157,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361949893.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361949893.json"
+        }
+      ],
+      "status": "block",
+      "costEstimateUsd": 0.052314,
+      "failureCount": 0,
+      "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-panel.json"
+    },
+    "adjudication": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:28:00.038Z",
+      "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-panel.json",
+      "verdict": "block",
+      "consensus": "unanimous",
+      "acceptedFindings": [
+        {
+          "id": "F01",
+          "severity": "blocker",
+          "category": "study_design",
+          "title": "Prespecified research question and clinical context absent",
+          "evidenceRefs": [
+            "manuscript.md: title, abstract, introduction"
+          ],
+          "whyItMatters": "Without a clear question, the analytic choices (variables, model, confounding control) cannot be judged for appropriateness, and the findings lack clinical interpretation.",
+          "actionableFix": "Explicitly define the population, intervention/exposure, comparison, outcome, and time frame (PICOT), along with a prespecified analysis plan.",
+          "reentryPoint": "protocol",
+          "deterministicVerification": "Check that the manuscript contains a sentence starting with 'The primary objective was to assess the association between...' with specific variables.",
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F1",
+          "severity": "blocker",
+          "category": "reporting",
+          "title": "Unspecified research question",
+          "evidenceRefs": [
+            "manuscript.md",
+            "stats-run.json"
+          ],
+          "whyItMatters": "Without a clear question (PICO), the analysis lacks direction, and results cannot be interpreted meaningfully or assessed for relevance.",
+          "actionableFix": "Explicitly state the primary research question, including population, intervention/exposure, comparator, and outcome.",
+          "reentryPoint": "protocol",
+          "deterministicVerification": null,
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F2",
+          "severity": "blocker",
+          "category": "variables",
+          "title": "Missing variable definitions",
+          "evidenceRefs": [
+            "manuscript.md",
+            "stats-run.json"
+          ],
+          "whyItMatters": "Interpretation of effect sizes, replication, and clinical relevance depend on understanding variable coding, units, and measurement.",
+          "actionableFix": "Provide a codebook detailing each variable, its type, coding scheme, and units (e.g., count_events as number of events per patient).",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": null,
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F02",
+          "severity": "major",
+          "category": "method_choice",
+          "title": "Poisson model likely misspecified: no offset or exposure variable for count events",
+          "evidenceRefs": [
+            "manuscript.md: Methods - Statistical Analysis",
+            "stats-run.json: variables"
+          ],
+          "whyItMatters": "Count outcomes (e.g., number of events per subject) typically require an offset term (log of follow-up time) to model rates correctly. Omitting it biases incidence rate ratios if follow-up varies.",
+          "actionableFix": "Include an offset variable (e.g., log(person-years)) in the Poisson regression, or justify its absence (e.g., all subjects have equal follow-up).",
+          "reentryPoint": "method_selection",
+          "deterministicVerification": "Inspect the stats-config.json for an offset term; if absent, flag as incomplete.",
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F03",
+          "severity": "major",
+          "category": "model_diagnostics",
+          "title": "No overdispersion assessment or check for zero-inflation",
+          "evidenceRefs": [
+            "stats-run.json: diagnostics",
+            "diagnostics.json"
+          ],
+          "whyItMatters": "Poisson regression assumes equidispersion; real-world count data often exhibit overdispersion, leading to underestimated standard errors and inflated type I error. Zero-inflation further biases estimates.",
+          "actionableFix": "Report the deviance/df ratio, perform a dispersion test (e.g., dispersiontest in R), and consider negative binomial or zero-inflated models if needed.",
+          "reentryPoint": "execution",
+          "deterministicVerification": "Check if deviance/df > 1.5; if so, overdispersion likely.",
+          "confidence": 0.85,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F04",
+          "severity": "major",
+          "category": "missingness",
+          "title": "Missing data handling unreported, complete-case analysis only",
+          "evidenceRefs": [
+            "manuscript.md: Limitations",
+            "stats-run.json: completeCaseN"
+          ],
+          "whyItMatters": "Complete-case analysis can introduce bias if missingness is related to outcome or covariates. The proportion and pattern of missingness are not disclosed, making results unreliable.",
+          "actionableFix": "Provide a missing data table, describe the missingness mechanism (MCAR/MAR/MNAR), and conduct sensitivity analyses (e.g., multiple imputation).",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": "Inspect raw data for missingness rates; verify that no additional rows were excluded beyond those already removed.",
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F05",
+          "severity": "major",
+          "category": "data_plausibility",
+          "title": "No descriptive statistics for study variables",
+          "evidenceRefs": [
+            "manuscript.md: Results"
+          ],
+          "whyItMatters": "Without summary statistics (Table 1), it is impossible to assess balance, range, outliers, or distribution of count_events, treatment, age, severity, which are essential for model interpretation.",
+          "actionableFix": "Include a table with n, mean, sd, median, IQR, min/max for continuous variables and counts/frequencies for categorical variables, stratified by exposure if relevant.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "Presence of a Table 1 block in the manuscript with the above statistics.",
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F07",
+          "severity": "major",
+          "category": "reproducibility",
+          "title": "Analysis not fully reproducible due to missing raw data and code",
+          "evidenceRefs": [
+            "manuscript.md: Reproducibility section",
+            "stats-run.json: binding"
+          ],
+          "whyItMatters": "The manuscript mentions only artifact hashes but does not provide the raw dataset, data dictionary, or analysis scripts. This prevents independent verification.",
+          "actionableFix": "Include a data availability statement, deposit de-identified data and code in a public repository, or document the exact software environment and seed.",
+          "reentryPoint": "execution",
+          "deterministicVerification": "Check that a 'reproduce.sh' script or README exists in the run directory that regenerates all artifacts from raw data.",
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F3",
+          "severity": "major",
+          "category": "model_diagnostics",
+          "title": "Inadequate Poisson regression diagnostics",
+          "evidenceRefs": [
+            "stats-run.json",
+            "diagnostics.json"
+          ],
+          "whyItMatters": "The Shapiro–Wilk test on residuals is inappropriate for Poisson models. No overdispersion assessment (e.g., dispersion parameter) or zero-inflation test is performed, risking invalid standard errors and p-values.",
+          "actionableFix": "Compute the dispersion statistic (deviance/df) and, if >1, use robust standard errors or a negative binomial model. Test for zero-inflation (e.g., Vuong test) and specify a zero-inflated model if needed.",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F4",
+          "severity": "major",
+          "category": "missingness",
+          "title": "No handling of missing data beyond complete-case analysis",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Complete-case exclusion can bias results if missingness is related to exposure or outcome; the extent and pattern of missing data are unreported.",
+          "actionableFix": "Report the number and proportion of missing values per variable, compare baseline characteristics of included vs. excluded records, and consider multiple imputation or sensitivity analyses.",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F5",
+          "severity": "major",
+          "category": "reproducibility",
+          "title": "No analysis code or data preprocessing script provided",
+          "evidenceRefs": [
+            "stats-run.json"
+          ],
+          "whyItMatters": "The analysis cannot be independently verified or rerun without the exact computational steps.",
+          "actionableFix": "Include the complete analysis script (R/Python) with data loading, cleaning, and model fitting, along with a seed for reproducibility.",
+          "reentryPoint": "qa",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F6",
+          "severity": "major",
+          "category": "data_plausibility",
+          "title": "No data plausibility checks",
+          "evidenceRefs": [
+            "stats-run.json"
+          ],
+          "whyItMatters": "Without summary statistics or distributions, impossible values or extreme outliers may distort the model.",
+          "actionableFix": "Provide descriptive statistics (mean, median, range) and visualizations (histograms, boxplots) for all variables. Flag any biologically implausible values.",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F7",
+          "severity": "major",
+          "category": "causal_claims",
+          "title": "Overinterpretation given unbound exploratory posture",
+          "evidenceRefs": [
+            "stats-run.json",
+            "manuscript.md"
+          ],
+          "whyItMatters": "The result posture is explicitly exploratory and 'cannot support paper-ready conclusions', yet the manuscript presents p-values and suggests interpretable evidence without adequate caveats.",
+          "actionableFix": "Downgrade language to explicitly state the exploratory nature, omit p-value interpretations unless a prespecified analysis plan exists, and avoid any implication of clinical actionability.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F06",
+          "severity": "minor",
+          "category": "reporting",
+          "title": "Incomplete quality-assurance reporting",
+          "evidenceRefs": [
+            "stats-qa.json (truncated)",
+            "manuscript.md: QC section"
+          ],
+          "whyItMatters": "Only 7/9 QA checks passed; the nature of the failures is hidden, undermining confidence in the analysis reliability.",
+          "actionableFix": "Publish the full stats-qa.json and discuss any failed checks. If failures are trivial, justify; otherwise, rerun analysis with corrections.",
+          "reentryPoint": "qa",
+          "deterministicVerification": "Verify that stats-qa.json is complete and its status is not 'warning' at final promotion.",
+          "confidence": 0.8,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F08",
+          "severity": "minor",
+          "category": "causal_claims",
+          "title": "Exploratory analysis presented as 'local evidence' with p-values",
+          "evidenceRefs": [
+            "stats-run.json: resultPosture",
+            "manuscript.md: Abstract, Discussion"
+          ],
+          "whyItMatters": "The result posture explicitly states the analysis is exploratory and cannot support 'paper-ready conclusions'. Yet the manuscript frames p-values and estimates as 'local evidence', risking overinterpretation.",
+          "actionableFix": "Downgrade the language to 'exploratory findings only' and remove p-values or clearly label them as unadjusted, hypothesis-generating.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "Check that the Discussion begins with a statement matching the resultPosture label.",
+          "confidence": 0.85,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F8",
+          "severity": "minor",
+          "category": "literature",
+          "title": "No literature contextualization",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Scientific contribution and interpretation require comparison with existing evidence.",
+          "actionableFix": "Add a brief literature review, citing prior studies on similar exposures/outcomes, and compare direction and magnitude of effects.",
+          "reentryPoint": "literature",
+          "deterministicVerification": null,
+          "confidence": 0.8,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        }
+      ],
+      "rejectedFindings": [],
+      "conflictNotes": [],
+      "reentryPoint": "protocol",
+      "nextAction": "Route back to protocol with review-response decisions.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-adjudication.json"
+    },
+    "response": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:28:00.040Z",
+      "adjudicationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-adjudication.json",
+      "autonomy": "aggressive",
+      "decisions": [
+        {
+          "findingId": "F01",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Explicitly define the population, intervention/exposure, comparison, outcome, and time frame (PICOT), along with a prespecified analysis plan.",
+          "reentryPoint": "protocol"
+        },
+        {
+          "findingId": "F1",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Explicitly state the primary research question, including population, intervention/exposure, comparator, and outcome.",
+          "reentryPoint": "protocol"
+        },
+        {
+          "findingId": "F2",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide a codebook detailing each variable, its type, coding scheme, and units (e.g., count_events as number of events per patient).",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F02",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include an offset variable (e.g., log(person-years)) in the Poisson regression, or justify its absence (e.g., all subjects have equal follow-up).",
+          "reentryPoint": "method_selection"
+        },
+        {
+          "findingId": "F03",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Report the deviance/df ratio, perform a dispersion test (e.g., dispersiontest in R), and consider negative binomial or zero-inflated models if needed.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F04",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide a missing data table, describe the missingness mechanism (MCAR/MAR/MNAR), and conduct sensitivity analyses (e.g., multiple imputation).",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F05",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include a table with n, mean, sd, median, IQR, min/max for continuous variables and counts/frequencies for categorical variables, stratified by exposure if relevant.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F07",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include a data availability statement, deposit de-identified data and code in a public repository, or document the exact software environment and seed.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F3",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Compute the dispersion statistic (deviance/df) and, if >1, use robust standard errors or a negative binomial model. Test for zero-inflation (e.g., Vuong test) and specify a zero-inflated model if needed.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F4",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Report the number and proportion of missing values per variable, compare baseline characteristics of included vs. excluded records, and consider multiple imputation or sensitivity analyses.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F5",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include the complete analysis script (R/Python) with data loading, cleaning, and model fitting, along with a seed for reproducibility.",
+          "reentryPoint": "qa"
+        },
+        {
+          "findingId": "F6",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide descriptive statistics (mean, median, range) and visualizations (histograms, boxplots) for all variables. Flag any biologically implausible values.",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F7",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Downgrade language to explicitly state the exploratory nature, omit p-value interpretations unless a prespecified analysis plan exists, and avoid any implication of clinical actionability.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F06",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Publish the full stats-qa.json and discuss any failed checks. If failures are trivial, justify; otherwise, rerun analysis with corrections.",
+          "reentryPoint": "qa"
+        },
+        {
+          "findingId": "F08",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Downgrade the language to 'exploratory findings only' and remove p-values or clearly label them as unadjusted, hypothesis-generating.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F8",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Add a brief literature review, citing prior studies on similar exposures/outcomes, and compare direction and magnitude of effects.",
+          "reentryPoint": "literature"
+        }
+      ],
+      "stateReentry": {
+        "status": "blocked",
+        "reentryPoint": "protocol",
+        "suggestedCommands": [
+          "agenteer research protocol-candidates --question <revised-question> --json",
+          "agenteer research method-select --question <revised-question> --json"
+        ],
+        "rerunReviewAfterRepair": true
+      },
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/review-response.json",
+      "stateReentryPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/review/state-reentry.json"
+    }
+  }
+}
+

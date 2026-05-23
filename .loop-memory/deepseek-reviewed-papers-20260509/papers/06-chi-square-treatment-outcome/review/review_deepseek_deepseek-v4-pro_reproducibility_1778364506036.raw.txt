@@ -1,0 +1,128 @@
+{
+  "verdict": "revise",
+  "summary": "The manuscript reports a statistically significant association between treatment and binary outcome based on chi-square test, but fails to report effect size or contingency table, inadequately describes cohort and missing data, does not address confounding or ethical considerations, and includes contradictory QA statements. These issues require revision before promotion.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Effect size (Cramer's V) omitted from manuscript",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "P-value alone does not convey practical importance; Cramer's V is available in the stats run but not reported, making interpretation incomplete.",
+      "actionableFix": "Include Cramer's V in the Results section and interpret its magnitude (e.g., small, moderate, large) in the Discussion.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that manuscript.md now contains 'Cramer's V = 0.216' or similar.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Contingency table not presented in manuscript",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The 2x2 table is essential for readers to verify the chi-square statistic and assess cell sizes.",
+      "actionableFix": "Add the contingency table (with labels for outcome and treatment levels) to the Results section.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that manuscript.md contains a 2x2 table with observed counts.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "No consideration of confounding or adjustment",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The bivariate association may be confounded; without mention of potential confounders or limitations, readers may overinterpret the result.",
+      "actionableFix": "Discuss unmeasured confounding as a limitation and explicitly state that causal inference is not intended without further design or adjustment.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Missing data and cohort derivation inadequately described",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Complete-case analysis can introduce bias if exclusion is non-random; without reporting the number excluded and reasons, validity is questionable.",
+      "actionableFix": "Describe the flow from initial records to the final 240, including number of records with missing data for treatment or outcome, and discuss potential impact.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Contradictory statements about methods review issues",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-qa.json"
+      ],
+      "whyItMatters": "Manuscript claims 'methods review found advisory issues' but QA checks show pass. This creates confusion about study reliability.",
+      "actionableFix": "Either list the specific advisory issues identified, or remove the statement if no such issues exist; align manuscript with QA artifact.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Search manuscript.md for 'advisory issues' and verify either removed or explicitly listed.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Chi-square assumptions not explicitly addressed",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Assumptions like independence of observations could fail in clustered data; lacking discussion may hide potential violations.",
+      "actionableFix": "Add a sentence confirming that observations are independent (e.g., no repeated measures) and that expected cell counts were adequate.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "literature",
+      "title": "No ethical consideration statement",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "For human subjects research, ethical approval or exemption must be disclosed per standard guidelines.",
+      "actionableFix": "Add a statement on ethical review board approval or exemption, and informed consent procedures.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check manuscript.md for a sentence mentioning ethics committee.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Conclusion is too generic and does not convey result",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The conclusion does not mention the significant association found, limiting its utility for readers seeking the bottom line.",
+      "actionableFix": "Revise conclusion to state that a statistically significant association was observed (p=0.0008) with a small-to-moderate effect size, while emphasizing the observational, local-data limitations.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Analysis script or specification used to generate chi-square results (beyond JSON output).",
+    "Raw data or detailed data dictionary for cohort variables.",
+    "Number and characteristics of excluded records due to missingness.",
+    "Ethical approval documentation or explicit waiver statement."
+  ],
+  "recommendedNextStage": "manuscript"
+}

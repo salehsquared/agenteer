@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:18:13.381Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361493381",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "The manuscript is a template-like placeholder without a defined study question, lacks viable diagnostic evidence, and reports only descriptive statistics from an unbound, unreproducible analysis. It cannot support any clinical or public-health inference.",
+    "findings": [
+      {
+        "id": "F001",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Prespecified study question never stated",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without a clear, explicit research question, the analysis has no scientific goal and its results are uninterpretable.",
+        "actionableFix": "State the primary study question (e.g., PICO/PECO) in the Introduction and align all analyses to it.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "Text search for 'prespecified study question' returns template text but no actual question.",
+        "confidence": 1
+      },
+      {
+        "id": "F002",
+        "severity": "blocker",
+        "category": "model_diagnostics",
+        "title": "Diagnostics.json is empty, contradicting claim of model-diagnostics review",
+        "evidenceRefs": [
+          "diagnostics.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript states that model diagnostics were reviewed, but the empty diagnostics artifact proves no checks were performed. This undermines all downstream claims.",
+        "actionableFix": "Implement appropriate diagnostic checks (distributional, assumption testing, outlier handling) and populate the diagnostics artifact; then rerun or re-evaluate.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "diagostics.json file size 2 bytes, content '{}'.",
+        "confidence": 1
+      },
+      {
+        "id": "F003",
+        "severity": "blocker",
+        "category": "reproducibility",
+        "title": "No code, data, or environment provided – analysis irreproducible",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The run artifacts are opaque summaries; without access to the raw dataset, analytic code, and execution environment, the analysis cannot be independently verified.",
+        "actionableFix": "Provide the complete pipeline (source data, cleaning scripts, analysis code, Docker/session info) in a publicly accessible, versioned repository.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Artifact inventory does not include a data file or script with executable code.",
+        "confidence": 1
+      },
+      {
+        "id": "F004",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Complete-case sample lacks missing-data context and may hide selection bias",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The report shows 0 missing values for variables in the complete-case subset, but no information is given about the original dataset size, exclusion criteria, or missingness patterns. This can mask informative missingness and threaten generalizability.",
+        "actionableFix": "Report the full dataset size, a flowchart of exclusions, and a missing-data analysis (proportions, patterns, sensitivity).",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Stats-run.json 'completeCaseN': 240 and all variables show missing_fraction=0, but no pre-exclusion counts.",
+        "confidence": 0.95
+      },
+      {
+        "id": "F005",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Variables lack definitions, units, and clinical meaning (e.g., 'outcome_cont')",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Readers cannot interpret descriptive statistics without knowing what the variables represent (age in years? outcome_cont of what?), making any inference impossible.",
+        "actionableFix": "Provide a data dictionary with variable names, definitions, units, measurement instruments, and reference ranges.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "Variables list includes 'outcome_cont' with no explanation; no data dictionary artifact.",
+        "confidence": 1
+      },
+      {
+        "id": "F006",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript claims 'no reader-facing paper/manuscript artifact was found' but manuscript.md exists",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "This internal inconsistency suggests poor quality control and unreliable self-assessment.",
+        "actionableFix": "Remove the contradictory statement or correct it after verifying the artifact inventory.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md lines: 'No reader-facing paper/manuscript artifact was found.'",
+        "confidence": 1
+      },
+      {
+        "id": "F007",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Results section contains no substantive findings beyond sample size",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript produces no tables, figures, or numerical summaries in the body; the Results section merely restates the sample size, making it hollow.",
+        "actionableFix": "Report key descriptive statistics (with measures of variability, effect sizes, or appropriate visualizations) in the Results, referencing companion artifacts for detail.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md 'Results' section text: '- The complete-case analytic sample included 240 records.'",
+        "confidence": 1
+      },
+      {
+        "id": "F008",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Analysis is unbound to a method-selection or analysis spec, making it purely exploratory",
+        "evidenceRefs": [
+          "stats-run.json"
+        ],
+        "whyItMatters": "The result posture is 'exploratory_standard_table' and cannot support any formal inference; using it for clinical or public-health conclusions is inappropriate.",
+        "actionableFix": "Create or bind a formal AnalysisSpec and method-selection evidence prior to rerunning, and update the manuscript to reflect the governed analysis status.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json 'binding.status': 'unbound'.",
+        "confidence": 1
+      }
+    ],
+    "missingEvidence": [
+      "Original dataset size and exclusion flowchart",
+      "Missing-data analysis (pattern, mechanism, sensitivity)",
+      "Variable data dictionary (definitions, units, reference ranges)",
+      "Study protocol or analysis plan (AnalysisSpec)",
+      "Data provenance and access information",
+      "Analysis code and computing environment specifications",
+      "Model diagnostics outputs (e.g., distribution checks, outlier detection)",
+      "Literature context and comparison to prior evidence"
+    ],
+    "recommendedNextStage": "protocol",
+    "costEstimate": {
+      "inputTokens": 3033,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026157,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361493381.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361493381.json"
+  }
+}

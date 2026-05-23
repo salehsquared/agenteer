@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+    "https://www.cms.gov/medicare/coding-billing/icd-10-codes",
+    "https://www.cms.gov/files/document/fy-2012-fr-table-6b-new-diagnosis-codes-pdf.pdf",
+    "https://www.cms.gov/regulations-and-guidance/guidance/transmittals/downloads/r2552cp.pdf",
+    "https://www.cms.gov/medicare/regulations-guidance/physician-self-referral/list-cpt-hcpcs-codes",
+    "https://physionet.org/content/mimiciv/3.1/",
+    "https://mimic.mit.edu/docs/iv/"
+  ],
+  "userSuppliedCodeSets": {
+    "tavrIcd9Procedure": [
+      "3505",
+      "3506"
+    ],
+    "savrIcd9Procedure": [
+      "3521",
+      "3522"
+    ],
+    "dialysisIcd10Diagnosis": [
+      "N186",
+      "Z992"
+    ],
+    "dialysisIcd9Diagnosis": [
+      "5856",
+      "V4511",
+      "V560",
+      "V561",
+      "V562",
+      "V5631",
+      "V5632",
+      "V568"
+    ],
+    "peritonealDialysisIcd9Procedure": [
+      "5498"
+    ],
+    "peritonealDialysisCptHcpcs": [
+      "49324",
+      "49325",
+      "49326",
+      "49418",
+      "49420",
+      "49421",
+      "49422",
+      "49435",
+      "49436",
+      "G0052"
+    ],
+    "auxiliaryHemodialysisCptHcpcsScan": [
+      "90935",
+      "90937",
+      "90945",
+      "90947",
+      "90999",
+      "G0257"
+    ]
+  },
+  "observedValveCptHcpcs": {
+    "tavr": [
+      "0256T",
+      "33361"
+    ],
+    "savr": []
+  },
+  "observedUserDialysisCodes": [
+    "49324",
+    "49325",
+    "49420",
+    "49421",
+    "49422",
+    "49435",
+    "5498",
+    "5856",
+    "N186",
+    "V4511",
+    "V560",
+    "V561",
+    "V562",
+    "V5631",
+    "V568",
+    "Z992"
+  ],
+  "observedAuxiliaryHemodialysisCptHcpcs": [
+    "90935",
+    "90945",
+    "G0257"
+  ],
+  "warnings": [
+    "SAVR CPT codes were scanned as auxiliary valve CPT evidence but are not part of the user-supplied code list.",
+    "ICD-10-PCS valve classification uses code-axis/title logic and should be reviewed before claims-style reuse.",
+    "MIMIC HCPCS rows are not a complete CPT claims feed."
+  ]
+}

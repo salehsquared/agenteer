@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:49:21.926Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Observational study with no confounder adjustment",
+        "evidenceRefs": [
+          "stats-run.json: variables only include 'outcome_binary' and 'treatment'",
+          "manuscript.md: 'Design: This was an observational dataset analysis'"
+        ],
+        "whyItMatters": "Without controlling for confounding, any observed association cannot be attributed to the treatment. The odds ratio and p-value are uninterpretable as evidence of a treatment effect.",
+        "actionableFix": "Design a causal study protocol specifying potential confounders, use multivariable regression, propensity scores, or other adjustment methods, or clearly state that only unadjusted association is reported and its limitations for causal inference.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json `variables` array contains only 'outcome_binary' and 'treatment'; no covariates present.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F01",
+        "severity": "blocker",
+        "category": "variables",
+        "title": "Variable definitions and clinical meaning are absent",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "Without a clear definition of ‘outcome_binary’ and ‘treatment’, readers cannot assess clinical relevance, direction of effect, or potential for misclassification. The abstract’s question (‘Is binary outcome frequency associated with treatment group?’) is content‑free and the analysis remains opaque.",
+        "actionableFix": "Add a Variables section that defines each variable, its coding (e.g., 0 = control, 1 = active; 0 = good outcome, 1 = poor outcome), measurement method, timing, and data source. Include a table of baseline characteristics by treatment group.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "cohort",
+        "title": "Insufficient cohort description",
+        "evidenceRefs": [
+          "manuscript.md: 'Participants: The analyzed sample included 240 complete-case records.'",
+          "manuscript.md: missing any details on source population, eligibility, sampling"
+        ],
+        "whyItMatters": "Readers cannot assess generalizability or potential selection biases. Cohort flow and inclusion/exclusion are fundamental to interpreting any study.",
+        "actionableFix": "Provide a detailed cohort description, including data source, target population, eligibility criteria, how the 240 records were selected, and a flow diagram. Include information on missingness handling.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Missing confidence interval for odds ratio",
+        "evidenceRefs": [
+          "stats-run.json: estimates array contains only 'odds_ratio' and 'p_value', no confidence interval"
+        ],
+        "whyItMatters": "The precision of the effect estimate is crucial; p-value alone does not convey the range of plausible effects. Reporting only the point estimate is insufficient.",
+        "actionableFix": "Compute and report the 95% confidence interval for the odds ratio from the Fisher exact test (or via profile-likelihood/bootstrap). Include it in the results and discussion.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "stats-run.json `estimates[0]` lacks a `confidence_interval` key.",
+        "confidence": 0.99,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Result posture is exploratory but manuscript language suggests confirmatory",
+        "evidenceRefs": [
+          "stats-run.json: resultPosture.status = 'exploratory_standard_table'",
+          "stats-qa.json: checks 'binding-status' and 'result-posture' both warning of unbound exploratory status",
+          "manuscript.md: 'Conclusion: The analysis produced interpretable local evidence...'"
+        ],
+        "whyItMatters": "The pipeline itself flagged the analysis as exploratory and not ready for paper conclusions. Presenting it with a formal 'Conclusion' section and p-value emphasis misleads readers about the strength of evidence.",
+        "actionableFix": "Explicitly downgrade the manuscript's language to 'exploratory analysis' without causal or inferential conclusions. Remove any suggestion of formal hypothesis testing. Align claims with the resultPosture guidance.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "stats-run.json `resultPosture.cannotSupport` includes 'paper-ready conclusions'.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No missing data analysis or complete-case justification",
+        "evidenceRefs": [
+          "manuscript.md: 'The complete-case analytic sample included 240 records.'",
+          "missing: description of raw sample size, missingness pattern, reasons for exclusion"
+        ],
+        "whyItMatters": "Complete-case analysis can bias results if missingness is related to exposure or outcome. Without reporting the extent and handling of missing data, the internal validity is questionable.",
+        "actionableFix": "Report the raw dataset size, number of missing values per variable, and pattern of missingness. Consider multiple imputation or sensitivity analysis, or at minimum justify why complete-case analysis is unbiased (e.g., MCAR).",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No interpretation of effect size or clinical relevance",
+        "evidenceRefs": [
+          "manuscript.md: Results only state OR=2.7778, p=0.0005",
+          "missing: absolute risks, risk difference, number needed to treat, clinical context"
+        ],
+        "whyItMatters": "Statistical significance alone does not imply practical importance. Without discussing the magnitude and clinical meaning of the odds ratio, the report fails to inform decision-making.",
+        "actionableFix": "Report absolute risk estimates per group, risk differences, confidence intervals, and provide a clinical interpretation (e.g., how many patients would need to be treated to observe one additional outcome).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F02",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Ungoverned exploratory analysis not disclosed",
+        "evidenceRefs": [
+          "stats-run/stats-run.json",
+          "stats-run/stats-qa.json"
+        ],
+        "whyItMatters": "The stats-run binding status is ‘unbound’ and the result posture is ‘exploratory_standard_table’. The manuscript presents the p‑value (0.0005) without acknowledging that the test was not pre‑registered or governed by a pre‑analysis plan. This inflates the perceived confirmatory weight of the result.",
+        "actionableFix": "Explicitly state that the analysis is exploratory and was not governed by a pre‑registered protocol. In the Limitations, note that the p‑value is not confirmatory and that multiplicity or data‑dependent choices could inflate error rates. If the work is meant to be confirmatory, create a method‑selection artifact (AnalysisSpec) and re‑run under binding.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check stats-run.json: binding.status = \"unbound\"",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F03",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No confounding control in an observational comparison",
+        "evidenceRefs": [
+          "stats-run/stats-run.json",
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "The study compares two groups on a binary outcome but includes only ‘treatment’ and ‘outcome_binary’. No confounders are measured or adjusted for. The odds ratio (2.78) cannot be interpreted as a treatment effect; it may be entirely driven by selection or confounding. The manuscript’s conservative language does not excuse the absence of any confounding discussion.",
+        "actionableFix": "At minimum, discuss potential confounders and why they cannot be addressed with available data. If the dataset contains covariates, add a multivariable model or propensity‑score analysis. If not, state this as a fatal limitation and refrain from using the term ‘associated with treatment group’ without qualifiers.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F04",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Missingness process and complete‑case impact not quantified",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "The report states 240 complete‑case records but provides no information on the number of records with missing data, which variables were affected, or whether missingness is related to exposure/outcome. This prevents assessment of selection bias and violates STROBE guidelines.",
+        "actionableFix": "Provide a flow diagram showing initial cohort size, number excluded for each reason, and final analytic sample. Perform a comparison of characteristics between complete‑case and excluded subjects if possible, or at least discuss the plausible direction of bias.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F05",
+        "severity": "major",
+        "category": "literature",
+        "title": "No literature context or reference to existing evidence",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript contains zero references. Without situating the result in prior work, the reader cannot gauge whether the odds ratio of 2.78 is expected, large, small, or clinically trivial. The discussion cannot justify the analysis or its meaning.",
+        "actionableFix": "Add a brief literature review (even a few key references) that establishes the clinical background, expected effect sizes, and how this analysis contributes. Revise the Discussion to compare and contrast with prior findings.",
+        "reentryPoint": "literature",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F06",
+        "severity": "major",
+        "category": "data_plausibility",
+        "title": "Data source and external plausibility are not discussed",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript does not state where the data come from, the population, time period, or any quality‑assurance steps. The plausibility of the counts (e.g., outcome prevalence of 60% overall) cannot be assessed. This undermines trust in the data integrity and the generalisability of the findings.",
+        "actionableFix": "Provide a Data Source subsection describing the dataset, its provenance, and any known limitations (e.g., sampling method, potential errors, external validity). Compare the observed prevalence to known benchmarks if available.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "literature",
+        "title": "No reference to prior evidence or comparison with existing literature",
+        "evidenceRefs": [
+          "manuscript.md: no references section, no citations"
+        ],
+        "whyItMatters": "Placing results in the context of existing knowledge is essential for informing readers about novelty and consistency. Without it, the study appears ad-hoc and its contribution unclear.",
+        "actionableFix": "Conduct a literature search, cite prior studies on the same or similar association, compare effect estimates, and discuss potential differences.",
+        "reentryPoint": "literature",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "minor",
+        "category": "figures",
+        "title": "Contingency table figure not integrated into manuscript results",
+        "evidenceRefs": [
+          "stats-run/figures.json: contingency-heatmap.png exists",
+          "manuscript.md: no figure reference or table included"
+        ],
+        "whyItMatters": "The raw counts are the fundamental evidence for the Fisher test. They should be presented in the manuscript (preferably as a table) for transparency and verification.",
+        "actionableFix": "Include a table displaying the 2x2 contingency table in the Results section, and optionally reference the heatmap.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F07",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Odds ratio lacks confidence interval and p‑value over‑precise",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "The manuscript reports only the point estimate (2.7778) and a p‑value (0.0005) with excessive decimal precision but no confidence interval. Fisher’s exact test can produce exact CIs, which are more informative than a p‑value alone.",
+        "actionableFix": "Report the 95% exact confidence interval for the odds ratio (e.g., from the same test). State p‑value as e.g., 0.0005 or <0.001 without implying more precision than warranted. Include ASA interpretation statement.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [],
+    "reentryPoint": "protocol",
+    "nextAction": "Route back to protocol with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review-adjudication.json"
+  }
+}

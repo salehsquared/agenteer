@@ -1,0 +1,137 @@
+{
+  "verdict": "block",
+  "summary": "The analysis lacks a pre-specified protocol, model diagnostics, and proper handling of missingness and confounding. The manuscript contains inaccuracies and the results are not fit for confirmatory interpretation.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Analysis is exploratory and lacks pre-specified protocol",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json",
+        "stats-qa.json"
+      ],
+      "whyItMatters": "Without a pre-specified analysis, p-values and confidence intervals are unreliable for confirmatory inference, and the risk of data dredging is high.",
+      "actionableFix": "Bind the run to a pre-registered AnalysisSpec and method selection, or clearly present results as exploratory with no confirmatory interpretation.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Verify that stats-run.json has 'binding.status' equal to 'unbound' and 'resultPosture.status' equal to 'exploratory_standard_table'.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Proportional hazards assumption not verified",
+      "evidenceRefs": [
+        "diagnostics.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Violation of the PH assumption can bias hazard ratio estimates and invalidate confidence intervals. The Cox model requires verification.",
+      "actionableFix": "Report Schoenfeld residuals test (e.g., cox.zph) and visual diagnostics, and consider alternative models if PH fails.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Confirm that diagnostics.json does not contain a 'schoenfeld' key and that manuscript.md does not mention PH testing.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without missing data exploration",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "If missingness is related to exposure, outcome, or covariates, complete-case analysis can introduce selection bias.",
+      "actionableFix": "Describe amount and patterns of missingness, perform sensitivity analyses (e.g., multiple imputation), and justify complete-case approach if missing completely at random.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "Check that manuscript.md lacks a description of missing data and that stats-run.json shows completeCaseN equal to rowCount without any missingness analysis artifacts.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "variables",
+      "title": "Confounders chosen without justification",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Including inappropriate covariates or omitting relevant confounders can bias the treatment effect estimate. Causal interpretation requires a DAG or expert knowledge.",
+      "actionableFix": "Provide a directed acyclic graph (DAG) or clinical rationale for covariate selection, and consider sensitivity analyses for unmeasured confounding.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "Check that manuscript.md does not contain any justification for the inclusion of 'age' and 'severity' as covariates.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Manuscript claims absence of estimates and report when both exist",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Inaccurate self-assessment undermines trust in the manuscript and may indicate a templating error.",
+      "actionableFix": "Remove contradictory statements and ensure manuscript accurately reflects available artifacts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Confirm that manuscript.md contains the text 'No estimate-like records were available for p-value/effect-size checks' while stats-run.json includes an 'estimates' array.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "figures",
+      "title": "No survival curves or model diagnostic plots provided",
+      "evidenceRefs": [
+        "figures.json",
+        "figure-qa.json"
+      ],
+      "whyItMatters": "Visual presentation of survival curves by treatment group and residual checks aids interpretation and transparency.",
+      "actionableFix": "Generate Kaplan-Meier curves and at least a Schoenfeld residual plot for the Cox model.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that figures.json reports 0 figures and figure-qa.json shows 0/0 figures passed.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "P-values reported without clinical or practical significance discussion",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Statistical significance does not imply clinical importance, especially with small sample sizes. The hazard ratios should be interpreted in absolute terms or with clinical context.",
+      "actionableFix": "Add discussion of effect sizes, confidence interval precision, and clinical relevance.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify that manuscript.md lacks any interpretation beyond p-values and hazard ratios for clinical applicability.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "data_plausibility",
+      "title": "No checks for sparse data or extreme values",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "Sparse covariates or few events per variable could lead to unstable estimates; standard rule of thumb is 10+ events per predictor.",
+      "actionableFix": "Check events per predictor (140 events, 3 predictors is adequate) but also check for zero cells or extreme values.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Verify that stats-run.json contains no per-variable summary statistics or outlier flags.",
+      "confidence": 0.6
+    }
+  ],
+  "missingEvidence": [
+    "Raw dataset or synthetic data seed",
+    "Code/scripts used for analysis",
+    "Pre-processing steps and handling of the survival_time and event variables",
+    "Definition of censoring",
+    "Proportional hazards test results",
+    "Missing data assessment",
+    "Confounder selection rationale (DAG)",
+    "Model diagnostics (residual plots, etc.)"
+  ],
+  "recommendedNextStage": "protocol"
+}

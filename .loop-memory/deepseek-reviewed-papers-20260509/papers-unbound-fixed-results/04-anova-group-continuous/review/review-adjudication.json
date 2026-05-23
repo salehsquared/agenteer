@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:47:03.492Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "split",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "No clinical group or outcome definitions provided",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without defining the clinical groups (e.g., treatment arms, disease stages) and the continuous outcome, the study question and results are uninterpretable to any reader. The manuscript defers to a 'companion variable artifact' not included in the review packet.",
+        "actionableFix": "Add explicit definitions of all groups (including reference category), the outcome variable (units, measurement method, clinical relevance), and the study population eligibility criteria directly in the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if manuscript.md contains definitions of 'group' levels and 'outcome_cont'; currently absent.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "reporting_method_absent",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Statistical method not stated in manuscript",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Readers cannot evaluate appropriateness without knowing the method.",
+        "actionableFix": "Explicitly state that a one-way ANOVA was performed.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Search manuscript.md for 'ANOVA' or 'analysis of variance'; not found.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "reporting_variable_defs",
+        "severity": "blocker",
+        "category": "variables",
+        "title": "Outcome and group variables are not defined",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without variable definitions, the research question is opaque and results cannot be interpreted.",
+        "actionableFix": "Define the continuous outcome and the categories of the group variable in the Methods.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md variables section only says variables not fully encoded.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "Analysis not bound to pre-specified plan; p-value is exploratory",
+        "evidenceRefs": [
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "The stats-run is 'unbound', meaning no method-selection or AnalysisSpec was defined before execution. The reported p-value is not confirmatory and cannot support hypothesis testing. The manuscript does not explicitly disclaim this limitation.",
+        "actionableFix": "Clearly state in abstract and discussion that this is an unplanned exploratory analysis; the p-value is not inferential. Consider re-running with a pre-registered analysis plan if confirmatory claims are desired.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "In stats-run.json, 'binding.status' equals 'unbound'.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Group means, standard deviations, and sample sizes not reported",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/estimates.csv"
+        ],
+        "whyItMatters": "ANOVA only informs on differences, but descriptive statistics are essential for assessing effect size, variability, and clinical importance. Readers cannot evaluate the magnitude of any non-significant differences.",
+        "actionableFix": "Include a table with n, mean, SD, median, IQR per group, and a boxplot or dot plot. This is standard for any group comparison.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check manuscript and estimates.csv: only ANOVA F and p present; no per-group summary statistics.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No information on missing data or exclusion criteria",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Complete-case analysis assumes data are missing completely at random. Without reporting the original sample size, number excluded, reasons, and evidence for MCAR, the results may be biased.",
+        "actionableFix": "Provide a participant flow diagram, proportion of missing outcomes/covariates, and consider sensitivity analysis or multiple imputation. At minimum, describe why complete-case analysis is appropriate.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Absence of any missingness report or flow chart in provided artifacts.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript does not conform to standard reporting guidelines",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The manuscript lacks structured sections (e.g., Introduction, Methods, Results, Discussion), a clear research question, description of setting, dates, variables, and bias assessment. This undermines transparency and disallows proper peer review.",
+        "actionableFix": "Reorganize according to STROBE or similar guidelines; include a proper abstract, introduction with clinical context, detailed methods, results with tables, and a discussion of limitations.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "STROBE checklist comparison: missing multiple items (e.g., eligibility, setting, descriptive data, etc.).",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "reporting_descriptives",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No descriptive statistics reported",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Readers need group means, standard deviations, and sample sizes per group to assess the data and check ANOVA assumptions.",
+        "actionableFix": "Add a table with n, mean, SD per group, and optionally a boxplot.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md results only include F and p.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "reporting_effect_size",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Effect size (eta-squared) not reported",
+        "evidenceRefs": [
+          "stats-run.json"
+        ],
+        "whyItMatters": "p-value alone does not convey the magnitude of group differences; effect size is essential.",
+        "actionableFix": "Report eta-squared or partial eta-squared with confidence interval.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "stats-run.json has sum_sq and df, but no eta-squared in manuscript.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "model_diagnostics_homogeneity",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Homogeneity of variance not assessed",
+        "evidenceRefs": [
+          "diagnostics.json"
+        ],
+        "whyItMatters": "ANOVA assumes equal variances; violation can inflate Type I error.",
+        "actionableFix": "Report Levene's test or Bartlett's test, and consider Welch's ANOVA if violated.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "diagnostics.json does not contain any test for homogeneity of variance.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "missingness_analysis",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No analysis of missing data",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Complete-case analysis can bias results if missingness is not completely at random.",
+        "actionableFix": "Document the amount and pattern of missingness, and consider sensitivity analysis.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "manuscript.md mentions missingness only as a limitation; no numbers given.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "reproducibility_binding",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Analysis not bound to a pre-registered protocol or AnalysisSpec",
+        "evidenceRefs": [
+          "stats-qa.json",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Unbound analysis increases risk of p-hacking and reduces credibility.",
+        "actionableFix": "Create an AnalysisSpec artifact and bind the run before considering confirmatory claims.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "stats-run.json.resultPosture.status is 'exploratory_standard_table'.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "reporting_assumptions_check",
+        "severity": "major",
+        "category": "reporting",
+        "title": "ANOVA assumption checks not reported in manuscript",
+        "evidenceRefs": [
+          "manuscript.md",
+          "diagnostics.json"
+        ],
+        "whyItMatters": "Readers need to know if model assumptions were met. Diagnostics show residual normality but not reported.",
+        "actionableFix": "Incorporate diagnostics results (normality, homoscedasticity, outliers) in the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md does not mention residual diagnostics.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Contradictory limitation: 'No reader-facing paper/manuscript artifact was found'",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The Limitations section states there is no manuscript artifact, yet manuscript.md exists. This internal inconsistency confuses readers and undermines confidence in the review process.",
+        "actionableFix": "Remove or correct this limitation; the manuscript artifact is present. Ensure all automated QA messages align with the actual artifact inventory.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Presence of manuscript.md artifact confirmed in run directory and its content.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "minor",
+        "category": "literature",
+        "title": "No references or background literature provided",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without citing prior similar studies, the novelty and relevance of the finding cannot be assessed. The discussion lacks context, making it an isolated report without scientific grounding.",
+        "actionableFix": "Include a brief literature review of comparable outcome-group comparisons and discuss how the current result aligns with existing knowledge.",
+        "reentryPoint": "literature",
+        "deterministicVerification": "Absence of a reference section in manuscript.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [
+      {
+        "finding": {
+          "id": "F7",
+          "severity": "info",
+          "category": "figures",
+          "title": "Figure QA artifacts appear empty; cannot verify figure checks",
+          "evidenceRefs": [
+            "stats-run/figure-qa.json",
+            "figure-qa.json"
+          ],
+          "whyItMatters": "The stats-run QA claims figure quality passed, but the detailed QA checks are missing from the provided artifacts (empty files). This prevents independent verification of figure readability, caption adequacy, and data representation.",
+          "actionableFix": "Populate the figure-qa.json with the actual checks performed and results, or include figure captions and quality notes in the manuscript supplement.",
+          "reentryPoint": "qa",
+          "deterministicVerification": "file size or content check: figure-qa.json files appear to have no content or are truncated.",
+          "confidence": 0.5
+        },
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "reason": "Low-severity single-reviewer finding kept as advisory but not accepted for automatic repair."
+      }
+    ],
+    "conflictNotes": [
+      "Reviewer verdicts differed: revise, block."
+    ],
+    "reentryPoint": "analysis_spec",
+    "nextAction": "Route back to analysis_spec with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/review/review-adjudication.json"
+  }
+}

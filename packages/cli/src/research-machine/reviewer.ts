@@ -233,6 +233,9 @@ export interface StudyCriticResult {
   response: ReviewResponseResult;
 }
 
+export const reviewerPanelSchema = z.enum(["default", "cheap", "strict", "all", "deepseek-dual", "deepseek-triple"]);
+export type ReviewerPanel = z.infer<typeof reviewerPanelSchema>;
+
 export function reviewerProviderConfigs(env: NodeJS.ProcessEnv = process.env): ReviewerProviderConfig[] {
   return [
     {
@@ -292,17 +295,30 @@ export function reviewerProviderConfigs(env: NodeJS.ProcessEnv = process.env): R
   ];
 }
 
-export function defaultReviewerPanel(panel: "default" | "cheap" | "strict" | "all" = "default"): ReviewerModelConfig[] {
-  const make = (provider: ReviewerProviderId, model: string, role: string): ReviewerModelConfig => ({
-    id: `${provider}:${model}`,
+export function defaultReviewerPanel(panel: ReviewerPanel = "default"): ReviewerModelConfig[] {
+  const make = (provider: ReviewerProviderId, model: string, role: string, idSuffix?: string): ReviewerModelConfig => ({
+    id: idSuffix ? `${provider}:${model}:${idSuffix}` : `${provider}:${model}`,
     provider,
     model,
     role,
     enabled: true,
-    maxInputChars: 36000,
-    maxOutputTokens: 1800,
-    timeoutMs: 90000,
+    maxInputChars: provider === "deepseek" ? 18000 : 36000,
+    maxOutputTokens: provider === "deepseek" ? 6000 : 1800,
+    timeoutMs: provider === "deepseek" ? 120000 : 90000,
   });
+  if (panel === "deepseek-dual") {
+    return [
+      make("deepseek", "deepseek-v4-pro", "clinical methods and study-design reviewer", "methods"),
+      make("deepseek", "deepseek-v4-pro", "statistical reporting and reproducibility reviewer", "reproducibility"),
+    ];
+  }
+  if (panel === "deepseek-triple") {
+    return [
+      make("deepseek", "deepseek-v4-pro", "clinical methods and study-design reviewer", "methods"),
+      make("deepseek", "deepseek-v4-pro", "diagnosis/procedure-code phenotype reviewer", "phenotype"),
+      make("deepseek", "deepseek-v4-pro", "statistical reporting and reproducibility reviewer", "reproducibility"),
+    ];
+  }
   if (panel === "cheap") {
     return [
       make("deepseek", "deepseek-v4-pro", "cheap broad methodological critic"),
@@ -349,7 +365,7 @@ export async function researchStudyCriticCommand(opts: {
   outDir?: string;
   stage?: ReviewStage;
   autonomy?: ReviewAutonomy;
-  panel?: "default" | "cheap" | "strict" | "all";
+  panel?: ReviewerPanel;
   reviewers?: string[];
   budget?: Partial<ReviewerBudget>;
   includeRaw?: boolean;
@@ -540,6 +556,7 @@ async function runReviewPanel(opts: {
 }): Promise<ReviewPanelResult> {
   const reviews: ModelReviewResult[] = [];
   let panelCost = 0;
+  const queued: ReviewerModelConfig[] = [];
   for (const reviewer of opts.reviewers) {
     const estimated = estimateReviewCost(reviewer, opts.packet.promptContext);
     if (estimated.estimatedUsd > opts.budget.maxPerCallUsd) {
@@ -550,10 +567,12 @@ async function runReviewPanel(opts: {
       reviews.push(skippedReview(reviewer, opts.stage, estimated, `Estimated panel cost would exceed $${opts.budget.maxPanelUsd.toFixed(2)}.`));
       continue;
     }
-    const result = await callReviewer(reviewer, opts.stage, opts.packet, opts.budget, opts.env, opts.fetchImpl, opts.outDir);
-    panelCost += result.costEstimate.estimatedUsd;
-    reviews.push(result);
+    panelCost += estimated.estimatedUsd;
+    queued.push(reviewer);
   }
+  const executed = await Promise.all(queued.map(reviewer => callReviewer(reviewer, opts.stage, opts.packet, opts.budget, opts.env, opts.fetchImpl, opts.outDir)));
+  reviews.push(...executed);
+  const ordered = opts.reviewers.flatMap(reviewer => reviews.filter(review => review.reviewer.id === reviewer.id));
   const succeeded = reviews.filter(review => review.status === "succeeded");
   const status = succeeded.length === 0
     ? "unavailable"
@@ -574,7 +593,7 @@ async function runReviewPanel(opts: {
     budget: opts.budget,
     packetPath: opts.packetPath,
     redactionReportPath: opts.redactionReportPath,
-    reviewers: reviews,
+    reviewers: ordered,
     status,
     costEstimateUsd: round(panelCost, 6),
     failureCount: reviews.filter(review => review.status === "failed").length,
@@ -614,6 +633,7 @@ async function callReviewer(reviewer: ReviewerModelConfig, stage: ReviewStage, p
     await writeJson(outPath, { schemaVersion: 1, modelReview: result });
     return result;
   } catch (error) {
+    const rawTextExists = await access(rawTextPath).then(() => true).catch(() => false);
     return {
       schemaVersion: 1,
       generatedAtIso: startedAt,
@@ -628,7 +648,7 @@ async function callReviewer(reviewer: ReviewerModelConfig, stage: ReviewStage, p
       recommendedNextStage: "human_review",
       costEstimate: estimated,
       error: error instanceof Error ? error.message : String(error),
-      rawTextPath: null,
+      rawTextPath: rawTextExists ? rawTextPath : null,
       outPath: null,
     };
   }
@@ -711,6 +731,9 @@ function buildReviewerPrompt(stage: ReviewStage, reviewer: ReviewerModelConfig, 
       "You are an independent cold reviewer for a medical/public-health research pipeline.",
       "You have no access to prior chat history. Judge only the supplied artifacts.",
       "Be skeptical, specific, and actionable. Do not praise. Do not invent missing data.",
+      "Prefer the highest-impact issues. Return at most 5 findings.",
+      "Keep every string concise; long prose can make the JSON invalid or incomplete.",
+      "If you are near the output limit, stop adding findings and close the JSON object correctly.",
       "Return strict JSON only, with no markdown fences.",
     ].join(" "),
     user: [
@@ -727,7 +750,7 @@ function buildReviewerPrompt(stage: ReviewStage, reviewer: ReviewerModelConfig, 
   };
 }
 
-async function providerGenerate(reviewer: ReviewerModelConfig, system: string, user: string, env: NodeJS.ProcessEnv, fetchImpl: typeof fetch): Promise<string> {
+export async function providerGenerate(reviewer: ReviewerModelConfig, system: string, user: string, env: NodeJS.ProcessEnv, fetchImpl: typeof fetch): Promise<string> {
   if (reviewer.provider === "mock") return mockReview(user, reviewer);
   if (reviewer.provider === "anthropic") return anthropicGenerate(reviewer, system, user, env, fetchImpl);
   if (reviewer.provider === "google") return googleGenerate(reviewer, system, user, env, fetchImpl);
@@ -754,9 +777,13 @@ async function openAiCompatibleGenerate(reviewer: ReviewerModelConfig, system: s
     }),
   }, reviewer.timeoutMs);
   if (!response.ok) throw new Error(`${reviewer.provider} reviewer ${response.status} ${response.statusText}: ${await response.text().catch(() => "")}`);
-  const json = await response.json() as { choices?: Array<{ message?: { content?: string | null } }> };
+  const json = await response.json() as { choices?: Array<{ finish_reason?: string; message?: { content?: string | null; reasoning_content?: string | null } }> };
   const text = json.choices?.[0]?.message?.content;
-  if (!text) throw new Error(`${reviewer.provider} reviewer returned empty content.`);
+  if (!text) {
+    const finishReason = json.choices?.[0]?.finish_reason ?? "unknown";
+    const reasoningChars = json.choices?.[0]?.message?.reasoning_content?.length ?? 0;
+    throw new Error(`${reviewer.provider} reviewer returned empty content; finish_reason=${finishReason}; reasoning_chars=${reasoningChars}. Increase max output tokens or reduce reviewer context.`);
+  }
   return text;
 }
 
@@ -823,11 +850,86 @@ function parseReviewerResponse(raw: string, reviewer: ReviewerModelConfig, stage
   const stripped = raw.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
   const parsed = JSON.parse(stripped) as unknown;
   const result = modelReviewPayloadSchema.safeParse(parsed);
-  if (!result.success) throw new Error(`reviewer output failed schema: ${result.error.message}`);
+  if (!result.success) {
+    const normalized = normalizeReviewerPayload(parsed);
+    const normalizedResult = modelReviewPayloadSchema.safeParse(normalized);
+    if (!normalizedResult.success) throw new Error(`reviewer output failed schema: ${result.error.message}`);
+    return {
+      ...normalizedResult.data,
+      findings: normalizedResult.data.findings.map((finding, index) => ({ ...finding, id: finding.id || `${sanitizeId(reviewer.id)}_${stage}_${index + 1}` })),
+    };
+  }
   return {
     ...result.data,
     findings: result.data.findings.map((finding, index) => ({ ...finding, id: finding.id || `${sanitizeId(reviewer.id)}_${stage}_${index + 1}` })),
   };
+}
+
+function normalizeReviewerPayload(value: unknown): unknown {
+  if (!value || typeof value !== "object") return value;
+  const raw = value as Record<string, unknown>;
+  const findings = Array.isArray(raw.findings) ? raw.findings.map(item => normalizeReviewerFinding(item)) : [];
+  return {
+    verdict: normalizeEnum(raw.verdict, ["pass", "revise", "block"], "revise"),
+    summary: typeof raw.summary === "string" && raw.summary.trim() ? raw.summary : "Reviewer returned a near-valid payload that required schema normalization.",
+    findings,
+    missingEvidence: Array.isArray(raw.missingEvidence) ? raw.missingEvidence.filter((item): item is string => typeof item === "string") : [],
+    recommendedNextStage: normalizeReentry(raw.recommendedNextStage, findings[0]?.reentryPoint),
+  };
+}
+
+function normalizeReviewerFinding(value: unknown): Record<string, unknown> {
+  const raw = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  const category = normalizeEnum(raw.category, reviewerCategorySchema.options, "reporting") as ReviewerCategory;
+  return {
+    id: typeof raw.id === "string" && raw.id.trim() ? raw.id : "",
+    severity: normalizeEnum(raw.severity, ["info", "minor", "major", "blocker"], "major"),
+    category,
+    title: typeof raw.title === "string" && raw.title.trim() ? raw.title : "Reviewer finding",
+    evidenceRefs: Array.isArray(raw.evidenceRefs) ? raw.evidenceRefs.filter((item): item is string => typeof item === "string") : [],
+    whyItMatters: typeof raw.whyItMatters === "string" && raw.whyItMatters.trim() ? raw.whyItMatters : "The reviewer indicated this issue may affect study interpretation.",
+    actionableFix: typeof raw.actionableFix === "string" && raw.actionableFix.trim() ? raw.actionableFix : "Route the finding to human review and add deterministic verification before promotion.",
+    reentryPoint: normalizeReentry(raw.reentryPoint, defaultReentryForCategory(category)),
+    deterministicVerification: typeof raw.deterministicVerification === "string" ? raw.deterministicVerification : null,
+    confidence: typeof raw.confidence === "number" && Number.isFinite(raw.confidence) ? Math.max(0, Math.min(1, raw.confidence)) : 0.7,
+  };
+}
+
+function normalizeReentry(value: unknown, fallback: unknown = "qa"): ReviewReentryPoint {
+  if (typeof value === "string" && reentryPointSchema.options.includes(value as ReviewReentryPoint)) return value as ReviewReentryPoint;
+  const normalized = typeof value === "string" ? value.toLowerCase().replace(/[-\s]+/g, "_") : "";
+  const aliases: Record<string, ReviewReentryPoint> = {
+    report: "manuscript",
+    reporting: "manuscript",
+    paper: "manuscript",
+    methods: "method_selection",
+    method: "method_selection",
+    diagnostics: "qa",
+    model_diagnostics: "execution",
+    data: "dataset_feasibility",
+    dataset: "dataset_feasibility",
+    variables: "analysis_spec",
+    cohort: "dataset_feasibility",
+    design: "protocol",
+  };
+  if (aliases[normalized]) return aliases[normalized];
+  if (typeof fallback === "string" && reentryPointSchema.options.includes(fallback as ReviewReentryPoint)) return fallback as ReviewReentryPoint;
+  return "qa";
+}
+
+function defaultReentryForCategory(category: ReviewerCategory): ReviewReentryPoint {
+  if (category === "study_design" || category === "causal_claims") return "protocol";
+  if (category === "cohort" || category === "data_plausibility") return "dataset_feasibility";
+  if (category === "variables" || category === "method_choice") return "analysis_spec";
+  if (category === "model_diagnostics" || category === "figures") return "execution";
+  if (category === "literature") return "literature";
+  if (category === "reporting") return "manuscript";
+  if (category === "cost_privacy") return "human_review";
+  return "qa";
+}
+
+function normalizeEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+  return typeof value === "string" && allowed.includes(value as T) ? value as T : fallback;
 }
 
 function mockReview(user: string, reviewer: ReviewerModelConfig): string {
@@ -871,14 +973,23 @@ function mockReview(user: string, reviewer: ReviewerModelConfig): string {
   return JSON.stringify(payload);
 }
 
-function parseReviewerConfigs(values: string[], panel: "default" | "cheap" | "strict" | "all", mock: boolean): ReviewerModelConfig[] {
+function parseReviewerConfigs(values: string[], panel: ReviewerPanel, mock: boolean): ReviewerModelConfig[] {
   if (mock) return [{ id: "mock:reviewer", provider: "mock", model: "mock-reviewer", role: "deterministic test reviewer", enabled: true, maxInputChars: 36000, maxOutputTokens: 1200, timeoutMs: 1000 }];
   if (!values.length) return defaultReviewerPanel(panel);
   return values.map(value => {
     const [providerText, ...modelParts] = value.split(":");
     const provider = reviewerProviderSchema.parse(providerText);
     const model = modelParts.join(":") || reviewerProviderConfigs().find(item => item.id === provider)?.defaultModel || value;
-    return { id: `${provider}:${model}`, provider, model, role: "configured reviewer", enabled: true, maxInputChars: 36000, maxOutputTokens: 1800, timeoutMs: 90000 };
+    return {
+      id: `${provider}:${model}`,
+      provider,
+      model,
+      role: "configured reviewer",
+      enabled: true,
+      maxInputChars: provider === "deepseek" ? 18000 : 36000,
+      maxOutputTokens: provider === "deepseek" ? 6000 : 1800,
+      timeoutMs: provider === "deepseek" ? 120000 : 90000,
+    };
   });
 }
 
@@ -895,11 +1006,11 @@ function estimateReviewCost(reviewer: ReviewerModelConfig, context: string): Mod
 }
 
 function ratePerMillion(provider: ReviewerProviderId): { input: number; output: number } {
-  if (provider === "anthropic") return { input: 15, output: 75 };
+  if (provider === "anthropic") return { input: 5, output: 25 };
   if (provider === "google") return { input: 2, output: 12 };
-  if (provider === "openai") return { input: 5, output: 20 };
-  if (provider === "deepseek") return { input: 1, output: 3 };
-  if (provider === "xai") return { input: 3, output: 15 };
+  if (provider === "openai") return { input: 2.5, output: 15 };
+  if (provider === "deepseek") return { input: 1.74, output: 3.48 };
+  if (provider === "xai") return { input: 1.25, output: 2.5 };
   return { input: 0, output: 0 };
 }
 

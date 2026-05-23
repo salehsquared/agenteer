@@ -1,0 +1,131 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript fails to present the descriptive statistics that are the study's primary objective. The Results section contains only sample size; no means, SDs, medians, or ranges are reported. The abstract likewise omits these. Cohort construction is not documented, diagnostics are absent, figures are not accessible, and unsupported claims about methods review persist. The manuscript cannot be promoted in its current state.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript does not report descriptive statistics for any variable",
+      "evidenceRefs": [
+        "manuscript.md: Results section",
+        "stats-run/stats-run.json: estimates array"
+      ],
+      "whyItMatters": "The research question is 'What are the distributions of age, severity, BMI, albumin, and continuous outcome?'. The manuscript does not answer it, making the study uninformative and unpromotable.",
+      "actionableFix": "Add a table or text summarising the distributional characteristics (mean, SD, median, IQR, range) for each variable in the Results section and update the Abstract to reflect key numbers.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The stats-run.json contains the required numbers; cross-check that the manuscript reproduces them exactly.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No documentation of cohort construction or exclusion criteria",
+      "evidenceRefs": [
+        "manuscript.md: Cohort Construction paragraph",
+        "stats-run/stats-run.json: no record of initial N or exclusion steps"
+      ],
+      "whyItMatters": "Without knowing how the 240 complete-case observations were derived, reproducibility and assessment of selection bias are impossible.",
+      "actionableFix": "Provide a cohort flowchart or table listing initial record counts, exclusion counts per criterion, and final analytic N. Include this in the manuscript or an appendix.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Compare the final N=240 against a data provenance log.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Claim of reviewed diagnostics is unsupported; diagnostics file is empty",
+      "evidenceRefs": [
+        "manuscript.md: Quality Control section",
+        "stats-run/diagnostics.json: {}"
+      ],
+      "whyItMatters": "The manuscript states that model diagnostics, missingness checks, and plausibility checks were reviewed, but no diagnostic output exists. This is misleading and may hide data issues.",
+      "actionableFix": "Either present the diagnostic outputs (e.g., distribution plots, missing data patterns, extreme value checks) or remove the claim that such checks were performed.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Check that diagnostics.json is non-empty and contains interpretable results.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "figures",
+      "title": "Figures not accessible for review; figure QA file appears empty",
+      "evidenceRefs": [
+        "stats-run/figures.json",
+        "stats-run/figure-qa.json"
+      ],
+      "whyItMatters": "The package includes three figure artifacts, but the image files and their QA results were not supplied in a reviewable form. Figure correctness cannot be verified.",
+      "actionableFix": "Include the actual image files in the review packet and ensure figure-qa.json contains actionable quality checks (e.g., readability, axis labeling, caption presence).",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Examine image files for blankness, axis labels, and consistency with stats-run.json estimates.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Unsubstantiated mention of 'advisory issues' from methods review",
+      "evidenceRefs": [
+        "manuscript.md: Quality Control section",
+        "stats-run/stats-qa.json: only one warning (unrelated to advisory issues)"
+      ],
+      "whyItMatters": "Stating that 'methods review found advisory issues' without listing them undermines transparency and may mask actual problems.",
+      "actionableFix": "Either enumerate the specific advisory issues found or delete the sentence. If issues exist, they must be described and their impact assessed.",
+      "reentryPoint": "human_review",
+      "deterministicVerification": "Check that the manuscript's claim matches a documented list of issues in a QA file.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Abstract wording is generic and does not reflect actual numeric findings",
+      "evidenceRefs": [
+        "manuscript.md: Abstract"
+      ],
+      "whyItMatters": "An abstract should succinctly convey key results. The current abstract mentions no statistics, making it inaccurate.",
+      "actionableFix": "Rewrite the abstract to include selected descriptive statistics (e.g., mean age, mean BMI) that answer the research question.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "QA warning about p-values is irrelevant for a purely descriptive study",
+      "evidenceRefs": [
+        "stats-run/stats-qa.json: check id='uncertainty-and-pvalue-context'"
+      ],
+      "whyItMatters": "The presence of a warning about p-value interpretation in a study that computes no p-values suggests a misapplied QA check, potentially confusing readers.",
+      "actionableFix": "Review the QA check logic; for descriptive studies, the check should not fire or should clarify that no p-values were produced.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Confirm that the stats-run output contains no p‑values.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No clinical or literature context for the reported distributions",
+      "evidenceRefs": [
+        "manuscript.md: Discussion, Limitations"
+      ],
+      "whyItMatters": "Without any reference to typical values or prior studies, readers cannot assess whether the observed distributions are plausible or noteworthy.",
+      "actionableFix": "Add a brief literature comparison (e.g., expected albumin ranges in this population) or state that no comparable benchmarks exist.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.7
+    }
+  ],
+  "missingEvidence": [
+    "Cohort construction details (inclusion/exclusion criteria, flow chart)",
+    "Actual image files for generated figures",
+    "Content of diagnostics (currently empty)",
+    "List of advisory issues identified by methods review",
+    "Any external validation or context for observed variable ranges"
+  ],
+  "recommendedNextStage": "manuscript"
+}

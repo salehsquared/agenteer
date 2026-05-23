@@ -1,0 +1,134 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript is incomplete and not ready for publication. It fails to report the actual descriptive results, lacks variable and cohort definitions, uses generic boilerplate, and does not provide evidence of quality checks or reproducibility. Multiple blocker and major issues must be resolved before re-evaluation.",
+  "findings": [
+    {
+      "id": "missing-results",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript omits the descriptive statistics that constitute the main results",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The stated objective is to present distributions, but only sample size is provided, making the manuscript incomplete and failing to answer the research question.",
+      "actionableFix": "Add a table or in-text summary of the distributions (means, medians, IQRs, min, max, SDs) for each variable from stats-run.json, and reference the histograms.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that manuscript.md contains at least the mean or median for each variable.",
+      "confidence": 1.0
+    },
+    {
+      "id": "undefined-variables-cohort",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "Variables and cohort definition are not described, preventing interpretation",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without definitions of severity, outcome_cont, and the cohort inclusion/exclusion criteria, readers cannot assess validity, clinical relevance, or generalizability.",
+      "actionableFix": "Provide explicit definitions for each variable (including units and clinical scales), and describe how the 240 complete cases were selected from the original dataset, including any eligibility filters.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Search for definitions of 'severity' and 'outcome_cont' in manuscript.md; also check for a cohort flow diagram or description.",
+      "confidence": 1.0
+    },
+    {
+      "id": "no-literature-context",
+      "severity": "major",
+      "category": "literature",
+      "title": "No comparison with prior literature or clinical benchmarks",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Descriptive distributions are more meaningful when placed in context; e.g., is a mean BMI of 29 typical for this patient population? The manuscript lacks any discussion of clinical plausibility or comparison with known norms.",
+      "actionableFix": "Add a paragraph in Discussion contextualizing the observed distributions with references to established clinical studies or population norms, and note any deviations.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check for citations in manuscript.md.",
+      "confidence": 0.9
+    },
+    {
+      "id": "empty-diagnostics-and-unreviewed-issues",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Diagnostics are empty and claimed advisory issues are not detailed",
+      "evidenceRefs": [
+        "diagnostics.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript states 'methods review found advisory issues', but diagnostics.json is empty, and no issues are listed. This undermines credibility and violates transparent reporting.",
+      "actionableFix": "Either populate diagnostics with meaningful checks (e.g., distribution shape, outliers) or explicitly state that no issues were found. Remove unreviewed generic claims.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Check that diagnostics.json or manuscript includes specific findings.",
+      "confidence": 0.95
+    },
+    {
+      "id": "unbound-analysis-no-reproducibility-plan",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analysis is unbound and lacks reproducibility elements",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The stats run is not bound to a method-selection or analysis specification, meaning the analysis path is ad-hoc. The manuscript does not provide code, data access information, or versioned environment details, hindering verification and reuse.",
+      "actionableFix": "Bind the analysis to a pre-specified plan or provide a reproducible workflow (e.g., code, Dockerfile, dataset identifier) in the run artifacts. The manuscript should cite the reproducibility artifacts.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Search for 'methodSelectionPath' or 'analysisSpec' in stats-run.json and note unbound status.",
+      "confidence": 0.9
+    },
+    {
+      "id": "manuscript-boilerplate-not-informative",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript text is generic boilerplate that does not reflect the actual analysis",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript contains generic placeholders about methods review and limitations but fails to describe the actual analytic steps, software, or specific findings. It reads like a template, not a completed clinical research report.",
+      "actionableFix": "Replace generic text with concrete descriptions of the analysis: software used, how descriptive statistics were computed, handling of missing data (if any), and any figure generation. Ensure the discussion is tailored to the observed data.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check if manuscript.md contains unique content beyond template phrases.",
+      "confidence": 0.85
+    },
+    {
+      "id": "missing-figures-description",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Figures exist but are not referenced or explained in the manuscript",
+      "evidenceRefs": [
+        "figures.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Histograms and missingness bar were generated, but no mention in text means readers cannot assess the visual evidence. Standard reporting requires including key figures and describing them.",
+      "actionableFix": "Include a note or description of the histograms and missingness plot, perhaps embedding them or referencing them in the results.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check if manuscript.md contains references to 'descriptive-histograms.png' or 'missingness-bar.png'.",
+      "confidence": 0.9
+    },
+    {
+      "id": "no-data-plausibility-check",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "No explicit data plausibility checks were performed or reported",
+      "evidenceRefs": [
+        "stats-run.json",
+        "diagnostics.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without verifying that values fall within plausible clinical ranges (e.g., BMI >0, age not negative), data errors could propagate silently. The presented ranges are plausible but undocumented.",
+      "actionableFix": "Add a note confirming that all variables fall within expected clinical ranges and note any outliers. This could be part of the results or a supplement.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Check diagnostics.json for any range check entries.",
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions (units, clinical scales)",
+    "Cohort inclusion/exclusion criteria",
+    "Data source description",
+    "Literature references for clinical context",
+    "Analysis code/environment/scripts",
+    "Clinical plausibility assessment",
+    "Specific description of statistical software and methods"
+  ],
+  "recommendedNextStage": "manuscript"
+}
