@@ -106,7 +106,7 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     qaGates: ["normality-review", "variance-review", ...commonClaimGates],
     commonFailureModes: ["non-independent groups", "extreme skew", "unequal variance without Welch correction"],
     stopForHumanReviewWhen: ["paired design detected"],
-    keywords: ["t-test", "compare two groups", "difference in means", "mean difference"],
+    keywords: ["t-test", "compare two groups", "two independent", "between two", "difference in means", "mean difference"],
   }),
   method({
     id: "paired-t-test",
@@ -148,6 +148,7 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     stopForHumanReviewWhen: ["repeated-measures design detected"],
     multiplicityRequirements: ["Tukey, Dunnett, Holm, or explicit contrast correction"],
     keywords: ["anova", "more than two groups", "three groups", "multiple groups"],
+    antiKeywords: ["two groups", "two independent", "between two"],
   }),
   method({
     id: "chi-square-independence",

@@ -7428,6 +7428,18 @@ async function controllerTableSummaryForModeling(state: ControllerState): Promis
         inferredType: inferred,
         nonMissingRows: typeof item.nonMissingRows === "number" ? item.nonMissingRows : 0,
         missingFraction: typeof item.missingFraction === "number" ? Math.max(0, Math.min(1, item.missingFraction)) : 1,
+        uniqueCount: typeof item.uniqueCount === "number" && item.uniqueCount >= 0 ? Math.floor(item.uniqueCount) : undefined,
+        valueCounts: Array.isArray(item.valueCounts)
+          ? item.valueCounts.map(valueCount => {
+            const valueRecord = valueCount && typeof valueCount === "object" ? valueCount as Record<string, unknown> : {};
+            const count = typeof valueRecord.count === "number" && Number.isFinite(valueRecord.count) ? Math.max(0, Math.floor(valueRecord.count)) : 0;
+            return {
+              value: String(valueRecord.value ?? ""),
+              count,
+              fraction: typeof valueRecord.fraction === "number" && Number.isFinite(valueRecord.fraction) ? Math.max(0, Math.min(1, valueRecord.fraction)) : 0,
+            };
+          }).filter(valueCount => valueCount.value !== "" && valueCount.count > 0).slice(0, 20)
+          : [],
         sampleValues: Array.isArray(item.sampleValues) ? item.sampleValues.map(value => String(value)).slice(0, 12) : [],
       };
     }),

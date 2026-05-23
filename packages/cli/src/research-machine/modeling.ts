@@ -57,6 +57,12 @@ export const modelingDecisionRequestSchema = z.object({
       inferredType: z.enum(["number", "string", "boolean", "empty", "mixed", "unknown"]).optional(),
       nonMissingRows: z.number().int().nonnegative(),
       missingFraction: z.number().min(0).max(1),
+      uniqueCount: z.number().int().nonnegative().optional(),
+      valueCounts: z.array(z.object({
+        value: z.string(),
+        count: z.number().int().nonnegative(),
+        fraction: z.number().min(0).max(1),
+      })).default([]),
       sampleValues: z.array(z.string()).default([]),
       min: z.number().optional(),
       max: z.number().optional(),
@@ -678,6 +684,10 @@ function buildStatisticalMethodGuidance(
   const maxMissingFraction = summary ? summary.columns.reduce((max, column) => Math.max(max, column.missingFraction), 0) : null;
   const targetType = targetColumn ? columnKind(targetColumn) : outcomeTypeToTargetKind(outcomeType);
   const classCount = targetColumn ? classCountFor(targetColumn) : request.classCount ?? null;
+  const targetBinaryCounts = targetColumn ? binaryCountsFor(targetColumn) : null;
+  const eventCount = targetBinaryCounts?.eventCount ?? null;
+  const nonEventCount = targetBinaryCounts?.nonEventCount ?? null;
+  const minTargetClassCount = minValueCount(targetColumn);
   const warnings: MachineIssue[] = [];
   const blockers: MachineIssue[] = [];
   const alternatives: ModelingDecisionPlan["statisticalMethodGuidance"]["alternatives"] = [];
@@ -705,6 +715,15 @@ function buildStatisticalMethodGuidance(
   if (targetColumn?.missingFraction && targetColumn.missingFraction > 0.2) {
     warnings.push(issue("warning", "METHOD_GUIDANCE_TARGET_MISSINGNESS", `Target '${targetColumn.name}' is ${(targetColumn.missingFraction * 100).toFixed(1)}% missing; missingness review should precede inference.`, [targetColumn.name]));
   }
+  if (targetColumn && classCount !== null && targetType !== "continuous" && classCount > 20) {
+    warnings.push(issue("warning", "METHOD_GUIDANCE_HIGH_CARDINALITY_TARGET", `Target '${targetColumn.name}' has ${classCount} observed levels; verify that this is an outcome rather than an identifier or free-text field.`, [targetColumn.name]));
+  }
+  if (targetType === "binary" && eventCount !== null && eventCount < 10) {
+    warnings.push(issue("warning", "METHOD_GUIDANCE_RARE_BINARY_EVENT", `Binary target '${targetColumn?.name ?? target ?? "outcome"}' has only ${eventCount} positive event(s); prefer exact/descriptive, penalized, or design-review routes over ordinary logistic inference.`, [targetColumn?.name ?? target ?? "outcome"]));
+  }
+  if (targetType === "categorical" && minTargetClassCount !== null && minTargetClassCount < 5) {
+    warnings.push(issue("warning", "METHOD_GUIDANCE_SPARSE_TARGET_LEVEL", `Target '${targetColumn?.name ?? target ?? "outcome"}' has a sparse observed level with ${minTargetClassCount} row(s); exact/suppressed or collapsed-category analysis may be required.`, [targetColumn?.name ?? target ?? "outcome"]));
+  }
   if (maxMissingFraction !== null && maxMissingFraction > 0.35) {
     warnings.push(issue("warning", "METHOD_GUIDANCE_HIGH_TABLE_MISSINGNESS", `At least one table column is ${(maxMissingFraction * 100).toFixed(1)}% missing; add missingness-summary and sensitivity analysis.`, ["tableSummary.columns"]));
     add("missingness-summary", "sensitivity", "High missingness should be explicitly profiled before formal modeling.", ["missingness patterns", "complete-case counts", "MNAR/MAR review"]);
@@ -712,6 +731,13 @@ function buildStatisticalMethodGuidance(
 
   const smallSample = (summary?.rowCount ?? request.rowCount ?? 0) > 0 && (summary?.rowCount ?? request.rowCount ?? 0) < 50;
   if (smallSample) warnings.push(issue("warning", "METHOD_GUIDANCE_SMALL_SAMPLE", "Small sample detected; prefer exact, nonparametric, descriptive, or penalized routes over high-parameter models.", ["tableSummary.rowCount"]));
+  const sparseGroupingColumn = categoricalPredictors.find(column => {
+    const minCount = minValueCount(column);
+    return minCount !== null && minCount < 5;
+  });
+  if (sparseGroupingColumn) {
+    warnings.push(issue("warning", "METHOD_GUIDANCE_SPARSE_GROUP", `Grouping/predictor column '${sparseGroupingColumn.name}' has a sparse observed level; verify small-cell policy before group comparisons.`, [sparseGroupingColumn.name]));
+  }
 
   let recommended: string | null = null;
   let rationale = "Insufficient table detail; start with descriptive profiling and method-selection evidence.";
@@ -728,9 +754,11 @@ function buildStatisticalMethodGuidance(
     const grouping = bestGroupingColumn(categoricalPredictors);
     if (targetType === "continuous" && grouping) {
       if (classCountFor(grouping) === 2) {
-        recommended = smallSample ? "mann-whitney" : "welch-t-test";
+        recommended = smallSample || (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5 ? "mann-whitney" : "welch-t-test";
         rationale = smallSample
           ? "Continuous outcome with two groups and small sample: rank-based comparison is safer as the primary executable check."
+          : (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5
+            ? "Continuous outcome with a very sparse comparison group: rank-based comparison is safer as the primary executable check."
           : "Continuous outcome with two groups: Welch t-test is preferred unless equal variances are proven.";
         add(recommended, "primary", rationale, ["group counts", "distribution plots", "effect size", "variance/normality review"]);
         add(recommended === "mann-whitney" ? "welch-t-test" : "mann-whitney", "sensitivity", "Use as a sensitivity route for distributional assumptions.", ["group counts", "distribution shape"]);
@@ -741,25 +769,38 @@ function buildStatisticalMethodGuidance(
         add(recommended === "anova" ? "kruskal-wallis" : "anova", "sensitivity", "Use as an assumption-checking companion route.", ["rank method disclosure", "variance/normality review"]);
       }
     } else if ((targetType === "binary" || targetType === "categorical") && grouping) {
-      recommended = smallSample ? "fisher-exact" : "chi-square";
+      recommended = smallSample || (eventCount !== null && eventCount < 10) || (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5 ? "fisher-exact" : "chi-square";
       rationale = smallSample
         ? "Categorical comparison with small sample: exact testing is safer than asymptotic chi-square when the table is 2x2."
+        : eventCount !== null && eventCount < 10
+          ? "Categorical comparison with rare events: exact testing or suppressed descriptive review is safer than asymptotic chi-square."
+          : (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5
+            ? "Categorical comparison with sparse group margins: exact testing or suppressed descriptive review is safer than asymptotic chi-square."
         : "Categorical comparison: start with chi-square and fall back to Fisher/exact review for sparse cells.";
       add(recommended, "primary", rationale, ["cell counts", "expected counts", "effect size", "sparse-cell policy"]);
       add(recommended === "chi-square" ? "fisher-exact" : "chi-square", "fallback", "Use when cell-count diagnostics indicate the primary route is inappropriate.", ["2x2 verification", "expected counts"]);
     }
   } else if (goal === "associate" || goal === "causal") {
     if (targetType === "binary") {
-      recommended = request.highDimensional ? "penalized-logistic-regression" : "logistic-regression";
-      rationale = "Binary outcome association should use logistic regression with event-count, separation, and events-per-variable checks.";
+      const parameterCount = Math.max(1, 1 + numericPredictors.length + categoricalPredictors.length);
+      const epv = eventCount !== null ? eventCount / parameterCount : null;
+      recommended = request.highDimensional || (epv !== null && epv < 10) ? "penalized-logistic-regression" : "logistic-regression";
+      rationale = epv !== null && epv < 10
+        ? `Binary outcome has low events per candidate parameter (${epv.toFixed(1)}); use penalized logistic or reduce the covariate set before ordinary adjusted inference.`
+        : "Binary outcome association should use logistic regression with event-count, separation, and events-per-variable checks.";
       add(recommended, "primary", rationale, ["event count", "separation diagnostics", "EPV", "calibration where predictive"]);
+      if (recommended === "penalized-logistic-regression") add("logistic-regression", "blocked", "Ordinary logistic regression should wait until events-per-variable and separation checks are acceptable.", ["EPV", "separation diagnostics"]);
       if (goal === "causal") add("propensity-score-matching", "sensitivity", "Causal framing requires explicit design and balance diagnostics before causal language.", ["balance/SMD", "positivity", "unmeasured confounding sensitivity"]);
     } else if (targetType === "count") {
-      recommended = "poisson-regression";
-      rationale = "Count outcome association should begin with Poisson regression and check overdispersion before negative-binomial escalation.";
-      add("poisson-regression", "primary", rationale, ["overdispersion", "zero inflation", "rate denominator"]);
+      const zeroFraction = targetColumn ? valueFraction(targetColumn, "0") : null;
+      recommended = zeroFraction !== null && zeroFraction > 0.4 ? "zero-inflated-poisson" : "poisson-regression";
+      rationale = zeroFraction !== null && zeroFraction > 0.4
+        ? `Count outcome has ${(zeroFraction * 100).toFixed(1)}% zeros; zero-inflated modeling or structural-zero review should precede ordinary Poisson interpretation.`
+        : "Count outcome association should begin with Poisson regression and check overdispersion before negative-binomial escalation.";
+      add(recommended, "primary", rationale, ["overdispersion", "zero inflation", "rate denominator"]);
+      if (recommended !== "poisson-regression") add("poisson-regression", "fallback", "Use only if zero inflation is ruled out and overdispersion is acceptable.", ["overdispersion", "zero inflation", "rate denominator"]);
       add("negative-binomial-regression", "sensitivity", "Use when overdispersion is detected or expected.", ["overdispersion", "model convergence"]);
-      add("zero-inflated-poisson", "sensitivity", "Use only when excess structural zeros are plausible and reviewed.", ["zero fraction", "structural-zero rationale"]);
+      if (recommended !== "zero-inflated-poisson") add("zero-inflated-poisson", "sensitivity", "Use only when excess structural zeros are plausible and reviewed.", ["zero fraction", "structural-zero rationale"]);
     } else if (targetType === "continuous") {
       recommended = request.highDimensional ? "penalized-linear-regression" : "linear-regression";
       rationale = "Continuous outcome association should use linear regression with residual, influence, and collinearity diagnostics.";
@@ -810,8 +851,8 @@ function buildStatisticalMethodGuidance(
       rowCount: summary?.rowCount ?? request.rowCount ?? null,
       completeTargetRows: targetColumn?.nonMissingRows ?? null,
       classCount,
-      eventCount: null,
-      nonEventCount: null,
+      eventCount,
+      nonEventCount,
       numericPredictorCount: numericPredictors.length,
       categoricalPredictorCount: categoricalPredictors.length,
       maxMissingFraction,
@@ -850,8 +891,40 @@ function outcomeTypeToTargetKind(outcomeType: OutcomeType): ModelingDecisionPlan
 }
 
 function classCountFor(column: ModelingTableColumn): number | null {
+  if (column.uniqueCount !== undefined) return column.uniqueCount || null;
+  if (column.valueCounts.length) return column.valueCounts.length;
   const values = new Set(column.sampleValues.filter(value => value !== ""));
   return values.size || null;
+}
+
+function minValueCount(column: ModelingTableColumn | null | undefined): number | null {
+  if (!column?.valueCounts.length) return null;
+  const counts = column.valueCounts.map(item => item.count).filter(count => Number.isFinite(count));
+  return counts.length ? Math.min(...counts) : null;
+}
+
+function valueFraction(column: ModelingTableColumn, rawValue: string): number | null {
+  const found = column.valueCounts.find(item => item.value === rawValue || Number(item.value) === Number(rawValue));
+  return found ? found.fraction : null;
+}
+
+function binaryCountsFor(column: ModelingTableColumn): { eventCount: number; nonEventCount: number; eventLabel: string } | null {
+  if (!column.valueCounts.length) return null;
+  const classCount = classCountFor(column);
+  if (classCount !== 2) return null;
+  const sorted = [...column.valueCounts].sort((a, b) => {
+    const numericA = Number(a.value);
+    const numericB = Number(b.value);
+    if (Number.isFinite(numericA) && Number.isFinite(numericB) && numericA !== numericB) return numericA - numericB;
+    return a.value.localeCompare(b.value);
+  });
+  const positive = sorted.find(item => Number(item.value) === 1)
+    ?? sorted.find(item => /^(true|yes|y|case|event|positive|pos|dead|death)$/i.test(item.value))
+    ?? sorted[sorted.length - 1];
+  if (!positive) return null;
+  const eventCount = positive.count;
+  const nonEventCount = column.valueCounts.reduce((sum, item) => sum + (item.value === positive.value ? 0 : item.count), 0);
+  return { eventCount, nonEventCount, eventLabel: positive.value };
 }
 
 function looksLikeCountColumn(column: ModelingTableColumn): boolean {
@@ -1060,13 +1133,29 @@ function guidanceCautionsForMethod(method: AnalysisMethod, guidance: ModelingDec
 function statsRunCommandHint(statsMethod: string, methodId: string): string {
   const shared = `agenteer research stats-run --method ${statsMethod} --data <rows.csv> --out-dir <out>`;
   if (statsMethod === "descriptive") return `${shared} --variable <column>`;
-  if (statsMethod === "t-test" || statsMethod === "mann-whitney") return `${shared} --outcome <continuous-outcome> --group <binary-group>`;
-  if (statsMethod === "chi-square" || statsMethod === "fisher-exact") return `${shared} --outcome <categorical-outcome> --exposure <categorical-exposure>`;
-  if (statsMethod === "pearson" || statsMethod === "spearman") return `${shared} --outcome <continuous-outcome> --exposure <continuous-exposure>`;
-  if (statsMethod === "linear-regression") return `${shared} --outcome <continuous-outcome> --exposure <exposure> --covariate <covariate>`;
-  if (statsMethod === "logistic-regression") return `${shared} --outcome <binary-outcome> --exposure <exposure> --covariate <covariate>`;
-  if (statsMethod === "poisson-regression") return `${shared} --outcome <count-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (statsMethod === "paired-t-test" || statsMethod === "wilcoxon") return `${shared} --outcome <post-measure> --exposure <pre-measure>`;
+  if (["t-test", "welch-t-test", "mann-whitney", "anova", "kruskal-wallis"].includes(statsMethod)) return `${shared} --outcome <continuous-outcome> --group <group>`;
+  if (statsMethod === "ancova") return `${shared} --outcome <continuous-outcome> --group <group> --covariate <covariate>`;
+  if (statsMethod === "friedman") return `${shared} --outcome <repeated-measure> --group <time-or-condition> --id <subject-id>`;
+  if (["chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend"].includes(statsMethod)) return `${shared} --outcome <categorical-outcome> --exposure <categorical-exposure>`;
+  if (["pearson", "spearman", "kendall", "partial-correlation"].includes(statsMethod)) return `${shared} --outcome <continuous-outcome> --exposure <continuous-exposure>${statsMethod === "partial-correlation" ? " --covariate <covariate>" : ""}`;
+  if (["linear-regression", "robust-linear-regression", "quantile-regression", "penalized-linear-regression"].includes(statsMethod)) return `${shared} --outcome <continuous-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (["logistic-regression", "ordinal-logistic-regression", "multinomial-logistic-regression", "penalized-logistic-regression"].includes(statsMethod)) return `${shared} --outcome <categorical-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (["poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial"].includes(statsMethod)) return `${shared} --outcome <count-outcome> --exposure <exposure> --covariate <covariate>`;
+  if (["gamma-glm", "inverse-gaussian-glm"].includes(statsMethod)) return `${shared} --outcome <positive-continuous-outcome> --exposure <exposure> --covariate <covariate>`;
   if (statsMethod === "diagnostic-accuracy") return `${shared} --outcome <binary-reference-standard> --exposure <binary-index-test>`;
+  if (statsMethod === "prediction-evaluation") return `${shared} --outcome <binary-outcome> --exposure <risk-score-or-probability>`;
+  if (["kaplan-meier", "log-rank", "cox-proportional-hazards", "stratified-cox", "aalen-johansen-cif", "recurrent-event-rate"].includes(statsMethod)) return `${shared} --time <time> --event <event-indicator> --group <group>`;
+  if (["linear-mixed-model", "gee", "repeated-measures-anova"].includes(statsMethod)) return `${shared} --outcome <outcome> --exposure <exposure> --id <subject-or-cluster-id>`;
+  if (["overlap-weighting", "entropy-balancing", "doubly-robust-aipw", "propensity-score-matching", "propensity-score-weighting"].includes(statsMethod)) return `${shared} --outcome <outcome> --exposure <treatment> --covariate <baseline-covariate>`;
+  if (statsMethod === "difference-in-differences") return `${shared} --outcome <outcome> --exposure <treated-group> --post <post-period-indicator>`;
+  if (statsMethod === "interrupted-time-series") return `${shared} --outcome <outcome> --time <time> --post <post-intervention-indicator>`;
+  if (statsMethod === "regression-discontinuity") return `${shared} --outcome <outcome> --running-variable <running-variable> --cutoff <cutoff>`;
+  if (statsMethod === "instrumental-variables-2sls") return `${shared} --outcome <outcome> --exposure <treatment> --instrument <instrument>`;
+  if (["missingness-summary", "multiple-imputation-mice", "missingness-ipw", "complete-case-sensitivity", "mnar-sensitivity", "pca", "clustering-validation", "cronbach-alpha", "multiple-comparison-correction"].includes(statsMethod)) return `${shared} --variable <column> --variable <column>`;
+  if (statsMethod === "reliability-kappa" || statsMethod === "intraclass-correlation" || statsMethod === "bland-altman") return `${shared} --variable <measurement-a> --variable <measurement-b>`;
+  if (statsMethod === "model-diagnostics") return `${shared} --outcome <outcome> --exposure <exposure> --covariate <covariate>`;
+  if (statsMethod === "power-sample-size") return `${shared} --outcome <outcome> --exposure <group-or-effect-proxy>`;
   return `${shared} # selected from ${methodId}`;
 }
 

@@ -360,7 +360,7 @@ function preflightGateChecks(gate: FeasibilityGateResult): StatsPreflightCheck[]
 }
 
 function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
-  const checks: StatsPreflightCheck[] = [];
+  const checks: StatsPreflightCheck[] = [...preflightRequiredArgumentChecks(request)];
   const completeRows = gate.completeCase.completeRows ?? gate.rowCount ?? 0;
   const variables = variableChecksByName(gate);
   const outcomeName = request.outcome ?? request.event ?? null;
@@ -430,7 +430,7 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
   }
   if (groupRequiredMethods().has(request.method)) {
     const grouping = group ?? exposure;
-    const levelCount = grouping?.sampleValues.length ?? 0;
+    const levelCount = grouping ? variableLevelCount(grouping) : 0;
     if (!grouping) {
       checks.push({
         id: "group-variable-present",
@@ -476,6 +476,91 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
     });
   }
   return checks;
+}
+
+type StatsArgumentName =
+  | "outcome"
+  | "exposure"
+  | "group"
+  | "time"
+  | "event"
+  | "id"
+  | "clusterOrId"
+  | "strata"
+  | "period"
+  | "post"
+  | "runningVariable"
+  | "instrument"
+  | "variables";
+
+function preflightRequiredArgumentChecks(request: StatsRunRequest): StatsPreflightCheck[] {
+  const missing = requiredArgumentsForMethod(request.method).filter(argument => !hasStatsArgument(request, argument));
+  if (!missing.length) return [];
+  return [{
+    id: "required-method-arguments",
+    status: "block",
+    detail: `${request.method} requires missing argument(s): ${missing.map(renderStatsArgument).join(", ")}.`,
+    evidenceRefs: ["method", request.method],
+    suggestedAction: `Provide ${missing.map(renderStatsArgument).join(", ")} or select a method whose required inputs match the available study design.`,
+  }];
+}
+
+function hasStatsArgument(request: StatsRunRequest, argument: StatsArgumentName): boolean {
+  if (argument === "variables") return request.variables.length > 0;
+  if (argument === "clusterOrId") return Boolean(request.cluster?.trim() || request.id?.trim());
+  const value = request[argument];
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function renderStatsArgument(argument: StatsArgumentName): string {
+  if (argument === "runningVariable") return "--running-variable";
+  if (argument === "variables") return "--variable";
+  if (argument === "clusterOrId") return "--cluster or --id";
+  return `--${argument}`;
+}
+
+function requiredArgumentsForMethod(method: StatsRunRequest["method"]): StatsArgumentName[] {
+  const commonRegression: StatsArgumentName[] = ["outcome", "exposure"];
+  const regression = new Set<StatsRunRequest["method"]>([
+    "linear-regression",
+    "robust-linear-regression",
+    "logistic-regression",
+    "ordinal-logistic-regression",
+    "multinomial-logistic-regression",
+    "poisson-regression",
+    "negative-binomial-regression",
+    "zero-inflated-poisson",
+    "zero-inflated-negative-binomial",
+    "gamma-glm",
+    "inverse-gaussian-glm",
+    "quantile-regression",
+    "penalized-linear-regression",
+    "penalized-logistic-regression",
+  ]);
+  if (method === "descriptive" || method === "missingness-summary" || method === "multiple-imputation-mice" || method === "pca" || method === "clustering-validation" || method === "cronbach-alpha" || method === "multiple-comparison-correction") return ["variables"];
+  if (method === "t-test" || method === "welch-t-test" || method === "mann-whitney" || method === "anova" || method === "ancova" || method === "kruskal-wallis") return ["outcome", "group"];
+  if (method === "paired-t-test" || method === "wilcoxon") return ["outcome", "exposure"];
+  if (method === "friedman") return ["outcome", "group", "id"];
+  if (method === "chi-square" || method === "fisher-exact" || method === "cochran-armitage-trend") return ["outcome", "exposure"];
+  if (method === "mcnemar") return ["outcome", "exposure"];
+  if (method === "pearson" || method === "spearman" || method === "kendall" || method === "partial-correlation") return ["outcome", "exposure"];
+  if (method === "diagnostic-accuracy" || method === "prediction-evaluation") return ["outcome", "exposure"];
+  if (regression.has(method)) return commonRegression;
+  if (method === "kaplan-meier" || method === "log-rank" || method === "aalen-johansen-cif") return method === "log-rank" || method === "kaplan-meier" ? ["time", "event", "group"] : ["time", "event"];
+  if (method === "cox-proportional-hazards" || method === "time-varying-cox") return ["time", "event", "exposure"];
+  if (method === "stratified-cox") return ["time", "event", "exposure", "strata"];
+  if (method === "fine-gray") return ["time", "event", "exposure"];
+  if (method === "recurrent-event-rate") return ["time", "event", "id"];
+  if (method === "linear-mixed-model" || method === "generalized-mixed-model" || method === "gee" || method === "repeated-measures-anova") return ["outcome", "exposure", "clusterOrId"];
+  if (method === "overlap-weighting" || method === "entropy-balancing" || method === "doubly-robust-aipw" || method === "propensity-score-matching" || method === "propensity-score-weighting") return ["outcome", "exposure"];
+  if (method === "difference-in-differences" || method === "event-study-did") return ["outcome", "exposure", "post"];
+  if (method === "interrupted-time-series") return ["outcome", "time", "post"];
+  if (method === "regression-discontinuity") return ["outcome", "runningVariable"];
+  if (method === "instrumental-variables-2sls") return ["outcome", "exposure", "instrument"];
+  if (method === "missingness-ipw" || method === "complete-case-sensitivity" || method === "mnar-sensitivity" || method === "model-diagnostics") return ["outcome"];
+  if (method === "power-sample-size") return ["variables"];
+  if (method === "reliability-kappa" || method === "intraclass-correlation" || method === "bland-altman") return ["variables"];
+  return [];
 }
 
 function preflightAlternativeChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
@@ -528,6 +613,7 @@ function issueCodeForCheck(id: string): string {
     "events-per-predictor": "STATS_EVENTS_PER_PREDICTOR_LOW",
     "complete-case-count": "STATS_COMPLETE_CASE_TOO_SMALL",
     "required-variables-present": "STATS_REQUIRED_VARIABLE_MISSING",
+    "required-method-arguments": "STATS_REQUIRED_ARGUMENT_MISSING",
     "continuous-outcome-type": "STATS_NON_NUMERIC_OUTCOME",
   };
   return explicit[id] ?? `STATS_PREFLIGHT_${id.toUpperCase().replaceAll("-", "_")}`;
@@ -586,6 +672,12 @@ function statsQuestionFor(request: StatsRunRequest): string {
 
 function variableChecksByName(gate: FeasibilityGateResult): Map<string, FeasibilityGateResult["variableChecks"][number]> {
   return new Map(gate.variableChecks.map(check => [check.name, check]));
+}
+
+function variableLevelCount(check: FeasibilityGateResult["variableChecks"][number]): number {
+  if (typeof check.uniqueCount === "number" && Number.isFinite(check.uniqueCount)) return check.uniqueCount;
+  if (check.valueCounts.length) return check.valueCounts.length;
+  return check.sampleValues.filter(value => value !== "").length;
 }
 
 function minimumRowsFor(request: StatsRunRequest): number {

@@ -1184,10 +1184,50 @@ describe("research stats methods expansion", () => {
     expect(result.issues.map(issue => issue.code)).toContain("METHOD_BACKEND_NOT_AVAILABLE");
   });
 
+  it("blocks missing required method arguments during stats preflight", async () => {
+    const { dir, dataPath } = await writeStatsFixture();
+    const result = await researchStatsRunCommand({
+      method: "instrumental-variables-2sls",
+      dataPath,
+      outDir: path.join(dir, "missing-iv-argument"),
+      outcome: "y",
+      exposure: "treat",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.issues.map(issue => issue.code)).toContain("STATS_REQUIRED_ARGUMENT_MISSING");
+    expect(result.errors.join(" ")).toContain("Stats preflight blocked execution");
+    expect(result.diagnostics.preflight).toMatchObject({ status: "block" });
+    expect(result.diagnostics.preflight).toHaveProperty("checks");
+    expect(JSON.stringify(result.diagnostics.preflight)).toContain("--instrument");
+  });
+
   it("maps expanded method ontology ids to stats-run methods", () => {
     expect(statsRunMethodForAnalysisMethod("cox-proportional-hazards")).toBe("cox-proportional-hazards");
     expect(statsRunMethodForAnalysisMethod("fine-gray-competing-risks")).toBe("fine-gray");
     expect(statsRunMethodForAnalysisMethod("multiple-imputation-mice")).toBe("multiple-imputation-mice");
-    expect(statsRunMethodForAnalysisMethod("principal-component-analysis")).toBe("pca");
+    expect(statsRunMethodForAnalysisMethod("anova-one-way")).toBe("anova");
+    expect(statsRunMethodForAnalysisMethod("gamma-glm")).toBe("gamma-glm");
+    expect(statsRunMethodForAnalysisMethod("linear-mixed-effects-model")).toBe("linear-mixed-model");
+    expect(statsRunMethodForAnalysisMethod("generalized-estimating-equations")).toBe("gee");
+    expect(statsRunMethodForAnalysisMethod("roc-auc-calibration")).toBe("prediction-evaluation");
+    expect(statsRunMethodForAnalysisMethod("pca-dimensionality-reduction")).toBe("pca");
+    expect(statsRunMethodForAnalysisMethod("kmeans-clustering")).toBe("clustering-validation");
+    expect(statsRunMethodForAnalysisMethod("cohens-kappa-icc")).toBe("reliability-kappa");
+    expect(statsRunMethodForAnalysisMethod("cronbach-alpha-scale")).toBe("cronbach-alpha");
+    expect(statsRunMethodForAnalysisMethod("multiple-comparison-fdr")).toBe("multiple-comparison-correction");
+    expect(statsRunMethodForAnalysisMethod("model-diagnostics-linear-logistic")).toBe("model-diagnostics");
   });
 });

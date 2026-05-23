@@ -976,6 +976,8 @@ export interface ResearchTableSummary {
     inferredType: "number" | "string" | "boolean" | "empty" | "mixed" | "unknown";
     nonMissingRows: number;
     missingFraction: number;
+    uniqueCount?: number;
+    valueCounts?: Array<{ value: string; count: number; fraction: number }>;
     min?: number;
     max?: number;
     mean?: number;
@@ -5887,7 +5889,11 @@ export function renderResearchTableSummary(result: ResearchTableSummary): string
       const stats = column.inferredType === "number" && column.min !== undefined
         ? ` min=${column.min} max=${column.max} mean=${column.mean?.toFixed(3)}`
         : "";
-      return `  - ${column.name}: ${column.inferredType} (${column.nonMissingRows} non-missing, ${(column.missingFraction * 100).toFixed(1)}% missing)${stats}`;
+      const cardinality = column.uniqueCount !== undefined ? `, ${column.uniqueCount} unique` : "";
+      const topValues = column.valueCounts?.length && (column.uniqueCount ?? Number.POSITIVE_INFINITY) <= 12
+        ? `; top=${column.valueCounts.slice(0, 4).map(item => `${item.value}:${item.count}`).join(", ")}`
+        : "";
+      return `  - ${column.name}: ${column.inferredType} (${column.nonMissingRows} non-missing, ${(column.missingFraction * 100).toFixed(1)}% missing${cardinality})${stats}${topValues}`;
     }),
     result.columns.length > 24 ? `  ... ${result.columns.length - 24} more columns` : "",
   ].filter(Boolean).join("\n");
@@ -8468,6 +8474,8 @@ function summarizeColumn(name: string, rawValues: unknown[], rowCount: number): 
     inferredType,
     nonMissingRows: values.length,
     missingFraction: rowCount ? (rowCount - values.length) / rowCount : 1,
+    uniqueCount: uniqueStrings(values.map(value => String(value))).length,
+    valueCounts: topValueCounts(values),
     sampleValues: uniqueStrings(values.slice(0, 8).map(value => String(value))).slice(0, 5),
   };
   if (numericValues.length) {
@@ -8476,6 +8484,19 @@ function summarizeColumn(name: string, rawValues: unknown[], rowCount: number): 
     result.mean = numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length;
   }
   return result;
+}
+
+function topValueCounts(values: unknown[], limit = 20): Array<{ value: string; count: number; fraction: number }> {
+  const counts = new Map<string, number>();
+  for (const value of values) {
+    const key = String(value);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const denominator = values.length || 1;
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit)
+    .map(([value, count]) => ({ value, count, fraction: count / denominator }));
 }
 
 async function hashFile(file: string): Promise<string> {
@@ -9072,6 +9093,11 @@ for name in df.columns:
         "inferredType": inferred,
         "nonMissingRows": int(len(non_missing)),
         "missingFraction": float((row_count - len(non_missing)) / row_count) if row_count else 1.0,
+        "uniqueCount": int(non_missing.nunique(dropna=True)),
+        "valueCounts": [
+            {"value": str(index), "count": int(count), "fraction": float(count / len(non_missing)) if len(non_missing) else 0.0}
+            for index, count in non_missing.astype(str).value_counts(dropna=True).head(20).items()
+        ],
         "sampleValues": [str(value) for value in non_missing.head(5).tolist()],
     }
     if inferred == "number" and len(non_missing):

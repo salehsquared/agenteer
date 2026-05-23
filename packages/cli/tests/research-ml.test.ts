@@ -153,6 +153,48 @@ describe("research ML modeling layer", () => {
     expect(prediction.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("logistic-regression");
   });
 
+  it("uses table value counts to avoid fragile methods before execution", () => {
+    const rareBinary = researchModelingPlanCommand({
+      question: "Is treatment associated with mortality after adjustment?",
+      goal: "associate",
+      outcomeType: "binary",
+      target: "mortality",
+      tableSummary: {
+        rowCount: 500,
+        columnCount: 4,
+        columns: [
+          { name: "mortality", inferredType: "number", nonMissingRows: 500, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "0", count: 494, fraction: 0.988 }, { value: "1", count: 6, fraction: 0.012 }], sampleValues: ["0", "1"], min: 0, max: 1 },
+          { name: "treatment", inferredType: "number", nonMissingRows: 500, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "0", count: 250, fraction: 0.5 }, { value: "1", count: 250, fraction: 0.5 }], sampleValues: ["0", "1"], min: 0, max: 1 },
+          { name: "age", inferredType: "number", nonMissingRows: 500, missingFraction: 0, uniqueCount: 50, sampleValues: ["50", "55", "60"], min: 20, max: 90 },
+          { name: "sex", inferredType: "string", nonMissingRows: 500, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "F", count: 260, fraction: 0.52 }, { value: "M", count: 240, fraction: 0.48 }], sampleValues: ["F", "M"] },
+        ],
+      },
+    });
+    expect(rareBinary.statisticalMethodGuidance.dataShape.eventCount).toBe(6);
+    expect(rareBinary.statisticalMethodGuidance.dataShape.nonEventCount).toBe(494);
+    expect(rareBinary.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("penalized-logistic-regression");
+    expect(rareBinary.statisticalMethodGuidance.warnings.map(issue => issue.code)).toContain("METHOD_GUIDANCE_RARE_BINARY_EVENT");
+    expect(rareBinary.statisticalMethodGuidance.alternatives.find(item => item.method === "logistic-regression")?.tier).toBe("blocked");
+
+    const zeroInflated = researchModelingPlanCommand({
+      question: "Are exposures associated with number of admissions?",
+      goal: "associate",
+      outcomeType: "count",
+      target: "admission_count",
+      tableSummary: {
+        rowCount: 300,
+        columnCount: 3,
+        columns: [
+          { name: "admission_count", inferredType: "number", nonMissingRows: 300, missingFraction: 0, uniqueCount: 6, valueCounts: [{ value: "0", count: 180, fraction: 0.6 }, { value: "1", count: 45, fraction: 0.15 }, { value: "2", count: 35, fraction: 0.1167 }, { value: "3", count: 20, fraction: 0.0667 }, { value: "4", count: 12, fraction: 0.04 }, { value: "5", count: 8, fraction: 0.0267 }], sampleValues: ["0", "1", "2"], min: 0, max: 5 },
+          { name: "exposure", inferredType: "number", nonMissingRows: 300, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "0", count: 150, fraction: 0.5 }, { value: "1", count: 150, fraction: 0.5 }], sampleValues: ["0", "1"], min: 0, max: 1 },
+          { name: "age", inferredType: "number", nonMissingRows: 300, missingFraction: 0, uniqueCount: 60, sampleValues: ["45", "50", "55"], min: 18, max: 95 },
+        ],
+      },
+    });
+    expect(zeroInflated.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("zero-inflated-poisson");
+    expect(zeroInflated.statisticalMethodGuidance.alternatives.find(item => item.method === "poisson-regression")?.tier).toBe("fallback");
+  });
+
   it("recommends design stop-for-review for causal and survival-shaped questions", () => {
     const causal = researchModelingPlanCommand({
       question: "What is the causal effect of treatment on mortality?",

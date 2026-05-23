@@ -77,6 +77,43 @@ describe("research feasibility gate", () => {
     expect(result.nextAction).toMatch(/Profile/);
   });
 
+  it("uses aggregate value counts for summary-only or parquet-style feasibility", async () => {
+    const result = await researchFeasibilityGateCommand({
+      question: "Is treatment associated with mortality?",
+      method: "logistic-regression",
+      outcome: "mortality",
+      exposure: "treatment",
+      covariates: ["age"],
+      minRows: 80,
+      tableSummary: {
+        file: "/bounded/profile.parquet",
+        format: "parquet",
+        adapter: { kind: "python-pandas-parquet", executable: "python", version: "3.12", packages: { pandas: "2", pyarrow: "20" } },
+        fileSizeBytes: 1024,
+        fileMtimeMs: 1,
+        fileSha256: "abc",
+        rowCount: 200,
+        columnCount: 3,
+        columns: [
+          { name: "mortality", inferredType: "number", nonMissingRows: 200, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "0", count: 150, fraction: 0.75 }, { value: "1", count: 50, fraction: 0.25 }], sampleValues: ["0", "1"], min: 0, max: 1, mean: 0.25 },
+          { name: "treatment", inferredType: "number", nonMissingRows: 200, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "0", count: 100, fraction: 0.5 }, { value: "1", count: 100, fraction: 0.5 }], sampleValues: ["0", "1"], min: 0, max: 1, mean: 0.5 },
+          { name: "age", inferredType: "number", nonMissingRows: 200, missingFraction: 0, uniqueCount: 60, valueCounts: [], sampleValues: ["50", "60"], min: 20, max: 90, mean: 61 },
+        ],
+        warnings: [],
+      },
+    });
+
+    expect(result.outcomeDiagnostics.observedLevels).toEqual(expect.arrayContaining([
+      { value: "1", count: 50 },
+      { value: "0", count: 150 },
+    ]));
+    expect(result.outcomeDiagnostics.eventCount).toBe(50);
+    expect(result.outcomeDiagnostics.nonEventCount).toBe(150);
+    expect(result.variableChecks.find(check => check.name === "mortality")?.uniqueCount).toBe(2);
+    expect(result.variableChecks.find(check => check.name === "mortality")?.valueCounts[0]).toMatchObject({ value: "0", count: 150 });
+    expect(result.domains.find(domain => domain.id === "event_count")?.status).toBe("pass");
+  });
+
   it("routes coded clinical studies to phenotype review before formal analysis", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-feasibility-phenotype-"));
     try {

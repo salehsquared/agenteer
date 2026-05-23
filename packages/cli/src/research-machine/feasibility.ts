@@ -84,6 +84,8 @@ export interface FeasibilityVariableCheck {
   min: number | null;
   max: number | null;
   mean: number | null;
+  uniqueCount: number | null;
+  valueCounts: Array<{ value: string; count: number; fraction: number }>;
   sampleValues: string[];
   issues: Array<{ severity: "blocker" | "warning" | "note"; code: string; message: string }>;
 }
@@ -462,6 +464,8 @@ function buildVariableCheck(item: FeasibilityVariableRole, byName: Map<string, R
     min: column?.min ?? null,
     max: column?.max ?? null,
     mean: column?.mean ?? null,
+    uniqueCount: column?.uniqueCount ?? null,
+    valueCounts: column?.valueCounts ?? [],
     sampleValues: column?.sampleValues ?? [],
     issues,
   };
@@ -522,6 +526,8 @@ function buildOutcomeDiagnostics(opts: FeasibilityGateOptions, rowScan: RowScan 
   const outcome = opts.outcome ?? opts.event ?? null;
   const observedLevels = outcome && rowScan?.valueCounts[outcome]
     ? Object.entries(rowScan.valueCounts[outcome]).map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count).slice(0, 20)
+    : outcome && byName.get(outcome)?.valueCounts?.length
+      ? byName.get(outcome)!.valueCounts!.map(item => ({ value: item.value, count: item.count })).sort((a, b) => b.count - a.count).slice(0, 20)
     : [];
   const binary = binaryCounts(observedLevels);
   const column = outcome ? byName.get(outcome) : undefined;

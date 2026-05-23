@@ -916,15 +916,22 @@ JSON
       const summary = await researchTableSummaryCommand({ file });
       const parsed = JSON.parse(renderResearchTableSummaryJson(summary)) as {
         schemaVersion: number;
-        tableSummary: { rowCount: number; columns: Array<{ name: string; missingFraction: number }> };
+        tableSummary: { rowCount: number; columns: Array<{ name: string; missingFraction: number; uniqueCount?: number; valueCounts?: Array<{ value: string; count: number; fraction: number }> }> };
       };
 
       expect(summary.format).toBe("csv");
       expect(summary.rowCount).toBe(3);
       expect(summary.columns.find(column => column.name === "LBXGH")?.missingFraction).toBeCloseTo(1 / 3);
+      expect(summary.columns.find(column => column.name === "RIAGENDR")?.uniqueCount).toBe(2);
+      expect(summary.columns.find(column => column.name === "RIAGENDR")?.valueCounts).toEqual(expect.arrayContaining([
+        expect.objectContaining({ value: "2", count: 2 }),
+        expect.objectContaining({ value: "1", count: 1 }),
+      ]));
       expect(renderResearchTableSummary(summary)).toContain("research table summary");
+      expect(renderResearchTableSummary(summary)).toContain("top=2:2, 1:1");
       expect(parsed.schemaVersion).toBe(1);
       expect(parsed.tableSummary.rowCount).toBe(3);
+      expect(parsed.tableSummary.columns.find(column => column.name === "RIAGENDR")?.uniqueCount).toBe(2);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
