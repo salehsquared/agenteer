@@ -1,0 +1,98 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript lacks a clear prespecified study question, study design, and model diagnostics. The scatterplot misrepresents the partial correlation. These are blocker-level issues preventing meaningful review.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Prespecified study question not stated",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Without a clear prespecified question, the analysis cannot be evaluated for relevance, design, or interpretation.",
+      "actionableFix": "State the exact clinical or public-health question, including population, exposure, outcome, and covariates.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Verify that the manuscript explicitly states a falsifiable prespecified question.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "figures",
+      "title": "Scatterplot shows raw variables, not partial correlation residuals",
+      "evidenceRefs": ["figure-qa.json", "correlation-scatter.png", "stats-run.json"],
+      "whyItMatters": "The partial correlation adjusts for age and treatment; the raw scatterplot does not reflect the adjusted relationship and misleads readers.",
+      "actionableFix": "Replace with added-variable plots or residual scatterplots to visualize the partial relationship.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that generated figure uses residuals from a regression of each variable on covariates. The x and y axes must correspond to these residuals.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "blocker",
+      "category": "model_diagnostics",
+      "title": "No model diagnostics for partial correlation",
+      "evidenceRefs": ["diagnostics.json", "stats-run.json"],
+      "whyItMatters": "Partial correlation assumes linearity, normality, and absence of influential outliers. Without checks, the estimate and extreme p-value may be unreliable.",
+      "actionableFix": "Perform and report residual diagnostics (Q-Q plot, residual vs. fitted, influence measures), and comment on robustness.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Confirm that diagnostics.json contains checks for normality, linearity, and influential points, and that any issues are flagged.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Study design not specified (data source, design type)",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Without knowing the design (e.g., cross-sectional, cohort, trial), confounding control and generalizability cannot be assessed nor can the relevance of the partial correlation.",
+      "actionableFix": "Describe the data source, design type, eligibility criteria, and target population explicitly.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Check that the manuscript includes a subsection detailing data source, study period, and design.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without missing data report",
+      "evidenceRefs": ["manuscript.md", "stats-run.json"],
+      "whyItMatters": "The sample is 240 complete cases, but no information on original sample size, missingness patterns, or potential selection bias. This threatens internal validity.",
+      "actionableFix": "Report the number of excluded records, missingness rates per variable, and discuss possible bias. Consider sensitivity analysis (e.g., multiple imputation).",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Confirm that the manuscript includes a table or text describing missing data and a comparison of complete vs. excluded cases on key variables.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript fails to report the statistical method explicitly",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "The method is described as 'inferred from artifacts'; readers need the exact procedure (partial correlation adjusting for age and treatment) to evaluate appropriateness.",
+      "actionableFix": "State the statistical method, the covariates adjusted for, and the rationale, e.g., partial Pearson correlation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the statistical analysis section clearly names the method and lists the covariates used in the adjustment.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Analysis is unbound and exploratory but not clearly labeled as such",
+      "evidenceRefs": ["stats-qa.json", "manuscript.md"],
+      "whyItMatters": "The run's resultPosture is 'exploratory_standard_table', and binding is 'unbound', yet the manuscript calls results 'interpretable local evidence' without strongly emphasizing the exploratory nature. This risks misinterpretation.",
+      "actionableFix": "Add a prominent disclaimer that this is an unplanned, exploratory analysis not registered or bound to a pre-specified protocol, and cannot support confirmatory or causal conclusions.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the manuscript includes a statement like 'This analysis is exploratory and not pre-registered; results should be interpreted with extreme caution.'",
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Prespecified clinical or public-health question",
+    "Study protocol or analysis plan",
+    "Missing data report (original N, missingness patterns, possible bias)",
+    "Model diagnostic plots and tests (normality, linearity, influence)",
+    "Data dictionary and source description"
+  ],
+  "recommendedNextStage": "protocol"
+}

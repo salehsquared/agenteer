@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:49:22.228Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778363362228",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:methods",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "clinical methods and study-design reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "The analysis is an unbound exploratory linear regression on a local dataset. Critical methodological and reporting gaps prevent any claim beyond data exploration. The study design is absent, variable definitions missing, no confounding control, no pre-specified plan, and p-values are inappropriately reported as 0.0000. The resultPosture explicitly deems this exploratory and not paper-ready.",
+    "findings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Analysis is unbound exploratory run, not a designed study",
+        "evidenceRefs": [
+          "stats-run.json resultPosture.status='exploratory_standard_table'",
+          "stats-run.json resultPosture.cannotSupport includes 'paper-ready conclusions'",
+          "manuscript.md lacks any study protocol or analysis plan"
+        ],
+        "whyItMatters": "The result cannot support the manuscript's implied inferential intent. Publishing exploratory output as a study misleads readers about the evidence level.",
+        "actionableFix": "Design a proper observational study with a pre-specified protocol, define the research question, and bind the analysis to a method-selection artifact before rerunning.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json.resultPosture.status == 'exploratory_standard_table'",
+        "confidence": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "study_design",
+        "title": "No cohort construction details provided",
+        "evidenceRefs": [
+          "manuscript.md 'Cohort Construction' section only states sample size, no inclusion/exclusion criteria"
+        ],
+        "whyItMatters": "Readers cannot assess selection bias or generalizability. The cohort may be highly selective, making associations non-generalizable.",
+        "actionableFix": "Define the source population, inclusion/exclusion criteria, and any matching or restriction explicitly in the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "No mention of eligibility criteria in manuscript.md",
+        "confidence": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "variables",
+        "title": "Exposure and covariate definitions missing",
+        "evidenceRefs": [
+          "manuscript.md 'Variables' section states details are in companion artifacts, but none are provided defining 'severity' or 'treatment'"
+        ],
+        "whyItMatters": "Without knowing if severity is ordinal, categorical, or continuous, and how treatment is coded, the regression coefficients are uninterpretable.",
+        "actionableFix": "Define each variable, including its scale and coding (e.g., severity: 1-10 scale; treatment: 0=placebo, 1=active).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Searching manuscript.md for 'severity' finds no definition; companion variables artifact not provided.",
+        "confidence": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No confounding control rationale; minimal covariate adjustment",
+        "evidenceRefs": [
+          "manuscript.md only adjusts for age and treatment; no DAG or causal framework",
+          "stats-run.json variables = ['outcome_cont','severity','age','treatment']"
+        ],
+        "whyItMatters": "The phrase 'after adjustment' is meaningless without a defensible confounder selection strategy. Omitted confounders can bias the severity-outcome association.",
+        "actionableFix": "Develop a directed acyclic graph (DAG) to identify minimal sufficient adjustment set or state the study as unadjusted descriptive.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "No DAG or confounder discussion in any artifact.",
+        "confidence": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reporting",
+        "title": "P-values reported as 0.0000 (impossible exact zero)",
+        "evidenceRefs": [
+          "manuscript.md Results: 'p=0.0000' for all estimates"
+        ],
+        "whyItMatters": "This misrepresents the precision of the p-value calculation and violates reporting standards (e.g., report <0.001 or exact value).",
+        "actionableFix": "Report p-values with appropriate precision or as '<0.001'. Use exact values from stats-run.json (e.g., const p=3.98e-28).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md contains 'p=0.0000' for every term.",
+        "confidence": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Model assumption checks incomplete and not reported",
+        "evidenceRefs": [
+          "manuscript.md 'Limitations' states no explicit influence diagnostic evidence found, but diagnostics.json provides max Cook's distance; residual plot exists but not described",
+          "manuscript.md contains no assessment of linearity or homoscedasticity"
+        ],
+        "whyItMatters": "Linear regression validity relies on assumptions. Without checking linearity and homoscedasticity, the standard errors and p-values may be invalid.",
+        "actionableFix": "Report residual vs fitted plot, Q-Q plot, scale-location plot, and assess whether assumptions are met. Interpret diagnostic thresholds.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "No mention of 'residual vs fitted' or 'homoscedasticity' in manuscript.md.",
+        "confidence": 1
+      },
+      {
+        "id": "F7",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Missing data handling not described",
+        "evidenceRefs": [
+          "manuscript.md mentions 'complete-case exclusion' in Limitations but original sample size and missingness pattern unknown"
+        ],
+        "whyItMatters": "Complete-case analysis can bias estimates if missingness is not MCAR. Reader cannot assess risk of bias.",
+        "actionableFix": "Report the number of missing records, compare complete vs incomplete cases on baseline characteristics, and consider sensitivity analysis (e.g., multiple imputation).",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "No missing-data table or description in artifacts.",
+        "confidence": 1
+      },
+      {
+        "id": "F8",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Influence diagnostics available but not discussed",
+        "evidenceRefs": [
+          "diagnostics.json max_cooks_distance = 0.0776",
+          "manuscript.md claims 'No explicit influence diagnostic evidence was found'"
+        ],
+        "whyItMatters": "The manuscript contradicts the data. Even if below typical threshold (0.5), it should be acknowledged.",
+        "actionableFix": "Mention the maximum Cook's distance and state it is not concerning, or investigate points with higher influence.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "diagnostics.json.max_cooks_distance != null and manuscript.md states no evidence found.",
+        "confidence": 1
+      }
+    ],
+    "missingEvidence": [
+      "Variable dictionary with definitions and coding",
+      "Original sample size before complete-case exclusion",
+      "Missingness pattern and rates",
+      "Pre-specified analysis protocol",
+      "Confounder selection rationale or DAG",
+      "Model diagnostic plots (residuals vs fitted, Q-Q)",
+      "Clinical interpretability of effect sizes (severity scale units)"
+    ],
+    "recommendedNextStage": "protocol",
+    "costEstimate": {
+      "inputTokens": 3033,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026157,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review_deepseek_deepseek-v4-pro_methods_1778363362228.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review_deepseek_deepseek-v4-pro_methods_1778363362228.json"
+  }
+}

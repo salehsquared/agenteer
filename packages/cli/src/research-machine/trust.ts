@@ -231,6 +231,7 @@ const knownJsonFiles = [
   "literature-qa.json",
   "literature-context.json",
   "manuscript-qa.json",
+  "stats-config.json",
   "stats-qa.json",
   "diagnostics.json",
   "feasibility-trial.json",
@@ -248,7 +249,7 @@ const knownJsonFiles = [
   "analysis-spec.json",
 ];
 
-const knownTextFiles = ["paper.md", "manuscript.md", "stats-report.md", "critique.md"];
+const knownTextFiles = ["paper.md", "manuscript.md", "stats-report.md", "critique.md", "reviewer-context.md"];
 
 export async function researchMethodQaCommand(opts: {
   runDir: string;
@@ -1239,13 +1240,14 @@ function renderManuscriptMarkdown(evidence: RunEvidence, methodQa: MethodQaResul
   const question = deriveResearchQuestion(evidence);
   const summary = methodQa.methodSummary;
   const resultBullets = deriveResultBullets(evidence);
+  const primaryResult = resultBullets.find(item => !/^The complete-case analytic sample included/i.test(item)) ?? resultBullets[0];
   const limitations = deriveLimitations(evidence, methodQa);
   return [
     `# ${title}`,
     "",
     "## Abstract",
     "",
-    "Background: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.",
+    `Background: This study analyzes a local research dataset to answer a ${evidence.spec ? "prespecified" : "declared"} clinical or public-health question.`,
     "",
     `Objective: ${question}`,
     "",
@@ -1255,7 +1257,7 @@ function renderManuscriptMarkdown(evidence: RunEvidence, methodQa: MethodQaResul
     "",
     `Methods: ${methodsSentence(evidence, summary)} The analysis used conservative claim language and was reviewed with deterministic methods checks.`,
     "",
-    `Results: ${resultBullets[0] ?? "The run produced local analysis artifacts but no extractable numeric result summary."}`,
+    `Results: ${primaryResult ?? "The run produced local analysis artifacts but no extractable numeric result summary."}`,
     "",
     `Conclusion: ${conclusionSentence(evidence, methodQa)}`,
     "",
@@ -1267,7 +1269,7 @@ function renderManuscriptMarkdown(evidence: RunEvidence, methodQa: MethodQaResul
     "",
     "### Study Design And Data Source",
     "",
-    `${designSentence(evidence, summary)} The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.`,
+    `${designSentence(evidence, summary)}. The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.`,
     "",
     "### Cohort Construction",
     "",
@@ -1361,7 +1363,7 @@ function renderRichAnalysisManuscript(evidence: RunEvidence, methodQa: MethodQaR
     "",
     "## Introduction",
     "",
-    `The prespecified research question was: ${question} The intent is to provide a reproducible local analysis of cohort construction, baseline characteristics, model results, missingness, and limitations, while keeping causal and deployment claims out of scope.`,
+    `The ${evidence.spec ? "prespecified" : "declared"} research question was: ${question} The intent is to provide a reproducible local analysis of cohort construction, baseline characteristics, model results, missingness, and limitations, while keeping causal and deployment claims out of scope.`,
     "",
     "## Methods",
     "",
@@ -1603,10 +1605,10 @@ function collectEstimateLikeRecords(json: Record<string, unknown | null>): Array
       return;
     }
     const record = value as Record<string, unknown>;
-    const hasEffect = ["estimate", "coefficient", "oddsRatio", "riskRatio", "meanDifference", "effectEstimate"].some(key => numberValue(record[key]) !== null);
+    const hasEffect = ["estimate", "coefficient", "correlation", "oddsRatio", "riskRatio", "meanDifference", "effectEstimate", "auroc", "auc", "brier_score", "rmse", "r2"].some(key => numberValue(record[key]) !== null);
     const hasP = ["p", "pValue", "p_value", "p.value"].some(key => numberValue(record[key]) !== null);
     const hasCi = ["ciLow", "ci_high", "confidenceInterval", "lower", "upper"].some(key => record[key] !== undefined);
-    if ((hasEffect && (hasP || hasCi)) || isDiagnosticEstimateRecord(record)) out.push(record);
+    if ((hasEffect && (hasP || hasCi)) || isDiagnosticEstimateRecord(record) || isPredictionEstimateRecord(record)) out.push(record);
     for (const item of Object.values(record)) walk(item);
   }
   for (const value of Object.values(json)) walk(value);
@@ -1630,6 +1632,10 @@ function isDiagnosticEstimateRecord(record: Record<string, unknown>): boolean {
   const hasDiagnosticCounts = ["true_positive", "false_positive", "true_negative", "false_negative", "tp", "fp", "tn", "fn"].some(key => numberValue(record[key]) !== null);
   const hasInterval = Object.keys(record).some(key => /_(ci_low|ci_high)$|^ci(Low|High)$/.test(key));
   return hasMetric && (hasDiagnosticCounts || hasInterval);
+}
+
+function isPredictionEstimateRecord(record: Record<string, unknown>): boolean {
+  return ["auroc", "auc", "brier_score", "brierScore", "calibration_slope", "calibrationSlope", "rmse", "r2"].some(key => numberValue(record[key]) !== null);
 }
 
 function detectRunSummary(evidence: RunEvidence, estimates: Array<Record<string, unknown>>): MethodQaResult["methodSummary"] {
@@ -1901,6 +1907,8 @@ function scoreInspection(inspection: RunInspectionResult): Record<string, number
 
 function deriveStudyTitle(evidence: RunEvidence): string {
   if (evidence.spec?.title) return evidence.spec.title;
+  const contextQuestion = evidence.text["reviewer-context.md"]?.match(/^Research question:\s*(.+)$/im)?.[1]?.trim();
+  if (contextQuestion) return contextQuestion.length < 90 ? contextQuestion.replace(/[?.!]\s*$/, "") : "Dataset-Grounded Research Analysis";
   const title = firstStringInJson(evidence.json, ["title"]);
   if (title) return title.replace(/[?.!]\s*$/, "");
   const question = deriveResearchQuestion(evidence);
@@ -1909,8 +1917,11 @@ function deriveStudyTitle(evidence: RunEvidence): string {
 
 function deriveResearchQuestion(evidence: RunEvidence): string {
   if (evidence.spec?.researchQuestion) return evidence.spec.researchQuestion;
+  const contextQuestion = evidence.text["reviewer-context.md"]?.match(/^Research question:\s*(.+)$/im)?.[1]?.trim();
+  if (contextQuestion) return contextQuestion;
   const question = firstStringInJson(evidence.json, ["researchQuestion", "question"]);
-  return question ?? "What does the analyzed dataset show for the prespecified study question?";
+  if (question) return question;
+  return "What does the analyzed dataset show for the declared study question?";
 }
 
 function deriveResultBullets(evidence: RunEvidence): string[] {
@@ -1918,13 +1929,74 @@ function deriveResultBullets(evidence: RunEvidence): string[] {
   const result = evidence.json["analysis-results.json"] ?? evidence.json["stats-run.json"] ?? evidence.json["analysis.json"] ?? evidence.json["ml-run.json"];
   const n = firstNumberInValue(result, ["completeCaseN", "completeCaseEligible", "n", "rowCount"]);
   if (n !== null) bullets.push(`The complete-case analytic sample included ${n} records.`);
-  const effect = firstNumberInValue(result, ["oddsRatio", "riskRatio", "estimate", "coefficient", "effectEstimate", "auc", "r2", "rmse"]);
+  for (const estimate of primaryEstimateRecords(result).slice(0, 4)) {
+    const summary = estimateSummarySentence(estimate);
+    if (summary) bullets.push(summary);
+  }
+  const effect = bullets.length <= 1 ? firstNumberInValue(result, ["oddsRatio", "riskRatio", "estimate", "coefficient", "effectEstimate", "auroc", "auc", "r2", "rmse"]) : null;
   const p = firstNumberInValue(result, ["pValue", "p_value", "p"]);
   if (effect !== null && p !== null) bullets.push(`The primary numeric estimate was ${formatNumber(effect, 4)} with p-value ${formatNumber(p, 4)}.`);
   else if (effect !== null) bullets.push(`The primary numeric estimate was ${formatNumber(effect, 4)}.`);
   const qaStatus = firstStringInValue(evidence.json["qa.json"], ["status"]);
   if (qaStatus) bullets.push(`The original runner quality-control status was ${qaStatus}.`);
   return uniqueStrings(bullets);
+}
+
+function primaryEstimateRecords(value: unknown): Array<Record<string, unknown>> {
+  const out: Array<Record<string, unknown>> = [];
+  const seen = new Set<unknown>();
+  function walk(candidate: unknown): void {
+    if (!candidate || typeof candidate !== "object" || seen.has(candidate) || out.length > 20) return;
+    seen.add(candidate);
+    if (Array.isArray(candidate)) {
+      for (const item of candidate) walk(item);
+      return;
+    }
+    const record = candidate as Record<string, unknown>;
+    if (["estimate", "coefficient", "correlation", "oddsRatio", "odds_ratio", "riskRatio", "risk_ratio", "hazardRatio", "hazard_ratio", "mean_difference", "statistic", "f_statistic", "chi_square", "cramers_v", "auroc", "auc", "brier_score", "rmse", "r2", "sensitivity", "specificity", "positive_predictive_value", "negative_predictive_value", "survival", "final_cumulative_incidence"].some(key => numberValue(record[key]) !== null)) out.push(record);
+    for (const key of ["estimates", "results", "metrics"]) walk(record[key]);
+  }
+  walk(value);
+  return out;
+}
+
+function estimateSummarySentence(record: Record<string, unknown>): string | null {
+  const term = typeof record.term === "string" && record.term.trim() ? record.term : "primary contrast";
+  const p = numberValue(record.p_value ?? record.pValue ?? record.p);
+  const isRatio = numberValue(record.oddsRatio ?? record.odds_ratio ?? record.riskRatio ?? record.risk_ratio ?? record.hazardRatio ?? record.hazard_ratio) !== null;
+  const ciLow = numberValue(isRatio ? (record.or_ci_low ?? record.rr_ci_low ?? record.hr_ci_low ?? record.ci_low ?? record.ciLow ?? record.lower) : (record.ci_low ?? record.ciLow ?? record.lower));
+  const ciHigh = numberValue(isRatio ? (record.or_ci_high ?? record.rr_ci_high ?? record.hr_ci_high ?? record.ci_high ?? record.ciHigh ?? record.upper) : (record.ci_high ?? record.ciHigh ?? record.upper));
+  const ci = ciLow !== null && ciHigh !== null ? ` (95% CI ${formatNumber(ciLow, 4)} to ${formatNumber(ciHigh, 4)})` : "";
+  const pText = p !== null ? `; ${formatPValue(p)}` : "";
+  const predictionMetrics = [
+    ["AUROC", numberValue(record.auroc ?? record.auc)],
+    ["Brier score", numberValue(record.brier_score ?? record.brierScore)],
+  ].filter((item): item is [string, number] => item[1] !== null);
+  if (predictionMetrics.length > 1) return `For ${term}, ${predictionMetrics.map(([label, value]) => `${label} was ${formatNumber(value, 4)}`).join(" and ")}.`;
+  const metrics: Array<[string, unknown, string]> = [
+    ["mean difference", record.meanDifference ?? record.mean_difference, ""],
+    ["test statistic", record.statistic, ""],
+    ["F statistic", record.f_statistic ?? record.fStatistic, ""],
+    ["chi-square statistic", record.chi_square ?? record.chiSquare, ""],
+    ["Cramer's V", record.cramers_v ?? record.cramersV, ""],
+    ["correlation", record.correlation, ""],
+    ["AUROC", record.auroc ?? record.auc, ""],
+    ["Brier score", record.brier_score ?? record.brierScore, ""],
+    ["odds ratio", record.oddsRatio ?? record.odds_ratio, ""],
+    ["risk ratio", record.riskRatio ?? record.risk_ratio, ""],
+    ["hazard ratio", record.hazardRatio ?? record.hazard_ratio, ""],
+    ["estimate", record.estimate ?? record.coefficient, ""],
+    ["sensitivity", record.sensitivity, ""],
+    ["specificity", record.specificity, ""],
+    ["positive predictive value", record.positive_predictive_value, ""],
+    ["negative predictive value", record.negative_predictive_value, ""],
+    ["survival probability", record.survival, ""],
+    ["final cumulative incidence", record.final_cumulative_incidence, ""],
+  ];
+  const found = metrics.find(([, value]) => numberValue(value) !== null);
+  if (!found) return null;
+  const [label, value] = found;
+  return `For ${term}, the ${label} was ${formatNumber(numberValue(value)!, 4)}${ci}${pText}.`;
 }
 
 function deriveLimitations(evidence: RunEvidence, methodQa: MethodQaResult): string[] {
@@ -1935,7 +2007,11 @@ function deriveLimitations(evidence: RunEvidence, methodQa: MethodQaResult): str
   if (evidence.spec?.dataset === "mimic") limitations.push("MIMIC analyses reflect ICU/hospital EHR data and may not generalize outside the source health system or care context.");
   if (evidence.spec?.dataset === "nhanes") limitations.push("NHANES analyses require correct survey weights, strata, PSU handling, and cycle/subsample eligibility to support population inference.");
   if (methodQa.readiness !== "local_review_ready") limitations.push("Deterministic methods checks identified issues that require review before publication or external sharing.");
-  for (const check of methodQa.checks.filter(item => item.status !== "pass").slice(0, 4)) limitations.push(check.message);
+  for (const check of methodQa.checks.filter(item => item.status !== "pass")) {
+    if (/No reader-facing (paper|report)|paper\/manuscript artifact/i.test(check.message)) continue;
+    limitations.push(check.message);
+    if (limitations.length >= 6) break;
+  }
   return uniqueStrings(limitations);
 }
 
@@ -1952,7 +2028,22 @@ function cohortSentence(evidence: RunEvidence, summary: MethodQaResult["methodSu
 }
 
 function variableSentence(evidence: RunEvidence): string {
-  if (!evidence.spec) return "The primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.";
+  if (!evidence.spec) {
+    const config = unwrapObject(evidence.json["stats-config.json"]);
+    const outcome = typeof config.outcome === "string" ? config.outcome : null;
+    const exposure = typeof config.exposure === "string" ? config.exposure : null;
+    const group = typeof config.group === "string" ? config.group : null;
+    const variables = Array.isArray(config.variables) ? config.variables.filter((item): item is string => typeof item === "string") : [];
+    const covariates = Array.isArray(config.covariates) ? config.covariates.filter((item): item is string => typeof item === "string") : [];
+    const parts = [
+      outcome ? `Outcome: ${outcome}.` : null,
+      exposure ? `Exposure or predictor: ${exposure}.` : null,
+      group ? `Grouping variable: ${group}.` : null,
+      variables.length ? `Analyzed variables: ${variables.join(", ")}.` : null,
+      covariates.length ? `Covariates: ${covariates.join(", ")}.` : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join(" ") : "The primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.";
+  }
   return [
     `Outcome: ${evidence.spec.variables.outcome.join(", ")}.`,
     `Exposure: ${evidence.spec.variables.exposure.join(", ")}.`,
@@ -1964,6 +2055,9 @@ function methodsSentence(evidence: RunEvidence, summary: MethodQaResult["methodS
   if (evidence.spec) {
     return `The primary model family was ${evidence.spec.model.family}, with formula ${evidence.spec.model.formula}.`;
   }
+  const config = unwrapObject(evidence.json["stats-config.json"]);
+  const method = typeof config.method === "string" ? config.method : null;
+  if (method) return `The statistical method was ${method}${summary.detectedModelFamilies.length ? `, within the ${summary.detectedModelFamilies.join(", ")} method family` : ""}.`;
   return summary.detectedModelFamilies.length
     ? `The detected model family was ${summary.detectedModelFamilies.join(", ")}.`
     : "The statistical method was inferred from the available run artifacts and should be confirmed during review.";
@@ -2134,6 +2228,12 @@ function mean(values: number[]): number {
 
 function formatNumber(value: number, digits: number): string {
   return Number.isFinite(value) ? value.toFixed(digits) : "NaN";
+}
+
+function formatPValue(value: number): string {
+  if (!Number.isFinite(value)) return "p=NaN";
+  if (value > 0 && value < 0.0001) return "p<0.0001";
+  return `p=${formatNumber(value, 4)}`;
 }
 
 function sentenceStatistics(text: string): { sentenceCount: number; averageSentenceWords: number } {

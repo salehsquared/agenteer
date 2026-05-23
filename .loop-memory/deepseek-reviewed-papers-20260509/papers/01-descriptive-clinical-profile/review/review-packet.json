@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T22:05:22.191Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile",
+  "packetHash": "f335a0fe91c280745d00670a94bb3b524eecb8d8803cd4711ce52537eccd53b7",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 29,
+    "includedFiles": 7,
+    "totalBytes": 151571,
+    "includedBytes": 26879
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3758,
+      "sha256": "91703d89278e700fabd4c8d808299a2c9c7da831939ee1de062bc083b655baa1",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What are the distributions of age, severity, BMI, albumin, and continuous outcome\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: What are the distributions of age, severity, BMI, albumin, and continuous outcome?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was descriptive, within the descriptive method family. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What are the distributions of age, severity, BMI, albumin, and continuous outcome? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nAnalyzed variables: age, severity, bmi, albumin, outcome_cont.\n\n### Statistical Analysis\n\nThe statistical method was descriptive, within the descriptive method family. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 15 artifact(s). The artifact inventory hash is d766bbc4c596aba1db71f22c49704e3d263e113672b41bb0662278f79a324c68. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 5953,
+      "sha256": "3bccc56b37f088d7c007ee252016b40d17740329e247362ce559eeab3e0aeebe",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_3705198074919858120\",\n  \"method\": \"descriptive\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"age\",\n    \"severity\",\n    \"bmi\",\n    \"albumin\",\n    \"outcome_cont\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"variable\": \"age\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 68.55135,\n      \"sd\": 14.397831937352036,\n      \"median\": 68.2945,\n      \"iqr\": 24.411,\n      \"min\": 41.51,\n      \"max\": 99.981\n    },\n    {\n      \"variable\": \"severity\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 2.2760416666666665,\n      \"sd\": 0.860036176098452,\n      \"median\": 2.293,\n      \"iqr\": 1.2137499999999999,\n      \"min\": 0,\n      \"max\": 4.298\n    },\n    {\n      \"variable\": \"bmi\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 28.958720833333334,\n      \"sd\": 4.446062078919502,\n      \"median\": 28.969,\n      \"iqr\": 5.532499999999999,\n      \"min\": 16.487,\n      \"max\": 39.464\n    },\n    {\n      \"variable\": \"albumin\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 3.4641333333333337,\n      \"sd\": 0.3669611367320626,\n      \"median\": 3.4684999999999997,\n      \"iqr\": 0.45474999999999977,\n      \"min\": 2.418,\n      \"max\": 4.676\n    },\n    {\n      \"variable\": \"outcome_cont\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 22.23474583333333,\n      \"sd\": 3.6196255045059007,\n      \"median\": 22.02,\n      \"iqr\": 5.0234999999999985,\n      \"min\": 13.415,\n      \"max\": 35.25\n    }\n  ],\n  \"diagnostics\": {},\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-config.json\",\n      \"sha256\": \"9ab7e76aed8dc86394aa80487daa368c070c7b78a10747e274bea17e3bbdca48\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-summary.json\",\n      \"sha256\": \"b92351074da83ab5db112cf0694d6a36bcea9683938c23dab1809eddda80c79e\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/estimates.csv\",\n      \"sha256\": \"f3cd3f222de90f3cf5dd33714667de21ce4613baac17362129541c47962cb2fe\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/diagnostics.json\",\n      \"sha256\": \"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/figures.json\",\n      \"sha256\": \"b5956a181cd89aaac773596b066d14c310f67973263b54d4f59025bc322c64f0\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/descriptive-histograms.png\",\n      \"sha256\": \"5bf064bad0ede3e78a27e659fe469f255881a850d5aa825ca42d745e4f4cd0a7\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/missingness-bar.png\",\n      \"sha256\": \"f76fc406e5eaf583a21e863e4759d292113679d49aa039b4fd1503738fa3623e\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/figure-qa.json\",\n      \"sha256\": \"5adf09a99613ef950294c60f707ee6fa28a0f1701252bc7d7420a6de1a89f984\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-report.md\",\n      \"sha256\": \"5b11545b5fc8ea1f473a1453a490a97a997f3f8758b423c4f899e8e2df1b6c18\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-qa.json\",\n      \"sha256\": \"167d76b778e70e40c2cc4ce705e819c0bc4c5ced83eb04a58df3ce1f137c24dd\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_01_descriptive_clinical_profile\",\n    \"methodId\": \"table-one-descriptive-summary\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1512,
+      "sha256": "167d76b778e70e40c2cc4ce705e819c0bc4c5ced83eb04a58df3ce1f137c24dd",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"5 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"2 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text,"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 6577,
+      "sha256": "5adf09a99613ef950294c60f707ee6fa28a0f1701252bc7d7420a6de1a89f984",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 6577,
+      "sha256": "5adf09a99613ef950294c60f707ee6fa28a0f1701252bc7d7420a6de1a89f984",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 2500,
+      "sha256": "b5956a181cd89aaac773596b066d14c310f67973263b54d4f59025bc322c64f0",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2238,
+      "sha256": "db3c61bd2b2a74f1ecac2ce4299c35ed66018ba12f5671945063c42ef491353a",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9897,
+      "sha256": "9e826f3fb94db34df44fca0030fb946f1052a7642643bf75bb4435fb62a0894c",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 2940,
+      "sha256": "7621cf8ddf91979fa716420d32282337da4d0efdfa95431e358f4d4a587d0181",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 7335,
+      "sha256": "f3300a32c4bf21c406e80843c03008b839e746726d8e919884d7791ca85fef77",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14628,
+      "sha256": "81a0748e4b21f5d7008a9001ffc172205fededa70b3aaae569b12f433b6eca32",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/method-selection.json",
+      "relativePath": "method-selection.json",
+      "bytes": 881,
+      "sha256": "4652fce2673f49a822a8b350b37a9355e6624ab11c5932d1e75eac650e5b610f",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4317,
+      "sha256": "bd17fc934bc9199ae07db426c473981d697928486c7a41ce646b75d37143f5f0",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 816,
+      "sha256": "10b8baf10a2931aa3321f014e953f319aebf37052622e69efd8c18498a774c63",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 10034,
+      "sha256": "3fb1dd3b4f990481259fb5b347d948dc922bcdd8ccae0335e74bd273067fac65",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1019,
+      "sha256": "28c289d109d49366391517c39810a6f6a3d4f447ac2791b017fd5f9c94df71c0",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 6322,
+      "sha256": "21428917aa964d784b473d90d093af2e71a9f40b87b398151583ee70f3fbf7a4",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/descriptive-histograms.png",
+      "relativePath": "stats-run/descriptive-histograms.png",
+      "bytes": 33117,
+      "sha256": "5bf064bad0ede3e78a27e659fe469f255881a850d5aa825ca42d745e4f4cd0a7",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 583,
+      "sha256": "f3cd3f222de90f3cf5dd33714667de21ce4613baac17362129541c47962cb2fe",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/missingness-bar.png",
+      "relativePath": "stats-run/missingness-bar.png",
+      "bytes": 27938,
+      "sha256": "f76fc406e5eaf583a21e863e4759d292113679d49aa039b4fd1503738fa3623e",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 822,
+      "sha256": "9ab7e76aed8dc86394aa80487daa368c070c7b78a10747e274bea17e3bbdca48",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1580,
+      "sha256": "5b11545b5fc8ea1f473a1453a490a97a997f3f8758b423c4f899e8e2df1b6c18",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 225,
+      "sha256": "b92351074da83ab5db112cf0694d6a36bcea9683938c23dab1809eddda80c79e",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3758 bytes, sha256=91703d89278e700fabd4c8d808299a2c9c7da831939ee1de062bc083b655baa1) ---\n# What are the distributions of age, severity, BMI, albumin, and continuous outcome\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: What are the distributions of age, severity, BMI, albumin, and continuous outcome?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was descriptive, within the descriptive method family. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What are the distributions of age, severity, BMI, albumin, and continuous outcome? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nAnalyzed variables: age, severity, bmi, albumin, outcome_cont.\n\n### Statistical Analysis\n\nThe statistical method was descriptive, within the descriptive method family. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 15 artifact(s). The artifact inventory hash is d766bbc4c596aba1db71f22c49704e3d263e113672b41bb0662278f79a324c68. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 5953 bytes, sha256=3bccc56b37f088d7c007ee252016b40d17740329e247362ce559eeab3e0aeebe) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_3705198074919858120\",\n  \"method\": \"descriptive\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"age\",\n    \"severity\",\n    \"bmi\",\n    \"albumin\",\n    \"outcome_cont\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"variable\": \"age\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 68.55135,\n      \"sd\": 14.397831937352036,\n      \"median\": 68.2945,\n      \"iqr\": 24.411,\n      \"min\": 41.51,\n      \"max\": 99.981\n    },\n    {\n      \"variable\": \"severity\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 2.2760416666666665,\n      \"sd\": 0.860036176098452,\n      \"median\": 2.293,\n      \"iqr\": 1.2137499999999999,\n      \"min\": 0,\n      \"max\": 4.298\n    },\n    {\n      \"variable\": \"bmi\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 28.958720833333334,\n      \"sd\": 4.446062078919502,\n      \"median\": 28.969,\n      \"iqr\": 5.532499999999999,\n      \"min\": 16.487,\n      \"max\": 39.464\n    },\n    {\n      \"variable\": \"albumin\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 3.4641333333333337,\n      \"sd\": 0.3669611367320626,\n      \"median\": 3.4684999999999997,\n      \"iqr\": 0.45474999999999977,\n      \"min\": 2.418,\n      \"max\": 4.676\n    },\n    {\n      \"variable\": \"outcome_cont\",\n      \"non_missing\": 240,\n      \"missing\": 0,\n      \"missing_fraction\": 0,\n      \"inferred_type\": \"float64\",\n      \"mean\": 22.23474583333333,\n      \"sd\": 3.6196255045059007,\n      \"median\": 22.02,\n      \"iqr\": 5.0234999999999985,\n      \"min\": 13.415,\n      \"max\": 35.25\n    }\n  ],\n  \"diagnostics\": {},\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-config.json\",\n      \"sha256\": \"9ab7e76aed8dc86394aa80487daa368c070c7b78a10747e274bea17e3bbdca48\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-summary.json\",\n      \"sha256\": \"b92351074da83ab5db112cf0694d6a36bcea9683938c23dab1809eddda80c79e\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/estimates.csv\",\n      \"sha256\": \"f3cd3f222de90f3cf5dd33714667de21ce4613baac17362129541c47962cb2fe\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/diagnostics.json\",\n      \"sha256\": \"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/figures.json\",\n      \"sha256\": \"b5956a181cd89aaac773596b066d14c310f67973263b54d4f59025bc322c64f0\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/descriptive-histograms.png\",\n      \"sha256\": \"5bf064bad0ede3e78a27e659fe469f255881a850d5aa825ca42d745e4f4cd0a7\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/missingness-bar.png\",\n      \"sha256\": \"f76fc406e5eaf583a21e863e4759d292113679d49aa039b4fd1503738fa3623e\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/figure-qa.json\",\n      \"sha256\": \"5adf09a99613ef950294c60f707ee6fa28a0f1701252bc7d7420a6de1a89f984\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-report.md\",\n      \"sha256\": \"5b11545b5fc8ea1f473a1453a490a97a997f3f8758b423c4f899e8e2df1b6c18\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run/stats-qa.json\",\n      \"sha256\": \"167d76b778e70e40c2cc4ce705e819c0bc4c5ced83eb04a58df3ce1f137c24dd\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/01-descriptive-clinical-profile/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_01_descriptive_clinical_profile\",\n    \"methodId\": \"table-one-descriptive-summary\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 2 bytes, sha256=44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a) ---\n{}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1512 bytes, sha256=167d76b778e70e40c2cc4ce705e819c0bc4c5ced83eb04a58df3ce1f137c24dd) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"5 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"2 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text,\n\n--- ARTIFACT figure-qa.json (json, 6577 bytes, sha256=5adf09a99613ef950294c60f707ee6fa28a0f1701252bc7d7420a6de1a89f984) ---\n\n\n--- ARTIFACT stats-run/figure-qa.json (json, 6577 bytes, sha256=5adf09a99613ef950294c60f707ee6fa28a0f1701252bc7d7420a6de1a89f984) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 2500 bytes, sha256=b5956a181cd89aaac773596b066d14c310f67973263b54d4f59025bc322c64f0) ---\n"
+}

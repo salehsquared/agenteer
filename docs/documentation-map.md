@@ -33,6 +33,7 @@ Use this map to choose the right document before opening source. It is intention
 | Document | Covers |
 |---|---|
 | [Research Pipeline](research-pipeline.md) | Research packet ownership, stage-based workflow, AnalysisSpec-to-paper path, research machine path, audit commands, packet readiness. |
+| [Research Controller Agent](research-controller.md) | Persistent autonomous runner state machine for feasibility, execution, QA, reviewer re-entry, and promotion decisions. |
 | [Dataset Intelligence](dataset-intelligence.md) | Canonical dataset manifests, variable registries, relationship graphs, data profiles, watchouts, question seeds, and agent context files for any dataset. |
 | [Research ML Modeling](research-ml.md) | ML adapter registry, `modeling-plan`, stats runner, ML run/compare/inspect, analysis manifests, benchmark readiness, preprocessing, metrics, artifacts, explainability. |
 | [External Reviewer Panel](reviewer-panel.md) | Cold LLM reviewer providers, panels, review packets, adjudication, response decisions, state reentry, cost limits, and autonomy modes. |

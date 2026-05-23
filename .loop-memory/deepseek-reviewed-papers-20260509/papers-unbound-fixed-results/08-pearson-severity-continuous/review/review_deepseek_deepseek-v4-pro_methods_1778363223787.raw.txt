@@ -1,0 +1,131 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript fails to report the primary result (correlation coefficient and p-value) and contains a false statement that no estimates were available. Additionally, key methodological details (cohort construction, variable definitions, assumption checks) are missing, and the analysis is unregistered and unadjusted for confounders. These issues prevent any meaningful interpretation and must be resolved before the paper can proceed.",
+  "findings": [
+    {
+      "id": "missing-main-result",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Primary result not reported in manuscript",
+      "evidenceRefs": [
+        "manuscript.md:Results",
+        "stats-run.json:estimates"
+      ],
+      "whyItMatters": "The manuscript fails to report the correlation coefficient and p-value, the core findings. Readers cannot assess the association without these numbers.",
+      "actionableFix": "Report the Pearson r=0.658, p<0.001, and n=240 in the Results section. Include confidence interval and effect size interpretation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify manuscript now contains the numeric correlation and p-value.",
+      "confidence": 1.0
+    },
+    {
+      "id": "no-assumption-checks",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No diagnostics for Pearson correlation assumptions",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json",
+        "stats-run/stats-run.json:diagnostics"
+      ],
+      "whyItMatters": "Pearson correlation assumes linearity, homoscedasticity, and bivariate normality. Without checks, the reported correlation may be misleading if assumptions are violated.",
+      "actionableFix": "Add diagnostic plots (residuals vs fitted, Q-Q plot) and tests (e.g., Shapiro-Wilk) to the run. Include these outputs in the manuscript or supplementary.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if diagnostics.json contains more than just 'test' and 'n'; look for skew, kurtosis, outlier detection.",
+      "confidence": 0.9
+    },
+    {
+      "id": "unbound-analysis",
+      "severity": "major",
+      "category": "study_design",
+      "title": "No pre-specified analysis plan; exploratory posture",
+      "evidenceRefs": [
+        "stats-run/stats-run.json:resultPosture",
+        "stats-run/stats-qa.json:checks"
+      ],
+      "whyItMatters": "Without a pre-registered analysis, the risk of p-hacking is high. The result may be cherry-picked from multiple exploratory tests.",
+      "actionableFix": "Create and bind an AnalysisSpec or method-selection artifact before claiming confirmatory findings. Or clearly label as exploratory and limit inference.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "Check if binding artifact exists and is referenced.",
+      "confidence": 0.9
+    },
+    {
+      "id": "missing-cohort-details",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No description of cohort construction or variable definitions",
+      "evidenceRefs": [
+        "manuscript.md:Cohort Construction, Variables"
+      ],
+      "whyItMatters": "Readers cannot assess selection bias, measurement validity, or generalizability. The complete-case approach is mentioned but not quantified.",
+      "actionableFix": "Provide inclusion/exclusion criteria, missing data patterns, and definitions of severity and outcome_cont. Report descriptive statistics.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Presence of a table 1 with demographics and clinical characteristics.",
+      "confidence": 0.95
+    },
+    {
+      "id": "confounding-ignored",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Association not adjusted for confounders",
+      "evidenceRefs": [
+        "stats-run/stats-run.json:estimates[0].adjusted_for\":\"\""
+      ],
+      "whyItMatters": "The observed correlation may be confounded by other variables, leading to spurious inference. This limits any practical interpretation.",
+      "actionableFix": "Either acknowledge unadjusted association, or perform multivariable analysis if confounders available. Report adjusted estimates.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "Check if the analysis spec includes covariate adjustment.",
+      "confidence": 0.85
+    },
+    {
+      "id": "claims-contradict-factual",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript incorrectly claims no estimates available",
+      "evidenceRefs": [
+        "manuscript.md:Limitations: No estimate-like records were available...",
+        "stats-run/stats-run.json:estimates"
+      ],
+      "whyItMatters": "This false statement misleads reviewers and readers about the existence of numerical results. It indicates a flawed automated generation.",
+      "actionableFix": "Correct the limitation to reflect that estimates exist but were not reported. Alternatively, remove the incorrect sentence.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Search for 'No estimate-like records were available' in manuscript.md.",
+      "confidence": 1.0
+    },
+    {
+      "id": "figure-not-available",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Scatterplot not available for reviewer inspection",
+      "evidenceRefs": [
+        "stats-run/figure-qa.json",
+        "stats-run/figures.json"
+      ],
+      "whyItMatters": "We cannot visually assess the linearity and potential outliers. The figure-qa only checks technical rendering, not data patterns.",
+      "actionableFix": "Include the scatterplot in the manuscript or provide direct access. Overlay a loess smoother to check linearity.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Presence of scatterplot with smooth line in the report.",
+      "confidence": 0.7
+    },
+    {
+      "id": "reproducibility-weak",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "No code or dependency information for full reproducibility",
+      "evidenceRefs": [
+        "stats-run/stats-run.json:artifacts"
+      ],
+      "whyItMatters": "Without code, the exact computation may differ; artifact hashes ensure fidelity only if the pipeline is shared.",
+      "actionableFix": "Provide the execution script or container specification. For now, the artifacts are sufficient for audit but not for recomputation.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check for a code artifact (e.g., .py, .R, Dockerfile) in the run directory.",
+      "confidence": 0.6
+    }
+  ],
+  "missingEvidence": [
+    "Scatterplot (correlation-scatter.png) not directly viewable",
+    "Normality/linearity assumption checks (e.g., Shapiro-Wilk, residual plots)",
+    "Data dictionary for severity and outcome_cont",
+    "Study protocol or pre-registration record",
+    "Code or script used to generate the analysis"
+  ],
+  "recommendedNextStage": "manuscript"
+}

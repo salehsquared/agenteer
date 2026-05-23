@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2756042624779439175",
+  "method": "pca",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "scale_item_1",
+    "scale_item_2",
+    "scale_item_3",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "PC1",
+      "explained_variance_ratio": 0.7906732079539086
+    },
+    {
+      "term": "PC2",
+      "explained_variance_ratio": 0.1548962615871217
+    },
+    {
+      "term": "PC3",
+      "explained_variance_ratio": 0.029717894140227685
+    },
+    {
+      "term": "PC4",
+      "explained_variance_ratio": 0.024712636318741907
+    }
+  ],
+  "diagnostics": {
+    "test": "PCA",
+    "transformed": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-transformed.csv",
+    "components": [
+      [
+        0.5751351345669089,
+        0.5771858167751387,
+        0.5629763723327298,
+        0.1383246691497918
+      ],
+      [
+        -0.037666031232208144,
+        -0.08994585968604857,
+        -0.11227484769157117,
+        0.9888808679473915
+      ],
+      [
+        -0.1887137771566446,
+        0.7760992044741372,
+        -0.6016917987484595,
+        -0.0049106460600013835
+      ],
+      [
+        0.7951024823185943,
+        -0.23756325484713453,
+        -0.5553547893822086,
+        -0.05437646979611294
+      ]
+    ]
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-config.json",
+      "sha256": "7caa8e434b6512701f7d9790e6e91ea2ccfa04fbb425da7947b2de4a4450ae8e"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-summary.json",
+      "sha256": "2024e0b1b4a75873663a46f5af97b0b1da9c1b18182bdac8fa7e79e0964433e4"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/estimates.csv",
+      "sha256": "a101665aa6e302b9868749f2d3ecb803b15938d6edfa48d9a70ef0f20b4f8fa2"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/diagnostics.json",
+      "sha256": "4e1958104140e20cf5563c66b9c36033acd6a45856bb93f5d3731ba3564a0609"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figures.json",
+      "sha256": "7f7330714d53f7fd5363e961582cb14d3c6a7959d7c24647f8ec77f80dc1817a"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/pca-scree.png",
+      "sha256": "9e2cecdba390de69e80da4e54937c3c96a8ba34b165c0c7bebcfac0831b0351a"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/figure-qa.json",
+      "sha256": "f9462f3c08ad82a8be4819f6af4034cb31b385f6fd4acc8be1dabfe467827cf8"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-report.md",
+      "sha256": "7db1f8f61e6e49c9de7434b1458ddb84cf75a35afbd0f0e503eee850a6bc6e8c"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run/stats-qa.json",
+      "sha256": "377c4a22e369e1fec6483f64f7a71a1bfe9ad6a32b2092ed1ba035821932d070"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

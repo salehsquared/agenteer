@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:51:03.614Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Analysis is unbound exploratory run, not a designed study",
+        "evidenceRefs": [
+          "stats-run.json resultPosture.status='exploratory_standard_table'",
+          "stats-run.json resultPosture.cannotSupport includes 'paper-ready conclusions'",
+          "manuscript.md lacks any study protocol or analysis plan"
+        ],
+        "whyItMatters": "The result cannot support the manuscript's implied inferential intent. Publishing exploratory output as a study misleads readers about the evidence level.",
+        "actionableFix": "Design a proper observational study with a pre-specified protocol, define the research question, and bind the analysis to a method-selection artifact before rerunning.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json.resultPosture.status == 'exploratory_standard_table'",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V01",
+        "severity": "blocker",
+        "category": "variables",
+        "title": "No variable definitions or data dictionary",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without definitions (units, coding, meaning) of outcome_cont, severity, age, treatment, the reported estimates are meaningless and cannot be interpreted or reproduced.",
+        "actionableFix": "Provide a detailed data dictionary that defines each variable, its type (continuous, binary, categorical), possible values, units, and how it was measured. Include this in the manuscript or a companion artifact.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": null,
+        "confidence": 0.99,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V02",
+        "severity": "blocker",
+        "category": "reproducibility",
+        "title": "Data source and ethical compliance not documented",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "The dataset is unnamed and lacks any ethics approval statement. This makes the study unreproducible and raises concerns about participant consent and data provenance.",
+        "actionableFix": "Describe the data source, ethics approval, and any data-sharing constraints. If the data cannot be shared, state this clearly and provide a minimal synthetic dataset that preserves the statistical properties for reproducibility checks.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": null,
+        "confidence": 0.99,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "study_design",
+        "title": "No cohort construction details provided",
+        "evidenceRefs": [
+          "manuscript.md 'Cohort Construction' section only states sample size, no inclusion/exclusion criteria"
+        ],
+        "whyItMatters": "Readers cannot assess selection bias or generalizability. The cohort may be highly selective, making associations non-generalizable.",
+        "actionableFix": "Define the source population, inclusion/exclusion criteria, and any matching or restriction explicitly in the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "No mention of eligibility criteria in manuscript.md",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "variables",
+        "title": "Exposure and covariate definitions missing",
+        "evidenceRefs": [
+          "manuscript.md 'Variables' section states details are in companion artifacts, but none are provided defining 'severity' or 'treatment'"
+        ],
+        "whyItMatters": "Without knowing if severity is ordinal, categorical, or continuous, and how treatment is coded, the regression coefficients are uninterpretable.",
+        "actionableFix": "Define each variable, including its scale and coding (e.g., severity: 1-10 scale; treatment: 0=placebo, 1=active).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Searching manuscript.md for 'severity' finds no definition; companion variables artifact not provided.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No confounding control rationale; minimal covariate adjustment",
+        "evidenceRefs": [
+          "manuscript.md only adjusts for age and treatment; no DAG or causal framework",
+          "stats-run.json variables = ['outcome_cont','severity','age','treatment']"
+        ],
+        "whyItMatters": "The phrase 'after adjustment' is meaningless without a defensible confounder selection strategy. Omitted confounders can bias the severity-outcome association.",
+        "actionableFix": "Develop a directed acyclic graph (DAG) to identify minimal sufficient adjustment set or state the study as unadjusted descriptive.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "No DAG or confounder discussion in any artifact.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reporting",
+        "title": "P-values reported as 0.0000 (impossible exact zero)",
+        "evidenceRefs": [
+          "manuscript.md Results: 'p=0.0000' for all estimates"
+        ],
+        "whyItMatters": "This misrepresents the precision of the p-value calculation and violates reporting standards (e.g., report <0.001 or exact value).",
+        "actionableFix": "Report p-values with appropriate precision or as '<0.001'. Use exact values from stats-run.json (e.g., const p=3.98e-28).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md contains 'p=0.0000' for every term.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Model assumption checks incomplete and not reported",
+        "evidenceRefs": [
+          "manuscript.md 'Limitations' states no explicit influence diagnostic evidence found, but diagnostics.json provides max Cook's distance; residual plot exists but not described",
+          "manuscript.md contains no assessment of linearity or homoscedasticity"
+        ],
+        "whyItMatters": "Linear regression validity relies on assumptions. Without checking linearity and homoscedasticity, the standard errors and p-values may be invalid.",
+        "actionableFix": "Report residual vs fitted plot, Q-Q plot, scale-location plot, and assess whether assumptions are met. Interpret diagnostic thresholds.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "No mention of 'residual vs fitted' or 'homoscedasticity' in manuscript.md.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Missing data handling not described",
+        "evidenceRefs": [
+          "manuscript.md mentions 'complete-case exclusion' in Limitations but original sample size and missingness pattern unknown"
+        ],
+        "whyItMatters": "Complete-case analysis can bias estimates if missingness is not MCAR. Reader cannot assess risk of bias.",
+        "actionableFix": "Report the number of missing records, compare complete vs incomplete cases on baseline characteristics, and consider sensitivity analysis (e.g., multiple imputation).",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "No missing-data table or description in artifacts.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V03",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Complete-case analysis without accounting for missing data",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "The manuscript mentions a complete-case sample of 240 but does not report the original sample size, number of missing values per variable, or any pattern of missingness. This can bias estimates if missingness is related to outcome or covariates.",
+        "actionableFix": "Report missingness patterns, consider multiple imputation or sensitivity analyses, and justify why complete-case analysis is adequate. At minimum, provide a table of missingness per variable.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V04",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Insufficient diagnostic checks for linear regression assumptions",
+        "evidenceRefs": [
+          "stats-run.json",
+          "diagnostics.json"
+        ],
+        "whyItMatters": "Only Shapiro–Wilk and leverage are reported. Homoscedasticity, linearity, and influence diagnostics are absent. For example, Breusch–Pagan test for heteroscedasticity and residual-vs-fitted plots are needed to support inference.",
+        "actionableFix": "Add and report heteroscedasticity tests, residual plots, and influence measures (e.g., DFBETAS). Include these in the diagnostics artifact.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V05",
+        "severity": "major",
+        "category": "causal_claims",
+        "title": "Causal interpretation despite exploratory posture",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "The objective 'How is severity associated with the continuous outcome after adjustment?' implies a causal relationship, yet the analysis is unadjusted for confounders (no covariate justification) and the run is declared exploratory. The manuscript's caveats do not fully retract the implication.",
+        "actionableFix": "Either reframe the question as purely associational without causal language, or, if causal, specify a DAG, adjust for confounders, and conduct sensitivity analyses. Clearly state that the current analysis does not support causal claims.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Influence diagnostics available but not discussed",
+        "evidenceRefs": [
+          "diagnostics.json max_cooks_distance = 0.0776",
+          "manuscript.md claims 'No explicit influence diagnostic evidence was found'"
+        ],
+        "whyItMatters": "The manuscript contradicts the data. Even if below typical threshold (0.5), it should be acknowledged.",
+        "actionableFix": "Mention the maximum Cook's distance and state it is not concerning, or investigate points with higher influence.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "diagnostics.json.max_cooks_distance != null and manuscript.md states no evidence found.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V06",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "p-values reported as 0.0000",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Statistically, p-values are never exactly zero. Reporting them as 0.0000 is inaccurate and may mislead readers about the strength of evidence. The underlying p-values are extremely small but not zero.",
+        "actionableFix": "Report p-values using standard conventions (e.g., p < 0.001) or with full precision (e.g., 1.97e-30).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "V07",
+        "severity": "minor",
+        "category": "literature",
+        "title": "No contextualization with prior work",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "The discussion lacks any reference to previous studies on the association between severity and the outcome. This omission makes it impossible to judge whether the estimates are plausible or novel.",
+        "actionableFix": "Add a brief literature review to situate the findings and discuss consistency with prior results.",
+        "reentryPoint": "literature",
+        "deterministicVerification": null,
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [],
+    "reentryPoint": "protocol",
+    "nextAction": "Route back to protocol with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-adjudication.json"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_1141862437954591230",
+  "method": "anova",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "group"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "C(group)",
+      "sum_sq": 37.55615773333331,
+      "df": 2,
+      "f_statistic": 1.4385158270118084,
+      "p_value": 0.23934374159285068
+    },
+    {
+      "term": "Residual",
+      "sum_sq": 3093.7474637625,
+      "df": 237,
+      "f_statistic": null,
+      "p_value": null
+    }
+  ],
+  "diagnostics": {
+    "model_family": "anova",
+    "aic": 1300.6503719016189,
+    "bic": 1311.0922886716448,
+    "df_resid": 237,
+    "residual_mean": -1.0894988614988204e-14,
+    "residual_sd": 3.597853534759813,
+    "shapiro_p_value": 0.38269057489017577,
+    "max_leverage": 0.012500000000000016,
+    "max_cooks_distance": 0.0535285941879534,
+    "vif": [
+      {
+        "term": "group_enhanced",
+        "vif": 1.3333333333333337
+      },
+      {
+        "term": "group_standard",
+        "vif": 1.3333333333333337
+      }
+    ],
+    "max_vif": 1.3333333333333337,
+    "test": "ANOVA"
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-config.json",
+      "sha256": "10e78838423de84f91f68ed8ebe6d7a070b5d6da6d86af45d6b5005031b6f1a9"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-summary.json",
+      "sha256": "52be04761101605dfefb5176cefcea1315d89361ee8e7dc5a2fdf00d91274864"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/estimates.csv",
+      "sha256": "474b468daca6ce560a3aaa65345e691e8bd6ef81c17d3f70f3e1b3ae841d0afc"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/diagnostics.json",
+      "sha256": "a7dfb9928a22332a3d708b7dd6f25a5a68ec41101f2715c25d182507e4450738"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/figures.json",
+      "sha256": "9c9ab830cde4746c153df38f523b320dc8f580a60ba91665a951f3750cf7cf4f"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/anova-group-distribution.png",
+      "sha256": "06b2ac5cca3af4f4d1a796b421f2e1a1caf5669eb81f40281d0cd19f5fb7edbf"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/figure-qa.json",
+      "sha256": "f4f079d1b5b02b410d9a46bec2db8421fc658aac0322eef202f46f2f3f4bd401"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-report.md",
+      "sha256": "2e405d2b2d8c4a950e27deb178e9df5e8bc588e99ab83e97ae1fe1947bff5e6e"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run/stats-qa.json",
+      "sha256": "49c0ffd6606edadd69dc1db849eea07bd8b95fd0c70c5e0fc0abe3cbab1340c8"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/04-anova-group-continuous/method-selection.json",
+    "methodSelectionId": "method_selection_04_anova_group_continuous",
+    "methodId": "one-way-anova",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

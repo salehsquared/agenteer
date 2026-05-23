@@ -1,0 +1,792 @@
+{
+  "schemaVersion": 1,
+  "studyCritic": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:50:02.302Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity",
+    "stage": "final",
+    "autonomy": "aggressive",
+    "generatedFiles": {
+      "reviewPacket": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-packet.json",
+      "redactionReport": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-redaction-report.json",
+      "panel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-panel.json",
+      "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-adjudication.json",
+      "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-response.json",
+      "stateReentry": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/state-reentry.json"
+    },
+    "panel": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:50:02.299Z",
+      "panelId": "review_panel_d045f3f5e266",
+      "stage": "final",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity",
+      "autonomy": "aggressive",
+      "budget": {
+        "maxPerCallUsd": 0.12,
+        "maxPanelUsd": 0.3,
+        "maxStudyLoopUsd": 5
+      },
+      "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-packet.json",
+      "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-redaction-report.json",
+      "reviewers": [
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T21:47:12.378Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778363232378",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:methods",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "clinical methods and study-design reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "block",
+          "summary": "The analysis is an unbound exploratory partial correlation with no model diagnostics, no confidence intervals, and inadequate confounding control. The manuscript omits essential reporting details and presents a misleading figure. The study is not suitable for clinical interpretation without fundamental redesign and pre-specification.",
+          "findings": [
+            {
+              "id": "no-model-diagnostics",
+              "severity": "blocker",
+              "category": "model_diagnostics",
+              "title": "Missing partial correlation diagnostics",
+              "evidenceRefs": [
+                "stats-run/diagnostics.json",
+                "stats-run/stats-run.json"
+              ],
+              "whyItMatters": "Partial correlation assumes linearity, homoscedasticity, and normality of residuals. Without diagnostic checks (e.g., residual plots, Q-Q plots, outlier detection), the estimate of 0.654 and the extremely small p-value (1.12e-30) may be unreliable or driven by artifacts.",
+              "actionableFix": "Generate and inspect partial regression plots, residuals vs. fitted values, and normality tests. If assumptions are violated, consider transformations, robust methods, or non-parametric alternatives. Document all diagnostics.",
+              "reentryPoint": "execution",
+              "deterministicVerification": "diagnostics.json contains only 'test' and 'n'; no entries for residual analysis or assumption checks.",
+              "confidence": 0.99
+            },
+            {
+              "id": "missing-confidence-interval",
+              "severity": "major",
+              "category": "reporting",
+              "title": "No confidence interval reported for partial correlation",
+              "evidenceRefs": [
+                "stats-run/stats-run.json",
+                "manuscript.md"
+              ],
+              "whyItMatters": "A p-value alone (even one as extreme as 1.12e-30) does not convey precision or practical significance. A 95% CI for the correlation is necessary to evaluate the range of plausible associations and to assess clinical relevance.",
+              "actionableFix": "Compute and report a 95% confidence interval for the partial correlation coefficient using appropriate methods (e.g., Fisher transformation). Include it in both the stats-run output and the manuscript.",
+              "reentryPoint": "execution",
+              "deterministicVerification": "stats-run.json.estimates[0] contains no 'ci_lower' or 'ci_upper' fields.",
+              "confidence": 0.99
+            },
+            {
+              "id": "exploratory-unbound",
+              "severity": "blocker",
+              "category": "study_design",
+              "title": "Analysis is unbound exploratory, not confirmatory",
+              "evidenceRefs": [
+                "stats-run/stats-run.json",
+                "stats-run/stats-qa.json"
+              ],
+              "whyItMatters": "The run lacks binding to a pre-specified method-selection or AnalysisSpec (binding.status = 'unbound'). This means the analysis model was not chosen a priori, inflating false-positive risk and undermining reproducibility. The manuscript does not clearly label the analysis as exploratory.",
+              "actionableFix": "Create an AnalysisSpec that prespecifies the covariates, model, and diagnostics. Bind the stats run to this spec. Rerun to ensure the same result is produced. Explicitly label the study as confirmatory or exploratory in the manuscript.",
+              "reentryPoint": "analysis_spec",
+              "deterministicVerification": "stats-run.json.binding.status === 'unbound'",
+              "confidence": 1
+            },
+            {
+              "id": "insufficient-confounding",
+              "severity": "major",
+              "category": "causal_claims",
+              "title": "Inadequate confounding adjustment justification",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Only age and treatment were adjusted for, without a directed acyclic graph (DAG) or clinical reasoning to support that these are sufficient to block backdoor paths. Unmeasured confounders could strongly bias the correlation estimate, and the high partial correlation may be residual confounding.",
+              "actionableFix": "Develop a DAG based on subject-matter knowledge; identify a minimal sufficient adjustment set. Include additional confounders if available, or acknowledge and discuss potential residual confounding. Consider sensitivity analyses like E-values.",
+              "reentryPoint": "protocol",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "missing-missingness-handling",
+              "severity": "major",
+              "category": "missingness",
+              "title": "Complete-case analysis without missing data evaluation",
+              "evidenceRefs": [
+                "manuscript.md",
+                "stats-run/stats-run.json"
+              ],
+              "whyItMatters": "The analytic sample of 240 is obtained by complete-case exclusion (completeCaseN = 240, but original N not reported). No assessment of missingness patterns or assumptions (MCAR, MAR, MNAR) is provided. If missingness is related to severity or outcome, the partial correlation may be biased.",
+              "actionableFix": "Report the proportion of missing data per variable, describe the missing data mechanism, and perform a sensitivity analysis (e.g., multiple imputation under MAR, or a pattern-mixture model). Discuss the potential impact on results.",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": "manuscript.md contains no missing data description; stats-run.json.completeCaseN equals rowCount, implying no exclusion process documented.",
+              "confidence": 0.97
+            },
+            {
+              "id": "misleading-figure",
+              "severity": "major",
+              "category": "figures",
+              "title": "Scatterplot uses raw variables, not partial residuals",
+              "evidenceRefs": [
+                "stats-run/figure-qa.json",
+                "stats-run/stats-run.json"
+              ],
+              "whyItMatters": "The correlation scatterplot plots severity against outcome_cont without adjustment for age and treatment. This visualizes the marginal association, not the partial correlation (0.654 after adjustment). Readers may incorrectly interpret the figure as representing the adjusted relationship, especially given the caption 'for the two variables used in the correlation run.'",
+              "actionableFix": "Generate and display a partial regression plot (e.g., residuals of outcome_cont regressed on age and treatment vs. residuals of severity regressed on age and treatment) with appropriate axis labels and caption clarifying the adjustment.",
+              "reentryPoint": "execution",
+              "deterministicVerification": "figure-qa.json.sourceColumns includes ['outcome_cont','severity'] but no mention of adjusted residuals; figure title is 'Correlation Scatterplot' without 'partial' reference.",
+              "confidence": 0.99
+            },
+            {
+              "id": "reporting-deficiencies",
+              "severity": "major",
+              "category": "reporting",
+              "title": "Manuscript lacks essential results and methodological detail",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "The manuscript contains only a generic methods description and no numeric results beyond sample size. Crucial information such as descriptive statistics, correlation coefficient interpretation, diagnostic outcomes, and software/tool specification is missing. This prevents critical appraisal and reproducibility.",
+              "actionableFix": "Revise the manuscript to include: a table of descriptive statistics for all variables, the adjusted correlation with 95% CI, a statement on clinical significance, a discussion of diagnostic results, and a complete methods section with software version and code availability.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": "manuscript.md sections 'Results' and 'Methods' do not contain numeric estimator output or diagnostic summaries.",
+              "confidence": 1
+            },
+            {
+              "id": "data-plausibility-unchecked",
+              "severity": "minor",
+              "category": "data_plausibility",
+              "title": "No data plausibility checks or variable description",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Readers cannot judge whether 'severity' and 'outcome_cont' have meaningful scales, reasonable ranges, or linear relationships. Outliers, zero variance, or non-normal distributions could have inflated the correlation. Without source documentation, the data quality is unverifiable.",
+              "actionableFix": "Provide a data dictionary with variable descriptions, units, and distributions. Include summary statistics (mean, SD, min, max, skewness, kurtosis) and note any variable transformations. If the data are sensitive, at least a de-identified summary should be available.",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            }
+          ],
+          "missingEvidence": [
+            "Residual diagnostic plots (e.g., partial regression plot, Q-Q plot)",
+            "Confidence interval for the partial correlation coefficient",
+            "Descriptive statistics table for all variables",
+            "Directed acyclic graph (DAG) for confounding structure",
+            "Missing data pattern analysis and original sample size before exclusion",
+            "Data source documentation (e.g., clinical context, measurement instruments)"
+          ],
+          "recommendedNextStage": "analysis_spec",
+          "costEstimate": {
+            "inputTokens": 3032,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026156,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review_deepseek_deepseek-v4-pro_methods_1778363232378.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review_deepseek_deepseek-v4-pro_methods_1778363232378.json"
+        },
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T21:47:12.396Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778363232396",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:reproducibility",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "statistical reporting and reproducibility reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "revise",
+          "summary": "The analysis is unbound and exploratory, lacking pre-specification, model diagnostics, and adequate reporting of missing data and variable encoding. Major issues in reproducibility and validity require revision before claims stronger than local exploration can be supported. Specific deficiencies: no assumption checks, potential figure quality problem, missing data handling, and unclear adjustment for categorical variables. Minor issues include missing confidence interval, self-contradictory statement, and absent literature context.",
+          "findings": [
+            {
+              "id": "F01",
+              "severity": "major",
+              "category": "reproducibility",
+              "title": "Analysis is unbound and exploratory; lacks pre-specification",
+              "evidenceRefs": [
+                "stats-run/stats-run.json (resultPosture)",
+                "stats-run/stats-qa.json (binding status)"
+              ],
+              "whyItMatters": "Without binding to a method-selection artifact or AnalysisSpec, the analysis cannot be considered confirmatory; p-values and confidence lack error-rate control, and the results are vulnerable to researcher degrees of freedom.",
+              "actionableFix": "Create a method-selection artifact and AnalysisSpec before analysis, or clearly label the entire analysis as exploratory and remove inferential language (e.g., p-values). Bind the run to these artifacts.",
+              "reentryPoint": "method_selection",
+              "deterministicVerification": null,
+              "confidence": 1
+            },
+            {
+              "id": "F02",
+              "severity": "major",
+              "category": "model_diagnostics",
+              "title": "No model diagnostics for partial correlation assumptions",
+              "evidenceRefs": [
+                "stats-run/diagnostics.json (only test and n)",
+                "manuscript.md (no mention of diagnostics)"
+              ],
+              "whyItMatters": "Partial correlation assumes linear relationships and normally distributed residuals; failure to check these assumptions can yield invalid point estimates and p-values, potentially leading to false conclusions.",
+              "actionableFix": "Run and report diagnostic checks: residual vs. fitted plots, Q-Q plots, scatterplots of each continuous variable against the other, and tests of linearity and normality. Include these in the diagnostics artifact and manuscript.",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 1
+            },
+            {
+              "id": "F03",
+              "severity": "major",
+              "category": "figures",
+              "title": "Scatterplot nonBlankRatio extremely low (0.06); potential data scaling issue",
+              "evidenceRefs": [
+                "stats-run/figure-qa.json (nonBlankRatio: 0.060036029202)"
+              ],
+              "whyItMatters": "A scatterplot with only 6% non-blank pixels suggests extreme range, outliers, or a plotting error; this may hide data quality problems and mislead visual interpretation.",
+              "actionableFix": "Manually inspect the generated scatterplot (correlation-scatter.png). If outliers or extreme values exist, verify data accuracy, adjust axes, or apply transforms. Re-render with appropriate scaling and re-check until nonBlankRatio is reasonable.",
+              "reentryPoint": "qa",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F04",
+              "severity": "major",
+              "category": "missingness",
+              "title": "Missing data reporting: no original sample size or missingness pattern",
+              "evidenceRefs": [
+                "manuscript.md (mentions complete-case 240)",
+                "stats-run.json (rowCount: 240)"
+              ],
+              "whyItMatters": "Complete-case analysis can introduce selection bias if missingness is not random; without reporting the initial cohort size, exclusions, and patterns, readers cannot assess the generalizability or validity of the results.",
+              "actionableFix": "Report total records before exclusions, describe missingness per variable, and consider multiple imputation or sensitivity analyses if missingness is non-trivial. Document the missing data mechanism assumption (MCAR/MAR).",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": null,
+              "confidence": 1
+            },
+            {
+              "id": "F05",
+              "severity": "major",
+              "category": "variables",
+              "title": "Variable encoding for adjustment variable 'treatment' not described",
+              "evidenceRefs": [
+                "stats-run/stats-run.json (variables list)"
+              ],
+              "whyItMatters": "Adjusting for a categorical variable like 'treatment' in partial correlation likely involves dummy coding, which affects degrees of freedom and interpretation. Without documentation, the analysis is not reproducible and the adjusted correlation may be computed incorrectly.",
+              "actionableFix": "Specify how 'treatment' was encoded (e.g., dummy coding with reference category, number of levels). Verify that the partial correlation implementation properly handles categorical adjusters. Include this in the analysis specification.",
+              "reentryPoint": "analysis_spec",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F06",
+              "severity": "minor",
+              "category": "reporting",
+              "title": "No confidence interval for partial correlation reported",
+              "evidenceRefs": [
+                "stats-run/stats-run.json (estimates array)"
+              ],
+              "whyItMatters": "A point estimate without a confidence interval limits interpretation of precision; the extremely small p-value alone does not convey the uncertainty around the correlation magnitude.",
+              "actionableFix": "Compute and report a confidence interval (e.g., Fisher's z transformation or bootstrap CI) for the partial correlation.",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 1
+            },
+            {
+              "id": "F07",
+              "severity": "minor",
+              "category": "reporting",
+              "title": "Manuscript self-contradiction about reader-facing artifact",
+              "evidenceRefs": [
+                "manuscript.md (line 'No reader-facing paper/manuscript artifact was found')"
+              ],
+              "whyItMatters": "This statement is contradictory in a reader-facing manuscript and may confuse readers about the status of the report.",
+              "actionableFix": "Remove or correct the statement to accurately reflect the presence of this manuscript artifact.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 1
+            },
+            {
+              "id": "F08",
+              "severity": "minor",
+              "category": "literature",
+              "title": "No comparison to existing literature or justification of method choice",
+              "evidenceRefs": [
+                "manuscript.md (no references)"
+              ],
+              "whyItMatters": "Even for a local dataset-grounded analysis, anchoring the methodology and findings in relevant literature helps readers assess novelty and contextualize the results.",
+              "actionableFix": "Include a brief literature review or explicitly state that the report is purely exploratory and does not claim to extend existing knowledge. Cite at least the method's original reference if standard.",
+              "reentryPoint": "literature",
+              "deterministicVerification": null,
+              "confidence": 0.8
+            }
+          ],
+          "missingEvidence": [
+            "Scatterplot image (correlation-scatter.png) not available for visual inspection",
+            "Detailed statistical report (stats-report.md) not included in review packet",
+            "Raw data not available to verify distributional assumptions or replicate results",
+            "Analysis script or step-by-step reproduction instructions missing"
+          ],
+          "recommendedNextStage": "analysis_spec",
+          "costEstimate": {
+            "inputTokens": 3032,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026156,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363232396.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review_deepseek_deepseek-v4-pro_reproducibility_1778363232396.json"
+        }
+      ],
+      "status": "block",
+      "costEstimateUsd": 0.052312,
+      "failureCount": 0,
+      "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-panel.json"
+    },
+    "adjudication": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:50:02.300Z",
+      "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-panel.json",
+      "verdict": "block",
+      "consensus": "split",
+      "acceptedFindings": [
+        {
+          "id": "no-model-diagnostics",
+          "severity": "blocker",
+          "category": "model_diagnostics",
+          "title": "Missing partial correlation diagnostics",
+          "evidenceRefs": [
+            "stats-run/diagnostics.json",
+            "stats-run/stats-run.json"
+          ],
+          "whyItMatters": "Partial correlation assumes linearity, homoscedasticity, and normality of residuals. Without diagnostic checks (e.g., residual plots, Q-Q plots, outlier detection), the estimate of 0.654 and the extremely small p-value (1.12e-30) may be unreliable or driven by artifacts.",
+          "actionableFix": "Generate and inspect partial regression plots, residuals vs. fitted values, and normality tests. If assumptions are violated, consider transformations, robust methods, or non-parametric alternatives. Document all diagnostics.",
+          "reentryPoint": "execution",
+          "deterministicVerification": "diagnostics.json contains only 'test' and 'n'; no entries for residual analysis or assumption checks.",
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "exploratory-unbound",
+          "severity": "blocker",
+          "category": "study_design",
+          "title": "Analysis is unbound exploratory, not confirmatory",
+          "evidenceRefs": [
+            "stats-run/stats-run.json",
+            "stats-run/stats-qa.json"
+          ],
+          "whyItMatters": "The run lacks binding to a pre-specified method-selection or AnalysisSpec (binding.status = 'unbound'). This means the analysis model was not chosen a priori, inflating false-positive risk and undermining reproducibility. The manuscript does not clearly label the analysis as exploratory.",
+          "actionableFix": "Create an AnalysisSpec that prespecifies the covariates, model, and diagnostics. Bind the stats run to this spec. Rerun to ensure the same result is produced. Explicitly label the study as confirmatory or exploratory in the manuscript.",
+          "reentryPoint": "analysis_spec",
+          "deterministicVerification": "stats-run.json.binding.status === 'unbound'",
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "missing-confidence-interval",
+          "severity": "major",
+          "category": "reporting",
+          "title": "No confidence interval reported for partial correlation",
+          "evidenceRefs": [
+            "stats-run/stats-run.json",
+            "manuscript.md"
+          ],
+          "whyItMatters": "A p-value alone (even one as extreme as 1.12e-30) does not convey precision or practical significance. A 95% CI for the correlation is necessary to evaluate the range of plausible associations and to assess clinical relevance.",
+          "actionableFix": "Compute and report a 95% confidence interval for the partial correlation coefficient using appropriate methods (e.g., Fisher transformation). Include it in both the stats-run output and the manuscript.",
+          "reentryPoint": "execution",
+          "deterministicVerification": "stats-run.json.estimates[0] contains no 'ci_lower' or 'ci_upper' fields.",
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "insufficient-confounding",
+          "severity": "major",
+          "category": "causal_claims",
+          "title": "Inadequate confounding adjustment justification",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Only age and treatment were adjusted for, without a directed acyclic graph (DAG) or clinical reasoning to support that these are sufficient to block backdoor paths. Unmeasured confounders could strongly bias the correlation estimate, and the high partial correlation may be residual confounding.",
+          "actionableFix": "Develop a DAG based on subject-matter knowledge; identify a minimal sufficient adjustment set. Include additional confounders if available, or acknowledge and discuss potential residual confounding. Consider sensitivity analyses like E-values.",
+          "reentryPoint": "protocol",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "missing-missingness-handling",
+          "severity": "major",
+          "category": "missingness",
+          "title": "Complete-case analysis without missing data evaluation",
+          "evidenceRefs": [
+            "manuscript.md",
+            "stats-run/stats-run.json"
+          ],
+          "whyItMatters": "The analytic sample of 240 is obtained by complete-case exclusion (completeCaseN = 240, but original N not reported). No assessment of missingness patterns or assumptions (MCAR, MAR, MNAR) is provided. If missingness is related to severity or outcome, the partial correlation may be biased.",
+          "actionableFix": "Report the proportion of missing data per variable, describe the missing data mechanism, and perform a sensitivity analysis (e.g., multiple imputation under MAR, or a pattern-mixture model). Discuss the potential impact on results.",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": "manuscript.md contains no missing data description; stats-run.json.completeCaseN equals rowCount, implying no exclusion process documented.",
+          "confidence": 0.97,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "misleading-figure",
+          "severity": "major",
+          "category": "figures",
+          "title": "Scatterplot uses raw variables, not partial residuals",
+          "evidenceRefs": [
+            "stats-run/figure-qa.json",
+            "stats-run/stats-run.json"
+          ],
+          "whyItMatters": "The correlation scatterplot plots severity against outcome_cont without adjustment for age and treatment. This visualizes the marginal association, not the partial correlation (0.654 after adjustment). Readers may incorrectly interpret the figure as representing the adjusted relationship, especially given the caption 'for the two variables used in the correlation run.'",
+          "actionableFix": "Generate and display a partial regression plot (e.g., residuals of outcome_cont regressed on age and treatment vs. residuals of severity regressed on age and treatment) with appropriate axis labels and caption clarifying the adjustment.",
+          "reentryPoint": "execution",
+          "deterministicVerification": "figure-qa.json.sourceColumns includes ['outcome_cont','severity'] but no mention of adjusted residuals; figure title is 'Correlation Scatterplot' without 'partial' reference.",
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "reporting-deficiencies",
+          "severity": "major",
+          "category": "reporting",
+          "title": "Manuscript lacks essential results and methodological detail",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "The manuscript contains only a generic methods description and no numeric results beyond sample size. Crucial information such as descriptive statistics, correlation coefficient interpretation, diagnostic outcomes, and software/tool specification is missing. This prevents critical appraisal and reproducibility.",
+          "actionableFix": "Revise the manuscript to include: a table of descriptive statistics for all variables, the adjusted correlation with 95% CI, a statement on clinical significance, a discussion of diagnostic results, and a complete methods section with software version and code availability.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": "manuscript.md sections 'Results' and 'Methods' do not contain numeric estimator output or diagnostic summaries.",
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F01",
+          "severity": "major",
+          "category": "reproducibility",
+          "title": "Analysis is unbound and exploratory; lacks pre-specification",
+          "evidenceRefs": [
+            "stats-run/stats-run.json (resultPosture)",
+            "stats-run/stats-qa.json (binding status)"
+          ],
+          "whyItMatters": "Without binding to a method-selection artifact or AnalysisSpec, the analysis cannot be considered confirmatory; p-values and confidence lack error-rate control, and the results are vulnerable to researcher degrees of freedom.",
+          "actionableFix": "Create a method-selection artifact and AnalysisSpec before analysis, or clearly label the entire analysis as exploratory and remove inferential language (e.g., p-values). Bind the run to these artifacts.",
+          "reentryPoint": "method_selection",
+          "deterministicVerification": null,
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F02",
+          "severity": "major",
+          "category": "model_diagnostics",
+          "title": "No model diagnostics for partial correlation assumptions",
+          "evidenceRefs": [
+            "stats-run/diagnostics.json (only test and n)",
+            "manuscript.md (no mention of diagnostics)"
+          ],
+          "whyItMatters": "Partial correlation assumes linear relationships and normally distributed residuals; failure to check these assumptions can yield invalid point estimates and p-values, potentially leading to false conclusions.",
+          "actionableFix": "Run and report diagnostic checks: residual vs. fitted plots, Q-Q plots, scatterplots of each continuous variable against the other, and tests of linearity and normality. Include these in the diagnostics artifact and manuscript.",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F03",
+          "severity": "major",
+          "category": "figures",
+          "title": "Scatterplot nonBlankRatio extremely low (0.06); potential data scaling issue",
+          "evidenceRefs": [
+            "stats-run/figure-qa.json (nonBlankRatio: 0.060036029202)"
+          ],
+          "whyItMatters": "A scatterplot with only 6% non-blank pixels suggests extreme range, outliers, or a plotting error; this may hide data quality problems and mislead visual interpretation.",
+          "actionableFix": "Manually inspect the generated scatterplot (correlation-scatter.png). If outliers or extreme values exist, verify data accuracy, adjust axes, or apply transforms. Re-render with appropriate scaling and re-check until nonBlankRatio is reasonable.",
+          "reentryPoint": "qa",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F04",
+          "severity": "major",
+          "category": "missingness",
+          "title": "Missing data reporting: no original sample size or missingness pattern",
+          "evidenceRefs": [
+            "manuscript.md (mentions complete-case 240)",
+            "stats-run.json (rowCount: 240)"
+          ],
+          "whyItMatters": "Complete-case analysis can introduce selection bias if missingness is not random; without reporting the initial cohort size, exclusions, and patterns, readers cannot assess the generalizability or validity of the results.",
+          "actionableFix": "Report total records before exclusions, describe missingness per variable, and consider multiple imputation or sensitivity analyses if missingness is non-trivial. Document the missing data mechanism assumption (MCAR/MAR).",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": null,
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F05",
+          "severity": "major",
+          "category": "variables",
+          "title": "Variable encoding for adjustment variable 'treatment' not described",
+          "evidenceRefs": [
+            "stats-run/stats-run.json (variables list)"
+          ],
+          "whyItMatters": "Adjusting for a categorical variable like 'treatment' in partial correlation likely involves dummy coding, which affects degrees of freedom and interpretation. Without documentation, the analysis is not reproducible and the adjusted correlation may be computed incorrectly.",
+          "actionableFix": "Specify how 'treatment' was encoded (e.g., dummy coding with reference category, number of levels). Verify that the partial correlation implementation properly handles categorical adjusters. Include this in the analysis specification.",
+          "reentryPoint": "analysis_spec",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "data-plausibility-unchecked",
+          "severity": "minor",
+          "category": "data_plausibility",
+          "title": "No data plausibility checks or variable description",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Readers cannot judge whether 'severity' and 'outcome_cont' have meaningful scales, reasonable ranges, or linear relationships. Outliers, zero variance, or non-normal distributions could have inflated the correlation. Without source documentation, the data quality is unverifiable.",
+          "actionableFix": "Provide a data dictionary with variable descriptions, units, and distributions. Include summary statistics (mean, SD, min, max, skewness, kurtosis) and note any variable transformations. If the data are sensitive, at least a de-identified summary should be available.",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F06",
+          "severity": "minor",
+          "category": "reporting",
+          "title": "No confidence interval for partial correlation reported",
+          "evidenceRefs": [
+            "stats-run/stats-run.json (estimates array)"
+          ],
+          "whyItMatters": "A point estimate without a confidence interval limits interpretation of precision; the extremely small p-value alone does not convey the uncertainty around the correlation magnitude.",
+          "actionableFix": "Compute and report a confidence interval (e.g., Fisher's z transformation or bootstrap CI) for the partial correlation.",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F07",
+          "severity": "minor",
+          "category": "reporting",
+          "title": "Manuscript self-contradiction about reader-facing artifact",
+          "evidenceRefs": [
+            "manuscript.md (line 'No reader-facing paper/manuscript artifact was found')"
+          ],
+          "whyItMatters": "This statement is contradictory in a reader-facing manuscript and may confuse readers about the status of the report.",
+          "actionableFix": "Remove or correct the statement to accurately reflect the presence of this manuscript artifact.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 1,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F08",
+          "severity": "minor",
+          "category": "literature",
+          "title": "No comparison to existing literature or justification of method choice",
+          "evidenceRefs": [
+            "manuscript.md (no references)"
+          ],
+          "whyItMatters": "Even for a local dataset-grounded analysis, anchoring the methodology and findings in relevant literature helps readers assess novelty and contextualize the results.",
+          "actionableFix": "Include a brief literature review or explicitly state that the report is purely exploratory and does not claim to extend existing knowledge. Cite at least the method's original reference if standard.",
+          "reentryPoint": "literature",
+          "deterministicVerification": null,
+          "confidence": 0.8,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        }
+      ],
+      "rejectedFindings": [],
+      "conflictNotes": [
+        "Reviewer verdicts differed: block, revise."
+      ],
+      "reentryPoint": "protocol",
+      "nextAction": "Route back to protocol with review-response decisions.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-adjudication.json"
+    },
+    "response": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T21:50:02.301Z",
+      "adjudicationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-adjudication.json",
+      "autonomy": "aggressive",
+      "decisions": [
+        {
+          "findingId": "no-model-diagnostics",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Generate and inspect partial regression plots, residuals vs. fitted values, and normality tests. If assumptions are violated, consider transformations, robust methods, or non-parametric alternatives. Document all diagnostics.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "exploratory-unbound",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Create an AnalysisSpec that prespecifies the covariates, model, and diagnostics. Bind the stats run to this spec. Rerun to ensure the same result is produced. Explicitly label the study as confirmatory or exploratory in the manuscript.",
+          "reentryPoint": "analysis_spec"
+        },
+        {
+          "findingId": "missing-confidence-interval",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Compute and report a 95% confidence interval for the partial correlation coefficient using appropriate methods (e.g., Fisher transformation). Include it in both the stats-run output and the manuscript.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "insufficient-confounding",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Develop a DAG based on subject-matter knowledge; identify a minimal sufficient adjustment set. Include additional confounders if available, or acknowledge and discuss potential residual confounding. Consider sensitivity analyses like E-values.",
+          "reentryPoint": "protocol"
+        },
+        {
+          "findingId": "missing-missingness-handling",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Report the proportion of missing data per variable, describe the missing data mechanism, and perform a sensitivity analysis (e.g., multiple imputation under MAR, or a pattern-mixture model). Discuss the potential impact on results.",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "misleading-figure",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Generate and display a partial regression plot (e.g., residuals of outcome_cont regressed on age and treatment vs. residuals of severity regressed on age and treatment) with appropriate axis labels and caption clarifying the adjustment.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "reporting-deficiencies",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Revise the manuscript to include: a table of descriptive statistics for all variables, the adjusted correlation with 95% CI, a statement on clinical significance, a discussion of diagnostic results, and a complete methods section with software version and code availability.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F01",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Create a method-selection artifact and AnalysisSpec before analysis, or clearly label the entire analysis as exploratory and remove inferential language (e.g., p-values). Bind the run to these artifacts.",
+          "reentryPoint": "method_selection"
+        },
+        {
+          "findingId": "F02",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Run and report diagnostic checks: residual vs. fitted plots, Q-Q plots, scatterplots of each continuous variable against the other, and tests of linearity and normality. Include these in the diagnostics artifact and manuscript.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F03",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Manually inspect the generated scatterplot (correlation-scatter.png). If outliers or extreme values exist, verify data accuracy, adjust axes, or apply transforms. Re-render with appropriate scaling and re-check until nonBlankRatio is reasonable.",
+          "reentryPoint": "qa"
+        },
+        {
+          "findingId": "F04",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Report total records before exclusions, describe missingness per variable, and consider multiple imputation or sensitivity analyses if missingness is non-trivial. Document the missing data mechanism assumption (MCAR/MAR).",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F05",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Specify how 'treatment' was encoded (e.g., dummy coding with reference category, number of levels). Verify that the partial correlation implementation properly handles categorical adjusters. Include this in the analysis specification.",
+          "reentryPoint": "analysis_spec"
+        },
+        {
+          "findingId": "data-plausibility-unchecked",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide a data dictionary with variable descriptions, units, and distributions. Include summary statistics (mean, SD, min, max, skewness, kurtosis) and note any variable transformations. If the data are sensitive, at least a de-identified summary should be available.",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F06",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Compute and report a confidence interval (e.g., Fisher's z transformation or bootstrap CI) for the partial correlation.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F07",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Remove or correct the statement to accurately reflect the presence of this manuscript artifact.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F08",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include a brief literature review or explicitly state that the report is purely exploratory and does not claim to extend existing knowledge. Cite at least the method's original reference if standard.",
+          "reentryPoint": "literature"
+        }
+      ],
+      "stateReentry": {
+        "status": "blocked",
+        "reentryPoint": "protocol",
+        "suggestedCommands": [
+          "agenteer research protocol-candidates --question <revised-question> --json",
+          "agenteer research method-select --question <revised-question> --json"
+        ],
+        "rerunReviewAfterRepair": true
+      },
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/review-response.json",
+      "stateReentryPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/09-partial-correlation-severity/review/state-reentry.json"
+    }
+  }
+}
+

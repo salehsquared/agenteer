@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:30:58.479Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "unanimous",
+    "acceptedFindings": [
+      {
+        "id": "F01",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Unsubstantiated claim of prespecification in an exploratory analysis",
+        "evidenceRefs": [
+          "stats-run.json: resultPosture.status == 'exploratory_standard_table' && binding.status == 'unbound'",
+          "manuscript.md: Abstract states 'prespecified study question' and 'prespecified clinical or public-health question'"
+        ],
+        "whyItMatters": "Claiming prespecification when the analysis was conducted post-hoc without a protocol inflates evidential rigor and misleads readers about the confirmatory nature of the work.",
+        "actionableFix": "Either remove all prespecification language and clearly label the analysis as exploratory, or re-run the analysis under a governed, pre-registered protocol with an AnalysisSpec.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json: resultPosture.status == 'exploratory_standard_table' AND manuscript.md contains 'prespecified'",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Missing essential study details",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Without a clear research question, population, exposure, and outcome definitions, the analysis is uninterpretable.",
+        "actionableFix": "State the pre-specified study question clearly: define the population, treatment groups, outcome (event of interest), and time scale. Provide a complete description of the cohort, including eligibility criteria and data source.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Survival probabilities reported without time points",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run.json"
+        ],
+        "whyItMatters": "Survival probability is meaningless without specifying the time point. The manuscript omits the times (493.146 and 354.29) for the reported estimates, making them uninterpretable.",
+        "actionableFix": "Report survival estimates at a clinically meaningful time point (e.g., 1 year) or at the last observed time, clearly stating the time along with survival probability and its confidence interval.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Verify that the time points match the reported probabilities.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F02",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No log-rank test or confidence intervals for survival comparison",
+        "evidenceRefs": [
+          "stats-run.json: estimates lack CI fields; no log-rank test mentioned",
+          "diagnostics.json: only contains test name and curve path"
+        ],
+        "whyItMatters": "Without a formal hypothesis test, the difference between survival curves cannot be statistically evaluated, and point estimates alone are insufficient for interpretation.",
+        "actionableFix": "Perform a log-rank test and compute confidence intervals for the survival curves or survival probabilities at clinically relevant time points.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "stats-run.json lacks 'logrank' key and no CI fields in estimates; diagnostics.json lacks 'p_value'",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F03",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Survival probabilities reported at arbitrary time points without context",
+        "evidenceRefs": [
+          "manuscript.md: Results list survival probability 0.3672 at time not given; stats-run.json estimates show time = 493.146 and 354.29"
+        ],
+        "whyItMatters": "The time points appear to be the maximum observed times, which can be misleading; conventional reporting uses predefined landmark times or medians, and the lack of time indicates obscures interpretation.",
+        "actionableFix": "Report survival at clinically meaningful times (e.g., 30-day, 1-year) or provide median survival with interquartile range. Include the estimated curve figure in the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md Results section mentions survival probabilities without specifying the time; stats-run.json estimates have time field with values 493.146 and 354.29 but none correspond to standard landmarks",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F04",
+        "severity": "major",
+        "category": "data_plausibility",
+        "title": "Group 1 shows zero survival, suggesting complete censoring or data issue",
+        "evidenceRefs": [
+          "stats-run.json: estimate for term='1' shows survival=0.0000",
+          "manuscript.md: Results states 'For 1, the survival probability was 0.0000' without comment"
+        ],
+        "whyItMatters": "A survival probability of zero typically means all events occurred before the last observation time, which may be implausible for many clinical contexts and could point to data errors, small sample, or follow-up length issues.",
+        "actionableFix": "Inspect raw data for group 1: number of events, censoring pattern, and time range. Discuss the biological/clinical plausibility of zero survival and consider alternative explanations (e.g., administrative censoring at a fixed time).",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "stats-run.json: estimates[1].survival == 0.0",
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F05",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Essential study details missing: variable definitions, data source, ethics, cohort eligibility",
+        "evidenceRefs": [
+          "manuscript.md: lacks any description of what 'treatment' codes represent, how 'survival_time' and 'event' were defined, the source of the data, inclusion/exclusion criteria, or ethical oversight"
+        ],
+        "whyItMatters": "Without these elements, the study is unreproducible and its clinical relevance cannot be assessed; any human-subject research requires ethics disclosure.",
+        "actionableFix": "Add a comprehensive Methods section detailing the dataset origin, enrollment period, operational definitions of variables, eligibility rules, and ethics committee approval or waiver.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "manuscript.md does not contain 'variable', 'data source', 'ethics', 'inclusion', or 'exclusion' in any substantial descriptive context",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F06",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Only complete-case analysis reported, no information on missing data",
+        "evidenceRefs": [
+          "manuscript.md: states 'The complete-case analytic sample included 240 records' but no prior count or missingness pattern described",
+          "stats-run.json: completeCaseN=240, but no mention of initial N"
+        ],
+        "whyItMatters": "Selective inclusion of complete cases can bias results if missingness is related to exposure or outcome; the absence of any missing-data description prevents assessment.",
+        "actionableFix": "Report the number of records excluded due to missing data, describe missingness patterns for each variable, and consider sensitivity analyses (e.g., multiple imputation) or justify the complete-case approach.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "manuscript.md mentions 'complete-case' but no number of excluded records; stats-run.json has no field for initialN",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F07",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Analysis not bound to method-selection or analysis spec, compromising reproducibility",
+        "evidenceRefs": [
+          "stats-run.json: binding.status = 'unbound'",
+          "stats-qa.json: binding-status check warning"
+        ],
+        "whyItMatters": "Reproducibility and trust in the results require that the analytical choices were made prior to seeing the outcomes; an unbound run is indistinguishable from ad-hoc data dredging.",
+        "actionableFix": "Create a method-selection artifact and an AnalysisSpec that declares the hypothesis, variables, and pre-specified analyses, then re-execute the pipeline in a governed environment.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "stats-run.json: binding.status == 'unbound'",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No confidence intervals for survival estimates",
+        "evidenceRefs": [
+          "stats-run.json"
+        ],
+        "whyItMatters": "Point estimates without confidence intervals (despite alpha=0.05) leave the precision of the estimates unknown, impairing reliability assessment.",
+        "actionableFix": "Report 95% confidence intervals for each survival estimate using Greenwood's formula. Include both text and tables.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Check that the CI calculation is correct and matches standard KM output.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No comparative test for two-group design",
+        "evidenceRefs": [
+          "stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "Two survival curves are presented but no formal comparison (e.g., log-rank test) is reported, leaving the question of treatment difference unanswered.",
+        "actionableFix": "Perform and report a log-rank test or Cox proportional hazards model with appropriate diagnostics (e.g., proportional hazards assumption).",
+        "reentryPoint": "method_selection",
+        "deterministicVerification": "Ensure the test statistic, degrees of freedom, and p-value are reported.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "data_plausibility",
+        "title": "Exploratory posture not disclosed; claims may overstate evidence",
+        "evidenceRefs": [
+          "stats-qa.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "The analysis is explicitly 'exploratory_standard_table' and cannot support paper-ready conclusions, yet the manuscript does not clearly disclose this, potentially misleading readers.",
+        "actionableFix": "Explicitly state that the analysis is exploratory, not pre-registered, and should not be used for decision-making. Remove any confirmatory language.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that the statement matches the 'resultPosture.cannotSupport' list.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Complete-case analysis without reporting missingness",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "No information on excluded records, reasons for missing data, or comparison of complete vs. incomplete cases is provided, risking selection bias.",
+        "actionableFix": "Report the initial sample size, number excluded for missing data, and compare characteristics. Consider sensitivity analyses for missingness.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Review the raw data to compute missingness proportions and patterns.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F8",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Raw data not provided; reproducibility limited",
+        "evidenceRefs": [],
+        "whyItMatters": "Without access to the raw data, independent verification of the analysis is impossible, undermining reproducibility claims.",
+        "actionableFix": "Include the de‑identified raw dataset or a detailed description of how to access it. Provide code/scripts used for data cleaning and analysis.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "Check that the dataset can be read and that the reported sample size and variables match.",
+        "confidence": 0.85,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Template placeholders and meta‑commentary in manuscript",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Lines like 'No reader-facing paper/manuscript artifact was found' appear to be internal QA remnants, not appropriate for a scientific manuscript.",
+        "actionableFix": "Remove all meta‑commentary and template language; ensure the manuscript is a self‑contained scientific report.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F08",
+        "severity": "info",
+        "category": "literature",
+        "title": "No literature review to contextualize findings",
+        "evidenceRefs": [
+          "manuscript.md: contains no references to prior studies"
+        ],
+        "whyItMatters": "The survival probabilities cannot be interpreted in isolation; similar patient cohorts may have known survival rates that would validate or challenge the present results.",
+        "actionableFix": "Include a brief literature review citing comparable Kaplan-Meier estimates for the same condition, and discuss how the present local sample compares.",
+        "reentryPoint": "literature",
+        "deterministicVerification": "manuscript.md text does not contain any citation markers (e.g., 'et al.', '[1]') or a reference list",
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [],
+    "reentryPoint": "protocol",
+    "nextAction": "Route back to protocol with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/review/review-adjudication.json"
+  }
+}

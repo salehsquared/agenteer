@@ -49,3 +49,8 @@
 - A failed model fit can be valuable validation evidence. The zero-inflated negative binomial stress run failed cleanly with a convergence blocker, while a better-shaped fixture succeeded.
 - Figure files are not enough. A generated study packet needs visual QA over dimensions, blankness, captions, alt text, axis labels, and source columns before a paper should be trusted as demo material.
 - Manual image review still matters after deterministic QA. The first pass showed technically nonblank plots with weak labels, which led to axis metadata and plot-label improvements.
+- External model review is most valuable when it is treated as a state-machine gate, not a decorative critique. The DeepSeek dual-review batch found real re-entry points: dataset feasibility, AnalysisSpec/method selection, manuscript repair, and exploration boundaries.
+- Reviewer prompts must be paired with parser tolerance. DeepSeek returned useful critiques with non-canonical stage labels; normalizing those labels preserved signal without weakening the schema.
+- A manuscript generator must prefer run context and declared research question over downstream review artifacts. Otherwise reviewer finding titles can contaminate regenerated papers.
+- Result extraction needs method breadth. Correlation, prediction metrics, tiny p-values, matched contrasts, survival summaries, and descriptive estimates each need explicit text paths rather than one generic estimate field.
+- Reviewer blocks are successful QA when they expose true limitations. The goal is not to force `pass`; it is to route the study back to the correct state with actionable defects.

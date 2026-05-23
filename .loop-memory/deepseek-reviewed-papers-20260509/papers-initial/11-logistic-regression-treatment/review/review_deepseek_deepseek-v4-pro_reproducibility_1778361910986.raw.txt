@@ -1,0 +1,135 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript contains critical reporting errors (confidence intervals on log-scale reported as odds ratios), omits a modeled variable from results, lacks any description of missing data handling, and presents an unbound exploratory analysis as a prespecified study. These issues undermine trustworthiness and interpretability. Revision of the manuscript and inclusion of essential methodological details are required before any promotional claim.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Misreporting of odds ratio confidence intervals: log-scale values presented as odds ratio CIs",
+      "evidenceRefs": [
+        "manuscript.md#Results",
+        "stats-run/stats-run.json#estimates"
+      ],
+      "whyItMatters": "The results section lists odds ratios but the accompanying 95% CI bounds are clearly on the log-odds scale (e.g., treatment OR=1.6092, CI=-0.1786 to 1.1301). This misleads readers about the precision and direction of effects; the true OR CI would be entirely above 1 for age/severity, but the log-scale CI includes negative values, which is nonsensical for an odds ratio.",
+      "actionableFix": "Replace the CI bounds in the Results text with the exponentiated values (or_ci_low, or_ci_high from stats-run.json). Clearly label that the CI is for the odds ratio. Remove the intercept odds ratio and its CI, as they have no clinical meaning.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "In manuscript.md, the line for treatment reads: 'odds ratio was 1.6092 (95% CI -0.1786 to 1.1301)'. In stats-run.json, the estimate for treatment has odds_ratio=1.6092, or_ci_low=0.8365, or_ci_high=3.0959. The reported CI matches ci_low/ci_high, which are log-odds estimates. This mismatch can be verified by comparing the two artifacts.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Omission of a model variable from results section",
+      "evidenceRefs": [
+        "manuscript.md#Results",
+        "stats-run/stats-run.json#estimates"
+      ],
+      "whyItMatters": "The manuscript's Results section lists only four terms (const, treatment, age, severity), but the statistical output shows five estimates including 'albumin'. Excluding a variable from the primary presentation without explanation creates a selective reporting bias and makes the model specification opaque.",
+      "actionableFix": "Either include the albumin coefficient/OR/CI/p-value in the Results table, or explicitly state why it was excluded (e.g., sensitivity analysis) and report its removal as a model selection step. If the model was meant to be parsimonious, that choice must be justified.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Count the number of terms under 'Results' in manuscript.md (4 terms). Compare with the length of the 'estimates' array in stats-run.json (5 objects, the 5th being 'albumin'). The omission is evident.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No information about missing data or complete-case exclusions",
+      "evidenceRefs": [
+        "manuscript.md#Cohort Construction",
+        "manuscript.md#Limitations"
+      ],
+      "whyItMatters": "The study uses complete-case analysis (n=240) but provides no details on how many records were originally available, how many were excluded due to missingness, or the pattern of missing variables. Unknown selection bias can distort associations. Without this information, the external validity and internal comparability are questionable.",
+      "actionableFix": "Add a flow diagram or table detailing the initial sample size, the number and reasons for exclusions, and a comparison of characteristics between included and excluded records. If missing data analysis (e.g., multiple imputation) is not performed, explain why and discuss potential bias.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Analysis is unbound and exploratory; manuscript claims prespecified question",
+      "evidenceRefs": [
+        "manuscript.md#Abstract",
+        "stats-run/stats-run.json#resultPosture"
+      ],
+      "whyItMatters": "The stats-run.json states the run is 'unbound', not governed by a method-selection or analysis-spec artifact, and its posture is 'exploratory_standard_table'. The manuscript, however, frames the study as answering a prespecified question. This mismatch inflates the strength of the evidence.",
+      "actionableFix": "Either (1) re-run the analysis after binding to a pre-registered protocol/analysis plan, or (2) clearly label the study as exploratory and downgrade all conclusions accordingly. The abstract should reflect the exploratory nature and note that no prespecification was in place.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "The 'resultPosture' field in stats-run.json explicitly says 'status: exploratory_standard_table' and 'cannotSupport: method-governed inference, paper-ready conclusions, causal claims'.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Inappropriate diagnostic statistic reported (Shapiro-Wilk on logistic residuals)",
+      "evidenceRefs": [
+        "stats-run/stats-run.json#diagnostics",
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "A Shapiro-Wilk test on residuals from a logistic regression is not a standard or valid check for model adequacy; logistic regression does not assume normal errors. Reporting a significant result (p<0.0001) may mislead readers into thinking the model is invalid. More appropriate diagnostics (Hosmer-Lemeshow, calibration, discrimination) are missing.",
+      "actionableFix": "Replace the Shapiro-Wilk test with appropriate logistic regression diagnostics: area under the ROC curve (c-statistic), Hosmer-Lemeshow goodness-of-fit or calibration plot, and a test for model separation (e.g., checking for extreme standard errors or quasi-complete separation). Document these in the manuscript.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "The diagnostics object in stats-run.json includes 'shapiro_p_value': 5.624175292591292e-8, while no c-statistic or HL test is present.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Continuous variable scaling not described; odds ratios lack per-unit context",
+      "evidenceRefs": [
+        "manuscript.md#Variables",
+        "stats-run/stats-run.json#estimates"
+      ],
+      "whyItMatters": "Age, severity, and albumin are continuous but the manuscript does not specify the units for which odds ratios are calculated. For example, an OR of 1.04 per year of age may be plausible, but per decade would be different. Without this, effect sizes are not interpretable or comparable.",
+      "actionableFix": "State the unit of measurement for each continuous predictor (e.g., per 1 year of age, per 1 point increase in severity score). Consider whether presenting OR for a clinically meaningful increment (e.g., 10 years) would be more useful. Add this to the Methods and Results sections.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Reporting of intercept as an odds ratio with p-value is unconventional and misleading",
+      "evidenceRefs": [
+        "manuscript.md#Results"
+      ],
+      "whyItMatters": "The intercept in logistic regression represents the log-odds of the outcome when all predictors are zero, which often has no substantive meaning. Presenting it as an odds ratio (0.0178) with a p-value implies it is a clinically relevant finding, which it is not. This distracts from the interpretable coefficients.",
+      "actionableFix": "Remove the intercept from the primary results table or, if included, label it clearly as not clinically interpretable and omit the p-value and CI. Focus on the predictor variables.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The first term listed in the Results section is 'const', with an odds ratio and p-value.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "QA artifacts are empty, indicating no verifiable quality checks",
+      "evidenceRefs": [
+        "stats-run/stats-qa.json",
+        "stats-run/figure-qa.json"
+      ],
+      "whyItMatters": "The stats-qa.json and figure-qa.json files appear to be empty (the artifact lists contain only filenames with no content). The manuscript claims deterministic methods checks, but no evidence of these checks is provided, undermining reproducibility trust.",
+      "actionableFix": "Provide populated QA artifacts with explicit checks (e.g., variable range validation, outcome distribution, model convergence, residual diagnostics) or explain why they are empty. If the QA pipeline is not operational, note that as a limitation.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "The uploaded stats-qa.json and figure-qa.json artifacts show only the file name and sha256; the actual content is absent (or empty objects after parsing). In contrast, diagnostics.json contains diagnostic metrics. The absence of QA results can be confirmed by comparing the content length of these artifacts with that of diagnostics.json.",
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Missing data flowchart and comparison of excluded vs included participants",
+    "Pre-registration or analysis plan (protocol) bound to this analysis",
+    "Calibration plot or Hosmer-Lemeshow statistic",
+    "C-statistic (AUC) for model discrimination",
+    "Separation diagnostic (e.g., variance inflation factor check for quasi-separation)",
+    "Variable scaling and units documentation",
+    "Population-level QA artifact content (not placeholder files)"
+  ],
+  "recommendedNextStage": "manuscript"
+}

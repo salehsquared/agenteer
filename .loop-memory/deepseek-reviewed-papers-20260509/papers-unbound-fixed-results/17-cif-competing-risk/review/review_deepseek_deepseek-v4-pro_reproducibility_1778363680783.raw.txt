@@ -1,0 +1,117 @@
+{
+  "verdict": "block",
+  "summary": "The study reports only point estimates of cumulative incidence without any statistical comparison, uncertainty measures, or essential methodological details. The analysis is exploratory and unfit for even dataset-bound interpretation.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "method_choice",
+      "title": "No formal statistical comparison between treatment groups",
+      "evidenceRefs": [
+        "stats-run.json: method 'aalen-johansen-cif' provides only unstratified CIF estimates per group, no test"
+      ],
+      "whyItMatters": "Without a hypothesis test or effect size with confidence interval, any claim about differences between groups is unsupported. The reader cannot assess whether the observed difference is due to chance.",
+      "actionableFix": "Perform a Gray's test or include a formal comparison (e.g., regression with treatment as covariate) and report p-values and confidence intervals for the difference in CIFs at a pre-specified time.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that a comparative procedure (e.g., cmprsk::cuminc with group variable) is run and outputs test statistics.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing uncertainty measures for cumulative incidence estimates",
+      "evidenceRefs": [
+        "stats-run.json: estimates contain only final_cumulative_incidence, no standard errors or CIs"
+      ],
+      "whyItMatters": "Point estimates alone are uninformative about precision. Users may overinterpret differences without knowing variability. CIFs without CIs are unsuitable for any inference.",
+      "actionableFix": "Provide 95% confidence intervals for each CIF (e.g., via Greenwood-type variance or bootstrap) and include them in the results table.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Verify that the output contains upper/lower CI bounds for each estimate.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Ambiguous 'final' cumulative incidence time point",
+      "evidenceRefs": [
+        "manuscript.md: 'final cumulative incidence' with no time specification"
+      ],
+      "whyItMatters": "CIFs depend on follow-up time. The 'final' time may differ per group due to last observed event, making direct comparison potentially invalid. Without a defined time horizon, reproducibility is compromised.",
+      "actionableFix": "Report CIFs at a clinically meaningful or pre-specified time point (e.g., 30-day, 1-year) with justification, and include the actual time value used.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Confirm that the time point is explicitly stated in the results and matches a fixed landmark.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Insufficient description of competing risk setup and variable definitions",
+      "evidenceRefs": [
+        "manuscript.md: no mention of how competing events, censoring, and event-of-interest codes were defined",
+        "stats-run.json: variables listed as survival_time, competing_event, treatment; diagnostics.json: event_of_interest_code=1"
+      ],
+      "whyItMatters": "Without clear definitions, the analysis is not interpretable. Readers cannot know if the competing event specification is clinically plausible or if censoring was inappropriately treated as a competing risk.",
+      "actionableFix": "Define: (1) what constitutes the event of interest (code 1), (2) what competing events were considered, (3) how censoring was handled (right-censoring indicator). Include a codebook or explicit statement in methods.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Confirm the manuscript contains a table or text specifying event types and coding.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Observational design with no consideration of confounding",
+      "evidenceRefs": [
+        "manuscript.md: acknowledges 'observational dataset analysis' but no covariates or adjustment",
+        "stats-run.json: variables list no confounders"
+      ],
+      "whyItMatters": "The crude CIF comparison may be biased if groups differ on prognostic factors. Even descriptive comparisons can be misleading without at least baseline characteristic comparison.",
+      "actionableFix": "Either adjust for confounders (e.g., via Fine-Gray model) or explicitly state that the analysis is purely exploratory and present a table of baseline characteristics by treatment to allow readers to assess potential confounding.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": "Check if adjusted analysis is performed or if a warning about unadjusted comparisons is prominent.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Result posture states exploratory, but manuscript structures as a study",
+      "evidenceRefs": [
+        "stats-run.json: resultPosture = 'exploratory_standard_table'",
+        "manuscript.md: sections like Abstract, Methods, Results suggest a standard research paper"
+      ],
+      "whyItMatters": "Misalignment between the exploratory nature of the run and the presentation may mislead readers into thinking the analysis is confirmatory.",
+      "actionableFix": "Either re-run with a pre-specified analysis plan (binding to an AnalysisSpec) or reframe the manuscript as an exploratory report with minimal conclusions.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Ensure the manuscript's title and abstract explicitly state 'exploratory analysis' and that conclusions are appropriately hedged.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "No code or data provided for full reproducibility",
+      "evidenceRefs": [
+        "manuscript.md: mentions artifacts inventory but no script or dataset link",
+        "stats-run.json: lists artifacts but not the raw data or analysis script"
+      ],
+      "whyItMatters": "Even dataset-bound evidence should be reproducible by a third party with the same data. The inability to rerun the exact steps undermines trust.",
+      "actionableFix": "Include the exact code (ideally with a reproducible workflow) and provide access to the de-identified dataset or a detailed description of its provenance.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that running the code on the provided data yields identical estimates.",
+      "confidence": 0.75
+    }
+  ],
+  "missingEvidence": [
+    "Standard errors or confidence intervals for cumulative incidence estimates.",
+    "Results of a formal statistical test comparing CIFs between groups (e.g., Gray's test).",
+    "Specification of the time point at which 'final' cumulative incidence was evaluated.",
+    "Detailed definition of competing events and censoring scheme.",
+    "Table of baseline characteristics by treatment group to assess confounding.",
+    "Code and data provenance for full replication."
+  ],
+  "recommendedNextStage": "execution"
+}

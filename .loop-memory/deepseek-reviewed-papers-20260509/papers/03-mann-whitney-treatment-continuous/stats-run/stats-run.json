@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_3816613422871283248",
+  "method": "mann-whitney",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "group_a": 0,
+      "group_b": 1,
+      "n_a": 96,
+      "n_b": 144,
+      "median_a": 20.0565,
+      "median_b": 23.076500000000003,
+      "statistic": 10079,
+      "p_value": 1.8599038046060571e-9
+    }
+  ],
+  "diagnostics": {
+    "test": "Mann-Whitney U",
+    "ties_possible": true
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-config.json",
+      "sha256": "2ee9e21d4d0d4985015871c1b7bb2c6f13e99c705a8a769d9c7add37ef40a5e2"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-summary.json",
+      "sha256": "169abcfdc89bd9801eda35eabe9f12fbd22501b26b551ea098f6272efdda9416"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/estimates.csv",
+      "sha256": "7b6b8da91f27d2f4ca61e1a7afc3ed9a38ff0e47e04ca0308826936f3c6c6992"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/diagnostics.json",
+      "sha256": "db32c7d2f31d074ff0ba63c43d9f798e3bf96d75af333f38b6fef7209c24e59a"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/figures.json",
+      "sha256": "f633e98e27e2e6c2a33f7499d94e727091bf2245fe06f86935b0f269526f1f95"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/group-distribution.png",
+      "sha256": "6dc4519d39f21c5683a8b0a0d6f79b50bda142f7a5740e8ce899939556cb84ca"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/figure-qa.json",
+      "sha256": "57566800d98a6277381d0660158241eb4270c2d0702ef9725f347253018a24e8"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-report.md",
+      "sha256": "cec1e92eac2ee6c48f6fc15d7291f5659ac6b4b69fb8d5ad57873381bcb3e30e"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-qa.json",
+      "sha256": "c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/method-selection.json",
+    "methodSelectionId": "method_selection_03_mann_whitney_treatment_continuous",
+    "methodId": "mann-whitney-u",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

@@ -1,5 +1,17 @@
 # Rejected Counter-Designs
 
+## Ticks 0409-0428
+
+- Rejected using only deterministic artifact QA for paper promotion. The DeepSeek panel found substantive missing-method and missing-results defects that deterministic QA had not blocked.
+- Rejected using a single DeepSeek reviewer per paper. Two same-provider but different-role reviewers produced useful disagreement and better coverage while staying inexpensive.
+- Rejected treating generated validation-table papers as publication-ready after manuscript repairs. The reviewers correctly identified remaining study-design, variable-definition, uncertainty, and assumption-reporting gaps.
+- Rejected hiding reviewer blocks in order to make the demo look better. The blocks are the product signal: they show where the pipeline must re-enter method selection, dataset feasibility, manuscript generation, or assumption QA.
+- Rejected broadening back to OpenAI/Anthropic/Gemini panels in this run. The user requested DeepSeek-only QA and the final 40/40 reviewer success rate was adequate for the current stress test.
+
+## Tick 0428
+
+- Rejected declaring the twentieth DeepSeek-reviewed paper complete merely because both reviewer calls succeeded. The correct outcome is a blocked/re-entry signal plus pipeline repairs, because the reviewers still found substantive prediction-validation and variable-definition gaps.
+
 ## Tick 0388
 
 - Rejected pretending MIMIC-IV can answer the full 2008-2022 CPT-based longitudinal SAVR/TAVR dialysis question. The run is explicitly a same-hospital MIMIC feasibility packet.

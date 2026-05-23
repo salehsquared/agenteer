@@ -22,6 +22,8 @@ Reviewer commands read normal environment variables. They also accept `--env-fil
 - `cheap`: DeepSeek plus xAI.
 - `strict`: Anthropic, OpenAI, and Gemini.
 - `all`: Anthropic, DeepSeek, OpenAI, Gemini, and xAI.
+- `deepseek-dual`: two independent DeepSeek v4 Pro reviewers with different roles: one clinical/methods reviewer and one statistical reporting/reproducibility reviewer. Use this when the runner is already GPT-based and you want a cheap external panel without Anthropic/OpenAI/Gemini spend.
+- `deepseek-triple`: three independent DeepSeek v4 Pro reviewers: clinical methods, code/phenotype definitions, and statistical reporting/reproducibility. Use this for coding-heavy medical studies where the code-set boundary is part of the methods risk.
 
 You can override the panel:
 
@@ -30,8 +32,7 @@ agenteer research study-critic \
   --run-dir ./run \
   --stage final \
   --env-file /Users/saleh/env_file \
-  --reviewer anthropic:claude-opus-4-7 \
-  --reviewer deepseek:deepseek-v4-pro \
+  --panel deepseek-dual \
   --autonomy aggressive
 ```
 

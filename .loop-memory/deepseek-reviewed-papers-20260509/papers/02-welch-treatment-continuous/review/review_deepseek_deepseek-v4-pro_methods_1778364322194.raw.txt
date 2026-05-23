@@ -1,0 +1,115 @@
+{
+  "verdict": "block",
+  "summary": "The study has critical gaps: no literature context, no information on treatment assignment or confounders, a potentially unusable figure, and misreported p-value. These issues prevent any meaningful interpretation and require substantial revision before promotion.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Observational design lacks any confounder control or treatment-assignment description",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without documentation of how treatment was assigned, whether there was randomization or which confounders were measured, the mean difference cannot be attributed to the treatment. Observational studies require at least a discussion of potential confounding, if not formal adjustment.",
+      "actionableFix": "Add a detailed description of the data source, treatment definition, eligibility criteria, and measured covariates. If confounding is plausible, either adjust for it or explicitly state that the unadjusted difference is purely descriptive and cannot support causal inference.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "literature",
+      "title": "No clinical or scientific context and zero literature citations",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "A standalone analysis without reference to prior work cannot place the findings in a meaningful context. This omission prevents assessment of novelty, plausibility, or clinical relevance.",
+      "actionableFix": "Add a background section with citations to relevant studies, explain the clinical significance of the outcome and treatment, and discuss expected effect sizes.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "figures",
+      "title": "Boxplot figure has extremely low nonBlankRatio (0.0278), likely unusable",
+      "evidenceRefs": [
+        "figure-qa.json"
+      ],
+      "whyItMatters": "A nonBlankRatio of 0.028 means only 2.8% of the image contains ink. The plot may be illegible, missing, or rendered incorrectly. This undermines the ability to visually assess distributions and potential outliers.",
+      "actionableFix": "Regenerate the figure ensuring the boxplot occupies a substantial portion of the canvas. Set appropriate figure dimensions and scaling. Verify visually that the output is informative.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Group-distribution.png nonBlankRatio=0.027872860635",
+      "confidence": 0.85
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No reporting of missing data or cohort flow from source to analytic sample",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The manuscript only mentions '240 complete-case records' without describing the original dataset size, exclusion criteria, or missingness patterns. Unreported missingness can introduce selection bias.",
+      "actionableFix": "Provide a cohort flow chart or table showing the number of records at each step (e.g., initial size, exclusions for missing outcome/treatment, other eligibility). Report the proportion missing and any exploration of missingness mechanisms.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "P-value is reported as 0.0000 instead of exact value or <0.0001",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Reporting p=0.0000 misrepresents the statistical result (actual p=3.83e-10). This violates standard reporting guidelines and could imply rounding to zero, which is inaccurate.",
+      "actionableFix": "Report the exact p-value to a few significant digits (e.g., p < 0.0001) or use the scientific notation 3.8e-10.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json estimates[0].p_value = 3.8287252527457425e-10",
+      "confidence": 1.0
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Incomplete claim‑safety: manuscript does not explicitly state that the difference may be entirely confounded",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The abstract and results sections present the mean difference and p-value without a strong, upfront caveat that confounding is uncontrolled. Readers may misinterpret the result as evidence of a treatment effect.",
+      "actionableFix": "Add a prominent statement in the abstract and results clarifying that the study design does not support causal interpretation and that unmeasured confounders could explain the observed difference.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "category": "reproducibility",
+      "title": "No accessible raw data, analysis code, or containerization for external reproducibility",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The run directory contains local artifacts, but without code and data sharing, independent verification is impossible. For a final‑stage manuscript, this limits trust in the results.",
+      "actionableFix": "Provide the analysis script, data (or synthetic version), and environment specification. At minimum, include a computational supplement with enough detail to rerun the analysis.",
+      "reentryPoint": "reproducibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Content of manuscript-qa.json (artifact referenced but not provided).",
+    "Full cohort construction details (initial sample size, exclusion criteria, missingness table).",
+    "Description of data source, treatment definitions, and potential confounders.",
+    "Visual inspection of group-distribution.png to confirm readability.",
+    "Literature references and clinical background."
+  ],
+  "recommendedNextStage": "manuscript"
+}

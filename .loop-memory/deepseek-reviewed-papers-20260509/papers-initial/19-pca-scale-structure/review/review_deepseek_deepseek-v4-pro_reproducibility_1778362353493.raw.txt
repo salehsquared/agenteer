@@ -1,0 +1,120 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript lacks essential reporting of PCA results, study objectives, and methodological justifications. The analysis is exploratory and unbound, yet presented with ambiguous claims. Key diagnostic and missing-data information is absent, and reproducibility is hampered by incomplete artifact access.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "No PCA results reported",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The manuscript's Results section contains only sample size; none of the PCA explained variance ratios or component loadings are presented or interpreted, making the study uninformative.",
+      "actionableFix": "Report the explained variance for each principal component, loadings, and possibly a scree plot interpretation. Discuss the structure and whether it suggests a single scale.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the manuscript contains numeric PCA estimates and a textual description of the factor structure.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "variables",
+      "title": "Ambiguous role of variable 'severity' in PCA",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Including an outcome variable (severity) with scale items in a PCA without justification could conflate distinct constructs and mislead interpretation. The study question is unclear, so the appropriateness of this variable selection cannot be evaluated.",
+      "actionableFix": "Clarify whether 'severity' is an indicator of the same latent construct or an external criterion. If the goal is scale validation, consider separate analyses (e.g., PCA on items only, then correlation with severity).",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Review analysis plan to confirm variable roles and justification for inclusion in PCA.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Missing PCA adequacy diagnostics",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "PCA requires assessing sampling adequacy (e.g., KMO, Bartlett's test), communalities, and inter-item correlations. Their absence leaves the suitability of PCA unverified.",
+      "actionableFix": "Provide and report a correlation matrix, KMO measure, Bartlett's test of sphericity, and possibly an anti-image correlation matrix. Discuss whether data are suitable for PCA.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Presence of KMO > 0.6 and significant Bartlett’s test (p < 0.05) in diagnostics.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Missing-data handling not described",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The analysis uses 240 complete cases, but no information is given about initial sample size, exclusion criteria, or missingness patterns. Selective complete-case analysis can bias results if missingness is non-random.",
+      "actionableFix": "Report the starting number of records, number and percentage of cases excluded due to missing data, and any sensitivity analyses performed.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check for a flow diagram or table describing subject exclusions and missing data.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Unbound exploratory analysis presented with ambiguous certainty",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The stats-run is 'unbound', i.e., not governed by a pre-specified analysis plan, and marked as exploratory. Yet the manuscript uses language like 'interpretable local evidence' and 'prespecified study question' without sufficient transparency on its exploratory nature.",
+      "actionableFix": "Explicitly label the analysis as exploratory and not confirmatory. Remove any implication of generalizability or clinical recommendation unless a protocol and binding are in place.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Inclusion of a statement like 'This is an exploratory analysis without pre-registration; results are hypothesis-generating only.'",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Incomplete artifact accessibility undermines reproducibility",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript and provided artifacts do not give clear access to the raw data, transformation code, or intermediate outputs (e.g., pca-transformed.csv, estimates.csv). The inventory lists files but they are not available for review, making independent verification impossible.",
+      "actionableFix": "Include all artifacts in the review packet or provide a public repository link. At minimum, supply the PCA-transformed dataset, correlation matrix, and config details.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "All referenced reproducible artifacts are accessible to the reviewer.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Contradictory statement about missing paper artifact",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript's limitations state 'No reader-facing paper/manuscript artifact was found,' which is self-contradictory and suggests a template error, reducing the document's professionalism.",
+      "actionableFix": "Remove or correct the conflicting statement.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The phrase no longer appears in the manuscript.",
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Prespecified study question and variable roles",
+    "Correlation matrix and PCA adequacy tests (KMO, Bartlett's)",
+    "Initial sample size before complete-case filtering",
+    "PCA transformed data (pca-transformed.csv)",
+    "Scree plot description and interpretation",
+    "Code or configuration for PCA execution",
+    "Date and source of dataset"
+  ],
+  "recommendedNextStage": "protocol"
+}

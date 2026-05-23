@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2992229236677189734",
+  "method": "pearson",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "severity"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "severity",
+      "correlation": 0.6578716230800155,
+      "p_value": 3.870555953990535e-31,
+      "n": 240,
+      "adjusted_for": ""
+    }
+  ],
+  "diagnostics": {
+    "test": "pearson",
+    "n": 240
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-config.json",
+      "sha256": "e5504ebee9d9957107f66f44cdada3d0c6c70d53973a7bbc4552e1b06f42893e"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-summary.json",
+      "sha256": "322e3847113a64a43ec8a25bf213a7c9391f7ab868787534ad3ce494e342f472"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/estimates.csv",
+      "sha256": "88a96739a5e338a9185cb14f1de906d7a18997c02532a0e24d44e79b5a984086"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/diagnostics.json",
+      "sha256": "e4c827275dfc3a061803c36a9926f83b92de337abab5d46b8457d181a7365d2c"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figures.json",
+      "sha256": "9d33b5e93fff337fd3971755e2734391a3fdb4cdd9c455aec59c5570b4099b31"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png",
+      "sha256": "4af05205d7a810c43715c82c9a5b4fb69aaf7a1f872a56d9e29883aba9593e24"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figure-qa.json",
+      "sha256": "cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-report.md",
+      "sha256": "475d293010b301beee8fb2e480d2041333ebd92c56e22c338fe66b3fcb350b96"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-qa.json",
+      "sha256": "c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/method-selection.json",
+    "methodSelectionId": "method_selection_08_pearson_severity_continuous",
+    "methodId": "pearson-correlation",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:22:38.226Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361758226",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "The study reports a Fisher exact test on 240 complete-case records showing an odds ratio of 2.78 and p=0.0005. However, the analysis is unbound and exploratory, critical reporting elements are missing (variable definitions, confidence interval, missingness analysis), and conclusions overstate the evidence. These issues must be resolved before the result can be considered for any inferential use.",
+    "findings": [
+      {
+        "id": "missing-variable-definitions",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Missing definitions of outcome, treatment, and covariates",
+        "evidenceRefs": [
+          "manuscript.md: Methods section states 'The primary outcome, exposure, and covariates were not fully encoded in the text report'"
+        ],
+        "whyItMatters": "Without clear variable definitions, readers cannot assess the clinical significance or potential confounding.",
+        "actionableFix": "Add explicit definitions of outcome_binary and treatment, and list any covariates considered.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check manuscripts for presence of definitions of outcome_binary and treatment.",
+        "confidence": 0.9
+      },
+      {
+        "id": "unbound-exploratory-analysis",
+        "severity": "blocker",
+        "category": "reproducibility",
+        "title": "Analysis not bound to a pre-specified analysis plan, making it exploratory yet presented as confirmatory",
+        "evidenceRefs": [
+          "stats-run/stats-qa.json: binding-status warning, result-posture warning",
+          "stats-run/stats-run.json: resultPosture status exploratory_standard_table"
+        ],
+        "whyItMatters": "An unbound analysis is vulnerable to p-hacking and lacks the integrity needed for evidence claims.",
+        "actionableFix": "Create and bind a method-selection artifact and AnalysisSpec before run, or clearly label the result as purely exploratory and not for inference.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Verify that stats-run.json binding has methodSelectionPath set and specHash valid, and that resultPosture status is bound.",
+        "confidence": 0.95
+      },
+      {
+        "id": "no-confidence-interval",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No confidence interval reported for the odds ratio",
+        "evidenceRefs": [
+          "stats-run/stats-run.json: estimates array only includes odds_ratio and p_value, no ci_lower/ci_upper"
+        ],
+        "whyItMatters": "Confidence intervals provide essential information about precision and clinical significance, beyond p-values.",
+        "actionableFix": "Compute and report 95% CI for odds ratio (e.g., using exact method from Fisher's test) and include in estimates and manuscript.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Check if estimates contain ci_lower and ci_upper fields.",
+        "confidence": 0.9
+      },
+      {
+        "id": "no-missingness-analysis",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Complete-case analysis without reporting missing data patterns or sensitivity",
+        "evidenceRefs": [
+          "manuscript.md: mentions complete-case n=240 but no missingness details",
+          "stats-run/stats-run.json: completeCaseN=240, no missingness diagnostics"
+        ],
+        "whyItMatters": "Missing data can bias results if non-random. Complete-case analysis may discard informative cases.",
+        "actionableFix": "Report the number and proportion of missing cases, compare characteristics of complete vs incomplete, and consider multiple imputation or sensitivity analysis.",
+        "reentryPoint": "exploration",
+        "deterministicVerification": "Look for missingness report artifact or documentation of excluded observations.",
+        "confidence": 0.9
+      },
+      {
+        "id": "overstated-conclusion",
+        "severity": "major",
+        "category": "causal_claims",
+        "title": "Conclusion of 'interpretable local evidence' overstates the exploratory nature",
+        "evidenceRefs": [
+          "manuscript.md: Abstract conclusion 'interpretable local evidence'",
+          "stats-run/stats-qa.json: result-posture 'cannotSupport paper-ready conclusions'"
+        ],
+        "whyItMatters": "Overclaiming can mislead readers about the strength of evidence, especially if no confounder adjustment or design rigor.",
+        "actionableFix": "Tone down conclusion to 'exploratory finding' and explicitly state that no causal inference should be drawn.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that the manuscript's conclusion uses exploratory language and disclaims causality.",
+        "confidence": 0.9
+      },
+      {
+        "id": "no-method-justification",
+        "severity": "minor",
+        "category": "method_choice",
+        "title": "No justification for Fisher's exact test over chi-square with n=240",
+        "evidenceRefs": [
+          "stats-run/stats-run.json: method 'fisher-exact'"
+        ],
+        "whyItMatters": "Standard approach for 2x2 tables with expected counts >5 is chi-square; Fisher's is typically for small samples or sparse tables. Method choice should be explained.",
+        "actionableFix": "Justify the choice, e.g., if any expected cell count <5, or if exact test preferred for robustness. Provide expected counts.",
+        "reentryPoint": "method_selection",
+        "deterministicVerification": "Check if expected counts are provided and any justification for Fisher's exact test is documented.",
+        "confidence": 0.7
+      },
+      {
+        "id": "no-data-availability",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "No raw data or data availability statement",
+        "evidenceRefs": [
+          "stats-run/stats-run.json: contains only summary tables, no data artifact"
+        ],
+        "whyItMatters": "Reproducibility requires access to underlying data; without it, results cannot be independently verified.",
+        "actionableFix": "Provide de-identified dataset or a clear data availability statement indicating where and under what conditions data can be accessed.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "Check for existence of a data file (e.g., CSV) with raw records.",
+        "confidence": 0.95
+      },
+      {
+        "id": "missing-figure-in-manuscript",
+        "severity": "minor",
+        "category": "figures",
+        "title": "Figure (contingency heatmap) not referenced or included in manuscript",
+        "evidenceRefs": [
+          "stats-run/figures.json: figureId contingency-heatmap.png",
+          "manuscript.md: no figure mentioned"
+        ],
+        "whyItMatters": "Figures enhance communication but must be integrated into the narrative; otherwise, they are disconnected.",
+        "actionableFix": "Incorporate the figure into the manuscript with proper caption and interpretation.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check that the manuscript PDF or text includes the figure and references it.",
+        "confidence": 0.9
+      }
+    ],
+    "missingEvidence": [
+      "Raw dataset",
+      "Variable definitions",
+      "Analysis specification",
+      "Confidence intervals",
+      "Missingness report",
+      "Method selection justification"
+    ],
+    "recommendedNextStage": "analysis_spec",
+    "costEstimate": {
+      "inputTokens": 3032,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026156,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361758226.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361758226.json"
+  }
+}

@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "reviewPanel": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:28:00.966Z",
+    "panelId": "review_panel_96d8856dea45",
+    "stage": "final",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity",
+    "autonomy": "aggressive",
+    "budget": {
+      "maxPerCallUsd": 0.12,
+      "maxPanelUsd": 0.3,
+      "maxStudyLoopUsd": 5
+    },
+    "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-packet.json",
+    "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-redaction-report.json",
+    "reviewers": [
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T21:25:08.944Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778361908944",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:methods",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "clinical methods and study-design reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The manuscript lacks essential variable definitions, making results uninterpretable. Additionally, missingness handling, model selection justification, reporting accuracy, and analysis binding are inadequate. These issues must be resolved before the manuscript can be reviewed further.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "variables",
+            "title": "Variable definitions are missing",
+            "evidenceRefs": [
+              "manuscript.md: lists variables (outcome_cont, severity, age, treatment) without definitions"
+            ],
+            "whyItMatters": "Readers cannot interpret the clinical meaning or scale of the variables, rendering the results unusable.",
+            "actionableFix": "Provide operational definitions for all variables (outcome_cont, severity, age, treatment) including units, possible ranges, and coding (e.g., treatment as binary).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check if manuscript.md includes explicit definitions for each variable; if not, block.",
+            "confidence": 1
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "method_choice",
+            "title": "Model selection not justified",
+            "evidenceRefs": [
+              "manuscript.md: 'The detected model family was linear'"
+            ],
+            "whyItMatters": "Without justification for linearity, alternative functional forms or non-linear models might be more appropriate, risking model misspecification.",
+            "actionableFix": "Document the process for selecting linear regression, including checks for linearity (e.g., residuals vs fitted plot, partial residual plots) and comparison to alternative models.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": "Check if manuscript or companion docs include model selection rationale beyond the generic statement; if not, major.",
+            "confidence": 0.9
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "missingness",
+            "title": "Missing data handling not described",
+            "evidenceRefs": [
+              "manuscript.md: 'complete-case sample size was 240'",
+              "stats-run.json: completeCaseN=240"
+            ],
+            "whyItMatters": "Complete-case analysis can introduce bias if missingness is not completely at random; the missingness mechanism is unknown.",
+            "actionableFix": "Report the number of records before exclusions, reasons for missingness, and consider sensitivity analysis or multiple imputation.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Check if missingness reporting includes initial N, exclusions, and missingness pattern; if not, major.",
+            "confidence": 1
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "causal_claims",
+            "title": "Analysis is unbound (post-hoc)",
+            "evidenceRefs": [
+              "stats-run.json: binding.status=unbound",
+              "stats-qa.json: warning binding-status"
+            ],
+            "whyItMatters": "Unbound analysis may have been data-driven, increasing risk of false positives and overfitting; conclusions are exploratory only.",
+            "actionableFix": "Bind the analysis to a pre-specified protocol or analysis plan. If not possible, clearly state that it is purely exploratory and cannot support confirmatory claims.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": "Check if stats-run.json binding.status equals 'bound' with a valid spec; if 'unbound', major.",
+            "confidence": 1
+          },
+          {
+            "id": "F5",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "Contradictory limitations in manuscript",
+            "evidenceRefs": [
+              "manuscript.md limitations: 'No reader-facing paper/manuscript artifact was found'",
+              "manuscript.md limitations: 'No explicit influence diagnostic evidence was found'",
+              "manuscript.md and diagnostics.json exist, latter has max_cooks_distance"
+            ],
+            "whyItMatters": "Inaccurate self-reporting undermines credibility and may confuse readers.",
+            "actionableFix": "Remove or correct the contradictory statements; confirm that influence diagnostics are reported if present.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check manuscript.md for the exact contradictory strings; if present, minor.",
+            "confidence": 1
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "P-values reported as 0.0000 and over-precision",
+            "evidenceRefs": [
+              "manuscript.md results: p=0.0000 for const, severity, age; p=0.0002 for treatment"
+            ],
+            "whyItMatters": "P=0.0000 is misleading as exact zero; standard practice is p<0.001; over-precision in CIs (4 decimals) not justified.",
+            "actionableFix": "Report p-values as <0.001 (or exact small values using scientific notation) and round estimates/CIs to reasonable precision (e.g., 2 decimal places).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check for string 'p=0.0000' in manuscript.md; if present, minor.",
+            "confidence": 1
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "literature",
+            "title": "No literature context provided",
+            "evidenceRefs": [
+              "manuscript.md: no references or prior studies"
+            ],
+            "whyItMatters": "Without literature context, it is unclear how these findings relate to existing evidence, and clinical relevance cannot be assessed.",
+            "actionableFix": "Add a brief literature review linking the study question and results to similar studies, or explicitly state that this is a novel local exploration.",
+            "reentryPoint": "literature",
+            "deterministicVerification": "Check if manuscript includes at least one external reference or explicit statement of literature gap; if none, minor.",
+            "confidence": 0.8
+          },
+          {
+            "id": "F8",
+            "severity": "minor",
+            "category": "data_plausibility",
+            "title": "Descriptive statistics not provided",
+            "evidenceRefs": [
+              "manuscript.md: no summary statistics",
+              "stats-run.json: no descriptive stats"
+            ],
+            "whyItMatters": "Without descriptive statistics (means, SDs, ranges), data quality and variable distributions are unknown, hindering interpretation.",
+            "actionableFix": "Include a table of descriptive statistics for all variables (N, mean, SD, min, max, missing for each).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check for a descriptive statistics table in the manuscript; if absent, minor.",
+            "confidence": 0.9
+          }
+        ],
+        "missingEvidence": [
+          "variable definitions (units, coding)",
+          "missing data flowchart and mechanism",
+          "pre-analysis protocol or analysis specification",
+          "data source and ethics approval documentation",
+          "model selection rationale",
+          "descriptive statistics table"
+        ],
+        "recommendedNextStage": "manuscript",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review_deepseek_deepseek-v4-pro_methods_1778361908944.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review_deepseek_deepseek-v4-pro_methods_1778361908944.json"
+      },
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T21:25:08.962Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361908962",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:reproducibility",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "statistical reporting and reproducibility reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The manuscript lacks a stated research question, variable definitions, and sufficient acknowledgment of its exploratory nature. Critical reporting gaps prevent meaningful interpretation and reproducibility.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "reporting",
+            "title": "Prespecified study question not stated",
+            "evidenceRefs": [
+              "manuscript.md"
+            ],
+            "whyItMatters": "Without the research question, the analysis cannot be interpreted, and the manuscript fails to meet basic reporting standards.",
+            "actionableFix": "Specify the exact study question, including the exposure, outcome, and hypothesis.",
+            "reentryPoint": "protocol",
+            "deterministicVerification": "Check if a protocol or analysis spec artifact exists and contains a hypothesis statement; if not, flag as missing.",
+            "confidence": 1
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "variables",
+            "title": "Outcome and predictor variables not defined",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run.json"
+            ],
+            "whyItMatters": "The outcome 'outcome_cont' and predictors are unlabeled, preventing readers from understanding what was measured. This renders the analysis unreproducible.",
+            "actionableFix": "Provide clear definitions of all variables, including measurement units and coding.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Verify variable names against data dictionary in run directory; if dictionary absent, request from data provider.",
+            "confidence": 1
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "causal_claims",
+            "title": "Analysis status is unbound exploratory, not acknowledged",
+            "evidenceRefs": [
+              "stats-run.json",
+              "manuscript.md"
+            ],
+            "whyItMatters": "The stats-run.json explicitly states the run is unbound and exploratory ('exploratory_standard_table'), but the manuscript does not clearly label the results as exploratory. This could mislead readers into thinking it is a confirmatory analysis.",
+            "actionableFix": "Add an explicit statement in the abstract and methods that this is an exploratory analysis without a pre-registered protocol, and results should be treated as hypothesis-generating.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check artifact 'stats-run.json' field 'resultPosture.status' for 'exploratory_standard_table' and confirm it's disclosed in manuscript.",
+            "confidence": 1
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "missingness",
+            "title": "No reporting of missing data patterns or justification for complete-case analysis",
+            "evidenceRefs": [
+              "manuscript.md"
+            ],
+            "whyItMatters": "The manuscript uses complete cases (N=240) but does not report the original sample size, amount of missingness, or patterns. If missingness is not MCAR, bias may result. This is a critical gap in transparency.",
+            "actionableFix": "Report the number and proportion of missing values for each variable, any patterns (e.g., monotone), and consider sensitivity analyses (e.g., MI, or at least discuss potential bias).",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": "Inspect raw data to compute missingness proportions; if data not available, request.",
+            "confidence": 0.9
+          },
+          {
+            "id": "F5",
+            "severity": "major",
+            "category": "reporting",
+            "title": "p-values reported as 0.0000",
+            "evidenceRefs": [
+              "manuscript.md",
+              "stats-run.json"
+            ],
+            "whyItMatters": "Displaying p-values as 0.0000 suggests zero probability when the actual values are extremely small but non-zero. This misrepresents the uncertainty and violates reporting guidelines.",
+            "actionableFix": "Report exact p-values in scientific notation (e.g., p < 1e-28) or as p < 0.001 if rounded, using appropriate significant digits.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Check that p-values in manuscript match those in stats-run.json but should not be formatted as 0.0000.",
+            "confidence": 1
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "model_diagnostics",
+            "title": "Linearity assumption not explicitly assessed",
+            "evidenceRefs": [
+              "diagnostics.json"
+            ],
+            "whyItMatters": "The model is linear, but no diagnostics for linearity (e.g., component-plus-residual plots, or tests for non-linearity) are presented. Without this, the adequacy of the linear model is unverified.",
+            "actionableFix": "Include residual vs. predictor plots or partial residual plots; consider adding higher-order terms or splines if departure is evident.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": "Review residual vs. fitted plot and component residual plots from stats-run/figures.json; if not present, request.",
+            "confidence": 0.8
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "data_plausibility",
+            "title": "No data distribution or summary statistics provided",
+            "evidenceRefs": [
+              "manuscript.md"
+            ],
+            "whyItMatters": "Readers cannot assess the range, outliers, or distribution of variables, which is necessary to interpret regression coefficients and ensure plausibility.",
+            "actionableFix": "Add a table of descriptive statistics (mean, SD, min, max, etc.) for all variables.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": "Generate summary statistics from raw data; if data not provided, request.",
+            "confidence": 0.9
+          },
+          {
+            "id": "F8",
+            "severity": "info",
+            "category": "reproducibility",
+            "title": "Companion variable artifact not found",
+            "evidenceRefs": [
+              "manuscript.md"
+            ],
+            "whyItMatters": "The manuscript directs readers to a 'companion variable artifact' for variable definitions, but this artifact is not provided in the packet. This hampers reproducibility.",
+            "actionableFix": "Include the variable definition file in the supplementary materials or directly in the manuscript.",
+            "reentryPoint": "dataset_feasibility",
+            "deterministicVerification": "Look for a file likely named something like 'variables.json' in the run directory; if not found, note.",
+            "confidence": 0.9
+          }
+        ],
+        "missingEvidence": [
+          "Original sample size and missing data summary",
+          "Variable definitions artifact",
+          "Figure QA details (figure-qa.json appears empty/incomplete)",
+          "Full stats-qa.json (only partial contents provided)",
+          "Residual plot and other diagnostic plots (model-residuals.png not viewable)",
+          "Study protocol or analysis plan (if exists)"
+        ],
+        "recommendedNextStage": "protocol",
+        "costEstimate": {
+          "inputTokens": 3033,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026157,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361908962.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361908962.json"
+      }
+    ],
+    "status": "block",
+    "costEstimateUsd": 0.052314,
+    "failureCount": 0,
+    "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/review/review-panel.json"
+  }
+}

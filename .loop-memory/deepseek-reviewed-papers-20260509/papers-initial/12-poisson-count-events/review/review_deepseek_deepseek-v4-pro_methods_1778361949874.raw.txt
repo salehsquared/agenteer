@@ -1,0 +1,135 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is critically flawed: it fails to specify the research question, models count data without addressing overdispersion or offset, ignores missing data handling, and provides insufficient reporting for evaluation. The result posture is exploratory, contradicting any claim of local evidence.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Prespecified research question and clinical context absent",
+      "evidenceRefs": [
+        "manuscript.md: title, abstract, introduction"
+      ],
+      "whyItMatters": "Without a clear question, the analytic choices (variables, model, confounding control) cannot be judged for appropriateness, and the findings lack clinical interpretation.",
+      "actionableFix": "Explicitly define the population, intervention/exposure, comparison, outcome, and time frame (PICOT), along with a prespecified analysis plan.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Check that the manuscript contains a sentence starting with 'The primary objective was to assess the association between...' with specific variables.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Poisson model likely misspecified: no offset or exposure variable for count events",
+      "evidenceRefs": [
+        "manuscript.md: Methods - Statistical Analysis",
+        "stats-run.json: variables"
+      ],
+      "whyItMatters": "Count outcomes (e.g., number of events per subject) typically require an offset term (log of follow-up time) to model rates correctly. Omitting it biases incidence rate ratios if follow-up varies.",
+      "actionableFix": "Include an offset variable (e.g., log(person-years)) in the Poisson regression, or justify its absence (e.g., all subjects have equal follow-up).",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "Inspect the stats-config.json for an offset term; if absent, flag as incomplete.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No overdispersion assessment or check for zero-inflation",
+      "evidenceRefs": [
+        "stats-run.json: diagnostics",
+        "diagnostics.json"
+      ],
+      "whyItMatters": "Poisson regression assumes equidispersion; real-world count data often exhibit overdispersion, leading to underestimated standard errors and inflated type I error. Zero-inflation further biases estimates.",
+      "actionableFix": "Report the deviance/df ratio, perform a dispersion test (e.g., dispersiontest in R), and consider negative binomial or zero-inflated models if needed.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if deviance/df > 1.5; if so, overdispersion likely.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Missing data handling unreported, complete-case analysis only",
+      "evidenceRefs": [
+        "manuscript.md: Limitations",
+        "stats-run.json: completeCaseN"
+      ],
+      "whyItMatters": "Complete-case analysis can introduce bias if missingness is related to outcome or covariates. The proportion and pattern of missingness are not disclosed, making results unreliable.",
+      "actionableFix": "Provide a missing data table, describe the missingness mechanism (MCAR/MAR/MNAR), and conduct sensitivity analyses (e.g., multiple imputation).",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "Inspect raw data for missingness rates; verify that no additional rows were excluded beyond those already removed.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "No descriptive statistics for study variables",
+      "evidenceRefs": [
+        "manuscript.md: Results"
+      ],
+      "whyItMatters": "Without summary statistics (Table 1), it is impossible to assess balance, range, outliers, or distribution of count_events, treatment, age, severity, which are essential for model interpretation.",
+      "actionableFix": "Include a table with n, mean, sd, median, IQR, min/max for continuous variables and counts/frequencies for categorical variables, stratified by exposure if relevant.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Presence of a Table 1 block in the manuscript with the above statistics.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Incomplete quality-assurance reporting",
+      "evidenceRefs": [
+        "stats-qa.json (truncated)",
+        "manuscript.md: QC section"
+      ],
+      "whyItMatters": "Only 7/9 QA checks passed; the nature of the failures is hidden, undermining confidence in the analysis reliability.",
+      "actionableFix": "Publish the full stats-qa.json and discuss any failed checks. If failures are trivial, justify; otherwise, rerun analysis with corrections.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Verify that stats-qa.json is complete and its status is not 'warning' at final promotion.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F07",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analysis not fully reproducible due to missing raw data and code",
+      "evidenceRefs": [
+        "manuscript.md: Reproducibility section",
+        "stats-run.json: binding"
+      ],
+      "whyItMatters": "The manuscript mentions only artifact hashes but does not provide the raw dataset, data dictionary, or analysis scripts. This prevents independent verification.",
+      "actionableFix": "Include a data availability statement, deposit de-identified data and code in a public repository, or document the exact software environment and seed.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that a 'reproduce.sh' script or README exists in the run directory that regenerates all artifacts from raw data.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F08",
+      "severity": "minor",
+      "category": "causal_claims",
+      "title": "Exploratory analysis presented as 'local evidence' with p-values",
+      "evidenceRefs": [
+        "stats-run.json: resultPosture",
+        "manuscript.md: Abstract, Discussion"
+      ],
+      "whyItMatters": "The result posture explicitly states the analysis is exploratory and cannot support 'paper-ready conclusions'. Yet the manuscript frames p-values and estimates as 'local evidence', risking overinterpretation.",
+      "actionableFix": "Downgrade the language to 'exploratory findings only' and remove p-values or clearly label them as unadjusted, hypothesis-generating.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that the Discussion begins with a statement matching the resultPosture label.",
+      "confidence": 0.85
+    }
+  ],
+  "missingEvidence": [
+    "Prespecified research question (PICOT)",
+    "Definition and unit of count_events (e.g., number of events, follow-up time)",
+    "Exposure/offset variable configuration",
+    "Overdispersion test results",
+    "Missing data table and sensitivity analysis",
+    "Descriptive statistics (Table 1)",
+    "Full stats-qa.json content",
+    "Data availability statement and analysis code"
+  ],
+  "recommendedNextStage": "protocol"
+}

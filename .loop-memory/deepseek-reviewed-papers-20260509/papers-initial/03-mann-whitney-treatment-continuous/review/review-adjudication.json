@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "reviewAdjudication": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:20:26.836Z",
+    "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-panel.json",
+    "verdict": "block",
+    "consensus": "split",
+    "acceptedFindings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Manuscript omits all key statistical results (test name, statistic, p-value, effect size)",
+        "evidenceRefs": [
+          "manuscript.md Results section",
+          "stats-run/stats-run.json estimates block"
+        ],
+        "whyItMatters": "Readers cannot evaluate the analysis or reproduce the findings; the central quantitative evidence is absent from the report.",
+        "actionableFix": "Explicitly state the Mann-Whitney U test, U = 10079, p < 0.001 (from estimate), group medians (20.06 vs 23.08), group sizes, and an effect-size measure (e.g., Hodges-Lehmann shift). Note the interpretation appropriate for a rank-based test.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Text search for 'Mann-Whitney' or 'p_value' in manuscript.md returns no matches.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F2",
+        "severity": "blocker",
+        "category": "reproducibility",
+        "title": "Analysis is unbound (no method-selection artifact or AnalysisSpec) but presented as if prespecified",
+        "evidenceRefs": [
+          "stats-run/stats-run.json binding.status = 'unbound'",
+          "stats-run/stats-qa.json checks: binding-status warning, result-posture warning",
+          "manuscript.md title claims 'prespecified study question'"
+        ],
+        "whyItMatters": "Without a pre-registered plan, the p-value is just an exploratory figure; presenting it as confirmatory inflates false-positive risk and misleads readers.",
+        "actionableFix": "Clearly label all results as exploratory and non-confirmatory. Remove the word 'prespecified' from title/abstract unless a pre-analysis plan is provided. Alternatively, create a method-selection artifact and re-run under binding.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "Binding status string 'unbound' is present in stats-run.json.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F01",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript inaccurately claims no p-value/effect-size estimates",
+        "evidenceRefs": [
+          "manuscript.md line: 'No estimate-like records were available for p-value/effect-size checks.'",
+          "stats-run.json: estimates array includes p_value=1.86e-9, median_a=20.06, median_b=23.08"
+        ],
+        "whyItMatters": "Directly contradicts the actual results, misleads readers about the presence of inferential statistics.",
+        "actionableFix": "Update the manuscript to accurately reflect the available estimates (including p-value and effect sizes) and discuss their interpretation under the exploratory design.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if the manuscript 'Limitations' section still contains the contradictory statement after the stats-run.json estimates are confirmed.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F02",
+        "severity": "major",
+        "category": "study_design",
+        "title": "Analysis is unbound and exploratory, but conclusion implies more certainty",
+        "evidenceRefs": [
+          "stats-qa.json: binding-status warning, resultPosture = exploratory_standard_table",
+          "stats-run.json: binding.status = unbound"
+        ],
+        "whyItMatters": "Without a pre-specified analysis plan, the risk of overinterpretation is high. The conclusion 'interpretable local evidence' does not adequately convey that the result is a post-hoc exploration.",
+        "actionableFix": "Explicitly label the result as exploratory and unvalidated. Add a statement that the findings cannot support clinical or causal inferences without a predetermined protocol and confounding control.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Verify that the manuscript's Discussion or Limitations section includes phrases like 'exploratory' and 'not pre-registered'.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F03",
+        "severity": "major",
+        "category": "missingness",
+        "title": "Complete-case analysis without description of missing data pattern or sensitivity",
+        "evidenceRefs": [
+          "manuscript.md: 240 complete-case records, no mention of total eligible or reasons for exclusion.",
+          "stats-run.json: completeCaseN = 240, no missingness diagnostics."
+        ],
+        "whyItMatters": "If missingness is non-ignorable, the estimates could be biased. The reader cannot judge selectability of the sample.",
+        "actionableFix": "Report the number of records excluded, reasons for missingness, and consider a sensitivity analysis (e.g., pattern-mixture or multiple imputation) or at minimum discuss potential bias.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Check for presence of a flow diagram and missing-indicator table in the revised manuscript.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F04",
+        "severity": "major",
+        "category": "variables",
+        "title": "No definitions or operationalization of outcome, treatment, or confounders",
+        "evidenceRefs": [
+          "manuscript.md: only mentions 'outcome_cont' and 'treatment'; stats-run.json variables array has only these two."
+        ],
+        "whyItMatters": "Without clinical context, the reader cannot assess measurement validity, relevance, or potential confounding. Any observed difference may be due to uncontrolled confounding.",
+        "actionableFix": "Provide variable dictionary, data provenance, and list potential confounders (or state why they are not needed). If no confounders are available, acknowledge that as a major limitation.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "Confirm that the manuscript includes a table describing variables with their units, coding, and collection methods.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F07",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Manuscript claims missing artifacts that actually exist",
+        "evidenceRefs": [
+          "manuscript.md: 'No reader-facing paper/manuscript artifact was found.' and 'No reader-facing report was available for claim alignment.'",
+          "stats-run/artifacts: includes stats-report.md (kind: report) and other reader-facing outputs."
+        ],
+        "whyItMatters": "Provokes confusion and undermines credibility of the review process.",
+        "actionableFix": "Remove the incorrect statements and ensure the artifacts listed match the actual run directory. If the statements refer to a separate paper artifact, clarify.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "The 'Limitations' section should no longer contain those bullet points.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "study_design",
+        "title": "No covariate adjustment for an observational comparison – potential confounding ignored",
+        "evidenceRefs": [
+          "stats-run/stats-run.json variables = ['outcome_cont','treatment'] only",
+          "manuscript.md mentions 'exposure, and covariates' but none are defined or used"
+        ],
+        "whyItMatters": "Observed group difference cannot be attributed to treatment without controlling for confounders; the naive comparison is prone to bias.",
+        "actionableFix": "Either declare the analysis purely unadjusted and discuss the risk of confounding, or include key covariates (if available) and use a regression or matched design. At minimum, provide a table of baseline characteristics by group.",
+        "reentryPoint": "analysis_spec",
+        "deterministicVerification": "Variable list in stats-run.json contains no covariate names.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "variables",
+        "title": "Variable definitions, units, and data source completely missing",
+        "evidenceRefs": [
+          "manuscript.md Methods: 'primary outcome, exposure, and covariates were not fully encoded'",
+          "No companion variable artifact or data dictionary provided"
+        ],
+        "whyItMatters": "Impossible to assess construct validity, measurement error, or external generalisability; the result is uninterpretable.",
+        "actionableFix": "Provide a data dictionary with variable names, descriptions, units, coding (e.g., 0=control, 1=treated), and a statement of data provenance (e.g., institutional registry, trial, survey).",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": "No artifact with 'variable' or 'data dictionary' in manifest; manuscript explicitly says 'not fully encoded'.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Template limitations contain false statements about missing artifacts",
+        "evidenceRefs": [
+          "manuscript.md Limitations: 'No reader-facing paper/manuscript artifact was found' (but manuscript.md exists)",
+          "'No estimate-like records were available for p-value/effect-size checks' (but stats-run.json contains estimates)"
+        ],
+        "whyItMatters": "Indicates the manuscript was not updated after analysis; such template errors erode trust in the reporting process.",
+        "actionableFix": "Rewrite limitations to reflect actual artifacts: state that estimates exist but are not yet embedded in the manuscript, and that binding is missing. Remove spurious negative claims.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Presence of estimates in stats-run.json vs. text claim of 'No estimate-like records'; presence of manuscript.md vs. claim of 'No reader-facing paper'.",
+        "confidence": 1,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F05",
+        "severity": "minor",
+        "category": "method_choice",
+        "title": "Mann-Whitney test with ties reported but no tie adjustment mentioned",
+        "evidenceRefs": [
+          "diagnostics.json: ties_possible = true",
+          "No description of how ties were handled."
+        ],
+        "whyItMatters": "Ties affect the test statistic distribution; failure to document the tie-breaking method undermines reproducibility.",
+        "actionableFix": "Specify the tie-handling method used (e.g., average ranks) in the Methods section. If the software default is used, state that explicitly.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Search for 'ties' in the revised manuscript; should be mentioned in the statistical analysis paragraph.",
+        "confidence": 0.8,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F06",
+        "severity": "minor",
+        "category": "study_design",
+        "title": "Imbalanced group sizes not discussed",
+        "evidenceRefs": [
+          "stats-run.json: n_a=96, n_b=144."
+        ],
+        "whyItMatters": "Imbalance can affect power and the robustness of the rank test if distribution shapes differ. May hint at selection bias.",
+        "actionableFix": "Comment on the imbalance, test for shape differences (e.g., Kolmogorov-Smirnov), and consider reporting standardized effect sizes.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Look for a sentence about group sizes and any diagnostics on distribution shape differences.",
+        "confidence": 0.75,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:methods"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F6",
+        "severity": "minor",
+        "category": "model_diagnostics",
+        "title": "Mann-Whitney ties handling not reported",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json: 'ties_possible': true",
+          "stats-run/stats-run.json diagnostics section"
+        ],
+        "whyItMatters": "Ties affect the p-value calculation; with continuous data they are usually rare, but failure to report handling leaves uncertainty about the reported p-value’s accuracy.",
+        "actionableFix": "State whether any ties were present (e.g., exact vs. approximate p-value), and if so, what correction (e.g., continuity correction, random jitter, exact permutation test) was applied.",
+        "reentryPoint": "qa",
+        "deterministicVerification": "Check diagnostic artifact for ties handling code – none present.",
+        "confidence": 0.9,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "figures",
+        "title": "Generated boxplot not referenced or discussed in manuscript",
+        "evidenceRefs": [
+          "stats-run/figure-qa.json: figure 'group-distribution.png' exists",
+          "manuscript.md contains no figure reference"
+        ],
+        "whyItMatters": "Visual evidence of group distributions is available but wasted; the figure could illustrate skew, outliers, and overlap, supporting the choice of a non-parametric test.",
+        "actionableFix": "Insert the boxplot with caption and brief interpretation in the Results section. Mention that the distributions suggest a location shift and any notable features (e.g., outliers, skew).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Image file hash listed, but text search for 'figure' or 'boxplot' in manuscript.md yields no relevant matches.",
+        "confidence": 0.95,
+        "reviewerIds": [
+          "deepseek:deepseek-v4-pro:reproducibility"
+        ],
+        "supportCount": 1
+      }
+    ],
+    "rejectedFindings": [],
+    "conflictNotes": [
+      "Reviewer verdicts differed: revise, block."
+    ],
+    "reentryPoint": "protocol",
+    "nextAction": "Route back to protocol with review-response decisions.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/review/review-adjudication.json"
+  }
+}

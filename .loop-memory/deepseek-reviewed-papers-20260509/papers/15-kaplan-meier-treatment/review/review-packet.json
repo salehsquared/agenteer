@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T22:15:52.036Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment",
+  "packetHash": "805ceb4ae762a5b300bbec066e2a322d839b749346dd5ea6cd7ed63c5486f8d2",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 29,
+    "includedFiles": 8,
+    "totalBytes": 116036,
+    "includedBytes": 20310
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3662,
+      "sha256": "f1b67aaa6238e2fc25a56460dcbc0599606e0a4519a0430f606fdb5ec9eceeae",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# How does event-free survival differ by treatment group\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How does event-free survival differ by treatment group?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was kaplan-meier. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How does event-free survival differ by treatment group? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nGrouping variable: treatment.\n\n### Statistical Analysis\n\nThe statistical method was kaplan-meier. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For 0, the survival probability was 0.3672.\n- For 1, the survival probability was 0.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 15 artifact(s). The artifact inventory hash is 6a4218d4c8a659795fcb215da3840deb2953637e045848cfc88d16db514ca6b8. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4410,
+      "sha256": "ef2fca604558dec1c6c6420f9fc210e94c42fe8cb09a0433ecffa3fd790939d8",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_3519104374464545063\",\n  \"method\": \"kaplan-meier\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"survival_time\",\n    \"event\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"0\",\n      \"time\": 493.146,\n      \"survival\": 0.3672338485262714\n    },\n    {\n      \"term\": \"1\",\n      \"time\": 354.29,\n      \"survival\": 0\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"Kaplan-Meier\",\n    \"curve_path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier-curve.csv\",\n    \"groups\": [\n      0,\n      1\n    ]\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-config.json\",\n      \"sha256\": \"9aee49d9cb2368337a1acc5d9e11badc5844dcc200768fb2ad834a43a39b3246\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-summary.json\",\n      \"sha256\": \"e7678346428f0393a58c7208e5863061453228fa62badfc208afef1c900012ce\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/estimates.csv\",\n      \"sha256\": \"b433af86993d86a0707adb326936419849b2c389e7c9db99b4fa9731e2f9a8d4\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/diagnostics.json\",\n      \"sha256\": \"6decfcd879f8c01125c72a1be2b14e85b1a8adefc33381218b084a27e9026e26\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figures.json\",\n      \"sha256\": \"b0840b893ea4d65ba95904b9a6059b40beed8247b0b777fdff16dfc6cbc7ee8d\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier.png\",\n      \"sha256\": \"d1db847d98e7503a28b1f0d13f684724cf8ef07db354ba5d3315caa71de7e576\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figure-qa.json\",\n      \"sha256\": \"738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-report.md\",\n      \"sha256\": \"01395d12f8ceb3fd0de0cc11c27d64ef1cf3570dff0117af5d7b7d64e526c0b6\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-qa.json\",\n      \"sha256\": \"5bce1658e4ee131451431066555043071d051575557cab9a05930bcbe1056720\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_15_kaplan_meier_treatment\",\n    \"methodId\": \"kaplan-meier-log-rank\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 227,
+      "sha256": "6decfcd879f8c01125c72a1be2b14e85b1a8adefc33381218b084a27e9026e26",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"Kaplan-Meier\",\n  \"curve_path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier-curve.csv\",\n  \"groups\": [\n    0,\n    1\n  ]\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1512,
+      "sha256": "5bce1658e4ee131451431066555043071d051575557cab9a05930bcbe1056720",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"2 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3547,
+      "sha256": "738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"kaplan-meier.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier.png\",\n      \"title\": \"Kaplan-Meier Survival Curve\",\n      \"caption\": \"Estimated survival curves by group.\",\n      \"altText\": \"Estimated survival curves by group.\",\n      \"xLabel\": \"Time\",\n      \"yLabel\": \"Survival probability\",\n      \"sourceColumns\": [\n        \"survival_time\",\n        \"event\",\n        \"treatment\"\n      ],\n      \"byteSize\": 33674,\n      \"sha256\": \"d1db847d98e7503a28b1f0d13f684724cf8ef07db354ba5d3315caa71de7e576\",\n      \"width\": 1125,\n      \"height\": 750,\n      \"nonBlankRatio\": 0.03193325116146772,\n      \"sampledColorBuckets\": 26,\n     "
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3547,
+      "sha256": "738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1192,
+      "sha256": "b0840b893ea4d65ba95904b9a6059b40beed8247b0b777fdff16dfc6cbc7ee8d",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2213,
+      "sha256": "03796735930a66288f647accfd21b68f97f99d7f109020d6f045e12a313b1c9c",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9738,
+      "sha256": "eb9f27e5822c8b556115b8b791d5c6d31bbc1647a6a5ab5fea97f61957581dcf",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1487,
+      "sha256": "60aee2be15a21a44b9c9d11f306dbfcbb247edbabcd44a4d952d762bd8349001",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4109,
+      "sha256": "a6d97a8e3f9d82209648ac2850340beda6ca7f91eb3d2bbc2503ea9dbc0593b0",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14356,
+      "sha256": "2177f3e8be8ea3e1ba08d83bb3b0bc16dbeadfbf3cb25d9dd415e2c4c9c8b12d",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/method-selection.json",
+      "relativePath": "method-selection.json",
+      "bytes": 832,
+      "sha256": "4deef27bf10912e4a23200f0bb5ce5b6a64d9d47437965df1184c868a5c9a808",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4305,
+      "sha256": "4b3a7a114e4561db3e69c9be33cd009ab497ed6bd17ae697c61e12bb982868be",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 789,
+      "sha256": "a8d45cf28e0919768e5bd222f6d484f90d378c895b7dc701cc706b3d00aac51a",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9869,
+      "sha256": "957f7a344134682a3d3ed2ef3537b6e83ed47ebe12d1beb5ac9d9f1185404386",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1013,
+      "sha256": "733e077b9673be0a47cfac7623fb4d4fdc4f169745b71627b1eca93bad6c7f8f",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 4669,
+      "sha256": "f50476c28087d6c6724f2720d2638107bcc2e23d42edbf6214c1da4f0c4a8674",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 61,
+      "sha256": "b433af86993d86a0707adb326936419849b2c389e7c9db99b4fa9731e2f9a8d4",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier-curve.csv",
+      "relativePath": "stats-run/kaplan-meier-curve.csv",
+      "bytes": 8291,
+      "sha256": "25eda29fa458e64097d6b6ee584573b2d1b0ea2792c1856dc2f8ae091e829eeb",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier.png",
+      "relativePath": "stats-run/kaplan-meier.png",
+      "bytes": 33674,
+      "sha256": "d1db847d98e7503a28b1f0d13f684724cf8ef07db354ba5d3315caa71de7e576",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 807,
+      "sha256": "9aee49d9cb2368337a1acc5d9e11badc5844dcc200768fb2ad834a43a39b3246",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1522,
+      "sha256": "01395d12f8ceb3fd0de0cc11c27d64ef1cf3570dff0117af5d7b7d64e526c0b6",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 204,
+      "sha256": "e7678346428f0393a58c7208e5863061453228fa62badfc208afef1c900012ce",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3662 bytes, sha256=f1b67aaa6238e2fc25a56460dcbc0599606e0a4519a0430f606fdb5ec9eceeae) ---\n# How does event-free survival differ by treatment group\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How does event-free survival differ by treatment group?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was kaplan-meier. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How does event-free survival differ by treatment group? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nGrouping variable: treatment.\n\n### Statistical Analysis\n\nThe statistical method was kaplan-meier. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For 0, the survival probability was 0.3672.\n- For 1, the survival probability was 0.0000.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 15 artifact(s). The artifact inventory hash is 6a4218d4c8a659795fcb215da3840deb2953637e045848cfc88d16db514ca6b8. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4410 bytes, sha256=ef2fca604558dec1c6c6420f9fc210e94c42fe8cb09a0433ecffa3fd790939d8) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_3519104374464545063\",\n  \"method\": \"kaplan-meier\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"survival_time\",\n    \"event\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"0\",\n      \"time\": 493.146,\n      \"survival\": 0.3672338485262714\n    },\n    {\n      \"term\": \"1\",\n      \"time\": 354.29,\n      \"survival\": 0\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"Kaplan-Meier\",\n    \"curve_path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier-curve.csv\",\n    \"groups\": [\n      0,\n      1\n    ]\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-config.json\",\n      \"sha256\": \"9aee49d9cb2368337a1acc5d9e11badc5844dcc200768fb2ad834a43a39b3246\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-summary.json\",\n      \"sha256\": \"e7678346428f0393a58c7208e5863061453228fa62badfc208afef1c900012ce\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/estimates.csv\",\n      \"sha256\": \"b433af86993d86a0707adb326936419849b2c389e7c9db99b4fa9731e2f9a8d4\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/diagnostics.json\",\n      \"sha256\": \"6decfcd879f8c01125c72a1be2b14e85b1a8adefc33381218b084a27e9026e26\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figures.json\",\n      \"sha256\": \"b0840b893ea4d65ba95904b9a6059b40beed8247b0b777fdff16dfc6cbc7ee8d\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier.png\",\n      \"sha256\": \"d1db847d98e7503a28b1f0d13f684724cf8ef07db354ba5d3315caa71de7e576\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figure-qa.json\",\n      \"sha256\": \"738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-report.md\",\n      \"sha256\": \"01395d12f8ceb3fd0de0cc11c27d64ef1cf3570dff0117af5d7b7d64e526c0b6\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/stats-qa.json\",\n      \"sha256\": \"5bce1658e4ee131451431066555043071d051575557cab9a05930bcbe1056720\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_15_kaplan_meier_treatment\",\n    \"methodId\": \"kaplan-meier-log-rank\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 227 bytes, sha256=6decfcd879f8c01125c72a1be2b14e85b1a8adefc33381218b084a27e9026e26) ---\n{\n  \"test\": \"Kaplan-Meier\",\n  \"curve_path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier-curve.csv\",\n  \"groups\": [\n    0,\n    1\n  ]\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1512 bytes, sha256=5bce1658e4ee131451431066555043071d051575557cab9a05930bcbe1056720) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"8/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"2 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"warning\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3547 bytes, sha256=738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"kaplan-meier.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/15-kaplan-meier-treatment/stats-run/kaplan-meier.png\",\n      \"title\": \"Kaplan-Meier Survival Curve\",\n      \"caption\": \"Estimated survival curves by group.\",\n      \"altText\": \"Estimated survival curves by group.\",\n      \"xLabel\": \"Time\",\n      \"yLabel\": \"Survival probability\",\n      \"sourceColumns\": [\n        \"survival_time\",\n        \"event\",\n        \"treatment\"\n      ],\n      \"byteSize\": 33674,\n      \"sha256\": \"d1db847d98e7503a28b1f0d13f684724cf8ef07db354ba5d3315caa71de7e576\",\n      \"width\": 1125,\n      \"height\": 750,\n      \"nonBlankRatio\": 0.03193325116146772,\n      \"sampledColorBuckets\": 26,\n     \n\n--- ARTIFACT stats-run/figure-qa.json (json, 3547 bytes, sha256=738efa9ae4791e74b2ae4329327037e8642a6c6fe51d44c947fef09a2dd7f572) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1192 bytes, sha256=b0840b893ea4d65ba95904b9a6059b40beed8247b0b777fdff16dfc6cbc7ee8d) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2213 bytes, sha256=03796735930a66288f647accfd21b68f97f99d7f109020d6f045e12a313b1c9c) ---\n"
+}

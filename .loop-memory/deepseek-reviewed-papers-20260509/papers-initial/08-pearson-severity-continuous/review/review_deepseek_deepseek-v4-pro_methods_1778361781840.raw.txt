@@ -1,0 +1,134 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is unbound, exploratory, and lacks essential diagnostic checks. The manuscript contains contradictory statements about available evidence, and critical methodological details (cohort construction, variable definitions, model assumptions) are missing or unverifiable. The result cannot support the claimed prespecified inference.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Analysis not bound to prespecification; result posture is exploratory",
+      "evidenceRefs": [
+        "stats-run/stats-run.json#resultPosture",
+        "stats-run/stats-run.json#binding",
+        "manuscript.md#Abstract (prespecified claim)"
+      ],
+      "whyItMatters": "The manuscript claims a prespecified study question, but the actual run is unbound and labeled 'exploratory_standard_table'. This invalidates any confirmatory interpretation and inflates false positive risk.",
+      "actionableFix": "Create and bind a formal method-selection artifact and AnalysisSpec before rerunning, or downgrade all claims explicitly to exploratory-only with no hypothesis testing.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Check that the stats-run binding object has methodSelectionPath, methodSelectionId, and analysisSpecPath populated and that the result posture changes to something other than exploratory.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "model_diagnostics",
+      "title": "No assumption checks for Pearson correlation",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json",
+        "stats-run/figures.json"
+      ],
+      "whyItMatters": "Pearson correlation requires linearity, bivariate normality, and absence of influential outliers. Without these checks, the point estimate and p-value may be severely misleading.",
+      "actionableFix": "Add residual diagnostics, Q-Q plots, outlier detection, and a formal test of bivariate normality (e.g., Mardia's test). Report the results and any remedies (e.g., transformation or robust alternative).",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Verify that the diagnostics artifact includes at least the Shapiro-Wilk test for each variable, a bivariate normality test, and a scatterplot with a loess smoother.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript falsely states no estimate records available",
+      "evidenceRefs": [
+        "manuscript.md#Limitations",
+        "stats-run/stats-run.json#estimates"
+      ],
+      "whyItMatters": "The manuscript claims that 'No estimate-like records were available for p-value/effect-size checks' while the run directory contains a correlation estimate (0.658) and a p-value (3.87e-31). This indicates either the manuscript was not updated or the review process missed existing artifacts, undermining credibility.",
+      "actionableFix": "Remove the incorrect statement and replace with a proper presentation of the estimate, confidence interval, and its interpretation boundary.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The manuscript Limitations section no longer contains the phrase 'No estimate-like records' and instead cites the correlation and p-value from the stats-run.json.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Cohort construction unreported and missingness unassessed",
+      "evidenceRefs": [
+        "manuscript.md#Cohort Construction",
+        "stats-run/stats-run.json#rowCount",
+        "stats-run/stats-run.json#completeCaseN"
+      ],
+      "whyItMatters": "The analytic sample of 240 complete cases is reported without any detail on the source population, exclusion criteria, or pattern of missingness. Selection bias or lack of generalizability cannot be evaluated.",
+      "actionableFix": "Provide a STROBE-style flow diagram showing initial data, exclusions, and final analytic sample. Compare complete-case demographics to the full dataset if possible. Include a missingness indicator analysis or sensitivity analysis.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "An artifact containing cohort-definition, eligibility rules, and a table of missingness proportions for each variable is present and referenced in the manuscript.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variable roles not defined; exposure/outcome unclear",
+      "evidenceRefs": [
+        "manuscript.md#Variables",
+        "stats-run/stats-run.json#variables"
+      ],
+      "whyItMatters": "Pearson correlation is symmetric; without specifying which variable is hypothesized as the exposure and which as the outcome, the clinical interpretation is ambiguous and prevents assessment of confounding or reverse causality.",
+      "actionableFix": "Explicitly declare the primary exposure and primary outcome, and clarify the study question (e.g., association between severity and continuous outcome). If the question is truly bidirectional, justify why Pearson is appropriate.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "The manuscript includes a sentence like 'The primary exposure was severity, and the primary outcome was outcome_cont.'",
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Figure QA artifact is truncated, figure integrity unverifiable",
+      "evidenceRefs": [
+        "figure-qa.json"
+      ],
+      "whyItMatters": "The figure-qa.json file is incomplete (ends mid-sentence), preventing reviewers from confirming that the scatterplot was properly generated, checked for axis labels, outliers, and non-blank ratio. This could hide data artifacts or rendering errors.",
+      "actionableFix": "Regenerate the figure-qa.json artifact with complete content. Ensure the file is not corrupted and that the QA checks for the figure are fully recorded.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "The figure-qa.json file ends with a valid closing bracket and contains a non-truncated 'summary' and all check details for the correlation scatterplot.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No reporting of 95% confidence interval for correlation",
+      "evidenceRefs": [
+        "stats-run/stats-run.json#estimates"
+      ],
+      "whyItMatters": "The p-value alone does not convey uncertainty magnitude. For a correlation of 0.658 with n=240, the confidence interval is narrow but should be reported to allow clinical interpretation.",
+      "actionableFix": "Compute and report the 95% CI (e.g., via Fisher's z transformation) in the results text and table.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "The stats-run.json estimates object contains a 'ci_lower' and 'ci_upper' field for the correlation term.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "causal_claims",
+      "title": "Causal wording not explicitly avoided in discussion",
+      "evidenceRefs": [
+        "manuscript.md#Discussion"
+      ],
+      "whyItMatters": "The discussion says findings should be interpreted as dataset-bound evidence, but the overall framing as a prespecified question could lead readers to overinterpret the correlation as predictive or explanatory without adjustment for confounders.",
+      "actionableFix": "Add a sentence explicitly stating no causal claims are supported and that confounding or reverse causation cannot be ruled out in this unadjusted bivariate analysis.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The Discussion includes the phrase 'no causal claims' or equivalent.",
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Cohort construction details (source population, inclusion/exclusion criteria, missingness patterns)",
+    "Variable definitions (units, distribution summary, clinical meaning of 'severity' and 'outcome_cont')",
+    "Model assumption diagnostics (normality tests, linearity check, outlier detection)",
+    "Complete figure-qa.json (current file is truncated)",
+    "manuscript-qa.json content (artifact listed but not provided in review package)",
+    "Binding evidence (analysis spec or method-selection artifact that prespecifies the study question and method choice)"
+  ],
+  "recommendedNextStage": "protocol"
+}

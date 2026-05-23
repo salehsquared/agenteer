@@ -1,0 +1,129 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript is a boilerplate template with critical omissions: it reports the wrong sample size, fails to report substantial residual imbalance, presents a suspiciously perfect risk balance, omits diagnostics, and lacks essential reproducibility details. The analysis is not ready for promotion and requires a complete rewrite and additional diagnostic checks.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript is an incomplete template lacking essential study details",
+      "evidenceRefs": [
+        "manuscript.md sections: Introduction, Methods, Results, Discussion"
+      ],
+      "whyItMatters": "The manuscript does not contain any specific information about the dataset, variables, rationale, or interpretation beyond generic boilerplate, making it unsuitable as a scientific report.",
+      "actionableFix": "Rewrite the manuscript to include a clear problem statement, description of the data source and variables, detailed methods including propensity model specification and matching algorithm, results with balance tables and effect estimates, and a discussion of limitations and implications.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Reported sample size in Results is the complete-case N (240) rather than the matched analysis sample (134, 67 pairs)",
+      "evidenceRefs": [
+        "manuscript.md Results section: 'The complete-case analytic sample included 240 records.'",
+        "stats-run.json: estimates.treated_n=67, control_n=67, matched_pairs=67"
+      ],
+      "whyItMatters": "Misleadingly suggests the analysis used all 240 subjects, but the propensity-matched contrast only includes 134 subjects, altering interpretation of precision and generalizability.",
+      "actionableFix": "Report the number of matched pairs and the number of subjects used in the final analysis. Clearly distinguish between the initial cohort and the effective sample after matching.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify that the manuscript states the correct analysis sample size and provides a flow diagram or description of exclusions.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Substantial covariate imbalance remains after matching (all covariates have SMD > 0.1, max 0.233)",
+      "evidenceRefs": [
+        "stats-run.json: balance covariates_over_0_1_after = 3, max_abs_smd_after=0.233, mean_abs_smd_after=0.187"
+      ],
+      "whyItMatters": "Residual imbalance can bias the treatment effect estimate, and the manuscript's claim of interpretable local evidence is weakened without acknowledging this.",
+      "actionableFix": "Report the balance statistics before and after matching in a table. Discuss the potential impact of residual imbalance on the results and consider additional adjustments (e.g., double-robust methods) or sensitivity analyses.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Confirm that balance metrics are reported and interpreted. If imbalance persists, perform sensitivity tests.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "blocker",
+      "category": "data_plausibility",
+      "title": "Perfectly equal risks in treated and control groups (both exactly 0.31343283582089554) raises suspicion of data or methodological error",
+      "evidenceRefs": [
+        "stats-run.json: estimates.treated_risk, control_risk values"
+      ],
+      "whyItMatters": "An exactly zero risk difference and exactly equal proportions to 14 decimal places is unlikely in real-world data and may indicate that the outcome was included as a covariate, the matching algorithm inadvertently balanced the outcome, or data were duplicated. This invalidates the results if not explained.",
+      "actionableFix": "Investigate the data and matching process to determine why the outcome proportions are identical. Provide raw outcome frequencies in matched groups. If the result is correct, provide a plausible explanation and discuss its implications.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": "Check the matched-pairs.csv to compute outcome counts manually and confirm identity. If identical, examine raw data and matching procedure.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "study_design",
+      "title": "77 of 144 treated units (53%) were unmatched and excluded, substantially reducing generalizability of ATT estimand",
+      "evidenceRefs": [
+        "stats-run.json: unmatched_treated=77, treated_total=144"
+      ],
+      "whyItMatters": "The ATT is defined on the treated population, but discarding over half of the treated units means the estimated effect applies only to a subset of treated subjects that are matchable, which may be different from the original treated group. This is not discussed.",
+      "actionableFix": "Report the proportion of unmatched treated/control, discuss the characteristics of unmatched units (e.g., compare propensity scores), and consider sensitivity analyses (e.g., trimming, weighting) or present the target population clearly.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Generate a table comparing matched vs. unmatched treated on covariates and propensities.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No diagnostic information provided for the propensity score logistic regression model (separation, collinearity, influence)",
+      "evidenceRefs": [
+        "manuscript.md Limitations: 'Logistic-type model detected; explicit separation diagnostic evidence was not found. No explicit collinearity diagnostic evidence was found. No explicit influence diagnostic evidence was found.'",
+        "stats-run/diagnostics.json not supplied in artifact packet"
+      ],
+      "whyItMatters": "If the propensity model suffers from separation or collinearity, the estimated propensity scores may be unreliable, compromising the matching. Without diagnostics, confidence in the analysis is low.",
+      "actionableFix": "Provide diagnostic outputs (e.g., variance inflation factors, condition indices, separation checks) for the propensity model. If diagnostics cannot be performed, state the model specification and note limitations.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "Examine diagnostics.json and any model outputs. If missing, re-run model with appropriate diagnostic tests.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Insufficient information for independent reproduction; key artifacts (diagnostics, figures) missing or empty",
+      "evidenceRefs": [
+        "manuscript.md: no code, no data dictionary, no seed set",
+        "stats-run.json: includes parameter list but no software version",
+        "figure-qa.json indicates 0 figures passed"
+      ],
+      "whyItMatters": "Reproducible research requires access to data, analysis scripts, and software environment. A reader cannot verify or reproduce the matching analysis from the provided materials.",
+      "actionableFix": "Include the source code (or detailed algorithm), the data (if permissible), and the seed for the random matching process. Provide all diagnostic outputs and figures (e.g., propensity score distribution, love plot) in the manuscript or supplementary materials.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Attempt to replicate the matching results using the provided inputs and code.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "figures",
+      "title": "No figures were generated or included in the report",
+      "evidenceRefs": [
+        "stats-run.json: issues contains FIGURE_QA_WARNING: 0/0 figure(s) passed",
+        "manuscript.md no figure references"
+      ],
+      "whyItMatters": "For a propensity score analysis, standard visualizations (propensity score distributions, balance plots) enhance transparency and aid interpretation. Their absence reduces the report's credibility.",
+      "actionableFix": "Generate and include at least a histogram/density plot of propensity scores by treatment group and a love plot showing SMD before and after matching.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that figures are properly referenced and interpretable.",
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Content of stats-run/diagnostics.json is missing from the artifact packet; only the header is present.",
+    "No raw data or variable definitions provided.",
+    "No analytical code or software environment details."
+  ],
+  "recommendedNextStage": "manuscript"
+}

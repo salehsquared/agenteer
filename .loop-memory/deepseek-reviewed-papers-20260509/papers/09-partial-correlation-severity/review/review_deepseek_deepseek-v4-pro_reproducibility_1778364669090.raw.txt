@@ -1,0 +1,102 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript fails to report the primary result (partial correlation and p-value) in the Results section. Model diagnostics are missing. No confidence interval is provided. Critical reporting and review gaps prevent use as evidence.",
+  "findings": [
+    {
+      "id": "no-results-in-manuscript",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Primary analysis result absent from manuscript",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Readers cannot assess the study's main finding without the partial correlation estimate and its uncertainty in the manuscript body.",
+      "actionableFix": "Add the partial correlation coefficient (0.654), p-value, and a confidence interval for the correlation to the Results section, with appropriate cautious interpretation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check that manuscript Results section contains numeric estimate and uncertainty from stats-run.json.",
+      "confidence": 1.0
+    },
+    {
+      "id": "missing-model-diagnostics",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No model diagnostics for partial correlation assumptions",
+      "evidenceRefs": [
+        "diagnostics.json",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Partial correlation assumes linearity, normality of residuals, and homoscedasticity. Violations can invalidate the estimate.",
+      "actionableFix": "Provide diagnostic plots (e.g., residual vs. fitted, Q-Q plot) and tests, or explicitly state that assumptions were checked and satisfied. Include these in supplementary or main text.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "no-confidence-interval",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Confidence interval for partial correlation missing",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "The point estimate alone gives no sense of precision; a 95% CI is essential for interpretability.",
+      "actionableFix": "Compute and report a 95% CI for the partial correlation (e.g., via Fisher transformation) alongside the p-value.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "p-value-overinterpretation-risk",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Extremely small p-value may mislead readers",
+      "evidenceRefs": [
+        "stats-run.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "A p-value of 1e-30 could be misinterpreted as a measure of effect size or practical importance. Caution is needed.",
+      "actionableFix": "Add explicit statement that the p-value does not equate to effect size and that with large n small effects can be significant; emphasize the moderate correlation coefficient.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "no-literature-context",
+      "severity": "minor",
+      "category": "literature",
+      "title": "Study not placed in context of existing research",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without references or comparison, the local evidence cannot be interpreted against known associations.",
+      "actionableFix": "Add a brief literature review or clarify that this is an isolated exploratory analysis with no external validation.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.7
+    },
+    {
+      "id": "figure-not-available-for-review",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Scatterplot figure not accessible for reviewer",
+      "evidenceRefs": [
+        "figures.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The scatterplot is the only visual check of the raw relationship; its absence prevents assessment of outliers or non-linearity.",
+      "actionableFix": "Include the actual scatterplot image in the manuscript or ensure it is available during review.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    }
+  ],
+  "missingEvidence": [
+    "Raw data or analysis code for reproducibility",
+    "Diagnostic plots for partial correlation assumptions",
+    "Scatterplot image for reviewer",
+    "Confidence interval for the partial correlation",
+    "Literature references or external validation"
+  ],
+  "recommendedNextStage": "manuscript"
+}

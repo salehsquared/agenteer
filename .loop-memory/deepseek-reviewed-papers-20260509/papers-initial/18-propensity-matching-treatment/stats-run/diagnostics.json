@@ -1,0 +1,74 @@
+{
+  "matching": {
+    "match_ratio": 1,
+    "replacement": false,
+    "caliper_logit_sd": 0.4,
+    "caliper_logit_width": 0.3391734340100101,
+    "treated_total": 144,
+    "control_total": 96,
+    "matched_treated": 67,
+    "matched_controls": 67,
+    "matched_pairs": 67,
+    "unmatched_treated": 77,
+    "control_reuse_max": 1
+  },
+  "test": "propensity-score-matching",
+  "treatment_column": "treatment",
+  "treatment_positive_level": 1,
+  "treatment_negative_level": 0,
+  "covariates": [
+    "age",
+    "severity",
+    "albumin"
+  ],
+  "exact_covariates": [
+    "sex"
+  ],
+  "propensity_model": {
+    "family": "logistic",
+    "n_parameters": 4,
+    "aic": 297.07484020817895,
+    "converged": true,
+    "propensity_min": 0.16469513196238075,
+    "propensity_max": 0.9395750181570478
+  },
+  "missingness": {
+    "input_rows": 240,
+    "complete_case_rows": 240,
+    "excluded_missing_rows": 0,
+    "complete_case_fraction": 1.0,
+    "missing_counts": {
+      "outcome_binary": 0,
+      "treatment": 0,
+      "age": 0,
+      "severity": 0,
+      "albumin": 0,
+      "sex": 0
+    }
+  },
+  "balance": {
+    "max_abs_smd_before": 0.6509123873374751,
+    "max_abs_smd_after": 0.2331414533603148,
+    "mean_abs_smd_before": 0.5146556918029893,
+    "mean_abs_smd_after": 0.18723542084001188,
+    "covariates_over_0_1_before": 3,
+    "covariates_over_0_1_after": 3,
+    "covariate_terms": 3
+  },
+  "positivity": {
+    "treated_min": 0.21024702376374668,
+    "treated_max": 0.9395750181570478,
+    "control_min": 0.16469513196238075,
+    "control_max": 0.8821848697024102,
+    "common_support_lower": 0.21024702376374668,
+    "common_support_upper": 0.8821848697024102,
+    "common_support_fraction": 0.9458333333333333
+  },
+  "artifacts": {
+    "propensity_scores": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-scores.csv",
+    "propensity_overlap": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/propensity-overlap.csv",
+    "balance": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/balance.csv",
+    "matched_pairs": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/18-propensity-matching-treatment/stats-run/matched-pairs.csv",
+    "weights": null
+  }
+}

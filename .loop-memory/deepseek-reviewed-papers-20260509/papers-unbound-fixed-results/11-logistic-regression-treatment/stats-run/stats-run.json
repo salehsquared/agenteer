@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_7058375777607694639",
+  "method": "logistic-regression",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_binary",
+    "treatment",
+    "age",
+    "severity",
+    "albumin"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "const",
+      "estimate": -4.027949563869277,
+      "std_error": 1.8486773765870437,
+      "p_value": 0.029344466851205203,
+      "ci_low": -7.651290641013873,
+      "ci_high": -0.4046084867246811,
+      "odds_ratio": 0.01781081247175052,
+      "or_ci_low": 0.00047543012326068133,
+      "or_ci_high": 0.6672379922589119
+    },
+    {
+      "term": "treatment",
+      "estimate": 0.4757562688242516,
+      "std_error": 0.3338524176897034,
+      "p_value": 0.15414285140348566,
+      "ci_low": -0.17858244599918993,
+      "ci_high": 1.1300949836476932,
+      "odds_ratio": 1.6092307484540973,
+      "or_ci_low": 0.836455091658669,
+      "or_ci_high": 3.095950550835882
+    },
+    {
+      "term": "age",
+      "estimate": 0.04326312675821376,
+      "std_error": 0.01137437975846303,
+      "p_value": 0.0001426318886337378,
+      "ci_low": 0.020969752085144823,
+      "ci_high": 0.0655565014312827,
+      "odds_ratio": 1.0442126189867118,
+      "or_ci_low": 1.0211911622670344,
+      "or_ci_high": 1.067753065185616
+    },
+    {
+      "term": "severity",
+      "estimate": 0.8337884943009074,
+      "std_error": 0.21256252401927272,
+      "p_value": 0.00008761436594307729,
+      "ci_low": 0.4171736027602027,
+      "ci_high": 1.2504033858416121,
+      "odds_ratio": 2.3020234436901754,
+      "or_ci_low": 1.5176659610666685,
+      "or_ci_high": 3.4917511964059824
+    },
+    {
+      "term": "albumin",
+      "estimate": -0.5576783461621193,
+      "std_error": 0.44310315220151747,
+      "p_value": 0.20818404772561372,
+      "ci_low": -1.4261445659132637,
+      "ci_high": 0.31078787358902493,
+      "odds_ratio": 0.572536754186453,
+      "or_ci_low": 0.24023334289620277,
+      "or_ci_high": 1.3644997440508921
+    }
+  ],
+  "diagnostics": {
+    "outcome_levels": [
+      0,
+      1
+    ],
+    "model_family": "logistic-regression",
+    "aic": 265.0746533802754,
+    "bic": -1032.8754936050925,
+    "df_resid": 235,
+    "residual_mean": -2.986129861900129e-14,
+    "residual_sd": 0.424457050745109,
+    "shapiro_p_value": 5.624175292591292e-8,
+    "max_leverage": 0.07232260818528582,
+    "max_cooks_distance": 0.04521966749444961,
+    "vif": [
+      {
+        "term": "treatment",
+        "vif": 1.153746929736106
+      },
+      {
+        "term": "age",
+        "vif": 1.0812043670722995
+      },
+      {
+        "term": "severity",
+        "vif": 1.2046947030591237
+      },
+      {
+        "term": "albumin",
+        "vif": 1.1134517131321229
+      }
+    ],
+    "max_vif": 1.2046947030591237,
+    "weighted": false
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-config.json",
+      "sha256": "f98315f3723d92a9223cfa05fd48e8fe6f8b425d08b3f52a67a570c7d724bdd5"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-summary.json",
+      "sha256": "bed898d95cff9d5b142bffe690328043ad263a2be3b3b07529f2b254218bed72"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/estimates.csv",
+      "sha256": "b2f0a9c3464d7c421272ae669fff15de2f85b29f367e7215fbd0a6f4da0e972e"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/diagnostics.json",
+      "sha256": "d53bd54ccc6b4d4cc10d026821fae63e16a6195b3dcf215579c56b20d5f8021d"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figures.json",
+      "sha256": "bb74b366baa681236a727e4096a8b1658fda0b42e003e1986482a0d57498eea5"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/model-residuals.png",
+      "sha256": "3ee736d1ec35df25f9249eb6f27df84e66b8326e3e00d6dda97b9ba7df40541b"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/figure-qa.json",
+      "sha256": "384afbe3ae73070be277ca7f011ade4bd54d329201cd6446c3ad62435e63088e"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-report.md",
+      "sha256": "2a6b0f8cd9e160576338a226b0299dc6b06e7e7018f2383c753ea755a34db768"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run/stats-qa.json",
+      "sha256": "a9b9295e52cc44ef37561c555f80975c3a54e4edbaf92b45dd112d1329d93519"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/11-logistic-regression-treatment/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

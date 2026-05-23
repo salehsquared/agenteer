@@ -1,0 +1,129 @@
+{
+  "verdict": "revise",
+  "summary": "The ANOVA analysis is incomplete: missing crucial assumption check (homogeneity of variances), no effect size, no descriptive statistics, unclear missingness handling, and other minor reporting gaps. Revision required.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "model_diagnostics",
+      "title": "No test for homogeneity of variances is reported",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "ANOVA assumes equal variances across groups; violation can inflate Type I error rates.",
+      "actionableFix": "Report Levene's test or Bartlett's test; if violated, consider Welch's ANOVA or robust methods.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No effect size (e.g., eta-squared) reported",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "A p-value alone does not convey the magnitude of group differences; effect size is essential for interpretation.",
+      "actionableFix": "Compute and report eta-squared or omega-squared from the ANOVA output.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Group-level descriptive statistics not provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without means and standard deviations, readers cannot assess direction, magnitude, or data plausibility.",
+      "actionableFix": "Add a table of N, mean, SD, and optionally 95% CI for each group.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Could be verified from raw data if available.",
+      "confidence": 1
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No description of missing data or exclusion criteria",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Complete-case analysis can bias results if missingness is not random; the extent and reasons for exclusion need documentation.",
+      "actionableFix": "Report the number of records excluded, reasons for missingness, and consider sensitivity analysis (e.g., pattern-mixture) or explicitly acknowledge limitation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Figure not referenced or described in manuscript",
+      "evidenceRefs": [
+        "stats-run/figures.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "Included figures enhance understanding, but if unmentioned, they do not contribute to the narrative.",
+      "actionableFix": "Include the figure in the manuscript with a descriptive caption and in-text reference.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No prior literature or clinical context discussed",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Lack of contextualization makes the novelty and relevance of the findings unclear.",
+      "actionableFix": "Briefly mention related studies or the clinical rationale for examining the outcome across these groups.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.7
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "No analysis script or raw data provided for independent reproduction",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Reproducibility is a core principle; without code and data, results cannot be independently verified.",
+      "actionableFix": "Include a script (e.g., R/Python) that reproduces the analysis from the raw data, or provide a reproducibility package.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "variables",
+      "title": "Group sample sizes not reported; possible imbalance unknown",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Unbalanced designs can affect ANOVA’s robustness to assumption violations and power; readers need to know group sizes.",
+      "actionableFix": "Report the number of observations per group.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compute from raw data.",
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Levene's test or Bartlett's test result for homogeneity of variances",
+    "Group sample sizes (N per group)",
+    "Descriptive statistics (mean, SD) for each group",
+    "Effect size (eta-squared or omega-squared)",
+    "Missing data details (number of exclusions, reasons)",
+    "Cohort definition specifics (inclusion/exclusion criteria, source)",
+    "Analysis script and raw data for reproducibility assessment"
+  ],
+  "recommendedNextStage": "manuscript"
+}

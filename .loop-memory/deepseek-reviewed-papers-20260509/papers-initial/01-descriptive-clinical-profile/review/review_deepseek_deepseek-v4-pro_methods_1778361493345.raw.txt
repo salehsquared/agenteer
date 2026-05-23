@@ -1,0 +1,130 @@
+{
+  "verdict": "block",
+  "summary": "The study lacks a prespecified research question, clinical context, and proper reporting alignment. Critical information missing: study protocol, variable definitions, cohort derivation, and resolution of manuscript contradictions with the actual analysis.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Missing prespecified research question",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without a specific research question, the analysis is aimless and results cannot be clinically interpreted.",
+      "actionableFix": "Define the exact research question using a framework like PICO (Population, Intervention/Exposure, Comparison, Outcome) and state it in the introduction and methods.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript contradicts actual analysis outputs",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The manuscript claims no estimate-like records are available, but the run artifact contains detailed summary statistics. This misleads reviewers and readers.",
+      "actionableFix": "Update the manuscript to include the actual descriptive statistics from the stats run. Remove the incorrect claim.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Compare manuscript Limitations section with stats-run.json estimates array.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Implicit outcome variable suggests association but no analysis conducted",
+      "evidenceRefs": [
+        "stats-run.json"
+      ],
+      "whyItMatters": "The presence of variables like age, bmi, albumin, and outcome_cont implies a research hypothesis about associations or prediction, but only descriptive statistics are reported. The analysis does not address potential relationships.",
+      "actionableFix": "If the goal is to explore associations, apply appropriate inferential or regression methods. If purely descriptive, clarify that no outcome-exposure analysis is intended and justify the variable selection.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No description of cohort derivation or eligibility criteria",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The source population, inclusion/exclusion criteria, and how the 240 complete cases were obtained are not described, making it impossible to assess generalizability or potential selection bias.",
+      "actionableFix": "Add a detailed cohort definition: data source, dates, inclusion/exclusion criteria, and flowchart of sample selection. Clarify if this is a consecutive sample or a selected subset.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variable definitions missing",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The variables age, severity, bmi, albumin, outcome_cont are not defined. Severity of what? What is outcome_cont? Clinical meaning is lost without operational definitions.",
+      "actionableFix": "Provide clear definitions and units for each variable. If they are derived or coded from raw data, explain the derivation. Include a data dictionary in the appendix.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Ambiguous and unreviewed methods checks",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript states deterministic methods checks identified issues that require review, but does not specify what they are. This leaves the reader uncertain about the reliability of the results.",
+      "actionableFix": "Either detail the specific checks and their outcomes, or remove the statement if the checks have been resolved. Provide the checklist used.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No comparison with existing literature",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The discussion does not place findings in the context of prior clinical research, limiting the ability to assess novelty or consistency with known evidence.",
+      "actionableFix": "Add a brief literature review or discussion section comparing the descriptive statistics to previously reported values in similar populations. If no literature exists, state that explicitly.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "Reproducibility claims lack explicit code or environment capture",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "While the run directory contains artifacts, there is no indication of the software, versions, or exact code used to generate the analysis, limiting full reproducibility.",
+      "actionableFix": "Include a reproducibility statement with software versions (e.g., R/Python and package versions) and reference the specific script or notebook used. Provide a docker container or session info if possible.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.7
+    }
+  ],
+  "missingEvidence": [
+    "Study protocol with prespecified research question",
+    "Variable definitions and data dictionary",
+    "Cohort selection criteria and derivation flowchart",
+    "Detailed methods checks results",
+    "Literature review or comparison",
+    "Reproducibility details (code, software versions)"
+  ],
+  "recommendedNextStage": "protocol"
+}

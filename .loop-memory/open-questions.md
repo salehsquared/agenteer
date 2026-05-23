@@ -345,6 +345,20 @@
 - Resolved partly: exploration handoffs now contain an `analysisSpecCandidate`.
 - Remaining gap: convert `analysisSpecCandidate` into a full AnalysisSpec V2 artifact with validation.
 
+# Ticks 0409-0428
+
+- Resolved: DeepSeek v4 Pro can now be used as a two-reviewer cold panel through `--panel deepseek-dual`.
+- Resolved: final 20-paper batch used bound method-selection artifacts, not unbound exploratory stats runs.
+- Remaining gap: manuscript generation still needs method-specific assumption paragraphs, richer descriptive/statistical tables, and variable/unit definitions from dataset metadata.
+- Remaining gap: external reviewer findings are adjudicated and written to state-reentry artifacts, but the full auto-replan/rerun loop should consume accepted findings directly rather than relying on the orchestrating agent to patch code manually.
+- Remaining gap: generated synthetic validation-table papers are useful stress tests, but not publication-grade manuscripts because they intentionally lack real clinical data dictionary context and literature framing.
+
+# Tick 0429
+
+- Should the primary SAVR ICD-9 definition remain exactly user-specified (`35.21`, `35.22`) or should an expanded sensitivity definition add codes such as `35.23` and `35.24` after codebook review?
+- Should same-hospital readmission/reintervention outcomes stay in the main manuscript as hypothesis-generating secondary endpoints, or move to a supplement until an all-payer/claims-style dataset is available?
+- Should the next methods build prioritize PH diagnostics and Fine-Gray/cumulative-incidence support for these longitudinal packets?
+
 # Tick 0241
 
 - Resolved partly: generated R-survey papers now use common NHANES labels, main-finding text, and readability QA. Remaining gap: variable labels are a small hardcoded map; they should eventually come from dataset adapters/codebooks.

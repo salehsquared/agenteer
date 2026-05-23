@@ -1,0 +1,795 @@
+{
+  "schemaVersion": 1,
+  "studyCritic": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:22:03.352Z",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure",
+    "stage": "final",
+    "autonomy": "aggressive",
+    "generatedFiles": {
+      "reviewPacket": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-packet.json",
+      "redactionReport": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-redaction-report.json",
+      "panel": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json",
+      "adjudication": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json",
+      "response": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-response.json",
+      "stateReentry": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/state-reentry.json"
+    },
+    "panel": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T22:22:03.348Z",
+      "panelId": "review_panel_3b4fc09feb18",
+      "stage": "final",
+      "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure",
+      "autonomy": "aggressive",
+      "budget": {
+        "maxPerCallUsd": 0.12,
+        "maxPanelUsd": 0.3,
+        "maxStudyLoopUsd": 5
+      },
+      "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-packet.json",
+      "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-redaction-report.json",
+      "reviewers": [
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T22:19:56.943Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778365196943",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:methods",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "clinical methods and study-design reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "block",
+          "summary": "The manuscript reports a PCA on 240 records with no sufficient description of variables, data source, cohort construction, pre-processing, or model diagnostics. The analysis is unreproducible and the interpretation is absent or misleading (e.g., 'latent component structure' from PCA). These issues prevent any meaningful evaluation and warrant blocking until core methodological and reporting deficiencies are addressed.",
+          "findings": [
+            {
+              "id": "F1",
+              "severity": "blocker",
+              "category": "reproducibility",
+              "title": "Data and code not provided, analysis unreproducible",
+              "evidenceRefs": [
+                "manuscript.md",
+                "stats-run.json"
+              ],
+              "whyItMatters": "Without access to the underlying data (raw or synthetic), the exact analytic steps, and the complete environment, the results cannot be independently verified, which is essential for scientific integrity and external validation.",
+              "actionableFix": "Provide the dataset in a repository or as supplementary material, along with a fully executable analysis script and a codebook that defines all variables.",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": null,
+              "confidence": 0.99
+            },
+            {
+              "id": "F2",
+              "severity": "major",
+              "category": "reporting",
+              "title": "Variable definitions and data source missing",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Readers cannot interpret the PCA loadings or assess the validity of the measures without knowing what 'scale_item_1–3' and 'severity' represent, their scales, and their provenance.",
+              "actionableFix": "Include a detailed description of each variable (type, range, units), the instrument or source they were derived from, and any relevant psychometric properties in the Methods.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F3",
+              "severity": "major",
+              "category": "cohort",
+              "title": "Cohort construction not described",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "The generalizability and internal validity depend on how participants were selected and which exclusions were applied. The statement 'read from available run artifacts' is opaque.",
+              "actionableFix": "Specify inclusion/exclusion criteria, the total eligible pool, how missing data were handled, and any thresholds for complete-case analysis. Report a participant flow diagram.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F4",
+              "severity": "major",
+              "category": "method_choice",
+              "title": "PCA pre-processing (scaling/centering) not specified",
+              "evidenceRefs": [
+                "stats-run.json",
+                "diagnostics.json"
+              ],
+              "whyItMatters": "PCA is sensitive to variable variances; loadings and explained variance depend on whether the correlation or covariance matrix was used. Without documentation, interpretation is unreliable.",
+              "actionableFix": "State explicitly whether variables were standardized (z-scored) before PCA, and justify the choice (e.g., correlation matrix used because variables have different scales).",
+              "reentryPoint": "analysis_spec",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F5",
+              "severity": "major",
+              "category": "model_diagnostics",
+              "title": "No assessment of data suitability for PCA",
+              "evidenceRefs": [
+                "diagnostics.json",
+                "stats-qa.json"
+              ],
+              "whyItMatters": "PCA requires adequate correlations among variables. Without KMO, Bartlett's test, or checking for ordinal structures, the analysis may be inappropriate, especially if items are binary or ordinal.",
+              "actionableFix": "Report Kaiser-Meyer-Olkin measure, Bartlett's test of sphericity, and consider whether polychoric correlations are needed for ordinal items. Discuss sample size adequacy.",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F6",
+              "severity": "major",
+              "category": "method_choice",
+              "title": "PCA misrepresented as latent variable analysis",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "PCA is not a latent variable model; it does not account for measurement error and assumes components are linear combinations of observed variables, not latent constructs. This mischaracterization may lead to incorrect clinical interpretation.",
+              "actionableFix": "Change terminology to 'component structure' or switch to an exploratory factor analysis model. If latent constructs are intended, use EFA with an appropriate extraction method and rotation.",
+              "reentryPoint": "method_selection",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F7",
+              "severity": "major",
+              "category": "reporting",
+              "title": "No interpretation of PCA results provided",
+              "evidenceRefs": [
+                "manuscript.md",
+                "stats-run.json"
+              ],
+              "whyItMatters": "The manuscript merely lists variance explained and loadings without any discussion of what the components represent, their clinical or research meaning, or how they relate to the original research question.",
+              "actionableFix": "Interpret each retained component based on loadings (>0.4 or 0.3), label them meaningfully, and relate them to the study objective. Include the scree plot with a description of retention criteria (e.g., Kaiser rule, parallel analysis).",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F8",
+              "severity": "major",
+              "category": "reporting",
+              "title": "No uncertainty measures or formal component retention criteria",
+              "evidenceRefs": [
+                "stats-run.json"
+              ],
+              "whyItMatters": "Component emphasis (e.g., PC1 explains 79%) is presented without confidence intervals, and the number of components to retain is not justified, making the solution appear more stable than it may be.",
+              "actionableFix": "Include bootstrap confidence intervals for eigenvalues or explained variance, report parallel analysis results, and discuss the rationale for retaining components (e.g., scree plot, >1 eigenvalue, cumulative variance).",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 0.85
+            }
+          ],
+          "missingEvidence": [
+            "Raw data or anonymized dataset",
+            "Detailed variable codebook (including scale definitions and ranges)",
+            "Cohort derivation flow (inclusion/exclusion counts, missingness patterns)",
+            "Pre-processing steps (mean-centering, scaling)",
+            "Scree plot and retention criteria (Kaiser criterion, parallel analysis)",
+            "KMO and Bartlett's test of sphericity results",
+            "PCA loadings interpretation and component naming",
+            "Uncertainty estimates for variance explained (e.g., bootstrap CIs)"
+          ],
+          "recommendedNextStage": "dataset_feasibility",
+          "costEstimate": {
+            "inputTokens": 3030,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026152,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_methods_1778365196943.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_methods_1778365196943.json"
+        },
+        {
+          "schemaVersion": 1,
+          "generatedAtIso": "2026-05-09T22:19:56.959Z",
+          "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778365196959",
+          "reviewer": {
+            "id": "deepseek:deepseek-v4-pro:reproducibility",
+            "provider": "deepseek",
+            "model": "deepseek-v4-pro",
+            "role": "statistical reporting and reproducibility reviewer",
+            "enabled": true,
+            "maxInputChars": 18000,
+            "maxOutputTokens": 6000,
+            "timeoutMs": 120000
+          },
+          "stage": "final",
+          "status": "succeeded",
+          "verdict": "block",
+          "summary": "The manuscript does not report the PCA results or interpret the components, making the study fundamentally incomplete. Critical methodological and reporting gaps prevent any evaluation of the claimed latent structure.",
+          "findings": [
+            {
+              "id": "F1",
+              "severity": "blocker",
+              "category": "reporting",
+              "title": "Manuscript does not report PCA outcomes or answer the research question",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Without any results or interpretation, the study is fundamentally incomplete and cannot be evaluated.",
+              "actionableFix": "Update the manuscript to include the proportion of variance explained, component loadings, and an interpretation of the latent components. Reference the scree plot and discuss component retention.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.99
+            },
+            {
+              "id": "F2",
+              "severity": "major",
+              "category": "reporting",
+              "title": "Variables not described",
+              "evidenceRefs": [
+                "manuscript.md",
+                "stats-run.json"
+              ],
+              "whyItMatters": "The reader cannot assess the meaning or quality of the variables, undermining the interpretability of the PCA.",
+              "actionableFix": "Add variable descriptions: what do scale items 1-3 and severity measure? What are the units, possible ranges, and reliability estimates?",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.99
+            },
+            {
+              "id": "F3",
+              "severity": "major",
+              "category": "model_diagnostics",
+              "title": "No PCA suitability diagnostics reported",
+              "evidenceRefs": [
+                "diagnostics.json",
+                "stats-qa.json"
+              ],
+              "whyItMatters": "Without checks like KMO, Bartlett's test, or determinant of correlation matrix, it is unclear if PCA is appropriate for these data.",
+              "actionableFix": "Run and report standard PCA diagnostics (KMO measure of sampling adequacy, Bartlett's test of sphericity, communalities, check for multicollinearity). Include them in the diagnostics file and manuscript.",
+              "reentryPoint": "execution",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            },
+            {
+              "id": "F4",
+              "severity": "major",
+              "category": "data_plausibility",
+              "title": "No descriptive statistics or distribution checks",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "PCA is affected by outliers, skewness, and variable scaling. Without summary statistics, the plausibility of the input data cannot be assessed.",
+              "actionableFix": "Provide univariate summary statistics (mean, SD, range, skewness) for each variable. Report any transformations or scaling applied before PCA.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F5",
+              "severity": "major",
+              "category": "reproducibility",
+              "title": "Data not available for reproducibility",
+              "evidenceRefs": [
+                "stats-run.json",
+                "manuscript.md"
+              ],
+              "whyItMatters": "The analysis is based on a local dataset that is not shared, making independent verification impossible.",
+              "actionableFix": "Deposit a de-identified minimal dataset or synthetic data with the analysis artifacts, or clearly state data availability restrictions.",
+              "reentryPoint": "dataset_feasibility",
+              "deterministicVerification": null,
+              "confidence": 0.9
+            },
+            {
+              "id": "F6",
+              "severity": "minor",
+              "category": "figures",
+              "title": "Figure QA file is empty",
+              "evidenceRefs": [
+                "figure-qa.json",
+                "stats-run/figure-qa.json"
+              ],
+              "whyItMatters": "The scree plot may have quality issues not automatically checked, potentially misleading component selection.",
+              "actionableFix": "Populate figure-qa.json with checks for axis labels, title, legibility, and verify that the scree plot is correctly referenced in the manuscript.",
+              "reentryPoint": "qa",
+              "deterministicVerification": null,
+              "confidence": 0.8
+            },
+            {
+              "id": "F7",
+              "severity": "blocker",
+              "category": "reporting",
+              "title": "No interpretation of components provided",
+              "evidenceRefs": [
+                "manuscript.md",
+                "diagnostics.json"
+              ],
+              "whyItMatters": "The primary output of PCA is the component structure; without interpretation, the research question remains unanswered.",
+              "actionableFix": "In the discussion, interpret the loadings: PC1 appears to load heavily on the three scale items, suggesting a general factor; PC2 is dominated by severity. Discuss what this implies about the latent structure.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.99
+            },
+            {
+              "id": "F8",
+              "severity": "info",
+              "category": "reporting",
+              "title": "Manuscript is overly generic and lacks study-specific content",
+              "evidenceRefs": [
+                "manuscript.md"
+              ],
+              "whyItMatters": "Most of the text is boilerplate that does not reflect the specific analysis, reducing clarity and specificity.",
+              "actionableFix": "Replace generic placeholder text with details tailored to this PCA analysis, including the specific research context and findings.",
+              "reentryPoint": "manuscript",
+              "deterministicVerification": null,
+              "confidence": 0.95
+            }
+          ],
+          "missingEvidence": [
+            "Raw data or data dictionary",
+            "Scree plot image",
+            "Detailed analysis plan",
+            "Descriptive statistics",
+            "PCA diagnostics (KMO, Bartlett's test)"
+          ],
+          "recommendedNextStage": "manuscript",
+          "costEstimate": {
+            "inputTokens": 3030,
+            "outputTokens": 6000,
+            "estimatedUsd": 0.026152,
+            "maxPerCallUsd": 0.5
+          },
+          "error": null,
+          "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_reproducibility_1778365196959.raw.txt",
+          "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review_deepseek_deepseek-v4-pro_reproducibility_1778365196959.json"
+        }
+      ],
+      "status": "block",
+      "costEstimateUsd": 0.052304,
+      "failureCount": 0,
+      "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json"
+    },
+    "adjudication": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T22:22:03.350Z",
+      "panelPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-panel.json",
+      "verdict": "block",
+      "consensus": "unanimous",
+      "acceptedFindings": [
+        {
+          "id": "F1",
+          "severity": "blocker",
+          "category": "reproducibility",
+          "title": "Data and code not provided, analysis unreproducible",
+          "evidenceRefs": [
+            "manuscript.md",
+            "stats-run.json"
+          ],
+          "whyItMatters": "Without access to the underlying data (raw or synthetic), the exact analytic steps, and the complete environment, the results cannot be independently verified, which is essential for scientific integrity and external validation.",
+          "actionableFix": "Provide the dataset in a repository or as supplementary material, along with a fully executable analysis script and a codebook that defines all variables.",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": null,
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F1",
+          "severity": "blocker",
+          "category": "reporting",
+          "title": "Manuscript does not report PCA outcomes or answer the research question",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Without any results or interpretation, the study is fundamentally incomplete and cannot be evaluated.",
+          "actionableFix": "Update the manuscript to include the proportion of variance explained, component loadings, and an interpretation of the latent components. Reference the scree plot and discuss component retention.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F7",
+          "severity": "blocker",
+          "category": "reporting",
+          "title": "No interpretation of components provided",
+          "evidenceRefs": [
+            "manuscript.md",
+            "diagnostics.json"
+          ],
+          "whyItMatters": "The primary output of PCA is the component structure; without interpretation, the research question remains unanswered.",
+          "actionableFix": "In the discussion, interpret the loadings: PC1 appears to load heavily on the three scale items, suggesting a general factor; PC2 is dominated by severity. Discuss what this implies about the latent structure.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F2",
+          "severity": "major",
+          "category": "reporting",
+          "title": "Variable definitions and data source missing",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Readers cannot interpret the PCA loadings or assess the validity of the measures without knowing what 'scale_item_1–3' and 'severity' represent, their scales, and their provenance.",
+          "actionableFix": "Include a detailed description of each variable (type, range, units), the instrument or source they were derived from, and any relevant psychometric properties in the Methods.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F3",
+          "severity": "major",
+          "category": "cohort",
+          "title": "Cohort construction not described",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "The generalizability and internal validity depend on how participants were selected and which exclusions were applied. The statement 'read from available run artifacts' is opaque.",
+          "actionableFix": "Specify inclusion/exclusion criteria, the total eligible pool, how missing data were handled, and any thresholds for complete-case analysis. Report a participant flow diagram.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F4",
+          "severity": "major",
+          "category": "method_choice",
+          "title": "PCA pre-processing (scaling/centering) not specified",
+          "evidenceRefs": [
+            "stats-run.json",
+            "diagnostics.json"
+          ],
+          "whyItMatters": "PCA is sensitive to variable variances; loadings and explained variance depend on whether the correlation or covariance matrix was used. Without documentation, interpretation is unreliable.",
+          "actionableFix": "State explicitly whether variables were standardized (z-scored) before PCA, and justify the choice (e.g., correlation matrix used because variables have different scales).",
+          "reentryPoint": "analysis_spec",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F5",
+          "severity": "major",
+          "category": "model_diagnostics",
+          "title": "No assessment of data suitability for PCA",
+          "evidenceRefs": [
+            "diagnostics.json",
+            "stats-qa.json"
+          ],
+          "whyItMatters": "PCA requires adequate correlations among variables. Without KMO, Bartlett's test, or checking for ordinal structures, the analysis may be inappropriate, especially if items are binary or ordinal.",
+          "actionableFix": "Report Kaiser-Meyer-Olkin measure, Bartlett's test of sphericity, and consider whether polychoric correlations are needed for ordinal items. Discuss sample size adequacy.",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F6",
+          "severity": "major",
+          "category": "method_choice",
+          "title": "PCA misrepresented as latent variable analysis",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "PCA is not a latent variable model; it does not account for measurement error and assumes components are linear combinations of observed variables, not latent constructs. This mischaracterization may lead to incorrect clinical interpretation.",
+          "actionableFix": "Change terminology to 'component structure' or switch to an exploratory factor analysis model. If latent constructs are intended, use EFA with an appropriate extraction method and rotation.",
+          "reentryPoint": "method_selection",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F7",
+          "severity": "major",
+          "category": "reporting",
+          "title": "No interpretation of PCA results provided",
+          "evidenceRefs": [
+            "manuscript.md",
+            "stats-run.json"
+          ],
+          "whyItMatters": "The manuscript merely lists variance explained and loadings without any discussion of what the components represent, their clinical or research meaning, or how they relate to the original research question.",
+          "actionableFix": "Interpret each retained component based on loadings (>0.4 or 0.3), label them meaningfully, and relate them to the study objective. Include the scree plot with a description of retention criteria (e.g., Kaiser rule, parallel analysis).",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F8",
+          "severity": "major",
+          "category": "reporting",
+          "title": "No uncertainty measures or formal component retention criteria",
+          "evidenceRefs": [
+            "stats-run.json"
+          ],
+          "whyItMatters": "Component emphasis (e.g., PC1 explains 79%) is presented without confidence intervals, and the number of components to retain is not justified, making the solution appear more stable than it may be.",
+          "actionableFix": "Include bootstrap confidence intervals for eigenvalues or explained variance, report parallel analysis results, and discuss the rationale for retaining components (e.g., scree plot, >1 eigenvalue, cumulative variance).",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 0.85,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:methods"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F2",
+          "severity": "major",
+          "category": "reporting",
+          "title": "Variables not described",
+          "evidenceRefs": [
+            "manuscript.md",
+            "stats-run.json"
+          ],
+          "whyItMatters": "The reader cannot assess the meaning or quality of the variables, undermining the interpretability of the PCA.",
+          "actionableFix": "Add variable descriptions: what do scale items 1-3 and severity measure? What are the units, possible ranges, and reliability estimates?",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.99,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F3",
+          "severity": "major",
+          "category": "model_diagnostics",
+          "title": "No PCA suitability diagnostics reported",
+          "evidenceRefs": [
+            "diagnostics.json",
+            "stats-qa.json"
+          ],
+          "whyItMatters": "Without checks like KMO, Bartlett's test, or determinant of correlation matrix, it is unclear if PCA is appropriate for these data.",
+          "actionableFix": "Run and report standard PCA diagnostics (KMO measure of sampling adequacy, Bartlett's test of sphericity, communalities, check for multicollinearity). Include them in the diagnostics file and manuscript.",
+          "reentryPoint": "execution",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F4",
+          "severity": "major",
+          "category": "data_plausibility",
+          "title": "No descriptive statistics or distribution checks",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "PCA is affected by outliers, skewness, and variable scaling. Without summary statistics, the plausibility of the input data cannot be assessed.",
+          "actionableFix": "Provide univariate summary statistics (mean, SD, range, skewness) for each variable. Report any transformations or scaling applied before PCA.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F5",
+          "severity": "major",
+          "category": "reproducibility",
+          "title": "Data not available for reproducibility",
+          "evidenceRefs": [
+            "stats-run.json",
+            "manuscript.md"
+          ],
+          "whyItMatters": "The analysis is based on a local dataset that is not shared, making independent verification impossible.",
+          "actionableFix": "Deposit a de-identified minimal dataset or synthetic data with the analysis artifacts, or clearly state data availability restrictions.",
+          "reentryPoint": "dataset_feasibility",
+          "deterministicVerification": null,
+          "confidence": 0.9,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F6",
+          "severity": "minor",
+          "category": "figures",
+          "title": "Figure QA file is empty",
+          "evidenceRefs": [
+            "figure-qa.json",
+            "stats-run/figure-qa.json"
+          ],
+          "whyItMatters": "The scree plot may have quality issues not automatically checked, potentially misleading component selection.",
+          "actionableFix": "Populate figure-qa.json with checks for axis labels, title, legibility, and verify that the scree plot is correctly referenced in the manuscript.",
+          "reentryPoint": "qa",
+          "deterministicVerification": null,
+          "confidence": 0.8,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        },
+        {
+          "id": "F8",
+          "severity": "info",
+          "category": "reporting",
+          "title": "Manuscript is overly generic and lacks study-specific content",
+          "evidenceRefs": [
+            "manuscript.md"
+          ],
+          "whyItMatters": "Most of the text is boilerplate that does not reflect the specific analysis, reducing clarity and specificity.",
+          "actionableFix": "Replace generic placeholder text with details tailored to this PCA analysis, including the specific research context and findings.",
+          "reentryPoint": "manuscript",
+          "deterministicVerification": null,
+          "confidence": 0.95,
+          "reviewerIds": [
+            "deepseek:deepseek-v4-pro:reproducibility"
+          ],
+          "supportCount": 1
+        }
+      ],
+      "rejectedFindings": [],
+      "conflictNotes": [],
+      "reentryPoint": "analysis_spec",
+      "nextAction": "Route back to analysis_spec with review-response decisions.",
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json"
+    },
+    "response": {
+      "schemaVersion": 1,
+      "generatedAtIso": "2026-05-09T22:22:03.352Z",
+      "adjudicationPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-adjudication.json",
+      "autonomy": "aggressive",
+      "decisions": [
+        {
+          "findingId": "F1",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide the dataset in a repository or as supplementary material, along with a fully executable analysis script and a codebook that defines all variables.",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F1",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Update the manuscript to include the proportion of variance explained, component loadings, and an interpretation of the latent components. Reference the scree plot and discuss component retention.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F7",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "In the discussion, interpret the loadings: PC1 appears to load heavily on the three scale items, suggesting a general factor; PC2 is dominated by severity. Discuss what this implies about the latent structure.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F2",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include a detailed description of each variable (type, range, units), the instrument or source they were derived from, and any relevant psychometric properties in the Methods.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F3",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Specify inclusion/exclusion criteria, the total eligible pool, how missing data were handled, and any thresholds for complete-case analysis. Report a participant flow diagram.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F4",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "State explicitly whether variables were standardized (z-scored) before PCA, and justify the choice (e.g., correlation matrix used because variables have different scales).",
+          "reentryPoint": "analysis_spec"
+        },
+        {
+          "findingId": "F5",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Report Kaiser-Meyer-Olkin measure, Bartlett's test of sphericity, and consider whether polychoric correlations are needed for ordinal items. Discuss sample size adequacy.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F6",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Change terminology to 'component structure' or switch to an exploratory factor analysis model. If latent constructs are intended, use EFA with an appropriate extraction method and rotation.",
+          "reentryPoint": "method_selection"
+        },
+        {
+          "findingId": "F7",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Interpret each retained component based on loadings (>0.4 or 0.3), label them meaningfully, and relate them to the study objective. Include the scree plot with a description of retention criteria (e.g., Kaiser rule, parallel analysis).",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F8",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Include bootstrap confidence intervals for eigenvalues or explained variance, report parallel analysis results, and discuss the rationale for retaining components (e.g., scree plot, >1 eigenvalue, cumulative variance).",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F2",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Add variable descriptions: what do scale items 1-3 and severity measure? What are the units, possible ranges, and reliability estimates?",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F3",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Run and report standard PCA diagnostics (KMO measure of sampling adequacy, Bartlett's test of sphericity, communalities, check for multicollinearity). Include them in the diagnostics file and manuscript.",
+          "reentryPoint": "execution"
+        },
+        {
+          "findingId": "F4",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Provide univariate summary statistics (mean, SD, range, skewness) for each variable. Report any transformations or scaling applied before PCA.",
+          "reentryPoint": "manuscript"
+        },
+        {
+          "findingId": "F5",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Deposit a de-identified minimal dataset or synthetic data with the analysis artifacts, or clearly state data availability restrictions.",
+          "reentryPoint": "dataset_feasibility"
+        },
+        {
+          "findingId": "F6",
+          "decision": "accepted",
+          "reason": "Finding is actionable under the selected autonomy policy.",
+          "repairAction": "Populate figure-qa.json with checks for axis labels, title, legibility, and verify that the scree plot is correctly referenced in the manuscript.",
+          "reentryPoint": "qa"
+        },
+        {
+          "findingId": "F8",
+          "decision": "modified",
+          "reason": "Finding is actionable but should be translated into a bounded deterministic repair before execution.",
+          "repairAction": "Replace generic placeholder text with details tailored to this PCA analysis, including the specific research context and findings.",
+          "reentryPoint": "manuscript"
+        }
+      ],
+      "stateReentry": {
+        "status": "blocked",
+        "reentryPoint": "analysis_spec",
+        "suggestedCommands": [
+          "agenteer research spec-v2 --spec <analysis-spec.json> --json",
+          "agenteer research execution-contract --spec <analysis-spec-v2.json> --json"
+        ],
+        "rerunReviewAfterRepair": true
+      },
+      "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/review-response.json",
+      "stateReentryPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/19-pca-scale-structure/review/state-reentry.json"
+    }
+  }
+}
+

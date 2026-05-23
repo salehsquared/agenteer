@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_4238021896461514828",
+    "method": "aalen-johansen-cif",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "survival_time",
+      "competing_event",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "0",
+        "final_cumulative_incidence": 0.5729300198569098
+      },
+      {
+        "term": "1",
+        "final_cumulative_incidence": 0.885632760150764
+      }
+    ],
+    "diagnostics": {
+      "test": "Aalen-Johansen cumulative incidence",
+      "curve_path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/cumulative-incidence.csv",
+      "event_of_interest_code": 1
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/stats-config.json",
+        "sha256": "38cef192af78ee7231fc158f2abe977bfb0bcd9a621ff0b3633a55a9aa6a3d32"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/stats-summary.json",
+        "sha256": "b1977177adbeb9fbd2ef54997377f3bfc3456ef74d456afa34c92516f671a7ff"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/estimates.csv",
+        "sha256": "3e6361e4977e74db8fe32882dc30c9a7189522998c87bec9bcbb803adbf14624"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/diagnostics.json",
+        "sha256": "90a790ec82550cca318a34fbefbcc9cf26aaa017d598a2ef8c7c0762bec71709"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/figures.json",
+        "sha256": "0bfea52304c3bec30e4a65ba86ee6a410c61a3b1caa2f2a7304ab58b08d6b9dc"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/cumulative-incidence.png",
+        "sha256": "2e65544a6adfefd60495c47aed1e4303482341f5de66c146d71e3e58abe8b443"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/figure-qa.json",
+        "sha256": "238302616424e6ec5458f8fb1e3ee22af1deb9a96ee1c6bc970e5575f9fe4b4c"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/stats-report.md",
+        "sha256": "2d2eeeaa003935a105a2d5f754538dd6f951b98517feacd70ffc71e6724e8447"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run/stats-qa.json",
+        "sha256": "5bce1658e4ee131451431066555043071d051575557cab9a05930bcbe1056720"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/stats-run",
+    "binding": {
+      "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/17-cif-competing-risk/method-selection.json",
+      "methodSelectionId": "method_selection_17_cif_competing_risk",
+      "methodId": "aalen-johansen-cumulative-incidence",
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "bound"
+    },
+    "resultPosture": {
+      "status": "bound_standard_table",
+      "label": "Bound standard-table result",
+      "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+      "supports": [
+        "method-bound estimates",
+        "standard-table diagnostics",
+        "local methods review"
+      ],
+      "cannotSupport": [
+        "causal claims without design support",
+        "clinical recommendations"
+      ],
+      "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+    }
+  }
+}
+

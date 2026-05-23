@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T22:10:50.440Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous",
+  "packetHash": "637dbd93a5e59ee37d14fa2143717d0b4c48e5295aabde40b4b20504eb3ee2b1",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 28,
+    "includedFiles": 8,
+    "totalBytes": 128187,
+    "includedBytes": 20143
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 3640,
+      "sha256": "e563fb9ec76171dad43a247348f4e25dd572457c7d7411faf761fc8d3100da62",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# How strongly is severity linearly associated with the continuous outcome\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How strongly is severity linearly associated with the continuous outcome?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was pearson. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How strongly is severity linearly associated with the continuous outcome? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nOutcome: outcome_cont. Exposure or predictor: severity.\n\n### Statistical Analysis\n\nThe statistical method was pearson. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 14 artifact(s). The artifact inventory hash is 3c089f7ba0f2c9a58a0bcfa104d260b0427da0cb0ee595769e5a7fbf6ef25b5c. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4250,
+      "sha256": "0a36ddc10196db702bbe03527334737d820c9c978826f414b8314bedce109ecb",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_2992229236677189734\",\n  \"method\": \"pearson\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_cont\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"severity\",\n      \"correlation\": 0.6578716230800155,\n      \"p_value\": 3.870555953990535e-31,\n      \"n\": 240,\n      \"adjusted_for\": \"\"\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"pearson\",\n    \"n\": 240\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-config.json\",\n      \"sha256\": \"e5504ebee9d9957107f66f44cdada3d0c6c70d53973a7bbc4552e1b06f42893e\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-summary.json\",\n      \"sha256\": \"322e3847113a64a43ec8a25bf213a7c9391f7ab868787534ad3ce494e342f472\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/estimates.csv\",\n      \"sha256\": \"88a96739a5e338a9185cb14f1de906d7a18997c02532a0e24d44e79b5a984086\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/diagnostics.json\",\n      \"sha256\": \"e4c827275dfc3a061803c36a9926f83b92de337abab5d46b8457d181a7365d2c\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figures.json\",\n      \"sha256\": \"9d33b5e93fff337fd3971755e2734391a3fdb4cdd9c455aec59c5570b4099b31\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png\",\n      \"sha256\": \"4af05205d7a810c43715c82c9a5b4fb69aaf7a1f872a56d9e29883aba9593e24\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figure-qa.json\",\n      \"sha256\": \"cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-report.md\",\n      \"sha256\": \"475d293010b301beee8fb2e480d2041333ebd92c56e22c338fe66b3fcb350b96\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-qa.json\",\n      \"sha256\": \"c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_08_pearson_severity_continuous\",\n    \"methodId\": \"pearson-correlation\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 35,
+      "sha256": "e4c827275dfc3a061803c36a9926f83b92de337abab5d46b8457d181a7365d2c",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"pearson\",\n  \"n\": 240\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1503,
+      "sha256": "c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"pass\",\n  \"summary\": \"9/9 stats QA checks passed; status=pass.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3625,
+      "sha256": "cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"correlation-scatter.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png\",\n      \"title\": \"Correlation Scatterplot\",\n      \"caption\": \"Scatterplot for the two variables used in the correlation run.\",\n      \"altText\": \"Scatterplot for the two variables used in the correlation run.\",\n      \"xLabel\": \"severity\",\n      \"yLabel\": \"outcome_cont\",\n      \"sourceColumns\": [\n        \"outcome_cont\",\n        \"severity\"\n      ],\n      \"byteSize\": 53937,\n      \"sha256\": \"4af05205d7a810c43715c82c9a5b4fb69aaf7a1f872a56d9e29883aba9593e24\",\n      \"width\": 1125,\n      \"height\": 750,\n      \"nonBlankRatio\": 0.06003602920261686,\n      \"sampledColorBuckets\": 33,\n      \"status\": \"pass\",\n      \"checks\": [\n        {\n          \"id\": \"path-recorded\",\n          \"status\": \"pass\",\n          \"detail\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png\"\n        },\n        {\n          \"id\": \"file-e"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3625,
+      "sha256": "cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1231,
+      "sha256": "9d33b5e93fff337fd3971755e2734391a3fdb4cdd9c455aec59c5570b4099b31",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2234,
+      "sha256": "eea67a09c3f665e7842ae92691b634ec8ec8ddafa6503ac63c77aeae54199143",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9843,
+      "sha256": "81bf74e161449855b0f3cea9060467cf0f107dd7db86a11089e9fd83c03d9e2f",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1572,
+      "sha256": "72e27ccc94091a27f1201c0e45778252e1a816a6baa98cf8856f2880f88096bc",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4195,
+      "sha256": "ae0dfb3e6ff8a190832fe46f55fa46bc268934b80a8d61cf12814acabfbf167e",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14453,
+      "sha256": "e3a25637620a8f3fe9ec10b635251758f79dcf6fbf32b443026519ac38287ac5",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/method-selection.json",
+      "relativePath": "method-selection.json",
+      "bytes": 851,
+      "sha256": "90f20bc9706877cd35fbeb5f1f9a3f5f2ed8cd0204a105830904b6f2fc5d0ed0",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4315,
+      "sha256": "812501785409aabf5a7b12bdc483c04e423eb3db6b290e740407094b3e826a57",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 807,
+      "sha256": "4e4c4c3cd54d9ad765e015e5905e29f391b025b092b36e7456a425a5192f3d86",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9979,
+      "sha256": "47fc65c80b2d143b4cc4ad29efcebd048618524255f48d94ec09a5a5def148d4",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1018,
+      "sha256": "a28e8979fcac1f512083ba09f6af3e975236ec453f5dd109c7b31b73c765f65f",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 4493,
+      "sha256": "592e01cbe46df31010018394965ea8e8aec5ecc7e7aac440ef9cf5da8f41b5dc",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png",
+      "relativePath": "stats-run/correlation-scatter.png",
+      "bytes": 53937,
+      "sha256": "4af05205d7a810c43715c82c9a5b4fb69aaf7a1f872a56d9e29883aba9593e24",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 95,
+      "sha256": "88a96739a5e338a9185cb14f1de906d7a18997c02532a0e24d44e79b5a984086",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 796,
+      "sha256": "e5504ebee9d9957107f66f44cdada3d0c6c70d53973a7bbc4552e1b06f42893e",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1506,
+      "sha256": "475d293010b301beee8fb2e480d2041333ebd92c56e22c338fe66b3fcb350b96",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 184,
+      "sha256": "322e3847113a64a43ec8a25bf213a7c9391f7ab868787534ad3ce494e342f472",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 3640 bytes, sha256=e563fb9ec76171dad43a247348f4e25dd572457c7d7411faf761fc8d3100da62) ---\n# How strongly is severity linearly associated with the continuous outcome\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: How strongly is severity linearly associated with the continuous outcome?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was pearson. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: How strongly is severity linearly associated with the continuous outcome? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nOutcome: outcome_cont. Exposure or predictor: severity.\n\n### Statistical Analysis\n\nThe statistical method was pearson. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No estimate-like records were available for p-value/effect-size checks.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 14 artifact(s). The artifact inventory hash is 3c089f7ba0f2c9a58a0bcfa104d260b0427da0cb0ee595769e5a7fbf6ef25b5c. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4250 bytes, sha256=0a36ddc10196db702bbe03527334737d820c9c978826f414b8314bedce109ecb) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_2992229236677189734\",\n  \"method\": \"pearson\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_cont\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"severity\",\n      \"correlation\": 0.6578716230800155,\n      \"p_value\": 3.870555953990535e-31,\n      \"n\": 240,\n      \"adjusted_for\": \"\"\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"pearson\",\n    \"n\": 240\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-config.json\",\n      \"sha256\": \"e5504ebee9d9957107f66f44cdada3d0c6c70d53973a7bbc4552e1b06f42893e\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-summary.json\",\n      \"sha256\": \"322e3847113a64a43ec8a25bf213a7c9391f7ab868787534ad3ce494e342f472\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/estimates.csv\",\n      \"sha256\": \"88a96739a5e338a9185cb14f1de906d7a18997c02532a0e24d44e79b5a984086\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/diagnostics.json\",\n      \"sha256\": \"e4c827275dfc3a061803c36a9926f83b92de337abab5d46b8457d181a7365d2c\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figures.json\",\n      \"sha256\": \"9d33b5e93fff337fd3971755e2734391a3fdb4cdd9c455aec59c5570b4099b31\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png\",\n      \"sha256\": \"4af05205d7a810c43715c82c9a5b4fb69aaf7a1f872a56d9e29883aba9593e24\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figure-qa.json\",\n      \"sha256\": \"cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-report.md\",\n      \"sha256\": \"475d293010b301beee8fb2e480d2041333ebd92c56e22c338fe66b3fcb350b96\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/stats-qa.json\",\n      \"sha256\": \"c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/method-selection.json\",\n    \"methodSelectionId\": \"method_selection_08_pearson_severity_continuous\",\n    \"methodId\": \"pearson-correlation\",\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"bound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"bound_standard_table\",\n    \"label\": \"Bound standard-table result\",\n    \"interpretationBoundary\": \"This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\",\n    \"supports\": [\n      \"method-bound estimates\",\n      \"standard-table diagnostics\",\n      \"local methods review\"\n    ],\n    \"cannotSupport\": [\n      \"causal claims without design support\",\n      \"clinical recommendations\"\n    ],\n    \"nextAction\": \"Review diagnostics, missingness, and claim language before packet promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 35 bytes, sha256=e4c827275dfc3a061803c36a9926f83b92de337abab5d46b8457d181a7365d2c) ---\n{\n  \"test\": \"pearson\",\n  \"n\": 240\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1503 bytes, sha256=c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"pass\",\n  \"summary\": \"9/9 stats QA checks passed; status=pass.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats run binding is bound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"pass\",\n      \"detail\": \"bound_standard_table: This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3625 bytes, sha256=cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"correlation-scatter.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png\",\n      \"title\": \"Correlation Scatterplot\",\n      \"caption\": \"Scatterplot for the two variables used in the correlation run.\",\n      \"altText\": \"Scatterplot for the two variables used in the correlation run.\",\n      \"xLabel\": \"severity\",\n      \"yLabel\": \"outcome_cont\",\n      \"sourceColumns\": [\n        \"outcome_cont\",\n        \"severity\"\n      ],\n      \"byteSize\": 53937,\n      \"sha256\": \"4af05205d7a810c43715c82c9a5b4fb69aaf7a1f872a56d9e29883aba9593e24\",\n      \"width\": 1125,\n      \"height\": 750,\n      \"nonBlankRatio\": 0.06003602920261686,\n      \"sampledColorBuckets\": 33,\n      \"status\": \"pass\",\n      \"checks\": [\n        {\n          \"id\": \"path-recorded\",\n          \"status\": \"pass\",\n          \"detail\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/stats-run/correlation-scatter.png\"\n        },\n        {\n          \"id\": \"file-e\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3625 bytes, sha256=cd1636957cc143c0bea4031139c72945826f6cd354da9e9ac20877645df7f68d) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1231 bytes, sha256=9d33b5e93fff337fd3971755e2734391a3fdb4cdd9c455aec59c5570b4099b31) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2234 bytes, sha256=eea67a09c3f665e7842ae92691b634ec8ec8ddafa6503ac63c77aeae54199143) ---\n"
+}

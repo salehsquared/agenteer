@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_4428864005194158087",
+  "method": "welch-t-test",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "group_a": 0,
+      "group_b": 1,
+      "n_a": 96,
+      "n_b": 144,
+      "mean_a": 20.48651041666667,
+      "mean_b": 23.400236111111113,
+      "mean_difference": 2.9137256944444445,
+      "cohen_d": 0.8744737870141851,
+      "statistic": 6.5913481275746815,
+      "p_value": 3.8287252527457425e-10
+    }
+  ],
+  "diagnostics": {
+    "test": "two-sample t-test",
+    "equal_variance_assumed": false,
+    "levene_p_value": 0.7081745345644388
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-config.json",
+      "sha256": "b9f3d59e8f03f11b96c5cbe9ba373345cae7ab441a26754d2ef621eea767833b"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-summary.json",
+      "sha256": "3e7e78d2d7ba28af3fd6ac56732859f6186c0d5cb27cb87a449263d52c801915"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/estimates.csv",
+      "sha256": "5a2b8c3cd242726190f500298a36d7cef403350e4410950037dd510706694d89"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/diagnostics.json",
+      "sha256": "25466afadf328893d04e17f805a9c28d9a2909a971c37d36d6db0a532ec4bbda"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figures.json",
+      "sha256": "e362459caa7cb16466ed3e3ec070dd95b30414f354224dd61026b7301b8bd873"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/group-distribution.png",
+      "sha256": "6dc4519d39f21c5683a8b0a0d6f79b50bda142f7a5740e8ce899939556cb84ca"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/figure-qa.json",
+      "sha256": "dd0ef644bcfdddbd3bbc2cb8641827222a0f1de76633f6d91c4020990b28aef0"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-report.md",
+      "sha256": "9ab3efc48ecf6e722d27fc8f98b73d9b0d992ad8fe272e0f7d5a832f3d9c977b"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run/stats-qa.json",
+      "sha256": "c87d6a8ca4dcb22bd8deed8c4dc19aceb322ad48c64649078d86f70f3d7dcd20"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/stats-run",
+  "binding": {
+    "methodSelectionPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/02-welch-treatment-continuous/method-selection.json",
+    "methodSelectionId": "method_selection_02_welch_treatment_continuous",
+    "methodId": "welch-t-test",
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "bound"
+  },
+  "resultPosture": {
+    "status": "bound_standard_table",
+    "label": "Bound standard-table result",
+    "interpretationBoundary": "This run is bound to method/spec evidence and can support local methods review for non-survey standard-table analyses.",
+    "supports": [
+      "method-bound estimates",
+      "standard-table diagnostics",
+      "local methods review"
+    ],
+    "cannotSupport": [
+      "causal claims without design support",
+      "clinical recommendations"
+    ],
+    "nextAction": "Review diagnostics, missingness, and claim language before packet promotion."
+  }
+}

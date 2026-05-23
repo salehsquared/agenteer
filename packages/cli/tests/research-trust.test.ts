@@ -54,6 +54,31 @@ describe("research trust layer", () => {
     }
   });
 
+  it("reports prediction estimates from stats-run artifacts in manuscripts", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-prediction-manuscript-"));
+    try {
+      await mkdir(dir, { recursive: true });
+      await writeFile(path.join(dir, "stats-run.json"), `${JSON.stringify({
+        status: "succeeded",
+        method: "prediction-evaluation",
+        resultPosture: "bound_standard_table",
+        completeCaseN: 360,
+        estimates: [{ term: "risk_score", auroc: 0.718, brier_score: 0.213, n: 360 }],
+        diagnostics: { test: "prediction evaluation", roc_points: 152 },
+      }, null, 2)}\n`);
+      await writeFile(path.join(dir, "stats-qa.json"), `${JSON.stringify({ status: "pass", checks: [] }, null, 2)}\n`);
+
+      const result = await researchManuscriptCommand({ runDir: dir });
+
+      expect(result.manuscriptMarkdown).toContain("AUROC");
+      expect(result.manuscriptMarkdown).toContain("0.7180");
+      expect(result.manuscriptMarkdown).toContain("Brier");
+      expect(result.methodQa.checks.find(check => check.category === "effect_size")?.message).not.toContain("No estimate-like records");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("keeps generated manuscripts reader-facing when the run needs methods review", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-manuscript-reader-"));
     try {

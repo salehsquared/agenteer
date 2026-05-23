@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:10:50.460Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778364650460",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "Essential Pearson correlation assumption checks (linearity, normality, outliers, homoscedasticity) are absent from the diagnostics artifact and not described. Without these, the reported correlation (r=0.658, p<0.001) is untrustworthy. The report also lacks a confidence interval, missingness analysis, and data plausibility review. The manuscript incorrectly claims QA issues were found when none are recorded. Analysis must be rerun with proper diagnostics and reporting before any claims.",
+    "findings": [
+      {
+        "id": "missing-pearson-diagnostics",
+        "severity": "blocker",
+        "category": "model_diagnostics",
+        "title": "No diagnostic checks for Pearson correlation assumptions",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "Pearson requires linearity, bivariate normality, and homoscedasticity. Violations can invalidate the correlation coefficient and p-value.",
+        "actionableFix": "Run and document diagnostic plots (residuals vs. fitted, Q-Q), normality tests (Shapiro-Wilk), and consider robust alternatives (e.g., Spearman) if violations are present.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95
+      },
+      {
+        "id": "empty-diagnostics-artifact",
+        "severity": "major",
+        "category": "reproducibility",
+        "title": "Diagnostics artifact contains only test name and sample size",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "No evidence that assumption checks were performed or inspected, making the analysis irreproducible and the result suspect.",
+        "actionableFix": "Extend the diagnostics.json to include numeric and visual results for normality, linearity, and outlier detection.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 1
+      },
+      {
+        "id": "missing-confidence-interval",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Confidence interval for correlation not reported",
+        "evidenceRefs": [
+          "stats-run/stats-run.json",
+          "manuscript.md"
+        ],
+        "whyItMatters": "A point estimate (0.658) alone is insufficient; a 95% CI communicates the precision of the estimate and is essential for interpretation.",
+        "actionableFix": "Compute and report a 95% confidence interval for the Pearson correlation coefficient.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 1
+      },
+      {
+        "id": "missingness-not-documented",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No description of missing data handling or complete-case exclusions",
+        "evidenceRefs": [
+          "manuscript.md"
+        ],
+        "whyItMatters": "Complete-case analysis can introduce selection bias if missingness is related to exposure or outcome; readers cannot assess the impact without details.",
+        "actionableFix": "Report number of records excluded, reasons, compare included/excluded groups on available variables, and discuss potential bias.",
+        "reentryPoint": "dataset_feasibility",
+        "deterministicVerification": null,
+        "confidence": 0.9
+      },
+      {
+        "id": "no-data-plausibility-checks",
+        "severity": "major",
+        "category": "data_plausibility",
+        "title": "No evidence of data range, distribution, or outlier inspection",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json"
+        ],
+        "whyItMatters": "Non-normal distributions or extreme outliers can distort Pearson correlation, yet the data are unchecked.",
+        "actionableFix": "Provide summary statistics (min, max, mean, SD, skewness) and visualizations (histograms, boxplots) before correlation.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.95
+      },
+      {
+        "id": "manuscript-qa-inconsistency",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Manuscript states advisory issues found, but QA records show none",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-qa.json"
+        ],
+        "whyItMatters": "Creates confusion: either the manuscript is outdated, or the QA process missed real issues. Inconsistent reporting undermines trust.",
+        "actionableFix": "If real issues exist, list them; otherwise, remove the generic advisory warning from the manuscript.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1
+      },
+      {
+        "id": "p-value-overinterpretation-risk",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Extremely small p-value reported without effect size interpretation",
+        "evidenceRefs": [
+          "manuscript.md",
+          "stats-run/stats-run.json"
+        ],
+        "whyItMatters": "A p-value of 3.87e-31 does not convey practical significance; the manuscript fails to contextualize the correlation magnitude (e.g., R² = 0.43).",
+        "actionableFix": "Add interpretation of the correlation strength (e.g., 'large effect') and its practical meaning, along with the CI.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1
+      },
+      {
+        "id": "figure-caption-too-generic",
+        "severity": "info",
+        "category": "figures",
+        "title": "Figure caption lacks descriptive detail",
+        "evidenceRefs": [
+          "stats-run/figure-qa.json"
+        ],
+        "whyItMatters": "The caption 'Scatterplot for the two variables used in the correlation run' does not guide interpretation or mention observed trend.",
+        "actionableFix": "Revise caption to note the linear association, strength, and any notable patterns (e.g., 'strong positive linear relationship, r = 0.66').",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9
+      }
+    ],
+    "missingEvidence": [
+      "Normality tests",
+      "Linearity check",
+      "Outlier analysis",
+      "Confidence interval computation",
+      "Missing data flow and pattern",
+      "Variable distribution summaries"
+    ],
+    "recommendedNextStage": "execution",
+    "costEstimate": {
+      "inputTokens": 3032,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026156,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364650460.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364650460.json"
+  }
+}

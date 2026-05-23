@@ -1,0 +1,138 @@
+{
+  "verdict": "revise",
+  "summary": "The analysis is an exploratory, unbound negative binomial regression on 240 complete cases. Key issues: no prespecified study question, default alpha parameter, missing outcome diagnostics, no missing data analysis, and incomplete reporting of results.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "No prespecified study question or analysis plan",
+      "evidenceRefs": [
+        "manuscript.md: objective not defined, only generic description",
+        "stats-run.json: binding.status = unbound",
+        "stats-run.json: resultPosture = exploratory_standard_table"
+      ],
+      "whyItMatters": "Without a prespecified question and protocol, all results are exploratory and cannot support confirmatory claims. The manuscript's conservative language does not fully mitigate the risk of post-hoc interpretation.",
+      "actionableFix": "State the specific clinical or public-health question, and provide a preregistered analysis plan or method-selection evidence. If this is purely exploratory, remove any implication of prespecification.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Negative binomial dispersion parameter left at default",
+      "evidenceRefs": [
+        "stats-run.json: warnings: ValueWarning about default alpha=1.0"
+      ],
+      "whyItMatters": "The dispersion parameter alpha was not estimated; using the default may yield incorrect standard errors and p-values, affecting all inferential statistics.",
+      "actionableFix": "Re-run the model with alpha estimated via maximum likelihood or a quasi-Poisson alternative. Justify the choice of dispersion estimation method.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check if alpha was estimated or fixed; statsmodels warns of default.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "No descriptive analysis of the count outcome",
+      "evidenceRefs": [
+        "manuscript.md: no distribution, zero-inflation, or overdispersion checks mentioned",
+        "stats-run.json: no summary statistics for count_events"
+      ],
+      "whyItMatters": "Without knowing the range, skew, zero fraction, and potential overdispersion, the choice of negative binomial cannot be critically assessed. A Poisson or zero-inflated model might be more appropriate.",
+      "actionableFix": "Report the distribution of count_events (min, max, median, IQR, percentage of zeros) and test for overdispersion relative to Poisson. Provide a histogram.",
+      "reentryPoint": "exploration",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No analysis of missing data patterns or sensitivity",
+      "evidenceRefs": [
+        "manuscript.md: acknowledges complete-case limitations but no data on excluded records",
+        "stats-run.json: rowCount = 240, no prior N or missingness report"
+      ],
+      "whyItMatters": "Complete-case analysis assumes missing completely at random, which is rarely plausible. The absence of a missingness report and sensitivity analyses undermines any inference.",
+      "actionableFix": "Report the original sample size, the number and proportion of missing values per variable, and a comparison of complete vs. incomplete cases. If possible, conduct multiple imputation or a sensitivity analysis under MAR.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Rate ratios not reported in main text",
+      "evidenceRefs": [
+        "manuscript.md: results only show regression coefficients, no rate ratios",
+        "stats-run.json: contains rate_ratio and confidence intervals"
+      ],
+      "whyItMatters": "Rate ratios are more interpretable for count outcomes. Readers should see both the log-scale coefficients and the exponentiated form to avoid manual conversion.",
+      "actionableFix": "Add a column or in-text mention of the rate ratio and its 95% CI for each predictor alongside the coefficient.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Inappropriate normality test on residuals",
+      "evidenceRefs": [
+        "diagnostics.json: shapiro_p_value = 8.17e-05 (very small)",
+        "manuscript.md: no discussion"
+      ],
+      "whyItMatters": "The Shapiro-Wilk test assumes normal residuals, which is not expected in a negative binomial model. Its significance may be misleading and does not indicate model failure.",
+      "actionableFix": "Replace with diagnostics appropriate for count models, such as deviance residuals plotted against fitted values, check for overdispersion (e.g., dispersion parameter test), and inspect zero inflation. Remove the Shapiro test result or note its inapplicability.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F07",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Unsubstantiated reference to advisory issues from methods review",
+      "evidenceRefs": [
+        "manuscript.md: 'The methods review found advisory issues that need human review.'",
+        "stats-qa.json: empty (no issues listed)",
+        "figure-qa.json: empty"
+      ],
+      "whyItMatters": "The claim of detected issues cannot be verified; if they exist, they should be disclosed. Otherwise, the statement is misleading and could mask real concerns.",
+      "actionableFix": "Either list the specific issues identified, or remove the statement if no review was actually conducted. If the review was automated, describe its scope and results transparently.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Check if 'issues' field in stats-qa.json is non-empty; it is empty.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F08",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Incomplete influence diagnostics",
+      "evidenceRefs": [
+        "diagnostics.json: max_cooks_distance = 0.053",
+        "manuscript.md: 'No explicit influence diagnostic evidence was found.'"
+      ],
+      "whyItMatters": "A single maximum Cook's distance does not rule out influential observations; high-leverage points could still affect estimates. Without a standard threshold check or visual assessment, robustness is unknown.",
+      "actionableFix": "Provide a plot of Cook's distances against observation index, and flag any points above a common threshold (e.g., 4/N). Consider robust standard errors or leave-one-out analysis.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Prespecified clinical or public health question",
+    "Analysis plan or protocol",
+    "Variable definitions and outcome distribution (count_events)",  
+    "Missing data patterns and original sample size",
+    "Model selection justification, especially for dispersion parameter",
+    "Sensitivity analyses for missingness and model specification",
+    "Influence diagnostics beyond max Cook's distance",
+    "External validation or population-design correction"
+  ],
+  "recommendedNextStage": "exploration"
+}

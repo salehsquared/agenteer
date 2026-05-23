@@ -1,0 +1,118 @@
+{
+  "verdict": "block",
+  "summary": "The study has fundamental flaws: variables are undefined, the data source is not described, and the analysis plan lacks pre-registration. Without variable definitions, the results are uninterpretable and irreproducible. Additional methodological gaps (missingness handling, limited diagnostics) further undermine trust. The manuscript's self-limiting stance does not mitigate these core deficiencies.",
+  "findings": [
+    {
+      "id": "V01",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "No variable definitions or data dictionary",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without definitions (units, coding, meaning) of outcome_cont, severity, age, treatment, the reported estimates are meaningless and cannot be interpreted or reproduced.",
+      "actionableFix": "Provide a detailed data dictionary that defines each variable, its type (continuous, binary, categorical), possible values, units, and how it was measured. Include this in the manuscript or a companion artifact.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "V02",
+      "severity": "blocker",
+      "category": "reproducibility",
+      "title": "Data source and ethical compliance not documented",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The dataset is unnamed and lacks any ethics approval statement. This makes the study unreproducible and raises concerns about participant consent and data provenance.",
+      "actionableFix": "Describe the data source, ethics approval, and any data-sharing constraints. If the data cannot be shared, state this clearly and provide a minimal synthetic dataset that preserves the statistical properties for reproducibility checks.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "V03",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without accounting for missing data",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The manuscript mentions a complete-case sample of 240 but does not report the original sample size, number of missing values per variable, or any pattern of missingness. This can bias estimates if missingness is related to outcome or covariates.",
+      "actionableFix": "Report missingness patterns, consider multiple imputation or sensitivity analyses, and justify why complete-case analysis is adequate. At minimum, provide a table of missingness per variable.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "V04",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Insufficient diagnostic checks for linear regression assumptions",
+      "evidenceRefs": [
+        "stats-run.json",
+        "diagnostics.json"
+      ],
+      "whyItMatters": "Only Shapiro–Wilk and leverage are reported. Homoscedasticity, linearity, and influence diagnostics are absent. For example, Breusch–Pagan test for heteroscedasticity and residual-vs-fitted plots are needed to support inference.",
+      "actionableFix": "Add and report heteroscedasticity tests, residual plots, and influence measures (e.g., DFBETAS). Include these in the diagnostics artifact.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "V05",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Causal interpretation despite exploratory posture",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The objective 'How is severity associated with the continuous outcome after adjustment?' implies a causal relationship, yet the analysis is unadjusted for confounders (no covariate justification) and the run is declared exploratory. The manuscript's caveats do not fully retract the implication.",
+      "actionableFix": "Either reframe the question as purely associational without causal language, or, if causal, specify a DAG, adjust for confounders, and conduct sensitivity analyses. Clearly state that the current analysis does not support causal claims.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "V06",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "p-values reported as 0.0000",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Statistically, p-values are never exactly zero. Reporting them as 0.0000 is inaccurate and may mislead readers about the strength of evidence. The underlying p-values are extremely small but not zero.",
+      "actionableFix": "Report p-values using standard conventions (e.g., p < 0.001) or with full precision (e.g., 1.97e-30).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "V07",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No contextualization with prior work",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The discussion lacks any reference to previous studies on the association between severity and the outcome. This omission makes it impossible to judge whether the estimates are plausible or novel.",
+      "actionableFix": "Add a brief literature review to situate the findings and discuss consistency with prior results.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions (units, coding, meaning)",
+    "Data source description and ethics approval",
+    "Missing data pattern and handling justification",
+    "Full regression diagnostics (heteroscedasticity, linearity, influence)",
+    "Data availability statement or synthetic data for reproducibility",
+    "Pre-registration or analysis protocol for covariate selection"
+  ],
+  "recommendedNextStage": "protocol"
+}

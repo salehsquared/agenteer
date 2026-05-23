@@ -1,0 +1,109 @@
+{
+  "verdict": "block",
+  "summary": "Manuscript lacks essential elements: explicit method, variable definitions, descriptive statistics, effect size, assumption checks, missingness analysis, and pre-registration binding. Not ready for publication or promotion.",
+  "findings": [
+    {
+      "id": "reporting_method_absent",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Statistical method not stated in manuscript",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Readers cannot evaluate appropriateness without knowing the method.",
+      "actionableFix": "Explicitly state that a one-way ANOVA was performed.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Search manuscript.md for 'ANOVA' or 'analysis of variance'; not found.",
+      "confidence": 1.0
+    },
+    {
+      "id": "reporting_variable_defs",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "Outcome and group variables are not defined",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Without variable definitions, the research question is opaque and results cannot be interpreted.",
+      "actionableFix": "Define the continuous outcome and the categories of the group variable in the Methods.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md variables section only says variables not fully encoded.",
+      "confidence": 1.0
+    },
+    {
+      "id": "reporting_descriptives",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No descriptive statistics reported",
+      "evidenceRefs": ["manuscript.md", "stats-run.json"],
+      "whyItMatters": "Readers need group means, standard deviations, and sample sizes per group to assess the data and check ANOVA assumptions.",
+      "actionableFix": "Add a table with n, mean, SD per group, and optionally a boxplot.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md results only include F and p.",
+      "confidence": 1.0
+    },
+    {
+      "id": "reporting_effect_size",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Effect size (eta-squared) not reported",
+      "evidenceRefs": ["stats-run.json"],
+      "whyItMatters": "p-value alone does not convey the magnitude of group differences; effect size is essential.",
+      "actionableFix": "Report eta-squared or partial eta-squared with confidence interval.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json has sum_sq and df, but no eta-squared in manuscript.",
+      "confidence": 1.0
+    },
+    {
+      "id": "model_diagnostics_homogeneity",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Homogeneity of variance not assessed",
+      "evidenceRefs": ["diagnostics.json"],
+      "whyItMatters": "ANOVA assumes equal variances; violation can inflate Type I error.",
+      "actionableFix": "Report Levene's test or Bartlett's test, and consider Welch's ANOVA if violated.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "diagnostics.json does not contain any test for homogeneity of variance.",
+      "confidence": 1.0
+    },
+    {
+      "id": "missingness_analysis",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No analysis of missing data",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Complete-case analysis can bias results if missingness is not completely at random.",
+      "actionableFix": "Document the amount and pattern of missingness, and consider sensitivity analysis.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "manuscript.md mentions missingness only as a limitation; no numbers given.",
+      "confidence": 1.0
+    },
+    {
+      "id": "reproducibility_binding",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analysis not bound to a pre-registered protocol or AnalysisSpec",
+      "evidenceRefs": ["stats-qa.json", "stats-run.json"],
+      "whyItMatters": "Unbound analysis increases risk of p-hacking and reduces credibility.",
+      "actionableFix": "Create an AnalysisSpec artifact and bind the run before considering confirmatory claims.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "stats-run.json.resultPosture.status is 'exploratory_standard_table'.",
+      "confidence": 1.0
+    },
+    {
+      "id": "reporting_assumptions_check",
+      "severity": "major",
+      "category": "reporting",
+      "title": "ANOVA assumption checks not reported in manuscript",
+      "evidenceRefs": ["manuscript.md", "diagnostics.json"],
+      "whyItMatters": "Readers need to know if model assumptions were met. Diagnostics show residual normality but not reported.",
+      "actionableFix": "Incorporate diagnostics results (normality, homoscedasticity, outliers) in the manuscript.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md does not mention residual diagnostics.",
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Content of figure-qa.json not provided",
+    "Content of figures.json not provided",
+    "Content of manuscript-qa.json not provided",
+    "Variable codebook/dictionary not provided"
+  ],
+  "recommendedNextStage": "execution"
+}

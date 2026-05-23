@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_6469807046337512968",
+    "method": "linear-regression",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "severity",
+      "age",
+      "treatment"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "const",
+        "estimate": 8.051800592292729,
+        "std_error": 0.6398646080368382,
+        "p_value": 3.98499681195026e-28,
+        "ci_low": 6.791224537526812,
+        "ci_high": 9.312376647058645
+      },
+      {
+        "term": "severity",
+        "estimate": 2.070716919793987,
+        "std_error": 0.15591603860871714,
+        "p_value": 1.9724447634601785e-30,
+        "ci_low": 1.763551900264119,
+        "ci_high": 2.3778819393238555
+      },
+      {
+        "term": "age",
+        "estimate": 0.12909417287305672,
+        "std_error": 0.009042304308119507,
+        "p_value": 9.476904212779542e-34,
+        "ci_low": 0.11128022887997702,
+        "ci_high": 0.14690811686613642
+      },
+      {
+        "term": "treatment",
+        "estimate": 1.0338790402267861,
+        "std_error": 0.2707588629200866,
+        "p_value": 0.0001716849260566661,
+        "ci_low": 0.5004659792045734,
+        "ci_high": 1.5672921012489989
+      }
+    ],
+    "diagnostics": {
+      "model_family": "linear-regression",
+      "aic": 1002.1446341994582,
+      "bic": 1016.0671898928261,
+      "df_resid": 236,
+      "residual_mean": 3.438138662659185e-13,
+      "residual_sd": 1.9237642375567996,
+      "shapiro_p_value": 0.7239025894122759,
+      "max_leverage": 0.048284099279017716,
+      "max_cooks_distance": 0.07756490742961414,
+      "vif": [
+        {
+          "term": "severity",
+          "vif": 1.1466300840300128
+        },
+        {
+          "term": "age",
+          "vif": 1.0808383501003018
+        },
+        {
+          "term": "treatment",
+          "vif": 1.1266739538918475
+        }
+      ],
+      "max_vif": 1.1466300840300128,
+      "weighted": false
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/stats-config.json",
+        "sha256": "9dcaf6386d932eb77663f0913142b34cba83d154c904c16f804a0cfea142cbd1"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/stats-summary.json",
+        "sha256": "7236fad1473e338ead7f6326f6b6c76c7cd470e94f4ee55d03cc732a00f361c0"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/estimates.csv",
+        "sha256": "abd6792cfcc00751fb1330a4c8ce782d439b49994b5aae53d81a7b838a29ecd4"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/diagnostics.json",
+        "sha256": "61c26be3b0c512f4ad17959d32321e8ec81ef3b89ff35161b5608fd1a5f78f07"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/figures.json",
+        "sha256": "5aa4df9d3f2a4845236c2512f8e0482dbdfead1a672fa29b84b984a1654d1e2d"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/model-residuals.png",
+        "sha256": "995b7b5810f6128b7d9fffff6a882630a19702c8260840072b375f493ba2ff26"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/figure-qa.json",
+        "sha256": "4c937939d6dcfc4defda488e05e10cb52981e3a9ba9e6ea6682517cfe73ab6ec"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/stats-report.md",
+        "sha256": "bc2ab4b3867203a1c2b703aac96404e41707044e6e1b46b93795d7114cee392d"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run/stats-qa.json",
+        "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/10-linear-regression-severity/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}
+

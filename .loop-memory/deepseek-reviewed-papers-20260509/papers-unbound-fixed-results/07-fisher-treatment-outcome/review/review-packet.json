@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:46:40.178Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome",
+  "packetHash": "18af4a26714320f7484fb2865c0aa8193c0e2ba0e9b0923221514d86161bd693",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 8,
+    "totalBytes": 98072,
+    "includedBytes": 20533
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 4073,
+      "sha256": "e8a7e9477248f7a6980a4409939f866223dc8be8d8be731883ad1416f49cb89c",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# Is binary outcome frequency associated with treatment group using exact testing\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: Is binary outcome frequency associated with treatment group using exact testing?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was inferred from the available run artifacts and should be confirmed during review. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: Is binary outcome frequency associated with treatment group using exact testing? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe statistical method was inferred from the available run artifacts and should be confirmed during review. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the odds ratio was 2.7778; p=0.0005.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No estimate-like records were available for p-value/effect-size checks.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 007a098740ecc89426d1c58ac8273df33393f266b33233ab6e4023a858c88b00. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 4183,
+      "sha256": "de6e0b8f1073ae728cb696d4a6972d0d52965d4f13273a6181c976d2eae4eac5",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_292397203522828863\",\n  \"method\": \"fisher-exact\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"odds_ratio\": 2.7777777777777777,\n      \"p_value\": 0.0005365881864916114\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"Fisher exact\",\n    \"table\": {\n      \"0\": {\n        \"0\": 75,\n        \"1\": 81\n      },\n      \"1\": {\n        \"0\": 21,\n        \"1\": 63\n      }\n    }\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-config.json\",\n      \"sha256\": \"1b940c48d032b073def854285135bd90863bc983e8e6c8cba0356e2866770297\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-summary.json\",\n      \"sha256\": \"f6dc0f1ab4a1299badb6503b9ba0443d352f9b6839a191588aebdf249381891e\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/estimates.csv\",\n      \"sha256\": \"1e1f6ecbab8868a829248730515382423e4ebae8cdfc224a5bb6a3b739199b74\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/diagnostics.json\",\n      \"sha256\": \"c0f3ae62659e30428c8366bfab84351269aaa07f7ba31d09b35a164e3f20c31a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figures.json\",\n      \"sha256\": \"5c97c05b9929049f304a870abeba56f7bb5a7b3be69ac9cfff197baa987b098f\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"sha256\": \"b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figure-qa.json\",\n      \"sha256\": \"eaa102168ba4ffb3ef21625b25546840da8cae7a903f399cbc4513cd62927117\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-report.md\",\n      \"sha256\": \"bb10a2ccf17590b527a01573de2e356d1677090a52f79522ec957d6d74bb9dfd\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-qa.json\",\n      \"sha256\": \"b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 139,
+      "sha256": "c0f3ae62659e30428c8366bfab84351269aaa07f7ba31d09b35a164e3f20c31a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"test\": \"Fisher exact\",\n  \"table\": {\n    \"0\": {\n      \"0\": 75,\n      \"1\": 81\n    },\n    \"1\": {\n      \"0\": 21,\n      \"1\": 63\n    }\n  }\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3585,
+      "sha256": "eaa102168ba4ffb3ef21625b25546840da8cae7a903f399cbc4513cd62927117",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"contingency-heatmap.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"title\": \"Contingency Table\",\n      \"caption\": \"Observed counts for the categorical association test.\",\n      \"altText\": \"Observed counts for the categorical association test.\",\n      \"xLabel\": \"treatment\",\n      \"yLabel\": \"outcome_binary\",\n      \"sourceColumns\": [\n        \"outcome_binary\",\n        \"treatment\"\n      ],\n      \"byteSize\": 24278,\n      \"sha256\": \"b241ba80c96315a190e20c908319874436191b964"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3585,
+      "sha256": "eaa102168ba4ffb3ef21625b25546840da8cae7a903f399cbc4513cd62927117",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1210,
+      "sha256": "5c97c05b9929049f304a870abeba56f7bb5a7b3be69ac9cfff197baa987b098f",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2221,
+      "sha256": "d8187920af9917ff5018771da7ac3e1eb442cab112b7832443c6be96597517f1",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9780,
+      "sha256": "b1d13d3e63617e0fa2ded69a6e10b71089be09ae3b9277ac41c07a969df322df",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1533,
+      "sha256": "33e23d9a53b55d651bed657bc114720013f2cf5357dcc60deac090acf3e2087f",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4149,
+      "sha256": "90859ef8a1b1b028a4ca23bd378d90e1447c8309e20c9b6d6f001a56aca74266",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14816,
+      "sha256": "49a224ea8880cb60b0a7c248a5400cf2545a4e793b11998c95d57cf6fab56636",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4312,
+      "sha256": "72460e582d2bbebfee9662187c5393643eab151a89784fc2419d1fa4d2190ab6",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 814,
+      "sha256": "07635dc15ea2283e142f734275322c448ab0578558b451d9cc0b4c9c610f6ec0",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9913,
+      "sha256": "f5ad113782a2f5c3fa688e7f6bb838920e06c56e747f336129e203c347e82cb2",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1015,
+      "sha256": "a4dffb9379d8e99f81b81d5ad45fcd44a1099f7f0afe5518fa1a9df95dc49fc8",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 4442,
+      "sha256": "933a0432ed4c92390b9bba5a0c84c9f49ed318425ab1caa62ca7344ce404b991",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/contingency-heatmap.png",
+      "relativePath": "stats-run/contingency-heatmap.png",
+      "bytes": 24278,
+      "sha256": "b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 75,
+      "sha256": "1e1f6ecbab8868a829248730515382423e4ebae8cdfc224a5bb6a3b739199b74",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 631,
+      "sha256": "1b940c48d032b073def854285135bd90863bc983e8e6c8cba0356e2866770297",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1589,
+      "sha256": "bb10a2ccf17590b527a01573de2e356d1677090a52f79522ec957d6d74bb9dfd",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 192,
+      "sha256": "f6dc0f1ab4a1299badb6503b9ba0443d352f9b6839a191588aebdf249381891e",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 4073 bytes, sha256=e8a7e9477248f7a6980a4409939f866223dc8be8d8be731883ad1416f49cb89c) ---\n# Is binary outcome frequency associated with treatment group using exact testing\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a declared clinical or public-health question.\n\nObjective: Is binary outcome frequency associated with treatment group using exact testing?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The statistical method was inferred from the available run artifacts and should be confirmed during review. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: Is binary outcome frequency associated with treatment group using exact testing? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe statistical method was inferred from the available run artifacts and should be confirmed during review. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For treatment, the odds ratio was 2.7778; p=0.0005.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No estimate-like records were available for p-value/effect-size checks.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 007a098740ecc89426d1c58ac8273df33393f266b33233ab6e4023a858c88b00. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 4183 bytes, sha256=de6e0b8f1073ae728cb696d4a6972d0d52965d4f13273a6181c976d2eae4eac5) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_292397203522828863\",\n  \"method\": \"fisher-exact\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"outcome_binary\",\n    \"treatment\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"treatment\",\n      \"odds_ratio\": 2.7777777777777777,\n      \"p_value\": 0.0005365881864916114\n    }\n  ],\n  \"diagnostics\": {\n    \"test\": \"Fisher exact\",\n    \"table\": {\n      \"0\": {\n        \"0\": 75,\n        \"1\": 81\n      },\n      \"1\": {\n        \"0\": 21,\n        \"1\": 63\n      }\n    }\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-config.json\",\n      \"sha256\": \"1b940c48d032b073def854285135bd90863bc983e8e6c8cba0356e2866770297\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-summary.json\",\n      \"sha256\": \"f6dc0f1ab4a1299badb6503b9ba0443d352f9b6839a191588aebdf249381891e\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/estimates.csv\",\n      \"sha256\": \"1e1f6ecbab8868a829248730515382423e4ebae8cdfc224a5bb6a3b739199b74\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/diagnostics.json\",\n      \"sha256\": \"c0f3ae62659e30428c8366bfab84351269aaa07f7ba31d09b35a164e3f20c31a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figures.json\",\n      \"sha256\": \"5c97c05b9929049f304a870abeba56f7bb5a7b3be69ac9cfff197baa987b098f\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"sha256\": \"b241ba80c96315a190e20c908319874436191b964d5817b81fe76dadbf680e92\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figure-qa.json\",\n      \"sha256\": \"eaa102168ba4ffb3ef21625b25546840da8cae7a903f399cbc4513cd62927117\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-report.md\",\n      \"sha256\": \"bb10a2ccf17590b527a01573de2e356d1677090a52f79522ec957d6d74bb9dfd\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/stats-qa.json\",\n      \"sha256\": \"b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 139 bytes, sha256=c0f3ae62659e30428c8366bfab84351269aaa07f7ba31d09b35a164e3f20c31a) ---\n{\n  \"test\": \"Fisher exact\",\n  \"table\": {\n    \"0\": {\n      \"0\": 75,\n      \"1\": 81\n    },\n    \"1\": {\n      \"0\": 21,\n      \"1\": 63\n    }\n  }\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\",\n      \"detail\": \"1 estimate row(s) produced.\"\n    },\n    {\n      \"id\": \"uncertainty-and-pvalue-context\",\n      \"status\": \"pass\",\n      \"detail\": \"Report includes ASA-style caution that p-values are not effect size or practical importance.\"\n    },\n    {\n      \"id\": \"binding-status\",\n      \"status\": \"warning\",\n      \"detail\": \"Stats run binding is unbound.\"\n    },\n    {\n      \"id\": \"standard-table-boundary\",\n      \"status\": \"pass\",\n      \"detail\": \"Standard-table runner is not a complex-survey variance engine.\"\n    },\n    {\n      \"id\": \"method-backend-availability\",\n      \"status\": \"pass\",\n      \"detail\": \"No missing-backend blocker was reported.\"\n    },\n    {\n      \"id\": \"figure-manifest\",\n      \"status\": \"pass\",\n      \"detail\": \"1 rendered figure artifact(s) recorded.\"\n    },\n    {\n      \"id\": \"figure-quality\",\n      \"status\": \"pass\",\n      \"detail\": \"Rendered figures were inspected for readability, dimensions, blankness, captions, alt text, and source columns.\"\n    },\n    {\n      \"id\": \"result-posture\",\n      \"status\": \"warning\",\n      \"detail\": \"exploratory_standard_table: This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\"\n    }\n  ]\n}\n\n\n--- ARTIFACT figure-qa.json (json, 3585 bytes, sha256=eaa102168ba4ffb3ef21625b25546840da8cae7a903f399cbc4513cd62927117) ---\n{\n  \"schemaVersion\": 1,\n  \"manifestPath\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/figures.json\",\n  \"status\": \"pass\",\n  \"summary\": \"1/1 figure(s) passed; status=pass.\",\n  \"figures\": [\n    {\n      \"figureId\": \"contingency-heatmap.png\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/07-fisher-treatment-outcome/stats-run/contingency-heatmap.png\",\n      \"title\": \"Contingency Table\",\n      \"caption\": \"Observed counts for the categorical association test.\",\n      \"altText\": \"Observed counts for the categorical association test.\",\n      \"xLabel\": \"treatment\",\n      \"yLabel\": \"outcome_binary\",\n      \"sourceColumns\": [\n        \"outcome_binary\",\n        \"treatment\"\n      ],\n      \"byteSize\": 24278,\n      \"sha256\": \"b241ba80c96315a190e20c908319874436191b964\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3585 bytes, sha256=eaa102168ba4ffb3ef21625b25546840da8cae7a903f399cbc4513cd62927117) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1210 bytes, sha256=5c97c05b9929049f304a870abeba56f7bb5a7b3be69ac9cfff197baa987b098f) ---\n\n\n--- ARTIFACT manuscript-qa.json (json, 2221 bytes, sha256=d8187920af9917ff5018771da7ac3e1eb442cab112b7832443c6be96597517f1) ---\n"
+}

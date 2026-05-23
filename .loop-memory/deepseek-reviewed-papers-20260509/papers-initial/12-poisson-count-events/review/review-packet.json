@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:25:49.870Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events",
+  "packetHash": "41a336b3fe4cbe69c56a3b047230554387d936215106797a7826ad4202040848",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 7,
+    "totalBytes": 140889,
+    "includedBytes": 20614
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 4143,
+      "sha256": "0f01748c0fe5658b25cc5c29a6edc5da2b268fde050921fafaa77d1591c17916",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was count. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was count. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the estimate was -0.7983 (95% CI -1.3433 to -0.2534); p=0.0041.\n- For treatment, the estimate was 0.2704 (95% CI 0.0388 to 0.5019); p=0.0221.\n- For age, the estimate was 0.0110 (95% CI 0.0037 to 0.0184); p=0.0032.\n- For severity, the estimate was 0.1241 (95% CI -0.0042 to 0.2525); p=0.0581.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is caa427b8342d28c4231c927bbe9a0d9b6a51aa9610f5e4b1b8678ed02024a578. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 5933,
+      "sha256": "e2277afef398ff868d203149f3b6c9d3f3d803783711da7067c90fe7843eeec5",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_5388545423868509071\",\n  \"method\": \"poisson-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"count_events\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": -0.7983446835113677,\n      \"std_error\": 0.2780566282743485,\n      \"p_value\": 0.004089702591897713,\n      \"ci_low\": -1.3433256605917325,\n      \"ci_high\": -0.2533637064310029,\n      \"rate_ratio\": 0.4500733616971637,\n      \"rr_ci_low\": 0.2609763051643033,\n      \"rr_ci_high\": 0.7761855268119306\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 0.2703648976558637,\n      \"std_error\": 0.11814059447931419,\n      \"p_value\": 0.02210834764097612,\n      \"ci_low\": 0.03881358736425633,\n      \"ci_high\": 0.501916207947471,\n      \"rate_ratio\": 1.3104425409122726,\n      \"rr_ci_low\": 1.0395766753584506,\n      \"rr_ci_high\": 1.6518835923675326\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.01102237601604572,\n      \"std_error\": 0.003741649452853114,\n      \"p_value\": 0.0032205797667838472,\n      \"ci_low\": 0.0036888778456796185,\n      \"ci_high\": 0.018355874186411825,\n      \"rate_ratio\": 1.011083346208782,\n      \"rr_ci_low\": 1.003695690129545,\n      \"rr_ci_high\": 1.0185253787916564\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 0.12411083283501828,\n      \"std_error\": 0.06548795677321297,\n      \"p_value\": 0.05806983917205497,\n      \"ci_low\": -0.0042432038615950185,\n      \"ci_high\": 0.2524648695316316,\n      \"rate_ratio\": 1.1321413424804951,\n      \"rr_ci_low\": 0.9957657858084149,\n      \"rr_ci_high\": 1.2871942756227068\n    }\n  ],\n  \"diagnostics\": {\n    \"model_family\": \"poisson-regression\",\n    \"aic\": 710.381549998833,\n    \"bic\": -1066.8941693222591,\n    \"df_resid\": 236,\n    \"residual_mean\": 2.036519101504079e-14,\n    \"residual_sd\": 1.0699038840584,\n    \"shapiro_p_value\": 0.00008087713024942379,\n    \"max_leverage\": 0.05426504496602559,\n    \"max_cooks_distance\": 0.039767004338049416,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.1266739538918475\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0808383501003018\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.146630084030013\n      }\n    ],\n    \"max_vif\": 1.146630084030013,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-config.json\",\n      \"sha256\": \"ee34ea210d852265a78ce3beca3d22c4841c241d847e1b729e5e12e8508676d8\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-summary.json\",\n      \"sha256\": \"00981ebf722416c1a29a05655c2cba0307dc60a561f755ac6189082e025ee1ea\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/estimates.csv\",\n      \"sha256\": \"cabcc9c68e6222234c68dd910fad9ade8ae5c052c31deeda01d5bae511e83097\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/diagnostics.json\",\n      \"sha256\": \"ca57b1a9fc7af00bcf75e2b9a5c68dcda81816c02d7b6919f57132d25717110e\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/figures.json\",\n      \"sha256\": \"516163db3ee544e39c1b1e338c9e20752095bbc49d922009d707f04efa67a85d\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/model-residuals.png\",\n      \"sha256\": \"e6666b64c307cfed06aaf9b8200203fab9e26527d27e932ebe6d5dece4b4ca24\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/figure-qa.json\",\n      \"sha256\": \"10ee74561b4b888f7f5a5d2cfb80bf61b498e5dd204e80ddde5632fbb6f1450b\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-report.md\",\n      \"sha256\": \"6f09646dc49b29f4e6961b186d0b6af0ce61f0172cb38f97dc82f96924108274\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-qa.json\",\n      \"sha256\": \"ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 599,
+      "sha256": "ca57b1a9fc7af00bcf75e2b9a5c68dcda81816c02d7b6919f57132d25717110e",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"model_family\": \"poisson-regression\",\n  \"aic\": 710.381549998833,\n  \"bic\": -1066.8941693222591,\n  \"df_resid\": 236,\n  \"residual_mean\": 2.036519101504079e-14,\n  \"residual_sd\": 1.0699038840584,\n  \"shapiro_p_value\": 8.087713024942379e-05,\n  \"max_leverage\": 0.05426504496602559,\n  \"max_cooks_distance\": 0.039767004338049416,\n  \"vif\": [\n    {\n      \"term\": \"treatment\",\n      \"vif\": 1.1266739538918475\n    },\n    {\n      \"term\": \"age\",\n      \"vif\": 1.0808383501003018\n    },\n    {\n      \"term\": \"severity\",\n      \"vif\": 1.146630084030013\n    }\n  ],\n  \"max_vif\": 1.146630084030013,\n  \"weighted\": false\n}"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3589,
+      "sha256": "10ee74561b4b888f7f5a5d2cfb80bf61b498e5dd204e80ddde5632fbb6f1450b",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3589,
+      "sha256": "10ee74561b4b888f7f5a5d2cfb80bf61b498e5dd204e80ddde5632fbb6f1450b",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1224,
+      "sha256": "516163db3ee544e39c1b1e338c9e20752095bbc49d922009d707f04efa67a85d",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2192,
+      "sha256": "06ef4b91098db7de315252cb56d419b3eaa556a460ad0d47d3c0b3ccecd462a5",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9680,
+      "sha256": "758ce4b0c918fb295d1dcf1d044e996fae76c36cf960762d6a3f74bcbf84995e",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1511,
+      "sha256": "d2debd91302665aa4fcfb5d0e3cc3346bda73f81bc1908614f74cd190595e7b9",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4149,
+      "sha256": "408aa193a60373cb03c64fb356db6bf4f37556361ff7c3bd3789eae6ff7723d0",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 14783,
+      "sha256": "d427a958c2068fc5b56cd1db9ca56e145e2e86fab00261327314027fbf5fd180",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4304,
+      "sha256": "5814a628d17f05bd9dfe736a6d54f6a61f4b5ece31ac2265fbcf1cc4d6243bc1",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 803,
+      "sha256": "201f0e65ceb4924f229d7546cb208713273292f8a049601d567025fb0f32f569",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 9809,
+      "sha256": "280c2e48e72d67263e4d3d14e62156e5f118a23c3eb68d3a049947cf0464cd29",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 992,
+      "sha256": "518c27ffd9d368f2a639549f14d69d358ac4d8ecb48c969304969c354b071108",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 6302,
+      "sha256": "04bc768ed95de9d596581c3dc2fd25dada7645c9cd86fd1b518689d02e86d168",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 739,
+      "sha256": "cabcc9c68e6222234c68dd910fad9ade8ae5c052c31deeda01d5bae511e83097",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/model-residuals.png",
+      "relativePath": "stats-run/model-residuals.png",
+      "bytes": 62355,
+      "sha256": "e6666b64c307cfed06aaf9b8200203fab9e26527d27e932ebe6d5dece4b4ca24",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "larger than maxArtifactBytes 60000",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 660,
+      "sha256": "ee34ea210d852265a78ce3beca3d22c4841c241d847e1b729e5e12e8508676d8",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 1773,
+      "sha256": "6f09646dc49b29f4e6961b186d0b6af0ce61f0172cb38f97dc82f96924108274",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 223,
+      "sha256": "00981ebf722416c1a29a05655c2cba0307dc60a561f755ac6189082e025ee1ea",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 4143 bytes, sha256=0f01748c0fe5658b25cc5c29a6edc5da2b268fde050921fafaa77d1591c17916) ---\n# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was count. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was count. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the estimate was -0.7983 (95% CI -1.3433 to -0.2534); p=0.0041.\n- For treatment, the estimate was 0.2704 (95% CI 0.0388 to 0.5019); p=0.0221.\n- For age, the estimate was 0.0110 (95% CI 0.0037 to 0.0184); p=0.0032.\n- For severity, the estimate was 0.1241 (95% CI -0.0042 to 0.2525); p=0.0581.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is caa427b8342d28c4231c927bbe9a0d9b6a51aa9610f5e4b1b8678ed02024a578. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 5933 bytes, sha256=e2277afef398ff868d203149f3b6c9d3f3d803783711da7067c90fe7843eeec5) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_5388545423868509071\",\n  \"method\": \"poisson-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"count_events\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": -0.7983446835113677,\n      \"std_error\": 0.2780566282743485,\n      \"p_value\": 0.004089702591897713,\n      \"ci_low\": -1.3433256605917325,\n      \"ci_high\": -0.2533637064310029,\n      \"rate_ratio\": 0.4500733616971637,\n      \"rr_ci_low\": 0.2609763051643033,\n      \"rr_ci_high\": 0.7761855268119306\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 0.2703648976558637,\n      \"std_error\": 0.11814059447931419,\n      \"p_value\": 0.02210834764097612,\n      \"ci_low\": 0.03881358736425633,\n      \"ci_high\": 0.501916207947471,\n      \"rate_ratio\": 1.3104425409122726,\n      \"rr_ci_low\": 1.0395766753584506,\n      \"rr_ci_high\": 1.6518835923675326\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.01102237601604572,\n      \"std_error\": 0.003741649452853114,\n      \"p_value\": 0.0032205797667838472,\n      \"ci_low\": 0.0036888778456796185,\n      \"ci_high\": 0.018355874186411825,\n      \"rate_ratio\": 1.011083346208782,\n      \"rr_ci_low\": 1.003695690129545,\n      \"rr_ci_high\": 1.0185253787916564\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 0.12411083283501828,\n      \"std_error\": 0.06548795677321297,\n      \"p_value\": 0.05806983917205497,\n      \"ci_low\": -0.0042432038615950185,\n      \"ci_high\": 0.2524648695316316,\n      \"rate_ratio\": 1.1321413424804951,\n      \"rr_ci_low\": 0.9957657858084149,\n      \"rr_ci_high\": 1.2871942756227068\n    }\n  ],\n  \"diagnostics\": {\n    \"model_family\": \"poisson-regression\",\n    \"aic\": 710.381549998833,\n    \"bic\": -1066.8941693222591,\n    \"df_resid\": 236,\n    \"residual_mean\": 2.036519101504079e-14,\n    \"residual_sd\": 1.0699038840584,\n    \"shapiro_p_value\": 0.00008087713024942379,\n    \"max_leverage\": 0.05426504496602559,\n    \"max_cooks_distance\": 0.039767004338049416,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.1266739538918475\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0808383501003018\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.146630084030013\n      }\n    ],\n    \"max_vif\": 1.146630084030013,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-config.json\",\n      \"sha256\": \"ee34ea210d852265a78ce3beca3d22c4841c241d847e1b729e5e12e8508676d8\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-summary.json\",\n      \"sha256\": \"00981ebf722416c1a29a05655c2cba0307dc60a561f755ac6189082e025ee1ea\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/estimates.csv\",\n      \"sha256\": \"cabcc9c68e6222234c68dd910fad9ade8ae5c052c31deeda01d5bae511e83097\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/diagnostics.json\",\n      \"sha256\": \"ca57b1a9fc7af00bcf75e2b9a5c68dcda81816c02d7b6919f57132d25717110e\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/figures.json\",\n      \"sha256\": \"516163db3ee544e39c1b1e338c9e20752095bbc49d922009d707f04efa67a85d\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/model-residuals.png\",\n      \"sha256\": \"e6666b64c307cfed06aaf9b8200203fab9e26527d27e932ebe6d5dece4b4ca24\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/figure-qa.json\",\n      \"sha256\": \"10ee74561b4b888f7f5a5d2cfb80bf61b498e5dd204e80ddde5632fbb6f1450b\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-report.md\",\n      \"sha256\": \"6f09646dc49b29f4e6961b186d0b6af0ce61f0172cb38f97dc82f96924108274\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run/stats-qa.json\",\n      \"sha256\": \"ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/12-poisson-count-events/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 599 bytes, sha256=ca57b1a9fc7af00bcf75e2b9a5c68dcda81816c02d7b6919f57132d25717110e) ---\n{\n  \"model_family\": \"poisson-regression\",\n  \"aic\": 710.381549998833,\n  \"bic\": -1066.8941693222591,\n  \"df_resid\": 236,\n  \"residual_mean\": 2.036519101504079e-14,\n  \"residual_sd\": 1.0699038840584,\n  \"shapiro_p_value\": 8.087713024942379e-05,\n  \"max_leverage\": 0.05426504496602559,\n  \"max_cooks_distance\": 0.039767004338049416,\n  \"vif\": [\n    {\n      \"term\": \"treatment\",\n      \"vif\": 1.1266739538918475\n    },\n    {\n      \"term\": \"age\",\n      \"vif\": 1.0808383501003018\n    },\n    {\n      \"term\": \"severity\",\n      \"vif\": 1.146630084030013\n    }\n  ],\n  \"max_vif\": 1.146630084030013,\n  \"weighted\": false\n}\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a) ---\n{\n  \"schemaVersion\": 1,\n  \"status\": \"warning\",\n  \"summary\": \"7/9 stats QA checks passed; status=warning.\",\n  \"checks\": [\n    {\n      \"id\": \"execution-status\",\n      \"status\": \"pass\",\n      \"detail\": \"Stats runner completed.\"\n    },\n    {\n      \"id\": \"effect-estimate-table\",\n      \"status\": \"pass\n\n--- ARTIFACT figure-qa.json (json, 3589 bytes, sha256=10ee74561b4b888f7f5a5d2cfb80bf61b498e5dd204e80ddde5632fbb6f1450b) ---\n\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3589 bytes, sha256=10ee74561b4b888f7f5a5d2cfb80bf61b498e5dd204e80ddde5632fbb6f1450b) ---\n\n\n--- ARTIFACT stats-run/figures.json (json, 1224 bytes, sha256=516163db3ee544e39c1b1e338c9e20752095bbc49d922009d707f04efa67a85d) ---\n"
+}

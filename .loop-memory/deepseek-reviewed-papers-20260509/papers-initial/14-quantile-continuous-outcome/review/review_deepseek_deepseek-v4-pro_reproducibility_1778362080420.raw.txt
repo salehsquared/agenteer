@@ -1,0 +1,132 @@
+{
+  "verdict": "revise",
+  "summary": "The study exhibits critical methodological and reporting flaws: the method is described inconsistently, the quantile level is unspecified, the analysis is unbound and exploratory, missing data handling is opaque, variable definitions are absent, and p-values are inappropriately rounded. These issues undermine reproducibility, interpretability, and trustworthiness, requiring major revisions before the work can be considered a credible research output.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Inconsistent model family description",
+      "evidenceRefs": [
+        "manuscript.md (Methods: \"detected model family was linear\")",
+        "stats-run/stats-run.json (method: \"quantile-regression\", diagnostics.model_family: \"quantile-regression\")"
+      ],
+      "whyItMatters": "The manuscript states a linear model, but the actual analysis is quantile regression. This misrepresentation misleads readers about the nature of the estimates (conditional quantile vs. mean) and may lead to incorrect interpretations of the coefficients.",
+      "actionableFix": "Correct the Methods section to accurately reflect quantile regression, specify the quantile level (tau) used, and note that coefficients represent changes in the quantile of the outcome.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json method field is 'quantile-regression'; manuscript.md line 'The detected model family was linear.'",
+      "confidence": 1.0
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Quantile level (tau) not reported",
+      "evidenceRefs": [
+        "stats-run/stats-run.json (parameters only include alpha=0.05)",
+        "manuscript.md (no mention of quantile)"
+      ],
+      "whyItMatters": "Quantile regression results depend on the quantile chosen (e.g., median vs. 0.9 quantile). Without specifying tau, the estimates are uninterpretable and the analysis is not reproducible.",
+      "actionableFix": "State the quantile level (tau) explicitly in the manuscript and ensure it is recorded in the run parameters (e.g., tau=0.5 for median regression).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "No 'tau' or 'quantile' field in stats-run.json parameters; manuscript lacks any quantile specification.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "P-values rounded to inappropriate precision",
+      "evidenceRefs": [
+        "manuscript.md (Results: p=0.0000, p=0.0001, p=0.0000, p=0.0000)",
+        "stats-run/stats-run.json (actual p-values: 3.71e-19, 1.33e-04, 1.36e-26, 4.20e-20)"
+      ],
+      "whyItMatters": "Rounding p-values to 0.0000 is inaccurate and against best practices (e.g., ASA statement). The true p-values are extremely small, and reporting them as zero masks the strength of evidence and could be seen as misleading.",
+      "actionableFix": "Report p-values in scientific notation or as p < 0.001 (or p < 0.0001) for extremely small values, and include full values in a table.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Manuscript shows p=0.0000 for const, age, severity; stats-run.json has p-values ~1e-19,1e-26.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No description of missing data handling or complete-case criteria",
+      "evidenceRefs": [
+        "manuscript.md (mentions 'complete-case records' but no details)"
+      ],
+      "whyItMatters": "Complete-case analysis can introduce bias if missingness is associated with exposure, outcome, or covariates. Without a description of the extent and pattern of missingness and any diagnostics, the generalizability and validity of the results are unknown.",
+      "actionableFix": "Provide a missing-data analysis: report the number/percentage of missing values per variable, compare characteristics of complete vs. incomplete cases, discuss plausible missing-data mechanisms, and consider sensitivity analyses or multiple imputation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "No missing-data details in any artifact.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analysis is unbound and exploratory",
+      "evidenceRefs": [
+        "stats-run/stats-run.json (binding.status: \"unbound\", resultPosture: \"exploratory_standard_table\")",
+        "stats-run/stats-qa.json (check: binding-status: warning)"
+      ],
+      "whyItMatters": "The analysis lacks a pre-specified protocol (method-selection, analysis spec), meaning it is exploratory and results cannot be interpreted as confirmatory. This increases the risk of p-hacking and overfitting, and prevents valid inferential conclusions.",
+      "actionableFix": "Create and bind a method-selection artifact and an analysis spec before re-running the analysis, then update the manuscript to reflect the governed analysis (or clearly label the current findings as strictly exploratory/hypothesis-generating).",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "stats-run.json binding status is 'unbound'; stats-qa.json binding-status is 'warning'.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F06",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "No analysis code or script provided",
+      "evidenceRefs": [
+        "stats-run/stats-run.json (artifacts list lacks .R/.py/.do files)"
+      ],
+      "whyItMatters": "Reproducibility requires that the exact commands used to generate results are available. Without the code, independent verification is impossible, and the analysis cannot be re-run or adapted.",
+      "actionableFix": "Include the script or notebook that executes the quantile regression, with all data-cleaning and model-fitting steps, in the run directory and reference it in the manuscript.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Artifact inventory contains no code file; only config, summaries, estimates, figures, and QA reports.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F07",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variable definitions and coding are missing",
+      "evidenceRefs": [
+        "manuscript.md (Methods/Variables: \"not fully encoded…review companion variable artifact\")",
+        "no variable definition artifact found in the run directory"
+      ],
+      "whyItMatters": "Without definitions (units, coding scheme for treatment, severity scale, age measurement), the numerical results (e.g., coefficient for treatment 1.307) are meaningless. The study cannot be interpreted or replicated.",
+      "actionableFix": "Create a data dictionary or variable metadata file (e.g., variable_definitions.json) that specifies each variable's name, label, type, units, and coding, and include it in the run artifacts. Reference it in the manuscript.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "No variable artifact present; manuscript explicitly notes missingness.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F08",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Lack of effect-size interpretation and practical significance discussion",
+      "evidenceRefs": [
+        "manuscript.md (Results only report coefficients and p-values, no prediction examples or clinical meaning)"
+      ],
+      "whyItMatters": "Statistical significance does not imply practical importance. For quantile regression, the magnitude should be contextualized (e.g., what does a 1.95 increase on severity translate to in terms of the outcome quantile?). This limits the utility of the results for decision-making.",
+      "actionableFix": "Include model-based predictions at representative covariate values, compute and discuss effect sizes (e.g., Cohen’s d analogue for quantiles), and relate coefficients to the scale of the outcome variable.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Manuscript lacks any interpretation beyond p-values; no descriptive statistics or prediction illustration.",
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions (data dictionary)",
+    "Raw data (or synthetic mock for verification)",
+    "Analysis code/script",
+    "Pre-specified analysis plan (protocol/AnalysisSpec)",
+    "Missing-data analysis and complete-case justification",
+    "Quantile level (tau) specification"
+  ],
+  "recommendedNextStage": "analysis_spec"
+}

@@ -1,0 +1,118 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is unbound and exploratory, lacking pre-registration, essential performance metrics (CIs, calibration), and clear variable definitions. The risk score derivation is unknown, risking overoptimistic AUROC. These issues prevent any confirmatory or clinical interpretation.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Analysis run is unbound and exploratory, not pre-registered",
+      "evidenceRefs": [
+        "stats-run.json.resultPosture",
+        "stats-qa.json checks binding-status",
+        "stats-qa.json result-posture"
+      ],
+      "whyItMatters": "Without a pre-specified method-selection and analysis plan, results cannot be considered confirmatory; they are vulnerable to selective reporting and overfitting. The study admits it is 'not ready for stronger claims'.",
+      "actionableFix": "Bind the run to a pre-registered method-selection artifact and analysis spec (e.g., via a protocol) and re-execute before finalizing conclusions.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "Check that the stats-run binding field is not 'unbound' and that a methodSelectionPath and analysisSpecPath are present in stats-run.json.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Risk score derivation untraceable and potential overoptimism from same-data evaluation",
+      "evidenceRefs": [
+        "stats-run.json no model-fitting step",
+        "manuscript.md no mention of model origin or data splits"
+      ],
+      "whyItMatters": "If the risk score (pred_score) was developed on the same 240 complete cases, the AUROC is likely inflated. Without external validation or internal cross-validation, the reported discrimination cannot be trusted for any prospective use.",
+      "actionableFix": "Clarify the source and training of the risk score. If it was built on the same dataset, use resampling or external validation to produce honest performance estimates. Document the model and any data splits.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "Review artifacts for model fitting evidence (e.g., a training script, model object, or explicit statement of external score). If none exists, label the risk as overoptimistic.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No confidence intervals for AUROC or Brier score",
+      "evidenceRefs": [
+        "stats-run.json.estimates only point estimates"
+      ],
+      "whyItMatters": "Without CIs, the precision of the performance metrics is unknown; one cannot assess whether the observed AUROC is statistically distinguishable from chance or a meaningful threshold.",
+      "actionableFix": "Compute 95% CIs for AUROC (e.g., via DeLong's method or bootstrap) and for Brier score, and report them in results.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that the estimates object in stats-run.json includes lower and upper CI fields for auroc and brier_score.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Absence of calibration assessment",
+      "evidenceRefs": [
+        "diagnostics.json only contains roc_points",
+        "figure-qa.json only one ROC curve"
+      ],
+      "whyItMatters": "Discrimination (AUROC) alone is insufficient for a risk score's performance; a well‑discriminating score can be poorly calibrated, leading to misleading risk estimates. The Brier score does not decompose calibration.",
+      "actionableFix": "Add calibration intercept, slope, and a calibration plot. Report expected/observed event rates by decile or a smooth calibration curve.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check that a calibration plot artifact exists and that calibration statistics (e.g., calibration‑in‑the‑large, slope) appear in diagnostics.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Variables and cohort characteristics not reported",
+      "evidenceRefs": [
+        "manuscript.md: 'The primary outcome, exposure, and covariates were not fully encoded...'"
+      ],
+      "whyItMatters": "Without variable definitions (coding, prevalence), outcome incidence, risk‑score distribution, or a Table 1, readers cannot assess data quality, generalisability, or potential spectrum bias.",
+      "actionableFix": "Include a descriptive table with outcome frequency, risk‑score summary (mean, SD, range), and any relevant cohort demographics. Define the outcome (0/1 meaning) and how pred_score was computed.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Look for a documented variable dictionary or a Table 1 artifact in the run directory.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Missing manuscript‑QA artifact and variable companion artifact",
+      "evidenceRefs": [
+        "manuscript-qa.json listed but content not provided in packet",
+        "Stats-run.json does not reference variable definitions"
+      ],
+      "whyItMatters": "Quality‑control checks on the manuscript and the variable definitions are essential for reproducibility and to verify that the analysis matches the declared data.",
+      "actionableFix": "Provide the full manuscript‑QA artifact and a companion variable file (e.g., a data dictionary or variables.json) so reviewers can assess alignment.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Confirm that the expected artifact hashes match and the files are present in the run directory.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Self‑contradictory statement about reader‑facing artifact",
+      "evidenceRefs": [
+        "manuscript.md limitations: 'No reader-facing paper/manuscript artifact was found.'"
+      ],
+      "whyItMatters": "This contradicts the presence of manuscript.md itself and confuses readers about the nature of the document.",
+      "actionableFix": "Remove or rephrase the line to reflect that the manuscript is the reader‑facing artifact, or clarify what artifact is missing.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions (outcome coding, risk score derivation, covariates)",
+    "Model training details or external score provenance",
+    "Confidence intervals for AUROC and Brier score",
+    "Calibration plot and calibration statistics",
+    "Full manuscript-qa.json and variable companion artifact",
+    "Descriptive statistics (outcome prevalence, risk score distribution)"
+  ],
+  "recommendedNextStage": "protocol"
+}

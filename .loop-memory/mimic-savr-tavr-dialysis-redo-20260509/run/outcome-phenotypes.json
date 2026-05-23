@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T23:19:45.856414+00:00",
+  "timeZero": "Index admission time for mortality horizons and time-to-death models; index discharge time for post-discharge readmission and reintervention outcomes; index admission for in-hospital mortality.",
+  "censoring": "Nonfatal time-to-event outcomes are censored at 3650 days when no same-hospital event is observed. Death before a nonfatal readmission is recorded in death-before-event flags but Fine-Gray competing-risk models are not estimated in this MIMIC redo.",
+  "definitions": {
+    "heart_failure_readmission": {
+      "source": "post-index same-hospital diagnosis codes",
+      "rules": [
+        "ICD-9-CM prefix 428",
+        "ICD-10-CM prefix I50",
+        "dictionary title contains heart failure"
+      ]
+    },
+    "cardiac_related_readmission": {
+      "source": "post-index same-hospital diagnosis codes",
+      "rules": [
+        "ICD-9-CM 390-459 diagnosis range",
+        "ICD-10-CM prefix I"
+      ]
+    },
+    "myocardial_infarction": {
+      "source": "post-index same-hospital diagnosis codes",
+      "rules": [
+        "ICD-9-CM prefix 410",
+        "ICD-10-CM prefixes I21 or I22"
+      ]
+    },
+    "stroke": {
+      "source": "post-index same-hospital diagnosis codes",
+      "rules": [
+        "ICD-9-CM prefixes 430, 431, 432, 433, 434, 436, 437, or 438; ICD-9-CM 435/TIA excluded",
+        "ICD-10-CM prefixes I60, I61, I62, I63, or I64"
+      ]
+    },
+    "mace": {
+      "source": "composite endpoint",
+      "rules": [
+        "death",
+        "myocardial infarction",
+        "stroke"
+      ]
+    },
+    "later_tavr": {
+      "source": "post-index same-hospital procedure/HCPCS evidence",
+      "rules": [
+        "user ICD-9-CM procedure 35.05 or 35.06",
+        "ICD-10-PCS aortic valve replacement with percutaneous/endoscopic/transapical axis/title logic",
+        "auxiliary CPT/HCPCS scan codes 0256T-0259T and 33361-33369 when present"
+      ]
+    },
+    "later_savr": {
+      "source": "post-index same-hospital procedure/HCPCS evidence",
+      "rules": [
+        "user ICD-9-CM procedure 35.21 or 35.22",
+        "ICD-10-PCS aortic valve replacement with open approach axis/title logic",
+        "auxiliary CPT scan codes 33405, 33406, 33410 when present"
+      ]
+    },
+    "revision_explant_proxy": {
+      "source": "post-index same-hospital ICD-10-PCS title logic",
+      "rules": [
+        "procedure title regex: revision of aortic valve, excision of aortic valve, supplement aortic valve, or removal of aortic valve"
+      ]
+    },
+    "valve_reintervention_composite": {
+      "source": "composite endpoint",
+      "rules": [
+        "later TAVR",
+        "later SAVR",
+        "revision/explant proxy"
+      ]
+    }
+  }
+}

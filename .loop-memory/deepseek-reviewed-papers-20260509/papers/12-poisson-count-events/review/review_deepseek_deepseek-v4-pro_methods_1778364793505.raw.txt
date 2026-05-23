@@ -1,0 +1,128 @@
+{
+  "verdict": "revise",
+  "summary": "The study applies Poisson regression to a local dataset but lacks critical diagnostic checks (overdispersion, zero-inflation, distributional assessment) and does not describe missing data handling or variable distributions. Inappropriate residual diagnostics (Shapiro-Wilk on raw residuals) are reported. These omissions undermine the reliability of the estimates and limit interpretation. Substantial revisions are needed to include proper diagnostics and transparent reporting.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "model_diagnostics",
+      "title": "Overdispersion not assessed",
+      "evidenceRefs": [
+        "stats-run.json:diagnostics",
+        "diagnostics.json"
+      ],
+      "whyItMatters": "Overdispersed count data lead to underestimated standard errors and inflated Type I error; rate ratios may be unreliable. Without checking, the Poisson model may be misspecified.",
+      "actionableFix": "Report residual deviance, Pearson chi-square, and perform a dispersion test. If overdispersed, consider quasi-Poisson or negative binomial regression.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "Check if (residual deviance / df) > 1 or perform formal overdispersion test.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without description of missing data",
+      "evidenceRefs": [
+        "manuscript.md (240 complete-case)"
+      ],
+      "whyItMatters": "Missing data that are non-random can bias estimates and reduce generalizability. The handling of missingness is unstated.",
+      "actionableFix": "Provide a flow chart of cohort construction, report amount and patterns of missingness, consider sensitivity analysis (e.g., multiple imputation).",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": "Review data preprocessing steps and compare complete-case vs. original sample descriptives.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Inappropriate use of Shapiro-Wilk test on raw Poisson residuals",
+      "evidenceRefs": [
+        "stats-run.json:shapiro_p_value=8.09e-5"
+      ],
+      "whyItMatters": "Raw residuals from Poisson are not normally distributed; normality testing is irrelevant and may mislead model assessment.",
+      "actionableFix": "Replace with appropriate GLM diagnostics: deviance residuals, Pearson residuals, QQ-plot of deviance residuals, and test for dispersion.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Remove Shapiro-Wilk and produce deviance-based diagnostic plots.",
+      "confidence": 0.98
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "No descriptive statistics for outcome and predictors",
+      "evidenceRefs": [
+        "manuscript.md (only model estimates)"
+      ],
+      "whyItMatters": "Without summaries (count distribution, zeros, covariate ranges), it's impossible to judge whether Poisson assumptions hold or if covariates are properly scaled.",
+      "actionableFix": "Add a table with summary statistics, including min, max, mean, variance of count_events, frequency of zeros, and distributions of treatment, age, severity.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Verify that the reported descriptives match the data used in the model.",
+      "confidence": 0.92
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Linearity assumption for continuous covariates not assessed",
+      "evidenceRefs": [
+        "stats-run.json:age, severity as linear terms"
+      ],
+      "whyItMatters": "Misspecifying the functional form of age or severity can bias effect estimates and reduce model fit.",
+      "actionableFix": "Examine partial residuals or include flexible terms (e.g., splines) and compare fit.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check for non-linearity via component-plus-residual plots.",
+      "confidence": 0.7
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "figures",
+      "title": "No diagnostic figures referenced in manuscript",
+      "evidenceRefs": [
+        "figures.json, figure-qa.json, model-residuals.png (not discussed)"
+      ],
+      "whyItMatters": "Visual diagnostics are essential for evaluating model fit, outliers, and patterns; their absence hampers credibility.",
+      "actionableFix": "Include key diagnostic plots (residuals vs fitted, QQ-plot of deviance residuals) in the manuscript or supplementary materials.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Ensure plots are correctly generated and match reported summaries.",
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Rate ratios not directly presented in results section",
+      "evidenceRefs": [
+        "manuscript.md (lists log-scale estimates only)"
+      ],
+      "whyItMatters": "Clinically interpretable rate ratios are omitted from the main text, making results harder to understand for broader audiences.",
+      "actionableFix": "Report rate ratios with 95% CIs alongside log estimates in the results table.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Recalculate rate ratios from log estimates and verify CIs.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "Potential zero-inflation not considered",
+      "evidenceRefs": [
+        "manuscript.md (outcome count_events)"
+      ],
+      "whyItMatters": "A high proportion of zero counts violates Poisson assumptions; ignoring zero-inflation can skew estimates.",
+      "actionableFix": "Report the percentage of zero counts and, if substantial, consider zero-inflated Poisson or negative binomial models.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Compare observed zero proportion to expected under Poisson using a chi-square test.",
+      "confidence": 0.6
+    }
+  ],
+  "missingEvidence": [
+    "Detailed missing data description (original N, exclusion criteria, patterns)",
+    "Overdispersion test results (deviance, Pearson statistic)",
+    "Descriptive statistics for all variables (count distribution, covariate summaries)",
+    "Diagnostic plots (residuals, QQ-plot of deviance residuals)",
+    "Full stats-qa.json (truncated artifact prevents verification of all QA checks)",
+    "Influence analysis details (observation-specific diagnostics, thresholds)"
+  ],
+  "recommendedNextStage": "execution"
+}

@@ -1,0 +1,958 @@
+<!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Dialysis Status and Outcomes After SAVR or TAVR in MIMIC-IV</title>
+        <style>
+      @page { size: Letter; margin: 0.72in 0.68in 0.78in 0.68in; }
+      * { box-sizing: border-box; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: #1f2933; font-size: 10.4pt; line-height: 1.45; margin: 0; }
+      h1 { font-size: 26pt; line-height: 1.08; margin: 0 0 0.2in 0; color: #111827; }
+      h2 { font-size: 15pt; margin: 0.28in 0 0.1in 0; color: #111827; break-after: avoid; }
+      h3 { font-size: 11.5pt; margin: 0.18in 0 0.06in 0; color: #243b53; break-after: avoid; }
+      p { margin: 0 0 0.08in 0; }
+      ul { margin: 0.03in 0 0.11in 0.18in; padding-left: 0.16in; }
+      li { margin: 0.025in 0; }
+      code { font-family: "SF Mono", Menlo, monospace; font-size: 8.8pt; background: #f3f4f6; padding: 0 2px; border-radius: 2px; }
+      a { color: #1d4ed8; text-decoration: none; overflow-wrap: anywhere; }
+      .cover { min-height: 9.3in; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+      .kicker { text-transform: uppercase; letter-spacing: 0.08em; color: #52606d; font-size: 8.5pt; font-weight: 700; margin-bottom: 0.18in; }
+      .subtitle { font-size: 12.5pt; color: #334e68; max-width: 6.5in; margin-top: 0.12in; }
+      .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.12in; margin: 0.35in 0; }
+      .status-card { border: 1px solid #d7dde5; border-left: 4px solid #2f80ed; border-radius: 5px; padding: 0.12in; background: #fbfcfe; }
+      .status-card b { display: block; color: #111827; margin-bottom: 0.02in; }
+      .warning { border-left-color: #b7791f; background: #fffaf0; }
+      .paper { page-break-after: always; }
+      .paper h1 { display: none; }
+      .figure-page, .table-page { page-break-before: always; }
+      figure { margin: 0.08in 0 0 0; }
+      figure img { display: block; max-width: 100%; max-height: 7.25in; object-fit: contain; margin: 0 auto; border: 1px solid #e5e7eb; }
+      figcaption { color: #475569; font-size: 9pt; margin-top: 0.08in; }
+      .data-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 7.2pt; margin-top: 0.08in; page-break-inside: auto; }
+      .data-table th { background: #e9eef5; color: #111827; font-weight: 700; border: 1px solid #cbd5e1; padding: 4px 4px; vertical-align: bottom; }
+      .data-table td { border: 1px solid #d7dde5; padding: 3px 4px; vertical-align: top; overflow-wrap: anywhere; }
+      .data-table tr { page-break-inside: avoid; break-inside: avoid; }
+      .data-table tr:nth-child(even) td { background: #f8fafc; }
+      .reference { font-size: 8.5pt; overflow-wrap: anywhere; }
+      .footer-note { color: #52606d; font-size: 8.5pt; border-top: 1px solid #d7dde5; padding-top: 0.1in; }
+    </style>
+      </head>
+      <body>
+        <section class="cover">
+          <div>
+            <div class="kicker">Research Review Packet</div>
+            <h1>Dialysis Status and Outcomes After SAVR or TAVR in MIMIC-IV</h1>
+            <div class="subtitle">Formatted PDF generated programmatically from the aggregate run packet. Includes the manuscript, figures, selected tables, and review posture.</div>
+            <div class="status-grid">
+              <div class="status-card"><b>Cohort</b>4,255 index admissions from 4,255 patients.</div>
+              <div class="status-card"><b>Deterministic QA</b>Paper QA pass; Figure QA pass.</div>
+              <div class="status-card"><b>Cost</b>Successful GCS read estimate: $0.0125.</div>
+              <div class="status-card warning"><b>Review Posture</b>External reviewer promotion remains blocked pending phenotype and methods decisions.</div>
+            </div>
+          </div>
+          <div class="footer-note">Source directory: /Users/saleh/TechProjects/agenteer/.loop-memory/mimic-savr-tavr-dialysis-redo-20260509/run</div>
+        </section>
+        <main class="paper"><h1>Dialysis Status and Outcomes After SAVR or TAVR in MIMIC-IV</h1>
+<h2>Abstract</h2>
+<p class=""><strong>Background:</strong> Dialysis patients undergoing aortic valve replacement are clinically high risk. A hospital EHR dataset can support a transparent same-institution analysis, but it cannot replace claims or registry follow-up.</p>
+<p class=""><strong>Objective:</strong> To compare mortality, heart-failure or cardiac-related readmission, MACE, and valve-reintervention outcomes after SAVR or TAVR by dialysis status.</p>
+<p class=""><strong>Design:</strong> Retrospective same-hospital longitudinal cohort analysis of MIMIC-IV v3.1. The study included 4,255 first observed SAVR/TAVR admissions from 4,255 patients.</p>
+<p class=""><strong>Methods:</strong> The cohort was identified from user-supplied ICD-9 procedure and dialysis diagnosis/procedure/CPT/HCPCS codes, ICD-10-PCS aortic-valve replacement logic, and local HCPCS/CPT-like event scanning. Outcomes were summarized at 30 days, 1 year, 3 years, 5 years, and 10 years where MIMIC timelines allowed. Adjusted logistic and event-specific Cox models compared non-dialysis versus hemodialysis/unspecified dialysis patients while adjusting for valve strategy; the peritoneal dialysis and mixed-procedure strata were descriptive only. A propensity-score matched sensitivity analysis compared hemodialysis/unspecified dialysis with non-dialysis patients.</p>
+<p class=""><strong>Results:</strong> The cohort included SAVR: 3,047; TAVR: 1,203; mixed savr tavr same admission: 5 by valve strategy and non dialysis: 4,076; hemodialysis or unspecified dialysis: 167; peritoneal dialysis: 12 by dialysis group. Peritoneal dialysis was very sparse. Same-hospital one-year outcomes are reported below; model estimates should be interpreted as local associations, not treatment effects.</p>
+<p class=""><strong>Conclusion:</strong> This redo creates a reviewer-ready MIMIC packet for the feasible version of the question. It does not establish complete 2008-2022 national longitudinal outcomes because MIMIC lacks complete outside-hospital claims follow-up and exact public dates.</p>
+<h2>Introduction</h2>
+<p class="">In hemodialysis, peritoneal dialysis, and non-dialysis patients undergoing SAVR and TAVR across ICD-9, ICD-10, and CPT/HCPCS-coded hospital data, how do clinical outcomes differ across mortality, heart-failure or cardiac-related hospital admission, MACE, and valve reintervention?</p>
+<p class="">The clinically ideal version of this question is a claims or registry study with complete procedure, CPT/HCPCS, readmission, and reintervention follow-up. This MIMIC-IV analysis is a narrower but auditable same-hospital study designed to test phenotype definitions, outcome logic, and reporting quality.</p>
+<h2>Methods</h2>
+<h3>Data Source</h3>
+<p class="">We used the project-owned local GCS Parquet cache of MIMIC-IV v3.1. Admissions, diagnosis codes, procedure codes, HCPCS events, patient metadata, and Charlson comorbidity scores were loaded. MIMIC-IV is not a complex survey dataset; there is no survey weight, strata, or PSU design for these models. Temporary row-level cache files were deleted after execution; saved artifacts are aggregate CSV/JSON/PNG files.</p>
+<h3>Code Definitions</h3>
+<p class="">The user-supplied TAVR ICD-9 procedure codes were 35.05 and 35.06. The user-supplied SAVR ICD-9 procedure codes were 35.21 and 35.22. Dialysis evidence used ICD-10-CM N18.6 and Z99.2; ICD-9-CM 585.6, V45.11, V56.0, V56.1, V56.2, V56.31, V56.32, and V56.8; ICD-9 procedure code 54.98; and peritoneal dialysis CPT/HCPCS codes 49324, 49325, 49326, 49418, 49420, 49421, 49422, 49435, 49436, and G0052. A secondary hemodialysis CPT/HCPCS scan used 90935, 90937, 90945, 90947, 90999, and G0257 when those rows were present.</p>
+<p class="">ICD-10-PCS SAVR/TAVR classification used aortic-valve replacement code-axis/title logic. The matched valve procedure code list is saved as <code>valve-phenotype-code-list.csv</code>, and the exact rule is saved in <code>outcome-phenotypes.json</code>. HCPCS/CPT-like event rows were scanned for auxiliary valve codes, but MIMIC HCPCS events are not a complete professional-claims feed.</p>
+<h3>Cohort Construction</h3>
+<p class="">Sample construction began with admissions containing SAVR or TAVR evidence in ICD procedure or auxiliary HCPCS/CPT-like records. We retained the first observed eligible SAVR/TAVR admission per patient. The study population contained 4,255 eligible rows from 4,255 unique patients. Valve strategy counts were SAVR: 3,047; TAVR: 1,203; mixed savr tavr same admission: 5. Dialysis group counts were non dialysis: 4,076; hemodialysis or unspecified dialysis: 167; peritoneal dialysis: 12. Peritoneal dialysis was treated as exploratory because only 12 index patients met that definition.</p>
+<h3>Outcomes</h3>
+<p class="">Outcomes were in-hospital mortality; death at 30 days, 1 year, 3 years, 5 years, and 10 years; heart-failure readmission; broad cardiac-related readmission; MI; stroke; MACE defined as death, MI, or stroke; later TAVR; later SAVR; revision/explant proxy; and valve reintervention composite. Readmission and reintervention outcomes are same-hospital only. Time zero was index admission for mortality horizons and time-to-death models, index discharge for post-discharge readmission and reintervention outcomes, and index admission for in-hospital mortality.</p>
+<p class="">Heart-failure readmission used ICD-9-CM 428* or ICD-10-CM I50* diagnosis evidence. Cardiac-related readmission used ICD-9-CM 390-459 or ICD-10-CM I* diagnosis evidence. MI used ICD-9-CM 410* or ICD-10-CM I21*/I22*. Stroke used ICD-9-CM 430*/431*/432*/433*/434*/436*/437*/438* or ICD-10-CM I60*/I61*/I62*/I63*/I64*, excluding ICD-9-CM 435/TIA. Valve reintervention combined later TAVR, later SAVR, and ICD-10-PCS title-based revision/explant proxy evidence. The full machine-readable outcome phenotype record is saved as <code>outcome-phenotypes.json</code>.</p>
+<h3>Statistical Analysis</h3>
+<p class="">We generated baseline summaries, outcome counts by horizon, adjusted logistic models for selected binary outcomes, event-specific Cox proportional-hazards models for time-to-event outcomes, and a propensity-score matched sensitivity analysis for hemodialysis/unspecified dialysis versus non-dialysis. Formal adjusted models excluded peritoneal dialysis patients and same-admission mixed SAVR/TAVR patients because those strata were too small for stable adjusted inference. Models included dialysis group, valve strategy, age, sex, Charlson comorbidity index, insurance, and anchor-year group when appropriate and feasible. Models used complete-case rows for the required outcome and adjustment variables. Missing data were handled by complete-case exclusion rather than imputation, and models were not interpreted when event counts were too sparse. Nonfatal readmission/reintervention Cox models censor deaths before nonfatal events; Fine-Gray competing-risk models were not estimated in this MIMIC redo.</p>
+<h2>Results</h2>
+<h3>One-Year Outcomes</h3>
+<ul>
+<li>SAVR / hemodialysis_or_unspecified_dialysis: n=113; death 40/113 (35.4%); HF readmission 21/113 (18.6%); cardiac readmission 42/113 (37.2%); MACE 45/113 (39.8%); valve reintervention 2/113 (1.8%).</li>
+<li>SAVR / non_dialysis: n=2,925; death 135/2925 (4.6%); HF readmission 293/2925 (10.0%); cardiac readmission 763/2925 (26.1%); MACE 226/2925 (7.7%); valve reintervention 14/2925 (0.5%).</li>
+<li>SAVR / peritoneal_dialysis: n=9; death 3/9 (33.3%); HF readmission 1/9 (11.1%); cardiac readmission 4/9 (44.4%); MACE 4/9 (44.4%); valve reintervention 0/9 (0.0%).</li>
+<li>TAVR / hemodialysis_or_unspecified_dialysis: n=54; death 20/54 (37.0%); HF readmission 17/54 (31.5%); cardiac readmission 21/54 (38.9%); MACE 20/54 (37.0%); valve reintervention 2/54 (3.7%).</li>
+<li>TAVR / non_dialysis: n=1,146; death 166/1146 (14.5%); HF readmission 287/1146 (25.0%); cardiac readmission 404/1146 (35.3%); MACE 210/1146 (18.3%); valve reintervention 13/1146 (1.1%).</li>
+<li>TAVR / peritoneal_dialysis: n=3; death 0/3 (0.0%); HF readmission 2/3 (66.7%); cardiac readmission 3/3 (100.0%); MACE 1/3 (33.3%); valve reintervention 0/3 (0.0%).</li>
+<li>mixed_savr_tavr_same_admission / non_dialysis: n=5; death 3/5 (60.0%); HF readmission 1/5 (20.0%); cardiac readmission 1/5 (20.0%); MACE 4/5 (80.0%); valve reintervention 0/5 (0.0%).</li>
+</ul>
+<h3>Baseline Characteristics</h3>
+<ul>
+<li>SAVR / hemodialysis_or_unspecified_dialysis: n=113; median age 66.0; median Charlson 7.0; male 77/113 (68.1%).</li>
+<li>SAVR / non_dialysis: n=2,925; median age 71.0; median Charlson 4.0; male 1928/2925 (65.9%).</li>
+<li>SAVR / peritoneal_dialysis: n=9; median age 62.0; median Charlson 7.0; male 4/9 (44.4%).</li>
+<li>TAVR / hemodialysis_or_unspecified_dialysis: n=54; median age 78.5; median Charlson 8.0; male 39/54 (72.2%).</li>
+<li>TAVR / non_dialysis: n=1,146; median age 82.0; median Charlson 6.0; male 613/1146 (53.5%).</li>
+<li>TAVR / peritoneal_dialysis: n=3; median age 69.0; median Charlson 7.0; male 1/3 (33.3%).</li>
+<li>mixed_savr_tavr_same_admission / non_dialysis: n=5; median age 79.0; median Charlson 6.0; male 4/5 (80.0%).</li>
+</ul>
+<h3>Missingness</h3>
+<ul>
+<li>admission_age: 0/4255 missing (0.0%).</li>
+<li>male: 0/4255 missing (0.0%).</li>
+<li>charlson_comorbidity_index: 0/4255 missing (0.0%).</li>
+<li>insurance: 12/4255 missing (0.3%).</li>
+<li>anchor_year_group: 0/4255 missing (0.0%).</li>
+<li>valve_strategy: 0/4255 missing (0.0%).</li>
+<li>dialysis_group: 0/4255 missing (0.0%).</li>
+</ul>
+<h3>Outcomes Across Follow-Up Horizons</h3>
+<p class="">The following horizon summaries collapse across SAVR/TAVR strategy to show the overall dialysis-status gradient. Readmission and reintervention outcomes remain same-hospital only.</p>
+<ul>
+<li>hemodialysis_or_unspecified_dialysis at 30d: death 24/167 (14.4%); HF readmission 22/167 (13.2%); cardiac readmission 41/167 (24.6%); MACE 28/167 (16.8%); valve reintervention 1/167 (0.6%).</li>
+<li>hemodialysis_or_unspecified_dialysis at 1y: death 60/167 (35.9%); HF readmission 38/167 (22.8%); cardiac readmission 63/167 (37.7%); MACE 65/167 (38.9%); valve reintervention 4/167 (2.4%).</li>
+<li>hemodialysis_or_unspecified_dialysis at 3y: death 75/167 (44.9%); HF readmission 49/167 (29.3%); cardiac readmission 78/167 (46.7%); MACE 82/167 (49.1%); valve reintervention 4/167 (2.4%).</li>
+<li>hemodialysis_or_unspecified_dialysis at 5y: death 83/167 (49.7%); HF readmission 54/167 (32.3%); cardiac readmission 81/167 (48.5%); MACE 88/167 (52.7%); valve reintervention 4/167 (2.4%).</li>
+<li>hemodialysis_or_unspecified_dialysis at 10y: death 86/167 (51.5%); HF readmission 57/167 (34.1%); cardiac readmission 83/167 (49.7%); MACE 93/167 (55.7%); valve reintervention 4/167 (2.4%).</li>
+<li>non_dialysis at 30d: death 65/4076 (1.6%); HF readmission 290/4076 (7.1%); cardiac readmission 663/4076 (16.3%); MACE 137/4076 (3.4%); valve reintervention 12/4076 (0.3%).</li>
+<li>non_dialysis at 1y: death 304/4076 (7.5%); HF readmission 581/4076 (14.3%); cardiac readmission 1168/4076 (28.7%); MACE 440/4076 (10.8%); valve reintervention 27/4076 (0.7%).</li>
+<li>non_dialysis at 3y: death 440/4076 (10.8%); HF readmission 760/4076 (18.6%); cardiac readmission 1442/4076 (35.4%); MACE 613/4076 (15.0%); valve reintervention 37/4076 (0.9%).</li>
+<li>non_dialysis at 5y: death 526/4076 (12.9%); HF readmission 870/4076 (21.3%); cardiac readmission 1590/4076 (39.0%); MACE 734/4076 (18.0%); valve reintervention 60/4076 (1.5%).</li>
+<li>non_dialysis at 10y: death 643/4076 (15.8%); HF readmission 973/4076 (23.9%); cardiac readmission 1701/4076 (41.7%); MACE 856/4076 (21.0%); valve reintervention 92/4076 (2.3%).</li>
+<li>peritoneal_dialysis at 30d: death 2/12 (16.7%); HF readmission 0/12 (0.0%); cardiac readmission 3/12 (25.0%); MACE 3/12 (25.0%); valve reintervention 0/12 (0.0%).</li>
+<li>peritoneal_dialysis at 1y: death 3/12 (25.0%); HF readmission 3/12 (25.0%); cardiac readmission 7/12 (58.3%); MACE 5/12 (41.7%); valve reintervention 0/12 (0.0%).</li>
+<li>peritoneal_dialysis at 3y: death 6/12 (50.0%); HF readmission 6/12 (50.0%); cardiac readmission 8/12 (66.7%); MACE 8/12 (66.7%); valve reintervention 0/12 (0.0%).</li>
+<li>peritoneal_dialysis at 5y: death 8/12 (66.7%); HF readmission 6/12 (50.0%); cardiac readmission 8/12 (66.7%); MACE 9/12 (75.0%); valve reintervention 0/12 (0.0%).</li>
+<li>peritoneal_dialysis at 10y: death 8/12 (66.7%); HF readmission 6/12 (50.0%); cardiac readmission 8/12 (66.7%); MACE 9/12 (75.0%); valve reintervention 0/12 (0.0%).</li>
+</ul>
+<h3>Code And Phenotype QA</h3>
+<ul>
+<li>User-supplied dialysis and peritoneal-dialysis codes observed in the local tables: 49324, 49325, 49420, 49421, 49422, 49435, 5498, 5856, N186, V4511, V560, V561, V562, V5631, V568, Z992.</li>
+<li>Auxiliary hemodialysis CPT/HCPCS scan codes observed: 90935, 90945, G0257.</li>
+<li>Auxiliary TAVR CPT/HCPCS scan codes observed: 0256T, 33361.</li>
+<li>Auxiliary SAVR CPT/HCPCS scan codes observed: none.</li>
+<li>ICD-10-PCS aortic-valve replacement classification was derived from code-axis/title logic and should be treated as a reviewed phenotype rule, not a raw exact-code list.</li>
+</ul>
+<h3>Adjusted Model Findings</h3>
+<ul>
+<li>logistic death_1y / dialysis_hd_unspecified: OR 4.44 (95% CI 3.04-6.49); p=1.07e-14; n=4238, events=361.</li>
+<li>logistic death_1y / valve_tavr: OR 1.78 (95% CI 1.36-2.33); p=2.43e-05; n=4238, events=361.</li>
+<li>logistic death_5y / dialysis_hd_unspecified: OR 4.00 (95% CI 2.80-5.71); p=2.38e-14; n=4238, events=606.</li>
+<li>logistic death_5y / valve_tavr: OR 2.27 (95% CI 1.82-2.82); p=2.21e-13; n=4238, events=606.</li>
+<li>logistic mace_1y / dialysis_hd_unspecified: OR 3.04 (95% CI 2.12-4.35); p=1.33e-09; n=4238, events=501.</li>
+<li>logistic mace_1y / valve_tavr: OR 1.55 (95% CI 1.23-1.95); p=0.000225; n=4238, events=501.</li>
+<li>logistic mace_5y / dialysis_hd_unspecified: OR 2.83 (95% CI 2.00-3.99); p=3.71e-09; n=4238, events=818.</li>
+<li>logistic mace_5y / valve_tavr: OR 1.87 (95% CI 1.54-2.27); p=3.04e-10; n=4238, events=818.</li>
+<li>logistic hf_1y / dialysis_hd_unspecified: OR 0.91 (95% CI 0.61-1.36); p=0.642; n=4238, events=618.</li>
+<li>logistic hf_1y / valve_tavr: OR 2.05 (95% CI 1.66-2.53); p=2.68e-11; n=4238, events=618.</li>
+<li>logistic cardiac_1y / dialysis_hd_unspecified: OR 1.01 (95% CI 0.72-1.42); p=0.932; n=4238, events=1230.</li>
+<li>logistic cardiac_1y / valve_tavr: OR 1.38 (95% CI 1.17-1.64); p=0.000178; n=4238, events=1230.</li>
+<li>cox death / dialysis_hd_unspecified: HR 2.63 (95% CI 2.07-3.34); p=2.63e-15; n=4231, events=723.</li>
+<li>cox death / valve_tavr: HR 1.47 (95% CI 1.25-1.74); p=5.25e-06; n=4231, events=723.</li>
+<li>cox hf_readmission / dialysis_hd_unspecified: HR 0.95 (95% CI 0.72-1.25); p=0.707; n=4222, events=1013.</li>
+<li>cox hf_readmission / valve_tavr: HR 1.38 (95% CI 1.20-1.60); p=1.18e-05; n=4222, events=1013.</li>
+<li>cox cardiac_readmission / dialysis_hd_unspecified: HR 1.00 (95% CI 0.79-1.27); p=0.989; n=4200, events=1745.</li>
+<li>cox cardiac_readmission / valve_tavr: HR 1.12 (95% CI 0.99-1.25); p=0.0634; n=4200, events=1745.</li>
+<li>cox mace / dialysis_hd_unspecified: HR 2.14 (95% CI 1.70-2.68); p=6.43e-11; n=4226, events=937.</li>
+<li>cox mace / valve_tavr: HR 1.30 (95% CI 1.12-1.50); p=0.000621; n=4226, events=937.</li>
+<li>cox valve_reintervention / dialysis_hd_unspecified: HR 0.79 (95% CI 0.27-2.27); p=0.657; n=4238, events=96.</li>
+<li>cox valve_reintervention / valve_tavr: HR 1.41 (95% CI 0.80-2.50); p=0.235; n=4238, events=96.</li>
+</ul>
+<h3>Propensity-Score Sensitivity</h3>
+<p class="">The hemodialysis/unspecified versus non-dialysis matched sensitivity analysis used nearest-neighbor matching on the logit propensity score with a caliper of 0.250. The propensity model covariates were admission_age, male, charlson_comorbidity_index, valve_tavr, insurance_Medicare, insurance_Other, insurance_Private, insurance_missing, anchor_year_group_2011 - 2013, anchor_year_group_2014 - 2016, anchor_year_group_2017 - 2019, anchor_year_group_2020 - 2022. It matched 166 of 167 treated patients. Maximum absolute SMD after matching was 0.125; the full balance table is saved as <code>propensity-balance.csv</code> and Figure 4.</p>
+<ul>
+<li>death_1y: treated risk 0.361, control risk 0.139, risk difference 0.223 (95% CI 0.134 to 0.312); McNemar p=8e-06.</li>
+<li>mace_1y: treated risk 0.392, control risk 0.199, risk difference 0.193 (95% CI 0.098 to 0.287); McNemar p=0.000211.</li>
+</ul>
+<h2>Discussion</h2>
+<p class="">This analysis consistently shows that dialysis-coded patients are a higher-risk subgroup after aortic valve replacement in the available MIMIC-IV hospital timeline. The hemodialysis/unspecified dialysis group had higher crude death and MACE rates than non-dialysis patients in both SAVR and TAVR strata. Peritoneal dialysis counts were too small for stable comparative inference.</p>
+<p class="">The most important interpretation boundary is ascertainment. MIMIC can observe same-hospital readmissions and reinterventions, plus death-date-based mortality where available. It cannot prove that a patient did not have an outside-hospital heart-failure admission, MI, stroke, TAVR, SAVR, or explant.</p>
+<h2>Limitations</h2>
+<ul>
+<li>This is a single-center deidentified EHR analysis, not a national claims or registry study.</li>
+<li>Calendar years are approximated through MIMIC anchor-year groups; exact public dates are not available.</li>
+<li>Same-hospital readmission and reintervention outcomes may miss outside-hospital events.</li>
+<li>CPT/HCPCS evidence is incomplete in MIMIC; valve classification is mainly ICD procedure driven.</li>
+<li>Peritoneal dialysis was rare and should be treated as descriptive only.</li>
+<li>Event-specific Cox models do not estimate subdistribution hazards; nonfatal event analyses should not be read as Fine-Gray competing-risk estimates.</li>
+<li>Dialysis modality assignment is code-based and may misclassify outpatient modality.</li>
+<li>No causal conclusion is supported by this observational design.</li>
+</ul>
+<h2>Figures</h2>
+<ul>
+<li>Figure 1: one-year MACE proportions by valve strategy and dialysis group.</li>
+<li>Figure 2: mortality proportions across 30-day, 1-year, 3-year, 5-year, and 10-year horizons by dialysis group.</li>
+<li>Figure 3: adjusted Cox-model dialysis-group hazard ratios.</li>
+<li>Figure 4, when available: propensity-balance love plot for hemodialysis/unspecified dialysis versus non-dialysis.</li>
+</ul>
+<h2>Reproducibility</h2>
+<p class="">Estimated GCS read cost was $0.0125; row-level cache files were removed after execution. The run directory contains aggregate code-match, cohort, outcome, model, propensity, figure, QA, source-inventory, and reviewer-context artifacts.</p>
+<h2>References</h2>
+<ul>
+<li>MIMIC-IV v3.1, PhysioNet: <a href="https://physionet.org/content/mimiciv/3.1/">https://physionet.org/content/mimiciv/3.1/</a></li>
+<li>MIMIC-IV documentation: <a href="https://mimic.mit.edu/docs/iv/">https://mimic.mit.edu/docs/iv/</a></li>
+<li>CDC ICD-10-CM information: <a href="https://www.cdc.gov/nchs/icd/icd-10-cm/index.html">https://www.cdc.gov/nchs/icd/icd-10-cm/index.html</a></li>
+<li>CMS ICD-10 coding resources: <a href="https://www.cms.gov/medicare/coding-billing/icd-10-codes">https://www.cms.gov/medicare/coding-billing/icd-10-codes</a></li>
+<li>CMS CPT/HCPCS code-list resources: <a href="https://www.cms.gov/medicare/regulations-guidance/physician-self-referral/list-cpt-hcpcs-codes">https://www.cms.gov/medicare/regulations-guidance/physician-self-referral/list-cpt-hcpcs-codes</a></li>
+</ul></main>
+        
+            <section class="figure-page">
+              <h2>Figure 1. One-year MACE by valve strategy and dialysis group</h2>
+              <figure>
+                <img src="figure-1-mace-by-group.png" alt="Horizontal bar chart of one-year MACE proportions by valve strategy and dialysis group.">
+                <figcaption>MACE is death, MI, or stroke within 365 days in available same-hospital/death-date follow-up.</figcaption>
+              </figure>
+            </section>
+            
+
+            <section class="figure-page">
+              <h2>Figure 2. Mortality horizons by dialysis group</h2>
+              <figure>
+                <img src="figure-2-mortality-horizons.png" alt="Line chart of death proportions at 30 days, 1 year, 3 years, 5 years, and 10 years by dialysis group.">
+                <figcaption>Mortality horizons use MIMIC death-date availability and are not national follow-up.</figcaption>
+              </figure>
+            </section>
+            
+
+            <section class="figure-page">
+              <h2>Figure 3. Adjusted dialysis-group hazard ratios</h2>
+              <figure>
+                <img src="figure-3-cox-forest.png" alt="Forest plot of dialysis-group hazard ratios for time-to-event outcomes.">
+                <figcaption>Cox models use available same-hospital/death-date timelines and complete-case covariates.</figcaption>
+              </figure>
+            </section>
+            
+
+            <section class="figure-page">
+              <h2>Figure 4. Propensity balance for HD/unspecified vs non-dialysis</h2>
+              <figure>
+                <img src="figure-4-propensity-love-plot.png" alt="Love plot comparing absolute standardized mean differences before and after matching.">
+                <figcaption>Balance is shown for numeric covariates only in the matched sensitivity analysis.</figcaption>
+              </figure>
+            </section>
+            
+        <section class="table-page"><h2>Table 1. Baseline Characteristics</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Valve</th>
+      <th>Dialysis group</th>
+      <th>N</th>
+      <th>Age median</th>
+      <th>Age Q1</th>
+      <th>Age Q3</th>
+      <th>Charlson median</th>
+      <th>charlson_comorbidity_index_q1</th>
+      <th>charlson_comorbidity_index_q3</th>
+      <th>Male n</th>
+      <th>Male %</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SAVR</td>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>113</td>
+      <td>66</td>
+      <td>57</td>
+      <td>77</td>
+      <td>7</td>
+      <td>5</td>
+      <td>8</td>
+      <td>77</td>
+      <td>68.1%</td>
+    </tr>
+    <tr>
+      <td>SAVR</td>
+      <td>non_dialysis</td>
+      <td>2925</td>
+      <td>71</td>
+      <td>62</td>
+      <td>78</td>
+      <td>4</td>
+      <td>3</td>
+      <td>5</td>
+      <td>1928</td>
+      <td>65.9%</td>
+    </tr>
+    <tr>
+      <td>SAVR</td>
+      <td>peritoneal_dialysis</td>
+      <td>9</td>
+      <td>62</td>
+      <td>53</td>
+      <td>71</td>
+      <td>7</td>
+      <td>6</td>
+      <td>9</td>
+      <td>4</td>
+      <td>44.4%</td>
+    </tr>
+    <tr>
+      <td>TAVR</td>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>54</td>
+      <td>78.5</td>
+      <td>72</td>
+      <td>84.8</td>
+      <td>8</td>
+      <td>7</td>
+      <td>9</td>
+      <td>39</td>
+      <td>72.2%</td>
+    </tr>
+    <tr>
+      <td>TAVR</td>
+      <td>non_dialysis</td>
+      <td>1146</td>
+      <td>82</td>
+      <td>75</td>
+      <td>88</td>
+      <td>6</td>
+      <td>5</td>
+      <td>8</td>
+      <td>613</td>
+      <td>53.5%</td>
+    </tr>
+    <tr>
+      <td>TAVR</td>
+      <td>peritoneal_dialysis</td>
+      <td>3</td>
+      <td>69</td>
+      <td>65</td>
+      <td>80</td>
+      <td>7</td>
+      <td>6.5</td>
+      <td>9.5</td>
+      <td>1</td>
+      <td>33.3%</td>
+    </tr>
+    <tr>
+      <td>mixed_savr_tavr_same_admission</td>
+      <td>non_dialysis</td>
+      <td>5</td>
+      <td>79</td>
+      <td>73</td>
+      <td>80</td>
+      <td>6</td>
+      <td>6</td>
+      <td>8</td>
+      <td>4</td>
+      <td>80.0%</td>
+    </tr>
+  </tbody>
+</table></section>
+<section class="table-page"><h2>Table 2. One-Year Outcomes</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Valve</th>
+      <th>Dialysis group</th>
+      <th>N</th>
+      <th>Death</th>
+      <th>HF readmission</th>
+      <th>Cardiac readmission</th>
+      <th>MACE</th>
+      <th>Valve reintervention</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SAVR</td>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>113</td>
+      <td>35.4%</td>
+      <td>18.6%</td>
+      <td>37.2%</td>
+      <td>39.8%</td>
+      <td>1.8%</td>
+    </tr>
+    <tr>
+      <td>SAVR</td>
+      <td>non_dialysis</td>
+      <td>2925</td>
+      <td>4.6%</td>
+      <td>10.0%</td>
+      <td>26.1%</td>
+      <td>7.7%</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>SAVR</td>
+      <td>peritoneal_dialysis</td>
+      <td>9</td>
+      <td>33.3%</td>
+      <td>11.1%</td>
+      <td>44.4%</td>
+      <td>44.4%</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>TAVR</td>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>54</td>
+      <td>37.0%</td>
+      <td>31.5%</td>
+      <td>38.9%</td>
+      <td>37.0%</td>
+      <td>3.7%</td>
+    </tr>
+    <tr>
+      <td>TAVR</td>
+      <td>non_dialysis</td>
+      <td>1146</td>
+      <td>14.5%</td>
+      <td>25.0%</td>
+      <td>35.3%</td>
+      <td>18.3%</td>
+      <td>1.1%</td>
+    </tr>
+    <tr>
+      <td>TAVR</td>
+      <td>peritoneal_dialysis</td>
+      <td>3</td>
+      <td>0.0%</td>
+      <td>66.7%</td>
+      <td>100.0%</td>
+      <td>33.3%</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>mixed_savr_tavr_same_admission</td>
+      <td>non_dialysis</td>
+      <td>5</td>
+      <td>60.0%</td>
+      <td>20.0%</td>
+      <td>20.0%</td>
+      <td>80.0%</td>
+      <td>0.0%</td>
+    </tr>
+  </tbody>
+</table></section>
+<section class="table-page"><h2>Table 3. Outcomes Across Follow-Up Horizons</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Dialysis group</th>
+      <th>Horizon</th>
+      <th>N</th>
+      <th>Death</th>
+      <th>MACE</th>
+      <th>Valve reintervention</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>30d</td>
+      <td>167</td>
+      <td>14.4%</td>
+      <td>16.8%</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>1y</td>
+      <td>167</td>
+      <td>35.9%</td>
+      <td>38.9%</td>
+      <td>2.4%</td>
+    </tr>
+    <tr>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>3y</td>
+      <td>167</td>
+      <td>44.9%</td>
+      <td>49.1%</td>
+      <td>2.4%</td>
+    </tr>
+    <tr>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>5y</td>
+      <td>167</td>
+      <td>49.7%</td>
+      <td>52.7%</td>
+      <td>2.4%</td>
+    </tr>
+    <tr>
+      <td>hemodialysis_or_unspecified_dialysis</td>
+      <td>10y</td>
+      <td>167</td>
+      <td>51.5%</td>
+      <td>55.7%</td>
+      <td>2.4%</td>
+    </tr>
+    <tr>
+      <td>non_dialysis</td>
+      <td>30d</td>
+      <td>4076</td>
+      <td>1.6%</td>
+      <td>3.4%</td>
+      <td>0.3%</td>
+    </tr>
+    <tr>
+      <td>non_dialysis</td>
+      <td>1y</td>
+      <td>4076</td>
+      <td>7.5%</td>
+      <td>10.8%</td>
+      <td>0.7%</td>
+    </tr>
+    <tr>
+      <td>non_dialysis</td>
+      <td>3y</td>
+      <td>4076</td>
+      <td>10.8%</td>
+      <td>15.0%</td>
+      <td>0.9%</td>
+    </tr>
+    <tr>
+      <td>non_dialysis</td>
+      <td>5y</td>
+      <td>4076</td>
+      <td>12.9%</td>
+      <td>18.0%</td>
+      <td>1.5%</td>
+    </tr>
+    <tr>
+      <td>non_dialysis</td>
+      <td>10y</td>
+      <td>4076</td>
+      <td>15.8%</td>
+      <td>21.0%</td>
+      <td>2.3%</td>
+    </tr>
+    <tr>
+      <td>peritoneal_dialysis</td>
+      <td>30d</td>
+      <td>12</td>
+      <td>16.7%</td>
+      <td>25.0%</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>peritoneal_dialysis</td>
+      <td>1y</td>
+      <td>12</td>
+      <td>25.0%</td>
+      <td>41.7%</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>peritoneal_dialysis</td>
+      <td>3y</td>
+      <td>12</td>
+      <td>50.0%</td>
+      <td>66.7%</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>peritoneal_dialysis</td>
+      <td>5y</td>
+      <td>12</td>
+      <td>66.7%</td>
+      <td>75.0%</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>peritoneal_dialysis</td>
+      <td>10y</td>
+      <td>12</td>
+      <td>66.7%</td>
+      <td>75.0%</td>
+      <td>0.0%</td>
+    </tr>
+  </tbody>
+</table></section>
+<section class="table-page"><h2>Table 4. Selected Adjusted Model Estimates</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Model</th>
+      <th>Outcome</th>
+      <th>Term</th>
+      <th>Measure</th>
+      <th>Estimate</th>
+      <th>95% CI</th>
+      <th>P value</th>
+      <th>N</th>
+      <th>Events</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>logistic</td>
+      <td>death_1y</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>OR</td>
+      <td>4.44</td>
+      <td>3.04-6.49</td>
+      <td>1.07e-14</td>
+      <td>4238</td>
+      <td>361</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>death_1y</td>
+      <td>valve_tavr</td>
+      <td>OR</td>
+      <td>1.78</td>
+      <td>1.36-2.33</td>
+      <td>2.43e-05</td>
+      <td>4238</td>
+      <td>361</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>death_5y</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>OR</td>
+      <td>4</td>
+      <td>2.8-5.71</td>
+      <td>2.38e-14</td>
+      <td>4238</td>
+      <td>606</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>death_5y</td>
+      <td>valve_tavr</td>
+      <td>OR</td>
+      <td>2.27</td>
+      <td>1.82-2.82</td>
+      <td>2.21e-13</td>
+      <td>4238</td>
+      <td>606</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>mace_1y</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>OR</td>
+      <td>3.04</td>
+      <td>2.12-4.35</td>
+      <td>1.33e-09</td>
+      <td>4238</td>
+      <td>501</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>mace_1y</td>
+      <td>valve_tavr</td>
+      <td>OR</td>
+      <td>1.55</td>
+      <td>1.23-1.95</td>
+      <td>2.25e-04</td>
+      <td>4238</td>
+      <td>501</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>mace_5y</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>OR</td>
+      <td>2.83</td>
+      <td>2-3.99</td>
+      <td>3.71e-09</td>
+      <td>4238</td>
+      <td>818</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>mace_5y</td>
+      <td>valve_tavr</td>
+      <td>OR</td>
+      <td>1.87</td>
+      <td>1.54-2.27</td>
+      <td>3.04e-10</td>
+      <td>4238</td>
+      <td>818</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>hf_1y</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>OR</td>
+      <td>0.909</td>
+      <td>0.606-1.36</td>
+      <td>0.642</td>
+      <td>4238</td>
+      <td>618</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>hf_1y</td>
+      <td>valve_tavr</td>
+      <td>OR</td>
+      <td>2.05</td>
+      <td>1.66-2.53</td>
+      <td>2.68e-11</td>
+      <td>4238</td>
+      <td>618</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>cardiac_1y</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>OR</td>
+      <td>1.01</td>
+      <td>0.724-1.42</td>
+      <td>0.932</td>
+      <td>4238</td>
+      <td>1230</td>
+    </tr>
+    <tr>
+      <td>logistic</td>
+      <td>cardiac_1y</td>
+      <td>valve_tavr</td>
+      <td>OR</td>
+      <td>1.38</td>
+      <td>1.17-1.64</td>
+      <td>1.78e-04</td>
+      <td>4238</td>
+      <td>1230</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>death</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>HR</td>
+      <td>2.63</td>
+      <td>2.07-3.34</td>
+      <td>2.63e-15</td>
+      <td>4231</td>
+      <td>723</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>death</td>
+      <td>valve_tavr</td>
+      <td>HR</td>
+      <td>1.47</td>
+      <td>1.25-1.74</td>
+      <td>5.25e-06</td>
+      <td>4231</td>
+      <td>723</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>hf_readmission</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>HR</td>
+      <td>0.948</td>
+      <td>0.716-1.25</td>
+      <td>0.707</td>
+      <td>4222</td>
+      <td>1013</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>hf_readmission</td>
+      <td>valve_tavr</td>
+      <td>HR</td>
+      <td>1.38</td>
+      <td>1.2-1.6</td>
+      <td>1.18e-05</td>
+      <td>4222</td>
+      <td>1013</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>cardiac_readmission</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>HR</td>
+      <td>1</td>
+      <td>0.793-1.27</td>
+      <td>0.989</td>
+      <td>4200</td>
+      <td>1745</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>cardiac_readmission</td>
+      <td>valve_tavr</td>
+      <td>HR</td>
+      <td>1.12</td>
+      <td>0.994-1.25</td>
+      <td>0.0634</td>
+      <td>4200</td>
+      <td>1745</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>mace</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>HR</td>
+      <td>2.14</td>
+      <td>1.7-2.68</td>
+      <td>6.43e-11</td>
+      <td>4226</td>
+      <td>937</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>mace</td>
+      <td>valve_tavr</td>
+      <td>HR</td>
+      <td>1.3</td>
+      <td>1.12-1.5</td>
+      <td>6.21e-04</td>
+      <td>4226</td>
+      <td>937</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>valve_reintervention</td>
+      <td>dialysis_hd_unspecified</td>
+      <td>HR</td>
+      <td>0.786</td>
+      <td>0.272-2.27</td>
+      <td>0.657</td>
+      <td>4238</td>
+      <td>96</td>
+    </tr>
+    <tr>
+      <td>cox</td>
+      <td>valve_reintervention</td>
+      <td>valve_tavr</td>
+      <td>HR</td>
+      <td>1.41</td>
+      <td>0.798-2.5</td>
+      <td>0.235</td>
+      <td>4238</td>
+      <td>96</td>
+    </tr>
+  </tbody>
+</table></section>
+<section class="table-page"><h2>Table 5. Propensity Balance</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Covariate</th>
+      <th>SMD before</th>
+      <th>SMD after</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>admission_age</td>
+      <td>-0.226</td>
+      <td>-0.0591</td>
+    </tr>
+    <tr>
+      <td>male</td>
+      <td>0.149</td>
+      <td>0.077</td>
+    </tr>
+    <tr>
+      <td>charlson_comorbidity_index</td>
+      <td>0.902</td>
+      <td>-0.0285</td>
+    </tr>
+    <tr>
+      <td>valve_tavr</td>
+      <td>0.0911</td>
+      <td>0.0258</td>
+    </tr>
+    <tr>
+      <td>insurance_Medicare</td>
+      <td>0.0801</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>insurance_Other</td>
+      <td>0.0336</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>insurance_Private</td>
+      <td>-0.162</td>
+      <td>0.0492</td>
+    </tr>
+    <tr>
+      <td>insurance_missing</td>
+      <td>-0.0769</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>anchor_year_group_2011 - 2013</td>
+      <td>0.225</td>
+      <td>0.0394</td>
+    </tr>
+    <tr>
+      <td>anchor_year_group_2014 - 2016</td>
+      <td>-0.117</td>
+      <td>0.125</td>
+    </tr>
+    <tr>
+      <td>anchor_year_group_2017 - 2019</td>
+      <td>-0.181</td>
+      <td>-0.0179</td>
+    </tr>
+    <tr>
+      <td>anchor_year_group_2020 - 2022</td>
+      <td>-0.159</td>
+      <td>0.0776</td>
+    </tr>
+  </tbody>
+</table></section>
+<section class="table-page"><h2>Table 6. Missingness Summary</h2><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Variable</th>
+      <th>N</th>
+      <th>Missing n</th>
+      <th>Missing %</th>
+      <th>Nonmissing n</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>admission_age</td>
+      <td>4255</td>
+      <td>0</td>
+      <td>0.0%</td>
+      <td>4255</td>
+    </tr>
+    <tr>
+      <td>male</td>
+      <td>4255</td>
+      <td>0</td>
+      <td>0.0%</td>
+      <td>4255</td>
+    </tr>
+    <tr>
+      <td>charlson_comorbidity_index</td>
+      <td>4255</td>
+      <td>0</td>
+      <td>0.0%</td>
+      <td>4255</td>
+    </tr>
+    <tr>
+      <td>insurance</td>
+      <td>4255</td>
+      <td>12</td>
+      <td>0.3%</td>
+      <td>4243</td>
+    </tr>
+    <tr>
+      <td>anchor_year_group</td>
+      <td>4255</td>
+      <td>0</td>
+      <td>0.0%</td>
+      <td>4255</td>
+    </tr>
+    <tr>
+      <td>valve_strategy</td>
+      <td>4255</td>
+      <td>0</td>
+      <td>0.0%</td>
+      <td>4255</td>
+    </tr>
+    <tr>
+      <td>dialysis_group</td>
+      <td>4255</td>
+      <td>0</td>
+      <td>0.0%</td>
+      <td>4255</td>
+    </tr>
+  </tbody>
+</table></section>
+      </body>
+    </html>

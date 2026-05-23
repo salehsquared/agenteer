@@ -1,0 +1,119 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript reports Kaplan-Meier survival probabilities without time horizon, comparison test, group sizes, censoring, or confidence intervals, making the results uninterpretable. Major reporting gaps must be addressed.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Survival probability estimates reported without time horizon",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Survival probabilities are meaningless without specifying the time at which they are evaluated. The reported 0.3672 and 0.0000 could be at the end of follow-up, at a specific quantile, or at the last observed time, but this is unclear.",
+      "actionableFix": "Report the time point (e.g., 'at 12 months', 'at last follow-up') alongside each survival probability. The stats-run.json provides associated times (493.146 and 354.29) which may need clarification.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "In stats-run.json, each estimate has a 'time' field (e.g., 493.146). The manuscript must explicitly state that these times (or a clinically meaningful time) correspond to the reported survival probabilities.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "No statistical test comparing survival curves",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "The study objective is to compare event-free survival by treatment group. Without a test (e.g., log-rank), the reported survival probabilities alone do not support any inference about differences between groups.",
+      "actionableFix": "Perform and report the log-rank test (or a Cox regression) with p-value and/or hazard ratio, including confidence intervals. The method-selection binding references 'kaplan-meier-log-rank', so this may have been intended but omitted.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing group sample sizes and event counts",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The group-specific N and number of events are essential to judge the reliability of the survival estimates. The extreme 0% survival in group 1 raises suspicion of a very small group or a data error.",
+      "actionableFix": "Add a table showing, per treatment group, the number of subjects, number of events, and number censored. If any group is too small, state the limitation.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The stats-run.json lacks any group sample size counts; this must be derived from the raw data or from the Kaplan-Meier object.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No definition of censoring, event, or time origin",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Readers cannot interpret the survival analysis without knowing what constitutes an event, how censoring was determined, and the time origin (e.g., randomization, diagnosis). The variable names 'survival_time' and 'event' are ambiguous.",
+      "actionableFix": "Define the event (e.g., death, progression), the censoring criteria, and the time origin. Provide a data dictionary or a clear sentence in the Methods.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Survival probabilities lack confidence intervals",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Point estimates of survival are insufficient to assess precision; confidence intervals (or standard errors) are standard for survival analysis.",
+      "actionableFix": "Include 95% confidence intervals for the reported survival probabilities, or a note if they could not be computed due to zero events.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "The stats-run.json estimates do not include standard errors or confidence intervals.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "info",
+      "category": "reporting",
+      "title": "QA warning about p-values unresolved: manuscript includes no p-value",
+      "evidenceRefs": [
+        "stats-qa.json",
+        "manuscript.md"
+      ],
+      "whyItMatters": "The QA system flagged a warning about p-values, suggesting that the analysis intended to report a p-value but the manuscript has none. This inconsistency points to an incomplete analysis or reporting.",
+      "actionableFix": "Either add the p-value from the log-rank test (if computed) or remove the QA warning by clarifying that no hypothesis test was performed.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-qa.json check 'uncertainty-and-pvalue-context' status=warning, but manuscript has no p-value.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "Raw data not provided for independent verification",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run.json"
+      ],
+      "whyItMatters": "Without access to the data, even with artifact hashes, a reviewer cannot verify the analysis steps or check for data errors. The claim of reproducibility is undermined.",
+      "actionableFix": "If data sharing is permitted, include a de-identified copy of the dataset or a detailed description of how to obtain it. Otherwise, acknowledge that the analysis is not externally reproducible.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    }
+  ],
+  "missingEvidence": [
+    "Group-specific sample sizes and event counts",
+    "Definition of event, censoring, and time origin",
+    "Time point(s) at which survival probabilities are reported",
+    "Log-rank test statistic and p-value",
+    "Confidence intervals for survival estimates",
+    "Censoring distribution per group",
+    "Numbers at risk over time"
+  ],
+  "recommendedNextStage": "manuscript"
+}

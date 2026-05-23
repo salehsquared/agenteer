@@ -1,0 +1,111 @@
+{
+  "verdict": "block",
+  "summary": "The study material is insufficient for a final manuscript. The research question is not specified, variable definitions are missing, Poisson model diagnostics are inadequate (no overdispersion or zero-inflation check), missing data handling is incomplete, reproducibility is compromised without analysis code, data plausibility is unverified, claims exceed the exploratory posture, and literature context is absent. Foundational methodological and reporting issues must be resolved before promotion.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Unspecified research question",
+      "evidenceRefs": ["manuscript.md", "stats-run.json"],
+      "whyItMatters": "Without a clear question (PICO), the analysis lacks direction, and results cannot be interpreted meaningfully or assessed for relevance.",
+      "actionableFix": "Explicitly state the primary research question, including population, intervention/exposure, comparator, and outcome.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "variables",
+      "title": "Missing variable definitions",
+      "evidenceRefs": ["manuscript.md", "stats-run.json"],
+      "whyItMatters": "Interpretation of effect sizes, replication, and clinical relevance depend on understanding variable coding, units, and measurement.",
+      "actionableFix": "Provide a codebook detailing each variable, its type, coding scheme, and units (e.g., count_events as number of events per patient).",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.99
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Inadequate Poisson regression diagnostics",
+      "evidenceRefs": ["stats-run.json", "diagnostics.json"],
+      "whyItMatters": "The Shapiro–Wilk test on residuals is inappropriate for Poisson models. No overdispersion assessment (e.g., dispersion parameter) or zero-inflation test is performed, risking invalid standard errors and p-values.",
+      "actionableFix": "Compute the dispersion statistic (deviance/df) and, if >1, use robust standard errors or a negative binomial model. Test for zero-inflation (e.g., Vuong test) and specify a zero-inflated model if needed.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No handling of missing data beyond complete-case analysis",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Complete-case exclusion can bias results if missingness is related to exposure or outcome; the extent and pattern of missing data are unreported.",
+      "actionableFix": "Report the number and proportion of missing values per variable, compare baseline characteristics of included vs. excluded records, and consider multiple imputation or sensitivity analyses.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "No analysis code or data preprocessing script provided",
+      "evidenceRefs": ["stats-run.json"],
+      "whyItMatters": "The analysis cannot be independently verified or rerun without the exact computational steps.",
+      "actionableFix": "Include the complete analysis script (R/Python) with data loading, cleaning, and model fitting, along with a seed for reproducibility.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "data_plausibility",
+      "title": "No data plausibility checks",
+      "evidenceRefs": ["stats-run.json"],
+      "whyItMatters": "Without summary statistics or distributions, impossible values or extreme outliers may distort the model.",
+      "actionableFix": "Provide descriptive statistics (mean, median, range) and visualizations (histograms, boxplots) for all variables. Flag any biologically implausible values.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Overinterpretation given unbound exploratory posture",
+      "evidenceRefs": ["stats-run.json", "manuscript.md"],
+      "whyItMatters": "The result posture is explicitly exploratory and 'cannot support paper-ready conclusions', yet the manuscript presents p-values and suggests interpretable evidence without adequate caveats.",
+      "actionableFix": "Downgrade language to explicitly state the exploratory nature, omit p-value interpretations unless a prespecified analysis plan exists, and avoid any implication of clinical actionability.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No literature contextualization",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Scientific contribution and interpretation require comparison with existing evidence.",
+      "actionableFix": "Add a brief literature review, citing prior studies on similar exposures/outcomes, and compare direction and magnitude of effects.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions / codebook",
+    "Descriptive statistics and data distributions",
+    "Analysis code (R/Python) from raw data to model output",
+    "Overdispersion test and zero-inflation diagnostics",
+    "Missing data report (extent, pattern, comparison of included/excluded)",
+    "Study protocol specifying research question and analysis plan"
+  ],
+  "recommendedNextStage": "protocol"
+}

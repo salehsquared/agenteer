@@ -1,0 +1,100 @@
+{
+  "verdict": "revise",
+  "summary": "The analysis lacks essential reporting elements: no confidence intervals, no description of cohort, no handling of confounding. Claims are limited but still misleading without these.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "No uncertainty estimates provided for cumulative incidence",
+      "evidenceRefs": [
+        "stats-run/stats-run.json:estimates has no confidence intervals",
+        "manuscript.md:results cite only point estimates"
+      ],
+      "whyItMatters": "Without confidence intervals, the precision and clinical meaning of the point estimates are unknown; the difference between treatments cannot be assessed.",
+      "actionableFix": "Compute and report 95% confidence intervals for the cumulative incidence functions, e.g., using log-log transformation or bootstrap.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Check stats-run JSON for new field e.g., 'ci_lower', 'ci_upper'",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No description of the study cohort or dataset origin",
+      "evidenceRefs": [
+        "manuscript.md:cohort construction lacks source, eligibility, definitions"
+      ],
+      "whyItMatters": "The study cannot be evaluated for selection bias, generalizability, or reproducibility.",
+      "actionableFix": "Add a detailed cohort section: data source, study period, inclusion/exclusion criteria, definitions of treatment, competing events, event of interest.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.98
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "causal_claims",
+      "title": "Observational comparison ignores confounding",
+      "evidenceRefs": [
+        "manuscript.md:no covariates, no adjustment, no sensitivity analysis"
+      ],
+      "whyItMatters": "Even a descriptive 'differ by treatment' statement implies a causal contrast; without addressing confounding, the comparison may be severely biased.",
+      "actionableFix": "Either adjust for confounders (e.g., via propensity scores or multivariable CIF regression) or explicitly state that only unadjusted crude estimates are presented and caution against causal interpretation.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without missingness evaluation",
+      "evidenceRefs": [
+        "manuscript.md:complete-case N=240, no missingness description"
+      ],
+      "whyItMatters": "If missingness is related to outcome or treatment, complete-case estimates can be biased.",
+      "actionableFix": "Report the number of records before exclusion, reasons for missingness, and consider multiple imputation or sensitivity analysis.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "No descriptive statistics for key variables",
+      "evidenceRefs": [
+        "manuscript.md:results only final CIF"
+      ],
+      "whyItMatters": "Readers cannot assess follow-up time, event counts, or censoring patterns, which are essential to interpret cumulative incidence.",
+      "actionableFix": "Add a table with number of events, median follow-up, number at risk at key timepoints, and treatment group sizes.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Figure QA file truncated; cannot fully verify figure quality",
+      "evidenceRefs": [
+        "stats-run/figure-qa.json:cuts off mid-sentence"
+      ],
+      "whyItMatters": "The figure may contain errors not caught by automated checks.",
+      "actionableFix": "Complete the QA report and ensure the cumulative incidence plot axes, legend, and footnotes are accurate.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Check for complete figure-qa.json with all checks passed.",
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Cohort definition (source, eligibility, period)",
+    "Baseline characteristics and treatment group sizes",
+    "Number of events (event of interest and competing) per group",
+    "Distribution of follow-up time and censoring",
+    "Confidence intervals for cumulative incidence estimates",
+    "Missingness analysis and initial sample size before exclusion"
+  ],
+  "recommendedNextStage": "execution"
+}

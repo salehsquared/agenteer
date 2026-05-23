@@ -1,0 +1,128 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript fails to report the actual ANCOVA results, lacks a defined study question, contains contradictory statements, and overinterprets an unbound exploratory analysis. These issues prevent any meaningful review.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Results section contains no statistical output",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The manuscript does not answer the study question; critical model estimates, p-values, and effect sizes are absent, rendering it useless for interpretation.",
+      "actionableFix": "Report all ANCOVA terms: group effect (F(2,235)=2.19, p=0.114), covariate effects, model fit, and ideally adjusted means and contrasts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Prespecified study question is never stated",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Readers cannot assess whether the analysis addresses a meaningful hypothesis or aligns with the objective.",
+      "actionableFix": "Explicitly state the study question in the Introduction, and explain how the ANCOVA model was chosen to answer it.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Analysis is unbound and exploratory, but claims imply confirmatory strength",
+      "evidenceRefs": [
+        "stats-run/stats-run.json (binding.status, resultPosture)"
+      ],
+      "whyItMatters": "Unbound analyses have inflated false-positive risk; the manuscript's 'interpretable local evidence' statement is overconfident.",
+      "actionableFix": "Bind the analysis to a pre-registered specification or downgrade all claims to explicitly exploratory language, acknowledging inflated Type I error.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Contradictory statements about missing artifacts and estimates",
+      "evidenceRefs": [
+        "manuscript.md (Limitations)",
+        "stats-run/stats-run.json (estimates)"
+      ],
+      "whyItMatters": "The manuscript says 'No reader-facing paper/manuscript artifact' and 'No estimate-like records', yet both exist; this undermines trust in the report's accuracy.",
+      "actionableFix": "Remove or correct these limitations statements after verifying that the manuscript reflects the actual artifacts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "cohort",
+      "title": "No participant flow or baseline characteristics reported",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Complete-case analysis may be biased; without details on initial cohort, exclusions, and group demographics, selection bias and generalizability cannot be assessed.",
+      "actionableFix": "Provide a STROBE flow diagram and a table of baseline characteristics by group, comparing complete-case to excluded records.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Statistical method is described vaguely",
+      "evidenceRefs": [
+        "manuscript.md (Methods)"
+      ],
+      "whyItMatters": "Reproducibility requires a clear statement of the model; readers should not need to infer from artifacts.",
+      "actionableFix": "Explicitly state: ANCOVA with outcome_cont as dependent variable, group as a three-level factor, and age and severity as covariates, using type III SS.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "No effect sizes or clinical significance reported",
+      "evidenceRefs": [
+        "stats-run/stats-run.json (only sum_sq, df, f, p)"
+      ],
+      "whyItMatters": "P-values alone do not convey magnitude of effects; readers cannot judge practical importance.",
+      "actionableFix": "Compute and report partial eta-squared for each effect (sum_sq_effect / (sum_sq_effect + sum_sq_residual)).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "literature",
+      "title": "No literature context or references provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The study lacks scientific framing; readers cannot gauge importance or compare with prior work.",
+      "actionableFix": "Add a brief background with references or explicitly state this is an internal-only analysis.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Variable dictionary or description of outcome_cont, group levels, age, severity",
+    "Pre-specified study protocol or analysis specification",
+    "Participant flow diagram and baseline demographics table",
+    "Effect size measures (e.g., partial eta-squared)",
+    "Adjusted group means and contrasts with confidence intervals"
+  ],
+  "recommendedNextStage": "manuscript"
+}

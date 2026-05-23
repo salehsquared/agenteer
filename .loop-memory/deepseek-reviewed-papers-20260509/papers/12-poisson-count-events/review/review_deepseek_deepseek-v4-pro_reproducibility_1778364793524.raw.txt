@@ -1,0 +1,99 @@
+{
+  "verdict": "block",
+  "summary": "The study fails to assess overdispersion in Poisson regression, lacks essential descriptive and variable-definition details, and provides incomplete QA artifacts, undermining reproducibility and validity.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "method_choice",
+      "title": "No assessment of overdispersion in Poisson regression",
+      "evidenceRefs": ["stats-run.json", "stats-run/diagnostics.json"],
+      "whyItMatters": "Poisson regression assumes mean = variance. Overdispersion inflates type I error rates and invalidates standard errors and p-values. The residual SD of 1.07 may indicate overdispersion, but no formal test or alternative model (e.g., negative binomial) was considered.",
+      "actionableFix": "Report dispersion parameter (e.g., deviance/df), perform a likelihood ratio test for overdispersion, or fit a negative binomial model and compare AIC. If overdispersion is present, use robust standard errors or switch to an appropriate model.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing variable definitions and descriptive statistics",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "Without clear definitions of variables (treatment coding, units of age and severity, distribution of count_events), readers cannot interpret the results or assess model appropriateness. No table of descriptive statistics (e.g., mean event count, proportion treated, summary of covariates) is provided.",
+      "actionableFix": "Provide a table with variable definitions, levels, and descriptive statistics (mean, SD, range, count for categorical). Include a histogram or table of the outcome distribution to show event counts.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Incomplete QA artifacts prevent full verification",
+      "evidenceRefs": ["stats-run/stats-qa.json", "stats-run/figure-qa.json"],
+      "whyItMatters": "The stats-qa.json artifact is truncated in the supplied packet, and the figure-qa.json is empty. This prevents reviewers from confirming that all QA checks passed and that figures were adequately reviewed. Reproducibility claims rely on these checks.",
+      "actionableFix": "Provide complete, non-truncated QA artifacts and figure QA results. Ensure all checks are documented.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No handling or reporting of missing data",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "The analysis uses complete-case (N=240) but does not report the number of records excluded due to missingness or assess whether missingness is associated with variables. This could introduce selection bias.",
+      "actionableFix": "Report the number of excluded records, compare characteristics of excluded vs. included subjects, and consider sensitivity analyses (e.g., multiple imputation) if missingness is substantial.",
+      "reentryPoint": "dataset_feasibility",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Inappropriate Shapiro-Wilk test on residuals",
+      "evidenceRefs": ["stats-run/diagnostics.json"],
+      "whyItMatters": "Poisson regression does not assume normally distributed residuals. The Shapiro-Wilk p-value (0.00008) is reported but not meaningful; it may mislead readers into thinking model assumption failed.",
+      "actionableFix": "Remove the Shapiro-Wilk test result or replace with appropriate diagnostics (e.g., deviance goodness-of-fit, overdispersion test, residual plots).",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Abstract lacks numeric results",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "The abstract does not include key effect estimates, confidence intervals, or sample size; this hinders quick comprehension.",
+      "actionableFix": "Include the rate ratio, 95% CI, and p-value for treatment, and mention sample size and model variables in the abstract.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Title is a question rather than declarative",
+      "evidenceRefs": ["manuscript.md"],
+      "whyItMatters": "The title 'How is treatment associated with count-event burden after adjustment?' is a question; standard reporting requires a declarative title summarizing the study.",
+      "actionableFix": "Use a declarative title, e.g., 'Association between treatment and count-event burden in a Poisson regression analysis of 240 observations'.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Distribution of count_events and descriptive statistics",
+    "Number and characteristics of records excluded due to missingness",
+    "Overdispersion test results or negative binomial model fit",
+    "Complete QA artifacts (stats-qa.json full content, figure-qa.json content)",
+    "Details of study design (population, time frame, data source)",
+    "Variable coding and units"
+  ],
+  "recommendedNextStage": "execution"
+}

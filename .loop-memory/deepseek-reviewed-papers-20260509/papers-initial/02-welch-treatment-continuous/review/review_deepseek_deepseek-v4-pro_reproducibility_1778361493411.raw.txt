@@ -1,0 +1,132 @@
+{
+  "verdict": "block",
+  "summary": "The manuscript fails to report the actual statistical results, contradicts the run artifacts, and presents an unbound exploratory analysis as a study finding. Major reporting, reproducibility, and methodological gaps prevent any valid interpretation.",
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript omits all key statistical results",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The Abstract and Results sections mention only sample size, ignoring the estimated treatment effect, p-value, and confidence interval. Readers cannot evaluate the study's primary finding.",
+      "actionableFix": "Update the manuscript to include the Welch t-test results: means, mean difference, Cohen's d, test statistic, p-value, and confidence interval.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md abstract and results lack any numeric estimates.",
+      "confidence": 1
+    },
+    {
+      "id": "F02",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript contradicts available evidence",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The Limitations section claims 'No estimate-like records were available for p-value/effect-size checks,' but the stats-run.json clearly contains an estimates array with p-value and effect size. This inconsistency undermines trust in the entire report.",
+      "actionableFix": "Reconcile the manuscript with the actual run output; remove the false statement.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json contains an 'estimates' key with p_value and cohen_d; manuscript.md says the opposite.",
+      "confidence": 1
+    },
+    {
+      "id": "F03",
+      "severity": "blocker",
+      "category": "reproducibility",
+      "title": "Analysis is unbound and purely exploratory",
+      "evidenceRefs": [
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The run's resultPosture is 'exploratory_standard_table' and cannot support paper-ready conclusions. Presenting it as a study answer is misleading and a claim-safety risk.",
+      "actionableFix": "Bind the run to a preregistered method-selection and AnalysisSpec, or explicitly downgrade the report to exploratory data analysis with no confirmatory claims.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json binding.status is 'unbound', resultPosture.label is 'Exploratory standard-table result'.",
+      "confidence": 1
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Complete-case analysis without missing data investigation",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "Only 240 complete cases were used, but the original sample size, missingness proportion, and missing-data mechanism are not reported. Non-random missingness could bias the estimate.",
+      "actionableFix": "Report the number of excluded records, reasons for missingness, and a sensitivity analysis (e.g., pattern-mixture, multiple imputation).",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No normality or outlier diagnostics reported",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The Welch t-test assumes approximate normality, especially with small groups. The only diagnostic is Levene's test for equal variance, which is not required. Without Q-Q plots or Shapiro-Wilk results, the validity of the p-value is uncertain.",
+      "actionableFix": "Provide distribution plots (histograms, Q-Q) per group and a formal normality test; discuss robustness.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F06",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Cohort definition and variable metadata missing",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "No information on how treatment groups were defined, what outcome_cont measures, or the eligibility criteria is provided. Interpretation and replication are impossible.",
+      "actionableFix": "Add a detailed cohort flowchart, variable definitions, and source data description.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F07",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "No descriptive statistics beyond group means",
+      "evidenceRefs": [
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "Standard deviations, ranges, and quantiles are essential to assess data quality, effect-size interpretation, and potential floor/ceiling effects. Their absence prevents full evaluation.",
+      "actionableFix": "Include a table of descriptive statistics (N, mean, SD, median, min, max) for each group.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F08",
+      "severity": "info",
+      "category": "literature",
+      "title": "No literature context or prior effect estimates",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "For interpretability, the observed Cohen's d needs benchmarking against similar studies. Omission limits the reader's ability to assess external consistency or plausibility.",
+      "actionableFix": "Briefly cite comparable studies or known effect sizes for this outcome–treatment pair.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.6
+    }
+  ],
+  "missingEvidence": [
+    "Full descriptive statistics (SD, percentiles) per group",
+    "Normality test results or Q-Q plots",
+    "Original sample size and missing data pattern (flowchart)",
+    "Cohort eligibility criteria and variable codebook",
+    "Pre-registration protocol or AnalysisSpec",
+    "Figure quality assessment details (only partially available)",
+    "Content of manuscript-qa.json to understand prior warnings"
+  ],
+  "recommendedNextStage": "manuscript"
+}

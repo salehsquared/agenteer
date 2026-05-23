@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2902107760555097202",
+  "method": "prediction-evaluation",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_binary",
+    "pred_score"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "pred_score",
+      "auroc": 0.7451159951159951,
+      "brier_score": 0.1924638645,
+      "n": 240
+    }
+  ],
+  "diagnostics": {
+    "test": "prediction evaluation",
+    "roc_points": 100
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-config.json",
+      "sha256": "147a1757f98f55246804cb60aa743aba83a1debdf5f88bbc0cbd6ef69b5a0a24"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-summary.json",
+      "sha256": "097fb22718a2a74fcb58610ae5c928d4fff0d778adac2a927b78c1f1d435f1f2"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/estimates.csv",
+      "sha256": "e246dc10906b5e41ceb91d8cba4e6af7024726528c5e38c97dc783968525e87c"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/diagnostics.json",
+      "sha256": "77a6832db264165ed885b6f514cf86cc2039fc6320f783475205a8558eec786e"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figures.json",
+      "sha256": "284f01271efe2c32d7e721f5ad3a83ba4ea3cd10972404e8f081f3eabc924aca"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/roc-curve.png",
+      "sha256": "327568da6f3eea9619590a742748a7bcf9a1236c70460eff3cda63a25ddfb521"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/figure-qa.json",
+      "sha256": "f2aa1632d8c076460281fc2c241219e945f00594fd20e2304563c094ae0579d4"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-report.md",
+      "sha256": "3526ec32bd527482fcd192cf164ff4bc12257fccd868faa5cc418e47c1eb94f7"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run/stats-qa.json",
+      "sha256": "e947c936d346f3ab9d525e325cb27328618718f4ff1c13f038bb30c9f5715260"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/20-prediction-risk-score/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

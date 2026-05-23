@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "generatedAtIso": "2026-05-09T21:27:32.911Z",
+  "stage": "final",
+  "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events",
+  "packetHash": "efaf16ec6dcddf27fc41dd4ed8904cc8a07677b4d6702c721cf65c53e2a45979",
+  "privacyPolicy": {
+    "rawRowsAllowed": true,
+    "phiAllowed": true,
+    "maxArtifactBytes": 60000,
+    "maxPromptChars": 12000
+  },
+  "artifactSummary": {
+    "totalFiles": 27,
+    "includedFiles": 6,
+    "totalBytes": 143354,
+    "includedBytes": 19922
+  },
+  "artifacts": [
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/manuscript.md",
+      "relativePath": "manuscript.md",
+      "bytes": 4144,
+      "sha256": "57bbfa1a1e7b4a934e066a29c90196a57fa9db53e7312f12b8fe04aeaf18524b",
+      "kind": "markdown",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was count. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was count. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the estimate was -0.8310 (95% CI -1.6882 to 0.0262); p=0.0574.\n- For treatment, the estimate was 0.2529 (95% CI -0.1068 to 0.6126); p=0.1682.\n- For age, the estimate was 0.0113 (95% CI -0.0006 to 0.0231); p=0.0617.\n- For severity, the estimate was 0.1354 (95% CI -0.0703 to 0.3411); p=0.1969.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 218bc696a7150f4a06d73c556aaf85ee2e5c7364f3d0e458ce48389dcb4cc7e2. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-run.json",
+      "relativePath": "stats-run/stats-run.json",
+      "bytes": 6368,
+      "sha256": "9cb58e834b0afa5444648b401fec106f66e935b306b7ccd006712a44faec3656",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included in reviewer context",
+      "contentPreview": "{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_260811074508167082\",\n  \"method\": \"negative-binomial-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"count_events\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": -0.8309992744861459,\n      \"std_error\": 0.4373434915326194,\n      \"p_value\": 0.05741912582943826,\n      \"ci_low\": -1.688176766763078,\n      \"ci_high\": 0.02617821779078633,\n      \"rate_ratio\": 0.4356137710309118,\n      \"rr_ci_low\": 0.18485625299647082,\n      \"rr_ci_high\": 1.0265238769899465\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 0.25292560928794716,\n      \"std_error\": 0.18352833616775804,\n      \"p_value\": 0.16816365357298435,\n      \"ci_low\": -0.10678331974341843,\n      \"ci_high\": 0.6126345383193128,\n      \"rate_ratio\": 1.2877874738440962,\n      \"rr_ci_low\": 0.8987203868582379,\n      \"rr_ci_high\": 1.8452864784643532\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.011268940601765804,\n      \"std_error\": 0.006030799573696979,\n      \"p_value\": 0.061683368323949515,\n      \"ci_low\": -0.0005512093606597854,\n      \"ci_high\": 0.023089090564191395,\n      \"rate_ratio\": 1.011332674291643,\n      \"rr_ci_low\": 0.9994489425273112,\n      \"rr_ci_high\": 1.0233577070015636\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 0.1354058568852481,\n      \"std_error\": 0.10493146056961561,\n      \"p_value\": 0.19690420521586116,\n      \"ci_low\": -0.07025602667638328,\n      \"ci_high\": 0.3410677404468795,\n      \"rate_ratio\": 1.1450013967623587,\n      \"rr_ci_low\": 0.9321551327715981,\n      \"rr_ci_high\": 1.4064485110859628\n    }\n  ],\n  \"diagnostics\": {\n    \"model_family\": \"negative-binomial-regression\",\n    \"aic\": 817.3626981317952,\n    \"bic\": -1176.5376279397344,\n    \"df_resid\": 236,\n    \"residual_mean\": -0.0006937159453536789,\n    \"residual_sd\": 1.0705991276588052,\n    \"shapiro_p_value\": 0.0000816800404523377,\n    \"max_leverage\": 0.05262748588255761,\n    \"max_cooks_distance\": 0.052838758422188166,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.1266739538918475\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0808383501003018\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.146630084030013\n      }\n    ],\n    \"max_vif\": 1.146630084030013,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [\n    \"/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/families/family.py:1367: ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.\\n  warnings.warn(\\\"Negative binomial dispersion parameter alpha not \\\"\"\n  ],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-config.json\",\n      \"sha256\": \"5498ea84a021fa6e45523450359c765965d27f8d5c4f416df950b89abaf319a5\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-summary.json\",\n      \"sha256\": \"638ecb1ab07f0dc7c8520f7c3064234c016c6424d9808bcfa91116b36deaa75f\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/estimates.csv\",\n      \"sha256\": \"40ba58edc8ce98cdb88f1388419dff49c37ad7165542776d8af1ee6cda29dd89\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/diagnostics.json\",\n      \"sha256\": \"13db3bbc0be490a5567ece025903335f80ae70ac00e2e3bb68294f03ff4bdf9a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figures.json\",\n      \"sha256\": \"4356312d14186fe75809c57155ae9e5fc6f68eb0aacdacf715c932557123d9e8\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/model-residuals.png\",\n      \"sha256\": \"d5d410bb0f2c534b4dc17e57a070e4016841b7d31f72331de21f5547b0725332\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figure-qa.json\",\n      \"sha256\": \"47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-report.md\",\n      \"sha256\": \"829356c611d3ab7dbfc06ac22a38fe2f9e324e9bf1ad9c2e1a0f27bd2055f041\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-qa.json\",\n      \"sha256\": \"ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/diagnostics.json",
+      "relativePath": "stats-run/diagnostics.json",
+      "bytes": 613,
+      "sha256": "13db3bbc0be490a5567ece025903335f80ae70ac00e2e3bb68294f03ff4bdf9a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": "{\n  \"model_family\": \"negative-binomial-regression\",\n  \"aic\": 817.3626981317952,\n  \"bic\": -1176.5376279397344,\n  \"df_resid\": 236,\n  \"residual_mean\": -0.0006937159453536789,\n  \"residual_sd\": 1.0705991276588052,\n  \"shapiro_p_value\": 8.16800404523377e-05,\n  \"max_leverage\": 0.05262748588255761,\n  \"max_cooks_distance\": 0.052838758422188166,\n  \"vif\": [\n    {\n      \"term\": \"treatment\",\n      \"vif\": 1.1266739538918475\n    },\n    {\n      \"term\": \"age\",\n      \"vif\": 1.0808383501003018\n    },\n    {\n      \"term\": \"severity\",\n      \"vif\": 1.146630084030013\n    }\n  ],\n  \"max_vif\": 1.14663008403"
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-qa.json",
+      "relativePath": "stats-run/stats-qa.json",
+      "bytes": 1537,
+      "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/figure-qa.json",
+      "relativePath": "figure-qa.json",
+      "bytes": 3630,
+      "sha256": "47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figure-qa.json",
+      "relativePath": "stats-run/figure-qa.json",
+      "bytes": 3630,
+      "sha256": "47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624",
+      "kind": "json",
+      "included": true,
+      "inclusionReason": "included but truncated for prompt budget",
+      "contentPreview": ""
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figures.json",
+      "relativePath": "stats-run/figures.json",
+      "bytes": 1234,
+      "sha256": "4356312d14186fe75809c57155ae9e5fc6f68eb0aacdacf715c932557123d9e8",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/manuscript-qa.json",
+      "relativePath": "manuscript-qa.json",
+      "bytes": 2232,
+      "sha256": "d91d79c928df4201788dd5f12901a7ba954b76a9785fc424bd0af862a4916f1e",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/run-inspection.json",
+      "relativePath": "run-inspection.json",
+      "bytes": 9890,
+      "sha256": "76fce3d35702f3b11afdc8511b5c7fa1abf15026b9d7738bfbf80330824c4ad9",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/figure-qa.md",
+      "relativePath": "figure-qa.md",
+      "bytes": 1541,
+      "sha256": "17deabdb9437f837529ba68fcd677636c463d10408a982084d8fb22e5bce1dfe",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/figure-qa.stderr",
+      "relativePath": "figure-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/figure-qa.stdout",
+      "relativePath": "figure-qa.stdout",
+      "bytes": 4210,
+      "sha256": "63e94f12376ddc753bdc58e48208e3b99ea872d7ff7b8284291929670b33fbbd",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/manuscript.stderr",
+      "relativePath": "manuscript.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/manuscript.stdout",
+      "relativePath": "manuscript.stdout",
+      "bytes": 15024,
+      "sha256": "2978844eddcc10a2410fb240e7a8db355e99ec110f82901cc1d9a6dd935e2793",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/paper-qa.stderr",
+      "relativePath": "paper-qa.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/paper-qa.stdout",
+      "relativePath": "paper-qa.stdout",
+      "bytes": 4324,
+      "sha256": "df69d561c6c7b9a9f2ba54a72b883eb64272794779ef4925ca23f5e2a0161f10",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/reviewer-context.md",
+      "relativePath": "reviewer-context.md",
+      "bytes": 817,
+      "sha256": "576c485780e3be0245cac30f3a2fb51307be171759ec78602e504f4c76673053",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/run-inspect.stderr",
+      "relativePath": "run-inspect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/run-inspect.stdout",
+      "relativePath": "run-inspect.stdout",
+      "bytes": 10029,
+      "sha256": "ffa5e2f46419ae7194723e438fd4c031e835fc19cc9e31c4a0fbdf112b54ceed",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/run-inspection.md",
+      "relativePath": "run-inspection.md",
+      "bytes": 1002,
+      "sha256": "418fca8d9f0eb726b3a3e9dedbc77f2cd17f10b5b9acf1b3cce04a003faa0d3e",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run.stderr",
+      "relativePath": "stats-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run.stdout",
+      "relativePath": "stats-run.stdout",
+      "bytes": 6741,
+      "sha256": "e9d24cc9753d483b835a79d4e756c52fbcacefaa5522978e4ccb44d1af292cf7",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "binary or unsupported artifact type",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/estimates.csv",
+      "relativePath": "stats-run/estimates.csv",
+      "bytes": 740,
+      "sha256": "40ba58edc8ce98cdb88f1388419dff49c37ad7165542776d8af1ee6cda29dd89",
+      "kind": "csv",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/model-residuals.png",
+      "relativePath": "stats-run/model-residuals.png",
+      "bytes": 62663,
+      "sha256": "d5d410bb0f2c534b4dc17e57a070e4016841b7d31f72331de21f5547b0725332",
+      "kind": "other",
+      "included": false,
+      "inclusionReason": "larger than maxArtifactBytes 60000",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-config.json",
+      "relativePath": "stats-run/stats-config.json",
+      "bytes": 680,
+      "sha256": "5498ea84a021fa6e45523450359c765965d27f8d5c4f416df950b89abaf319a5",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-report.md",
+      "relativePath": "stats-run/stats-report.md",
+      "bytes": 2072,
+      "sha256": "829356c611d3ab7dbfc06ac22a38fe2f9e324e9bf1ad9c2e1a0f27bd2055f041",
+      "kind": "markdown",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    },
+    {
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-summary.json",
+      "relativePath": "stats-run/stats-summary.json",
+      "bytes": 233,
+      "sha256": "638ecb1ab07f0dc7c8520f7c3064234c016c6424d9808bcfa91116b36deaa75f",
+      "kind": "json",
+      "included": false,
+      "inclusionReason": "selected but excluded because prompt budget was exhausted",
+      "contentPreview": null
+    }
+  ],
+  "promptContext": "Review stage: final\nRun directory: /Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events\nRaw row-level data allowed: true\nPHI-sensitive content allowed by caller: true\n\n\n--- ARTIFACT manuscript.md (markdown, 4144 bytes, sha256=57bbfa1a1e7b4a934e066a29c90196a57fa9db53e7312f12b8fe04aeaf18524b) ---\n# What does the analyzed dataset show for the prespecified study question\n\n## Abstract\n\nBackground: This study analyzes a local research dataset to answer a prespecified clinical or public-health question.\n\nObjective: What does the analyzed dataset show for the prespecified study question?\n\nDesign: This was an observational dataset analysis with interpretation bounded to the analyzed data.\n\nParticipants: The analyzed sample included 240 complete-case records.\n\nMethods: The detected model family was count. The analysis used conservative claim language and was reviewed with deterministic methods checks.\n\nResults: The complete-case analytic sample included 240 records.\n\nConclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.\n\n## Introduction\n\nThis analysis asks: What does the analyzed dataset show for the prespecified study question? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.\n\n## Methods\n\n### Study Design And Data Source\n\nThis was an observational dataset analysis with interpretation bounded to the analyzed data The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.\n\n### Cohort Construction\n\nThe cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.\n\n### Variables\n\nThe primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.\n\n### Statistical Analysis\n\nThe detected model family was count. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.\n\n### Quality Control\n\nThe methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Keep internal framework details in companion artifacts, not the manuscript.\n\n## Results\n\n- The complete-case analytic sample included 240 records.\n- For const, the estimate was -0.8310 (95% CI -1.6882 to 0.0262); p=0.0574.\n- For treatment, the estimate was 0.2529 (95% CI -0.1068 to 0.6126); p=0.1682.\n- For age, the estimate was 0.0113 (95% CI -0.0006 to 0.0231); p=0.0617.\n- For severity, the estimate was 0.1354 (95% CI -0.0703 to 0.3411); p=0.1969.\n\n## Discussion\n\nThe result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.\n\n## Limitations\n\n- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.\n- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.\n- Deterministic methods checks identified issues that require review before publication or external sharing.\n- No reader-facing paper/manuscript artifact was found.\n- No explicit influence diagnostic evidence was found.\n- No reader-facing report was available for claim alignment.\n\n## What This Does And Does Not Show\n\n- This report shows what the analyzed table or packet produced under the declared local methods.\n- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.\n- It does not establish clinical deployability, external validity, or treatment recommendations.\n\n## Reproducibility\n\nThe run directory contains 13 artifact(s). The artifact inventory hash is 218bc696a7150f4a06d73c556aaf85ee2e5c7364f3d0e458ce48389dcb4cc7e2. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.\n\n\n--- ARTIFACT stats-run/stats-run.json (json, 6368 bytes, sha256=9cb58e834b0afa5444648b401fec106f66e935b306b7ccd006712a44faec3656) ---\n{\n  \"schemaVersion\": 1,\n  \"runId\": \"statsrun_260811074508167082\",\n  \"method\": \"negative-binomial-regression\",\n  \"status\": \"succeeded\",\n  \"rowCount\": 240,\n  \"completeCaseN\": 240,\n  \"variables\": [\n    \"count_events\",\n    \"treatment\",\n    \"age\",\n    \"severity\"\n  ],\n  \"parameters\": {\n    \"alpha\": 0.05\n  },\n  \"estimates\": [\n    {\n      \"term\": \"const\",\n      \"estimate\": -0.8309992744861459,\n      \"std_error\": 0.4373434915326194,\n      \"p_value\": 0.05741912582943826,\n      \"ci_low\": -1.688176766763078,\n      \"ci_high\": 0.02617821779078633,\n      \"rate_ratio\": 0.4356137710309118,\n      \"rr_ci_low\": 0.18485625299647082,\n      \"rr_ci_high\": 1.0265238769899465\n    },\n    {\n      \"term\": \"treatment\",\n      \"estimate\": 0.25292560928794716,\n      \"std_error\": 0.18352833616775804,\n      \"p_value\": 0.16816365357298435,\n      \"ci_low\": -0.10678331974341843,\n      \"ci_high\": 0.6126345383193128,\n      \"rate_ratio\": 1.2877874738440962,\n      \"rr_ci_low\": 0.8987203868582379,\n      \"rr_ci_high\": 1.8452864784643532\n    },\n    {\n      \"term\": \"age\",\n      \"estimate\": 0.011268940601765804,\n      \"std_error\": 0.006030799573696979,\n      \"p_value\": 0.061683368323949515,\n      \"ci_low\": -0.0005512093606597854,\n      \"ci_high\": 0.023089090564191395,\n      \"rate_ratio\": 1.011332674291643,\n      \"rr_ci_low\": 0.9994489425273112,\n      \"rr_ci_high\": 1.0233577070015636\n    },\n    {\n      \"term\": \"severity\",\n      \"estimate\": 0.1354058568852481,\n      \"std_error\": 0.10493146056961561,\n      \"p_value\": 0.19690420521586116,\n      \"ci_low\": -0.07025602667638328,\n      \"ci_high\": 0.3410677404468795,\n      \"rate_ratio\": 1.1450013967623587,\n      \"rr_ci_low\": 0.9321551327715981,\n      \"rr_ci_high\": 1.4064485110859628\n    }\n  ],\n  \"diagnostics\": {\n    \"model_family\": \"negative-binomial-regression\",\n    \"aic\": 817.3626981317952,\n    \"bic\": -1176.5376279397344,\n    \"df_resid\": 236,\n    \"residual_mean\": -0.0006937159453536789,\n    \"residual_sd\": 1.0705991276588052,\n    \"shapiro_p_value\": 0.0000816800404523377,\n    \"max_leverage\": 0.05262748588255761,\n    \"max_cooks_distance\": 0.052838758422188166,\n    \"vif\": [\n      {\n        \"term\": \"treatment\",\n        \"vif\": 1.1266739538918475\n      },\n      {\n        \"term\": \"age\",\n        \"vif\": 1.0808383501003018\n      },\n      {\n        \"term\": \"severity\",\n        \"vif\": 1.146630084030013\n      }\n    ],\n    \"max_vif\": 1.146630084030013,\n    \"weighted\": false\n  },\n  \"issues\": [],\n  \"warnings\": [\n    \"/Users/saleh/TechProjects/agenteer/.research-runtime/python/lib/python3.9/site-packages/statsmodels/genmod/families/family.py:1367: ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.\\n  warnings.warn(\\\"Negative binomial dispersion parameter alpha not \\\"\"\n  ],\n  \"errors\": [],\n  \"artifacts\": [\n    {\n      \"kind\": \"config\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-config.json\",\n      \"sha256\": \"5498ea84a021fa6e45523450359c765965d27f8d5c4f416df950b89abaf319a5\"\n    },\n    {\n      \"kind\": \"summary\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-summary.json\",\n      \"sha256\": \"638ecb1ab07f0dc7c8520f7c3064234c016c6424d9808bcfa91116b36deaa75f\"\n    },\n    {\n      \"kind\": \"table\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/estimates.csv\",\n      \"sha256\": \"40ba58edc8ce98cdb88f1388419dff49c37ad7165542776d8af1ee6cda29dd89\"\n    },\n    {\n      \"kind\": \"diagnostics\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/diagnostics.json\",\n      \"sha256\": \"13db3bbc0be490a5567ece025903335f80ae70ac00e2e3bb68294f03ff4bdf9a\"\n    },\n    {\n      \"kind\": \"figure-manifest\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figures.json\",\n      \"sha256\": \"4356312d14186fe75809c57155ae9e5fc6f68eb0aacdacf715c932557123d9e8\"\n    },\n    {\n      \"kind\": \"figure\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/model-residuals.png\",\n      \"sha256\": \"d5d410bb0f2c534b4dc17e57a070e4016841b7d31f72331de21f5547b0725332\"\n    },\n    {\n      \"kind\": \"figure-qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/figure-qa.json\",\n      \"sha256\": \"47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624\"\n    },\n    {\n      \"kind\": \"report\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-report.md\",\n      \"sha256\": \"829356c611d3ab7dbfc06ac22a38fe2f9e324e9bf1ad9c2e1a0f27bd2055f041\"\n    },\n    {\n      \"kind\": \"qa\",\n      \"path\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run/stats-qa.json\",\n      \"sha256\": \"ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a\"\n    }\n  ],\n  \"outDir\": \"/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/stats-run\",\n  \"binding\": {\n    \"methodSelectionPath\": null,\n    \"methodSelectionId\": null,\n    \"methodId\": null,\n    \"analysisSpecPath\": null,\n    \"specHash\": null,\n    \"status\": \"unbound\"\n  },\n  \"resultPosture\": {\n    \"status\": \"exploratory_standard_table\",\n    \"label\": \"Exploratory standard-table result\",\n    \"interpretationBoundary\": \"This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.\",\n    \"supports\": [\n      \"local data debugging\",\n      \"rough statistical exploration\",\n      \"candidate method smoke testing\"\n    ],\n    \"cannotSupport\": [\n      \"method-governed inference\",\n      \"paper-ready conclusions\",\n      \"causal claims\"\n    ],\n    \"nextAction\": \"Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion.\"\n  }\n}\n\n\n--- ARTIFACT stats-run/diagnostics.json (json, 613 bytes, sha256=13db3bbc0be490a5567ece025903335f80ae70ac00e2e3bb68294f03ff4bdf9a) ---\n{\n  \"model_family\": \"negative-binomial-regression\",\n  \"aic\": 817.3626981317952,\n  \"bic\": -1176.5376279397344,\n  \"df_resid\": 236,\n  \"residual_mean\": -0.0006937159453536789,\n  \"residual_sd\": 1.0705991276588052,\n  \"shapiro_p_value\": 8.16800404523377e-05,\n  \"max_leverage\": 0.05262748588255761,\n  \"max_cooks_distance\": 0.052838758422188166,\n  \"vif\": [\n    {\n      \"term\": \"treatment\",\n      \"vif\": 1.1266739538918475\n    },\n    {\n      \"term\": \"age\",\n      \"vif\": 1.0808383501003018\n    },\n    {\n      \"term\": \"severity\",\n      \"vif\": 1.146630084030013\n    }\n  ],\n  \"max_vif\": 1.14663008403\n\n--- ARTIFACT stats-run/stats-qa.json (json, 1537 bytes, sha256=ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a) ---\n\n\n--- ARTIFACT figure-qa.json (json, 3630 bytes, sha256=47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624) ---\n\n\n--- ARTIFACT stats-run/figure-qa.json (json, 3630 bytes, sha256=47423bf63cfec480dcb46523bd870917a50ff5f340aefbf07c1bf39899903624) ---\n"
+}

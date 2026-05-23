@@ -1,0 +1,122 @@
+{
+  "verdict": "block",
+  "summary": "The study is an unbound exploratory prediction evaluation lacking protocol, variable definitions, model description, calibration, sample size justification, and missing data analysis. It cannot be interpreted as a confirmatory finding.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Analysis is explicitly unbound and lacks pre‑registration",
+      "evidenceRefs": [
+        "stats-run/stats-run.json#/binding",
+        "stats-run/stats-run.json#/resultPosture",
+        "stats-run/stats-qa.json#/checks/3",
+        "stats-run/stats-qa.json#/checks/8"
+      ],
+      "whyItMatters": "Without a pre‑specified analysis plan, all results become exploratory and cannot support confirmatory claims. The binding status ‘unbound’ and result posture ‘exploratory_standard_table’ indicate that no protocol or AnalysisSpec governs this run.",
+      "actionableFix": "Create a pre‑registered protocol or analysis specification, bind the statistical run to it, and re‑run the analysis before submitting as a final manuscript.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "variables",
+      "title": "Outcome, exposure and covariates are not defined",
+      "evidenceRefs": [
+        "manuscript.md#/Methods/Variables"
+      ],
+      "whyItMatters": "Readers cannot reproduce the study or interpret the clinical meaning of the prediction. Only generic names ‘outcome_binary’ and ‘pred_score’ appear, with no operational definitions.",
+      "actionableFix": "Provide a complete data dictionary with definitions, measurement scales, and derivation rules for every variable used.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Origin and nature of the prediction model are undisclosed",
+      "evidenceRefs": [
+        "manuscript.md#/Methods/Statistical Analysis",
+        "stats-run/stats-run.json#/estimates/0"
+      ],
+      "whyItMatters": "The model that generated ‘pred_score’ is not described (e.g., logistic regression, random forest, external risk score). Reproducibility and internal validity cannot be assessed, and overfitting or data leakage cannot be ruled out.",
+      "actionableFix": "Describe the model class, training data, feature set, hyperparameters, and any internal validation (e.g., cross‑validation) that produced the predicted probabilities.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No calibration assessment performed",
+      "evidenceRefs": [
+        "stats-run/stats-run.json#/estimates/0",
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "For risk prediction, good discrimination (AUROC) does not imply good calibration. Without calibration intercept, slope, or calibration plot, the model may give misleadingly over‑ or under‑confident predictions.",
+      "actionableFix": "Add calibration‑in‑the‑large, calibration slope, a calibration plot, and optionally a decision curve analysis.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Sample size is small with no justification or event rate reported",
+      "evidenceRefs": [
+        "manuscript.md#/Methods/Cohort Construction",
+        "stats-run/stats-run.json#/rowCount"
+      ],
+      "whyItMatters": "Prediction model evaluation requires adequate events per candidate predictor. Without the event rate or a sample‑size justification, the study may be severely underpowered or produce unstable estimates.",
+      "actionableFix": "Report the outcome prevalence (number of events), discuss event‑per‑variable criteria, or provide a sample size calculation justifying the current N.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No missing‑data analysis beyond a complete‑case statement",
+      "evidenceRefs": [
+        "manuscript.md#/Limitations",
+        "stats-run/stats-run.json#/completeCaseN"
+      ],
+      "whyItMatters": "Complete‑case analysis can bias evaluation if missingness is related to outcome or predictors. The study provides no flow chart, comparison of excluded vs included subjects, or sensitivity analysis.",
+      "actionableFix": "Describe the initial sample, record‑level exclusions, and compare demographics of included and excluded records. Consider multiple imputation or a missing‑at‑random sensitivity analysis.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript is presented as final while self‑documented as exploratory and unreviewed",
+      "evidenceRefs": [
+        "manuscript.md#/Limitations",
+        "manuscript.md#/What This Does And Does Not Show",
+        "stats-run/stats-qa.json#/status"
+      ],
+      "whyItMatters": "The paper admits it is not bound to an analysis plan, lacks a reader‑facing report, and has unaddressed advisory issues. Submitting it as a final manuscript is premature and may mislead stakeholders.",
+      "actionableFix": "Downgrade the manuscript to an exploratory technical note, resolve all flagged issues, and undergo proper protocol‑governed analysis before resubmitting.",
+      "reentryPoint": "human_review",
+      "deterministicVerification": null,
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Pre‑registered protocol or analysis specification",
+    "Variable dictionary / data dictionary",
+    "Model training details (algorithm, features, internal validation)",
+    "Calibration report (intercept, slope, plot)",
+    "Sample size justification or event rate",
+    "Missing‑data flow chart and sensitivity analysis"
+  ],
+  "recommendedNextStage": "protocol"
+}

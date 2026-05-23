@@ -1,0 +1,134 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is a simple unadjusted Fisher test on two variables, lacking any confounder control, cohort details, confidence intervals, or clinical interpretation. The manuscript is a generic template that acknowledges its own incompleteness. It is not suitable for any clinical or inferential conclusion without substantial methodological redesign.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Observational study with no confounder adjustment",
+      "evidenceRefs": [
+        "stats-run.json: variables only include 'outcome_binary' and 'treatment'",
+        "manuscript.md: 'Design: This was an observational dataset analysis'"
+      ],
+      "whyItMatters": "Without controlling for confounding, any observed association cannot be attributed to the treatment. The odds ratio and p-value are uninterpretable as evidence of a treatment effect.",
+      "actionableFix": "Design a causal study protocol specifying potential confounders, use multivariable regression, propensity scores, or other adjustment methods, or clearly state that only unadjusted association is reported and its limitations for causal inference.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json `variables` array contains only 'outcome_binary' and 'treatment'; no covariates present.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "cohort",
+      "title": "Insufficient cohort description",
+      "evidenceRefs": [
+        "manuscript.md: 'Participants: The analyzed sample included 240 complete-case records.'",
+        "manuscript.md: missing any details on source population, eligibility, sampling"
+      ],
+      "whyItMatters": "Readers cannot assess generalizability or potential selection biases. Cohort flow and inclusion/exclusion are fundamental to interpreting any study.",
+      "actionableFix": "Provide a detailed cohort description, including data source, target population, eligibility criteria, how the 240 records were selected, and a flow diagram. Include information on missingness handling.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing confidence interval for odds ratio",
+      "evidenceRefs": [
+        "stats-run.json: estimates array contains only 'odds_ratio' and 'p_value', no confidence interval"
+      ],
+      "whyItMatters": "The precision of the effect estimate is crucial; p-value alone does not convey the range of plausible effects. Reporting only the point estimate is insufficient.",
+      "actionableFix": "Compute and report the 95% confidence interval for the odds ratio from the Fisher exact test (or via profile-likelihood/bootstrap). Include it in the results and discussion.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "stats-run.json `estimates[0]` lacks a `confidence_interval` key.",
+      "confidence": 0.99
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Result posture is exploratory but manuscript language suggests confirmatory",
+      "evidenceRefs": [
+        "stats-run.json: resultPosture.status = 'exploratory_standard_table'",
+        "stats-qa.json: checks 'binding-status' and 'result-posture' both warning of unbound exploratory status",
+        "manuscript.md: 'Conclusion: The analysis produced interpretable local evidence...'"
+      ],
+      "whyItMatters": "The pipeline itself flagged the analysis as exploratory and not ready for paper conclusions. Presenting it with a formal 'Conclusion' section and p-value emphasis misleads readers about the strength of evidence.",
+      "actionableFix": "Explicitly downgrade the manuscript's language to 'exploratory analysis' without causal or inferential conclusions. Remove any suggestion of formal hypothesis testing. Align claims with the resultPosture guidance.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json `resultPosture.cannotSupport` includes 'paper-ready conclusions'.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No missing data analysis or complete-case justification",
+      "evidenceRefs": [
+        "manuscript.md: 'The complete-case analytic sample included 240 records.'",
+        "missing: description of raw sample size, missingness pattern, reasons for exclusion"
+      ],
+      "whyItMatters": "Complete-case analysis can bias results if missingness is related to exposure or outcome. Without reporting the extent and handling of missing data, the internal validity is questionable.",
+      "actionableFix": "Report the raw dataset size, number of missing values per variable, and pattern of missingness. Consider multiple imputation or sensitivity analysis, or at minimum justify why complete-case analysis is unbiased (e.g., MCAR).",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reporting",
+      "title": "No interpretation of effect size or clinical relevance",
+      "evidenceRefs": [
+        "manuscript.md: Results only state OR=2.7778, p=0.0005",
+        "missing: absolute risks, risk difference, number needed to treat, clinical context"
+      ],
+      "whyItMatters": "Statistical significance alone does not imply practical importance. Without discussing the magnitude and clinical meaning of the odds ratio, the report fails to inform decision-making.",
+      "actionableFix": "Report absolute risk estimates per group, risk differences, confidence intervals, and provide a clinical interpretation (e.g., how many patients would need to be treated to observe one additional outcome).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No reference to prior evidence or comparison with existing literature",
+      "evidenceRefs": [
+        "manuscript.md: no references section, no citations"
+      ],
+      "whyItMatters": "Placing results in the context of existing knowledge is essential for informing readers about novelty and consistency. Without it, the study appears ad-hoc and its contribution unclear.",
+      "actionableFix": "Conduct a literature search, cite prior studies on the same or similar association, compare effect estimates, and discuss potential differences.",
+      "reentryPoint": "literature",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "figures",
+      "title": "Contingency table figure not integrated into manuscript results",
+      "evidenceRefs": [
+        "stats-run/figures.json: contingency-heatmap.png exists",
+        "manuscript.md: no figure reference or table included"
+      ],
+      "whyItMatters": "The raw counts are the fundamental evidence for the Fisher test. They should be presented in the manuscript (preferably as a table) for transparency and verification.",
+      "actionableFix": "Include a table displaying the 2x2 contingency table in the Results section, and optionally reference the heatmap.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    }
+  ],
+  "missingEvidence": [
+    "Raw data file for verification of counts and variable coding",
+    "Cohort construction details (eligibility, exclusion, source database)",
+    "Analysis specification or statistical analysis plan (pre-registration)",
+    "Software code or exact commands used to produce the results",
+    "Variable dictionary defining treatment and outcome_binary",
+    "Literature search strategy or reference list for comparison"
+  ],
+  "recommendedNextStage": "protocol"
+}

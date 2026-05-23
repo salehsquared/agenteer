@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "reviewPanel": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T22:17:44.279Z",
+    "panelId": "review_panel_74743fcb5d0c",
+    "stage": "final",
+    "runDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events",
+    "autonomy": "aggressive",
+    "budget": {
+      "maxPerCallUsd": 0.12,
+      "maxPanelUsd": 0.3,
+      "maxStudyLoopUsd": 5
+    },
+    "packetPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-packet.json",
+    "redactionReportPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-redaction-report.json",
+    "reviewers": [
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T22:14:52.332Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778364892332",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:methods",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "clinical methods and study-design reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The negative binomial regression model was fitted with a default dispersion parameter (alpha=1.0) without estimation, invalidating standard errors and p-values. Additionally, the study lacks justification for model choice, adequate reporting of cohort and variables, and handling of missing data. These issues prevent any local interpretation of results.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "method_choice",
+            "title": "Negative binomial model used default dispersion parameter alpha=1.0 without estimation; standard errors and p-values may be invalid.",
+            "evidenceRefs": [
+              "stats-run/stats-run.json: warnings field includes 'Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0'"
+            ],
+            "whyItMatters": "The negative binomial model's variance function depends on alpha; using a fixed alpha=1.0 assumes a specific dispersion that may not match the data, leading to incorrect inference.",
+            "actionableFix": "Re-fit the model using maximum likelihood estimation of alpha (e.g., statsmodels' discrete.NegativeBinomial) or method of moments, and report the estimated alpha and its standard error. Re-evaluate all results.",
+            "reentryPoint": "execution",
+            "deterministicVerification": "Run the analysis script and check whether the negative binomial model object has an estimated alpha parameter (not fixed to 1.0). Confirmation can be obtained from the model summary or a dedicated dispersion estimate output.",
+            "confidence": 1
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "method_choice",
+            "title": "No evidence of overdispersion testing or model comparison (e.g., against Poisson) to justify negative binomial choice.",
+            "evidenceRefs": [
+              "stats-run/stats-run.json: no overdispersion test present",
+              "stats-run/diagnostics.json: no likelihood ratio test or dispersion statistic"
+            ],
+            "whyItMatters": "Choosing NB to handle overdispersion is sensible, but the model should be justified by evidence of overdispersion. Without testing, model selection may be ad hoc, and the risk of model misspecification remains unexamined.",
+            "actionableFix": "Provide a formal test of overdispersion (e.g., likelihood ratio test of alpha=0, Pearson chi-square/df from a Poisson model, or dispersion test) and document the result. Alternatively, compare fit statistics with a Poisson model.",
+            "reentryPoint": "analysis_spec",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "reporting",
+            "title": "Insufficient reporting of cohort construction, variable definitions, and missing data handling, hampering interpretability and reproducibility.",
+            "evidenceRefs": [
+              "manuscript.md: Methods section mentions cohort definition 'read from available run artifacts' but no details; variables listed without definitions or coding; missingness only mentioned as 'complete-case'."
+            ],
+            "whyItMatters": "Without clear definitions, readers cannot assess internal/external validity, replicate the study, or evaluate confounding and selection bias.",
+            "actionableFix": "Add a table of baseline characteristics, define each variable (e.g., treatment: binary 0/1; age: in years; severity: scale and range; count_events: unit of time/observation). Describe eligibility criteria and the number of records excluded at each step. Clarify the complete-case strategy and any sensitivity analysis.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 1
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "missingness",
+            "title": "Potential selection bias from complete-case analysis; missingness mechanism not examined.",
+            "evidenceRefs": [
+              "manuscript.md: 'complete-case analytic sample included 240 records'",
+              "stats-run/stats-run.json: completeCaseN=240, no missingness diagnostics"
+            ],
+            "whyItMatters": "If missingness is related to outcome or exposure, complete-case analysis yields biased estimates. The assumption of MCAR is often unrealistic.",
+            "actionableFix": "Report the number and percentage of missing values per variable, compare characteristics of complete and incomplete cases, and consider multiple imputation or inverse probability weighting if data are not MCAR. At minimum, discuss the potential direction of bias.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F5",
+            "severity": "minor",
+            "category": "reporting",
+            "title": "Manuscript reports log rate ratios (estimates) but not rate ratios; rate ratios are more clinically interpretable.",
+            "evidenceRefs": [
+              "manuscript.md: Results show estimates like -0.8310",
+              "stats-run/stats-run.json: rate_ratio and rr_ci_low/rr_ci_high present"
+            ],
+            "whyItMatters": "Rate ratios facilitate understanding of effect size. Clinicians and public health readers expect rate ratios.",
+            "actionableFix": "Include rate ratios and their 95% CIs in the results table, alongside or instead of log-scale estimates.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "F6",
+            "severity": "minor",
+            "category": "data_plausibility",
+            "title": "No data summary or description of distribution of outcome and covariates.",
+            "evidenceRefs": [
+              "manuscript.md: no descriptive statistics provided"
+            ],
+            "whyItMatters": "Cannot assess whether the outcome is truly count (non-negative integers), if it contains excess zeros, or if covariates have plausible ranges, all of which affect model appropriateness.",
+            "actionableFix": "Provide summary statistics (mean, median, min, max, variance, proportion zeros for count_events) and histograms or frequency tables. Report the distribution of age, severity, and treatment.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "model_diagnostics",
+            "title": "Model diagnostic evaluation incomplete: no assessment of deviance residuals, influence measures beyond leverage/Cook's, or goodness-of-fit.",
+            "evidenceRefs": [
+              "stats-run/diagnostics.json: no deviance or Pearson residual diagnostics, no dispersion test, no residual vs fitted plot analysis",
+              "stats-run/figure-qa.json: empty, no evaluation of the residual plot"
+            ],
+            "whyItMatters": "Without these, the adequacy of the model fit cannot be confirmed. Residual patterns could indicate model misspecification.",
+            "actionableFix": "Compute deviance residuals, produce residual vs fitted plot and QQ plot of deviance residuals, check for overdispersion after proper alpha estimation, report goodness-of-fit statistics (e.g., Pearson chi-square/df).",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.8
+          }
+        ],
+        "missingEvidence": [
+          "Method selection rationale and overdispersion testing evidence",
+          "Cohort definition (eligibility criteria, flow diagram)",
+          "Variable definitions (units, coding, distribution)",
+          "Missing data patterns and comparison of complete vs incomplete cases",
+          "Residual diagnostic plot evaluation and goodness-of-fit metrics"
+        ],
+        "recommendedNextStage": "execution",
+        "costEstimate": {
+          "inputTokens": 3034,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026159,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review_deepseek_deepseek-v4-pro_methods_1778364892332.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review_deepseek_deepseek-v4-pro_methods_1778364892332.json"
+      },
+      {
+        "schemaVersion": 1,
+        "generatedAtIso": "2026-05-09T22:14:52.349Z",
+        "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778364892349",
+        "reviewer": {
+          "id": "deepseek:deepseek-v4-pro:reproducibility",
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "role": "statistical reporting and reproducibility reviewer",
+          "enabled": true,
+          "maxInputChars": 18000,
+          "maxOutputTokens": 6000,
+          "timeoutMs": 120000
+        },
+        "stage": "final",
+        "status": "succeeded",
+        "verdict": "block",
+        "summary": "The negative binomial regression was fit with a default alpha=1.0 instead of estimating the dispersion parameter, invalidating the overdispersion model. QA artifacts are empty, descriptive statistics are missing, and reporting is inadequate. The study cannot support any claims.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "blocker",
+            "category": "method_choice",
+            "title": "Negative binomial model misspecified: dispersion parameter not estimated; default alpha=1.0 used",
+            "evidenceRefs": [
+              "stats-run.json warnings: \"ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.\""
+            ],
+            "whyItMatters": "A negative binomial model with fixed alpha=1.0 fails to capture overdispersion; standard errors, confidence intervals, and p-values are likely incorrect, rendering the analysis unreliable.",
+            "actionableFix": "Re-run the negative binomial regression with maximum likelihood estimation of the dispersion parameter (e.g., in statsmodels use `NegativeBinomial(y, X, loglike_method='nb2')` and check convergence). Alternatively, compare with a Poisson model and assess need for overdispersion.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.99
+          },
+          {
+            "id": "F2",
+            "severity": "major",
+            "category": "model_diagnostics",
+            "title": "No evidence of overdispersion assessment or model goodness-of-fit",
+            "evidenceRefs": [
+              "manuscript.md: no mention of dispersion test; stats-run.json diagnostics lack goodness-of-fit statistics (e.g., deviance, likelihood ratio test vs Poisson, Pseudo R-squared)"
+            ],
+            "whyItMatters": "Without a test for overdispersion (e.g., Cameron & Trivedi’s test, AER dispersion test), the choice of NB over Poisson is unjustified, and model fit cannot be evaluated.",
+            "actionableFix": "Provide a formal test for overdispersion (e.g., dispersion test in R `glm` vs `glm.nb`), report deviance, and compare AIC/BIC with a Poisson model.",
+            "reentryPoint": "execution",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "F3",
+            "severity": "major",
+            "category": "reporting",
+            "title": "Manuscript reports log coefficients instead of rate ratios (incidence rate ratios)",
+            "evidenceRefs": [
+              "manuscript.md Results: estimates presented as log coefficients; stats-run.json contains rate_ratio and rr_ci fields"
+            ],
+            "whyItMatters": "Log coefficients are not directly interpretable for clinical or public-health audiences; rate ratios convey the multiplicative effect on event rates and should be the primary reported metric.",
+            "actionableFix": "Amend the Results section to report incidence rate ratios (rate_ratio) with 95% confidence intervals (rr_ci_low, rr_ci_high) alongside or instead of log coefficients.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.98
+          },
+          {
+            "id": "F4",
+            "severity": "major",
+            "category": "reproducibility",
+            "title": "Quality assurance artifacts (stats-qa.json, figure-qa.json) are empty, contradicting claims of deterministic checks",
+            "evidenceRefs": [
+              "stats-run/stats-qa.json (empty content, 1509 bytes but no data)",
+              "figure-qa.json (empty, 3630 bytes but no data)",
+              "stats-run/figure-qa.json (duplicate empty)"
+            ],
+            "whyItMatters": "The manuscript states \"Deterministic methods checks identified issues that require review\", but no QA was actually performed or recorded, making it impossible to verify the claimed quality control.",
+            "actionableFix": "Populate the QA artifacts with actual checks: data integrity, model diagnostics, convergence warnings, figure quality, and script reproducibility steps. Document any warnings and their resolutions.",
+            "reentryPoint": "qa",
+            "deterministicVerification": null,
+            "confidence": 0.99
+          },
+          {
+            "id": "F5",
+            "severity": "major",
+            "category": "reporting",
+            "title": "No descriptive statistics (Table 1) for the cohort",
+            "evidenceRefs": [
+              "manuscript.md: no summary of count_events distribution, no frequencies or summary statistics for treatment, age, severity"
+            ],
+            "whyItMatters": "Readers cannot assess baseline characteristics, data plausibility (e.g., excessive zeros, outliers), or potential confounding, which is essential for observational studies.",
+            "actionableFix": "Add a Table 1 with at least N, mean/SD or median/IQR for continuous variables, and N (%) for categorical variables, overall and by exposure groups.",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.97
+          },
+          {
+            "id": "F6",
+            "severity": "major",
+            "category": "missingness",
+            "title": "Complete-case analysis without assessment of missing data mechanism",
+            "evidenceRefs": [
+              "manuscript.md: 'Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.'",
+              "stats-run.json: rowCount=240, completeCaseN=240, but no mention of initial sample size or dropped observations"
+            ],
+            "whyItMatters": "If missingness is not completely random, complete-case estimates may be biased. Without exploring the pattern and proportion of missing data, the validity of the results is questionable.",
+            "actionableFix": "Report the number of observations with missing values, examine missing data patterns (e.g., missing by exposure/outcome), and consider multiple imputation or sensitivity analyses. If truly complete, provide evidence that no data was excluded.",
+            "reentryPoint": "dataset_feasibility",
+            "deterministicVerification": null,
+            "confidence": 0.95
+          },
+          {
+            "id": "F7",
+            "severity": "minor",
+            "category": "literature",
+            "title": "Generic and uninformative title",
+            "evidenceRefs": [
+              "manuscript.md title: \"How is treatment associated with overdispersed count-event burden after adjustment\""
+            ],
+            "whyItMatters": "The title fails to specify the treatment, outcome, or setting, making it difficult for readers to identify the study's relevance and for indexing purposes.",
+            "actionableFix": "Revise the title to include the specific exposure (e.g., drug X), outcome (e.g., number of falls), and study design (e.g., retrospective cohort study).",
+            "reentryPoint": "manuscript",
+            "deterministicVerification": null,
+            "confidence": 0.9
+          }
+        ],
+        "missingEvidence": [
+          "Descriptive statistics (Table 1) for all variables",
+          "Overdispersion test (e.g., Poisson goodness-of-fit test)",
+          "Model selection criteria (AIC/BIC comparison with Poisson)",
+          "Missing data mechanism assessment and proportion of missing data",
+          "Quality assurance checklist results (populated stats-qa.json)",
+          "Negative binomial model with maximum likelihood estimation of dispersion parameter",
+          "Rate ratio interpretations in manuscript",
+          "Figure: residual plot with interpretation"
+        ],
+        "recommendedNextStage": "execution",
+        "costEstimate": {
+          "inputTokens": 3034,
+          "outputTokens": 6000,
+          "estimatedUsd": 0.026159,
+          "maxPerCallUsd": 0.5
+        },
+        "error": null,
+        "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364892349.raw.txt",
+        "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review_deepseek_deepseek-v4-pro_reproducibility_1778364892349.json"
+      }
+    ],
+    "status": "block",
+    "costEstimateUsd": 0.052318,
+    "failureCount": 0,
+    "nextAction": "Adjudicate findings and route accepted repairs back into the pipeline.",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review-panel.json"
+  }
+}

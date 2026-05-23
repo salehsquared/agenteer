@@ -1,0 +1,130 @@
+{
+  "verdict": "revise",
+  "summary": "Major reporting discrepancy (linear vs quantile regression) and unbound exploratory state undermine the credibility of this final-stage manuscript. Additional missing evidence on variables, cohort, and diagnostics must be addressed.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "Manuscript reports linear model but actual method is quantile regression",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "Incorrect model family misleads interpretation; readers might think coefficients represent mean change rather than median change.",
+      "actionableFix": "Correct the manuscript to state quantile regression (median) and interpret coefficients accordingly.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "stats-run.json method field is 'quantile-regression'; manuscript.md 'Methods' states 'The detected model family was linear'.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "study_design",
+      "title": "Analysis is unbound and exploratory, but presented as a final-stage manuscript",
+      "evidenceRefs": [
+        "stats-run/stats-run.json",
+        "stats-run/stats-qa.json"
+      ],
+      "whyItMatters": "Unbound runs lack pre-specified analysis plans, increasing risk of p-hacking and overinterpretation. Claims should be clearly exploratory.",
+      "actionableFix": "Either bind the analysis to a pre-registered AnalysisSpec/method selection, or explicitly label the entire manuscript as dataset-level exploration with no inferential intent.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "stats-qa.json binding-status=warning; resultPosture.status=exploratory_standard_table.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Missing specification of quantile in quantile regression",
+      "evidenceRefs": [
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "Without specifying the quantile (e.g., 0.5 for median), the target of the model is ambiguous and irreproducible.",
+      "actionableFix": "Add the quantile value (presumably 0.5) to methods and results.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "No 'quantile' parameter in stats-run.json parameters; manuscript title says 'median' but methods omitted.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No variable definitions or cohort construction details provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Cannot assess data plausibility, confounding, or external validity; missingness handling not described.",
+      "actionableFix": "Include a data dictionary, cohort flow chart, and description of missing data patterns. If no missing data, confirm explicitly.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "model_diagnostics",
+      "title": "Shapiro-Wilk test applied to quantile regression residuals is inappropriate",
+      "evidenceRefs": [
+        "stats-run/diagnostics.json"
+      ],
+      "whyItMatters": "Shapiro-Wilk tests normality, which is not an assumption of quantile regression. Reporting it may confuse validity checks.",
+      "actionableFix": "Remove Shapiro-Wilk from quantile regression diagnostics and report more appropriate diagnostics (e.g., quantile-specific residual plots, pseudo R-squared).",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "diagnostics.json includes shapiro_p_value=0.3929.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "P-values reported as 0.0000 for const",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "P-values should not be reported as zero; it violates precision standards and can mislead about certainty.",
+      "actionableFix": "Report p-values using '< 0.001' or scientific notation, e.g., 3.71e-19.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md shows 'p=0.0000' for const; stats-run.json p_value is 3.71433e-19.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F7",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "No analysis code or data provided for external reproducibility",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript mentions reproducibility but only has artifacts; without code, exact steps cannot be verified.",
+      "actionableFix": "Provide the analysis script or detailed computational steps, and ideally the raw data (if PHI allows) or a synthetic version.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "study_design",
+      "title": "No sensitivity analysis or confounding adjustment description",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Observational study without discussion of confounders limits causal interpretations even at local level.",
+      "actionableFix": "Include a DAG or explicit list of confounders, and if possible, a sensitivity analysis (e.g., E-value) to acknowledge unmeasured confounding.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "Variable definitions (data dictionary)",
+    "Cohort construction flowchart or detailed eligibility criteria",
+    "Missing data handling description",
+    "Quantile specification in stats-run (e.g., tau value)",
+    "Analysis code or computational steps",
+    "Figure-qa details (missing evidence in provided artifact)",
+    "Influence diagnostics as acknowledged by manuscript"
+  ],
+  "recommendedNextStage": "method_selection"
+}

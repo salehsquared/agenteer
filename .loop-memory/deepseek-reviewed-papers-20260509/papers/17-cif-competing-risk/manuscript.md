@@ -1,0 +1,71 @@
+# Dataset-Grounded Research Analysis
+
+## Abstract
+
+Background: This study analyzes a local research dataset to answer a declared clinical or public-health question.
+
+Objective: How does cumulative incidence of the target event differ by treatment when competing events are present?
+
+Design: This was an observational dataset analysis with interpretation bounded to the analyzed data.
+
+Participants: The analyzed sample included 240 complete-case records.
+
+Methods: The statistical method was aalen-johansen-cif. The analysis used conservative claim language and was reviewed with deterministic methods checks.
+
+Results: For 0, the final cumulative incidence was 0.5729.
+
+Conclusion: The analysis produced interpretable local evidence, but methods review is required before stronger claims.
+
+## Introduction
+
+This analysis asks: How does cumulative incidence of the target event differ by treatment when competing events are present? The goal is to summarize a dataset-grounded association, prediction signal, diagnostic-performance estimate, or cohort outcome in a way that is reproducible and clear about its limits.
+
+## Methods
+
+### Study Design And Data Source
+
+This was an observational dataset analysis with interpretation bounded to the analyzed data. The report is based on local analysis artifacts in the run directory. It should be interpreted as a local research analysis unless an external validation or population-design correction is explicitly documented.
+
+### Cohort Construction
+
+The cohort definition was read from available run artifacts. The complete-case sample size was 240. Missingness, eligibility, and sparse-cell concerns are handled as review items rather than hidden implementation details.
+
+### Variables
+
+Grouping variable: treatment.
+
+### Statistical Analysis
+
+The statistical method was aalen-johansen-cif. Model diagnostics, missingness checks, semantic plausibility checks, and claim-alignment checks were reviewed before considering the result ready for promotion.
+
+### Quality Control
+
+The methods review found advisory issues that need human review. The analysis is not ready for stronger claims until the advisory methods issues are reviewed. Complete method-review warnings, regenerate the manuscript if needed, and rerun inspection.
+
+## Results
+
+- The complete-case analytic sample included 240 records.
+- For 0, the final cumulative incidence was 0.5729.
+- For 1, the final cumulative incidence was 0.8856.
+
+## Discussion
+
+The result should be interpreted conservatively as local evidence from the analyzed dataset. These findings should be read as dataset-bound evidence, not as a clinical recommendation or causal proof unless the study design specifically supports that interpretation.
+
+## Limitations
+
+- The analysis is limited to the rows, variables, and eligibility rules represented in the run artifacts.
+- Complete-case exclusion or missingness may affect the result if missingness is related to exposure, outcome, or covariates.
+- Deterministic methods checks identified issues that require review before publication or external sharing.
+- No estimate-like records were available for p-value/effect-size checks.
+- Dataset-specific semantic plausibility concerns were detected.
+
+## What This Does And Does Not Show
+
+- This report shows what the analyzed table or packet produced under the declared local methods.
+- It does not establish causality unless a causal design, confounding plan, and sensitivity analysis were explicitly reviewed.
+- It does not establish clinical deployability, external validity, or treatment recommendations.
+
+## Reproducibility
+
+The run directory contains 41 artifact(s). The artifact inventory hash is 4310f49569d5682e00ff3f9f14057bd2ef331c59ec2668f7a54a30761f47467c. Companion JSON files contain machine-readable provenance, QA checks, and run inspection data.

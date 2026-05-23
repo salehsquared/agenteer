@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "revise",
+        "block"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "findings": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "minor",
+              "major",
+              "blocker"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "study_design",
+              "cohort",
+              "variables",
+              "method_choice",
+              "model_diagnostics",
+              "missingness",
+              "causal_claims",
+              "data_plausibility",
+              "literature",
+              "reporting",
+              "figures",
+              "reproducibility",
+              "cost_privacy"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceRefs": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whyItMatters": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actionableFix": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reentryPoint": {
+            "type": "string",
+            "enum": [
+              "exploration",
+              "protocol",
+              "analysis_spec",
+              "dataset_feasibility",
+              "method_selection",
+              "execution",
+              "qa",
+              "manuscript",
+              "literature",
+              "human_review",
+              "promotion"
+            ]
+          },
+          "deterministicVerification": {
+            "default": null,
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "id",
+          "severity",
+          "category",
+          "title",
+          "evidenceRefs",
+          "whyItMatters",
+          "actionableFix",
+          "reentryPoint",
+          "deterministicVerification",
+          "confidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "missingEvidence": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommendedNextStage": {
+      "type": "string",
+      "enum": [
+        "exploration",
+        "protocol",
+        "analysis_spec",
+        "dataset_feasibility",
+        "method_selection",
+        "execution",
+        "qa",
+        "manuscript",
+        "literature",
+        "human_review",
+        "promotion"
+      ]
+    }
+  },
+  "required": [
+    "verdict",
+    "summary",
+    "findings",
+    "missingEvidence",
+    "recommendedNextStage"
+  ],
+  "additionalProperties": false
+}

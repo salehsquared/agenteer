@@ -1,0 +1,113 @@
+{
+  "verdict": "block",
+  "summary": "The study reports a perfectly null treatment effect (OR=1.0000, p=1.0000) with exact risk equality, which is highly implausible and requires immediate investigation. Additionally, post-matching balance is inadequate (all covariates SMD>0.1), 77/144 treated subjects unmatched, and reporting is severely deficient with missing diagnostics, code, and figures.",
+  "findings": [
+    {
+      "id": "suspicious_null_effect",
+      "severity": "blocker",
+      "category": "data_plausibility",
+      "title": "Implausible exact null effect with p=1.0 and identical risks",
+      "evidenceRefs": [
+        "manuscript.md results",
+        "stats-run.json estimates"
+      ],
+      "whyItMatters": "An exact odds ratio of 1.0000 with p=1.0000 and a risk difference of exactly 0.0 (treated risk = control risk = 0.3134) is extremely unlikely in real-world data, especially after matching. This may indicate data fabrication, a fatal coding error, or an analysis that inadvertently balanced the outcome, completely undermining the study's credibility.",
+      "actionableFix": "Verify the raw data and analysis code. Re-run the propensity score matching and outcome analysis from scratch, ensuring the outcome variable is not used in the propensity model and that no post-matching pruning was based on the outcome. Report the exact number of events in each matched group.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "Confirm that treatment and control outcome counts in matched pairs are identical by inspecting matched-pairs.csv, and verify that the outcome regression coefficient is exactly zero.",
+      "confidence": 0.95
+    },
+    {
+      "id": "inadequate_post_matching_balance",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "Residual imbalance persists after matching (all SMD > 0.1)",
+      "evidenceRefs": [
+        "stats-run.json diagnostics.balance",
+        "manuscript.md limitations"
+      ],
+      "whyItMatters": "Post-matching absolute standardized mean differences (SMDs) are all above the conventional 0.1 threshold (max 0.233), indicating substantial residual confounding. The estimated treatment effect is therefore unreliable even if the data are otherwise valid.",
+      "actionableFix": "Explore alternative matching or weighting methods (e.g., genetic matching, full matching, or inverse probability weighting with robust standard errors) to improve covariate balance. Report a full balance table with SMDs before and after adjustment for each covariate.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "high_unmatched_fraction",
+      "severity": "major",
+      "category": "study_design",
+      "title": "77 of 144 treated subjects unmatched, compromising generalizability",
+      "evidenceRefs": [
+        "stats-run.json diagnostics.matching"
+      ],
+      "whyItMatters": "The ATT is estimated on only 67 matched pairs, discarding 53.5% of treated individuals. The matched subset may differ systematically from the full treated population, limiting the practical interpretation of the estimate and raising concerns about positivity violations.",
+      "actionableFix": "Report characteristics of unmatched vs. matched treated subjects. Consider relaxing the caliper, using a different matching algorithm, or applying weighting methods that retain more observations. Discuss the consequences of attrition on the estimand.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    },
+    {
+      "id": "insufficient_reporting_of_methods",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Critical methodological details and balance diagnostics absent",
+      "evidenceRefs": [
+        "manuscript.md methods",
+        "manuscript.md results"
+      ],
+      "whyItMatters": "Without a balance table showing SMDs per covariate, the outcome analysis method (e.g., logistic regression on matched pairs vs. 2x2 table), and specification of how p-values/confidence intervals were computed, the study is not reproducible and cannot be properly evaluated.",
+      "actionableFix": "Add a Table 1 with baseline characteristics before/after matching, specify the exact outcome model or contingency table analysis, provide the software and code used, and include a balance plot and propensity score overlap figure.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "missing_propensity_model_diagnostics",
+      "severity": "major",
+      "category": "model_diagnostics",
+      "title": "No diagnostics for logistic propensity model",
+      "evidenceRefs": [
+        "manuscript.md limitations",
+        "stats-run.json diagnostics.propensity_model"
+      ],
+      "whyItMatters": "The manuscript acknowledges lack of separation, collinearity, and influence diagnostics. Such issues can distort propensity scores, leading to biased matching and invalid effect estimates.",
+      "actionableFix": "Report variance inflation factors (VIFs) for covariates, test for perfect separation (e.g., using logistf or brglm), and compute influence measures (e.g., dfbetas) for the propensity model. Address any problems encountered.",
+      "reentryPoint": "qa",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "no_reproducible_code_or_software",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Analytic code and software versions are not provided",
+      "evidenceRefs": [
+        "manuscript.md reproducibility"
+      ],
+      "whyItMatters": "The study cannot be independently reproduced or verified without the analysis script, compromising the reproducibility mandate and making it impossible to detect potential coding errors.",
+      "actionableFix": "Deposit the complete analysis script (e.g., R or Python) with package versions and seed settings in a public repository or as supplementary material, and reference it in the manuscript.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "missing_diagnostic_figures",
+      "severity": "minor",
+      "category": "figures",
+      "title": "No diagnostic figures for propensity score overlap or balance",
+      "evidenceRefs": [
+        "stats-run.json issues.figure_qa"
+      ],
+      "whyItMatters": "Visual diagnostics are essential for assessing common support, covariate balance, and potential outliers. The absence of standard plots weakens the transparency of the analysis.",
+      "actionableFix": "Generate and include a jitter plot of propensity scores by treatment group and a love plot of standardized mean differences before/after matching.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.8
+    }
+  ],
+  "missingEvidence": [
+    "The contents of the following referenced artifacts were not provided for review: balance.csv, propensity-overlap.csv, matched-pairs.csv, figures.json, and stats-qa.json. Their absence prevents independent verification of covariate balance values, outcome event counts, and quality-control checks.",
+    "The exact outcome analysis method (e.g., matched pairs analysis, conditional logistic regression, or unadjusted 2x2 table) and how confidence intervals/p-values were derived is not stated in any artifact."
+  ],
+  "recommendedNextStage": "qa"
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:23:01.858Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_reproducibility_1778361781858",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:reproducibility",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "statistical reporting and reproducibility reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "The manuscript fails to report the core statistical result, misrepresents the exploratory nature as prespecified, and omits crucial methodological details including missingness handling and assumption diagnostics.",
+    "findings": [
+      {
+        "id": "missing-primary-result",
+        "severity": "blocker",
+        "category": "reporting",
+        "title": "Primary statistical result not reported in manuscript",
+        "evidenceRefs": [
+          "manuscript.md (Results section lists only sample size)",
+          "stats-run/stats-run.json (contains correlation estimate and p-value)"
+        ],
+        "whyItMatters": "The manuscript's abstract and conclusions are unsupported because the actual correlation coefficient, p-value, and confidence interval are not presented, making the paper uninformative.",
+        "actionableFix": "Incorporate the estimated correlation (0.658) and p-value (3.87e-31) with a confidence interval into the Results and Abstract. Note the sample size (240).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 1
+      },
+      {
+        "id": "prespecified-claim-unbound",
+        "severity": "major",
+        "category": "study_design",
+        "title": "Study claims prespecified question but analysis is unbound/exploratory",
+        "evidenceRefs": [
+          "manuscript.md (title and abstract imply prespecification)",
+          "stats-run/stats-run.json resultPosture.status = 'unbound', resultPosture.label = 'Exploratory standard-table result'"
+        ],
+        "whyItMatters": "Presenting an unplanned exploratory analysis as prespecified inflates credibility and misleads readers about the confirmatory status of the finding.",
+        "actionableFix": "Rewrite the title, abstract, and methods to clarify that the analysis emerged from data exploration without a pre-registered protocol. Remove the word 'prespecified'.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.95
+      },
+      {
+        "id": "missingness-not-described",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No description of missing data handling or excluded participants",
+        "evidenceRefs": [
+          "manuscript.md (mentions complete-case 240 but no exclusion details)",
+          "stats-run/stats-run.json completeCaseN = 240"
+        ],
+        "whyItMatters": "Without reporting the number of records excluded due to missing data, reasons, and a comparison of excluded vs. included characteristics, selection bias cannot be ruled out and the generalizability is unknown.",
+        "actionableFix": "Add a flow diagram showing eligibility and missingness. Report the number and percentage of missing values per variable, and ideally present a table comparing included and excluded subjects on key demographics if available.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.9
+      },
+      {
+        "id": "no-pearson-diagnostics",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Pearson correlation assumptions not checked or reported",
+        "evidenceRefs": [
+          "stats-run/diagnostics.json (contains only test and n)",
+          "stats-run/correlation-scatter.png (present but not analytically assessed in manuscript)",
+          "manuscript.md (methods mention diagnostics but no details)"
+        ],
+        "whyItMatters": "Violations of normality or linearity can yield misleading Pearson coefficients; without diagnostic reporting, the validity of the result is unsubstantiated.",
+        "actionableFix": "Report formal tests or visual checks for bivariate normality, linearity, and influential outliers. Consider presenting a Spearman correlation or a robust alternative alongside. Include the scatterplot with a smoothed curve.",
+        "reentryPoint": "execution",
+        "deterministicVerification": null,
+        "confidence": 0.9
+      },
+      {
+        "id": "no-descriptive-stats",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Descriptive statistics for variables not reported",
+        "evidenceRefs": [
+          "manuscript.md (no means, SDs, ranges)"
+        ],
+        "whyItMatters": "The reader cannot gauge the variability or distribution shape of the correlated variables, limiting interpretation of the coefficient.",
+        "actionableFix": "Add a table with mean, standard deviation, median, IQR, and range for outcome_cont and severity.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.8
+      },
+      {
+        "id": "no-confounding-discussion",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "No consideration of potential confounders",
+        "evidenceRefs": [
+          "stats-run/stats-run.json estimates[0].adjusted_for = ''",
+          "manuscript.md (no mention of covariates)"
+        ],
+        "whyItMatters": "The observed correlation could be confounded by unmeasured variables, but the analysis makes no attempt to adjust or discuss this limitation, potentially overstating the direct association.",
+        "actionableFix": "Either perform an adjusted partial correlation or discuss known confounders (age, sex, comorbidities) and why the unadjusted correlation remains informative. Acknowledge the lack of causal interpretation.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.85
+      },
+      {
+        "id": "no-literature-context",
+        "severity": "minor",
+        "category": "literature",
+        "title": "No comparison with prior literature or effect size context",
+        "evidenceRefs": [
+          "manuscript.md (no references or discussion of expected correlation)"
+        ],
+        "whyItMatters": "Without contextualizing the magnitude of the correlation against similar studies, the reader cannot assess whether 0.658 is plausible or clinically meaningful.",
+        "actionableFix": "Add a brief literature review or reference to known benchmarks for the relationship between these variables.",
+        "reentryPoint": "literature",
+        "deterministicVerification": null,
+        "confidence": 0.7
+      },
+      {
+        "id": "reproducibility-limited",
+        "severity": "minor",
+        "category": "reproducibility",
+        "title": "Limited reproducibility information",
+        "evidenceRefs": [
+          "manuscript.md (mentions artifact inventory but no analysis script)",
+          "stats-run/stats-run.json binding.status = 'unbound'"
+        ],
+        "whyItMatters": "Other researchers cannot easily replicate the analysis steps (e.g., data cleaning, correlation computation) without the analysis code, reducing trust and verifiability.",
+        "actionableFix": "Provide the analysis script (or at minimum a text description with software/version) and note whether a seed was used for any random procedures. If no random procedures, state that explicitly.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": null,
+        "confidence": 0.75
+      }
+    ],
+    "missingEvidence": [],
+    "recommendedNextStage": "manuscript",
+    "costEstimate": {
+      "inputTokens": 3032,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026156,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361781858.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/08-pearson-severity-continuous/review/review_deepseek_deepseek-v4-pro_reproducibility_1778361781858.json"
+  }
+}

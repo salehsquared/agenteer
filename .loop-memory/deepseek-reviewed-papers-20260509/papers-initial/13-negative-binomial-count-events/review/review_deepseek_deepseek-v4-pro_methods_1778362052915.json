@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "modelReview": {
+    "schemaVersion": 1,
+    "generatedAtIso": "2026-05-09T21:27:32.915Z",
+    "reviewId": "review_deepseek_deepseek-v4-pro_methods_1778362052915",
+    "reviewer": {
+      "id": "deepseek:deepseek-v4-pro:methods",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "role": "clinical methods and study-design reviewer",
+      "enabled": true,
+      "maxInputChars": 18000,
+      "maxOutputTokens": 6000,
+      "timeoutMs": 120000
+    },
+    "stage": "final",
+    "status": "succeeded",
+    "verdict": "block",
+    "summary": "The analysis is explicitly exploratory and lacks a prespecified protocol, undermining any claim about a 'prespecified study question'. The model used default alpha=1.0 for negative binomial dispersion, which is not estimated from data, potentially biasing standard errors. Model diagnostics are inappropriate for count data (e.g., Shapiro-Wilk test on raw residuals). No descriptive statistics, variable definitions, or study context are provided. These fundamental methodological and reporting gaps preclude any clinical or public-health interpretation.",
+    "findings": [
+      {
+        "id": "F1",
+        "severity": "blocker",
+        "category": "study_design",
+        "title": "Analysis is unbound from any prespecified protocol or analysis plan",
+        "evidenceRefs": [
+          "stats-run.json: resultPosture.status = 'exploratory_standard_table'",
+          "stats-run.json: binding.status = 'unbound'"
+        ],
+        "whyItMatters": "The abstract claims a 'prespecified study question', but the actual analysis is post-hoc and exploratory. This misalignment undermines the study's credibility and prevents valid inference.",
+        "actionableFix": "Either (a) bind the analysis to a preregistered protocol and analysis spec before proceeding, or (b) rewrite the manuscript to accurately describe the exploratory nature and downgrade all claims accordingly.",
+        "reentryPoint": "protocol",
+        "deterministicVerification": "Check stats-run.json: if binding.status is 'unbound' and resultPosture.status contains 'exploratory', then the analysis is not prespecified.",
+        "confidence": 1
+      },
+      {
+        "id": "F2",
+        "severity": "major",
+        "category": "method_choice",
+        "title": "Negative binomial dispersion parameter not estimated; default alpha=1.0 used",
+        "evidenceRefs": [
+          "stats-run.json: warnings[0] about alpha not set"
+        ],
+        "whyItMatters": "Using a fixed auxiliary parameter without estimation can distort standard errors, confidence intervals, and p-values, potentially leading to incorrect conclusions about predictor significance.",
+        "actionableFix": "Re-run the model with maximum-likelihood estimation of the dispersion parameter (e.g., using statsmodels' NegativeBinomial with alpha estimation or glm.nb in R).",
+        "reentryPoint": "execution",
+        "deterministicVerification": "In the stats-run output, if the warning 'Negative binomial dispersion parameter alpha not set' exists, then the default alpha was used. After fix, the warning should disappear.",
+        "confidence": 0.95
+      },
+      {
+        "id": "F3",
+        "severity": "major",
+        "category": "model_diagnostics",
+        "title": "Inappropriate residual diagnostics for negative binomial model",
+        "evidenceRefs": [
+          "stats-run.json: diagnostics.shapiro_p_value = 8.168e-05",
+          "diagnostics.json: shapiro_p_value = 8.168e-05"
+        ],
+        "whyItMatters": "The Shapiro-Wilk test on raw residuals assumes normality, which is violated by count data. Valid diagnostics should assess overdispersion, deviance residuals, Pearson residuals, and zero-inflation; relying on inappropriate tests may miss model misspecification.",
+        "actionableFix": "Replace Shapiro-Wilk with appropriate checks: (1) test for overdispersion (e.g., Cameron-Trivedi test), (2) plot deviance residuals vs. fitted values, (3) assess zero-inflation (e.g., Vuong test), (4) show observed vs. predicted count distributions.",
+        "reentryPoint": "execution",
+        "deterministicVerification": "Check if diagnostics.json contains a Shapiro-Wilk p-value and no overdispersion test. After fix, the QA artifact should include a dispersion test and no Shapiro p-value.",
+        "confidence": 0.9
+      },
+      {
+        "id": "F4",
+        "severity": "major",
+        "category": "reporting",
+        "title": "No descriptive statistics or variable definitions provided",
+        "evidenceRefs": [
+          "manuscript.md: no table of characteristics, variable summaries"
+        ],
+        "whyItMatters": "Readers cannot assess the study population, distribution of outcome (count_events), or balance of covariates, making it impossible to interpret the regression estimates or judge generalizability.",
+        "actionableFix": "Provide a Table 1 showing demographics, outcome distribution (mean, variance, range), and exposure/covariate summaries. Define all variables (e.g., how treatment and severity are coded, units of age).",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "A valid manuscript must include a table with at least n, mean, sd, min, max for continuous variables and counts/proportions for categorical ones.",
+        "confidence": 1
+      },
+      {
+        "id": "F5",
+        "severity": "major",
+        "category": "reporting",
+        "title": "Study question, context, and prior literature are absent",
+        "evidenceRefs": [
+          "manuscript.md: introduction lacks a specific question and background",
+          "manuscript.md: discussion has no comparison with existing literature"
+        ],
+        "whyItMatters": "Without a clear research question and literature context, the manuscript reads as a generic statistical dump and provides no scientific value. Results cannot be interpreted for clinical or public-health relevance.",
+        "actionableFix": "State the specific research question, define the exposure and primary outcome, summarize relevant prior work, and explain the expected relationship. Discuss results in light of that literature.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "The manuscript should contain a sentence like: 'The study question is: In [population], is [exposure] associated with [outcome] after adjusting for [covariates]?'",
+        "confidence": 1
+      },
+      {
+        "id": "F6",
+        "severity": "major",
+        "category": "missingness",
+        "title": "No report on missing data, exclusion criteria, or impact of complete-case analysis",
+        "evidenceRefs": [
+          "manuscript.md: mentions 240 complete-case records but no attrition flow",
+          "stats-run.json: completeCaseN=240, no missingness report"
+        ],
+        "whyItMatters": "Complete-case analysis can bias results if data are not missing completely at random. Without describing the amount and pattern of missingness, the validity of the sample is questionable.",
+        "actionableFix": "Add a participant flow diagram showing initial and final sample sizes, reasons for exclusion. Describe characteristics of excluded observations. Consider sensitivity analysis (e.g., multiple imputation) if missingness is >5%.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Missingness report should include total records before exclusion, missing count per variable, and comparison of included vs. excluded on key variables.",
+        "confidence": 0.95
+      },
+      {
+        "id": "F7",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Claims of 'prespecified study question' contradict exploratory binding",
+        "evidenceRefs": [
+          "manuscript.md: abstract and title",
+          "stats-run.json: resultPosture.label = 'Exploratory standard-table result'"
+        ],
+        "whyItMatters": "This inconsistency is misleading and could be considered a misrepresentation of the research design. It must be resolved for transparency.",
+        "actionableFix": "Remove 'prespecified' from the title and abstract. Replace with language that reflects the exploratory, data-driven nature of the analysis.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "Check if the word 'prespecified' appears in the abstract or title; it should not unless a protocol is bound.",
+        "confidence": 1
+      },
+      {
+        "id": "F8",
+        "severity": "minor",
+        "category": "reporting",
+        "title": "Model diagnostics available but not referenced or interpreted in text",
+        "evidenceRefs": [
+          "diagnostics.json: contains AIC, BIC, VIFs, leverage",
+          "manuscript.md: no mention of model fit metrics"
+        ],
+        "whyItMatters": "Model fit (e.g., AIC) and multicollinearity (VIF) are important for assessing the adequacy of the regression. Omitting them reduces the reader's ability to evaluate the model.",
+        "actionableFix": "Report AIC, BIC, maximum VIF, and any tests for overdispersion or deviation. Note that VIFs < 2 indicate low collinearity, which is favorable.",
+        "reentryPoint": "manuscript",
+        "deterministicVerification": "After revision, the Results or Methods should include a sentence like: 'VIFs were all below 2, indicating no serious multicollinearity.'",
+        "confidence": 0.9
+      }
+    ],
+    "missingEvidence": [
+      "Protocol or analysis specification document (binding artifact)",
+      "Data dictionary and variable definitions",
+      "Descriptive statistics table for the study cohort",
+      "Flow diagram of participant inclusion/exclusion",
+      "Distribution of the outcome variable (count_events) with histogram",
+      "Overdispersion test (e.g., Cameron-Trivedi) and zero-inflation assessment",
+      "Literature search or background section defining the research question"
+    ],
+    "recommendedNextStage": "protocol",
+    "costEstimate": {
+      "inputTokens": 3034,
+      "outputTokens": 6000,
+      "estimatedUsd": 0.026159,
+      "maxPerCallUsd": 0.5
+    },
+    "error": null,
+    "rawTextPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review_deepseek_deepseek-v4-pro_methods_1778362052915.raw.txt",
+    "outPath": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/13-negative-binomial-count-events/review/review_deepseek_deepseek-v4-pro_methods_1778362052915.json"
+  }
+}

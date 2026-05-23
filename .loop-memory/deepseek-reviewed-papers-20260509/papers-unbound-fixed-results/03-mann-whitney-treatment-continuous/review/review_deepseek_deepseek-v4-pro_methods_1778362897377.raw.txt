@@ -1,0 +1,136 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is an unbound exploratory run with no pre-specified protocol, no confounder adjustment, and incomplete reporting. The manuscript lacks necessary methodological detail and cannot support the implied claims. Major revisions are required before this can be considered a credible research output.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Analysis is unbound exploratory, not suitable for paper-ready interpretation",
+      "evidenceRefs": [
+        "stats-run.json:resultPosture.status=exploratory_standard_table",
+        "stats-run.json:binding.status=unbound"
+      ],
+      "whyItMatters": "Without a pre-registered analysis plan or a bound method-selection artifact, the study lacks methodological governance. The results are explicitly marked as not supporting paper-ready conclusions. Promoting this to a manuscript misrepresents the evidence level.",
+      "actionableFix": "Either bind the analysis to a pre-specified protocol and analysis spec, or downgrade the output to an exploratory data summary. If resubmitted as a full study, provide a detailed analysis plan with confounder adjustment, inclusion/exclusion criteria, and a hypothesis testing framework.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "stats-run.json:binding.status == 'unbound'",
+      "confidence": 0.99
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "study_design",
+      "title": "No confounders or covariates included in the comparison",
+      "evidenceRefs": [
+        "stats-run.json:variables = ['outcome_cont','treatment']",
+        "manuscript.md: no mention of covariates"
+      ],
+      "whyItMatters": "In an observational study, treatment groups may differ systematically on other prognostic factors. Without adjustment or balancing, the observed difference cannot be attributed to the treatment. The analysis provides only a raw bivariate association, which is highly susceptible to confounding.",
+      "actionableFix": "Identify potential confounders (demographics, baseline characteristics) and include them in a multivariable model or use propensity matching/stratification. Document variable selection and provide adjusted effect estimates with uncertainty intervals.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json:variables.length == 2",
+      "confidence": 0.95
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript omits key effect estimates and misreports p-value",
+      "evidenceRefs": [
+        "manuscript.md:Results: only test statistic and p=0.0000",
+        "stats-run.json:estimates includes medians, sample sizes"
+      ],
+      "whyItMatters": "The reader cannot assess the magnitude of the difference. Reporting p=0.0000 is misleading and violates standard reporting practices (should be <0.001 or exact small number).",
+      "actionableFix": "Report medians, IQRs, sample sizes, and an appropriate effect size (e.g., probability of superiority). Use correct p-value notation (p < 0.001) and include confidence intervals if computable.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md:line containing 'p=0.0000'",
+      "confidence": 0.98
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Mann-Whitney test applied without verifying the equal-shape assumption",
+      "evidenceRefs": [
+        "stats-run.json:diagnostics.ties_possible=true",
+        "manuscript.md: no distribution diagnostics"
+      ],
+      "whyItMatters": "The test's interpretation as a median difference depends on the assumption that the two distributions are identically shaped under the null. Ties alone do not validate this. Violation can lead to misinterpretation of the test result.",
+      "actionableFix": "Provide plots of the two distributions (overlaid histograms or density plots) and comment on shape similarity. Consider alternative tests (e.g., permutation test, quantile regression) or report the test as a stochastic dominance test rather than a median test.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "diagnostics.json contains only test name and ties_possible",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "missingness",
+      "title": "Cohort derivation and missing data handling not documented",
+      "evidenceRefs": [
+        "manuscript.md: states complete-case N=240 without exclusion flow",
+        "no artifact on eligibility or missingness patterns"
+      ],
+      "whyItMatters": "Complete-case analysis assumes missingness is completely at random, which is rarely true. Without knowing how the final 240 were selected, selection bias cannot be assessed.",
+      "actionableFix": "Provide a STROBE-like flow diagram showing starting sample, exclusions (with reasons), and final analytic sample. Conduct a missingness analysis (e.g., compare included vs excluded) and consider sensitivity analysis (e.g., multiple imputation).",
+      "reentryPoint": "execution",
+      "deterministicVerification": "No file in artifacts describes cohort flow.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F6",
+      "severity": "major",
+      "category": "reproducibility",
+      "title": "Limited reproducibility: no raw data or code provided",
+      "evidenceRefs": [
+        "stats-run.json: only summary estimates and diagnostics",
+        "manuscript.md: refers to local run directory"
+      ],
+      "whyItMatters": "The study cannot be independently verified or rerun without access to the original data and the exact code used. Reproducibility is a cornerstone of credible research.",
+      "actionableFix": "Deposit a de-identified or synthetic version of the dataset (if allowed) and the analysis script (e.g., R/Python code) in a persistent repository, or provide a detailed computational notebook.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "No .csv or script file present among artifacts beyond summary tables.",
+      "confidence": 0.95
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "category": "data_plausibility",
+      "title": "No outlier or distributional checks beyond ties flag",
+      "evidenceRefs": [
+        "diagnostics.json: only ties_possible",
+        "figure-qa.json: boxplot present but no outlier audit"
+      ],
+      "whyItMatters": "Extreme outliers could distort medians and inflate the test statistic, leading to false confidence in the result.",
+      "actionableFix": "Add a table or figure summarizing distributional features (range, IQR, skewness, number of outliers) and discuss any data integrity concerns.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "No artifact contains outlier summary or data range.",
+      "confidence": 0.8
+    },
+    {
+      "id": "F8",
+      "severity": "info",
+      "category": "literature",
+      "title": "No reference to prior literature or clinical context",
+      "evidenceRefs": [
+        "manuscript.md: no citations, no background on treatment or outcome"
+      ],
+      "whyItMatters": "The study lacks grounding in existing knowledge, making it impossible to assess novelty or external consistency. This is required for any publishable research.",
+      "actionableFix": "Add a brief literature review and state how this local analysis relates to or extends prior work.",
+      "reentryPoint": "literature",
+      "deterministicVerification": "No .bib or citation in manuscript.",
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Protocol or pre-analysis plan",
+    "Method-selection artifact or justification",
+    "Raw dataset or data dictionary",
+    "Cohort derivation flowchart with inclusion/exclusion criteria and missingness report",
+    "Confounder variables and their distributions by treatment group",
+    "Model diagnostics (e.g., shape similarity for Mann-Whitney, residual plots if applicable)",
+    "Analysis code (R/Python script or notebook)",
+    "Literature review or comparison to prior studies"
+  ],
+  "recommendedNextStage": "analysis_spec"
+}

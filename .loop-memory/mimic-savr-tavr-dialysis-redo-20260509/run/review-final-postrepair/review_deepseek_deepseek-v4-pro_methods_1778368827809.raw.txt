@@ -1,0 +1,80 @@
+{
+  "verdict": "revise",
+  "summary": "The paper acknowledges important limitations but still presents same-hospital readmission/reintervention comparisons as primary results, which are likely severely biased due to incomplete follow-up. The lack of competing-risk analysis for nonfatal outcomes in this high-mortality population additionally weakens causal interpretation. Major revisions are needed to either remove or substantially qualify these outcomes, and provide appropriate sensitivity analyses or alternative methods.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Same‑hospital readmission and reintervention outcomes are likely biased by differential loss to follow‑up",
+      "evidenceRefs": [
+        "paper.md: one‑year outcomes tables, adjusted model findings for HF readmission, cardiac readmission, valve reintervention"
+      ],
+      "whyItMatters": "Because MIMIC‑IV captures only events within the same hospital system, the absolute risk and hazard ratios for readmission and reintervention may be strongly biased if dialysis status influences the probability of being readmitted elsewhere. The paper admits this limitation but does not discuss its likely magnitude or direction, and still reports p‑values and ORs without explicit warning that those estimates could be artefacts of ascertainment bias. This undermines the interpretability of most non‑mortality outcomes.",
+      "actionableFix": "Either drop all readmission and reintervention comparisons from the main results, or perform a formal quantitative bias analysis (e.g., sensitivity analysis under assumed proportions of outside‑hospital events) and downgrade the interpretation to hypothesis‑generating only. If retained, the abstract and conclusion must prominently flag that readmission/reintervention HRs are uninterpretable because of incomplete follow‑up.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.95
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Competing risks not accounted for in nonfatal time‑to‑event analyses",
+      "evidenceRefs": [
+        "paper.md: event‑specific Cox models for HF readmission, cardiac readmission, valve reintervention; limitation statement 'Fine‑Gray competing‑risk models were not estimated'"
+      ],
+      "whyItMatters": "Mortality is high in the dialysis group (e.g., 35% at one year). When death is a competing event, cause‑specific hazard ratios can overstate the effect on the cumulative incidence of readmission. The reported HRs may mislead readers about the clinical probability of readmission, especially for dialysis patients.",
+      "actionableFix": "Re‑analyse these endpoints using Fine‑Gray subdistribution hazard models, or supplement the cause‑specific Cox models with cumulative incidence curves and clearly explain that the HRs do not reflect cumulative incidence. At minimum, add a statement that cause‑specific HRs should not be interpreted as the effect on risk of readmission.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.85
+    },
+    {
+      "id": "F3",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Propensity‑score matched sensitivity analysis only presented for one‑year outcomes",
+      "evidenceRefs": [
+        "paper.md: 'Propensity‑Score Sensitivity' section reports only death_1y and mace_1y"
+      ],
+      "whyItMatters": "The main analysis includes five‑year outcomes, but the matched analysis, which is intended to strengthen causal inference, is restricted to one year. This limits the ability to assess whether the propensity‑score adjustment would alter long‑term comparisons.",
+      "actionableFix": "Extend the matched analysis to five‑year mortality and MACE using the same matching set or explain why longer follow‑up is not feasible (e.g., small numbers). If added, report risk differences and McNemar’s test results for five‑year endpoints.",
+      "reentryPoint": "execution",
+      "deterministicVerification": null,
+      "confidence": 0.7
+    },
+    {
+      "id": "F4",
+      "severity": "minor",
+      "category": "variables",
+      "title": "Dialysis group 'hemodialysis or unspecified dialysis' mixes known and uncertain modality",
+      "evidenceRefs": [
+        "paper.md: 'hemodialysis or unspecified dialysis: 167'"
+      ],
+      "whyItMatters": "If some patients classified as 'unspecified' actually received peritoneal dialysis (e.g., if peritoneal‑specific CPT codes were missed or not recorded), the dialysis group may be heterogeneous. Given the very small peritoneal dialysis subgroup, misclassification could dilute the contrast with non‑dialysis patients.",
+      "actionableFix": "Report how many of the 167 patients had explicit hemodialysis codes vs only generic dialysis codes. If possible, perform a sensitivity analysis excluding the 'unspecified' subset, or at least discuss the potential impact on effect estimates.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": null,
+      "confidence": 0.5
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "category": "reproducibility",
+      "title": "Run directory artifacts not provided for independent verification",
+      "evidenceRefs": [
+        "paper.md: 'The run directory contains aggregate code‑match, cohort, outcome, model, propensity, figure, QA'"
+      ],
+      "whyItMatters": "The manuscript refers to a 'reviewer‑ready MIMIC packet', but the actual CSV/JSON/PNG files and any accompanying code are absent from the review packet. Without them, the reviewer cannot confirm that phenotype definitions, cohort assembly, and statistical modeling steps were correctly implemented.",
+      "actionableFix": "Include the referenced run directory files as supplementary materials with the manuscript submission, or provide a stable repository link containing all aggregate outputs and the exact analysis code.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": null,
+      "confidence": 0.9
+    }
+  ],
+  "missingEvidence": [
+    "Run directory artifacts (aggregate CSV files, outcome‑phenotype JSON, figures, QA outputs) and analysis code are not included in the review packet, which prevents verification of data processing steps, phenotype rules, and model building."
+  ],
+  "recommendedNextStage": "manuscript"
+}

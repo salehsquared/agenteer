@@ -1,0 +1,127 @@
+{
+  "verdict": "revise",
+  "summary": "The study is an exploratory one-way ANOVA with significant methodological and reporting gaps. Critical information missing: clinical group definitions, outcome variable description, descriptive statistics, missing data handling, and pre-specified analysis binding. The manuscript does not follow standard reporting guidelines, limiting interpretability and reproducibility. Major revisions required before any claims beyond internal exploration.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "category": "reporting",
+      "title": "No clinical group or outcome definitions provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without defining the clinical groups (e.g., treatment arms, disease stages) and the continuous outcome, the study question and results are uninterpretable to any reader. The manuscript defers to a 'companion variable artifact' not included in the review packet.",
+      "actionableFix": "Add explicit definitions of all groups (including reference category), the outcome variable (units, measurement method, clinical relevance), and the study population eligibility criteria directly in the manuscript.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check if manuscript.md contains definitions of 'group' levels and 'outcome_cont'; currently absent.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "category": "method_choice",
+      "title": "Analysis not bound to pre-specified plan; p-value is exploratory",
+      "evidenceRefs": [
+        "stats-run/stats-run.json"
+      ],
+      "whyItMatters": "The stats-run is 'unbound', meaning no method-selection or AnalysisSpec was defined before execution. The reported p-value is not confirmatory and cannot support hypothesis testing. The manuscript does not explicitly disclaim this limitation.",
+      "actionableFix": "Clearly state in abstract and discussion that this is an unplanned exploratory analysis; the p-value is not inferential. Consider re-running with a pre-registered analysis plan if confirmatory claims are desired.",
+      "reentryPoint": "analysis_spec",
+      "deterministicVerification": "In stats-run.json, 'binding.status' equals 'unbound'.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Group means, standard deviations, and sample sizes not reported",
+      "evidenceRefs": [
+        "manuscript.md",
+        "stats-run/estimates.csv"
+      ],
+      "whyItMatters": "ANOVA only informs on differences, but descriptive statistics are essential for assessing effect size, variability, and clinical importance. Readers cannot evaluate the magnitude of any non-significant differences.",
+      "actionableFix": "Include a table with n, mean, SD, median, IQR per group, and a boxplot or dot plot. This is standard for any group comparison.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Check manuscript and estimates.csv: only ANOVA F and p present; no per-group summary statistics.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F4",
+      "severity": "major",
+      "category": "missingness",
+      "title": "No information on missing data or exclusion criteria",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Complete-case analysis assumes data are missing completely at random. Without reporting the original sample size, number excluded, reasons, and evidence for MCAR, the results may be biased.",
+      "actionableFix": "Provide a participant flow diagram, proportion of missing outcomes/covariates, and consider sensitivity analysis or multiple imputation. At minimum, describe why complete-case analysis is appropriate.",
+      "reentryPoint": "execution",
+      "deterministicVerification": "Absence of any missingness report or flow chart in provided artifacts.",
+      "confidence": 0.9
+    },
+    {
+      "id": "F5",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Manuscript does not conform to standard reporting guidelines",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The manuscript lacks structured sections (e.g., Introduction, Methods, Results, Discussion), a clear research question, description of setting, dates, variables, and bias assessment. This undermines transparency and disallows proper peer review.",
+      "actionableFix": "Reorganize according to STROBE or similar guidelines; include a proper abstract, introduction with clinical context, detailed methods, results with tables, and a discussion of limitations.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "STROBE checklist comparison: missing multiple items (e.g., eligibility, setting, descriptive data, etc.).",
+      "confidence": 0.9
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "category": "reporting",
+      "title": "Contradictory limitation: 'No reader-facing paper/manuscript artifact was found'",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "The Limitations section states there is no manuscript artifact, yet manuscript.md exists. This internal inconsistency confuses readers and undermines confidence in the review process.",
+      "actionableFix": "Remove or correct this limitation; the manuscript artifact is present. Ensure all automated QA messages align with the actual artifact inventory.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "Presence of manuscript.md artifact confirmed in run directory and its content.",
+      "confidence": 1.0
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "category": "figures",
+      "title": "Figure QA artifacts appear empty; cannot verify figure checks",
+      "evidenceRefs": [
+        "stats-run/figure-qa.json",
+        "figure-qa.json"
+      ],
+      "whyItMatters": "The stats-run QA claims figure quality passed, but the detailed QA checks are missing from the provided artifacts (empty files). This prevents independent verification of figure readability, caption adequacy, and data representation.",
+      "actionableFix": "Populate the figure-qa.json with the actual checks performed and results, or include figure captions and quality notes in the manuscript supplement.",
+      "reentryPoint": "qa",
+      "deterministicVerification": "file size or content check: figure-qa.json files appear to have no content or are truncated.",
+      "confidence": 0.5
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "category": "literature",
+      "title": "No references or background literature provided",
+      "evidenceRefs": [
+        "manuscript.md"
+      ],
+      "whyItMatters": "Without citing prior similar studies, the novelty and relevance of the finding cannot be assessed. The discussion lacks context, making it an isolated report without scientific grounding.",
+      "actionableFix": "Include a brief literature review of comparable outcome-group comparisons and discuss how the current result aligns with existing knowledge.",
+      "reentryPoint": "literature",
+      "deterministicVerification": "Absence of a reference section in manuscript.",
+      "confidence": 1.0
+    }
+  ],
+  "missingEvidence": [
+    "Raw dataset file (for full reproducibility)",
+    "Data dictionary or variable definitions (groups, outcome details)",
+    "Participant flow diagram or missing data report",
+    "Detailed figure quality assessment report"
+  ],
+  "recommendedNextStage": "manuscript"
+}

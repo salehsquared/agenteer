@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "runId": "statsrun_2544508952468515993",
+  "method": "mann-whitney",
+  "status": "succeeded",
+  "rowCount": 240,
+  "completeCaseN": 240,
+  "variables": [
+    "outcome_cont",
+    "treatment"
+  ],
+  "parameters": {
+    "alpha": 0.05
+  },
+  "estimates": [
+    {
+      "term": "treatment",
+      "group_a": 0,
+      "group_b": 1,
+      "n_a": 96,
+      "n_b": 144,
+      "median_a": 20.0565,
+      "median_b": 23.076500000000003,
+      "statistic": 10079,
+      "p_value": 1.8599038046060571e-9
+    }
+  ],
+  "diagnostics": {
+    "test": "Mann-Whitney U",
+    "ties_possible": true
+  },
+  "issues": [],
+  "warnings": [],
+  "errors": [],
+  "artifacts": [
+    {
+      "kind": "config",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-config.json",
+      "sha256": "2d355d9496c2464d7ac7858900881a5f014adcc2ced6f5004fe24440380b50e5"
+    },
+    {
+      "kind": "summary",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-summary.json",
+      "sha256": "169abcfdc89bd9801eda35eabe9f12fbd22501b26b551ea098f6272efdda9416"
+    },
+    {
+      "kind": "table",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/estimates.csv",
+      "sha256": "7b6b8da91f27d2f4ca61e1a7afc3ed9a38ff0e47e04ca0308826936f3c6c6992"
+    },
+    {
+      "kind": "diagnostics",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/diagnostics.json",
+      "sha256": "db32c7d2f31d074ff0ba63c43d9f798e3bf96d75af333f38b6fef7209c24e59a"
+    },
+    {
+      "kind": "figure-manifest",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/figures.json",
+      "sha256": "f633e98e27e2e6c2a33f7499d94e727091bf2245fe06f86935b0f269526f1f95"
+    },
+    {
+      "kind": "figure",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/group-distribution.png",
+      "sha256": "6dc4519d39f21c5683a8b0a0d6f79b50bda142f7a5740e8ce899939556cb84ca"
+    },
+    {
+      "kind": "figure-qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/figure-qa.json",
+      "sha256": "57566800d98a6277381d0660158241eb4270c2d0702ef9725f347253018a24e8"
+    },
+    {
+      "kind": "report",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-report.md",
+      "sha256": "b289c88103b73358b4f44bd172c5fe0f67793f85e979c9f95ab8415cbf893ed2"
+    },
+    {
+      "kind": "qa",
+      "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run/stats-qa.json",
+      "sha256": "b8bf30c3dce5eeba93c89e4c26c1f2577fc10d09cf157f5e6a0bad0c59289bd3"
+    }
+  ],
+  "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/03-mann-whitney-treatment-continuous/stats-run",
+  "binding": {
+    "methodSelectionPath": null,
+    "methodSelectionId": null,
+    "methodId": null,
+    "analysisSpecPath": null,
+    "specHash": null,
+    "status": "unbound"
+  },
+  "resultPosture": {
+    "status": "exploratory_standard_table",
+    "label": "Exploratory standard-table result",
+    "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+    "supports": [
+      "local data debugging",
+      "rough statistical exploration",
+      "candidate method smoke testing"
+    ],
+    "cannotSupport": [
+      "method-governed inference",
+      "paper-ready conclusions",
+      "causal claims"
+    ],
+    "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+  }
+}

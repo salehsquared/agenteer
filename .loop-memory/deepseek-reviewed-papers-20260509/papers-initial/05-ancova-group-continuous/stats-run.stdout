@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "statsRun": {
+    "schemaVersion": 1,
+    "runId": "statsrun_510258950773264840",
+    "method": "ancova",
+    "status": "succeeded",
+    "rowCount": 240,
+    "completeCaseN": 240,
+    "variables": [
+      "outcome_cont",
+      "group",
+      "age",
+      "severity"
+    ],
+    "parameters": {
+      "alpha": 0.05
+    },
+    "estimates": [
+      {
+        "term": "C(group)",
+        "sum_sq": 17.197542103973838,
+        "df": 2,
+        "f_statistic": 2.191763477356693,
+        "p_value": 0.11399822958541696
+      },
+      {
+        "term": "age",
+        "sum_sq": 831.9384082833592,
+        "df": 1,
+        "f_statistic": 212.05497944550945,
+        "p_value": 1.1453978378314278e-34
+      },
+      {
+        "term": "severity",
+        "sum_sq": 814.9736847310398,
+        "df": 1,
+        "f_statistic": 207.73079622669533,
+        "p_value": 3.6080265129480807e-34
+      },
+      {
+        "term": "Residual",
+        "sum_sq": 921.9567795946398,
+        "df": 235,
+        "f_statistic": null,
+        "p_value": null
+      }
+    ],
+    "diagnostics": {
+      "model_family": "ancova",
+      "aic": 1014.0967572951508,
+      "bic": 1031.4999519118608,
+      "df_resid": 235,
+      "residual_mean": 3.709033080667723e-13,
+      "residual_sd": 1.9640671442845092,
+      "shapiro_p_value": 0.7920537966485959,
+      "max_leverage": 0.05248887842411279,
+      "max_cooks_distance": 0.05358121655346542,
+      "vif": [
+        {
+          "term": "age",
+          "vif": 1.0625929394815323
+        },
+        {
+          "term": "severity",
+          "vif": 1.0772526852274302
+        },
+        {
+          "term": "group_enhanced",
+          "vif": 1.349749621234435
+        },
+        {
+          "term": "group_standard",
+          "vif": 1.3338671960019923
+        }
+      ],
+      "max_vif": 1.349749621234435,
+      "test": "ANCOVA"
+    },
+    "issues": [],
+    "warnings": [],
+    "errors": [],
+    "artifacts": [
+      {
+        "kind": "config",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/stats-config.json",
+        "sha256": "06a71a544e4660d11967238298b14f9b4f33d49a5ab16c215c0a1bd21e3e3a67"
+      },
+      {
+        "kind": "summary",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/stats-summary.json",
+        "sha256": "06f3c4356e0d0c5207cfe50c11c15098a06c307dfedc48f3f9227c9e4ead6baa"
+      },
+      {
+        "kind": "table",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/estimates.csv",
+        "sha256": "d84f25c7d5f751cd94d4e22394d5494e9cdb66c6ae53679182f1bc73bc448b69"
+      },
+      {
+        "kind": "diagnostics",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/diagnostics.json",
+        "sha256": "045bca6152c6b9c201bbdabc946c058f57d663cc89aa97019238e9182e57102d"
+      },
+      {
+        "kind": "figure-manifest",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/figures.json",
+        "sha256": "a71eb8ff846aaf8f4a083aec1c7cfa923fda13b43db19e73ce9250ca685ae1a7"
+      },
+      {
+        "kind": "figure",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/anova-group-distribution.png",
+        "sha256": "06b2ac5cca3af4f4d1a796b421f2e1a1caf5669eb81f40281d0cd19f5fb7edbf"
+      },
+      {
+        "kind": "figure-qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/figure-qa.json",
+        "sha256": "212128cf0b1ed71c8adbc5fd9dfc671977d24cffa1fc39d4a0932e6e39a1a1d6"
+      },
+      {
+        "kind": "report",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/stats-report.md",
+        "sha256": "fdcf1be1ce3cb4f6d62d68d5797fab66035020a86633a1204649b87018a95771"
+      },
+      {
+        "kind": "qa",
+        "path": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run/stats-qa.json",
+        "sha256": "ad2beee531a444a68abbcc4675af9bd46e5a73f702f1532270822bf6b9b59a8a"
+      }
+    ],
+    "outDir": "/Users/saleh/TechProjects/agenteer/.loop-memory/deepseek-reviewed-papers-20260509/papers/05-ancova-group-continuous/stats-run",
+    "binding": {
+      "methodSelectionPath": null,
+      "methodSelectionId": null,
+      "methodId": null,
+      "analysisSpecPath": null,
+      "specHash": null,
+      "status": "unbound"
+    },
+    "resultPosture": {
+      "status": "exploratory_standard_table",
+      "label": "Exploratory standard-table result",
+      "interpretationBoundary": "This run is not bound to a method-selection artifact or AnalysisSpec, so treat it as exploratory until governed by pre-run evidence.",
+      "supports": [
+        "local data debugging",
+        "rough statistical exploration",
+        "candidate method smoke testing"
+      ],
+      "cannotSupport": [
+        "method-governed inference",
+        "paper-ready conclusions",
+        "causal claims"
+      ],
+      "nextAction": "Create or bind method-selection and AnalysisSpec evidence, then rerun before paper lifecycle promotion."
+    }
+  }
+}
+

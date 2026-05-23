@@ -1,0 +1,64 @@
+{
+  "verdict": "block",
+  "summary": "The analysis is methodologically inappropriate (PCA for latent component structure), entirely unbound from any pre-specification, and the manuscript fails to report essential results, variable definitions, diagnostics, or literature context. The study cannot support any reasonable scientific claim in its current form.",
+  "findings": [
+    {
+      "id": "method-pca-vs-factor",
+      "severity": "blocker",
+      "category": "method_choice",
+      "title": "PCA is used to explore latent component structure, but factor analysis is the appropriate method for latent constructs",
+      "evidenceRefs": [
+        "manuscript.md: 'What latent component structure is suggested by correlated scale items and severity?'",
+        "stats-run.json: 'method':'pca'"
+      ],
+      "whyItMatters": "PCA is a data reduction technique that does not model latent variables; interpreting components as latent factors can mislead scale validation and clinical interpretation.",
+      "actionableFix": "Replace PCA with exploratory factor analysis (e.g., maximum likelihood or principal axis factoring) with appropriate rotation. Justify the choice based on the underlying latent variable theory, or explicitly reframe the question as a data reduction exercise.",
+      "reentryPoint": "method_selection",
+      "deterministicVerification": "stats-run.json method field equals 'pca'",
+      "confidence": 0.95
+    },
+    {
+      "id": "unbound-exploratory-analysis",
+      "severity": "blocker",
+      "category": "study_design",
+      "title": "Analysis is unbound and purely exploratory; cannot support any confirmatory inference",
+      "evidenceRefs": [
+        "stats-run.json: resultPosture.status='exploratory_standard_table', resultPosture.binding.status='unbound'",
+        "manuscript.md: limitations 'methods review is required before stronger claims'"
+      ],
+      "whyItMatters": "Without a pre-registered protocol and binding to a method-selection artifact, results are entirely post-hoc and cannot be presented as evidence of latent structure; high risk of cherry-picking and overinterpretation.",
+      "actionableFix": "Create a formal analysis protocol with pre-specified hypotheses, bind it to a method-selection artifact, and re-run the analysis as governed inference. If that is not feasible, label all output strictly as hypothesis-generating and remove any interpretive language.",
+      "reentryPoint": "protocol",
+      "deterministicVerification": "stats-run.json resultPosture.binding.status equals 'unbound'",
+      "confidence": 0.9
+    },
+    {
+      "id": "missing-variable-definitions",
+      "severity": "major",
+      "category": "variables",
+      "title": "Variable definitions, measurement properties, and clinical meaning are absent",
+      "evidenceRefs": [
+        "manuscript.md: 'The primary outcome, exposure, and covariates were not fully encoded in the text report; review the companion variable artifact before external sharing.'"
+      ],
+      "whyItMatters": "An intelligent reader or clinical stakeholder cannot interpret the study without understanding what scale_item_1-3 and severity represent, their scales, and how they were collected.",
+      "actionableFix": "Add a detailed variable table describing each item (e.g., Likert scale range, whether ordinal vs. continuous, wording if appropriate) and the clinical meaning of severity. Cite the source of the scale.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md contains the phrase 'not fully encoded'",
+      "confidence": 0.99
+    },
+    {
+      "id": "empty-results-reporting",
+      "severity": "major",
+      "category": "reporting",
+      "title": "Results section reports only sample size; key PCA findings are omitted",
+      "evidenceRefs": [
+        "manuscript.md: 'The complete-case analytic sample included 240 records.'",
+        "stats-run.json: contains estimates of explained variance and component loadings"
+      ],
+      "whyItMatters": "The manuscript fails to communicate any quantitative findings; it is devoid of scientific content.",
+      "actionableFix": "Report the explained variance ratio for each component, the component loading matrix in a clear table, and interpret the meaning of each retained component. Include the scree plot.",
+      "reentryPoint": "manuscript",
+      "deterministicVerification": "manuscript.md Results section does not contain the word 'component' or 'explained'",
+      "confidence": 0.99
+    },
+   

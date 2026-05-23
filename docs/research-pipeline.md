@@ -106,7 +106,24 @@ agenteer research navigation-trace --packet ./packet --json
 agenteer research packet-verify --packet ./packet --json
 ```
 
-The current CLI is intentionally stage-based rather than a single hidden "run everything" command. The orchestrating agent must remain involved between stages as the human-in-the-loop reviewer.
+The base CLI remains stage-based so each artifact can be inspected. For autonomous operation, use the research controller, which persists state and executes the same stages with feasibility gates, bounded actions, reviewer-driven repair, reviewer re-entry, and explicit stop reasons:
+
+```bash
+agenteer research controller-run \
+  --question "..." \
+  --out-dir ./controller-run \
+  --data ./rows.csv \
+  --method linear-regression \
+  --outcome outcome \
+  --exposure exposure \
+  --use-model \
+  --require-controller-model \
+  --external-review
+```
+
+The controller is not a hidden success path: it stops as `blocked` or `needs_human_review` when data feasibility, methods QA, manuscript QA, external review, bounded repair, or promotion evidence is insufficient.
+Use `--require-controller-model` when the controller must be a real model-driven runner. In that mode unavailable or invalid model responses stop the run instead of falling back to deterministic stage automation.
+The same runtime policy flags can be added to `controller-run --state <controller-state.json>`; explicit changes are persisted as `controller-policy-update` artifacts before the run continues.
 
 ### Primary Path
 
