@@ -789,6 +789,11 @@ function statsQa(result: StatsRunResult): {
     },
     ...diagnosticAccuracyQaChecks(result),
     ...propensityQaChecks(result),
+    ...coreInferenceQaChecks(result),
+    ...missingnessQaChecks(result),
+    ...causalQaChecks(result),
+    ...predictionQaChecks(result),
+    ...measurementAndExplorationQaChecks(result),
     ...modelReliabilityQaChecks(result),
   ];
   const status = result.status === "failed" || blockerIssues.length > 0 || checks.some(check => check.status === "fail")
@@ -1131,6 +1136,387 @@ function modelReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; s
   return [];
 }
 
+function missingnessQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (!missingnessMethods().has(result.method)) return [];
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const maxMissing = numericDiagnostic(diagnostics, "max_missing_fraction");
+  const completeCaseFraction = numericDiagnostic(diagnostics, "complete_case_fraction");
+  const mechanismScreen = diagnostics.mechanism_screen as Record<string, unknown> | undefined;
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
+    {
+      id: "missingness-profile-present",
+      status: diagnostics.missingness_pattern_count || diagnostics.missingness_patterns_path ? "pass" : "fail",
+      detail: diagnostics.missingness_patterns_path
+        ? "Missingness pattern artifact was recorded."
+        : "Missingness pattern evidence is missing.",
+    },
+    {
+      id: "missingness-complete-case-retention",
+      status: completeCaseFraction === null ? "warning" : completeCaseFraction >= 0.8 ? "pass" : completeCaseFraction >= 0.6 ? "warning" : "fail",
+      detail: completeCaseFraction === null
+        ? "Complete-case retention fraction is missing."
+        : `${(completeCaseFraction * 100).toFixed(1)}% of rows remain complete across selected variables.`,
+    },
+    {
+      id: "missingness-variable-burden",
+      status: maxMissing === null ? "warning" : maxMissing <= 0.2 ? "pass" : maxMissing <= 0.5 ? "warning" : "fail",
+      detail: maxMissing === null
+        ? "Maximum variable-level missingness is missing."
+        : `Maximum selected-variable missingness is ${(maxMissing * 100).toFixed(1)}%.`,
+    },
+    {
+      id: "missingness-mechanism-screen",
+      status: !mechanismScreen ? "warning" : Number(mechanismScreen.associations_below_0_05 ?? 0) > 0 ? "warning" : "pass",
+      detail: !mechanismScreen
+        ? "Missingness mechanism association screen is missing."
+        : `${mechanismScreen.associations_below_0_05 ?? 0} missingness association(s) had p<0.05; this is a screen, not proof of MAR/MNAR.`,
+    },
+  ];
+  if (result.method === "multiple-imputation-mice") {
+    const metadata = diagnostics.imputation_metadata as Record<string, unknown> | undefined;
+    checks.push({
+      id: "imputation-artifact-present",
+      status: diagnostics.imputed_data ? "pass" : "fail",
+      detail: diagnostics.imputed_data ? "Imputed data artifact was recorded." : "Imputed data artifact is missing.",
+    });
+    checks.push({
+      id: "imputation-method-boundary",
+      status: metadata?.numeric_only === true ? "warning" : "pass",
+      detail: metadata?.numeric_only === true
+        ? "Current MICE-style route is numeric-only; categorical imputation requires a categorical model before paper-grade use."
+        : "Imputation metadata was recorded.",
+    });
+  }
+  if (result.method === "missingness-ipw") {
+    const maxIpw = numericDiagnostic(diagnostics, "max_ipw");
+    checks.push({
+      id: "missingness-ipw-stability",
+      status: maxIpw === null ? "warning" : maxIpw <= 10 ? "pass" : maxIpw <= 25 ? "warning" : "fail",
+      detail: maxIpw === null ? "Maximum missingness IPW is missing." : `Maximum missingness IPW is ${maxIpw.toFixed(3)}.`,
+    });
+  }
+  if (result.method === "complete-case-sensitivity" || result.method === "mnar-sensitivity") {
+    checks.push({
+      id: "missingness-sensitivity-scenarios",
+      status: result.estimates.length >= (result.method === "mnar-sensitivity" ? 5 : 2) ? "pass" : "warning",
+      detail: `${result.estimates.length} missingness sensitivity scenario row(s) were produced.`,
+    });
+  }
+  return checks;
+}
+
+function causalQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (!causalMethods().has(result.method)) return [];
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
+    {
+      id: "causal-design-boundary",
+      status: "warning",
+      detail: "Causal/quasi-experimental routes require design review for exchangeability, positivity, consistency, timing, and unsupported causal claim prevention.",
+    },
+  ];
+  if (["overlap-weighting", "entropy-balancing", "doubly-robust-aipw"].includes(result.method)) {
+    const balance = diagnostics.balance as Record<string, unknown> | undefined;
+    const positivity = diagnostics.positivity as Record<string, unknown> | undefined;
+    const maxAfter = typeof balance?.max_abs_smd_after === "number" ? balance.max_abs_smd_after : null;
+    const commonSupportFraction = typeof positivity?.common_support_fraction === "number" ? positivity.common_support_fraction : null;
+    const effectiveN = numericDiagnostic(diagnostics, "effective_sample_size");
+    checks.push({
+      id: "causal-balance-after-adjustment",
+      status: maxAfter === null ? "fail" : maxAfter <= 0.1 ? "pass" : maxAfter <= 0.2 ? "warning" : "fail",
+      detail: maxAfter === null ? "Post-adjustment balance summary is missing." : `Maximum post-adjustment absolute SMD is ${maxAfter.toFixed(3)}.`,
+    });
+    checks.push({
+      id: "causal-positivity-support",
+      status: commonSupportFraction === null ? "fail" : commonSupportFraction >= 0.9 ? "pass" : commonSupportFraction >= 0.75 ? "warning" : "fail",
+      detail: commonSupportFraction === null ? "Common-support fraction is missing." : `${(commonSupportFraction * 100).toFixed(1)}% of complete cases are inside observed cross-arm propensity support.`,
+    });
+    checks.push({
+      id: "causal-effective-sample-size",
+      status: effectiveN === null ? "warning" : effectiveN >= result.completeCaseN * 0.5 ? "pass" : effectiveN >= result.completeCaseN * 0.25 ? "warning" : "fail",
+      detail: effectiveN === null ? "Effective sample size is missing." : `Effective sample size is ${effectiveN.toFixed(1)} of ${result.completeCaseN} complete cases.`,
+    });
+  }
+  if (result.method === "difference-in-differences" || result.method === "event-study-did") {
+    const minCell = numericDiagnostic(diagnostics, "min_treatment_period_cell_n");
+    checks.push({
+      id: "did-cell-support",
+      status: minCell === null ? "warning" : minCell >= 10 ? "pass" : minCell >= 3 ? "warning" : "fail",
+      detail: minCell === null ? "Treatment-by-period support is missing." : `Smallest treatment-by-period cell has ${minCell} row(s).`,
+    });
+    checks.push({
+      id: "did-parallel-trends-review",
+      status: diagnostics.parallel_trends_review_required === true ? "warning" : "fail",
+      detail: diagnostics.parallel_trends_review_required === true ? "Parallel trends review is explicitly required before causal interpretation." : "Parallel trends review flag is missing.",
+    });
+  }
+  if (result.method === "interrupted-time-series") {
+    const pre = numericDiagnostic(diagnostics, "pre_period_observations");
+    const post = numericDiagnostic(diagnostics, "post_period_observations");
+    checks.push({
+      id: "its-segment-support",
+      status: pre === null || post === null ? "warning" : pre >= 8 && post >= 8 ? "pass" : pre >= 3 && post >= 3 ? "warning" : "fail",
+      detail: pre === null || post === null ? "Pre/post segment counts are missing." : `${pre} pre-intervention and ${post} post-intervention observation(s) were recorded.`,
+    });
+  }
+  if (result.method === "regression-discontinuity") {
+    const below = numericDiagnostic(diagnostics, "below_cutoff_n");
+    const above = numericDiagnostic(diagnostics, "above_cutoff_n");
+    checks.push({
+      id: "rdd-cutoff-support",
+      status: below === null || above === null ? "warning" : below >= 20 && above >= 20 ? "pass" : below >= 5 && above >= 5 ? "warning" : "fail",
+      detail: below === null || above === null ? "Cutoff side counts are missing." : `${below} row(s) below and ${above} row(s) at/above the cutoff.`,
+    });
+  }
+  if (result.method === "instrumental-variables-2sls") {
+    const firstStage = numericDiagnostic(diagnostics, "first_stage_f_statistic");
+    checks.push({
+      id: "iv-first-stage-strength",
+      status: firstStage === null ? "warning" : firstStage >= 10 ? "pass" : firstStage >= 5 ? "warning" : "fail",
+      detail: firstStage === null ? "First-stage F statistic is missing." : `First-stage F statistic is ${firstStage.toFixed(3)}.`,
+    });
+    checks.push({
+      id: "iv-exclusion-review",
+      status: diagnostics.exclusion_restriction_review_required === true ? "warning" : "fail",
+      detail: diagnostics.exclusion_restriction_review_required === true ? "Exclusion restriction review is explicitly required." : "Exclusion restriction review flag is missing.",
+    });
+  }
+  if (result.method === "target-trial-emulation-spec") {
+    checks.push({
+      id: "target-trial-required-items",
+      status: Array.isArray(diagnostics.required_protocol_items) && diagnostics.required_protocol_items.length >= 6 ? "warning" : "fail",
+      detail: Array.isArray(diagnostics.required_protocol_items) ? `${diagnostics.required_protocol_items.length} target-trial protocol item(s) were recorded for human review.` : "Target-trial protocol items are missing.",
+    });
+  }
+  if (result.method === "unmeasured-confounding-sensitivity") {
+    checks.push({
+      id: "unmeasured-confounding-effect-bound",
+      status: hasAnyNumeric(result.estimates[0] ?? {}, ["e_value"]) ? "warning" : "fail",
+      detail: hasAnyNumeric(result.estimates[0] ?? {}, ["e_value"]) ? "E-value-style sensitivity bound was recorded; it does not prove absence of confounding." : "E-value-style sensitivity estimate is missing.",
+    });
+  }
+  return checks;
+}
+
+function predictionQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (result.method !== "prediction-evaluation") return [];
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const first = result.estimates[0] ?? {};
+  const auroc = typeof first.auroc === "number" && Number.isFinite(first.auroc) ? first.auroc : null;
+  const auprc = typeof first.auprc === "number" && Number.isFinite(first.auprc) ? first.auprc : null;
+  const brier = typeof first.brier_score === "number" && Number.isFinite(first.brier_score) ? first.brier_score : null;
+  const eventCount = numericDiagnostic(diagnostics, "event_count");
+  const nonEventCount = numericDiagnostic(diagnostics, "non_event_count");
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
+    {
+      id: "prediction-class-balance",
+      status: eventCount === null || nonEventCount === null ? "warning" : Math.min(eventCount, nonEventCount) >= 20 ? "pass" : Math.min(eventCount, nonEventCount) >= 5 ? "warning" : "fail",
+      detail: eventCount === null || nonEventCount === null ? "Binary class counts are missing." : `${eventCount} event(s) and ${nonEventCount} non-event(s) were evaluated.`,
+    },
+    {
+      id: "prediction-discrimination",
+      status: auroc === null ? "fail" : auroc >= 0.7 ? "pass" : auroc >= 0.55 ? "warning" : "fail",
+      detail: auroc === null ? "AUROC is missing." : `AUROC is ${auroc.toFixed(3)}${auprc === null ? "" : ` and AUPRC is ${auprc.toFixed(3)}`}.`,
+    },
+    {
+      id: "prediction-threshold-operating-point",
+      status: diagnostics.confusion_matrix && hasAnyNumeric(first, ["sensitivity", "specificity", "f1"]) ? "pass" : "fail",
+      detail: diagnostics.confusion_matrix ? `Threshold ${String(first.threshold ?? "unknown")} has sensitivity/specificity/F1 recorded.` : "Confusion matrix and threshold metrics are missing.",
+    },
+    {
+      id: "prediction-calibration",
+      status: brier === null ? "warning" : brier <= 0.25 ? "pass" : brier <= 0.35 ? "warning" : "fail",
+      detail: brier === null ? "Brier score is missing." : `Brier score is ${brier.toFixed(3)}.`,
+    },
+    {
+      id: "prediction-score-probability-boundary",
+      status: diagnostics.score_is_probability_like === true ? "pass" : "warning",
+      detail: diagnostics.score_is_probability_like === true ? "Scores are bounded in [0, 1], so calibration/Brier interpretation is probability-like." : "Scores are not bounded in [0, 1]; calibration and Brier score should be treated as score diagnostics only.",
+    },
+    {
+      id: "prediction-artifact-completeness",
+      status: result.artifacts.some(artifact => artifact.kind === "table" && /roc-curve/i.test(artifact.path))
+        && result.artifacts.some(artifact => artifact.kind === "table" && /precision-recall/i.test(artifact.path))
+        && result.artifacts.some(artifact => artifact.kind === "table" && /calibration/i.test(artifact.path))
+        ? "pass"
+        : "fail",
+      detail: "Prediction evaluation should emit ROC, precision-recall, calibration, and confusion-matrix source artifacts.",
+    },
+  ];
+  return checks;
+}
+
+function measurementAndExplorationQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (!measurementAndExplorationMethods().has(result.method)) return [];
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const first = result.estimates[0] ?? {};
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [];
+  if (result.method === "reliability-kappa") {
+    checks.push({
+      id: "agreement-kappa-interval",
+      status: hasAnyNumeric(first, ["ci_low", "ci_high"]) ? "pass" : "warning",
+      detail: hasAnyNumeric(first, ["ci_low", "ci_high"]) ? "Approximate kappa confidence interval was recorded." : "Kappa confidence interval is missing.",
+    });
+    checks.push({
+      id: "agreement-contingency-table",
+      status: Boolean(diagnostics.table) ? "pass" : "fail",
+      detail: Boolean(diagnostics.table) ? "Rater contingency table was recorded." : "Rater contingency table is missing.",
+    });
+  }
+  if (result.method === "intraclass-correlation" || result.method === "cronbach-alpha") {
+    checks.push({
+      id: "scale-reliability-sample-size",
+      status: result.completeCaseN >= 30 ? "pass" : result.completeCaseN >= 10 ? "warning" : "fail",
+      detail: `${result.completeCaseN} complete row(s) were available for reliability estimation.`,
+    });
+    checks.push({
+      id: "scale-reliability-item-count",
+      status: numericDiagnostic(diagnostics, "items") === null && numericDiagnostic(diagnostics, "raters_or_measures") === null ? "warning" : "pass",
+      detail: `Reliability route recorded ${diagnostics.items ?? diagnostics.raters_or_measures ?? "unknown"} item/measure column(s).`,
+    });
+  }
+  if (result.method === "pca") {
+    const cumulative = numericDiagnostic(diagnostics, "cumulative_explained_variance");
+    checks.push({
+      id: "pca-variance-captured",
+      status: cumulative === null ? "warning" : cumulative >= 0.7 ? "pass" : cumulative >= 0.5 ? "warning" : "fail",
+      detail: cumulative === null ? "Cumulative explained variance is missing." : `Selected components explain ${(cumulative * 100).toFixed(1)}% of variance.`,
+    });
+    checks.push({
+      id: "pca-artifacts",
+      status: result.artifacts.some(artifact => /pca-transformed|pca-loadings/i.test(artifact.path)) ? "pass" : "fail",
+      detail: "PCA should emit transformed scores and loadings artifacts.",
+    });
+  }
+  if (result.method === "clustering-validation") {
+    const minCluster = numericDiagnostic(diagnostics, "min_cluster_size");
+    checks.push({
+      id: "clustering-cluster-size",
+      status: minCluster === null ? "warning" : minCluster >= 5 ? "pass" : minCluster >= 2 ? "warning" : "fail",
+      detail: minCluster === null ? "Minimum cluster size is missing." : `Smallest cluster has ${minCluster} row(s).`,
+    });
+    checks.push({
+      id: "clustering-validation-metrics",
+      status: hasAnyNumeric(first, ["silhouette"]) && hasAnyNumeric(first, ["davies_bouldin", "calinski_harabasz"]) ? "pass" : "warning",
+      detail: "Clustering route should report silhouette, Davies-Bouldin, and Calinski-Harabasz metrics where feasible.",
+    });
+  }
+  if (result.method === "bland-altman") {
+    checks.push({
+      id: "agreement-limits-of-agreement",
+      status: hasAnyNumeric(first, ["loa_low", "loa_high"]) ? "pass" : "fail",
+      detail: hasAnyNumeric(first, ["loa_low", "loa_high"]) ? "Bland-Altman limits of agreement were recorded." : "Limits of agreement are missing.",
+    });
+  }
+  if (result.method === "multiple-comparison-correction") {
+    checks.push({
+      id: "multiple-comparison-methods",
+      status: Array.isArray(diagnostics.methods) && diagnostics.methods.length >= 4 ? "pass" : "warning",
+      detail: Array.isArray(diagnostics.methods) ? `${diagnostics.methods.length} correction method(s) were applied.` : "Correction method list is missing.",
+    });
+    checks.push({
+      id: "multiple-comparison-artifact",
+      status: result.artifacts.some(artifact => /adjusted-p-values/i.test(artifact.path)) ? "pass" : "fail",
+      detail: "Adjusted p-value artifact should be recorded for auditability.",
+    });
+  }
+  if (result.method === "power-sample-size") {
+    const n = typeof first.n_per_group === "number" && Number.isFinite(first.n_per_group) ? first.n_per_group : null;
+    checks.push({
+      id: "power-sample-size-finite",
+      status: n === null ? "fail" : n > 0 ? "pass" : "fail",
+      detail: n === null ? "Power calculation did not return a finite sample size." : `Estimated required n per group is ${n.toFixed(1)}.`,
+    });
+  }
+  return checks;
+}
+
+function coreInferenceQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (!coreInferenceMethods().has(result.method)) return [];
+  const first = result.estimates[0] ?? {};
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
+    {
+      id: "core-inference-sample-size",
+      status: result.completeCaseN >= 40 ? "pass" : result.completeCaseN >= 10 ? "warning" : "fail",
+      detail: `${result.completeCaseN} complete row(s) were available for the inferential route.`,
+    },
+  ];
+  if (meanComparisonMethods().has(result.method)) {
+    const hasEffect = hasAnyNumeric(first, ["mean_difference", "median_difference", "cohen_d", "hedges_g", "rank_biserial_correlation", "matched_rank_biserial_correlation"]);
+    const hasInterval = hasAnyNumeric(first, ["ci_low", "ci_high"]) || result.method === "mann-whitney" || result.method === "wilcoxon";
+    checks.push({
+      id: "core-inference-effect-size",
+      status: hasEffect ? "pass" : "warning",
+      detail: hasEffect ? "Comparison includes an interpretable effect size or distributional contrast." : "Comparison is missing an interpretable effect size beyond a test statistic.",
+    });
+    checks.push({
+      id: "core-inference-uncertainty",
+      status: hasInterval ? "pass" : "warning",
+      detail: hasInterval ? "Comparison includes a confidence interval or is a nonparametric route with an explicit effect-size contrast." : "Comparison is missing confidence-interval evidence.",
+    });
+    checks.push({
+      id: "core-inference-assumptions",
+      status: diagnostics.test || diagnostics.group_counts ? "pass" : "warning",
+      detail: diagnostics.test || diagnostics.group_counts ? "Assumption/context diagnostics were recorded for the comparison." : "Comparison diagnostics are sparse.",
+    });
+  }
+  if (categoricalAssociationMethods().has(result.method)) {
+    const hasTable = Boolean(diagnostics.table);
+    const hasAssociation = hasAnyNumeric(first, ["cramers_v", "odds_ratio", "risk_ratio", "risk_difference", "matched_odds_ratio", "trend_z_statistic"]);
+    checks.push({
+      id: "categorical-association-table",
+      status: hasTable ? "pass" : "fail",
+      detail: hasTable ? "Observed contingency table was recorded." : "Observed contingency table is missing.",
+    });
+    checks.push({
+      id: "categorical-association-effect-size",
+      status: hasAssociation ? "pass" : "warning",
+      detail: hasAssociation ? "Categorical association includes an effect-size measure." : "Categorical association is missing an effect-size measure beyond a p-value.",
+    });
+    if (result.method === "chi-square") {
+      checks.push({
+        id: "categorical-expected-counts",
+        status: numericDiagnostic(diagnostics, "min_expected") === null ? "warning" : numericDiagnostic(diagnostics, "min_expected")! >= 5 ? "pass" : "warning",
+        detail: numericDiagnostic(diagnostics, "min_expected") === null ? "Minimum expected cell count is missing." : `Minimum expected cell count is ${numericDiagnostic(diagnostics, "min_expected")!.toFixed(3)}.`,
+      });
+    }
+  }
+  if (correlationMethods().has(result.method)) {
+    checks.push({
+      id: "correlation-effect-size",
+      status: hasAnyNumeric(first, ["correlation"]) ? "pass" : "fail",
+      detail: hasAnyNumeric(first, ["correlation"]) ? "Correlation coefficient was recorded." : "Correlation coefficient is missing.",
+    });
+    checks.push({
+      id: "correlation-uncertainty",
+      status: hasAnyNumeric(first, ["ci_low", "ci_high"]) ? "pass" : "warning",
+      detail: hasAnyNumeric(first, ["ci_low", "ci_high"]) ? String(diagnostics.ci_method ?? "Correlation confidence interval was recorded.") : "Correlation confidence interval is missing or unavailable for the sample size.",
+    });
+  }
+  return checks;
+}
+
+function hasAnyNumeric(row: Record<string, unknown>, keys: string[]): boolean {
+  return keys.some(key => typeof row[key] === "number" && Number.isFinite(row[key] as number));
+}
+
+function coreInferenceMethods(): Set<StatsRunRequest["method"]> {
+  return new Set([...meanComparisonMethods(), ...categoricalAssociationMethods(), ...correlationMethods()]);
+}
+
+function meanComparisonMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["t-test", "welch-t-test", "paired-t-test", "mann-whitney", "wilcoxon", "anova", "ancova", "kruskal-wallis", "friedman"]);
+}
+
+function categoricalAssociationMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend"]);
+}
+
+function correlationMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["pearson", "spearman", "kendall", "partial-correlation"]);
+}
+
 function regressionReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
   const diagnostics = result.diagnostics as Record<string, unknown>;
   const maxVif = numericDiagnostic(diagnostics, "max_vif");
@@ -1211,20 +1597,47 @@ function regressionReliabilityQaChecks(result: StatsRunResult): Array<{ id: stri
 function survivalReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
   const diagnostics = result.diagnostics as Record<string, unknown>;
   const events = numericDiagnostic(diagnostics, "events");
+  const censored = numericDiagnostic(diagnostics, "censored");
   const nPredictors = numericDiagnostic(diagnostics, "n_predictors");
   const epv = numericDiagnostic(diagnostics, "events_per_predictor") ?? (events !== null && nPredictors !== null ? events / Math.max(nPredictors, 1) : null);
+  const cIndex = numericDiagnostic(diagnostics, "harrell_c_index");
+  const tiedEventTimes = numericDiagnostic(diagnostics, "tied_event_times");
   const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
     {
       id: "survival-event-count",
       status: events === null ? "warning" : events >= 20 ? "pass" : events >= 5 ? "warning" : "fail",
       detail: events === null ? "Survival event count is missing." : `${events} event(s) are available for the survival route.`,
     },
+    {
+      id: "survival-censoring-context",
+      status: events === null || censored === null ? "warning" : events > 0 && censored >= 0 ? "pass" : "fail",
+      detail: events === null || censored === null ? "Censoring/event context is incomplete." : `${events} event(s) and ${censored} censored observation(s) were recorded.`,
+    },
   ];
+  if (result.method === "kaplan-meier" || result.method === "aalen-johansen-cif") {
+    checks.push({
+      id: "survival-curve-artifact",
+      status: result.artifacts.some(artifact => artifact.kind === "table" && /curve|incidence/i.test(artifact.path)) ? "pass" : "fail",
+      detail: result.artifacts.some(artifact => artifact.kind === "table" && /curve|incidence/i.test(artifact.path))
+        ? "Machine-readable survival/cumulative-incidence curve artifact was recorded."
+        : "Survival/cumulative-incidence curve table artifact is missing.",
+    });
+  }
   if (result.method === "cox-proportional-hazards" || result.method === "stratified-cox") {
     checks.push({
       id: "survival-events-per-predictor",
       status: epv === null ? "warning" : epv >= 10 ? "pass" : epv >= 3 ? "warning" : "fail",
       detail: epv === null ? "Events-per-predictor is missing." : `Events per predictor is ${epv.toFixed(3)}.`,
+    });
+    checks.push({
+      id: "cox-discrimination-diagnostic",
+      status: cIndex === null ? "warning" : cIndex >= 0.55 && cIndex <= 1 ? "pass" : "warning",
+      detail: cIndex === null ? "Harrell C-index diagnostic is missing." : `Harrell C-index is ${cIndex.toFixed(3)}.`,
+    });
+    checks.push({
+      id: "cox-tie-burden",
+      status: tiedEventTimes === null ? "warning" : tiedEventTimes <= Math.max((events ?? 0) * 0.5, 10) ? "pass" : "warning",
+      detail: tiedEventTimes === null ? "Tied event-time burden is missing." : `${tiedEventTimes} event time(s) have tied events.`,
     });
     checks.push({
       id: "cox-proportional-hazards-diagnostic",
@@ -1274,6 +1687,38 @@ function survivalFamilyMethods(): Set<StatsRunRequest["method"]> {
 
 function longitudinalFamilyMethods(): Set<StatsRunRequest["method"]> {
   return new Set(["linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova"]);
+}
+
+function missingnessMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["missingness-summary", "multiple-imputation-mice", "missingness-ipw", "complete-case-sensitivity", "mnar-sensitivity"]);
+}
+
+function causalMethods(): Set<StatsRunRequest["method"]> {
+  return new Set([
+    "overlap-weighting",
+    "entropy-balancing",
+    "doubly-robust-aipw",
+    "difference-in-differences",
+    "event-study-did",
+    "interrupted-time-series",
+    "regression-discontinuity",
+    "instrumental-variables-2sls",
+    "target-trial-emulation-spec",
+    "unmeasured-confounding-sensitivity",
+  ]);
+}
+
+function measurementAndExplorationMethods(): Set<StatsRunRequest["method"]> {
+  return new Set([
+    "reliability-kappa",
+    "intraclass-correlation",
+    "cronbach-alpha",
+    "pca",
+    "clustering-validation",
+    "bland-altman",
+    "multiple-comparison-correction",
+    "power-sample-size",
+  ]);
 }
 
 function renderEstimateTable(result: StatsRunResult): string {
@@ -1401,6 +1846,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import (
     adjusted_rand_score,
+    average_precision_score,
     brier_score_loss,
     calinski_harabasz_score,
     confusion_matrix,
@@ -1631,6 +2077,133 @@ def cramers_v(table):
     r, k = arr.shape
     return clean_value(math.sqrt((chi2 / n) / max(1, min(k - 1, r - 1))))
 
+def confidence_level(alpha):
+    return clean_value(1 - float(alpha))
+
+def mean_ci(mean, se, df, alpha):
+    if se is None or pd.isna(se) or df is None or df <= 0:
+        return None, None
+    crit = float(stats.t.ppf(1 - float(alpha) / 2, df))
+    return clean_value(mean - crit * se), clean_value(mean + crit * se)
+
+def hedges_correction(df):
+    return clean_value(1 - (3 / (4 * df - 1))) if df and df > 1 else None
+
+def two_sample_summary(y0, y1, equal_var, alpha):
+    y0 = pd.Series(y0).dropna().astype(float)
+    y1 = pd.Series(y1).dropna().astype(float)
+    n0 = int(len(y0))
+    n1 = int(len(y1))
+    mean0 = float(y0.mean())
+    mean1 = float(y1.mean())
+    var0 = float(y0.var(ddof=1)) if n0 > 1 else np.nan
+    var1 = float(y1.var(ddof=1)) if n1 > 1 else np.nan
+    diff = mean1 - mean0
+    pooled_var = ((n0 - 1) * var0 + (n1 - 1) * var1) / max(1, n0 + n1 - 2)
+    pooled_sd = math.sqrt(max(0.0, pooled_var)) if not pd.isna(pooled_var) else np.nan
+    if equal_var:
+        se = pooled_sd * math.sqrt((1 / n0) + (1 / n1)) if n0 and n1 and not pd.isna(pooled_sd) else np.nan
+        dfree = n0 + n1 - 2
+    else:
+        se = math.sqrt((var0 / n0) + (var1 / n1)) if n0 and n1 and not pd.isna(var0) and not pd.isna(var1) else np.nan
+        numerator = ((var0 / n0) + (var1 / n1)) ** 2
+        denominator = ((var0 / n0) ** 2 / max(1, n0 - 1)) + ((var1 / n1) ** 2 / max(1, n1 - 1))
+        dfree = numerator / denominator if denominator else np.nan
+    ci_low, ci_high = mean_ci(diff, se, dfree, alpha)
+    cohen_d = diff / pooled_sd if pooled_sd and not pd.isna(pooled_sd) else np.nan
+    correction = hedges_correction(n0 + n1 - 2)
+    return {
+        "mean_difference": clean_value(diff),
+        "standard_error": clean_value(se),
+        "degrees_of_freedom": clean_value(dfree),
+        "ci_low": ci_low,
+        "ci_high": ci_high,
+        "ci_level": confidence_level(alpha),
+        "cohen_d": clean_value(cohen_d),
+        "hedges_g": clean_value(cohen_d * correction if correction is not None and not pd.isna(cohen_d) else None),
+        "pooled_sd": clean_value(pooled_sd),
+        "variance_ratio": clean_value(var1 / var0 if var0 and not pd.isna(var0) and not pd.isna(var1) else None),
+    }
+
+def paired_difference_summary(diff, alpha):
+    diff = pd.Series(diff).dropna().astype(float)
+    n = int(len(diff))
+    mean_diff = float(diff.mean()) if n else np.nan
+    sd_diff = float(diff.std(ddof=1)) if n > 1 else np.nan
+    se = sd_diff / math.sqrt(n) if n > 0 and not pd.isna(sd_diff) else np.nan
+    ci_low, ci_high = mean_ci(mean_diff, se, n - 1, alpha)
+    return {
+        "mean_difference": clean_value(mean_diff),
+        "sd_difference": clean_value(sd_diff),
+        "standard_error": clean_value(se),
+        "degrees_of_freedom": clean_value(n - 1),
+        "ci_low": ci_low,
+        "ci_high": ci_high,
+        "ci_level": confidence_level(alpha),
+        "standardized_mean_change": clean_value(mean_diff / sd_diff if sd_diff and not pd.isna(sd_diff) else None),
+    }
+
+def fisher_z_ci(r, n, alpha):
+    if r is None or pd.isna(r) or n is None or n <= 3 or abs(float(r)) >= 1:
+        return None, None
+    z = math.atanh(float(r))
+    se = 1 / math.sqrt(n - 3)
+    crit = float(stats.norm.ppf(1 - float(alpha) / 2))
+    return clean_value(math.tanh(z - crit * se)), clean_value(math.tanh(z + crit * se))
+
+def two_by_two_effects(table, alpha):
+    if table.shape != (2, 2):
+        return {}
+    arr_raw = np.asarray(table, dtype=float)
+    exposure_negative = clean_value(table.index[0])
+    exposure_positive = clean_value(table.index[1])
+    outcome_negative = clean_value(table.columns[0])
+    outcome_positive = clean_value(table.columns[1])
+    exposed_negative = float(arr_raw[1, 0])
+    exposed_positive = float(arr_raw[1, 1])
+    unexposed_negative = float(arr_raw[0, 0])
+    unexposed_positive = float(arr_raw[0, 1])
+    correction_used = bool(np.any(arr_raw == 0))
+    arr = arr_raw + 0.5 if correction_used else arr_raw.copy()
+    b = float(arr[1, 0])
+    a = float(arr[1, 1])
+    d = float(arr[0, 0])
+    c = float(arr[0, 1])
+    exposed_total = a + b
+    unexposed_total = c + d
+    risk_exposed = a / exposed_total if exposed_total else np.nan
+    risk_unexposed = c / unexposed_total if unexposed_total else np.nan
+    odds_ratio = (a * d) / (b * c) if b * c else np.nan
+    risk_ratio = risk_exposed / risk_unexposed if risk_unexposed else np.nan
+    risk_difference = risk_exposed - risk_unexposed
+    z = float(stats.norm.ppf(1 - float(alpha) / 2))
+    log_or_se = math.sqrt((1 / a) + (1 / b) + (1 / c) + (1 / d)) if min(a, b, c, d) > 0 else np.nan
+    log_rr_se = math.sqrt(max(0.0, (1 / a) - (1 / exposed_total) + (1 / c) - (1 / unexposed_total))) if a > 0 and c > 0 and exposed_total > 0 and unexposed_total > 0 else np.nan
+    rd_se = math.sqrt((risk_exposed * (1 - risk_exposed) / exposed_total) + (risk_unexposed * (1 - risk_unexposed) / unexposed_total)) if exposed_total and unexposed_total else np.nan
+    return {
+        "exposure_negative_level": exposure_negative,
+        "exposure_positive_level": exposure_positive,
+        "outcome_negative_level": outcome_negative,
+        "outcome_positive_level": outcome_positive,
+        "exposed_positive": clean_value(exposed_positive),
+        "exposed_negative": clean_value(exposed_negative),
+        "unexposed_positive": clean_value(unexposed_positive),
+        "unexposed_negative": clean_value(unexposed_negative),
+        "risk_exposed": clean_value(risk_exposed),
+        "risk_unexposed": clean_value(risk_unexposed),
+        "risk_difference": clean_value(risk_difference),
+        "risk_difference_ci_low": clean_value(risk_difference - z * rd_se if not pd.isna(rd_se) else None),
+        "risk_difference_ci_high": clean_value(risk_difference + z * rd_se if not pd.isna(rd_se) else None),
+        "risk_ratio": clean_value(risk_ratio),
+        "rr_ci_low": clean_value(math.exp(math.log(risk_ratio) - z * log_rr_se) if risk_ratio and risk_ratio > 0 and not pd.isna(log_rr_se) else None),
+        "rr_ci_high": clean_value(math.exp(math.log(risk_ratio) + z * log_rr_se) if risk_ratio and risk_ratio > 0 and not pd.isna(log_rr_se) else None),
+        "odds_ratio": clean_value(odds_ratio),
+        "or_ci_low": clean_value(math.exp(math.log(odds_ratio) - z * log_or_se) if odds_ratio and odds_ratio > 0 and not pd.isna(log_or_se) else None),
+        "or_ci_high": clean_value(math.exp(math.log(odds_ratio) + z * log_or_se) if odds_ratio and odds_ratio > 0 and not pd.isna(log_or_se) else None),
+        "continuity_correction_used": correction_used,
+        "ci_level": confidence_level(alpha),
+    }
+
 def effect_ci_from_model(model, term):
     ci = model.conf_int()
     if hasattr(ci, "loc"):
@@ -1697,13 +2270,19 @@ def km_curve(time, event, group=None):
     for g, data in groups:
         data = data.sort_values("time")
         survival = 1.0
+        greenwood_sum = 0.0
         for t in sorted(data["time"].unique()):
             at_risk = int((data["time"] >= t).sum())
             events = int(((data["time"] == t) & (data["event"] == 1)).sum())
             censored = int(((data["time"] == t) & (data["event"] == 0)).sum())
             if at_risk > 0 and events > 0:
                 survival *= (1 - events / at_risk)
-            rows.append({"group": clean_value(g), "time": clean_value(t), "at_risk": at_risk, "events": events, "censored": censored, "survival": clean_value(survival)})
+                if at_risk > events:
+                    greenwood_sum += events / (at_risk * (at_risk - events))
+            se = survival * math.sqrt(greenwood_sum) if greenwood_sum >= 0 else np.nan
+            lower = max(0.0, survival - 1.96 * se) if not pd.isna(se) else None
+            upper = min(1.0, survival + 1.96 * se) if not pd.isna(se) else None
+            rows.append({"group": clean_value(g), "time": clean_value(t), "at_risk": at_risk, "events": events, "censored": censored, "survival": clean_value(survival), "survival_ci_low": clean_value(lower), "survival_ci_high": clean_value(upper), "greenwood_se": clean_value(se)})
     return rows
 
 def logrank_two_group(time, event, group):
@@ -1727,6 +2306,88 @@ def logrank_two_group(time, event, group):
     chi2 = z * z if not pd.isna(z) else np.nan
     p = 1 - stats.chi2.cdf(chi2, 1) if not pd.isna(chi2) else np.nan
     return {"group_contrast": f"{groups[1]} vs {groups[0]}", "observed_events": clean_value(o1), "expected_events": clean_value(e1), "chi_square": clean_value(chi2), "p_value": clean_value(p)}
+
+def survival_group_summary(time, event, group=None):
+    frame = pd.DataFrame({"time": pd.to_numeric(time, errors="coerce"), "event": event_indicator(event)})
+    if group is None:
+        frame = frame.dropna()
+        grouped = [("__all__", frame)]
+    else:
+        frame["group"] = group
+        frame = frame.dropna()
+        grouped = list(frame.groupby("group", dropna=False))
+    rows = []
+    for label, data in grouped:
+        rows.append({
+            "group": clean_value(label),
+            "n": int(data.shape[0]),
+            "events": int(data["event"].sum()),
+            "censored": int((data["event"] == 0).sum()),
+            "time_min": clean_value(data["time"].min()),
+            "time_max": clean_value(data["time"].max()),
+            "median_followup_time": clean_value(data["time"].median()),
+        })
+    return rows
+
+def km_final_summary(rows):
+    out = []
+    groups = sorted(set(r["group"] for r in rows), key=str)
+    for g in groups:
+        group_rows = [r for r in rows if r["group"] == g]
+        if not group_rows:
+            continue
+        median_rows = [r for r in group_rows if r.get("survival") is not None and r["survival"] <= 0.5]
+        out.append({
+            "term": str(g),
+            "time": clean_value(max([r["time"] for r in group_rows], default=None)),
+            "survival": clean_value(group_rows[-1]["survival"]),
+            "survival_ci_low": clean_value(group_rows[-1].get("survival_ci_low")),
+            "survival_ci_high": clean_value(group_rows[-1].get("survival_ci_high")),
+            "median_survival_time": clean_value(median_rows[0]["time"] if median_rows else None),
+            "events": int(sum(r.get("events", 0) for r in group_rows)),
+            "last_at_risk": int(group_rows[-1].get("at_risk", 0)),
+        })
+    return out
+
+def harrell_c_index(time, event, risk_score):
+    frame = pd.DataFrame({"time": pd.to_numeric(time, errors="coerce"), "event": event_indicator(event), "risk": pd.to_numeric(risk_score, errors="coerce")}).dropna()
+    concordant = 0.0
+    comparable = 0.0
+    tied_risk = 0.0
+    values = frame[["time", "event", "risk"]].to_numpy(dtype=float)
+    for i in range(len(values)):
+        for j in range(i + 1, len(values)):
+            ti, ei, ri = values[i]
+            tj, ej, rj = values[j]
+            if ti == tj:
+                continue
+            if ei == 1 and ti < tj:
+                comparable += 1
+                if ri > rj:
+                    concordant += 1
+                elif ri == rj:
+                    tied_risk += 1
+            elif ej == 1 and tj < ti:
+                comparable += 1
+                if rj > ri:
+                    concordant += 1
+                elif ri == rj:
+                    tied_risk += 1
+    return clean_value((concordant + 0.5 * tied_risk) / comparable if comparable else None), int(comparable)
+
+def tied_event_time_count(time, event):
+    frame = pd.DataFrame({"time": pd.to_numeric(time, errors="coerce"), "event": event_indicator(event)}).dropna()
+    counts = frame.loc[frame["event"] == 1, "time"].value_counts()
+    return int((counts > 1).sum())
+
+def poisson_rate_interval(events, person_time, alpha):
+    events = float(events)
+    person_time = float(person_time)
+    if person_time <= 0:
+        return None, None
+    low = 0.0 if events == 0 else stats.chi2.ppf(float(alpha) / 2, 2 * events) / (2 * person_time)
+    high = stats.chi2.ppf(1 - float(alpha) / 2, 2 * (events + 1)) / (2 * person_time)
+    return clean_value(low), clean_value(high)
 
 def cif_curve(time, event_code, event_of_interest=1, competing_codes=None, group=None):
     frame = pd.DataFrame({"time": pd.to_numeric(time, errors="coerce"), "event_code": pd.to_numeric(event_code, errors="coerce")})
@@ -2078,6 +2739,97 @@ def treatment_effect_estimate(data, treatment_col, outcome_col, weights, estiman
         "control_n": control_n,
     }
 
+def treatment_group_summary(data, treatment_col):
+    t = pd.Series(data[treatment_col]).astype(int)
+    return {
+        "treated_n": int((t == 1).sum()),
+        "control_n": int((t == 0).sum()),
+        "treated_fraction": clean_value(float((t == 1).mean()) if len(t) else None),
+    }
+
+def treatment_period_summary(data, treatment_col, post_col):
+    frame = pd.DataFrame({"treatment": pd.Series(data[treatment_col]).astype(int), "post": pd.Series(data[post_col]).astype(int)})
+    table = pd.crosstab(frame["treatment"], frame["post"])
+    cells = []
+    for treatment_level in sorted(frame["treatment"].dropna().unique()):
+        for post_level in sorted(frame["post"].dropna().unique()):
+            cells.append({
+                "treatment": clean_value(treatment_level),
+                "post": clean_value(post_level),
+                "n": int(((frame["treatment"] == treatment_level) & (frame["post"] == post_level)).sum()),
+            })
+    return {
+        "table": table.to_dict(),
+        "cells": cells,
+        "min_cell_n": int(min([cell["n"] for cell in cells], default=0)),
+    }
+
+def prediction_calibration_rows(y, score, bins=10):
+    frame = pd.DataFrame({"y": pd.Series(y).astype(float), "score": pd.Series(score).astype(float)}).dropna()
+    if frame.empty:
+        return []
+    try:
+        frame["bin"] = pd.qcut(frame["score"], q=min(bins, frame["score"].nunique()), duplicates="drop")
+    except Exception:
+        frame["bin"] = pd.cut(frame["score"], bins=min(bins, max(1, frame["score"].nunique())), include_lowest=True, duplicates="drop")
+    rows = []
+    for label, data in frame.groupby("bin", observed=False):
+        rows.append({
+            "bin": str(label),
+            "n": int(data.shape[0]),
+            "mean_score": clean_value(data["score"].mean()),
+            "observed_event_rate": clean_value(data["y"].mean()),
+            "event_count": int(data["y"].sum()),
+        })
+    return rows
+
+def threshold_metrics(y, score, threshold):
+    y = pd.Series(y).astype(int)
+    score = pd.Series(score).astype(float)
+    pred = (score >= threshold).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
+    sensitivity = safe_divide(tp, tp + fn)
+    specificity = safe_divide(tn, tn + fp)
+    precision = safe_divide(tp, tp + fp)
+    npv = safe_divide(tn, tn + fn)
+    recall = sensitivity
+    f1 = safe_divide(2 * precision * recall, precision + recall) if precision is not None and recall is not None else None
+    accuracy = safe_divide(tp + tn, tp + tn + fp + fn)
+    return {
+        "threshold": clean_value(threshold),
+        "true_positive": int(tp),
+        "false_positive": int(fp),
+        "true_negative": int(tn),
+        "false_negative": int(fn),
+        "sensitivity": sensitivity,
+        "specificity": specificity,
+        "precision": precision,
+        "positive_predictive_value": precision,
+        "negative_predictive_value": npv,
+        "f1": clean_value(f1),
+        "accuracy": accuracy,
+    }
+
+def cronbach_alpha_for_matrix(mat):
+    k = mat.shape[1]
+    return k / (k - 1) * (1 - mat.var(axis=0, ddof=1).sum() / mat.sum(axis=1).var(ddof=1)) if k > 1 else np.nan
+
+def item_total_rows(mat):
+    rows = []
+    total = mat.sum(axis=1)
+    for col in mat.columns:
+        remainder = total - mat[col]
+        corr = stats.pearsonr(mat[col], remainder)[0] if len(mat) > 3 and remainder.std(ddof=1) > 0 and mat[col].std(ddof=1) > 0 else np.nan
+        subset = mat[[c for c in mat.columns if c != col]]
+        rows.append({
+            "item": str(col),
+            "mean": clean_value(mat[col].mean()),
+            "sd": clean_value(mat[col].std(ddof=1)),
+            "item_total_correlation": clean_value(corr),
+            "alpha_if_deleted": clean_value(cronbach_alpha_for_matrix(subset)) if subset.shape[1] > 1 else None,
+        })
+    return rows
+
 def descriptive(df, req):
     variables = req.get("variables") or list(df.columns)
     require_columns(df, variables)
@@ -2107,6 +2859,109 @@ def descriptive(df, req):
             base.update({"levels": len(counts), "top_values": "; ".join([f"{idx}:{int(val)}" for idx, val in counts.items()])})
         rows.append(base)
     return rows, {"complete_case_n": int(df[variables].dropna().shape[0])}
+
+def missingness_profile(data, variables, out_dir):
+    selected = data[variables].copy()
+    missing = selected.isna()
+    input_rows = int(selected.shape[0])
+    complete_case_n = int(selected.dropna().shape[0])
+    summary_rows = []
+    for col in variables:
+        miss = int(missing[col].sum())
+        summary_rows.append({
+            "term": col,
+            "missing": miss,
+            "non_missing": int(selected[col].notna().sum()),
+            "missing_fraction": clean_value(miss / input_rows if input_rows else None),
+        })
+    pattern_counts = missing.apply(lambda row: "".join("1" if bool(value) else "0" for value in row), axis=1).value_counts(dropna=False)
+    pattern_rows = []
+    for pattern, count in pattern_counts.items():
+        missing_vars = [variables[index] for index, char in enumerate(str(pattern)) if char == "1"]
+        pattern_rows.append({
+            "pattern": str(pattern),
+            "count": int(count),
+            "fraction": clean_value(int(count) / input_rows if input_rows else None),
+            "missing_variables": ";".join(missing_vars),
+        })
+    patterns_path = os.path.join(out_dir, "missingness-patterns.csv")
+    write_csv(patterns_path, pattern_rows)
+    indicators = missing.astype(float)
+    pairwise_path = os.path.join(out_dir, "missingness-indicator-correlations.csv")
+    pairwise_rows = []
+    if len(variables) > 1:
+        corr = indicators.corr().fillna(0.0)
+        for left in variables:
+            for right in variables:
+                pairwise_rows.append({"left": left, "right": right, "phi_correlation": clean_value(corr.loc[left, right])})
+    write_csv(pairwise_path, pairwise_rows)
+    mechanism_rows = []
+    for target in variables:
+        indicator = missing[target].astype(int)
+        if indicator.nunique(dropna=True) < 2:
+            continue
+        for predictor in variables:
+            if predictor == target:
+                continue
+            pred = selected[predictor]
+            numeric = pd.to_numeric(pred, errors="coerce")
+            if numeric.notna().sum() >= max(8, pred.notna().sum() * 0.75):
+                observed_group = numeric[indicator == 0].dropna()
+                missing_group = numeric[indicator == 1].dropna()
+                if len(observed_group) >= 3 and len(missing_group) >= 3:
+                    stat, p = stats.ttest_ind(missing_group, observed_group, equal_var=False, nan_policy="omit")
+                    denom = math.sqrt((observed_group.var(ddof=1) + missing_group.var(ddof=1)) / 2)
+                    mechanism_rows.append({
+                        "missing_variable": target,
+                        "predictor": predictor,
+                        "predictor_type": "numeric",
+                        "observed_mean": clean_value(observed_group.mean()),
+                        "missing_mean": clean_value(missing_group.mean()),
+                        "standardized_difference": clean_value((missing_group.mean() - observed_group.mean()) / denom if denom else None),
+                        "p_value": clean_value(p),
+                    })
+            else:
+                frame = pd.DataFrame({"missing": indicator, "predictor": pred.astype(str)}).dropna()
+                if frame["missing"].nunique() == 2 and frame["predictor"].nunique() > 1:
+                    table = pd.crosstab(frame["missing"], frame["predictor"])
+                    if table.shape[0] == 2 and table.shape[1] > 1:
+                        chi2, p, _, expected = stats.chi2_contingency(table)
+                        mechanism_rows.append({
+                            "missing_variable": target,
+                            "predictor": predictor,
+                            "predictor_type": "categorical",
+                            "chi_square": clean_value(chi2),
+                            "min_expected": clean_value(np.min(expected)),
+                            "levels": int(table.shape[1]),
+                            "p_value": clean_value(p),
+                        })
+    mechanism_rows = sorted(mechanism_rows, key=lambda row: (row.get("p_value") is None, row.get("p_value") if row.get("p_value") is not None else 1, str(row.get("missing_variable")), str(row.get("predictor"))))
+    mechanism_path = os.path.join(out_dir, "missingness-mechanism-screen.csv")
+    write_csv(mechanism_path, mechanism_rows)
+    max_missing = max([row["missing_fraction"] for row in summary_rows if row["missing_fraction"] is not None], default=0.0)
+    profile = {
+        "input_rows": input_rows,
+        "complete_case_n": complete_case_n,
+        "complete_case_fraction": clean_value(complete_case_n / input_rows if input_rows else None),
+        "variables_with_missing": int(sum(row["missing"] > 0 for row in summary_rows)),
+        "max_missing_fraction": clean_value(max_missing),
+        "missingness_pattern_count": int(len(pattern_rows)),
+        "missingness_patterns_path": patterns_path,
+        "missingness_pairwise_path": pairwise_path,
+        "missingness_mechanism_path": mechanism_path,
+        "mechanism_screen": {
+            "comparisons": int(len(mechanism_rows)),
+            "associations_below_0_05": int(sum((row.get("p_value") is not None and row.get("p_value") < 0.05) for row in mechanism_rows)),
+            "minimum_p_value": clean_value(min([row.get("p_value") for row in mechanism_rows if row.get("p_value") is not None], default=None)),
+            "interpretation": "Association screening can reject a simple MCAR story but cannot prove MAR or MNAR.",
+        },
+        "artifacts": {
+            "missingness_patterns": patterns_path,
+            "missingness_pairwise": pairwise_path,
+            "missingness_mechanism": mechanism_path,
+        },
+    }
+    return summary_rows, profile
 
 def run(req):
     df = load_table(req["dataPath"])
@@ -2148,12 +3003,19 @@ def run(req):
             if method == "paired-t-test":
                 stat, p = stats.ttest_rel(y1[ok], y0[ok], nan_policy="omit")
                 diff = y1[ok] - y0[ok]
-                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "mean_difference": clean_value(diff.mean()), "sd_difference": clean_value(diff.std(ddof=1)), "statistic": clean_value(stat), "p_value": clean_value(p)}]
-                diagnostics = {"test": "paired t-test"}
+                effect = paired_difference_summary(diff, params["alpha"])
+                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), **effect, "statistic": clean_value(stat), "p_value": clean_value(p)}]
+                diagnostics = {"test": "paired t-test", "n_pairs": int(ok.sum())}
             else:
                 stat, p = stats.wilcoxon(y1[ok], y0[ok])
-                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "median_difference": clean_value((y1[ok] - y0[ok]).median()), "statistic": clean_value(stat), "p_value": clean_value(p)}]
-                diagnostics = {"test": "Wilcoxon signed-rank"}
+                diff = y1[ok] - y0[ok]
+                nonzero = diff[diff != 0]
+                abs_rank = stats.rankdata(np.abs(nonzero)) if len(nonzero) else []
+                signed_rank_sum = float(np.sum(np.sign(nonzero) * abs_rank)) if len(nonzero) else np.nan
+                rank_total = float(np.sum(abs_rank)) if len(nonzero) else np.nan
+                matched_rank_biserial = signed_rank_sum / rank_total if rank_total else np.nan
+                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "median_difference": clean_value(diff.median()), "matched_rank_biserial_correlation": clean_value(matched_rank_biserial), "statistic": clean_value(stat), "p_value": clean_value(p)}]
+                diagnostics = {"test": "Wilcoxon signed-rank", "n_pairs": int(ok.sum()), "zero_differences": int((diff == 0).sum())}
             complete = int(ok.sum())
         else:
             groups = list(data[group].unique())
@@ -2164,13 +3026,22 @@ def run(req):
             if method in ("t-test", "welch-t-test"):
                 equal_var = method == "t-test"
                 stat, p = stats.ttest_ind(y1, y0, equal_var=equal_var, nan_policy="omit")
-                pooled = math.sqrt(((len(y0)-1)*y0.var(ddof=1) + (len(y1)-1)*y1.var(ddof=1)) / max(1, len(y0)+len(y1)-2))
-                estimates = [{"term": str(group), "group_a": clean_value(groups[0]), "group_b": clean_value(groups[1]), "n_a": len(y0), "n_b": len(y1), "mean_a": clean_value(y0.mean()), "mean_b": clean_value(y1.mean()), "mean_difference": clean_value(y1.mean() - y0.mean()), "cohen_d": clean_value((y1.mean() - y0.mean()) / pooled if pooled else None), "statistic": clean_value(stat), "p_value": clean_value(p)}]
-                diagnostics = {"test": "two-sample t-test", "equal_variance_assumed": equal_var, "levene_p_value": clean_value(stats.levene(y0, y1)[1]) if len(y0) > 1 and len(y1) > 1 else None}
+                effect = two_sample_summary(y0, y1, equal_var, params["alpha"])
+                estimates = [{"term": str(group), "group_a": clean_value(groups[0]), "group_b": clean_value(groups[1]), "n_a": len(y0), "n_b": len(y1), "mean_a": clean_value(y0.mean()), "mean_b": clean_value(y1.mean()), **effect, "statistic": clean_value(stat), "p_value": clean_value(p)}]
+                diagnostics = {
+                    "test": "two-sample t-test",
+                    "equal_variance_assumed": equal_var,
+                    "group_counts": {str(groups[0]): int(len(y0)), str(groups[1]): int(len(y1))},
+                    "sd_a": clean_value(y0.std(ddof=1)),
+                    "sd_b": clean_value(y1.std(ddof=1)),
+                    "variance_ratio": effect.get("variance_ratio"),
+                    "levene_p_value": clean_value(stats.levene(y0, y1)[1]) if len(y0) > 1 and len(y1) > 1 else None,
+                }
             else:
                 stat, p = stats.mannwhitneyu(y1, y0, alternative="two-sided")
-                estimates = [{"term": str(group), "group_a": clean_value(groups[0]), "group_b": clean_value(groups[1]), "n_a": len(y0), "n_b": len(y1), "median_a": clean_value(y0.median()), "median_b": clean_value(y1.median()), "statistic": clean_value(stat), "p_value": clean_value(p)}]
-                diagnostics = {"test": "Mann-Whitney U", "ties_possible": True}
+                rank_biserial = (2 * float(stat) / max(1, len(y0) * len(y1))) - 1
+                estimates = [{"term": str(group), "group_a": clean_value(groups[0]), "group_b": clean_value(groups[1]), "n_a": len(y0), "n_b": len(y1), "median_a": clean_value(y0.median()), "median_b": clean_value(y1.median()), "median_difference": clean_value(y1.median() - y0.median()), "rank_biserial_correlation": clean_value(rank_biserial), "statistic": clean_value(stat), "p_value": clean_value(p)}]
+                diagnostics = {"test": "Mann-Whitney U", "ties_possible": True, "group_counts": {str(groups[0]): int(len(y0)), str(groups[1]): int(len(y1))}}
             complete = int(len(y0) + len(y1))
             figures.append(save_fig(out_dir, "group-distribution.png", "Outcome Distribution By Group", "Boxplot of the numeric outcome by comparison group.", [outcome, group], lambda: data.boxplot(column=outcome, by=group, grid=False), group, outcome))
     elif method in ("anova", "ancova", "kruskal-wallis"):
@@ -2221,8 +3092,14 @@ def run(req):
             if table.shape != (2, 2):
                 raise ValueError("McNemar test requires a paired 2x2 table.")
             result = sm_mcnemar(table.to_numpy(), exact=False, correction=True)
-            estimates = [{"term": str(exposure), "statistic": clean_value(result.statistic), "p_value": clean_value(result.pvalue)}]
-            diagnostics = {"test": "McNemar", "table": table.to_dict()}
+            arr = np.asarray(table, dtype=float)
+            discordant_01 = float(arr[0, 1])
+            discordant_10 = float(arr[1, 0])
+            matched_or = (discordant_01 + 0.5) / (discordant_10 + 0.5)
+            se_log = math.sqrt((1 / (discordant_01 + 0.5)) + (1 / (discordant_10 + 0.5)))
+            z = float(stats.norm.ppf(1 - params["alpha"] / 2))
+            estimates = [{"term": str(exposure), "statistic": clean_value(result.statistic), "p_value": clean_value(result.pvalue), "matched_odds_ratio": clean_value(matched_or), "or_ci_low": clean_value(math.exp(math.log(matched_or) - z * se_log)), "or_ci_high": clean_value(math.exp(math.log(matched_or) + z * se_log)), "discordant_01": clean_value(discordant_01), "discordant_10": clean_value(discordant_10), "ci_level": confidence_level(params["alpha"])}]
+            diagnostics = {"test": "McNemar", "table": table.to_dict(), "discordant_pairs": clean_value(discordant_01 + discordant_10), "continuity_correction_used": True}
         elif method == "cochran-armitage-trend":
             if table.shape[1] != 2:
                 raise ValueError("Cochran-Armitage trend test requires a binary outcome.")
@@ -2236,21 +3113,25 @@ def run(req):
             denominator = math.sqrt(p_hat * (1 - p_hat) * np.sum(totals * (scores - score_mean) ** 2))
             z = numerator / denominator if denominator else np.nan
             p = 2 * (1 - stats.norm.cdf(abs(z))) if not pd.isna(z) else np.nan
-            estimates = [{"term": str(exposure), "z_statistic": clean_value(z), "p_value": clean_value(p), "groups": int(len(ordered))}]
-            diagnostics = {"test": "Cochran-Armitage trend", "ordered_groups": [clean_value(v) for v in ordered], "table": table.to_dict()}
+            slope_proxy = numerator / np.sum(totals * (scores - score_mean) ** 2) if np.sum(totals * (scores - score_mean) ** 2) else np.nan
+            estimates = [{"term": str(exposure), "trend_z_statistic": clean_value(z), "p_value": clean_value(p), "groups": int(len(ordered)), "risk_slope_per_score": clean_value(slope_proxy), "outcome_positive_level": clean_value(table.columns[1])}]
+            diagnostics = {"test": "Cochran-Armitage trend", "ordered_groups": [clean_value(v) for v in ordered], "table": table.to_dict(), "group_totals": [clean_value(v) for v in totals], "group_successes": [clean_value(v) for v in successes]}
         elif method == "fisher-exact":
             if table.shape != (2, 2):
                 raise ValueError("Fisher exact test requires a 2x2 table.")
             odds, p = stats.fisher_exact(table.to_numpy())
-            estimates = [{"term": str(exposure), "odds_ratio": clean_value(odds), "p_value": clean_value(p)}]
-            diagnostics = {"test": "Fisher exact", "table": table.to_dict()}
+            effects = two_by_two_effects(table, params["alpha"])
+            effects["fisher_exact_odds_ratio"] = clean_value(odds)
+            estimates = [{"term": str(exposure), **effects, "p_value": clean_value(p)}]
+            diagnostics = {"test": "Fisher exact", "table": table.to_dict(), "two_by_two_effects": bool(effects)}
         else:
             chi2, p, dof, expected = stats.chi2_contingency(table)
             if np.any(expected < 5):
                 warnings.append("At least one expected cell count is below 5; consider Fisher/exact or sparse-cell policy.")
                 issues.append({"severity": "warning", "code": "SPARSE_EXPECTED_CELL", "message": "At least one expected cell count is below 5.", "evidenceRefs": ["expected_counts"]})
-            estimates = [{"term": str(exposure), "chi_square": clean_value(chi2), "degrees_of_freedom": int(dof), "p_value": clean_value(p), "cramers_v": cramers_v(table)}]
-            diagnostics = {"test": "Chi-square independence", "table": table.to_dict(), "min_expected": clean_value(np.min(expected))}
+            effects = two_by_two_effects(table, params["alpha"]) if table.shape == (2, 2) else {}
+            estimates = [{"term": str(exposure), "chi_square": clean_value(chi2), "degrees_of_freedom": int(dof), "p_value": clean_value(p), "cramers_v": cramers_v(table), **effects}]
+            diagnostics = {"test": "Chi-square independence", "table": table.to_dict(), "expected_counts": clean_value(expected.tolist()), "min_expected": clean_value(np.min(expected)), "two_by_two_effects": bool(effects)}
         complete = int(data.shape[0])
         figures.append(save_fig(out_dir, "contingency-heatmap.png", "Contingency Table", "Observed counts for the categorical association test.", [outcome, exposure], lambda: (plt.imshow(table.to_numpy(), aspect="auto"), plt.xticks(range(len(table.columns)), [str(c) for c in table.columns]), plt.yticks(range(len(table.index)), [str(i) for i in table.index]), plt.colorbar(label="Count")), exposure, outcome))
     elif method in ("pearson", "spearman", "kendall", "partial-correlation"):
@@ -2265,10 +3146,13 @@ def run(req):
         ok = x.notna() & y.notna()
         if method == "pearson":
             r, p = stats.pearsonr(x[ok], y[ok])
+            ci_method = "Fisher z confidence interval"
         elif method == "spearman":
             r, p = stats.spearmanr(x[ok], y[ok])
+            ci_method = "Fisher z confidence interval on rank correlation approximation"
         elif method == "kendall":
             r, p = stats.kendalltau(x[ok], y[ok])
+            ci_method = "Fisher z confidence interval on Kendall tau approximation"
         else:
             if sm is None:
                 raise ValueError("statsmodels is required for partial correlation.")
@@ -2278,8 +3162,10 @@ def run(req):
             y_res = sm.OLS(pd.to_numeric(aligned[outcome], errors="coerce"), sm.add_constant(cov, has_constant="add")).fit().resid
             r, p = stats.pearsonr(x_res, y_res)
             ok = pd.Series(True, index=cov.index)
-        estimates = [{"term": str(exposure), "correlation": clean_value(r), "p_value": clean_value(p), "n": int(ok.sum()), "adjusted_for": ", ".join(covariates) if method == "partial-correlation" else ""}]
-        diagnostics = {"test": method, "n": int(ok.sum())}
+            ci_method = "Fisher z confidence interval on residualized Pearson correlation"
+        ci_low, ci_high = fisher_z_ci(r, int(ok.sum()), params["alpha"])
+        estimates = [{"term": str(exposure), "correlation": clean_value(r), "ci_low": ci_low, "ci_high": ci_high, "ci_level": confidence_level(params["alpha"]), "p_value": clean_value(p), "n": int(ok.sum()), "adjusted_for": ", ".join(covariates) if method == "partial-correlation" else ""}]
+        diagnostics = {"test": method, "n": int(ok.sum()), "ci_method": ci_method, "ci_available": bool(ci_low is not None and ci_high is not None)}
         complete = int(ok.sum())
         figures.append(save_fig(out_dir, "correlation-scatter.png", "Correlation Scatterplot", "Scatterplot for the two variables used in the correlation run.", [outcome, exposure], lambda: plt.scatter(x[ok], y[ok], alpha=0.6), exposure, outcome))
     elif method == "diagnostic-accuracy":
@@ -2671,15 +3557,15 @@ def run(req):
                 rows = km_curve(data[time_col], data[event_col], data[group] if group else None)
                 curve_path = os.path.join(out_dir, "kaplan-meier-curve.csv")
                 write_csv(curve_path, rows)
-                estimates = [{"term": str(g), "time": clean_value(max([r["time"] for r in rows if r["group"] == g], default=None)), "survival": clean_value([r for r in rows if r["group"] == g][-1]["survival"] if [r for r in rows if r["group"] == g] else None)} for g in sorted(set(r["group"] for r in rows), key=str)]
+                estimates = km_final_summary(rows)
                 ev = event_indicator(data[event_col])
-                diagnostics = {"test": "Kaplan-Meier", "curve_path": curve_path, "groups": sorted(set(r["group"] for r in rows), key=str), "events": int(ev.sum()), "censored": int((ev == 0).sum())}
+                diagnostics = {"test": "Kaplan-Meier", "curve_path": curve_path, "groups": sorted(set(r["group"] for r in rows), key=str), "events": int(ev.sum()), "censored": int((ev == 0).sum()), "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max()), "group_summary": survival_group_summary(data[time_col], data[event_col], data[group] if group else None), "ci_method": "Greenwood normal approximation", "artifacts": {"survival_curve": curve_path}}
                 figures.append(save_fig(out_dir, "kaplan-meier.png", "Kaplan-Meier Survival Curve", "Estimated survival curves by group.", variables, lambda: [plt.step([r["time"] for r in rows if r["group"] == g], [r["survival"] for r in rows if r["group"] == g], where="post", label=str(g)) for g in sorted(set(r["group"] for r in rows), key=str)] and plt.legend(title=group or "Group"), "Time", "Survival probability"))
             elif method == "log-rank":
                 result = logrank_two_group(data[time_col], data[event_col], data[group])
                 estimates = [{"term": str(group), **result}]
                 ev = event_indicator(data[event_col])
-                diagnostics = {"test": "log-rank", "groups": list(data[group].dropna().unique()), "events": int(ev.sum()), "censored": int((ev == 0).sum())}
+                diagnostics = {"test": "log-rank", "groups": list(data[group].dropna().unique()), "events": int(ev.sum()), "censored": int((ev == 0).sum()), "group_summary": survival_group_summary(data[time_col], data[event_col], data[group]), "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max())}
             elif method in ("cox-proportional-hazards", "stratified-cox"):
                 if PHReg is None:
                     raise ValueError("statsmodels PHReg is required for Cox models.")
@@ -2694,20 +3580,24 @@ def run(req):
                     est = model.params[i]
                     estimates.append({"term": str(term), "log_hazard_ratio": clean_value(est), "hazard_ratio": clean_value(safe_exp(est)), "ci_low": clean_value(safe_exp(ci[i][0])), "ci_high": clean_value(safe_exp(ci[i][1])), "p_value": clean_value(model.pvalues[i])})
                 event_count = int(event_indicator(data[event_col]).sum())
-                diagnostics = {"test": method, "events": event_count, "n_predictors": int(x.shape[1]), "events_per_predictor": clean_value(event_count / max(1, int(x.shape[1]))), "strata": strata_col, "proportional_hazards_check": "not_available"}
+                risk_score = pd.Series(np.dot(np.asarray(x, dtype=float), np.asarray(model.params, dtype=float)), index=data.index)
+                c_index, comparable_pairs = harrell_c_index(data[time_col], data[event_col], risk_score)
+                diagnostics = {"test": method, "events": event_count, "censored": int((event_indicator(data[event_col]) == 0).sum()), "n_predictors": int(x.shape[1]), "events_per_predictor": clean_value(event_count / max(1, int(x.shape[1]))), "strata": strata_col, "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max()), "tied_event_times": tied_event_time_count(data[time_col], data[event_col]), "harrell_c_index": c_index, "concordance_comparable_pairs": comparable_pairs, "proportional_hazards_check": "not_available"}
             elif method == "aalen-johansen-cif":
                 rows = cif_curve(data[time_col], data[event_col], event_of_interest=1, group=data[group] if group else None)
                 curve_path = os.path.join(out_dir, "cumulative-incidence.csv")
                 write_csv(curve_path, rows)
-                estimates = [{"term": str(g), "final_cumulative_incidence": clean_value([r for r in rows if r["group"] == g][-1]["cumulative_incidence"] if [r for r in rows if r["group"] == g] else None)} for g in sorted(set(r["group"] for r in rows), key=str)]
+                estimates = [{"term": str(g), "final_cumulative_incidence": clean_value([r for r in rows if r["group"] == g][-1]["cumulative_incidence"] if [r for r in rows if r["group"] == g] else None), "last_at_risk": int([r for r in rows if r["group"] == g][-1]["at_risk"] if [r for r in rows if r["group"] == g] else 0), "target_events": int(sum(r.get("target_events", 0) for r in rows if r["group"] == g)), "all_events": int(sum(r.get("all_events", 0) for r in rows if r["group"] == g))} for g in sorted(set(r["group"] for r in rows), key=str)]
                 event_codes = pd.Series(data[event_col]).dropna()
-                diagnostics = {"test": "Aalen-Johansen cumulative incidence", "curve_path": curve_path, "event_of_interest_code": 1, "events": int((event_codes == 1).sum()), "competing_events": int(((event_codes != 0) & (event_codes != 1)).sum()), "event_codes": [clean_value(v) for v in sorted(event_codes.unique())]}
+                any_event = pd.to_numeric(data[event_col], errors="coerce").map(lambda value: np.nan if pd.isna(value) else int(value != 0))
+                diagnostics = {"test": "Aalen-Johansen cumulative incidence", "curve_path": curve_path, "event_of_interest_code": 1, "events": int((event_codes == 1).sum()), "censored": int((event_codes == 0).sum()), "competing_events": int(((event_codes != 0) & (event_codes != 1)).sum()), "event_codes": [clean_value(v) for v in sorted(event_codes.unique())], "group_summary": survival_group_summary(data[time_col], any_event, data[group] if group else None), "artifacts": {"cumulative_incidence_curve": curve_path}}
                 figures.append(save_fig(out_dir, "cumulative-incidence.png", "Cumulative Incidence", "Nonparametric cumulative incidence for event code 1 with other nonzero codes treated as competing events.", variables, lambda: [plt.step([r["time"] for r in rows if r["group"] == g], [r["cumulative_incidence"] for r in rows if r["group"] == g], where="post", label=str(g)) for g in sorted(set(r["group"] for r in rows), key=str)] and plt.legend(title=group or "Group"), "Time", "Cumulative incidence"))
             else:
                 denom_time = pd.to_numeric(data[time_col], errors="coerce").sum()
                 events = event_indicator(data[event_col]).sum()
-                estimates = [{"term": "event_rate", "events": clean_value(events), "person_time": clean_value(denom_time), "rate": safe_divide(events, denom_time)}]
-                diagnostics = {"test": "recurrent event rate", "id": id_col, "events": int(events), "person_time": clean_value(denom_time), "unique_subjects": int(data[id_col].nunique()) if id_col else None}
+                rate_low, rate_high = poisson_rate_interval(events, denom_time, params["alpha"])
+                estimates = [{"term": "event_rate", "events": clean_value(events), "person_time": clean_value(denom_time), "rate": safe_divide(events, denom_time), "rate_ci_low": rate_low, "rate_ci_high": rate_high, "ci_level": confidence_level(params["alpha"])}]
+                diagnostics = {"test": "recurrent event rate", "id": id_col, "events": int(events), "censored": int((event_indicator(data[event_col]) == 0).sum()), "person_time": clean_value(denom_time), "unique_subjects": int(data[id_col].nunique()) if id_col else None, "rate_ci_method": "exact Poisson interval"}
     elif method in ("linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova"):
         outcome = req.get("outcome")
         exposure = req.get("exposure") or req.get("group")
@@ -2805,7 +3695,20 @@ def run(req):
             balance, den = balance_rows(x_cov, data["_t"], weights)
             balance_path = os.path.join(out_dir, "balance.csv")
             write_csv(balance_path, balance)
-            diagnostics = {"test": method, "propensity_model": {"aic": clean_value(getattr(ps_model, "aic", None))}, "balance": balance_summary(balance), "positivity": positivity_summary(ps, data["_t"]), "artifacts": {"balance": balance_path}}
+            weights_path = os.path.join(out_dir, "causal-weights.csv")
+            pd.DataFrame({"row_index": data.index, "treatment": data["_t"], "propensity_score": ps, "weight": weights}).to_csv(weights_path, index=False)
+            overlap_path = os.path.join(out_dir, "propensity-overlap.csv")
+            write_csv(overlap_path, overlap_rows(ps, data["_t"]))
+            diagnostics = {
+                "test": method,
+                "treatment": treatment_group_summary(data, "_t"),
+                "propensity_model": {"aic": clean_value(getattr(ps_model, "aic", None)), "converged": bool(getattr(ps_model, "converged", True)), "propensity_min": clean_value(ps.min()), "propensity_max": clean_value(ps.max())},
+                "balance": balance_summary(balance),
+                "positivity": positivity_summary(ps, data["_t"]),
+                "effective_sample_size": effective_sample_size(weights),
+                "max_weight": clean_value(weights.max()),
+                "artifacts": {"balance": balance_path, "weights": weights_path, "propensity_overlap": overlap_path},
+            }
             complete = int(data.shape[0])
         elif method == "entropy-balancing":
             require_columns(df, [outcome, treatment] + covariates)
@@ -2832,8 +3735,24 @@ def run(req):
             weights.loc[~treated] = cw
             estimates = [treatment_effect_estimate(data, "_t", outcome, weights, "ATT", "entropy balancing")]
             balance, _ = balance_rows(x_cov, data["_t"], weights)
-            diagnostics = {"test": "entropy balancing", "optimized": bool(opt.success), "balance": balance_summary(balance), "artifacts": {}}
+            balance_path = os.path.join(out_dir, "balance.csv")
+            write_csv(balance_path, balance)
+            weights_path = os.path.join(out_dir, "causal-weights.csv")
+            pd.DataFrame({"row_index": data.index, "treatment": data["_t"], "weight": weights}).to_csv(weights_path, index=False)
+            pseudo_ps = pd.Series(np.where(data["_t"] == 1, 0.5, np.clip(weights / max(1.0, float(weights.max())), 1e-6, 1 - 1e-6)), index=data.index)
+            diagnostics = {
+                "test": "entropy balancing",
+                "optimized": bool(opt.success),
+                "treatment": treatment_group_summary(data, "_t"),
+                "balance": balance_summary(balance),
+                "positivity": positivity_summary(pseudo_ps, data["_t"]),
+                "effective_sample_size": effective_sample_size(weights),
+                "max_weight": clean_value(weights.max()),
+                "artifacts": {"balance": balance_path, "weights": weights_path},
+            }
             complete = int(data.shape[0])
+            if not bool(opt.success):
+                issues.append({"severity": "warning", "code": "ENTROPY_BALANCING_OPTIMIZATION_WARNING", "message": "Entropy balancing optimizer did not report success; review balance diagnostics before interpretation.", "evidenceRefs": ["diagnostics.optimized"]})
         elif method in ("difference-in-differences", "event-study-did"):
             post = req.get("post") or req.get("period")
             require_columns(df, [outcome, treatment, post])
@@ -2847,7 +3766,18 @@ def run(req):
             ci = model.conf_int()
             estimates = [{"term": str(term), "estimate": clean_value(model.params[term]), "std_error": clean_value(model.bse[term]), "ci_low": clean_value(ci.loc[term, 0]), "ci_high": clean_value(ci.loc[term, 1]), "p_value": clean_value(model.pvalues[term])} for term in model.params.index]
             diagnostics = regression_diagnostics(model, sm.add_constant(pd.get_dummies(data[[treatment, post] + covariates], drop_first=True, dtype=float), has_constant="add"), pd.to_numeric(data[outcome], errors="coerce"), method)
+            tp_summary = treatment_period_summary(data, treatment, post)
+            diagnostics["treatment_period_table"] = tp_summary["table"]
+            diagnostics["treatment_period_cells"] = tp_summary["cells"]
+            diagnostics["min_treatment_period_cell_n"] = tp_summary["min_cell_n"]
+            diagnostics["treated_n"] = int((pd.to_numeric(data[treatment], errors="coerce") == 1).sum())
+            diagnostics["control_n"] = int((pd.to_numeric(data[treatment], errors="coerce") == 0).sum())
+            diagnostics["post_n"] = int((pd.to_numeric(data[post], errors="coerce") == 1).sum())
+            diagnostics["pre_n"] = int((pd.to_numeric(data[post], errors="coerce") == 0).sum())
             diagnostics["parallel_trends_review_required"] = True
+            if method == "event-study-did":
+                diagnostics["event_study_limitation"] = "This route validates DiD/event-study inputs but fits a two-period interaction model unless richer period/event-time inputs are supplied by a specialized backend."
+                issues.append({"severity": "warning", "code": "EVENT_STUDY_ROUTE_IS_TWO_PERIOD_DID", "message": "event-study-did currently records event-study design expectations but fits the bounded two-period DiD route.", "evidenceRefs": ["diagnostics.event_study_limitation"]})
             complete = int(data.shape[0])
         elif method == "interrupted-time-series":
             time_col = req.get("time") or (req.get("variables") or [None])[0]
@@ -2862,6 +3792,10 @@ def run(req):
             ci = model.conf_int()
             estimates = [{"term": str(term), "estimate": clean_value(model.params[term]), "std_error": clean_value(model.bse[term]), "ci_low": clean_value(ci.loc[term, 0]), "ci_high": clean_value(ci.loc[term, 1]), "p_value": clean_value(model.pvalues[term])} for term in model.params.index]
             diagnostics = regression_diagnostics(model, sm.add_constant(data[["_time", "_post", "_time_after"]], has_constant="add"), pd.to_numeric(data[outcome], errors="coerce"), method)
+            diagnostics["pre_period_observations"] = int((data["_post"] == 0).sum())
+            diagnostics["post_period_observations"] = int((data["_post"] == 1).sum())
+            diagnostics["unique_time_points"] = int(data["_time"].nunique())
+            diagnostics["hac_maxlags"] = 1
             complete = int(data.shape[0])
         elif method == "regression-discontinuity":
             running = req.get("runningVariable")
@@ -2877,6 +3811,12 @@ def run(req):
             estimates = [{"term": str(term), "estimate": clean_value(model.params[term]), "std_error": clean_value(model.bse[term]), "ci_low": clean_value(ci.loc[term, 0]), "ci_high": clean_value(ci.loc[term, 1]), "p_value": clean_value(model.pvalues[term])} for term in model.params.index]
             diagnostics = regression_diagnostics(model, x, pd.to_numeric(data[outcome], errors="coerce"), method)
             diagnostics["cutoff"] = cutoff
+            diagnostics["below_cutoff_n"] = int((data["_running_centered"] < 0).sum())
+            diagnostics["above_cutoff_n"] = int((data["_running_centered"] >= 0).sum())
+            diagnostics["running_min"] = clean_value(data["_running_centered"].min())
+            diagnostics["running_max"] = clean_value(data["_running_centered"].max())
+            diagnostics["bandwidth_rule"] = "global linear local-design approximation; use specialized RDD bandwidth selection before publication-grade claims"
+            issues.append({"severity": "warning", "code": "RDD_BANDWIDTH_REVIEW_REQUIRED", "message": "Regression discontinuity route uses a bounded global linear approximation; bandwidth and manipulation diagnostics require review.", "evidenceRefs": ["diagnostics.bandwidth_rule"]})
             complete = int(data.shape[0])
         else:
             instrument = req.get("instrument")
@@ -2890,25 +3830,40 @@ def run(req):
             second = sm.OLS(pd.to_numeric(data[outcome], errors="coerce"), second_x).fit(cov_type="HC1")
             ci = second.conf_int()
             estimates = [{"term": str(term), "estimate": clean_value(second.params[term]), "std_error": clean_value(second.bse[term]), "ci_low": clean_value(ci.loc[term, 0]), "ci_high": clean_value(ci.loc[term, 1]), "p_value": clean_value(second.pvalues[term])} for term in second.params.index]
-            diagnostics = {"test": "2SLS", "first_stage_f_statistic": clean_value(float(first.fvalue) if first.fvalue is not None else None), "instrument": instrument, "exclusion_restriction_review_required": True}
+            diagnostics = {"test": "2SLS", "first_stage_f_statistic": clean_value(float(first.fvalue) if first.fvalue is not None else None), "first_stage_r_squared": clean_value(first.rsquared), "instrument": instrument, "exclusion_restriction_review_required": True, "endogenous_treatment": treatment, "covariates": covariates}
+            if first.fvalue is not None and float(first.fvalue) < 10:
+                issues.append({"severity": "warning", "code": "WEAK_INSTRUMENT_WARNING", "message": "First-stage F statistic is below the common rule-of-thumb threshold of 10.", "evidenceRefs": ["diagnostics.first_stage_f_statistic"]})
             complete = int(data.shape[0])
     elif method in ("prediction-evaluation", "missingness-summary", "multiple-imputation-mice", "missingness-ipw", "complete-case-sensitivity", "mnar-sensitivity", "model-diagnostics", "reliability-kappa", "intraclass-correlation", "cronbach-alpha", "pca", "clustering-validation", "bland-altman", "multiple-comparison-correction", "power-sample-size"):
         variables = req.get("variables") or [c for c in [req.get("outcome"), req.get("exposure"), req.get("group")] + (req.get("covariates") or []) if c]
         require_columns(df, variables)
         data = df[variables].copy()
         complete = int(data.dropna().shape[0])
+        missing_rows, missing_profile = missingness_profile(data, variables, out_dir)
         if method == "missingness-summary":
-            estimates = [{"term": col, "missing": int(data[col].isna().sum()), "non_missing": int(data[col].notna().sum()), "missing_fraction": clean_value(data[col].isna().mean())} for col in variables]
-            diagnostics = {"test": method, "complete_case_n": complete, "input_rows": int(data.shape[0])}
+            estimates = missing_rows
+            diagnostics = {"test": method, **missing_profile}
             figures.append(save_fig(out_dir, "missingness-bar.png", "Missingness By Variable", "Fraction missing by variable.", variables, lambda: plt.bar([r["term"] for r in estimates], [r["missing_fraction"] for r in estimates]), "Variable", "Fraction missing"))
+            figures.append(save_fig(out_dir, "missingness-heatmap.png", "Missingness Pattern Heatmap", "Rows by selected variables, with darker cells indicating missing values.", variables, lambda: plt.imshow(data[variables].isna().astype(int).to_numpy(), aspect="auto", interpolation="nearest"), "Variable index", "Row index"))
+            if missing_profile["max_missing_fraction"] is not None and missing_profile["max_missing_fraction"] > 0.5:
+                issues.append({"severity": "warning", "code": "HIGH_VARIABLE_MISSINGNESS", "message": "At least one selected variable is missing in more than half of rows.", "evidenceRefs": ["diagnostics.max_missing_fraction"]})
+            if missing_profile["mechanism_screen"]["associations_below_0_05"] > 0:
+                issues.append({"severity": "warning", "code": "MISSINGNESS_ASSOCIATED_WITH_OBSERVED_DATA", "message": "Missingness is associated with at least one observed variable in the deterministic screen; complete-case analysis may be biased.", "evidenceRefs": ["diagnostics.mechanism_screen"]})
         elif method == "multiple-imputation-mice":
             numeric = data.apply(pd.to_numeric, errors="coerce")
-            imputed = IterativeImputer(random_state=1, max_iter=10).fit_transform(numeric)
+            all_missing = [col for col in variables if numeric[col].notna().sum() == 0]
+            usable = [col for col in variables if col not in all_missing]
+            if not usable:
+                raise ValueError("No numeric variables are available for MICE-style imputation.")
+            imputer = IterativeImputer(random_state=1, max_iter=10, sample_posterior=False)
+            imputed = imputer.fit_transform(numeric[usable])
             imputed_path = os.path.join(out_dir, "imputed-data.csv")
-            pd.DataFrame(imputed, columns=variables).to_csv(imputed_path, index=False)
-            estimates = [{"term": col, "missing_before": int(data[col].isna().sum()), "imputed_values": int(data[col].isna().sum())} for col in variables]
-            diagnostics = {"test": "MICE-style iterative imputation", "imputed_data": imputed_path, "assumption": "MAR sensitivity required"}
+            pd.DataFrame(imputed, columns=usable).to_csv(imputed_path, index=False)
+            estimates = [{"term": col, "missing_before": int(data[col].isna().sum()), "imputed_values": int(numeric[col].isna().sum()), "included_in_imputation": col in usable} for col in variables]
+            diagnostics = {"test": "MICE-style iterative imputation", **missing_profile, "imputed_data": imputed_path, "assumption": "MAR sensitivity required", "imputation_metadata": {"numeric_only": True, "included_variables": usable, "excluded_all_missing_or_nonnumeric": all_missing, "iterations": int(getattr(imputer, "n_iter_", 10)), "random_state": 1}}
             issues.append({"severity": "warning", "code": "IMPUTATION_ASSUMPTION_REVIEW", "message": "Multiple imputation relies on MAR/model assumptions; compare against complete-case and sensitivity analyses.", "evidenceRefs": ["imputed-data.csv"]})
+            if all_missing:
+                issues.append({"severity": "warning", "code": "IMPUTATION_DROPPED_NONNUMERIC_OR_ALL_MISSING", "message": "Some requested variables could not be included in numeric MICE-style imputation.", "evidenceRefs": ["diagnostics.imputation_metadata"]})
         elif method == "missingness-ipw":
             outcome = req.get("outcome") or variables[0]
             covariates = req.get("covariates") or [c for c in variables if c != outcome]
@@ -2921,8 +3876,13 @@ def run(req):
             p_obs = pd.Series(model.predict(x), index=model_data.index).clip(1e-6, 1)
             weights_path = os.path.join(out_dir, "missingness-ipw.csv")
             pd.DataFrame({"row_index": model_data.index, "observed": model_data["_observed"], "prob_observed": p_obs, "ipw": 1 / p_obs}).to_csv(weights_path, index=False)
-            estimates = [{"term": outcome, "observed_fraction": clean_value(frame["_observed"].mean()), "max_ipw": clean_value((1 / p_obs).max())}]
-            diagnostics = {"test": method, "weights": weights_path}
+            max_ipw = float((1 / p_obs).max())
+            estimates = [{"term": outcome, "observed_fraction": clean_value(frame["_observed"].mean()), "min_prob_observed": clean_value(p_obs.min()), "max_ipw": clean_value(max_ipw), "effective_sample_size": effective_sample_size(1 / p_obs)}]
+            diagnostics = {"test": method, **missing_profile, "weights": weights_path, "observed_fraction": clean_value(frame["_observed"].mean()), "min_prob_observed": clean_value(p_obs.min()), "max_ipw": clean_value(max_ipw), "effective_sample_size": effective_sample_size(1 / p_obs), "model": {"aic": clean_value(getattr(model, "aic", None)), "covariates": covariates}}
+            if max_ipw > 25:
+                issues.append({"severity": "blocker", "code": "MISSINGNESS_IPW_EXTREME_WEIGHTS", "message": "Missingness IPW produced extreme weights; revise missingness model or truncate weights before inference.", "evidenceRefs": ["diagnostics.max_ipw"]})
+            elif max_ipw > 10:
+                issues.append({"severity": "warning", "code": "MISSINGNESS_IPW_HIGH_WEIGHTS", "message": "Missingness IPW produced high weights; review positivity and consider truncation.", "evidenceRefs": ["diagnostics.max_ipw"]})
         elif method in ("complete-case-sensitivity", "mnar-sensitivity"):
             outcome = req.get("outcome") or variables[0]
             numeric = pd.to_numeric(data[outcome], errors="coerce")
@@ -2930,10 +3890,14 @@ def run(req):
             scenarios = [-1, -0.5, 0, 0.5, 1] if method == "mnar-sensitivity" else [0]
             sd = numeric.dropna().std(ddof=1)
             estimates = []
+            complete_case_mean = pd.to_numeric(data.dropna()[outcome], errors="coerce").mean() if outcome in data.columns and data.dropna().shape[0] else np.nan
+            if method == "complete-case-sensitivity":
+                estimates.append({"term": "available_outcome", "mean": clean_value(observed_mean), "n": int(numeric.notna().sum()), "assumption": "uses all non-missing outcome values"})
+                estimates.append({"term": "complete_case_all_selected_variables", "mean": clean_value(complete_case_mean), "n": int(data.dropna().shape[0]), "mean_difference_vs_available": clean_value(complete_case_mean - observed_mean if not pd.isna(complete_case_mean) and not pd.isna(observed_mean) else None), "assumption": "requires all selected variables observed"})
             for delta in scenarios:
                 filled = numeric.fillna(observed_mean + delta * sd)
                 estimates.append({"term": f"delta_{delta}", "mean": clean_value(filled.mean()), "assumption": "missing values shifted by delta SD from observed mean"})
-            diagnostics = {"test": method, "observed_n": int(numeric.notna().sum()), "missing_n": int(numeric.isna().sum())}
+            diagnostics = {"test": method, **missing_profile, "observed_n": int(numeric.notna().sum()), "missing_n": int(numeric.isna().sum()), "available_outcome_mean": clean_value(observed_mean), "complete_case_mean": clean_value(complete_case_mean), "outcome_sd": clean_value(sd)}
         elif method == "model-diagnostics":
             estimates = [{"term": "diagnostics-request", "status": "review_artifacts"}]
             diagnostics = {"required_diagnostics": ["residuals", "VIF/collinearity", "Cook distance", "leverage", "convergence", "overdispersion", "sparse cells/events per variable", "effect-size/CI/p-value consistency"]}
@@ -2945,8 +3909,12 @@ def run(req):
             po = np.trace(table.to_numpy()) / n
             pe = np.sum(table.sum(axis=0).to_numpy() * table.sum(axis=1).to_numpy()) / (n * n)
             kappa = (po - pe) / (1 - pe) if pe != 1 else np.nan
-            estimates = [{"term": "cohen_kappa", "kappa": clean_value(kappa), "observed_agreement": clean_value(po), "expected_agreement": clean_value(pe)}]
-            diagnostics = {"test": "Cohen kappa", "table": table.to_dict()}
+            se = math.sqrt(max(0.0, po * (1 - po) / max(1, n))) / max(1e-9, (1 - pe)) if n else np.nan
+            z = float(stats.norm.ppf(1 - params["alpha"] / 2))
+            table_path = os.path.join(out_dir, "kappa-table.csv")
+            write_csv(table_path, [{"rater_a": clean_value(idx), **{str(col): int(table.loc[idx, col]) for col in table.columns}} for idx in table.index])
+            estimates = [{"term": "cohen_kappa", "kappa": clean_value(kappa), "std_error": clean_value(se), "ci_low": clean_value(kappa - z * se if not pd.isna(se) else None), "ci_high": clean_value(kappa + z * se if not pd.isna(se) else None), "observed_agreement": clean_value(po), "expected_agreement": clean_value(pe), "n": int(n)}]
+            diagnostics = {"test": "Cohen kappa", "table": table.to_dict(), "levels_a": int(table.shape[0]), "levels_b": int(table.shape[1]), "artifacts": {"kappa_table": table_path}}
         elif method == "intraclass-correlation":
             if len(variables) < 2:
                 raise ValueError("ICC requires at least two measurement columns.")
@@ -2960,28 +3928,41 @@ def run(req):
             ms_between = ss_between / max(1, n - 1)
             ms_within = ss_within / max(1, n * (k - 1))
             icc = (ms_between - ms_within) / (ms_between + (k - 1) * ms_within)
-            estimates = [{"term": "ICC(1,k)-approx", "icc": clean_value(icc), "subjects": n, "raters_or_measures": k}]
-            diagnostics = {"test": "intraclass correlation approximate one-way random effects"}
+            estimates = [{"term": "ICC(1,k)-approx", "icc": clean_value(icc), "subjects": n, "raters_or_measures": k, "ms_between": clean_value(ms_between), "ms_within": clean_value(ms_within)}]
+            diagnostics = {"test": "intraclass correlation approximate one-way random effects", "subjects": int(n), "raters_or_measures": int(k), "ms_between": clean_value(ms_between), "ms_within": clean_value(ms_within)}
         elif method == "cronbach-alpha":
             mat = data[variables].apply(pd.to_numeric, errors="coerce").dropna()
             k = mat.shape[1]
-            alpha = k / (k - 1) * (1 - mat.var(axis=0, ddof=1).sum() / mat.sum(axis=1).var(ddof=1)) if k > 1 else np.nan
-            estimates = [{"term": "cronbach_alpha", "alpha": clean_value(alpha), "items": k, "n": int(mat.shape[0])}]
-            diagnostics = {"test": "Cronbach alpha"}
+            alpha = cronbach_alpha_for_matrix(mat)
+            item_rows = item_total_rows(mat)
+            item_path = os.path.join(out_dir, "cronbach-item-diagnostics.csv")
+            write_csv(item_path, item_rows)
+            estimates = [{"term": "cronbach_alpha", "alpha": clean_value(alpha), "items": k, "n": int(mat.shape[0]), "min_item_total_correlation": clean_value(min([row["item_total_correlation"] for row in item_rows if row["item_total_correlation"] is not None], default=None))}]
+            diagnostics = {"test": "Cronbach alpha", "items": int(k), "n": int(mat.shape[0]), "item_diagnostics": item_rows, "artifacts": {"cronbach_item_diagnostics": item_path}}
         elif method == "pca":
             mat = data[variables].apply(pd.to_numeric, errors="coerce").dropna()
             pca = PCA(n_components=min(len(variables), mat.shape[0], int(req.get("outcomeThreshold") or len(variables)))).fit(mat)
             transformed_path = os.path.join(out_dir, "pca-transformed.csv")
             pd.DataFrame(pca.transform(mat)).to_csv(transformed_path, index=False)
-            estimates = [{"term": f"PC{i+1}", "explained_variance_ratio": clean_value(v)} for i, v in enumerate(pca.explained_variance_ratio_)]
-            diagnostics = {"test": "PCA", "transformed": transformed_path, "components": pca.components_.tolist()}
+            loadings_path = os.path.join(out_dir, "pca-loadings.csv")
+            loadings_rows = []
+            for component_index, component in enumerate(pca.components_):
+                for variable, loading in zip(variables, component):
+                    loadings_rows.append({"component": f"PC{component_index + 1}", "variable": variable, "loading": clean_value(loading)})
+            write_csv(loadings_path, loadings_rows)
+            cumulative = np.cumsum(pca.explained_variance_ratio_)
+            estimates = [{"term": f"PC{i+1}", "explained_variance_ratio": clean_value(v), "cumulative_explained_variance": clean_value(cumulative[i])} for i, v in enumerate(pca.explained_variance_ratio_)]
+            diagnostics = {"test": "PCA", "transformed": transformed_path, "loadings": loadings_path, "components": pca.components_.tolist(), "n_components": int(len(pca.explained_variance_ratio_)), "cumulative_explained_variance": clean_value(cumulative[-1] if len(cumulative) else None), "artifacts": {"pca_transformed": transformed_path, "pca_loadings": loadings_path}}
             figures.append(save_fig(out_dir, "pca-scree.png", "PCA Scree Plot", "Explained variance ratio by component.", variables, lambda: plt.plot(range(1, len(pca.explained_variance_ratio_) + 1), pca.explained_variance_ratio_, marker="o"), "Principal component", "Explained variance ratio"))
         elif method == "clustering-validation":
             mat = data[variables].apply(pd.to_numeric, errors="coerce").dropna()
             k = int(req.get("outcomeThreshold") or 3)
             labels = KMeans(n_clusters=k, random_state=1, n_init=10).fit_predict(mat)
-            estimates = [{"term": "kmeans", "clusters": k, "silhouette": clean_value(silhouette_score(mat, labels) if k > 1 else None), "davies_bouldin": clean_value(davies_bouldin_score(mat, labels) if k > 1 else None), "calinski_harabasz": clean_value(calinski_harabasz_score(mat, labels) if k > 1 else None)}]
-            diagnostics = {"test": "clustering validation", "cluster_counts": pd.Series(labels).value_counts().to_dict()}
+            labels_path = os.path.join(out_dir, "cluster-labels.csv")
+            pd.DataFrame({"row_index": mat.index, "cluster": labels}).to_csv(labels_path, index=False)
+            counts = pd.Series(labels).value_counts().sort_index()
+            estimates = [{"term": "kmeans", "clusters": k, "silhouette": clean_value(silhouette_score(mat, labels) if k > 1 else None), "davies_bouldin": clean_value(davies_bouldin_score(mat, labels) if k > 1 else None), "calinski_harabasz": clean_value(calinski_harabasz_score(mat, labels) if k > 1 else None), "min_cluster_size": int(counts.min())}]
+            diagnostics = {"test": "clustering validation", "cluster_counts": counts.to_dict(), "min_cluster_size": int(counts.min()), "max_cluster_size": int(counts.max()), "artifacts": {"cluster_labels": labels_path}}
         elif method == "bland-altman":
             if len(variables) < 2:
                 raise ValueError("Bland-Altman requires two measurement variables.")
@@ -2991,10 +3972,15 @@ def run(req):
             diff = a[ok] - b[ok]
             mean = (a[ok] + b[ok]) / 2
             bias = diff.mean()
-            loa_low = bias - 1.96 * diff.std(ddof=1)
-            loa_high = bias + 1.96 * diff.std(ddof=1)
-            estimates = [{"term": "bland_altman", "bias": clean_value(bias), "loa_low": clean_value(loa_low), "loa_high": clean_value(loa_high), "n": int(ok.sum())}]
-            diagnostics = {"test": "Bland-Altman agreement"}
+            sd_diff = diff.std(ddof=1)
+            loa_low = bias - 1.96 * sd_diff
+            loa_high = bias + 1.96 * sd_diff
+            se_bias = sd_diff / math.sqrt(max(1, int(ok.sum())))
+            z = float(stats.norm.ppf(1 - params["alpha"] / 2))
+            ba_path = os.path.join(out_dir, "bland-altman-source.csv")
+            pd.DataFrame({"mean": mean, "difference": diff}).to_csv(ba_path, index=False)
+            estimates = [{"term": "bland_altman", "bias": clean_value(bias), "bias_ci_low": clean_value(bias - z * se_bias), "bias_ci_high": clean_value(bias + z * se_bias), "sd_difference": clean_value(sd_diff), "loa_low": clean_value(loa_low), "loa_high": clean_value(loa_high), "n": int(ok.sum())}]
+            diagnostics = {"test": "Bland-Altman agreement", "artifacts": {"bland_altman_source": ba_path}}
             figures.append(save_fig(out_dir, "bland-altman.png", "Bland-Altman Plot", "Difference versus mean for two measurements.", variables[:2], lambda: plt.scatter(mean, diff, alpha=0.6), "Mean of measurements", "Difference between measurements"))
         elif method == "multiple-comparison-correction":
             pvals = pd.to_numeric(data[variables[0]], errors="coerce").dropna()
@@ -3002,18 +3988,23 @@ def run(req):
                 raise ValueError("statsmodels multipletests is required.")
             corrected = {}
             estimates = []
+            adjusted_rows = []
             for m in ["bonferroni", "holm", "fdr_bh", "fdr_by"]:
                 reject, p_adj, _, _ = multipletests(pvals, alpha=req.get("alpha", 0.05), method=m)
                 estimates.append({"term": m, "tests": int(len(pvals)), "rejected": int(reject.sum()), "min_adjusted_p": clean_value(np.min(p_adj))})
                 corrected[m] = [clean_value(v) for v in p_adj]
-            diagnostics = {"test": "multiple comparison correction", "methods": list(corrected.keys())}
+                for i, (raw_p, adj_p, keep) in enumerate(zip(pvals, p_adj, reject)):
+                    adjusted_rows.append({"test_index": int(i), "method": m, "raw_p_value": clean_value(raw_p), "adjusted_p_value": clean_value(adj_p), "reject": bool(keep)})
+            adjusted_path = os.path.join(out_dir, "adjusted-p-values.csv")
+            write_csv(adjusted_path, adjusted_rows)
+            diagnostics = {"test": "multiple comparison correction", "methods": list(corrected.keys()), "adjusted_p_values": adjusted_path, "artifacts": {"adjusted_p_values": adjusted_path}}
         elif method == "power-sample-size":
             effect = float(req.get("outcomeThreshold") if req.get("outcomeThreshold") is not None else 0.5)
             alpha = float(req.get("alpha", 0.05))
             power = float(req.get("exposureThreshold") if req.get("exposureThreshold") is not None else 0.8)
             n = TTestIndPower().solve_power(effect_size=effect, alpha=alpha, power=power) if TTestIndPower else None
-            estimates = [{"term": "two_sample_t_test_per_group", "effect_size": effect, "alpha": alpha, "power": power, "n_per_group": clean_value(n)}]
-            diagnostics = {"test": "power/sample size"}
+            estimates = [{"term": "two_sample_t_test_per_group", "effect_size": effect, "alpha": alpha, "power": power, "n_per_group": clean_value(n), "total_n": clean_value(n * 2 if n is not None else None)}]
+            diagnostics = {"test": "power/sample size", "solver": "statsmodels TTestIndPower" if TTestIndPower else "unavailable", "finite_result": bool(n is not None and np.isfinite(n))}
         else:
             outcome = req.get("outcome")
             exposure = req.get("exposure")
@@ -3021,12 +4012,66 @@ def run(req):
             y = as_binary_numeric(df[outcome])[0]
             score = pd.to_numeric(df[exposure], errors="coerce")
             ok = y.notna() & score.notna()
-            auc = roc_auc_score(y[ok], score[ok])
-            brier = brier_score_loss(y[ok], score[ok])
-            estimates = [{"term": str(exposure), "auroc": clean_value(auc), "brier_score": clean_value(brier), "n": int(ok.sum())}]
-            fpr, tpr, _ = roc_curve(y[ok], score[ok])
-            diagnostics = {"test": "prediction evaluation", "roc_points": len(fpr)}
+            y_eval = y[ok].astype(int)
+            score_eval = score[ok].astype(float)
+            score_min = float(score_eval.min())
+            score_max = float(score_eval.max())
+            score_is_probability = score_min >= 0 and score_max <= 1
+            probability_score = score_eval.clip(0, 1)
+            auc = roc_auc_score(y_eval, score_eval)
+            auprc = average_precision_score(y_eval, score_eval)
+            brier = brier_score_loss(y_eval, probability_score)
+            fpr, tpr, roc_thresholds = roc_curve(y_eval, score_eval)
+            precision, recall, pr_thresholds = precision_recall_curve(y_eval, score_eval)
+            finite = np.isfinite(roc_thresholds)
+            youden = tpr - fpr
+            valid_indices = np.where(finite)[0]
+            best_index = int(valid_indices[np.argmax(youden[valid_indices])]) if len(valid_indices) else int(np.argmax(youden))
+            threshold = float(roc_thresholds[best_index]) if np.isfinite(roc_thresholds[best_index]) else float(score_eval.median())
+            operating = threshold_metrics(y_eval, score_eval, threshold)
+            default_operating = threshold_metrics(y_eval, probability_score, 0.5) if score_is_probability else None
+            calibration_rows = prediction_calibration_rows(y_eval, probability_score)
+            roc_path = os.path.join(out_dir, "roc-curve.csv")
+            pr_path = os.path.join(out_dir, "precision-recall-curve.csv")
+            calibration_path = os.path.join(out_dir, "calibration-bins.csv")
+            confusion_path = os.path.join(out_dir, "confusion-matrix.csv")
+            write_csv(roc_path, [{"false_positive_rate": clean_value(a), "true_positive_rate": clean_value(b), "threshold": clean_value(c)} for a, b, c in zip(fpr, tpr, roc_thresholds)])
+            write_csv(pr_path, [{"precision": clean_value(p), "recall": clean_value(r), "threshold": clean_value(pr_thresholds[i]) if i < len(pr_thresholds) else None} for i, (p, r) in enumerate(zip(precision, recall))])
+            write_csv(calibration_path, calibration_rows)
+            write_csv(confusion_path, [{"cell": "true_positive", "count": operating["true_positive"]}, {"cell": "false_positive", "count": operating["false_positive"]}, {"cell": "true_negative", "count": operating["true_negative"]}, {"cell": "false_negative", "count": operating["false_negative"]}])
+            calibration_abs_error = float(np.average([abs(row["observed_event_rate"] - row["mean_score"]) for row in calibration_rows if row["observed_event_rate"] is not None and row["mean_score"] is not None], weights=[row["n"] for row in calibration_rows if row["observed_event_rate"] is not None and row["mean_score"] is not None])) if calibration_rows else np.nan
+            estimates = [{
+                "term": str(exposure),
+                "auroc": clean_value(auc),
+                "auprc": clean_value(auprc),
+                "brier_score": clean_value(brier),
+                "calibration_mean_absolute_error": clean_value(calibration_abs_error),
+                "n": int(ok.sum()),
+                **operating,
+            }]
+            diagnostics = {
+                "test": "prediction evaluation",
+                "event_count": int(y_eval.sum()),
+                "non_event_count": int(len(y_eval) - y_eval.sum()),
+                "prevalence": clean_value(float(y_eval.mean())),
+                "score_min": clean_value(score_min),
+                "score_max": clean_value(score_max),
+                "score_is_probability_like": bool(score_is_probability),
+                "roc_points": len(fpr),
+                "pr_points": len(precision),
+                "threshold_rule": "max Youden index",
+                "threshold": clean_value(threshold),
+                "confusion_matrix": {"tp": operating["true_positive"], "fp": operating["false_positive"], "tn": operating["true_negative"], "fn": operating["false_negative"]},
+                "default_threshold_0_5": default_operating,
+                "calibration_bins": len(calibration_rows),
+                "calibration_mean_absolute_error": clean_value(calibration_abs_error),
+                "artifacts": {"roc_curve": roc_path, "precision_recall_curve": pr_path, "calibration": calibration_path, "confusion_matrix": confusion_path},
+            }
+            if not score_is_probability:
+                issues.append({"severity": "warning", "code": "PREDICTION_SCORE_NOT_PROBABILITY", "message": "Prediction scores are outside [0, 1]; calibration and Brier score are score diagnostics only unless scores are calibrated probabilities.", "evidenceRefs": ["diagnostics.score_min", "diagnostics.score_max"]})
             figures.append(save_fig(out_dir, "roc-curve.png", "ROC Curve", "Receiver operating characteristic curve.", [outcome, exposure], lambda: (plt.plot(fpr, tpr), plt.plot([0, 1], [0, 1], linestyle="--", color="gray", linewidth=1)), "False positive rate", "True positive rate"))
+            figures.append(save_fig(out_dir, "precision-recall-curve.png", "Precision-Recall Curve", "Precision-recall curve for the prediction score.", [outcome, exposure], lambda: plt.plot(recall, precision), "Recall", "Precision"))
+            figures.append(save_fig(out_dir, "calibration-plot.png", "Calibration Plot", "Observed event rate by score bin.", [outcome, exposure], lambda: (plt.plot([0, 1], [0, 1], linestyle="--", color="gray", linewidth=1), plt.scatter([r["mean_score"] for r in calibration_rows], [r["observed_event_rate"] for r in calibration_rows], s=[max(20, r["n"] * 4) for r in calibration_rows])), "Mean predicted score", "Observed event rate"))
     else:
         raise ValueError(f"Unsupported stats method: {method}")
 
@@ -3069,6 +4114,9 @@ def run(req):
             artifacts.append({"kind": "matched-pairs", "path": propensity_artifacts["matched_pairs"]})
         if propensity_artifacts.get("weights"):
             artifacts.append({"kind": "weights", "path": propensity_artifacts["weights"]})
+        for key in ["missingness_patterns", "missingness_pairwise", "missingness_mechanism", "survival_curve", "cumulative_incidence_curve", "roc_curve", "precision_recall_curve", "calibration", "confusion_matrix", "kappa_table", "cronbach_item_diagnostics", "pca_transformed", "pca_loadings", "cluster_labels", "bland_altman_source", "adjusted_p_values"]:
+            if propensity_artifacts.get(key):
+                artifacts.append({"kind": "table", "path": propensity_artifacts[key]})
     run_status = "failed" if any(item.get("severity") == "blocker" for item in issues) else "succeeded"
     return {
         "schemaVersion": 1,

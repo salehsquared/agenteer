@@ -734,7 +734,7 @@ function methodRequiresEvents(method: StatsMethod | null | undefined): boolean {
 }
 
 function requiresExposure(method: StatsMethod | null | undefined): boolean {
-  return Boolean(method && !["descriptive", "missingness-summary", "pca", "clustering-validation", "power-sample-size"].includes(method));
+  return Boolean(method && !["descriptive", "missingness-summary", "pca", "clustering-validation", "power-sample-size", "interrupted-time-series", "regression-discontinuity"].includes(method));
 }
 function requiresGroup(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["t-test", "paired-t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "wilcoxon", "kruskal-wallis", "friedman", "chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "log-rank"].includes(method));
@@ -749,7 +749,7 @@ function requiresId(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["paired-t-test", "wilcoxon", "mcnemar", "friedman", "linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova", "time-varying-cox", "recurrent-event-rate"].includes(method));
 }
 function requiresPeriod(method: StatsMethod | null | undefined): boolean {
-  return Boolean(method && ["event-study-did", "interrupted-time-series"].includes(method));
+  return method === "event-study-did";
 }
 function requiresPost(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["difference-in-differences", "event-study-did", "interrupted-time-series"].includes(method));
