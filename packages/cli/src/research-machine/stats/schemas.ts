@@ -118,7 +118,7 @@ export const statsRunRequestSchema = z.object({
 export type StatsRunRequest = z.infer<typeof statsRunRequestSchema>;
 
 export const statsArtifactSchema = z.object({
-  kind: z.enum(["config", "summary", "table", "diagnostics", "report", "qa", "balance", "propensity-scores", "propensity-overlap", "matched-pairs", "weights", "figure", "figure-manifest", "figure-qa", "imputed-data"]),
+  kind: z.enum(["config", "preflight", "preflight-report", "summary", "table", "diagnostics", "report", "qa", "balance", "propensity-scores", "propensity-overlap", "matched-pairs", "weights", "figure", "figure-manifest", "figure-qa", "imputed-data"]),
   path: z.string().min(1),
   sha256: z.string().optional(),
 });

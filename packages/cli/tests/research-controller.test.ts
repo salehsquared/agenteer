@@ -1317,7 +1317,7 @@ describe("research controller agent", () => {
         method: "linear-regression",
         outcome: "y",
         exposure: "x",
-        maxSteps: 12,
+        maxSteps: 8,
       });
       const patched = await researchControllerPatchCommand({
         statePath: result.state.statePath,

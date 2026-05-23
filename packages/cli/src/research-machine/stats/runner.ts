@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { researchFeasibilityGateCommand, renderResearchFeasibilityGateMarkdown, type FeasibilityGateResult } from "../feasibility.js";
 import { stableHash } from "../runtime.js";
 import { buildFigureQa } from "./figure-qa.js";
 import { statsRunMethodForAnalysisMethod } from "./method-map.js";
@@ -17,6 +18,8 @@ export async function runStatsMethod(rawRequest: StatsRunRequest): Promise<Stats
   const configPath = path.join(request.outDir, "stats-config.json");
   const scriptPath = path.join(await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-")), "stats_bridge.py");
   const binding = await inspectStatsBinding(request);
+  let preflight: StatsPreflightResult | null = null;
+  let preflightArtifacts: StatsArtifact[] = [];
   await writeFile(scriptPath, statsBridgeSource());
   await writeFile(configPath, `${JSON.stringify(request, null, 2)}\n`);
   if (binding.issues.some(issue => issue.severity === "blocker")) {
@@ -68,6 +71,30 @@ export async function runStatsMethod(rawRequest: StatsRunRequest): Promise<Stats
     await writeFile(path.join(request.outDir, "stats-run.json"), `${JSON.stringify(failed, null, 2)}\n`);
     return failed;
   }
+  preflight = await buildStatsPreflight(request);
+  preflightArtifacts = await writeStatsPreflightArtifacts(preflight, request.outDir);
+  if (preflight.status === "block") {
+    const failed = await attachHashes(await writeStatsPacketArtifacts({
+      schemaVersion: 1,
+      runId: `statsrun_${Date.now()}`,
+      method: request.method,
+      status: "failed",
+      rowCount: preflight.feasibilityGate.rowCount ?? 0,
+      completeCaseN: preflight.feasibilityGate.completeCase.completeRows ?? 0,
+      variables: variablesFor(request),
+      binding: binding.binding,
+      parameters: { preflightStatus: preflight.status, feasibilityVerdict: preflight.feasibilityGate.verdict },
+      estimates: [],
+      diagnostics: { preflight: summarizeStatsPreflight(preflight) },
+      issues: [...binding.issues, ...preflight.issues],
+      warnings: preflight.warnings,
+      errors: [`Stats preflight blocked execution: ${preflight.nextAction}`],
+      artifacts: [{ kind: "config", path: configPath }, ...preflightArtifacts],
+      outDir: request.outDir,
+    }, request));
+    await writeFile(path.join(request.outDir, "stats-run.json"), `${JSON.stringify(failed, null, 2)}\n`);
+    return failed;
+  }
   const python = request.python ?? process.env.AGENTEER_RESEARCH_PYTHON ?? path.resolve(".research-runtime/python/bin/python");
   try {
     const { stdout, stderr } = await execFileAsync(python, [scriptPath, configPath], {
@@ -79,8 +106,10 @@ export async function runStatsMethod(rawRequest: StatsRunRequest): Promise<Stats
     const result = await attachHashes(await writeStatsPacketArtifacts({
       ...parsed,
       binding: binding.binding,
-      issues: [...binding.issues, ...parsed.issues],
-      warnings: stderr.trim() ? [...parsed.warnings, stderr.trim()] : parsed.warnings,
+      diagnostics: { ...parsed.diagnostics, preflight: preflight ? summarizeStatsPreflight(preflight) : null },
+      issues: [...binding.issues, ...(preflight?.issues ?? []), ...parsed.issues],
+      warnings: stderr.trim() ? [...(preflight?.warnings ?? []), ...parsed.warnings, stderr.trim()] : [...(preflight?.warnings ?? []), ...parsed.warnings],
+      artifacts: [...preflightArtifacts, ...parsed.artifacts],
     }, request));
     await writeFile(path.join(request.outDir, "stats-run.json"), `${JSON.stringify(result, null, 2)}\n`);
     return result;
@@ -100,9 +129,9 @@ export async function runStatsMethod(rawRequest: StatsRunRequest): Promise<Stats
       estimates: [],
       diagnostics: {},
       issues: [],
-      warnings: [],
+      warnings: preflight?.warnings ?? [],
       errors: [stderr.trim() || message],
-      artifacts: [{ kind: "config", path: configPath }],
+      artifacts: [{ kind: "config", path: configPath }, ...preflightArtifacts],
       outDir: request.outDir,
     }, request);
     const hashed = await attachHashes(failed);
@@ -163,9 +192,461 @@ function issue(severity: StatsIssue["severity"], code: string, message: string, 
   return { severity, code, message, evidenceRefs };
 }
 
+type StatsPreflightStatus = "pass" | "warning" | "block";
+
+interface StatsPreflightCheck {
+  id: string;
+  status: StatsPreflightStatus;
+  detail: string;
+  evidenceRefs: string[];
+  suggestedAction?: string;
+}
+
+interface StatsPreflightResult {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  method: StatsRunRequest["method"];
+  dataPath: string;
+  status: StatsPreflightStatus;
+  feasibilityGate: FeasibilityGateResult;
+  checks: StatsPreflightCheck[];
+  issues: StatsIssue[];
+  warnings: string[];
+  nextAction: string;
+}
+
 export function normalizeStatsRunRequest(rawRequest: StatsRunRequest): StatsRunRequest {
   const parsed = statsRunRequestSchema.parse(rawRequest);
   return { ...parsed, dataPath: path.resolve(parsed.dataPath), outDir: path.resolve(parsed.outDir) };
+}
+
+async function buildStatsPreflight(request: StatsRunRequest): Promise<StatsPreflightResult> {
+  let gate: FeasibilityGateResult;
+  try {
+    gate = await researchFeasibilityGateCommand({
+      question: statsQuestionFor(request),
+      dataPath: request.dataPath,
+      method: request.method,
+      outcome: request.outcome,
+      exposure: request.exposure,
+      group: request.group,
+      time: request.time,
+      event: request.event,
+      id: request.id,
+      strata: request.strata,
+      cluster: request.cluster,
+      period: request.period,
+      post: request.post,
+      runningVariable: request.runningVariable,
+      instrument: request.instrument,
+      weight: request.weight,
+      variables: request.variables,
+      covariates: request.covariates,
+      exactCovariates: request.exactCovariates,
+      surveyDesign: request.surveyDesign,
+      allowSurveyApproximation: request.allowSurveyApproximation,
+      minRows: minimumRowsFor(request),
+      minEvents: minimumEventsFor(request),
+      maxMissingness: 0.65,
+      python: request.python,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    gate = {
+      schemaVersion: 1,
+      generatedAtIso: new Date().toISOString(),
+      question: statsQuestionFor(request),
+      verdict: "reject",
+      status: "block",
+      score: 0,
+      confidence: 0.95,
+      readinessLabel: "Data profiling failed",
+      primaryAction: "profile_data",
+      rowCount: null,
+      columnCount: null,
+      method: request.method,
+      requiredVariables: variablesFor(request),
+      variableChecks: [],
+      completeCase: { scanned: false, scannedRows: 0, completeRows: null, completeFraction: null, scanReason: "Stats preflight could not summarize the table." },
+      outcomeDiagnostics: { outcome: request.outcome ?? request.event ?? null, observedLevels: [], eventCount: null, nonEventCount: null, eventRate: null, usable: null },
+      domains: [],
+      internalReviews: [],
+      blockers: [`Unable to profile data before stats execution: ${message}`],
+      warnings: [],
+      notes: [],
+      clarifyingQuestions: [],
+      requiredModifications: ["Fix the data path or runtime used for table profiling before running statistical methods."],
+      optionalModifications: [],
+      alternativeStudyIdeas: [],
+      studyDesignAdvice: {
+        recommendedPosture: "reject",
+        methodRecommendation: "Run table profiling before method execution.",
+        estimandOrDesignWarning: null,
+        reviewerRiskSummary: "Stats preflight failed before data suitability could be assessed.",
+      },
+      evidenceRefs: [request.dataPath],
+      nextAction: "Fix data profiling before executing the statistical method.",
+      outPath: null,
+      reportPath: null,
+    };
+  }
+  const checks = [
+    ...preflightGateChecks(gate),
+    ...preflightMethodChecks(request, gate),
+    ...preflightAlternativeChecks(request, gate),
+  ];
+  const blockerChecks = checks.filter(check => check.status === "block");
+  const warningChecks = checks.filter(check => check.status === "warning");
+  const status: StatsPreflightStatus = blockerChecks.length ? "block" : warningChecks.length || gate.status !== "pass" ? "warning" : "pass";
+  const issues = checks.flatMap(check => checkToIssue(check));
+  const warnings = [
+    ...gate.warnings,
+    ...warningChecks.map(check => check.detail),
+  ];
+  return {
+    schemaVersion: 1,
+    generatedAtIso: new Date().toISOString(),
+    method: request.method,
+    dataPath: request.dataPath,
+    status,
+    feasibilityGate: gate,
+    checks,
+    issues,
+    warnings: uniqueStrings(warnings),
+    nextAction: blockerChecks[0]?.suggestedAction ?? gate.nextAction,
+  };
+}
+
+async function writeStatsPreflightArtifacts(preflight: StatsPreflightResult, outDir: string): Promise<StatsArtifact[]> {
+  const preflightPath = path.join(outDir, "stats-preflight.json");
+  const reportPath = path.join(outDir, "stats-preflight.md");
+  await writeFile(preflightPath, `${JSON.stringify({ schemaVersion: 1, statsPreflight: preflight }, null, 2)}\n`, "utf-8");
+  await writeFile(reportPath, renderStatsPreflightMarkdown(preflight), "utf-8");
+  return [
+    { kind: "preflight", path: preflightPath },
+    { kind: "preflight-report", path: reportPath },
+  ];
+}
+
+function preflightGateChecks(gate: FeasibilityGateResult): StatsPreflightCheck[] {
+  const checks: StatsPreflightCheck[] = [
+    {
+      id: "feasibility-gate-verdict",
+      status: gate.verdict === "reject" ? "block" : gate.verdict === "formal_analysis_ready" ? "pass" : "warning",
+      detail: `Feasibility gate verdict is ${gate.verdict} with score ${gate.score}.`,
+      evidenceRefs: gate.evidenceRefs,
+      suggestedAction: gate.nextAction,
+    },
+    {
+      id: "data-profile-available",
+      status: gate.rowCount === null || gate.columnCount === null ? "block" : "pass",
+      detail: gate.rowCount === null || gate.columnCount === null
+        ? "Stats execution requires a table profile before running."
+        : `Profiled ${gate.rowCount} row(s) and ${gate.columnCount} column(s).`,
+      evidenceRefs: gate.evidenceRefs,
+      suggestedAction: "Profile or repair the dataset path before executing the method.",
+    },
+  ];
+  if (gate.blockers.length) {
+    checks.push({
+      id: "feasibility-blockers",
+      status: "block",
+      detail: gate.blockers.join("; "),
+      evidenceRefs: gate.evidenceRefs,
+      suggestedAction: gate.requiredModifications[0] ?? gate.nextAction,
+    });
+  }
+  return checks;
+}
+
+function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
+  const checks: StatsPreflightCheck[] = [];
+  const completeRows = gate.completeCase.completeRows ?? gate.rowCount ?? 0;
+  const variables = variableChecksByName(gate);
+  const outcomeName = request.outcome ?? request.event ?? null;
+  const outcome = outcomeName ? variables.get(outcomeName) : null;
+  const exposure = request.exposure ? variables.get(request.exposure) : null;
+  const group = request.group ? variables.get(request.group) : null;
+  const requiredMissing = gate.variableChecks.filter(check => check.required && !check.present);
+  if (requiredMissing.length) {
+    checks.push({
+      id: "required-variables-present",
+      status: "block",
+      detail: `Missing required variable(s): ${requiredMissing.map(check => `${check.role}:${check.name}`).join(", ")}.`,
+      evidenceRefs: [request.dataPath],
+      suggestedAction: "Map variables to real columns or revise the requested method before execution.",
+    });
+  }
+  checks.push({
+    id: "complete-case-count",
+    status: completeRows < hardMinimumRowsFor(request) ? "block" : completeRows < minimumRowsFor(request) ? "warning" : "pass",
+    detail: `${completeRows} complete-case row(s) available; preferred minimum is ${minimumRowsFor(request)}.`,
+    evidenceRefs: [request.dataPath],
+    suggestedAction: "Use a simpler/descriptive analysis, broaden eligibility, or repair missingness before inference.",
+  });
+  if (outcomeName && outcome && !isNumericMethodExempt(request.method) && continuousOutcomeMethods().has(request.method) && outcome.inferredType !== "number") {
+    checks.push({
+      id: "continuous-outcome-type",
+      status: "block",
+      detail: `Method ${request.method} requires a numeric/continuous outcome, but ${outcomeName} is ${outcome.inferredType}.`,
+      evidenceRefs: [request.dataPath, outcomeName],
+      suggestedAction: "Choose a categorical method or map a numeric outcome.",
+    });
+  }
+  if (binaryOutcomeMethods().has(request.method)) {
+    const events = gate.outcomeDiagnostics.eventCount;
+    const nonEvents = gate.outcomeDiagnostics.nonEventCount;
+    if (events === null || nonEvents === null) {
+      checks.push({
+        id: "binary-outcome-levels",
+        status: "block",
+        detail: `Method ${request.method} requires a binary outcome/event, but preflight could not verify two binary levels for ${outcomeName ?? "(missing)"}.`,
+        evidenceRefs: [request.dataPath, outcomeName ?? "outcome"],
+        suggestedAction: "Recode the outcome to 0/1 or choose a method for the observed outcome type.",
+      });
+    } else if (events < minimumEventsFor(request) || nonEvents < minimumEventsFor(request)) {
+      checks.push({
+        id: "binary-event-count",
+        status: events < hardMinimumEventsFor(request) || nonEvents < hardMinimumEventsFor(request) ? "block" : "warning",
+        detail: `Binary outcome has ${events} event(s) and ${nonEvents} non-event(s); preferred minimum per class is ${minimumEventsFor(request)}.`,
+        evidenceRefs: [request.dataPath, outcomeName ?? "outcome"],
+        suggestedAction: "Broaden the endpoint/horizon, simplify predictors, or use descriptive/exact methods.",
+      });
+    }
+  }
+  if (eventDependentMethods().has(request.method)) {
+    const events = gate.outcomeDiagnostics.eventCount;
+    if (events !== null) {
+      const predictors = Math.max(1, uniqueStrings([request.exposure, request.group, ...request.covariates].filter((item): item is string => Boolean(item))).length);
+      const epv = events / predictors;
+      checks.push({
+        id: "events-per-predictor",
+        status: epv < 3 ? "block" : epv < 10 ? "warning" : "pass",
+        detail: `Approximate events per modeled predictor is ${round(epv, 2)} (${events} events / ${predictors} predictor term groups).`,
+        evidenceRefs: [request.dataPath],
+        suggestedAction: "Reduce predictors, broaden events, or use penalized/descriptive methods before formal modeling.",
+      });
+    }
+  }
+  if (groupRequiredMethods().has(request.method)) {
+    const grouping = group ?? exposure;
+    const levelCount = grouping?.sampleValues.length ?? 0;
+    if (!grouping) {
+      checks.push({
+        id: "group-variable-present",
+        status: "block",
+        detail: `${request.method} requires a group/exposure variable.`,
+        evidenceRefs: [request.dataPath],
+        suggestedAction: "Provide --group or --exposure.",
+      });
+    } else if (twoGroupMethods().has(request.method) && levelCount > 2) {
+      checks.push({
+        id: "two-group-method-levels",
+        status: "block",
+        detail: `${request.method} expects two groups, but ${grouping.name} appears to have ${levelCount} sampled level(s).`,
+        evidenceRefs: [request.dataPath, grouping.name],
+        suggestedAction: "Use ANOVA/Kruskal-Wallis or collapse to a prespecified binary contrast.",
+      });
+    } else if ((request.method === "anova" || request.method === "kruskal-wallis") && levelCount < 3) {
+      checks.push({
+        id: "multi-group-method-levels",
+        status: "warning",
+        detail: `${request.method} is usually for more than two groups; ${grouping.name} appears to have ${levelCount} sampled level(s).`,
+        evidenceRefs: [request.dataPath, grouping.name],
+        suggestedAction: "Use a two-sample test if the contrast is binary.",
+      });
+    }
+  }
+  if (backendUnavailableMethods().has(request.method)) {
+    checks.push({
+      id: "method-backend-available",
+      status: "block",
+      detail: `${request.method} requires a validated backend that is not available in this local stats runner.`,
+      evidenceRefs: ["method", request.method],
+      suggestedAction: "Route to an R/survival-specialized backend or choose a supported approximation with explicit methods review.",
+    });
+  }
+  if (request.surveyDesign && !request.allowSurveyApproximation) {
+    checks.push({
+      id: "survey-aware-runner-required",
+      status: "block",
+      detail: "Complex-survey design was declared but this stats runner is a standard-table runner.",
+      evidenceRefs: ["request.surveyDesign"],
+      suggestedAction: "Use a survey-aware backend or explicitly mark this run as an exploratory approximation.",
+    });
+  }
+  return checks;
+}
+
+function preflightAlternativeChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
+  const checks: StatsPreflightCheck[] = [];
+  if (request.method === "chi-square") {
+    const hasSparseWarning = gate.warnings.some(warning => /sparse|cell/i.test(warning));
+    if (hasSparseWarning) {
+      checks.push({
+        id: "alternative-exact-test",
+        status: "warning",
+        detail: "Sparse categorical cells may make Fisher exact or suppressed descriptive reporting more appropriate than chi-square.",
+        evidenceRefs: [request.dataPath],
+        suggestedAction: "Review cell counts and prefer Fisher exact for a 2x2 sparse table.",
+      });
+    }
+  }
+  if ((request.method === "t-test" || request.method === "welch-t-test") && gate.completeCase.completeRows !== null && gate.completeCase.completeRows < 40) {
+    checks.push({
+      id: "alternative-nonparametric-test",
+      status: "warning",
+      detail: "Small complete-case count for a mean-comparison test; Mann-Whitney or exact/permutation review may be more robust.",
+      evidenceRefs: [request.dataPath],
+      suggestedAction: "Review distribution plots and consider a rank-based or resampling method.",
+    });
+  }
+  if (request.method.includes("regression") && request.covariates.length > 12) {
+    checks.push({
+      id: "high-dimensional-model-review",
+      status: "warning",
+      detail: `Model includes ${request.covariates.length} covariates; collinearity, overfitting, and multiplicity diagnostics are mandatory.`,
+      evidenceRefs: [request.dataPath],
+      suggestedAction: "Run model-diagnostics, VIF/collinearity review, and sensitivity analyses.",
+    });
+  }
+  return checks;
+}
+
+function checkToIssue(check: StatsPreflightCheck): StatsIssue[] {
+  if (check.status === "pass") return [];
+  const severity: StatsIssue["severity"] = check.status === "block" ? "blocker" : "warning";
+  return [issue(severity, issueCodeForCheck(check.id), check.detail, check.evidenceRefs)];
+}
+
+function issueCodeForCheck(id: string): string {
+  const explicit: Record<string, string> = {
+    "method-backend-available": "METHOD_BACKEND_NOT_AVAILABLE",
+    "survey-aware-runner-required": "SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER",
+    "binary-outcome-levels": "STATS_BINARY_OUTCOME_INVALID",
+    "binary-event-count": "STATS_BINARY_EVENT_COUNT_LOW",
+    "events-per-predictor": "STATS_EVENTS_PER_PREDICTOR_LOW",
+    "complete-case-count": "STATS_COMPLETE_CASE_TOO_SMALL",
+    "required-variables-present": "STATS_REQUIRED_VARIABLE_MISSING",
+    "continuous-outcome-type": "STATS_NON_NUMERIC_OUTCOME",
+  };
+  return explicit[id] ?? `STATS_PREFLIGHT_${id.toUpperCase().replaceAll("-", "_")}`;
+}
+
+function summarizeStatsPreflight(preflight: StatsPreflightResult): Record<string, unknown> {
+  return {
+    status: preflight.status,
+    verdict: preflight.feasibilityGate.verdict,
+    score: preflight.feasibilityGate.score,
+    confidence: preflight.feasibilityGate.confidence,
+    rowCount: preflight.feasibilityGate.rowCount,
+    completeCaseN: preflight.feasibilityGate.completeCase.completeRows,
+    checks: preflight.checks.map(check => ({ id: check.id, status: check.status, detail: check.detail })),
+    nextAction: preflight.nextAction,
+  };
+}
+
+function renderStatsPreflightMarkdown(preflight: StatsPreflightResult): string {
+  return [
+    "# Stats Preflight Reliability Gate",
+    "",
+    `Method: ${preflight.method}`,
+    `Status: ${preflight.status}`,
+    `Feasibility verdict: ${preflight.feasibilityGate.verdict}`,
+    `Feasibility score: ${preflight.feasibilityGate.score}`,
+    `Rows: ${preflight.feasibilityGate.rowCount ?? "unknown"}`,
+    `Complete-case rows: ${preflight.feasibilityGate.completeCase.completeRows ?? "unknown"}`,
+    `Next action: ${preflight.nextAction}`,
+    "",
+    "## Checks",
+    "",
+    ...preflight.checks.map(check => `- [${check.status}] ${check.id}: ${check.detail}${check.suggestedAction ? ` Action: ${check.suggestedAction}` : ""}`),
+    "",
+    "## Feasibility Detail",
+    "",
+    renderResearchFeasibilityGateMarkdown(preflight.feasibilityGate),
+    "",
+    "## Machine-Readable Feasibility JSON",
+    "",
+    "The companion stats-preflight.json file includes the full feasibility gate, reliability checks, issue codes, and evidence references.",
+  ].join("\n");
+}
+
+function statsQuestionFor(request: StatsRunRequest): string {
+  const parts = [
+    `Run ${request.method}`,
+    request.outcome ? `outcome=${request.outcome}` : null,
+    request.exposure ? `exposure=${request.exposure}` : null,
+    request.group ? `group=${request.group}` : null,
+    request.time ? `time=${request.time}` : null,
+    request.event ? `event=${request.event}` : null,
+  ].filter(Boolean);
+  return `${parts.join("; ")}.`;
+}
+
+function variableChecksByName(gate: FeasibilityGateResult): Map<string, FeasibilityGateResult["variableChecks"][number]> {
+  return new Map(gate.variableChecks.map(check => [check.name, check]));
+}
+
+function minimumRowsFor(request: StatsRunRequest): number {
+  if (request.method === "descriptive" || request.method === "missingness-summary") return 10;
+  if (request.method === "fisher-exact" || request.method === "mcnemar" || request.method === "diagnostic-accuracy") return 10;
+  if (eventDependentMethods().has(request.method) || request.method.includes("regression") || request.method.includes("glm")) return Math.max(50, (uniqueStrings([request.exposure, request.group, ...request.covariates].filter((item): item is string => Boolean(item))).length + 1) * 20);
+  return 30;
+}
+
+function hardMinimumRowsFor(request: StatsRunRequest): number {
+  if (request.method === "descriptive" || request.method === "missingness-summary") return 3;
+  if (request.method === "fisher-exact" || request.method === "mcnemar") return 6;
+  return Math.min(25, Math.max(8, Math.floor(minimumRowsFor(request) / 3)));
+}
+
+function minimumEventsFor(request: StatsRunRequest): number {
+  const predictors = uniqueStrings([request.exposure, request.group, ...request.covariates].filter((item): item is string => Boolean(item))).length;
+  if (request.method === "diagnostic-accuracy") return 6;
+  if (eventDependentMethods().has(request.method) || binaryOutcomeMethods().has(request.method)) return Math.max(10, predictors * 10, 10);
+  return 10;
+}
+
+function hardMinimumEventsFor(request: StatsRunRequest): number {
+  return request.method === "prediction-evaluation" ? 5 : 3;
+}
+
+function eventDependentMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["kaplan-meier", "log-rank", "cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "recurrent-event-rate"]);
+}
+
+function binaryOutcomeMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["logistic-regression", "penalized-logistic-regression", "prediction-evaluation"]);
+}
+
+function continuousOutcomeMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["t-test", "paired-t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "wilcoxon", "kruskal-wallis", "friedman", "pearson", "spearman", "kendall", "partial-correlation", "linear-regression", "robust-linear-regression", "gamma-glm", "inverse-gaussian-glm", "quantile-regression", "penalized-linear-regression", "linear-mixed-model", "gee", "repeated-measures-anova"]);
+}
+
+function groupRequiredMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["t-test", "paired-t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "wilcoxon", "kruskal-wallis", "friedman", "chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "log-rank"]);
+}
+
+function twoGroupMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["t-test", "paired-t-test", "welch-t-test", "mann-whitney", "wilcoxon", "fisher-exact", "mcnemar"]);
+}
+
+function backendUnavailableMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["fine-gray", "time-varying-cox", "generalized-mixed-model"]);
+}
+
+function isNumericMethodExempt(method: StatsRunRequest["method"]): boolean {
+  return ["chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "logistic-regression", "ordinal-logistic-regression", "multinomial-logistic-regression", "penalized-logistic-regression", "prediction-evaluation", "diagnostic-accuracy"].includes(method);
+}
+
+function uniqueStrings(items: string[]): string[] {
+  return [...new Set(items)];
+}
+
+function round(value: number, digits = 4): number {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
 }
 
 async function attachHashes(result: StatsRunResult): Promise<StatsRunResult> {
@@ -257,6 +738,11 @@ function statsQa(result: StatsRunResult): {
       detail: `Stats run binding is ${result.binding.status}.`,
     },
     {
+      id: "preflight-reliability-gate",
+      status: preflightQaStatus(result),
+      detail: preflightQaDetail(result),
+    },
+    {
       id: "standard-table-boundary",
       status: result.issues.some(issue => issue.code === "SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER") ? "fail" as const : result.issues.some(issue => issue.code === "SURVEY_APPROXIMATION_EXPLICIT") ? "warning" as const : "pass" as const,
       detail: "Standard-table runner is not a complex-survey variance engine.",
@@ -303,6 +789,7 @@ function statsQa(result: StatsRunResult): {
     },
     ...diagnosticAccuracyQaChecks(result),
     ...propensityQaChecks(result),
+    ...modelReliabilityQaChecks(result),
   ];
   const status = result.status === "failed" || blockerIssues.length > 0 || checks.some(check => check.status === "fail")
     ? "fail"
@@ -319,6 +806,16 @@ function statsQa(result: StatsRunResult): {
 
 function deriveStatsResultPosture(result: StatsRunResult, request: StatsRunRequest): StatsResultPosture {
   const issueCodes = new Set(result.issues.map(issue => issue.code));
+  if (issueCodes.has("STATS_PREFLIGHT_FEASIBILITY_BLOCKERS") || issueCodes.has("STATS_REQUIRED_VARIABLE_MISSING") || issueCodes.has("STATS_BINARY_OUTCOME_INVALID") || issueCodes.has("STATS_NON_NUMERIC_OUTCOME") || issueCodes.has("STATS_COMPLETE_CASE_TOO_SMALL")) {
+    return {
+      status: "failed",
+      label: "Blocked: data/method preflight failed",
+      interpretationBoundary: "This run cannot be interpreted because the requested statistical method was not compatible with the profiled data.",
+      supports: ["pre-run failure attribution", "method redesign", "data repair planning"],
+      cannotSupport: ["effect estimates", "p-values", "paper-ready inference"],
+      nextAction: "Resolve stats-preflight blockers, revise the method, or choose an exploratory/descriptive analysis before execution.",
+    };
+  }
   if (issueCodes.has("SURVEY_DESIGN_REQUIRES_SURVEY_RUNNER")) {
     return {
       status: "blocked_survey_required",
@@ -395,6 +892,7 @@ function renderStatsReport(result: StatsRunResult, request: StatsRunRequest, qa:
   const table = renderEstimateTable(result);
   const diagnosticSection = renderDiagnosticAccuracySection(result, request);
   const propensitySection = renderPropensitySection(result, request);
+  const preflightSection = renderPreflightSection(result);
   return [
     `# Stats Run Report`,
     "",
@@ -422,6 +920,8 @@ function renderStatsReport(result: StatsRunResult, request: StatsRunRequest, qa:
     `- Supports: ${result.resultPosture?.supports.join("; ") ?? "(not declared)"}`,
     `- Cannot support: ${result.resultPosture?.cannotSupport.join("; ") ?? "(not declared)"}`,
     `- Next action: ${result.resultPosture?.nextAction ?? "Declare result posture and rerun."}`,
+    "",
+    ...preflightSection,
     "",
     "## Results",
     "",
@@ -521,6 +1021,43 @@ function diagnosticAccuracyQaChecks(result: StatsRunResult): Array<{ id: string;
   ];
 }
 
+function preflightQaStatus(result: StatsRunResult): "pass" | "warning" | "fail" {
+  const hasPreflightArtifact = result.artifacts.some(artifact => artifact.kind === "preflight");
+  const preflight = preflightSummaryFromResult(result);
+  if (!hasPreflightArtifact || !preflight) return "fail";
+  if (preflight.status === "block") return "fail";
+  if (preflight.status === "warning") return "warning";
+  return "pass";
+}
+
+function preflightQaDetail(result: StatsRunResult): string {
+  const preflight = preflightSummaryFromResult(result);
+  if (!result.artifacts.some(artifact => artifact.kind === "preflight")) return "Stats preflight artifact is missing.";
+  if (!preflight) return "Stats preflight summary is missing from diagnostics.";
+  return `Stats preflight status=${preflight.status}, verdict=${preflight.verdict}, score=${preflight.score}, completeCaseN=${preflight.completeCaseN ?? "unknown"}.`;
+}
+
+function preflightSummaryFromResult(result: StatsRunResult): Record<string, unknown> | null {
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  return diagnostics.preflight && typeof diagnostics.preflight === "object"
+    ? diagnostics.preflight as Record<string, unknown>
+    : null;
+}
+
+function renderPreflightSection(result: StatsRunResult): string[] {
+  const preflight = preflightSummaryFromResult(result);
+  const checks = Array.isArray(preflight?.checks) ? preflight.checks as Array<Record<string, unknown>> : [];
+  return [
+    "## Preflight Reliability",
+    "",
+    preflight
+      ? `- Status: ${cell(preflight.status)}; verdict: ${cell(preflight.verdict)}; score: ${cell(preflight.score)}; complete-case N: ${cell(preflight.completeCaseN)}.`
+      : "- No preflight summary was recorded.",
+    preflight?.nextAction ? `- Next action: ${cell(preflight.nextAction)}` : "- Next action: rerun with stats preflight evidence.",
+    ...checks.slice(0, 8).map(check => `- [${cell(check.status)}] ${cell(check.id)}: ${cell(check.detail)}`),
+  ];
+}
+
 function propensityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
   if (result.method !== "propensity-score-matching" && result.method !== "propensity-score-weighting") return [];
   const diagnostics = result.diagnostics as Record<string, unknown>;
@@ -585,6 +1122,158 @@ function propensityQaChecks(result: StatsRunResult): Array<{ id: string; status:
       detail: "The result posture requires target-trial, DAG/confounder, positivity, missingness, and sensitivity review before causal claims.",
     },
   ];
+}
+
+function modelReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  if (regressionFamilyMethods().has(result.method)) return regressionReliabilityQaChecks(result);
+  if (survivalFamilyMethods().has(result.method)) return survivalReliabilityQaChecks(result);
+  if (longitudinalFamilyMethods().has(result.method)) return longitudinalReliabilityQaChecks(result);
+  return [];
+}
+
+function regressionReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const maxVif = numericDiagnostic(diagnostics, "max_vif");
+  const maxCooks = numericDiagnostic(diagnostics, "max_cooks_distance");
+  const nObs = numericDiagnostic(diagnostics, "n_obs") ?? result.completeCaseN;
+  const nPredictors = numericDiagnostic(diagnostics, "n_predictors");
+  const overdispersion = numericDiagnostic(diagnostics, "overdispersion_ratio");
+  const eventCount = numericDiagnostic(diagnostics, "event_count");
+  const nonEventCount = numericDiagnostic(diagnostics, "non_event_count");
+  const converged = diagnostics.converged;
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
+    {
+      id: "model-diagnostics-present",
+      status: diagnostics.model_family || diagnostics.test ? "pass" : "fail",
+      detail: diagnostics.model_family || diagnostics.test
+        ? `Diagnostics recorded for ${String(diagnostics.model_family ?? diagnostics.test)}.`
+        : "Model diagnostics are missing.",
+    },
+    {
+      id: "model-convergence",
+      status: result.issues.some(issue => issue.code === "REGRESSION_DID_NOT_CONVERGE") || converged === false ? "fail" : converged === undefined ? "warning" : "pass",
+      detail: converged === undefined
+        ? "Convergence evidence is not exposed by this backend/model class."
+        : `Backend convergence flag is ${String(converged)}.`,
+    },
+    {
+      id: "model-parameter-burden",
+      status: nPredictors === null ? "warning" : nObs / Math.max(nPredictors, 1) >= 20 ? "pass" : nObs / Math.max(nPredictors, 1) >= 10 ? "warning" : "fail",
+      detail: nPredictors === null
+        ? "Predictor count is missing from diagnostics."
+        : `${nObs} complete rows for ${nPredictors} modeled predictor term(s).`,
+    },
+    {
+      id: "model-collinearity",
+      status: maxVif === null ? "warning" : maxVif <= 5 ? "pass" : maxVif <= 10 ? "warning" : "fail",
+      detail: maxVif === null
+        ? "VIF/collinearity diagnostics are unavailable."
+        : `Maximum VIF is ${maxVif.toFixed(3)}.`,
+    },
+  ];
+  if (maxCooks !== null) {
+    const threshold = 4 / Math.max(nObs, 1);
+    checks.push({
+      id: "model-influence",
+      status: maxCooks <= threshold ? "pass" : maxCooks <= threshold * 3 ? "warning" : "fail",
+      detail: `Maximum Cook's distance is ${maxCooks.toFixed(4)}; heuristic threshold is ${threshold.toFixed(4)}.`,
+    });
+  }
+  if (result.method === "logistic-regression" || result.method === "penalized-logistic-regression") {
+    const minClass = eventCount !== null && nonEventCount !== null ? Math.min(eventCount, nonEventCount) : null;
+    checks.push({
+      id: "model-binary-class-balance",
+      status: minClass === null ? "warning" : minClass >= 20 ? "pass" : minClass >= 5 ? "warning" : "fail",
+      detail: minClass === null
+        ? "Binary event/non-event counts are missing from diagnostics."
+        : `Binary outcome has ${eventCount} event(s) and ${nonEventCount} non-event(s).`,
+    });
+  }
+  if (countRegressionMethods().has(result.method)) {
+    checks.push({
+      id: "model-count-overdispersion",
+      status: overdispersion === null ? "warning" : result.method === "poisson-regression" && overdispersion > 2 ? "warning" : "pass",
+      detail: overdispersion === null
+        ? "Count overdispersion diagnostic is missing."
+        : `Pearson overdispersion ratio is ${overdispersion.toFixed(3)}.`,
+    });
+  }
+  if (result.method.startsWith("penalized-")) {
+    checks.push({
+      id: "penalized-inference-boundary",
+      status: "warning",
+      detail: "Penalized coefficients are shrinkage estimates; classical p-values/CIs require bootstrap or post-selection inference.",
+    });
+  }
+  return checks;
+}
+
+function survivalReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const events = numericDiagnostic(diagnostics, "events");
+  const nPredictors = numericDiagnostic(diagnostics, "n_predictors");
+  const epv = numericDiagnostic(diagnostics, "events_per_predictor") ?? (events !== null && nPredictors !== null ? events / Math.max(nPredictors, 1) : null);
+  const checks: Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> = [
+    {
+      id: "survival-event-count",
+      status: events === null ? "warning" : events >= 20 ? "pass" : events >= 5 ? "warning" : "fail",
+      detail: events === null ? "Survival event count is missing." : `${events} event(s) are available for the survival route.`,
+    },
+  ];
+  if (result.method === "cox-proportional-hazards" || result.method === "stratified-cox") {
+    checks.push({
+      id: "survival-events-per-predictor",
+      status: epv === null ? "warning" : epv >= 10 ? "pass" : epv >= 3 ? "warning" : "fail",
+      detail: epv === null ? "Events-per-predictor is missing." : `Events per predictor is ${epv.toFixed(3)}.`,
+    });
+    checks.push({
+      id: "cox-proportional-hazards-diagnostic",
+      status: diagnostics.proportional_hazards_check === "not_available" ? "warning" : "pass",
+      detail: diagnostics.proportional_hazards_check === "not_available"
+        ? "This runtime fitted Cox coefficients but did not compute Schoenfeld/proportional-hazards diagnostics."
+        : "Proportional-hazards diagnostic evidence was recorded.",
+    });
+  }
+  return checks;
+}
+
+function longitudinalReliabilityQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  const clusters = numericDiagnostic(diagnostics, "clusters");
+  const minObsPerCluster = numericDiagnostic(diagnostics, "min_observations_per_cluster");
+  return [
+    {
+      id: "longitudinal-cluster-count",
+      status: clusters === null ? "warning" : clusters >= 20 ? "pass" : clusters >= 8 ? "warning" : "fail",
+      detail: clusters === null ? "Cluster count is missing." : `${clusters} cluster(s)/subject(s) are available.`,
+    },
+    {
+      id: "longitudinal-observations-per-cluster",
+      status: minObsPerCluster === null ? "warning" : minObsPerCluster >= 2 ? "pass" : "fail",
+      detail: minObsPerCluster === null ? "Within-cluster observation counts are missing." : `Minimum observations per cluster is ${minObsPerCluster}.`,
+    },
+  ];
+}
+
+function numericDiagnostic(diagnostics: Record<string, unknown>, key: string): number | null {
+  const value = diagnostics[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function regressionFamilyMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["linear-regression", "robust-linear-regression", "logistic-regression", "ordinal-logistic-regression", "multinomial-logistic-regression", "poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial", "gamma-glm", "inverse-gaussian-glm", "quantile-regression", "penalized-linear-regression", "penalized-logistic-regression"]);
+}
+
+function countRegressionMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial"]);
+}
+
+function survivalFamilyMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["kaplan-meier", "log-rank", "cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "recurrent-event-rate"]);
+}
+
+function longitudinalFamilyMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova"]);
 }
 
 function renderEstimateTable(result: StatsRunResult): string {
@@ -954,13 +1643,24 @@ def regression_diagnostics(model, x, y, family):
     try:
         fitted = pd.Series(model.fittedvalues)
         resid = pd.Series(getattr(model, "resid", getattr(model, "resid_response", y - fitted)))
+        predictor_cols = [c for c in x.columns if c != "const"]
         out.update({
             "aic": clean_value(getattr(model, "aic", None)),
             "bic": clean_value(getattr(model, "bic", None)),
+            "n_obs": int(len(y)),
+            "n_predictors": int(len(predictor_cols)),
             "df_resid": clean_value(getattr(model, "df_resid", None)),
             "residual_mean": clean_value(resid.mean()),
             "residual_sd": clean_value(resid.std(ddof=1)),
+            "converged": clean_value(getattr(model, "converged", None)),
         })
+        if hasattr(model, "pearson_chi2"):
+            out["pearson_chi2"] = clean_value(getattr(model, "pearson_chi2", None))
+            out["overdispersion_ratio"] = clean_value(float(model.pearson_chi2) / max(1, float(getattr(model, "df_resid", 1))))
+        try:
+            out["condition_number"] = clean_value(float(np.linalg.cond(np.asarray(x, dtype=float))))
+        except Exception:
+            pass
         if len(resid) >= 8:
             out["shapiro_p_value"] = clean_value(stats.shapiro(resid.sample(min(len(resid), 5000), random_state=1))[1])
         if hasattr(model, "get_influence"):
@@ -1919,6 +2619,22 @@ def run(req):
                     estimates.append(row)
             diagnostics.update(regression_diagnostics(model, x, pd.to_numeric(y_raw, errors="coerce"), method))
             diagnostics["weighted"] = weight is not None
+            if method in ("logistic-regression", "penalized-logistic-regression"):
+                try:
+                    y_binary, _levels_for_counts = binary_series(y_raw)
+                    diagnostics["event_count"] = int(pd.Series(y_binary).sum())
+                    diagnostics["non_event_count"] = int(len(y_binary) - pd.Series(y_binary).sum())
+                    diagnostics["event_rate"] = clean_value(float(pd.Series(y_binary).mean()))
+                except Exception:
+                    pass
+            if method in ("poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial"):
+                try:
+                    y_count = pd.to_numeric(y_raw, errors="coerce")
+                    diagnostics["zero_fraction"] = clean_value(float((y_count == 0).mean()))
+                    diagnostics["outcome_min"] = clean_value(y_count.min())
+                    diagnostics["outcome_max"] = clean_value(y_count.max())
+                except Exception:
+                    pass
             if hasattr(model, "converged") and not bool(model.converged):
                 issues.append({"severity": "blocker", "code": "REGRESSION_DID_NOT_CONVERGE", "message": "The regression model did not converge.", "evidenceRefs": ["diagnostics.converged"]})
             try:
@@ -1956,12 +2672,14 @@ def run(req):
                 curve_path = os.path.join(out_dir, "kaplan-meier-curve.csv")
                 write_csv(curve_path, rows)
                 estimates = [{"term": str(g), "time": clean_value(max([r["time"] for r in rows if r["group"] == g], default=None)), "survival": clean_value([r for r in rows if r["group"] == g][-1]["survival"] if [r for r in rows if r["group"] == g] else None)} for g in sorted(set(r["group"] for r in rows), key=str)]
-                diagnostics = {"test": "Kaplan-Meier", "curve_path": curve_path, "groups": sorted(set(r["group"] for r in rows), key=str)}
+                ev = event_indicator(data[event_col])
+                diagnostics = {"test": "Kaplan-Meier", "curve_path": curve_path, "groups": sorted(set(r["group"] for r in rows), key=str), "events": int(ev.sum()), "censored": int((ev == 0).sum())}
                 figures.append(save_fig(out_dir, "kaplan-meier.png", "Kaplan-Meier Survival Curve", "Estimated survival curves by group.", variables, lambda: [plt.step([r["time"] for r in rows if r["group"] == g], [r["survival"] for r in rows if r["group"] == g], where="post", label=str(g)) for g in sorted(set(r["group"] for r in rows), key=str)] and plt.legend(title=group or "Group"), "Time", "Survival probability"))
             elif method == "log-rank":
                 result = logrank_two_group(data[time_col], data[event_col], data[group])
                 estimates = [{"term": str(group), **result}]
-                diagnostics = {"test": "log-rank", "groups": list(data[group].dropna().unique())}
+                ev = event_indicator(data[event_col])
+                diagnostics = {"test": "log-rank", "groups": list(data[group].dropna().unique()), "events": int(ev.sum()), "censored": int((ev == 0).sum())}
             elif method in ("cox-proportional-hazards", "stratified-cox"):
                 if PHReg is None:
                     raise ValueError("statsmodels PHReg is required for Cox models.")
@@ -1975,19 +2693,21 @@ def run(req):
                 for i, term in enumerate(terms):
                     est = model.params[i]
                     estimates.append({"term": str(term), "log_hazard_ratio": clean_value(est), "hazard_ratio": clean_value(safe_exp(est)), "ci_low": clean_value(safe_exp(ci[i][0])), "ci_high": clean_value(safe_exp(ci[i][1])), "p_value": clean_value(model.pvalues[i])})
-                diagnostics = {"test": method, "events": int(event_indicator(data[event_col]).sum()), "n_predictors": int(x.shape[1]), "strata": strata_col}
+                event_count = int(event_indicator(data[event_col]).sum())
+                diagnostics = {"test": method, "events": event_count, "n_predictors": int(x.shape[1]), "events_per_predictor": clean_value(event_count / max(1, int(x.shape[1]))), "strata": strata_col, "proportional_hazards_check": "not_available"}
             elif method == "aalen-johansen-cif":
                 rows = cif_curve(data[time_col], data[event_col], event_of_interest=1, group=data[group] if group else None)
                 curve_path = os.path.join(out_dir, "cumulative-incidence.csv")
                 write_csv(curve_path, rows)
                 estimates = [{"term": str(g), "final_cumulative_incidence": clean_value([r for r in rows if r["group"] == g][-1]["cumulative_incidence"] if [r for r in rows if r["group"] == g] else None)} for g in sorted(set(r["group"] for r in rows), key=str)]
-                diagnostics = {"test": "Aalen-Johansen cumulative incidence", "curve_path": curve_path, "event_of_interest_code": 1}
+                event_codes = pd.Series(data[event_col]).dropna()
+                diagnostics = {"test": "Aalen-Johansen cumulative incidence", "curve_path": curve_path, "event_of_interest_code": 1, "events": int((event_codes == 1).sum()), "competing_events": int(((event_codes != 0) & (event_codes != 1)).sum()), "event_codes": [clean_value(v) for v in sorted(event_codes.unique())]}
                 figures.append(save_fig(out_dir, "cumulative-incidence.png", "Cumulative Incidence", "Nonparametric cumulative incidence for event code 1 with other nonzero codes treated as competing events.", variables, lambda: [plt.step([r["time"] for r in rows if r["group"] == g], [r["cumulative_incidence"] for r in rows if r["group"] == g], where="post", label=str(g)) for g in sorted(set(r["group"] for r in rows), key=str)] and plt.legend(title=group or "Group"), "Time", "Cumulative incidence"))
             else:
                 denom_time = pd.to_numeric(data[time_col], errors="coerce").sum()
                 events = event_indicator(data[event_col]).sum()
                 estimates = [{"term": "event_rate", "events": clean_value(events), "person_time": clean_value(denom_time), "rate": safe_divide(events, denom_time)}]
-                diagnostics = {"test": "recurrent event rate", "id": id_col, "unique_subjects": int(data[id_col].nunique()) if id_col else None}
+                diagnostics = {"test": "recurrent event rate", "id": id_col, "events": int(events), "person_time": clean_value(denom_time), "unique_subjects": int(data[id_col].nunique()) if id_col else None}
     elif method in ("linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova"):
         outcome = req.get("outcome")
         exposure = req.get("exposure") or req.get("group")
@@ -2021,7 +2741,8 @@ def run(req):
             anova = sm.stats.AnovaRM(data, depvar=outcome, subject=subject, within=[within]).fit()
             table = anova.anova_table
             estimates = [{"term": str(idx), "f_statistic": clean_value(row.get("F Value")), "df_num": clean_value(row.get("Num DF")), "df_den": clean_value(row.get("Den DF")), "p_value": clean_value(row.get("Pr > F"))} for idx, row in table.iterrows()]
-            diagnostics = {"test": "repeated-measures ANOVA", "subject": subject, "within": within}
+            counts = data.groupby(subject).size()
+            diagnostics = {"test": "repeated-measures ANOVA", "subject": subject, "within": within, "clusters": int(data[subject].nunique()), "min_observations_per_cluster": int(counts.min()), "median_observations_per_cluster": clean_value(float(counts.median()))}
             model = None
         else:
             issues.append({"severity": "blocker", "code": "GLMM_BACKEND_NOT_AVAILABLE", "message": "Generalized mixed models require a validated GLMM backend; use GEE for population-average binary/continuous repeated measures in this runtime.", "evidenceRefs": ["method"]})
@@ -2031,7 +2752,8 @@ def run(req):
         if method in ("linear-mixed-model", "gee"):
             ci = model.conf_int()
             estimates = [{"term": str(term), "estimate": clean_value(model.params[term]), "std_error": clean_value(model.bse[term]), "ci_low": clean_value(ci.loc[term, 0]), "ci_high": clean_value(ci.loc[term, 1]), "p_value": clean_value(model.pvalues[term])} for term in model.params.index]
-            diagnostics = {"test": method, "cluster": cluster, "clusters": int(data[cluster].nunique()), "aic": clean_value(getattr(model, "aic", None))}
+            counts = data.groupby(cluster).size()
+            diagnostics = {"test": method, "cluster": cluster, "clusters": int(data[cluster].nunique()), "min_observations_per_cluster": int(counts.min()), "median_observations_per_cluster": clean_value(float(counts.median())), "aic": clean_value(getattr(model, "aic", None)), "converged": clean_value(getattr(model, "converged", None))}
     elif method in ("overlap-weighting", "entropy-balancing", "doubly-robust-aipw", "difference-in-differences", "event-study-did", "interrupted-time-series", "regression-discontinuity", "instrumental-variables-2sls", "target-trial-emulation-spec", "unmeasured-confounding-sensitivity"):
         outcome = req.get("outcome")
         treatment = req.get("exposure") or req.get("group")

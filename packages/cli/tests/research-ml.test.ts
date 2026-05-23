@@ -85,6 +85,74 @@ describe("research ML modeling layer", () => {
     expect(largeClean.dataEvidence.highMissingness).toBe(false);
   });
 
+  it("selects data-aware executable statistical methods from table shape", () => {
+    const continuousTwoGroup = researchModelingPlanCommand({
+      question: "Compare outcome between two treatment groups.",
+      goal: "compare_groups",
+      outcomeType: "continuous",
+      target: "outcome",
+      tableSummary: {
+        rowCount: 120,
+        columnCount: 3,
+        columns: [
+          { name: "outcome", inferredType: "number", nonMissingRows: 118, missingFraction: 0.016, sampleValues: ["1.2", "2.4", "3.8"] },
+          { name: "treatment_group", inferredType: "number", nonMissingRows: 120, missingFraction: 0, sampleValues: ["0", "1"], min: 0, max: 1 },
+          { name: "age", inferredType: "number", nonMissingRows: 120, missingFraction: 0, sampleValues: ["45", "50", "55"], min: 20, max: 90 },
+        ],
+      },
+    });
+    expect(continuousTwoGroup.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("welch-t-test");
+    expect(continuousTwoGroup.statisticalMethodGuidance.alternatives.map(item => item.method)).toEqual(expect.arrayContaining(["welch-t-test", "mann-whitney"]));
+    expect(continuousTwoGroup.statisticalMethodGuidance.alternatives[0]?.commandHint).toContain("--group treatment_group");
+
+    const smallCategorical = researchModelingPlanCommand({
+      question: "Compare binary complications between two procedure groups.",
+      goal: "compare_groups",
+      outcomeType: "binary",
+      target: "complication",
+      tableSummary: {
+        rowCount: 28,
+        columnCount: 3,
+        columns: [
+          { name: "complication", inferredType: "number", nonMissingRows: 28, missingFraction: 0, sampleValues: ["0", "1"], min: 0, max: 1 },
+          { name: "procedure_group", inferredType: "string", nonMissingRows: 28, missingFraction: 0, sampleValues: ["A", "B"] },
+          { name: "age", inferredType: "number", nonMissingRows: 28, missingFraction: 0, sampleValues: ["45", "50", "55"], min: 20, max: 90 },
+        ],
+      },
+    });
+    expect(smallCategorical.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("fisher-exact");
+    expect(smallCategorical.statisticalMethodGuidance.warnings.map(issue => issue.code)).toContain("METHOD_GUIDANCE_SMALL_SAMPLE");
+
+    const countAssociation = researchModelingPlanCommand({
+      question: "Associate exposure with number of admissions.",
+      goal: "associate",
+      outcomeType: "count",
+      target: "admission_count",
+      tableSummary: {
+        rowCount: 300,
+        columnCount: 3,
+        columns: [
+          { name: "admission_count", inferredType: "number", nonMissingRows: 300, missingFraction: 0, sampleValues: ["0", "1", "2", "3"], min: 0, max: 12 },
+          { name: "exposure", inferredType: "number", nonMissingRows: 300, missingFraction: 0, sampleValues: ["0.2", "0.5", "0.8"], min: 0, max: 1 },
+          { name: "site", inferredType: "string", nonMissingRows: 290, missingFraction: 0.033, sampleValues: ["A", "B", "C"] },
+        ],
+      },
+    });
+    expect(countAssociation.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("poisson-regression");
+    expect(countAssociation.statisticalMethodGuidance.alternatives.map(item => item.method)).toEqual(expect.arrayContaining(["negative-binomial-regression", "zero-inflated-poisson"]));
+
+    const prediction = researchModelingPlanCommand({
+      question: "Predict elevated HbA1c from clinical variables.",
+      goal: "classify",
+      outcomeType: "binary",
+      target: "elevated",
+      requiresPrediction: true,
+      tableSummary: syntheticSummary({ rows: 500, missing: 0.01, columns: 8, targetClasses: ["0", "1"] }),
+    });
+    expect(prediction.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("prediction-evaluation");
+    expect(prediction.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("logistic-regression");
+  });
+
   it("recommends design stop-for-review for causal and survival-shaped questions", () => {
     const causal = researchModelingPlanCommand({
       question: "What is the causal effect of treatment on mortality?",
@@ -908,13 +976,11 @@ describe("research ML modeling layer", () => {
       const methodSelectionPath = path.join(dir, "method-selection.json");
       await writeFile(statsCsvPath, [
         "group,outcome",
-        "0,10",
-        "0,11",
-        "0,12",
-        "1,14",
-        "1,15",
-        "1,16",
-        "1,17",
+        ...Array.from({ length: 48 }, (_, index) => {
+          const group = index < 24 ? 0 : 1;
+          const outcome = group === 0 ? 10 + (index % 6) * 0.4 : 14 + (index % 6) * 0.45;
+          return `${group},${outcome.toFixed(2)}`;
+        }),
       ].join("\n"));
       const methodSelection = await researchMethodSelectCommand({
         question: "Use a two-sample t-test to compare the difference in means between two groups.",

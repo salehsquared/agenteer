@@ -749,7 +749,7 @@ function requiresId(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["paired-t-test", "wilcoxon", "mcnemar", "friedman", "linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova", "time-varying-cox", "recurrent-event-rate"].includes(method));
 }
 function requiresPeriod(method: StatsMethod | null | undefined): boolean {
-  return Boolean(method && ["difference-in-differences", "event-study-did", "interrupted-time-series"].includes(method));
+  return Boolean(method && ["event-study-did", "interrupted-time-series"].includes(method));
 }
 function requiresPost(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["difference-in-differences", "event-study-did", "interrupted-time-series"].includes(method));
@@ -773,7 +773,9 @@ function semanticIssuesForColumn(column: ResearchTableSummary["columns"][number]
   if (/(^|_)age($|_)/.test(lower) && ((column.min ?? 0) < 0 || (column.max ?? 0) > 120)) issues.push({ severity: "warning", code: "IMPLAUSIBLE_AGE_RANGE", message: `Age-like column ${column.name} has implausible range ${column.min} to ${column.max}.` });
   if (/(bmi|body.?mass)/.test(lower) && ((column.min ?? 20) < 5 || (column.max ?? 20) > 100)) issues.push({ severity: "warning", code: "IMPLAUSIBLE_BMI_RANGE", message: `BMI-like column ${column.name} has implausible range ${column.min} to ${column.max}.` });
   if (/(los|length.?of.?stay)/.test(lower) && (column.min ?? 0) < 0) issues.push({ severity: "warning", code: "NEGATIVE_LENGTH_OF_STAY", message: `Length-of-stay-like column ${column.name} has negative values.` });
-  if (/(death|mortality|event|flag|stroke|mace)/.test(lower) && column.min !== undefined && column.max !== undefined && (column.min < 0 || column.max > 1)) issues.push({ severity: "blocker", code: "INVALID_BINARY_EVENT_RANGE", message: `Binary-event-like column ${column.name} is not bounded to 0/1 (${column.min} to ${column.max}).` });
+  if (/(death|mortality|flag|stroke|mace)/.test(lower) && column.min !== undefined && column.max !== undefined && (column.min < 0 || column.max > 1)) issues.push({ severity: "blocker", code: "INVALID_BINARY_EVENT_RANGE", message: `Binary-event-like column ${column.name} is not bounded to 0/1 (${column.min} to ${column.max}).` });
+  if (/(event)/.test(lower) && !/(death|mortality|flag|stroke|mace)/.test(lower) && column.min !== undefined && column.max !== undefined && column.min < 0) issues.push({ severity: "blocker", code: "INVALID_EVENT_CODE_RANGE", message: `Event-like column ${column.name} has negative event codes (${column.min} to ${column.max}).` });
+  if (/(event)/.test(lower) && !/(death|mortality|flag|stroke|mace)/.test(lower) && column.min !== undefined && column.max !== undefined && column.max > 1) issues.push({ severity: "warning", code: "MULTISTATE_EVENT_CODES", message: `Event-like column ${column.name} has codes beyond 0/1 (${column.min} to ${column.max}); verify the selected method supports competing or multistate event coding.` });
   if (/(year)/.test(lower) && column.min !== undefined && column.max !== undefined && (column.min < 1800 || column.max > 2200)) issues.push({ severity: "warning", code: "IMPLAUSIBLE_YEAR_RANGE", message: `Year-like column ${column.name} has implausible range ${column.min} to ${column.max}.` });
   return issues;
 }

@@ -88,10 +88,14 @@ describe("research stats methods expansion", () => {
 
       expect(result.status, method).toBe("succeeded");
       expect(result.estimates.length, method).toBeGreaterThan(0);
+      expect(result.artifacts.some(artifact => artifact.kind === "preflight"), method).toBe(true);
+      expect(result.artifacts.some(artifact => artifact.kind === "preflight-report"), method).toBe(true);
+      expect(result.diagnostics.preflight, method).toMatchObject({ status: expect.any(String), verdict: expect.any(String) });
       expect(result.artifacts.some(artifact => artifact.kind === "figure-manifest"), method).toBe(true);
       expect(result.artifacts.some(artifact => artifact.kind === "figure-qa"), method).toBe(true);
-      const qa = JSON.parse(await readFile(path.join(outDir, "stats-qa.json"), "utf-8")) as { status: string };
+      const qa = JSON.parse(await readFile(path.join(outDir, "stats-qa.json"), "utf-8")) as { status: string; checks: Array<{ id: string; status: string }> };
       expect(["pass", "warning"]).toContain(qa.status);
+      expect(qa.checks.find(check => check.id === "preflight-reliability-gate")?.status).toMatch(/pass|warning/);
     }
   }, 240_000);
 
@@ -131,6 +135,98 @@ describe("research stats methods expansion", () => {
     expect(qa.figures[0]?.altText).toBeTruthy();
   }, 60_000);
 
+  it("records family-specific reliability QA for count, survival, and longitudinal routes", async () => {
+    const { dir, dataPath } = await writeStatsFixture();
+    const countOut = path.join(dir, "count-reliability");
+    const count = await researchStatsRunCommand({
+      method: "poisson-regression",
+      dataPath,
+      outDir: countOut,
+      outcome: "count",
+      exposure: "x",
+      covariates: ["g"],
+      variables: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(count.status).toBe("succeeded");
+    expect(count.diagnostics).toMatchObject({ model_family: "poisson-regression", n_predictors: expect.any(Number), overdispersion_ratio: expect.any(Number), zero_fraction: expect.any(Number) });
+    const countQa = JSON.parse(await readFile(path.join(countOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+    expect(countQa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
+      "model-diagnostics-present",
+      "model-count-overdispersion",
+      "model-collinearity",
+    ]));
+
+    const survivalOut = path.join(dir, "cox-reliability");
+    const survival = await researchStatsRunCommand({
+      method: "cox-proportional-hazards",
+      dataPath,
+      outDir: survivalOut,
+      time: "time",
+      event: "event",
+      exposure: "x",
+      covariates: ["g"],
+      variables: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(survival.status).toBe("succeeded");
+    expect(survival.diagnostics).toMatchObject({ events: expect.any(Number), events_per_predictor: expect.any(Number), proportional_hazards_check: "not_available" });
+    const survivalQa = JSON.parse(await readFile(path.join(survivalOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+    expect(survivalQa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
+      "survival-event-count",
+      "survival-events-per-predictor",
+      "cox-proportional-hazards-diagnostic",
+    ]));
+    expect(survivalQa.checks.find(check => check.id === "cox-proportional-hazards-diagnostic")?.status).toBe("warning");
+
+    const longitudinalOut = path.join(dir, "gee-reliability");
+    const longitudinal = await researchStatsRunCommand({
+      method: "gee",
+      dataPath,
+      outDir: longitudinalOut,
+      outcome: "y",
+      exposure: "x",
+      cluster: "cluster",
+      covariates: ["g"],
+      variables: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(longitudinal.status).toBe("succeeded");
+    expect(longitudinal.diagnostics).toMatchObject({ clusters: expect.any(Number), min_observations_per_cluster: expect.any(Number) });
+    const longitudinalQa = JSON.parse(await readFile(path.join(longitudinalOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+    expect(longitudinalQa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
+      "longitudinal-cluster-count",
+      "longitudinal-observations-per-cluster",
+    ]));
+  }, 120_000);
+
   it("blocks execution when selected variables contain semantically impossible values", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-semantic-"));
     const dataPath = path.join(dir, "bad.csv");
@@ -160,6 +256,105 @@ describe("research stats methods expansion", () => {
 
     expect(result.status).toBe("failed");
     expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(["SEMANTIC_VALUE_ABOVE_RANGE", "SEMANTIC_MEAN_ABOVE_EXPECTED"]));
+  }, 60_000);
+
+  it("blocks binary models when the outcome is not actually binary", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-binary-preflight-"));
+    const dataPath = path.join(dir, "multiclass.csv");
+    await writeFile(dataPath, [
+      "x,y",
+      ...Array.from({ length: 80 }, (_, index) => `${index / 10},${index % 3}`),
+    ].join("\n"));
+    const result = await researchStatsRunCommand({
+      method: "logistic-regression",
+      dataPath,
+      outDir: path.join(dir, "run"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.estimates).toEqual([]);
+    expect(result.artifacts.some(artifact => artifact.kind === "preflight")).toBe(true);
+    expect(result.issues.map(issue => issue.code)).toContain("STATS_BINARY_OUTCOME_INVALID");
+  }, 60_000);
+
+  it("blocks event models when event counts are too sparse for reliable inference", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-event-preflight-"));
+    const dataPath = path.join(dir, "sparse-events.csv");
+    await writeFile(dataPath, [
+      "time,event,x,z",
+      ...Array.from({ length: 90 }, (_, index) => `${index + 1},${index === 4 ? 1 : 0},${(index % 10) / 10},${index % 2}`),
+    ].join("\n"));
+    const result = await researchStatsRunCommand({
+      method: "cox-proportional-hazards",
+      dataPath,
+      outDir: path.join(dir, "run"),
+      time: "time",
+      event: "event",
+      exposure: "x",
+      covariates: ["z"],
+      variables: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(["STATS_EVENTS_PER_PREDICTOR_LOW"]));
+    const preflight = result.diagnostics.preflight as { status?: string; checks?: Array<{ id: string; status: string }> };
+    expect(preflight.status).toBe("block");
+    expect(preflight.checks?.find(check => check.id === "events-per-predictor")?.status).toBe("block");
+  }, 60_000);
+
+  it("blocks continuous-outcome models when the selected outcome is categorical text", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-type-preflight-"));
+    const dataPath = path.join(dir, "categorical-outcome.csv");
+    await writeFile(dataPath, [
+      "x,y",
+      ...Array.from({ length: 60 }, (_, index) => `${index / 10},${index % 2 === 0 ? "high" : "low"}`),
+    ].join("\n"));
+    const result = await researchStatsRunCommand({
+      method: "linear-regression",
+      dataPath,
+      outDir: path.join(dir, "run"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.issues.map(issue => issue.code)).toContain("STATS_NON_NUMERIC_OUTCOME");
   }, 60_000);
 
   it("blocks methods whose validated backend is not available", async () => {

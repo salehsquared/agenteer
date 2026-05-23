@@ -1440,6 +1440,7 @@ export function renderResearchModelingPlan(result: ModelingDecisionPlan): string
     `  literature: ${result.literatureEvidence.source}; status=${result.literatureEvidence.status ?? "(none)"}; strength=${result.literatureEvidence.evidenceStrength ?? "(none)"}; sources=${result.literatureEvidence.sourceCount ?? "?"}`,
     `  exploration handoff: ${result.request.explorationHandoff ? `${result.request.explorationHandoff.status}; clearance=${result.request.explorationHandoff.clearanceLevel}; question=${result.request.explorationHandoff.questionId ?? "(unknown)"}` : "(none)"}`,
     `  method selection: ${result.methodSelectionEvidence.selectionId}; primary=${result.methodSelectionEvidence.primaryMethodId ?? "(none)"}; backend=${result.methodSelectionEvidence.recommendedBackend}; review=${result.methodSelectionEvidence.stopForHumanReview ? "required" : "not-required"}`,
+    `  stats guidance: ${result.statisticalMethodGuidance.recommendedStatsRunMethod ?? "(none)"}; confidence=${result.statisticalMethodGuidance.confidence}; ${result.statisticalMethodGuidance.rationale}`,
     `  route: ${result.routeRecommendation.route}; ${result.routeRecommendation.reason}`,
     `  blocking policies: ${result.blockingPolicies.map(candidate => candidate.id).join(", ") || "(none)"}`,
     `  primary: ${result.primary ? `${result.primary.id} [${result.primary.backend}]` : "(none)"}`,
