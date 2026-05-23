@@ -166,6 +166,98 @@ describe("research ML modeling layer", () => {
     expect(prediction.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("logistic-regression");
   });
 
+  it("does not recommend 2x2-only exact tests for sparse multi-level categorical tables", () => {
+    const sparseTwoByTwo = researchModelingPlanCommand({
+      question: "Compare binary complications between two procedure groups.",
+      goal: "compare_groups",
+      outcomeType: "binary",
+      target: "complication",
+      tableSummary: {
+        rowCount: 60,
+        columnCount: 2,
+        columns: [
+          { name: "complication", inferredType: "number", nonMissingRows: 60, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "0", count: 56, fraction: 0.933 }, { value: "1", count: 4, fraction: 0.067 }], sampleValues: ["0", "1"], min: 0, max: 1 },
+          { name: "procedure_group", inferredType: "string", nonMissingRows: 60, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "A", count: 30, fraction: 0.5 }, { value: "B", count: 30, fraction: 0.5 }], sampleValues: ["A", "B"] },
+        ],
+      },
+    });
+    expect(sparseTwoByTwo.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("fisher-exact");
+    expect(sparseTwoByTwo.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("chi-square");
+
+    const sparseMultiLevel = researchModelingPlanCommand({
+      question: "Compare discharge disposition categories between two procedure groups.",
+      goal: "compare_groups",
+      outcomeType: "categorical",
+      target: "disposition",
+      tableSummary: {
+        rowCount: 80,
+        columnCount: 2,
+        columns: [
+          { name: "disposition", inferredType: "string", nonMissingRows: 80, missingFraction: 0, uniqueCount: 3, valueCounts: [{ value: "home", count: 70, fraction: 0.875 }, { value: "rehab", count: 7, fraction: 0.0875 }, { value: "other", count: 3, fraction: 0.0375 }], sampleValues: ["home", "rehab", "other"] },
+          { name: "procedure_group", inferredType: "string", nonMissingRows: 80, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "A", count: 40, fraction: 0.5 }, { value: "B", count: 40, fraction: 0.5 }], sampleValues: ["A", "B"] },
+        ],
+      },
+    });
+
+    expect(sparseMultiLevel.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("chi-square");
+    expect(sparseMultiLevel.statisticalMethodGuidance.warnings.map(issue => issue.code)).toContain("METHOD_GUIDANCE_EXACT_TEST_REQUIRES_2X2");
+    expect(sparseMultiLevel.statisticalMethodGuidance.alternatives.map(item => item.method)).not.toContain("fisher-exact");
+    expect(sparseMultiLevel.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("descriptive");
+  });
+
+  it("selects repeated-measure statistical routes and executable variable-based command hints", () => {
+    const paired = researchModelingPlanCommand({
+      question: "Compare blood pressure before and after treatment in the same patients.",
+      goal: "compare_groups",
+      outcomeType: "continuous",
+      repeatedMeasures: true,
+      dataStructures: ["repeated_measures"],
+      tableSummary: {
+        rowCount: 120,
+        columnCount: 3,
+        columns: [
+          { name: "patient_id", inferredType: "number", nonMissingRows: 120, missingFraction: 0, uniqueCount: 120, sampleValues: ["1", "2", "3"], min: 1, max: 120 },
+          { name: "bp_pre", inferredType: "number", nonMissingRows: 118, missingFraction: 0.016, uniqueCount: 78, sampleValues: ["130", "142", "118"], min: 92, max: 188 },
+          { name: "bp_post", inferredType: "number", nonMissingRows: 117, missingFraction: 0.025, uniqueCount: 80, sampleValues: ["126", "137", "116"], min: 88, max: 181 },
+        ],
+      },
+    });
+
+    expect(paired.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("paired-t-test");
+    expect(paired.statisticalMethodGuidance.contract).toMatchObject({
+      method: "paired-t-test",
+      requiredArguments: ["variables"],
+    });
+    expect(paired.statisticalMethodGuidance.alternatives[0]?.commandHint).toContain("--variable bp_pre --variable bp_post");
+    expect(paired.candidates.find(candidate => candidate.id === "method:paired-t-test")?.commandHint).toContain("--variable <pre-measure> --variable <post-measure>");
+
+    const repeated = researchModelingPlanCommand({
+      question: "Compare symptom score across baseline, month 1, and month 3 in the same participants.",
+      goal: "compare_groups",
+      outcomeType: "continuous",
+      repeatedMeasures: true,
+      dataStructures: ["repeated_measures"],
+      tableSummary: {
+        rowCount: 90,
+        columnCount: 4,
+        columns: [
+          { name: "baseline_score", inferredType: "number", nonMissingRows: 90, missingFraction: 0, uniqueCount: 40, sampleValues: ["8", "12", "15"], min: 0, max: 40 },
+          { name: "month_1_score", inferredType: "number", nonMissingRows: 86, missingFraction: 0.044, uniqueCount: 38, sampleValues: ["7", "10", "14"], min: 0, max: 39 },
+          { name: "month_3_score", inferredType: "number", nonMissingRows: 82, missingFraction: 0.089, uniqueCount: 37, sampleValues: ["6", "9", "12"], min: 0, max: 37 },
+          { name: "treatment_group", inferredType: "string", nonMissingRows: 90, missingFraction: 0, uniqueCount: 2, valueCounts: [{ value: "A", count: 45, fraction: 0.5 }, { value: "B", count: 45, fraction: 0.5 }], sampleValues: ["A", "B"] },
+        ],
+      },
+    });
+
+    expect(repeated.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("friedman");
+    expect(repeated.statisticalMethodGuidance.contract).toMatchObject({
+      method: "friedman",
+      requiredArguments: ["variables"],
+    });
+    expect(repeated.statisticalMethodGuidance.alternatives[0]?.commandHint).toContain("--variable baseline_score --variable month_1_score --variable month_3_score");
+    expect(repeated.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("repeated-measures-anova");
+  });
+
   it("uses table value counts to avoid fragile methods before execution", () => {
     const rareBinary = researchModelingPlanCommand({
       question: "Is treatment associated with mortality after adjustment?",

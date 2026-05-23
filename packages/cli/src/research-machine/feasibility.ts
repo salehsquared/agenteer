@@ -744,10 +744,10 @@ function methodRequiresEvents(method: StatsMethod | null | undefined): boolean {
 }
 
 function requiresExposure(method: StatsMethod | null | undefined): boolean {
-  return Boolean(method && !["descriptive", "missingness-summary", "pca", "clustering-validation", "power-sample-size", "interrupted-time-series", "regression-discontinuity"].includes(method));
+  return Boolean(method && !["descriptive", "paired-t-test", "wilcoxon", "friedman", "missingness-summary", "pca", "clustering-validation", "power-sample-size", "interrupted-time-series", "regression-discontinuity"].includes(method));
 }
 function requiresGroup(method: StatsMethod | null | undefined): boolean {
-  return Boolean(method && ["t-test", "paired-t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "wilcoxon", "kruskal-wallis", "friedman", "chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "log-rank"].includes(method));
+  return Boolean(method && ["t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "kruskal-wallis", "chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "log-rank"].includes(method));
 }
 function requiresTime(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["kaplan-meier", "log-rank", "cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "recurrent-event-rate", "interrupted-time-series"].includes(method));
@@ -756,7 +756,7 @@ function requiresEvent(method: StatsMethod | null | undefined): boolean {
   return Boolean(method && ["kaplan-meier", "log-rank", "cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "recurrent-event-rate"].includes(method));
 }
 function requiresId(method: StatsMethod | null | undefined): boolean {
-  return Boolean(method && ["paired-t-test", "wilcoxon", "mcnemar", "friedman", "linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova", "time-varying-cox", "recurrent-event-rate"].includes(method));
+  return Boolean(method && ["mcnemar", "linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova", "time-varying-cox", "recurrent-event-rate"].includes(method));
 }
 function requiresPeriod(method: StatsMethod | null | undefined): boolean {
   return method === "event-study-did";

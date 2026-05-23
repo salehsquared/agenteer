@@ -216,6 +216,8 @@ function figuresFor(method: StatsMethod, family: StatisticalMethodSpec["family"]
   ];
   if (family === "core_inference") {
     if (["chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend"].includes(method)) return [figure("contingency-table-heatmap", "Contingency table heatmap", "heatmap", ["outcome", "exposure"], true)];
+    if (["paired-t-test", "wilcoxon"].includes(method)) return [figure("paired-difference-distribution", "Paired difference distribution", "histogram", ["variables"], true)];
+    if (method === "friedman") return [figure("repeated-measure-profile", "Repeated-measure profile", "line", ["variables"], true)];
     return [figure("outcome-distribution-by-group", "Outcome distribution by group", "boxplot", ["outcome", "group"], true)];
   }
   if (family === "correlation") return [figure("correlation-scatter", "Correlation scatterplot", "scatter", ["outcome", "exposure"], true)];

@@ -363,6 +363,7 @@ function preflightGateChecks(gate: FeasibilityGateResult): StatsPreflightCheck[]
 function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
   const checks: StatsPreflightCheck[] = [...preflightRequiredArgumentChecks(request)];
   checks.push(...preflightRepeatedMeasureChecks(request));
+  checks.push(...preflightModelTermChecks(request));
   const completeRows = gate.completeCase.completeRows ?? gate.rowCount ?? 0;
   const variables = variableChecksByName(gate);
   const outcomeName = request.outcome ?? request.event ?? null;
@@ -394,6 +395,19 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
       evidenceRefs: [request.dataPath, outcomeName],
       suggestedAction: "Choose a categorical method or map a numeric outcome.",
     });
+  }
+  if (outcomeName && outcome && outcomeVariationRequiredMethods().has(request.method)) {
+    const completeOutcomeLevels = completeCaseLevelCounts(gate, outcomeName);
+    const outcomeLevelCount = completeOutcomeLevels.length || variableLevelCount(outcome);
+    if (outcomeLevelCount > 0 && outcomeLevelCount < 2) {
+      checks.push({
+        id: "outcome-variation",
+        status: "block",
+        detail: `${request.method} cannot estimate an outcome distribution or contrast because ${outcomeName} has only ${outcomeLevelCount} observed complete-case level(s).`,
+        evidenceRefs: [request.dataPath, outcomeName],
+        suggestedAction: "Choose an outcome with variation, broaden the cohort/endpoint, or switch to descriptive reporting.",
+      });
+    }
   }
   if (outcomeName && outcome && countRegressionMethods().has(request.method)) {
     const values = completeCaseNumericValues(gate, outcomeName);
@@ -662,14 +676,81 @@ function preflightRepeatedMeasureChecks(request: StatsRunRequest): StatsPrefligh
     : request.method === "friedman"
       ? 3
       : null;
-  if (requiredCount === null || request.variables.length >= requiredCount) return [];
-  return [{
-    id: "required-repeated-measure-variables",
-    status: "block",
-    detail: `${request.method} requires at least ${requiredCount} repeated-measure variable(s), but ${request.variables.length} were provided.`,
-    evidenceRefs: ["method", request.method],
-    suggestedAction: `Provide at least ${requiredCount} --variable entries for repeated measurements, or choose a method for independent groups.`,
-  }];
+  if (requiredCount === null) return [];
+  const checks: StatsPreflightCheck[] = [];
+  if (request.variables.length < requiredCount) {
+    checks.push({
+      id: "required-repeated-measure-variables",
+      status: "block",
+      detail: `${request.method} requires at least ${requiredCount} repeated-measure variable(s), but ${request.variables.length} were provided.`,
+      evidenceRefs: ["method", request.method],
+      suggestedAction: `Provide at least ${requiredCount} --variable entries for repeated measurements, or choose a method for independent groups.`,
+    });
+  }
+  const uniqueVariables = new Set(request.variables);
+  if (uniqueVariables.size < request.variables.length) {
+    checks.push({
+      id: "duplicate-repeated-measure-variables",
+      status: "block",
+      detail: `${request.method} received duplicate repeated-measure variable entries: ${request.variables.join(", ")}.`,
+      evidenceRefs: ["method", request.method, ...request.variables],
+      suggestedAction: "Provide distinct repeated-measure columns in the intended temporal or condition order.",
+    });
+  }
+  return checks;
+}
+
+function preflightModelTermChecks(request: StatsRunRequest): StatsPreflightCheck[] {
+  const checks: StatsPreflightCheck[] = [];
+  const duplicateCovariates = duplicatedValues(request.covariates);
+  if (duplicateCovariates.length) {
+    checks.push({
+      id: "duplicate-model-covariates",
+      status: "block",
+      detail: `${request.method} received duplicated adjustment covariate(s): ${duplicateCovariates.join(", ")}.`,
+      evidenceRefs: ["method", request.method, ...duplicateCovariates],
+      suggestedAction: "Remove duplicated covariates before fitting a model or estimating an adjusted contrast.",
+    });
+  }
+  if (!modelTermConflictMethods().has(request.method)) return checks;
+  const roleTerms: Array<{ role: string; value: string | undefined }> = [
+    { role: "outcome", value: request.outcome },
+    { role: "event", value: request.event },
+    { role: "time", value: request.time },
+    { role: "exposure", value: request.exposure },
+    { role: "group", value: request.group },
+    { role: "post", value: request.post },
+    { role: "runningVariable", value: request.runningVariable },
+    { role: "instrument", value: request.instrument },
+  ];
+  const protectedTerms = new Map(roleTerms.filter(item => item.value).map(item => [item.value!, item.role]));
+  const conflictingCovariates = request.covariates
+    .map(covariate => ({ covariate, role: protectedTerms.get(covariate) }))
+    .filter((item): item is { covariate: string; role: string } => Boolean(item.role));
+  if (conflictingCovariates.length) {
+    checks.push({
+      id: "model-role-conflict",
+      status: "block",
+      detail: `${request.method} cannot use primary role variable(s) as adjustment covariates: ${conflictingCovariates.map(item => `${item.covariate} is ${item.role}`).join(", ")}.`,
+      evidenceRefs: ["method", request.method, ...conflictingCovariates.map(item => item.covariate)],
+      suggestedAction: "Remove outcome, time/event, exposure/treatment, group, post, running-variable, and instrument columns from the adjustment covariate set.",
+    });
+  }
+  if (causalMethods().has(request.method) || request.method === "propensity-score-matching" || request.method === "propensity-score-weighting") {
+    const exactConflicts = request.exactCovariates
+      .map(covariate => ({ covariate, role: protectedTerms.get(covariate) }))
+      .filter((item): item is { covariate: string; role: string } => Boolean(item.role));
+    if (exactConflicts.length) {
+      checks.push({
+        id: "exact-match-role-conflict",
+        status: "block",
+        detail: `${request.method} cannot exact-match on primary role variable(s): ${exactConflicts.map(item => `${item.covariate} is ${item.role}`).join(", ")}.`,
+        evidenceRefs: ["method", request.method, ...exactConflicts.map(item => item.covariate)],
+        suggestedAction: "Use baseline covariates only for exact matching; do not exact-match on treatment/exposure, outcome, or design-defining columns.",
+      });
+    }
+  }
+  return checks;
 }
 
 function hasStatsArgument(request: StatsRunRequest, argument: StatsArgumentName): boolean {
@@ -713,6 +794,16 @@ function allAdjustmentCovariatesConstant(request: StatsRunRequest, gate: Feasibi
     const levels = completeCaseLevelCounts(gate, covariate);
     return levels.length > 0 && levels.length < 2;
   });
+}
+
+function duplicatedValues(values: string[]): string[] {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const value of values) {
+    if (seen.has(value)) duplicates.add(value);
+    seen.add(value);
+  }
+  return [...duplicates].sort();
 }
 
 function requiredArgumentsForMethod(method: StatsRunRequest["method"]): StatsArgumentName[] {
@@ -798,7 +889,12 @@ function issueCodeForCheck(id: string): string {
     "required-variables-present": "STATS_REQUIRED_VARIABLE_MISSING",
     "required-method-arguments": "STATS_REQUIRED_ARGUMENT_MISSING",
     "required-repeated-measure-variables": "STATS_REPEATED_MEASURE_VARIABLES_MISSING",
+    "duplicate-repeated-measure-variables": "STATS_REPEATED_MEASURE_VARIABLES_DUPLICATED",
+    "duplicate-model-covariates": "STATS_MODEL_COVARIATES_DUPLICATED",
+    "model-role-conflict": "STATS_MODEL_ROLE_CONFLICT",
+    "exact-match-role-conflict": "STATS_EXACT_MATCH_ROLE_CONFLICT",
     "continuous-outcome-type": "STATS_NON_NUMERIC_OUTCOME",
+    "outcome-variation": "STATS_OUTCOME_VARIATION_INSUFFICIENT",
     "count-outcome-domain": "STATS_COUNT_OUTCOME_DOMAIN_INVALID",
     "zero-inflation-support": "STATS_ZERO_INFLATION_UNSUPPORTED",
     "positive-continuous-outcome-domain": "STATS_POSITIVE_OUTCOME_REQUIRED",
@@ -2074,6 +2170,41 @@ function regressionFamilyMethods(): Set<StatsRunRequest["method"]> {
 
 function countRegressionMethods(): Set<StatsRunRequest["method"]> {
   return new Set(["poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial"]);
+}
+
+function modelTermConflictMethods(): Set<StatsRunRequest["method"]> {
+  return new Set([
+    "ancova",
+    "partial-correlation",
+    ...regressionFamilyMethods(),
+    ...survivalFamilyMethods(),
+    ...longitudinalFamilyMethods(),
+    ...causalMethods(),
+    "propensity-score-matching",
+    "propensity-score-weighting",
+    "model-diagnostics",
+    "missingness-ipw",
+  ]);
+}
+
+function outcomeVariationRequiredMethods(): Set<StatsRunRequest["method"]> {
+  return new Set([
+    "t-test",
+    "welch-t-test",
+    "anova",
+    "ancova",
+    "mann-whitney",
+    "kruskal-wallis",
+    ...categoricalAssociationMethods(),
+    ...correlationMethods(),
+    ...regressionFamilyMethods(),
+    ...survivalFamilyMethods(),
+    ...longitudinalFamilyMethods(),
+    ...causalMethods(),
+    "diagnostic-accuracy",
+    "prediction-evaluation",
+    "model-diagnostics",
+  ]);
 }
 
 function exposureVariationRequiredMethods(): Set<StatsRunRequest["method"]> {
@@ -3655,11 +3786,6 @@ def run(req):
         missing = df[variables].isna().mean().sort_values(ascending=False)
         figures.append(save_fig(out_dir, "missingness-bar.png", "Missingness By Variable", "Fraction missing for variables included in the run.", variables, lambda: plt.bar(missing.index.astype(str), missing.values), "Variable", "Fraction missing"))
     elif method in ("t-test", "welch-t-test", "paired-t-test", "mann-whitney", "wilcoxon"):
-        outcome = req.get("outcome")
-        group = req.get("group") or req.get("exposure")
-        require_columns(df, [outcome, group])
-        variables = [outcome, group]
-        data = df[variables].dropna()
         if method in ("paired-t-test", "wilcoxon"):
             if len(req.get("variables") or []) < 2:
                 raise ValueError("Paired tests require two repeated-measure variables via --variable.")
@@ -3670,24 +3796,46 @@ def run(req):
             y0 = pd.to_numeric(data[v0], errors="coerce")
             y1 = pd.to_numeric(data[v1], errors="coerce")
             ok = y0.notna() & y1.notna()
+            diff = y1[ok] - y0[ok]
+            if int(ok.sum()) < 2:
+                issues.append({"severity": "blocker", "code": "PAIRED_COMPLETE_CASES_TOO_FEW", "message": "Paired tests require at least two complete pairs.", "evidenceRefs": [v0, v1]})
+                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "status": "blocked", "reason": "too_few_complete_pairs"}]
+                diagnostics = {"test": method, "n_pairs": int(ok.sum()), "paired_difference_unique_values": int(diff.nunique(dropna=True))}
+                complete = int(ok.sum())
+            elif int(diff.nunique(dropna=True)) < 2:
+                issues.append({"severity": "blocker", "code": "PAIRED_DIFFERENCE_DEGENERATE", "message": "Paired differences have fewer than two observed values, so paired inference is not estimable.", "evidenceRefs": [v0, v1]})
+                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "mean_difference": clean_value(diff.mean()), "median_difference": clean_value(diff.median()), "status": "blocked", "reason": "degenerate_paired_difference"}]
+                diagnostics = {"test": method, "n_pairs": int(ok.sum()), "paired_difference_unique_values": int(diff.nunique(dropna=True)), "zero_differences": int((diff == 0).sum())}
+                complete = int(ok.sum())
             if method == "paired-t-test":
-                stat, p = stats.ttest_rel(y1[ok], y0[ok], nan_policy="omit")
-                diff = y1[ok] - y0[ok]
-                effect = paired_difference_summary(diff, params["alpha"])
-                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), **effect, "statistic": clean_value(stat), "p_value": clean_value(p)}]
-                diagnostics = {"test": "paired t-test", "n_pairs": int(ok.sum())}
+                if not issues:
+                    stat, p = stats.ttest_rel(y1[ok], y0[ok], nan_policy="omit")
+                    effect = paired_difference_summary(diff, params["alpha"])
+                    estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), **effect, "statistic": clean_value(stat), "p_value": clean_value(p)}]
+                    diagnostics = {"test": "paired t-test", "n_pairs": int(ok.sum()), "paired_difference_unique_values": int(diff.nunique(dropna=True))}
             else:
-                stat, p = stats.wilcoxon(y1[ok], y0[ok])
-                diff = y1[ok] - y0[ok]
-                nonzero = diff[diff != 0]
-                abs_rank = stats.rankdata(np.abs(nonzero)) if len(nonzero) else []
-                signed_rank_sum = float(np.sum(np.sign(nonzero) * abs_rank)) if len(nonzero) else np.nan
-                rank_total = float(np.sum(abs_rank)) if len(nonzero) else np.nan
-                matched_rank_biserial = signed_rank_sum / rank_total if rank_total else np.nan
-                estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "median_difference": clean_value(diff.median()), "matched_rank_biserial_correlation": clean_value(matched_rank_biserial), "statistic": clean_value(stat), "p_value": clean_value(p)}]
-                diagnostics = {"test": "Wilcoxon signed-rank", "n_pairs": int(ok.sum()), "zero_differences": int((diff == 0).sum())}
+                if not issues:
+                    nonzero = diff[diff != 0]
+                    if len(nonzero) == 0:
+                        issues.append({"severity": "blocker", "code": "PAIRED_DIFFERENCE_DEGENERATE", "message": "Wilcoxon signed-rank requires at least one nonzero paired difference.", "evidenceRefs": [v0, v1]})
+                        estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "median_difference": clean_value(diff.median()), "status": "blocked", "reason": "all_paired_differences_zero"}]
+                        diagnostics = {"test": "Wilcoxon signed-rank", "n_pairs": int(ok.sum()), "zero_differences": int((diff == 0).sum())}
+                    else:
+                        stat, p = stats.wilcoxon(y1[ok], y0[ok])
+                        abs_rank = stats.rankdata(np.abs(nonzero)) if len(nonzero) else []
+                        signed_rank_sum = float(np.sum(np.sign(nonzero) * abs_rank)) if len(nonzero) else np.nan
+                        rank_total = float(np.sum(abs_rank)) if len(nonzero) else np.nan
+                        matched_rank_biserial = signed_rank_sum / rank_total if rank_total else np.nan
+                        estimates = [{"term": f"{v1} - {v0}", "n": int(ok.sum()), "median_difference": clean_value(diff.median()), "matched_rank_biserial_correlation": clean_value(matched_rank_biserial), "statistic": clean_value(stat), "p_value": clean_value(p)}]
+                        diagnostics = {"test": "Wilcoxon signed-rank", "n_pairs": int(ok.sum()), "zero_differences": int((diff == 0).sum()), "paired_difference_unique_values": int(diff.nunique(dropna=True))}
             complete = int(ok.sum())
+            figures.append(save_fig(out_dir, "paired-difference.png", "Paired Difference Distribution", "Histogram of within-unit repeated-measure differences.", [v0, v1], lambda: plt.hist(diff.dropna(), bins=min(20, max(5, int(np.sqrt(max(1, len(diff.dropna()))))))), f"{v1} - {v0}", "Frequency"))
         else:
+            outcome = req.get("outcome")
+            group = req.get("group") or req.get("exposure")
+            require_columns(df, [outcome, group])
+            variables = [outcome, group]
+            data = df[variables].dropna()
             groups = list(data[group].unique())
             if len(groups) != 2:
                 raise ValueError("Expected exactly two groups.")
@@ -3749,6 +3897,7 @@ def run(req):
         estimates = [{"term": "friedman", "statistic": clean_value(stat), "p_value": clean_value(p), "repeated_measures": len(variables), "n": int(data.shape[0])}]
         diagnostics = {"test": "Friedman repeated-measures rank test"}
         complete = int(data.shape[0])
+        figures.append(save_fig(out_dir, "repeated-measure-profile.png", "Repeated-Measure Profile", "Mean repeated-measure value across complete cases for each measurement column.", variables, lambda: plt.plot(range(len(variables)), [pd.to_numeric(data[c], errors="coerce").mean() for c in variables], marker="o"), "Measurement", "Mean value"))
     elif method in ("chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend"):
         outcome = req.get("outcome")
         exposure = req.get("exposure") or req.get("group")

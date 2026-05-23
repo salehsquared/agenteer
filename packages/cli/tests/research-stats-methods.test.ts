@@ -64,6 +64,8 @@ describe("research stats methods expansion", () => {
     expect(getStatisticalMethodSpec("paired-t-test").requiredArguments).toEqual(["variables"]);
     expect(getStatisticalMethodSpec("wilcoxon").requiredArguments).toEqual(["variables"]);
     expect(getStatisticalMethodSpec("friedman").requiredArguments).toEqual(["variables"]);
+    expect(getStatisticalMethodSpec("paired-t-test").expectedFigures.filter(figure => figure.required).map(figure => figure.id)).toEqual(["paired-difference-distribution"]);
+    expect(getStatisticalMethodSpec("friedman").expectedFigures.filter(figure => figure.required).map(figure => figure.id)).toEqual(["repeated-measure-profile"]);
   });
 
   it("exposes stats contracts through an operator-facing command renderer", () => {
@@ -86,7 +88,10 @@ describe("research stats methods expansion", () => {
     const { dir, dataPath } = await writeStatsFixture();
     const runs = [
       ["welch-t-test", { outcome: "y", group: "g" }],
+      ["paired-t-test", { variables: ["wide1", "wide2"] }],
+      ["wilcoxon", { variables: ["wide1", "wide2"] }],
       ["kruskal-wallis", { outcome: "y", group: "cat" }],
+      ["friedman", { variables: ["wide1", "wide2", "wide3"] }],
       ["cochran-armitage-trend", { outcome: "ybin", exposure: "g" }],
       ["partial-correlation", { outcome: "y", exposure: "x", covariates: ["g"] }],
       ["robust-linear-regression", { outcome: "y", exposure: "x", covariates: ["g"] }],
@@ -1402,6 +1407,33 @@ describe("research stats methods expansion", () => {
     expect(regression.status).toBe("failed");
     expect(regression.issues.map(issue => issue.code)).toContain("STATS_EXPOSURE_VARIATION_INSUFFICIENT");
 
+    const constantOutcomePath = path.join(dir, "constant-outcome.csv");
+    await writeFile(constantOutcomePath, [
+      "y,x,z",
+      ...Array.from({ length: 80 }, (_, index) => `1,${(index / 10).toFixed(3)},${index % 2}`),
+    ].join("\n"));
+    const constantOutcome = await researchStatsRunCommand({
+      method: "linear-regression",
+      dataPath: constantOutcomePath,
+      outDir: path.join(dir, "constant-outcome-run"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: ["z"],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(constantOutcome.status).toBe("failed");
+    expect(constantOutcome.issues.map(issue => issue.code)).toContain("STATS_OUTCOME_VARIATION_INSUFFICIENT");
+
     const oneGroupPath = path.join(dir, "one-group.csv");
     await writeFile(oneGroupPath, [
       "y,g",
@@ -1455,6 +1487,102 @@ describe("research stats methods expansion", () => {
     });
     expect(partial.status).toBe("failed");
     expect(partial.issues.map(issue => issue.code)).toContain("STATS_COVARIATE_VARIATION_INSUFFICIENT");
+
+    const constantCategoricalOutcomePath = path.join(dir, "constant-categorical-outcome.csv");
+    await writeFile(constantCategoricalOutcomePath, [
+      "y,g",
+      ...Array.from({ length: 80 }, (_, index) => `case,${index % 2}`),
+    ].join("\n"));
+    const categorical = await researchStatsRunCommand({
+      method: "chi-square",
+      dataPath: constantCategoricalOutcomePath,
+      outDir: path.join(dir, "constant-categorical-outcome-run"),
+      outcome: "y",
+      exposure: "g",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(categorical.status).toBe("failed");
+    expect(categorical.issues.map(issue => issue.code)).toContain("STATS_OUTCOME_VARIATION_INSUFFICIENT");
+  }, 60_000);
+
+  it("blocks duplicated model terms and conflicting adjustment roles before execution", async () => {
+    const { dir, dataPath } = await writeStatsFixture();
+    const duplicatedCovariates = await researchStatsRunCommand({
+      method: "linear-regression",
+      dataPath,
+      outDir: path.join(dir, "duplicate-model-covariates"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: ["g", "g"],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(duplicatedCovariates.status).toBe("failed");
+    expect(duplicatedCovariates.issues.map(issue => issue.code)).toContain("STATS_MODEL_COVARIATES_DUPLICATED");
+
+    const exposureAsCovariate = await researchStatsRunCommand({
+      method: "linear-regression",
+      dataPath,
+      outDir: path.join(dir, "exposure-as-covariate"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: ["x", "g"],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(exposureAsCovariate.status).toBe("failed");
+    expect(exposureAsCovariate.issues.map(issue => issue.code)).toContain("STATS_MODEL_ROLE_CONFLICT");
+
+    const exactTreatmentConflict = await researchStatsRunCommand({
+      method: "propensity-score-matching",
+      dataPath,
+      outDir: path.join(dir, "exact-treatment-conflict"),
+      outcome: "y",
+      exposure: "treat",
+      variables: [],
+      covariates: ["x", "cat"],
+      exactCovariates: ["treat"],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(exactTreatmentConflict.status).toBe("failed");
+    expect(exactTreatmentConflict.issues.map(issue => issue.code)).toContain("STATS_EXACT_MATCH_ROLE_CONFLICT");
   }, 60_000);
 
   it("blocks event models when event counts are too sparse for reliable inference", async () => {
@@ -1664,6 +1792,121 @@ describe("research stats methods expansion", () => {
     });
     expect(friedman.status).toBe("failed");
     expect(friedman.issues.map(issue => issue.code)).toContain("STATS_REPEATED_MEASURE_VARIABLES_MISSING");
+
+    const duplicateRepeated = await researchStatsRunCommand({
+      method: "paired-t-test",
+      dataPath,
+      outDir: path.join(dir, "duplicate-paired-measures"),
+      variables: ["wide1", "wide1"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(duplicateRepeated.status).toBe("failed");
+    expect(duplicateRepeated.issues.map(issue => issue.code)).toContain("STATS_REPEATED_MEASURE_VARIABLES_DUPLICATED");
+  });
+
+  it("executes repeated-measure methods from variable-only contracts", async () => {
+    const { dir, dataPath } = await writeStatsFixture();
+    const paired = await researchStatsRunCommand({
+      method: "paired-t-test",
+      dataPath,
+      outDir: path.join(dir, "paired-variable-contract"),
+      variables: ["wide1", "wide2"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(paired.status).toBe("succeeded");
+    expect(paired.estimates[0]?.term).toBe("wide2 - wide1");
+    expect(paired.artifacts.some(artifact => artifact.kind === "figure" && artifact.path.endsWith("paired-difference.png"))).toBe(true);
+
+    const friedman = await researchStatsRunCommand({
+      method: "friedman",
+      dataPath,
+      outDir: path.join(dir, "friedman-variable-contract"),
+      variables: ["wide1", "wide2", "wide3"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(friedman.status).toBe("succeeded");
+    expect(friedman.estimates[0]).toMatchObject({ term: "friedman", repeated_measures: 3 });
+    expect(friedman.artifacts.some(artifact => artifact.kind === "figure" && artifact.path.endsWith("repeated-measure-profile.png"))).toBe(true);
+  });
+
+  it("blocks repeated-measure tests when paired differences are degenerate", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-paired-degenerate-"));
+    const dataPath = path.join(dir, "paired-degenerate.csv");
+    await writeFile(dataPath, [
+      "pre,post",
+      ...Array.from({ length: 40 }, (_, index) => `${index},${index}`),
+    ].join("\n"));
+
+    const paired = await researchStatsRunCommand({
+      method: "paired-t-test",
+      dataPath,
+      outDir: path.join(dir, "paired"),
+      variables: ["pre", "post"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(paired.status).toBe("failed");
+    expect(paired.issues.map(issue => issue.code)).toContain("PAIRED_DIFFERENCE_DEGENERATE");
+    expect(paired.diagnostics).toMatchObject({ paired_difference_unique_values: 1 });
+
+    const wilcoxon = await researchStatsRunCommand({
+      method: "wilcoxon",
+      dataPath,
+      outDir: path.join(dir, "wilcoxon"),
+      variables: ["pre", "post"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(wilcoxon.status).toBe("failed");
+    expect(wilcoxon.issues.map(issue => issue.code)).toContain("PAIRED_DIFFERENCE_DEGENERATE");
   });
 
   it("maps expanded method ontology ids to stats-run methods", () => {

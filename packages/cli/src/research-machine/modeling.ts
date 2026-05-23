@@ -695,6 +695,7 @@ function buildStatisticalMethodGuidance(
   const predictors = summary ? summary.columns.filter(column => column.name !== target) : [];
   const numericPredictors = predictors.filter(column => columnKind(column) === "continuous" || columnKind(column) === "count");
   const categoricalPredictors = predictors.filter(column => columnKind(column) === "binary" || columnKind(column) === "categorical");
+  const repeatedMeasures = repeatedMeasureColumns(targetColumn, numericPredictors, request);
   const maxMissingFraction = summary ? summary.columns.reduce((max, column) => Math.max(max, column.missingFraction), 0) : null;
   const targetType = targetColumn ? columnKind(targetColumn) : outcomeTypeToTargetKind(outcomeType);
   const classCount = targetColumn ? classCountFor(targetColumn) : request.classCount ?? null;
@@ -752,6 +753,9 @@ function buildStatisticalMethodGuidance(
   if (sparseGroupingColumn) {
     warnings.push(issue("warning", "METHOD_GUIDANCE_SPARSE_GROUP", `Grouping/predictor column '${sparseGroupingColumn.name}' has a sparse observed level; verify small-cell policy before group comparisons.`, [sparseGroupingColumn.name]));
   }
+  if (request.repeatedMeasures && repeatedMeasures.length < 2) {
+    blockers.push(issue("blocker", "METHOD_GUIDANCE_REPEATED_MEASURES_MISSING", "Repeated-measures analysis was requested, but fewer than two repeated numeric measurement columns were visible in the table summary.", ["request.repeatedMeasures", "tableSummary.columns"]));
+  }
 
   let recommended: string | null = null;
   let rationale = "Insufficient table detail; start with descriptive profiling and method-selection evidence.";
@@ -766,7 +770,21 @@ function buildStatisticalMethodGuidance(
     add("prediction-evaluation", "sensitivity", "If the index test is a continuous score, add ROC/PR and calibration-style evaluation.", ["ROC/PR", "Brier score", "threshold policy"]);
   } else if (goal === "compare_groups") {
     const grouping = bestGroupingColumn(categoricalPredictors);
-    if (targetType === "continuous" && grouping) {
+    if (request.repeatedMeasures && repeatedMeasures.length >= 2) {
+      if (repeatedMeasures.length === 2) {
+        recommended = smallSample ? "wilcoxon" : "paired-t-test";
+        rationale = smallSample
+          ? "Repeated paired measurements with small sample: Wilcoxon signed-rank is safer as the primary executable paired comparison."
+          : "Two repeated measurements on the same units: paired t-test is the correct primary route when the within-pair difference distribution is acceptable.";
+        add(recommended, "primary", rationale, ["paired completeness", "difference distribution", "within-subject pairing integrity"]);
+        add(recommended === "paired-t-test" ? "wilcoxon" : "paired-t-test", "sensitivity", "Use as a sensitivity route for paired-difference distribution assumptions.", ["paired completeness", "difference distribution"]);
+      } else {
+        recommended = "friedman";
+        rationale = "More than two repeated measurements were detected; Friedman provides a nonparametric repeated-measure omnibus test before post-hoc contrasts.";
+        add("friedman", "primary", rationale, ["repeated-measure completeness", "subject-level pairing integrity", "post-hoc/multiplicity policy"]);
+        add("repeated-measures-anova", "sensitivity", "Use only when repeated-measures ANOVA assumptions and sphericity policy are reviewed.", ["sphericity", "residual diagnostics", "post-hoc/multiplicity policy"]);
+      }
+    } else if (targetType === "continuous" && grouping) {
       if (classCountFor(grouping) === 2) {
         recommended = smallSample || (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5 ? "mann-whitney" : "welch-t-test";
         rationale = smallSample
@@ -783,16 +801,30 @@ function buildStatisticalMethodGuidance(
         add(recommended === "anova" ? "kruskal-wallis" : "anova", "sensitivity", "Use as an assumption-checking companion route.", ["rank method disclosure", "variance/normality review"]);
       }
     } else if ((targetType === "binary" || targetType === "categorical") && grouping) {
-      recommended = smallSample || (eventCount !== null && eventCount < 10) || (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5 ? "fisher-exact" : "chi-square";
-      rationale = smallSample
-        ? "Categorical comparison with small sample: exact testing is safer than asymptotic chi-square when the table is 2x2."
-        : eventCount !== null && eventCount < 10
-          ? "Categorical comparison with rare events: exact testing or suppressed descriptive review is safer than asymptotic chi-square."
-          : (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5
-            ? "Categorical comparison with sparse group margins: exact testing or suppressed descriptive review is safer than asymptotic chi-square."
-        : "Categorical comparison: start with chi-square and fall back to Fisher/exact review for sparse cells.";
+      const outcomeLevels = targetColumn ? classCountFor(targetColumn) : classCount;
+      const groupLevels = classCountFor(grouping);
+      const twoByTwo = outcomeLevels === 2 && groupLevels === 2;
+      const sparseCategorical = smallSample || (eventCount !== null && eventCount < 10) || (minValueCount(grouping) ?? Number.POSITIVE_INFINITY) < 5 || (minTargetClassCount ?? Number.POSITIVE_INFINITY) < 5;
+      if (sparseCategorical && !twoByTwo) {
+        warnings.push(issue(
+          "warning",
+          "METHOD_GUIDANCE_EXACT_TEST_REQUIRES_2X2",
+          `Sparse categorical table appears to be ${groupLevels ?? "unknown"}x${outcomeLevels ?? "unknown"}; this runner's Fisher exact route is limited to true 2x2 tables.`,
+          [grouping.name, targetColumn?.name ?? target ?? "outcome"],
+        ));
+      }
+      recommended = sparseCategorical && twoByTwo ? "fisher-exact" : "chi-square";
+      rationale = sparseCategorical && twoByTwo
+        ? "Categorical comparison has sparse/small 2x2 support; Fisher exact is safer than asymptotic chi-square."
+        : sparseCategorical
+          ? "Categorical comparison is sparse but not a true 2x2 table; use chi-square only as a reviewed/sensitivity route with sparse-cell disclosure rather than forcing Fisher exact."
+          : "Categorical comparison: start with chi-square and fall back to Fisher/exact review only for true sparse 2x2 tables.";
       add(recommended, "primary", rationale, ["cell counts", "expected counts", "effect size", "sparse-cell policy"]);
-      add(recommended === "chi-square" ? "fisher-exact" : "chi-square", "fallback", "Use when cell-count diagnostics indicate the primary route is inappropriate.", ["2x2 verification", "expected counts"]);
+      if (twoByTwo) {
+        add(recommended === "chi-square" ? "fisher-exact" : "chi-square", "fallback", "Use when cell-count diagnostics indicate the primary route is inappropriate.", ["2x2 verification", "expected counts"]);
+      } else if (sparseCategorical) {
+        add("descriptive", "sensitivity", "When sparse multi-level cells make asymptotic inference fragile, report reviewed counts and suppress unstable contrasts.", ["cell counts", "small-cell suppression", "category-collapse rationale"]);
+      }
     }
   } else if (goal === "associate" || goal === "causal") {
     if (targetType === "binary") {
@@ -979,6 +1011,34 @@ function bestGroupingColumn(columns: ModelingTableColumn[]): ModelingTableColumn
   })[0] ?? null;
 }
 
+function repeatedMeasureColumns(
+  target: ModelingTableColumn | null,
+  numericPredictors: ModelingTableColumn[],
+  request: ModelingDecisionRequest,
+): ModelingTableColumn[] {
+  if (!request.repeatedMeasures && !request.dataStructures.includes("repeated_measures")) return [];
+  const candidates = [target, ...numericPredictors].filter((column): column is ModelingTableColumn => Boolean(column));
+  const seen = new Set<string>();
+  return candidates
+    .filter(column => {
+      if (seen.has(column.name)) return false;
+      seen.add(column.name);
+      const lower = column.name.toLowerCase();
+      if (/(^|_)(id|subject|person|patient|encounter|visit|row)(_|$)/.test(lower)) return false;
+      if (/(group|arm|treat|exposure|case|control|sex|gender|race|site|hospital)/.test(lower) && columnKind(column) !== "continuous") return false;
+      return columnKind(column) === "continuous" || columnKind(column) === "count";
+    })
+    .sort((a, b) => repeatedMeasureOrder(a.name) - repeatedMeasureOrder(b.name) || a.name.localeCompare(b.name));
+}
+
+function repeatedMeasureOrder(name: string): number {
+  const lower = name.toLowerCase();
+  if (/baseline|pre|before|time[_-]?0|t0|month[_-]?0|day[_-]?0/.test(lower)) return 0;
+  if (/post|after|follow|time[_-]?1|t1|month[_-]?1|day[_-]?1/.test(lower)) return 10;
+  const match = lower.match(/(?:time|month|week|day|visit|t)[_-]?(\d+)/);
+  return match ? 20 + Number(match[1]) : 100;
+}
+
 function statsRunMethodCommandForGuidance(
   method: string,
   request: ModelingDecisionRequest,
@@ -990,7 +1050,17 @@ function statsRunMethodCommandForGuidance(
   const outcome = target?.name ?? request.target ?? "<outcome>";
   const exposure = numericPredictors[0]?.name ?? categoricalPredictors[0]?.name ?? "<exposure>";
   const group = bestGroupingColumn(categoricalPredictors)?.name ?? "<group>";
+  const repeatedMeasures = repeatedMeasureColumns(target, numericPredictors, request);
   if (["descriptive", "missingness-summary", "pca", "clustering-validation"].includes(method)) return `${shared} --variable <column>`;
+  if (["paired-t-test", "wilcoxon"].includes(method)) {
+    const variables = repeatedMeasures.slice(0, 2).map(column => `--variable ${column.name}`).join(" ");
+    return `${shared} ${variables || "--variable <pre-measure> --variable <post-measure>"}`;
+  }
+  if (method === "friedman") {
+    const variables = repeatedMeasures.slice(0, 3).map(column => `--variable ${column.name}`).join(" ");
+    return `${shared} ${variables || "--variable <time-1-measure> --variable <time-2-measure> --variable <time-3-measure>"}`;
+  }
+  if (method === "repeated-measures-anova") return `${shared} --outcome <outcome> --exposure <time-or-condition> --id <subject-id>`;
   if (["t-test", "welch-t-test", "mann-whitney", "anova", "kruskal-wallis"].includes(method)) return `${shared} --outcome ${outcome} --group ${group}`;
   if (["chi-square", "fisher-exact"].includes(method)) return `${shared} --outcome ${outcome} --exposure ${group}`;
   if (["pearson", "spearman", "kendall"].includes(method)) return `${shared} --outcome ${outcome} --exposure ${exposure}`;
@@ -1166,10 +1236,10 @@ function guidanceCautionsForMethod(method: AnalysisMethod, guidance: ModelingDec
 function statsRunCommandHint(statsMethod: string, methodId: string): string {
   const shared = `agenteer research stats-run --method ${statsMethod} --data <rows.csv> --out-dir <out>`;
   if (statsMethod === "descriptive") return `${shared} --variable <column>`;
-  if (statsMethod === "paired-t-test" || statsMethod === "wilcoxon") return `${shared} --outcome <post-measure> --exposure <pre-measure>`;
+  if (statsMethod === "paired-t-test" || statsMethod === "wilcoxon") return `${shared} --variable <pre-measure> --variable <post-measure>`;
   if (["t-test", "welch-t-test", "mann-whitney", "anova", "kruskal-wallis"].includes(statsMethod)) return `${shared} --outcome <continuous-outcome> --group <group>`;
   if (statsMethod === "ancova") return `${shared} --outcome <continuous-outcome> --group <group> --covariate <covariate>`;
-  if (statsMethod === "friedman") return `${shared} --outcome <repeated-measure> --group <time-or-condition> --id <subject-id>`;
+  if (statsMethod === "friedman") return `${shared} --variable <time-1-measure> --variable <time-2-measure> --variable <time-3-measure>`;
   if (["chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend"].includes(statsMethod)) return `${shared} --outcome <categorical-outcome> --exposure <categorical-exposure>`;
   if (["pearson", "spearman", "kendall", "partial-correlation"].includes(statsMethod)) return `${shared} --outcome <continuous-outcome> --exposure <continuous-exposure>${statsMethod === "partial-correlation" ? " --covariate <covariate>" : ""}`;
   if (["linear-regression", "robust-linear-regression", "quantile-regression", "penalized-linear-regression"].includes(statsMethod)) return `${shared} --outcome <continuous-outcome> --exposure <exposure> --covariate <covariate>`;
