@@ -121,9 +121,12 @@ export {
 export {
   parseStatsMethod,
   researchFigureQaCommand,
+  researchStatsContractsCommand,
   researchStatsRunCommand,
   renderResearchFigureQa,
   renderResearchFigureQaJson,
+  renderResearchStatsContracts,
+  renderResearchStatsContractsJson,
   renderResearchStatsRun,
   renderResearchStatsRunJson,
 } from "./research-machine/stats/commands.js";
@@ -166,6 +169,14 @@ export {
   type StatsRunRequest,
   type StatsRunResult,
 } from "./research-machine/stats/schemas.js";
+export {
+  figureSpecSchema,
+  getStatisticalMethodSpec,
+  listStatisticalMethodSpecs,
+  statisticalMethodSpecSchema,
+  type FigureSpec,
+  type StatisticalMethodSpec,
+} from "./research-machine/stats/contracts.js";
 export {
   analysisMethodIdsWithStatsRunner,
   statsRunMethodForAnalysisMethod,

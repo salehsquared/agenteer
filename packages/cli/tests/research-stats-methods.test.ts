@@ -2,7 +2,7 @@ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { researchFigureQaCommand, researchStatsRunCommand, statsRunMethodForAnalysisMethod } from "../src/index.js";
+import { getStatisticalMethodSpec, listStatisticalMethodSpecs, researchFigureQaCommand, researchStatsContractsCommand, researchStatsRunCommand, renderResearchStatsContracts, renderResearchStatsContractsJson, statisticalMethodSpecSchema, statsMethodSchema, statsRunMethodForAnalysisMethod } from "../src/index.js";
 
 const python = path.resolve(".research-runtime/python/bin/python");
 
@@ -40,6 +40,40 @@ async function writeStatsFixture(): Promise<{ dir: string; dataPath: string }> {
 }
 
 describe("research stats methods expansion", () => {
+  it("defines inspectable method contracts for every executable stats method", () => {
+    const specs = listStatisticalMethodSpecs();
+    expect(specs.map(spec => spec.method).sort()).toEqual([...statsMethodSchema.options].sort());
+    for (const spec of specs) {
+      expect(() => statisticalMethodSpecSchema.parse(spec)).not.toThrow();
+      expect(spec.assumptions.length, spec.method).toBeGreaterThan(0);
+      expect(spec.diagnostics.length, spec.method).toBeGreaterThan(0);
+      expect(spec.expectedTables.length, spec.method).toBeGreaterThan(0);
+      expect(spec.qaGates.length, spec.method).toBeGreaterThan(0);
+      expect(spec.failureModes.length, spec.method).toBeGreaterThan(0);
+      expect(spec.interpretationBoundary.length, spec.method).toBeGreaterThan(20);
+    }
+    const cox = getStatisticalMethodSpec("cox-proportional-hazards");
+    expect(cox.family).toBe("survival");
+    expect(cox.requiredArguments).toEqual(expect.arrayContaining(["time", "event", "exposure"]));
+    expect(cox.assumptions.join(" ")).toMatch(/time zero|censoring/i);
+  });
+
+  it("exposes stats contracts through an operator-facing command renderer", () => {
+    const single = researchStatsContractsCommand({ method: "prediction-evaluation" });
+    expect(single.contracts).toHaveLength(1);
+    expect(single.contracts[0]).toMatchObject({
+      method: "prediction-evaluation",
+      family: "prediction",
+      requiredArguments: expect.arrayContaining(["outcome", "exposure"]),
+    });
+    expect(single.contracts[0]?.expectedFigures.map(figure => figure.type)).toEqual(expect.arrayContaining(["roc", "precision_recall", "calibration"]));
+    expect(renderResearchStatsContracts(single)).toContain("prediction-evaluation: prediction");
+    expect(renderResearchStatsContracts(single)).toContain("required figures");
+    const parsed = JSON.parse(renderResearchStatsContractsJson(single)) as { statsContracts: { contracts: Array<{ method: string; qaGates: string[] }> } };
+    expect(parsed.statsContracts.contracts[0]?.method).toBe("prediction-evaluation");
+    expect(parsed.statsContracts.contracts[0]?.qaGates).toContain("calibration");
+  });
+
   it("executes representative core, regression, survival, causal, missingness, and psychometric methods", async () => {
     const { dir, dataPath } = await writeStatsFixture();
     const runs = [
@@ -98,6 +132,58 @@ describe("research stats methods expansion", () => {
       expect(qa.checks.find(check => check.id === "preflight-reliability-gate")?.status).toMatch(/pass|warning/);
     }
   }, 240_000);
+
+  it("writes method contracts into stats packets and QA checks the contract", async () => {
+    const { dir, dataPath } = await writeStatsFixture();
+    const outDir = path.join(dir, "contracted-welch");
+    const result = await researchStatsRunCommand({
+      method: "welch-t-test",
+      dataPath,
+      outDir,
+      outcome: "y",
+      group: "g",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(result.status).toBe("succeeded");
+    expect(result.artifacts.some(artifact => artifact.kind === "method-contract")).toBe(true);
+    const contract = JSON.parse(await readFile(path.join(outDir, "method-contract.json"), "utf-8")) as {
+      statisticalMethodSpec: {
+        method: string;
+        family: string;
+        requiredArguments: string[];
+        assumptions: string[];
+        expectedFigures: Array<{ id: string; required: boolean }>;
+        qaGates: string[];
+      };
+    };
+    expect(contract.statisticalMethodSpec).toMatchObject({
+      method: "welch-t-test",
+      family: "core_inference",
+      requiredArguments: expect.arrayContaining(["outcome", "group"]),
+    });
+    expect(contract.statisticalMethodSpec.assumptions.join(" ")).toMatch(/distributional|p-values/i);
+    expect(contract.statisticalMethodSpec.expectedFigures.some(figure => figure.required)).toBe(true);
+    const qa = JSON.parse(await readFile(path.join(outDir, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+    expect(qa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
+      "method-contract-artifact",
+      "method-contract-required-inputs",
+      "method-contract-diagnostics",
+      "method-contract-figure-coverage",
+      "method-contract-escalation-rules",
+    ]));
+    expect(qa.checks.find(check => check.id === "method-contract-artifact")?.status).toBe("pass");
+  }, 60_000);
 
   it("inspects rendered figures for dimensions, blankness, captions, alt text, and source columns", async () => {
     const { dir, dataPath } = await writeStatsFixture();
@@ -287,11 +373,22 @@ describe("research stats methods expansion", () => {
     });
     expect(count.status).toBe("succeeded");
     expect(count.diagnostics).toMatchObject({ model_family: "poisson-regression", n_predictors: expect.any(Number), overdispersion_ratio: expect.any(Number), zero_fraction: expect.any(Number) });
+    expect(count.diagnostics).toMatchObject({ high_influence_rows: expect.any(Number), artifacts: expect.objectContaining({ model_diagnostics: expect.stringContaining("model-diagnostics.csv") }) });
+    expect(count.artifacts.map(artifact => artifact.kind)).toContain("model-diagnostics");
+    const modelDiagnostics = await readFile(path.join(countOut, "model-diagnostics.csv"), "utf-8");
+    expect(modelDiagnostics).toContain("fitted");
+    expect(modelDiagnostics).toContain("residual");
+    expect(modelDiagnostics).toContain("cooks_distance");
+    expect(modelDiagnostics).toContain("high_influence_flag");
+    const countFigures = JSON.parse(await readFile(path.join(countOut, "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string; sourceColumns: string[] }> };
+    expect(countFigures.figures.map(figure => path.basename(figure.path))).toEqual(expect.arrayContaining(["model-residuals.png", "model-influence.png", "model-coefficients.png"]));
+    expect(countFigures.figures.find(figure => path.basename(figure.path) === "model-coefficients.png")?.sourceColumns).toEqual(expect.arrayContaining(["count", "x", "g"]));
     const countQa = JSON.parse(await readFile(path.join(countOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
     expect(countQa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
       "model-diagnostics-present",
       "model-count-overdispersion",
       "model-collinearity",
+      "model-diagnostics-artifact",
     ]));
 
     const kmOut = path.join(dir, "km-reliability");
@@ -366,7 +463,11 @@ describe("research stats methods expansion", () => {
       harrell_c_index: expect.any(Number),
       concordance_comparable_pairs: expect.any(Number),
       tied_event_times: expect.any(Number),
-      proportional_hazards_check: "not_available",
+      proportional_hazards_check: expect.stringMatching(/pass|warning|underpowered|not_available/),
+      proportional_hazards_diagnostic: expect.objectContaining({
+        method: "time_interaction_approximation",
+        status: expect.stringMatching(/pass|warning|underpowered|not_available/),
+      }),
     });
     const survivalQa = JSON.parse(await readFile(path.join(survivalOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
     expect(survivalQa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
@@ -377,7 +478,7 @@ describe("research stats methods expansion", () => {
       "cox-tie-burden",
       "cox-proportional-hazards-diagnostic",
     ]));
-    expect(survivalQa.checks.find(check => check.id === "cox-proportional-hazards-diagnostic")?.status).toBe("warning");
+    expect(survivalQa.checks.find(check => check.id === "cox-proportional-hazards-diagnostic")?.status).toMatch(/pass|warning/);
 
     const recurrentOut = path.join(dir, "recurrent-reliability");
     const recurrent = await researchStatsRunCommand({
@@ -622,6 +723,9 @@ describe("research stats methods expansion", () => {
       }),
     });
     expect(overlap.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "weights", "propensity-overlap"]));
+    expect(overlap.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["figure", "figure-manifest", "figure-qa"]));
+    const overlapFigures = JSON.parse(await readFile(path.join(overlapOut, "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string }> };
+    expect(overlapFigures.figures.map(figure => path.basename(figure.path))).toEqual(expect.arrayContaining(["causal-love-plot.png", "causal-propensity-overlap.png"]));
     const overlapQa = JSON.parse(await readFile(path.join(overlapOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
     expect(overlapQa.checks.map(check => check.id)).toEqual(expect.arrayContaining([
       "causal-design-boundary",

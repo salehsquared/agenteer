@@ -256,9 +256,12 @@ import {
 import {
   parseStatsMethod,
   researchFigureQaCommand,
+  researchStatsContractsCommand,
   researchStatsRunCommand,
   renderResearchFigureQa,
   renderResearchFigureQaJson,
+  renderResearchStatsContracts,
+  renderResearchStatsContractsJson,
   renderResearchStatsRun,
   renderResearchStatsRunJson,
 } from "../research-machine/stats/commands.js";
@@ -851,6 +854,7 @@ Usage:
   agenteer research ml-run --task <task> --model <id> --data <rows.csv|json|parquet> [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--test-size <n>] [--seed <n>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-compare --task <task> --data <rows.csv|json|parquet> --model <id>* [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-inspect --run <ml-run.json> [--json]
+  agenteer research stats-contracts [--method <stats-method>] [--json]
   agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--time <column>] [--event <column>] [--id <column>] [--strata <column>] [--cluster <column>] [--period <column>] [--post <column>] [--running-variable <column>] [--cutoff <n>] [--instrument <column>] [--alpha-penalty <n>] [--l1-ratio <n>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--exact-covariate <column>]* [--weight <column>] [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
   agenteer research figure-qa --figures <figures.json> [--out <figure-qa.json>] [--report <figure-qa.md>] [--json]
   agenteer research explore --data <rows.csv|json|parquet> [--out-dir <dir>] [--target <column>] [--max-pairs <n>] [--python <path>] [--json]
@@ -2474,6 +2478,14 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       const result = await researchMlInspectCommand({ runPath: requireFlagString(flags, "run") });
       console.log(flags.json === true ? renderResearchMlRunJson(result) : renderResearchMlRun(result));
       return result.status === "failed" ? 1 : 0;
+    }
+    case "stats-contracts": {
+      const methodRaw = flagString(flags, "method");
+      const result = researchStatsContractsCommand({
+        method: methodRaw ? parseStatsMethod(methodRaw) : undefined,
+      });
+      console.log(flags.json === true ? renderResearchStatsContractsJson(result) : renderResearchStatsContracts(result));
+      return result.contracts.length ? 0 : 1;
     }
     case "stats-run": {
       const result = await researchStatsRunCommand({

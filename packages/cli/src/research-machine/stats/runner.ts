@@ -6,6 +6,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { researchFeasibilityGateCommand, renderResearchFeasibilityGateMarkdown, type FeasibilityGateResult } from "../feasibility.js";
 import { stableHash } from "../runtime.js";
+import { getStatisticalMethodSpec } from "./contracts.js";
 import { buildFigureQa } from "./figure-qa.js";
 import { statsRunMethodForAnalysisMethod } from "./method-map.js";
 import { statsRunRequestSchema, type StatsArtifact, type StatsIssue, type StatsResultPosture, type StatsRunRequest, type StatsRunResult } from "./schemas.js";
@@ -757,8 +758,37 @@ async function attachHashes(result: StatsRunResult): Promise<StatsRunResult> {
 async function writeStatsPacketArtifacts(result: StatsRunResult, request: StatsRunRequest): Promise<StatsRunResult> {
   const reportPath = path.join(request.outDir, "stats-report.md");
   const qaPath = path.join(request.outDir, "stats-qa.json");
+  const methodContractPath = path.join(request.outDir, "method-contract.json");
   await mkdir(request.outDir, { recursive: true });
   let augmentedResult = result;
+  const methodContract = getStatisticalMethodSpec(result.method);
+  await writeFile(methodContractPath, `${JSON.stringify({
+    schemaVersion: 1,
+    statisticalMethodSpec: methodContract,
+    contractHash: stableHash(methodContract),
+    requestBinding: {
+      method: request.method,
+      variables: variablesFor(request),
+      covariates: request.covariates,
+      surveyDesign: request.surveyDesign,
+      allowSurveyApproximation: request.allowSurveyApproximation,
+    },
+  }, null, 2)}\n`, "utf-8");
+  augmentedResult = {
+    ...augmentedResult,
+    diagnostics: {
+      ...augmentedResult.diagnostics,
+      methodContract: {
+        method: methodContract.method,
+        family: methodContract.family,
+        expectedFigureCount: methodContract.expectedFigures.length,
+        requiredFigureCount: methodContract.expectedFigures.filter(figure => figure.required).length,
+        qaGateCount: methodContract.qaGates.length,
+        contractHash: stableHash(methodContract),
+      },
+    },
+    artifacts: [{ kind: "method-contract", path: methodContractPath }, ...augmentedResult.artifacts],
+  };
   const figureManifest = result.artifacts.find(artifact => artifact.kind === "figure-manifest");
   if (figureManifest?.path) {
     try {
@@ -879,6 +909,7 @@ function statsQa(result: StatsRunResult): {
         ? `${result.resultPosture.status}: ${result.resultPosture.interpretationBoundary}`
         : "Stats run did not declare an interpretation posture.",
     },
+    ...methodContractQaChecks(result),
     ...diagnosticAccuracyQaChecks(result),
     ...propensityQaChecks(result),
     ...coreInferenceQaChecks(result),
@@ -899,6 +930,59 @@ function statsQa(result: StatsRunResult): {
     summary: `${checks.filter(check => check.status === "pass").length}/${checks.length} stats QA checks passed; status=${status}.`,
     checks,
   };
+}
+
+function methodContractQaChecks(result: StatsRunResult): Array<{ id: string; status: "pass" | "warning" | "fail"; detail: string }> {
+  const contract = getStatisticalMethodSpec(result.method);
+  const hasContractArtifact = result.artifacts.some(artifact => artifact.kind === "method-contract");
+  const artifactKinds = new Set(result.artifacts.map(artifact => artifact.kind));
+  const requiredFigures = contract.expectedFigures.filter(figure => figure.required);
+  const figureCount = result.artifacts.filter(artifact => artifact.kind === "figure").length;
+  const diagnostics = result.diagnostics as Record<string, unknown>;
+  return [
+    {
+      id: "method-contract-artifact",
+      status: hasContractArtifact ? "pass" : "fail",
+      detail: hasContractArtifact
+        ? `Method contract recorded for ${contract.method} (${contract.family}).`
+        : "Method contract artifact is missing; assumptions, expected figures, QA gates, and failure modes are not inspectable.",
+    },
+    {
+      id: "method-contract-required-inputs",
+      status: result.issues.some(issue => issue.code === "STATS_REQUIRED_ARGUMENT_MISSING" || issue.code === "STATS_REQUIRED_VARIABLE_MISSING") ? "fail" : "pass",
+      detail: contract.requiredArguments.length
+        ? `Contract requires: ${contract.requiredArguments.join(", ")}.`
+        : "Contract has no method-specific required arguments beyond the data source.",
+    },
+    {
+      id: "method-contract-diagnostics",
+      status: Object.keys(diagnostics).length > 0 ? "pass" : "warning",
+      detail: Object.keys(diagnostics).length > 0
+        ? `Diagnostics present; contract expects ${contract.diagnostics.join(", ")}.`
+        : `No diagnostics were recorded; contract expects ${contract.diagnostics.join(", ")}.`,
+    },
+    {
+      id: "method-contract-artifact-coverage",
+      status: artifactKinds.has("summary") && artifactKinds.has("table") && artifactKinds.has("diagnostics") ? "pass" : result.status === "failed" ? "warning" : "fail",
+      detail: `Contract expects tables/artifacts including ${contract.expectedTables.join(", ")}.`,
+    },
+    {
+      id: "method-contract-figure-coverage",
+      status: requiredFigures.length === 0
+        ? "pass"
+        : figureCount >= requiredFigures.length && artifactKinds.has("figure-qa")
+          ? "pass"
+          : "warning",
+      detail: requiredFigures.length === 0
+        ? "No required figures are declared for this method; recommended figures remain in the method contract."
+        : `${figureCount} rendered figure artifact(s); contract declares ${requiredFigures.length} required figure family/families: ${requiredFigures.map(figure => figure.label).join(", ")}.`,
+    },
+    {
+      id: "method-contract-escalation-rules",
+      status: contract.escalationRules.length > 0 && contract.failureModes.length > 0 ? "pass" : "warning",
+      detail: `Contract records ${contract.failureModes.length} common failure mode(s) and ${contract.escalationRules.length} escalation rule(s).`,
+    },
+  ];
 }
 
 function deriveStatsResultPosture(result: StatsRunResult, request: StatsRunRequest): StatsResultPosture {
@@ -1648,6 +1732,13 @@ function regressionReliabilityQaChecks(result: StatsRunResult): Array<{ id: stri
         ? "VIF/collinearity diagnostics are unavailable."
         : `Maximum VIF is ${maxVif.toFixed(3)}.`,
     },
+    {
+      id: "model-diagnostics-artifact",
+      status: result.artifacts.some(artifact => artifact.kind === "model-diagnostics") ? "pass" : "warning",
+      detail: result.artifacts.some(artifact => artifact.kind === "model-diagnostics")
+        ? "Row-level fitted value, residual, leverage, and Cook's-distance diagnostics were recorded."
+        : "Row-level model diagnostics artifact is missing.",
+    },
   ];
   if (maxCooks !== null) {
     const threshold = 4 / Math.max(nObs, 1);
@@ -1733,10 +1824,18 @@ function survivalReliabilityQaChecks(result: StatsRunResult): Array<{ id: string
     });
     checks.push({
       id: "cox-proportional-hazards-diagnostic",
-      status: diagnostics.proportional_hazards_check === "not_available" ? "warning" : "pass",
-      detail: diagnostics.proportional_hazards_check === "not_available"
-        ? "This runtime fitted Cox coefficients but did not compute Schoenfeld/proportional-hazards diagnostics."
-        : "Proportional-hazards diagnostic evidence was recorded.",
+      status: diagnostics.proportional_hazards_check === "pass"
+        ? "pass"
+        : diagnostics.proportional_hazards_check === "warning" || diagnostics.proportional_hazards_check === "underpowered"
+          ? "warning"
+          : "warning",
+      detail: diagnostics.proportional_hazards_check === "pass"
+        ? "Approximate predictor-by-log(time) proportional-hazards screen did not flag violations."
+        : diagnostics.proportional_hazards_check === "warning"
+          ? "Approximate predictor-by-log(time) proportional-hazards screen flagged possible non-proportional hazards."
+          : diagnostics.proportional_hazards_check === "underpowered"
+            ? "Too few events were available for a stable proportional-hazards screen."
+            : "Proportional-hazards diagnostic evidence is unavailable; use a dedicated survival backend for formal Schoenfeld residual review.",
     });
   }
   return checks;
@@ -2131,6 +2230,95 @@ def save_fig(out_dir, name, title, caption, source_columns, draw, x_label=None, 
             "qa": {"status": "fail", "checks": [{"id": "render-error", "status": "fail", "message": str(exc)}]},
         }
 
+def draw_love_plot(balance):
+    frame = pd.DataFrame(balance).copy()
+    if frame.empty or "covariate" not in frame.columns:
+        plt.text(0.5, 0.5, "No balance rows available", ha="center", va="center")
+        return
+    frame["abs_smd_before"] = pd.to_numeric(frame.get("smd_before"), errors="coerce").abs()
+    frame["abs_smd_after"] = pd.to_numeric(frame.get("smd_after"), errors="coerce").abs()
+    frame = frame.sort_values("abs_smd_before", ascending=True).tail(30)
+    y = np.arange(len(frame))
+    plt.scatter(frame["abs_smd_before"], y, label="Before", alpha=0.75)
+    plt.scatter(frame["abs_smd_after"], y, label="After", alpha=0.85)
+    plt.axvline(0.1, color="red", linestyle="--", linewidth=1, label="|SMD| = 0.10")
+    plt.yticks(y, frame["covariate"].astype(str))
+    plt.xlim(left=0)
+    plt.legend(loc="best")
+    plt.grid(axis="x", alpha=0.25)
+
+def draw_propensity_overlap(scores, treatment_col="treatment", score_col="propensity_score"):
+    frame = pd.DataFrame(scores).copy()
+    if frame.empty or treatment_col not in frame.columns or score_col not in frame.columns:
+        plt.text(0.5, 0.5, "No propensity-score rows available", ha="center", va="center")
+        return
+    frame[score_col] = pd.to_numeric(frame[score_col], errors="coerce")
+    frame[treatment_col] = pd.to_numeric(frame[treatment_col], errors="coerce")
+    treated = frame.loc[frame[treatment_col] == 1, score_col].dropna()
+    control = frame.loc[frame[treatment_col] == 0, score_col].dropna()
+    bins = np.linspace(0, 1, 21)
+    if not control.empty:
+        plt.hist(control, bins=bins, alpha=0.55, density=True, label="Control")
+    if not treated.empty:
+        plt.hist(treated, bins=bins, alpha=0.55, density=True, label="Treated")
+    plt.xlim(0, 1)
+    plt.legend(loc="best")
+    plt.grid(axis="y", alpha=0.25)
+
+def draw_coefficient_plot(estimates):
+    frame = pd.DataFrame(estimates).copy()
+    if frame.empty or "estimate" not in frame.columns or "term" not in frame.columns:
+        plt.text(0.5, 0.5, "No coefficient rows available", ha="center", va="center")
+        return
+    frame = frame[~frame["term"].astype(str).str.lower().isin(["const", "intercept"])]
+    frame["estimate"] = pd.to_numeric(frame["estimate"], errors="coerce")
+    frame["ci_low"] = pd.to_numeric(frame.get("ci_low"), errors="coerce") if "ci_low" in frame.columns else np.nan
+    frame["ci_high"] = pd.to_numeric(frame.get("ci_high"), errors="coerce") if "ci_high" in frame.columns else np.nan
+    frame = frame.dropna(subset=["estimate"])
+    if frame.empty:
+        plt.text(0.5, 0.5, "No finite coefficient estimates", ha="center", va="center")
+        return
+    frame["abs_estimate"] = frame["estimate"].abs()
+    frame = frame.sort_values("abs_estimate", ascending=True).tail(25)
+    y = np.arange(len(frame))
+    plt.axvline(0, color="gray", linestyle="--", linewidth=1)
+    finite_ci = frame["ci_low"].notna() & frame["ci_high"].notna()
+    if finite_ci.any():
+        xerr = np.vstack([
+            (frame.loc[finite_ci, "estimate"] - frame.loc[finite_ci, "ci_low"]).clip(lower=0),
+            (frame.loc[finite_ci, "ci_high"] - frame.loc[finite_ci, "estimate"]).clip(lower=0),
+        ])
+        plt.errorbar(frame.loc[finite_ci, "estimate"], y[finite_ci.to_numpy()], xerr=xerr, fmt="o", capsize=3, label="Estimate with CI")
+    if (~finite_ci).any():
+        plt.scatter(frame.loc[~finite_ci, "estimate"], y[~finite_ci.to_numpy()], label="Estimate")
+    plt.yticks(y, frame["term"].astype(str))
+    plt.grid(axis="x", alpha=0.25)
+    plt.legend(loc="best")
+
+def draw_influence_plot(rows):
+    frame = pd.DataFrame(rows).copy()
+    if frame.empty:
+        plt.text(0.5, 0.5, "No diagnostic rows available", ha="center", va="center")
+        return
+    frame["leverage"] = pd.to_numeric(frame.get("leverage"), errors="coerce")
+    frame["residual"] = pd.to_numeric(frame.get("residual"), errors="coerce")
+    frame["cooks_distance"] = pd.to_numeric(frame.get("cooks_distance"), errors="coerce")
+    frame = frame.dropna(subset=["residual"])
+    if frame.empty:
+        plt.text(0.5, 0.5, "No finite residuals available", ha="center", va="center")
+        return
+    x = frame["leverage"].fillna(0)
+    sizes = (frame["cooks_distance"].fillna(0).clip(lower=0) * 1200) + 18
+    plt.scatter(x, frame["residual"], s=sizes, alpha=0.65)
+    plt.axhline(0, color="gray", linestyle="--", linewidth=1)
+    threshold = 4 / max(1, len(frame))
+    if frame["cooks_distance"].notna().any():
+        flagged = frame[frame["cooks_distance"] > threshold]
+        if not flagged.empty:
+            plt.scatter(flagged["leverage"].fillna(0), flagged["residual"], s=60, facecolors="none", edgecolors="red", linewidths=1.5, label="Cook's > 4/n")
+            plt.legend(loc="best")
+    plt.grid(alpha=0.25)
+
 def require_columns(df, cols):
     missing = [c for c in cols if c and c not in df.columns]
     if missing:
@@ -2352,6 +2540,48 @@ def regression_diagnostics(model, x, y, family):
         out["vif_error"] = str(exc)
     return out
 
+def regression_diagnostic_rows(model, x, y):
+    rows = []
+    try:
+        fitted = pd.Series(model.fittedvalues, index=x.index)
+    except Exception:
+        try:
+            fitted = pd.Series(model.predict(x), index=x.index)
+        except Exception:
+            fitted = pd.Series([np.nan] * len(x), index=x.index)
+    y_numeric = pd.to_numeric(pd.Series(y, index=x.index), errors="coerce")
+    try:
+        residual = pd.Series(getattr(model, "resid_response", getattr(model, "resid", y_numeric - fitted)), index=x.index)
+    except Exception:
+        residual = y_numeric - fitted
+    leverage = pd.Series([np.nan] * len(x), index=x.index)
+    cooks = pd.Series([np.nan] * len(x), index=x.index)
+    try:
+        if hasattr(model, "get_influence"):
+            infl = model.get_influence()
+            hat = getattr(infl, "hat_matrix_diag", None)
+            if hat is not None and len(hat) == len(x):
+                leverage = pd.Series(hat, index=x.index)
+            if hasattr(infl, "cooks_distance"):
+                cook_values = infl.cooks_distance[0]
+                if len(cook_values) == len(x):
+                    cooks = pd.Series(cook_values, index=x.index)
+    except Exception:
+        pass
+    threshold = 4 / max(1, len(x))
+    for idx in x.index:
+        rows.append({
+            "row_index": clean_value(idx),
+            "observed": clean_value(y_numeric.loc[idx] if idx in y_numeric.index else None),
+            "fitted": clean_value(fitted.loc[idx] if idx in fitted.index else None),
+            "residual": clean_value(residual.loc[idx] if idx in residual.index else None),
+            "absolute_residual": clean_value(abs(residual.loc[idx]) if idx in residual.index and not pd.isna(residual.loc[idx]) else None),
+            "leverage": clean_value(leverage.loc[idx] if idx in leverage.index else None),
+            "cooks_distance": clean_value(cooks.loc[idx] if idx in cooks.index else None),
+            "high_influence_flag": bool(cooks.loc[idx] > threshold) if idx in cooks.index and not pd.isna(cooks.loc[idx]) else False,
+        })
+    return rows
+
 def km_curve(time, event, group=None):
     frame = pd.DataFrame({"time": pd.to_numeric(time, errors="coerce"), "event": event_indicator(event)})
     if group is not None:
@@ -2471,6 +2701,60 @@ def tied_event_time_count(time, event):
     frame = pd.DataFrame({"time": pd.to_numeric(time, errors="coerce"), "event": event_indicator(event)}).dropna()
     counts = frame.loc[frame["event"] == 1, "time"].value_counts()
     return int((counts > 1).sum())
+
+def cox_time_interaction_ph_check(time, event, x, strata=None, alpha=0.05):
+    if PHReg is None:
+        return {"method": "time_interaction_approximation", "status": "not_available", "reason": "PHReg unavailable"}
+    try:
+        frame = x.copy().astype(float)
+        frame["_time"] = pd.to_numeric(time, errors="coerce")
+        frame["_event"] = event_indicator(event)
+        if strata is not None:
+            frame["_strata"] = strata
+        frame = frame.replace([np.inf, -np.inf], np.nan).dropna()
+        if frame.empty or int(frame["_event"].sum()) < max(6, x.shape[1] * 3):
+            return {
+                "method": "time_interaction_approximation",
+                "status": "underpowered",
+                "reason": "Too few events for a stable time-interaction proportional-hazards diagnostic.",
+                "events": int(frame["_event"].sum()) if not frame.empty else 0,
+            }
+        base_cols = [c for c in x.columns if c in frame.columns]
+        log_time = np.log(np.maximum(frame["_time"].astype(float), 1e-6))
+        centered_log_time = log_time - float(log_time.mean())
+        design = frame[base_cols].copy()
+        interaction_cols = []
+        for col in base_cols:
+            interaction = f"{col}__log_time_interaction"
+            design[interaction] = frame[col].astype(float) * centered_log_time
+            interaction_cols.append(interaction)
+        model = PHReg(
+            frame["_time"].astype(float),
+            design,
+            status=frame["_event"].astype(int),
+            strata=frame["_strata"] if strata is not None and "_strata" in frame.columns else None,
+        ).fit()
+        pvalues = list(model.pvalues)
+        columns = list(design.columns)
+        rows = []
+        for col in interaction_cols:
+            idx = columns.index(col)
+            p_value = pvalues[idx] if idx < len(pvalues) else np.nan
+            rows.append({"term": col.replace("__log_time_interaction", ""), "p_value": clean_value(p_value)})
+        finite = [row["p_value"] for row in rows if row["p_value"] is not None and not pd.isna(row["p_value"])]
+        violating = [row for row in rows if row["p_value"] is not None and not pd.isna(row["p_value"]) and row["p_value"] < alpha]
+        return {
+            "method": "time_interaction_approximation",
+            "status": "warning" if violating else "pass",
+            "alpha": clean_value(alpha),
+            "events": int(frame["_event"].sum()),
+            "tested_terms": rows,
+            "min_p_value": clean_value(min(finite) if finite else None),
+            "violating_terms": violating,
+            "interpretation": "Approximate PH screen using predictor-by-log(time) terms; not a substitute for formal Schoenfeld residual review in a dedicated survival backend.",
+        }
+    except Exception as exc:
+        return {"method": "time_interaction_approximation", "status": "not_available", "reason": str(exc)}
 
 def poisson_rate_interval(events, person_time, alpha):
     events = float(events)
@@ -3482,6 +3766,8 @@ def run(req):
             "treatmentPositiveLevel": treated_level,
             "treatmentNegativeLevel": control_level,
         })
+        figures.append(save_fig(out_dir, "propensity-love-plot.png", "Covariate Balance Love Plot", "Absolute standardized mean differences before and after propensity adjustment; lower values indicate better measured-covariate balance.", [treatment] + covariates, lambda: draw_love_plot(after_rows), "Absolute standardized mean difference", "Covariate term"))
+        figures.append(save_fig(out_dir, "propensity-overlap.png", "Propensity Score Overlap", "Distribution of estimated propensity scores by treatment group for positivity/common-support review.", [treatment] + covariates, lambda: draw_propensity_overlap(score_rows), "Estimated propensity score", "Density"))
         complete = int(data.shape[0])
     elif method in ("linear-regression", "robust-linear-regression", "logistic-regression", "ordinal-logistic-regression", "multinomial-logistic-regression", "poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial", "gamma-glm", "inverse-gaussian-glm", "quantile-regression", "penalized-linear-regression", "penalized-logistic-regression"):
         if sm is None:
@@ -3597,6 +3883,17 @@ def run(req):
                     estimates.append(row)
             diagnostics.update(regression_diagnostics(model, x, pd.to_numeric(y_raw, errors="coerce"), method))
             diagnostics["weighted"] = weight is not None
+            diagnostic_rows = []
+            if method not in ("ordinal-logistic-regression", "multinomial-logistic-regression"):
+                try:
+                    diagnostic_rows = regression_diagnostic_rows(model, x, pd.to_numeric(y_raw, errors="coerce"))
+                    model_diag_path = os.path.join(out_dir, "model-diagnostics.csv")
+                    write_csv(model_diag_path, diagnostic_rows)
+                    diagnostics.setdefault("artifacts", {})
+                    diagnostics["artifacts"]["model_diagnostics"] = model_diag_path
+                    diagnostics["high_influence_rows"] = int(sum(1 for row in diagnostic_rows if row.get("high_influence_flag")))
+                except Exception as exc:
+                    diagnostics["model_diagnostics_error"] = str(exc)
             if method in ("logistic-regression", "penalized-logistic-regression"):
                 try:
                     y_binary, _levels_for_counts = binary_series(y_raw)
@@ -3627,6 +3924,14 @@ def run(req):
                     figures.append(save_fig(out_dir, "model-residuals.png", "Residuals Versus Fitted", "Residual diagnostic plot for the fitted model.", [outcome, exposure] + covariates, lambda: plt.scatter(model.fittedvalues, getattr(model, "resid_response", getattr(model, "resid", pd.to_numeric(y_raw, errors="coerce") - model.fittedvalues)), alpha=0.6), "Fitted value", "Residual"))
                 except Exception:
                     pass
+                try:
+                    figures.append(save_fig(out_dir, "model-influence.png", "Influence Diagnostic Plot", "Residuals by leverage with point size scaled by Cook's distance; outlined points exceed the 4/n Cook's-distance heuristic.", [outcome, exposure] + covariates, lambda: draw_influence_plot(diagnostic_rows), "Leverage", "Residual"))
+                except Exception:
+                    pass
+            try:
+                figures.append(save_fig(out_dir, "model-coefficients.png", "Model Coefficient Plot", "Model coefficient estimates with confidence intervals when available; intercept terms are omitted.", [outcome, exposure] + covariates, lambda: draw_coefficient_plot(estimates), "Estimate", "Term"))
+            except Exception:
+                pass
     elif method in ("kaplan-meier", "log-rank", "cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "recurrent-event-rate"):
         time_col = req.get("time") or (req.get("variables") or [None])[0]
         event_col = req.get("event") or req.get("outcome")
@@ -3674,7 +3979,13 @@ def run(req):
                 event_count = int(event_indicator(data[event_col]).sum())
                 risk_score = pd.Series(np.dot(np.asarray(x, dtype=float), np.asarray(model.params, dtype=float)), index=data.index)
                 c_index, comparable_pairs = harrell_c_index(data[time_col], data[event_col], risk_score)
-                diagnostics = {"test": method, "events": event_count, "censored": int((event_indicator(data[event_col]) == 0).sum()), "n_predictors": int(x.shape[1]), "events_per_predictor": clean_value(event_count / max(1, int(x.shape[1]))), "strata": strata_col, "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max()), "tied_event_times": tied_event_time_count(data[time_col], data[event_col]), "harrell_c_index": c_index, "concordance_comparable_pairs": comparable_pairs, "proportional_hazards_check": "not_available"}
+                ph_check = cox_time_interaction_ph_check(data[time_col], data[event_col], x, data[strata_col] if strata_col else None, params["alpha"])
+                diagnostics = {"test": method, "events": event_count, "censored": int((event_indicator(data[event_col]) == 0).sum()), "n_predictors": int(x.shape[1]), "events_per_predictor": clean_value(event_count / max(1, int(x.shape[1]))), "strata": strata_col, "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max()), "tied_event_times": tied_event_time_count(data[time_col], data[event_col]), "harrell_c_index": c_index, "concordance_comparable_pairs": comparable_pairs, "proportional_hazards_check": ph_check.get("status", "not_available"), "proportional_hazards_diagnostic": ph_check}
+                if ph_check.get("status") == "warning":
+                    terms = ", ".join([str(row.get("term")) for row in ph_check.get("violating_terms", [])])
+                    issues.append({"severity": "warning", "code": "COX_PROPORTIONAL_HAZARDS_TIME_INTERACTION", "message": f"Approximate time-interaction screen flagged possible non-proportional hazards for: {terms or 'one or more terms'}.", "evidenceRefs": ["diagnostics.proportional_hazards_diagnostic"]})
+                elif ph_check.get("status") in ("underpowered", "not_available"):
+                    issues.append({"severity": "warning", "code": "COX_PROPORTIONAL_HAZARDS_DIAGNOSTIC_LIMITED", "message": "Proportional-hazards diagnostic evidence is limited; use a dedicated survival backend for formal Schoenfeld residual review before strong inference.", "evidenceRefs": ["diagnostics.proportional_hazards_diagnostic"]})
             elif method == "aalen-johansen-cif":
                 rows = cif_curve(data[time_col], data[event_col], event_of_interest=1, group=data[group] if group else None)
                 curve_path = os.path.join(out_dir, "cumulative-incidence.csv")
@@ -3788,7 +4099,8 @@ def run(req):
             balance_path = os.path.join(out_dir, "balance.csv")
             write_csv(balance_path, balance)
             weights_path = os.path.join(out_dir, "causal-weights.csv")
-            pd.DataFrame({"row_index": data.index, "treatment": data["_t"], "propensity_score": ps, "weight": weights}).to_csv(weights_path, index=False)
+            causal_score_rows = pd.DataFrame({"row_index": data.index, "treatment": data["_t"], "propensity_score": ps, "weight": weights})
+            causal_score_rows.to_csv(weights_path, index=False)
             overlap_path = os.path.join(out_dir, "propensity-overlap.csv")
             write_csv(overlap_path, overlap_rows(ps, data["_t"]))
             diagnostics = {
@@ -3801,6 +4113,8 @@ def run(req):
                 "max_weight": clean_value(weights.max()),
                 "artifacts": {"balance": balance_path, "weights": weights_path, "propensity_overlap": overlap_path},
             }
+            figures.append(save_fig(out_dir, "causal-love-plot.png", "Covariate Balance Love Plot", "Absolute standardized mean differences before and after causal weighting; lower values indicate better measured-covariate balance.", [treatment] + covariates, lambda: draw_love_plot(balance), "Absolute standardized mean difference", "Covariate term"))
+            figures.append(save_fig(out_dir, "causal-propensity-overlap.png", "Propensity Score Overlap", "Distribution of estimated propensity scores by treatment group for positivity/common-support review.", [treatment] + covariates, lambda: draw_propensity_overlap(causal_score_rows), "Estimated propensity score", "Density"))
             complete = int(data.shape[0])
         elif method == "entropy-balancing":
             require_columns(df, [outcome, treatment] + covariates)
@@ -3842,6 +4156,7 @@ def run(req):
                 "max_weight": clean_value(weights.max()),
                 "artifacts": {"balance": balance_path, "weights": weights_path},
             }
+            figures.append(save_fig(out_dir, "entropy-balance-love-plot.png", "Covariate Balance Love Plot", "Absolute standardized mean differences before and after entropy balancing; lower values indicate better measured-covariate balance.", [treatment] + covariates, lambda: draw_love_plot(balance), "Absolute standardized mean difference", "Covariate term"))
             complete = int(data.shape[0])
             if not bool(opt.success):
                 issues.append({"severity": "warning", "code": "ENTROPY_BALANCING_OPTIMIZATION_WARNING", "message": "Entropy balancing optimizer did not report success; review balance diagnostics before interpretation.", "evidenceRefs": ["diagnostics.optimized"]})
@@ -4196,6 +4511,8 @@ def run(req):
         artifacts.append({"kind": "imputed-data", "path": diagnostics["imputed_data"]})
     propensity_artifacts = diagnostics.get("artifacts") if isinstance(diagnostics, dict) else None
     if isinstance(propensity_artifacts, dict):
+        if propensity_artifacts.get("model_diagnostics"):
+            artifacts.append({"kind": "model-diagnostics", "path": propensity_artifacts["model_diagnostics"]})
         if propensity_artifacts.get("balance"):
             artifacts.append({"kind": "balance", "path": propensity_artifacts["balance"]})
         if propensity_artifacts.get("propensity_scores"):

@@ -2,7 +2,9 @@ import { z } from "zod";
 import { listMlModels, defaultPrimaryMetric } from "./ml/catalog.js";
 import type { MlTaskType } from "./ml/schemas.js";
 import { stableHash } from "./runtime.js";
+import { getStatisticalMethodSpec } from "./stats/contracts.js";
 import { statsRunMethodForAnalysisMethod } from "./stats/method-map.js";
+import { statsMethodSchema } from "./stats/schemas.js";
 import {
   dataStructureSchema,
   outcomeTypeSchema,
@@ -220,6 +222,18 @@ export interface ModelingDecisionPlan {
       categoricalPredictorCount: number;
       maxMissingFraction: number | null;
     };
+    contract: {
+      method: string;
+      family: string;
+      requiredArguments: string[];
+      assumptions: string[];
+      diagnostics: string[];
+      expectedTables: string[];
+      requiredFigures: string[];
+      qaGates: string[];
+      failureModes: string[];
+      interpretationBoundary: string;
+    } | null;
     alternatives: Array<{
       method: string;
       tier: "primary" | "baseline" | "sensitivity" | "fallback" | "blocked";
@@ -857,9 +871,28 @@ function buildStatisticalMethodGuidance(
       categoricalPredictorCount: categoricalPredictors.length,
       maxMissingFraction,
     },
+    contract: contractSummaryForStatsMethod(recommended),
     alternatives: alternatives.slice(0, 8),
     warnings,
     blockers,
+  };
+}
+
+function contractSummaryForStatsMethod(method: string | null): ModelingDecisionPlan["statisticalMethodGuidance"]["contract"] {
+  const parsed = statsMethodSchema.safeParse(method);
+  if (!parsed.success) return null;
+  const contract = getStatisticalMethodSpec(parsed.data);
+  return {
+    method: contract.method,
+    family: contract.family,
+    requiredArguments: contract.requiredArguments,
+    assumptions: contract.assumptions,
+    diagnostics: contract.diagnostics,
+    expectedTables: contract.expectedTables,
+    requiredFigures: contract.expectedFigures.filter(figure => figure.required).map(figure => figure.label),
+    qaGates: contract.qaGates,
+    failureModes: contract.failureModes,
+    interpretationBoundary: contract.interpretationBoundary,
   };
 }
 

@@ -102,6 +102,13 @@ describe("research ML modeling layer", () => {
       },
     });
     expect(continuousTwoGroup.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("welch-t-test");
+    expect(continuousTwoGroup.statisticalMethodGuidance.contract).toMatchObject({
+      method: "welch-t-test",
+      family: "core_inference",
+      requiredArguments: expect.arrayContaining(["outcome", "group"]),
+      qaGates: expect.arrayContaining(["assumption-review", "effect-size"]),
+    });
+    expect(continuousTwoGroup.statisticalMethodGuidance.contract?.requiredFigures).toContain("Outcome distribution by group");
     expect(continuousTwoGroup.statisticalMethodGuidance.alternatives.map(item => item.method)).toEqual(expect.arrayContaining(["welch-t-test", "mann-whitney"]));
     expect(continuousTwoGroup.statisticalMethodGuidance.alternatives[0]?.commandHint).toContain("--group treatment_group");
 
@@ -150,6 +157,12 @@ describe("research ML modeling layer", () => {
       tableSummary: syntheticSummary({ rows: 500, missing: 0.01, columns: 8, targetClasses: ["0", "1"] }),
     });
     expect(prediction.statisticalMethodGuidance.recommendedStatsRunMethod).toBe("prediction-evaluation");
+    expect(prediction.statisticalMethodGuidance.contract).toMatchObject({
+      method: "prediction-evaluation",
+      family: "prediction",
+      requiredFigures: expect.arrayContaining(["ROC curve", "Precision-recall curve", "Calibration plot"]),
+      qaGates: expect.arrayContaining(["leakage", "discrimination", "calibration"]),
+    });
     expect(prediction.statisticalMethodGuidance.alternatives.map(item => item.method)).toContain("logistic-regression");
   });
 
@@ -896,7 +909,10 @@ describe("research ML modeling layer", () => {
       expect(result.diagnostics.balance).toMatchObject({ covariate_terms: expect.any(Number) });
       expect((result.diagnostics.balance as { max_abs_smd_after: number }).max_abs_smd_after).toBeLessThan(0.6);
       expect(result.diagnostics.matching).toMatchObject({ matched_pairs: expect.any(Number), unmatched_treated: expect.any(Number) });
-      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "matched-pairs", "report", "qa"]));
+      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "matched-pairs", "figure", "figure-manifest", "figure-qa", "report", "qa"]));
+      const figures = JSON.parse(await readFile(path.join(dir, "matching", "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string; sourceColumns: string[] }> };
+      expect(figures.figures.map(figure => path.basename(figure.path))).toEqual(expect.arrayContaining(["propensity-love-plot.png", "propensity-overlap.png"]));
+      expect(figures.figures.find(figure => path.basename(figure.path) === "propensity-love-plot.png")?.sourceColumns).toEqual(expect.arrayContaining(["treated", "age", "bmi"]));
       const balance = await readFile(path.join(dir, "matching", "balance.csv"), "utf-8");
       expect(balance).toContain("smd_before");
       expect(balance).toContain("smd_after");
@@ -973,7 +989,9 @@ describe("research ML modeling layer", () => {
         stabilized: true,
         effective_sample_size: expect.any(Number),
       });
-      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "weights"]));
+      expect(result.artifacts.map(artifact => artifact.kind)).toEqual(expect.arrayContaining(["balance", "propensity-scores", "propensity-overlap", "weights", "figure", "figure-manifest", "figure-qa"]));
+      const figures = JSON.parse(await readFile(path.join(dir, "weighting", "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string; sourceColumns: string[] }> };
+      expect(figures.figures.map(figure => path.basename(figure.path))).toEqual(expect.arrayContaining(["propensity-love-plot.png", "propensity-overlap.png"]));
       const weights = await readFile(path.join(dir, "weighting", "weights.csv"), "utf-8");
       expect(weights).toContain("analysis_weight");
       expect(result.issues.map(issue => issue.code)).not.toContain("PROPENSITY_POOR_OVERLAP");

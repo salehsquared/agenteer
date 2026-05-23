@@ -1,4 +1,5 @@
 import path from "node:path";
+import { getStatisticalMethodSpec, listStatisticalMethodSpecs, type StatisticalMethodSpec } from "./contracts.js";
 import { renderFigureQaCli, renderFigureQaJson, writeFigureQa, type FigureQaResult } from "./figure-qa.js";
 import { runStatsMethod } from "./runner.js";
 import { statsMethodSchema, type StatsMethod, type StatsRunRequest, type StatsRunResult } from "./schemas.js";
@@ -35,6 +36,37 @@ export function renderResearchStatsRun(result: StatsRunResult): string {
 
 export function renderResearchStatsRunJson(result: StatsRunResult): string {
   return `${JSON.stringify({ schemaVersion: 1, statsRun: result }, null, 2)}\n`;
+}
+
+export function researchStatsContractsCommand(opts: { method?: StatsMethod } = {}): { contracts: StatisticalMethodSpec[]; method: StatsMethod | null; nextAction: string } {
+  const contracts = opts.method ? [getStatisticalMethodSpec(opts.method)] : listStatisticalMethodSpecs();
+  return {
+    contracts,
+    method: opts.method ?? null,
+    nextAction: opts.method
+      ? "Use this contract to verify required arguments, assumptions, diagnostics, figures, QA gates, and failure modes before stats-run."
+      : "Inspect a specific method contract before execution, or run modeling-plan to pick a contract from data evidence.",
+  };
+}
+
+export function renderResearchStatsContracts(result: ReturnType<typeof researchStatsContractsCommand>): string {
+  return [
+    `research stats contracts${result.method ? `: ${result.method}` : ""}`,
+    `  methods: ${result.contracts.length}`,
+    ...result.contracts.slice(0, 20).map(contract => [
+      `  ${contract.method}: ${contract.family}`,
+      `    required: ${contract.requiredArguments.join(", ") || "(none)"}`,
+      `    diagnostics: ${contract.diagnostics.slice(0, 5).join(", ")}${contract.diagnostics.length > 5 ? ", ..." : ""}`,
+      `    required figures: ${contract.expectedFigures.filter(figure => figure.required).map(figure => figure.label).join(", ") || "(none)"}`,
+      `    qa gates: ${contract.qaGates.slice(0, 6).join(", ")}${contract.qaGates.length > 6 ? ", ..." : ""}`,
+    ].join("\n")),
+    result.contracts.length > 20 ? `  ... ${result.contracts.length - 20} more contract(s)` : null,
+    `  next: ${result.nextAction}`,
+  ].filter((line): line is string => Boolean(line)).join("\n");
+}
+
+export function renderResearchStatsContractsJson(result: ReturnType<typeof researchStatsContractsCommand>): string {
+  return `${JSON.stringify({ schemaVersion: 1, statsContracts: result }, null, 2)}\n`;
 }
 
 export async function researchFigureQaCommand(opts: { manifestPath: string; outPath?: string; reportPath?: string }): Promise<FigureQaResult & { outPath: string | null; reportPath: string | null }> {
