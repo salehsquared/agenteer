@@ -190,6 +190,19 @@ export {
   type ReviewStage,
   type StudyCriticResult,
 } from "./research-machine/reviewer.js";
+export {
+  evaluateFeasibilityGate,
+  researchFeasibilityGateCommand,
+  renderResearchFeasibilityGate,
+  renderResearchFeasibilityGateJson,
+  renderResearchFeasibilityGateMarkdown,
+  type FeasibilityAction,
+  type FeasibilityDomainScore,
+  type FeasibilityGateOptions,
+  type FeasibilityGateResult,
+  type FeasibilityInternalReview,
+  type FeasibilityVerdict,
+} from "./research-machine/feasibility.js";
 
 export {
   agentAdversarialProtocolsCommand,

@@ -241,6 +241,10 @@ Before execution, the controller summarizes the dataset and blocks studies that 
 - complete-case scan for CSV/JSON inputs
 - outcome/event class-count checks where row-level scanning is available
 - method-specific feasibility checks such as numeric continuous outcomes, binary outcome classes, event counts, and rough events-per-variable warnings
+- comprehensive feasibility dimensions for data availability, cohort size, event count, missingness, code/phenotype confidence, temporal validity, outcome observability, method suitability, semantic plausibility, expected statistical power, expected reviewer risk, design specificity, artifact readiness, and cost/access
+- five deterministic internal reviewer agents: data, methods, phenotype/timing, semantic/power, and skeptical reviewer
+- explicit study-idea verdicts: `reject`, `needs_data_profiling`, `needs_phenotype_review`, `exploratory_only`, and `formal_analysis_ready`
+- required modifications, clarifying questions, alternative study ideas, study-design advice, and evidence references
 
 This is the first line of defense against generating polished papers from weak or inappropriate data.
 
@@ -250,7 +254,7 @@ The gate writes:
 - `controller-feasibility-verdict.json`
 - `controller-feasibility-verdict.md`
 
-The feasibility verdict is the durable authority for whether a study idea can proceed. It records the row/column counts, required-variable checks, semantic issues, complete-case evidence, outcome diagnostics, method-specific checks, blockers, warnings, notes, score, and next action. A blocked verdict stops the controller before analysis execution.
+The feasibility verdict is the durable authority for whether a study idea can proceed. It records the row/column counts, required-variable checks, semantic issues, complete-case evidence, outcome diagnostics, method-specific checks, richer domain scores, internal reviewer findings, blockers, warnings, notes, required modifications, alternatives, score, confidence, final verdict, and next action. A `reject` verdict stops the controller before analysis execution; nonterminal verdicts force either profiling, phenotype review, exploratory-only posture, or documented minor modifications before stronger claims.
 
 ## Context Preflight
 

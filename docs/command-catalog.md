@@ -221,6 +221,7 @@ Use `dataset-spec` and `dataset-run` when the study depends on multiple manifest
 | `research archetypes` | List or inspect study archetype manifests. |
 | `research machine-plan` | Build a higher-level machine execution plan. |
 | `research machine-benchmark` | Evaluate machine packet completeness and posture. |
+| `research feasibility-gate` | Score a proposed study idea against data availability, cohort/event counts, missingness, phenotype confidence, timing, outcome observability, method suitability, semantic plausibility, power, reviewer risk, and internal reviewer agents; returns `reject`, `needs_data_profiling`, `needs_phenotype_review`, `exploratory_only`, or `formal_analysis_ready`. |
 
 The modeling plan is the front door after a research proposal exists.
 

@@ -164,6 +164,7 @@ import {
   renderResearchStudyCriticJson,
   renderResearchExecutionContract,
   renderResearchExecutionContractJson,
+  researchFeasibilityGateCommand,
   renderResearchMachineBenchmark,
   renderResearchMachineBenchmarkJson,
   renderResearchMachinePlan,
@@ -208,6 +209,8 @@ import {
   renderResearchControllerSupervisorJson,
   renderResearchExplorePlan,
   renderResearchExplorePlanJson,
+  renderResearchFeasibilityGate,
+  renderResearchFeasibilityGateJson,
   renderResearchManuscript,
   renderResearchManuscriptJson,
   renderResearchMethodQa,
@@ -836,6 +839,7 @@ Usage:
   agenteer research literature-search --question <text> [--base-url <url>] [--endpoint <path>] [--api-key <key>] [--bearer-token <token>] [--cookie <cookie>] [--auth-secret <secret>] [--user-id <id>] [--user-email <email>] [--depth quick|standard|long] [--date-range <range>] [--high-impact] [--top-k <n>] [--timeout-ms <n>] [--mock-response <json>] [--out <json>] [--report <md>] [--json]
   agenteer research literature-context --literature <literature-search.json> [--question <text>] [--out <json>] [--report <md>] [--json]
   agenteer research literature-qa --literature <literature-search.json> [--question <text>] [--paper <paper.md>] [--out <json>] [--report <md>] [--json]
+  agenteer research feasibility-gate --question <text> [--data <rows.csv|json|parquet>] [--dataset-dir <dir>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--group <col>] [--time <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--instrument <col>] [--weight <col>] [--variable <col>]* [--covariate <col>]* [--exact-covariate <col>]* [--phenotype-id <id>]* [--phenotype-confidence <n>] [--phenotype-reviewed] [--temporal-start-year <yyyy>] [--temporal-end-year <yyyy>] [--expected-followup-years <n>] [--min-rows <n>] [--min-events <n>] [--max-missingness <n>] [--survey] [--allow-survey-approximation] [--out-dir <dir>] [--python <path>] [--json]
   agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json> | --exploration-handoff <handoff.json>] [--literature <literature-search-or-context.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
   agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--time <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--cutoff <n>] [--instrument <col>] [--alpha-penalty <n>] [--l1-ratio <n>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--exact-covariate <col>]* [--variable <col>]* [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--method-selection <json>] [--analysis-spec <json>] [--literature <literature-search.json>] [--require-bound] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
   agenteer research analysis-manifest --run-dir <dir> [--out <analysis-run-manifest.json>] [--require-ready] [--json]
@@ -2143,6 +2147,46 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       });
       console.log(flags.json === true ? renderResearchLiteratureQaJson(result) : renderResearchLiteratureQa(result));
       return result.status === "fail" ? 1 : 0;
+    }
+    case "feasibility-gate": {
+      const methodRaw = flagString(flags, "method");
+      const result = await researchFeasibilityGateCommand({
+        question: requireFlagString(flags, "question"),
+        dataPath: flagString(flags, "data") ?? undefined,
+        datasetDir: flagString(flags, "dataset-dir") ?? undefined,
+        method: methodRaw ? parseStatsMethod(methodRaw) : undefined,
+        outcome: flagString(flags, "outcome") ?? undefined,
+        exposure: flagString(flags, "exposure") ?? undefined,
+        group: flagString(flags, "group") ?? undefined,
+        time: flagString(flags, "time") ?? undefined,
+        event: flagString(flags, "event") ?? undefined,
+        id: flagString(flags, "id") ?? undefined,
+        strata: flagString(flags, "strata") ?? undefined,
+        cluster: flagString(flags, "cluster") ?? undefined,
+        period: flagString(flags, "period") ?? undefined,
+        post: flagString(flags, "post") ?? undefined,
+        runningVariable: flagString(flags, "running-variable") ?? undefined,
+        instrument: flagString(flags, "instrument") ?? undefined,
+        weight: flagString(flags, "weight") ?? undefined,
+        variables: flagList(flags, "variable"),
+        covariates: flagList(flags, "covariate"),
+        exactCovariates: flagList(flags, "exact-covariate"),
+        phenotypeIds: flagList(flags, "phenotype-id"),
+        phenotypeConfidence: parseOptionalNumberFlag(flags, "phenotype-confidence"),
+        phenotypeReviewed: flags["phenotype-reviewed"] === true,
+        temporalStartYear: parseOptionalIntegerFlag(flags, "temporal-start-year"),
+        temporalEndYear: parseOptionalIntegerFlag(flags, "temporal-end-year"),
+        expectedFollowupYears: parseOptionalNumberFlag(flags, "expected-followup-years"),
+        minRows: parseOptionalIntegerFlag(flags, "min-rows"),
+        minEvents: parseOptionalIntegerFlag(flags, "min-events"),
+        maxMissingness: parseOptionalNumberFlag(flags, "max-missingness"),
+        surveyDesign: flags.survey === true,
+        allowSurveyApproximation: flags["allow-survey-approximation"] === true,
+        outDir: flagString(flags, "out-dir") ?? undefined,
+        python: flagString(flags, "python") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchFeasibilityGateJson(result) : renderResearchFeasibilityGate(result));
+      return result.verdict === "reject" ? 1 : 0;
     }
     case "modeling-plan": {
       const maxCandidatesRaw = flagString(flags, "max-candidates");

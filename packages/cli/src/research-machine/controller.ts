@@ -7,6 +7,7 @@ import { z } from "zod";
 import { agentContextPreflightCommand, type AgentContextPreflight } from "../commands/agent.js";
 import { researchExploreCommand, researchTableSummaryCommand, type ResearchExplorationResult, type ResearchTableSummary } from "../commands/research.js";
 import { researchLiteratureContextCommand, researchLiteratureQaCommand, researchMedbreviaLiteratureSearchCommand, type ResearchLiteratureContext, type ResearchLiteratureQaResult, type ResearchLiteratureSearchResult } from "./medbrevia-literature.js";
+import { evaluateFeasibilityGate, type FeasibilityGateResult, type FeasibilityVerdict } from "./feasibility.js";
 import { buildModelingDecisionPlan, type ModelingDecisionPlan, type ModelingDecisionRequest } from "./modeling.js";
 import { selectAnalysisMethods } from "./methods.js";
 import { researchStudyCriticCommand, reviewAutonomySchema, reviewStageSchema, reviewerProviderConfigs, providerGenerate, type ReviewAutonomy, type ReviewerBudget, type ReviewerModelConfig, type ReviewerPanel, type ReviewReentryPoint, type ReviewStage, type StudyCriticResult } from "./reviewer.js";
@@ -1340,8 +1341,12 @@ export interface ControllerSourcePatchRollback {
 export interface ControllerFeasibilityVerdict {
   schemaVersion: 1;
   generatedAtIso: string;
+  verdict: FeasibilityVerdict;
   status: "pass" | "warning" | "block";
   score: number;
+  confidence: number;
+  readinessLabel: string;
+  primaryAction: FeasibilityGateResult["primaryAction"];
   summaryPath: string;
   reportPath: string;
   rowCount: number;
@@ -1376,10 +1381,18 @@ export interface ControllerFeasibilityVerdict {
     eventRate: number | null;
     usable: boolean | null;
   };
+  domains: FeasibilityGateResult["domains"];
+  internalReviews: FeasibilityGateResult["internalReviews"];
   methodChecks: Array<{ id: string; status: "pass" | "warning" | "block"; message: string; evidenceRefs: string[] }>;
   blockers: string[];
   warnings: string[];
   notes: string[];
+  clarifyingQuestions: string[];
+  requiredModifications: string[];
+  optionalModifications: string[];
+  alternativeStudyIdeas: FeasibilityGateResult["alternativeStudyIdeas"];
+  studyDesignAdvice: FeasibilityGateResult["studyDesignAdvice"];
+  evidenceRefs: string[];
   nextAction: string;
 }
 
@@ -6017,18 +6030,68 @@ async function buildControllerFeasibilityVerdict(
     else notes.push(message);
   }
 
-  const uniqueBlockers = uniqueText(blockers);
-  const uniqueWarnings = uniqueText(warnings);
+  const codedPhenotypeQuestion = /\b(icd|cpt|hcpcs|pcs|phenotype|diagnos|procedure|code|claims?)\b/i.test(state.inputs.question);
+  const feasibilityGate = await evaluateFeasibilityGate({
+    question: state.inputs.question,
+    dataPath: state.inputs.dataPath,
+    datasetDir: state.inputs.datasetDir,
+    tableSummary: summary,
+    method: state.inputs.method,
+    outcome: state.inputs.outcome,
+    exposure: state.inputs.exposure,
+    group: state.inputs.group,
+    time: state.inputs.time,
+    event: state.inputs.event,
+    id: state.inputs.id,
+    strata: state.inputs.strata,
+    cluster: state.inputs.cluster,
+    period: state.inputs.period,
+    post: state.inputs.post,
+    runningVariable: state.inputs.runningVariable,
+    instrument: state.inputs.instrument,
+    variables: state.inputs.variables,
+    covariates: state.inputs.covariates,
+    exactCovariates: state.inputs.exactCovariates,
+    phenotypeIds: codedPhenotypeQuestion ? ["question-implied-coded-phenotype"] : [],
+    phenotypeReviewed: codedPhenotypeQuestion ? false : undefined,
+    minRows: state.policy.minRows,
+    maxMissingness: state.policy.maxRequiredVariableMissingness,
+    surveyDesign: state.inputs.surveyDesign,
+    allowSurveyApproximation: state.inputs.allowSurveyApproximation,
+    python: state.inputs.python ?? undefined,
+  });
+  addCheck(
+    "comprehensive-feasibility-gate",
+    feasibilityGate.status,
+    `Comprehensive feasibility gate returned ${feasibilityGate.verdict}: ${feasibilityGate.nextAction}`,
+    feasibilityGate.evidenceRefs,
+  );
+
+  const uniqueBlockers = uniqueText([
+    ...blockers,
+    ...(feasibilityGate.verdict === "reject" ? feasibilityGate.blockers : []),
+  ]);
+  const uniqueWarnings = uniqueText([
+    ...warnings,
+    ...feasibilityGate.warnings,
+    ...(feasibilityGate.verdict !== "formal_analysis_ready" && feasibilityGate.verdict !== "reject" ? [feasibilityGate.nextAction] : []),
+    ...feasibilityGate.requiredModifications,
+  ]).filter(item => !uniqueBlockers.includes(item));
   const uniqueNotes = uniqueText(notes);
-  const score = round(Math.max(0, 1 - uniqueBlockers.length * 0.35 - uniqueWarnings.length * 0.08 - Math.max(0, state.policy.minRows - summary.rowCount) / Math.max(state.policy.minRows, 1)), 4);
-  const status: ControllerFeasibilityVerdict["status"] = uniqueBlockers.length ? "block" : uniqueWarnings.length ? "warning" : "pass";
+  const legacyScore = round(Math.max(0, 1 - uniqueBlockers.length * 0.35 - uniqueWarnings.length * 0.08 - Math.max(0, state.policy.minRows - summary.rowCount) / Math.max(state.policy.minRows, 1)), 4);
+  const score = round(Math.min(legacyScore, feasibilityGate.score), 4);
+  const status: ControllerFeasibilityVerdict["status"] = uniqueBlockers.length || feasibilityGate.verdict === "reject" ? "block" : feasibilityGate.verdict === "formal_analysis_ready" ? "pass" : "warning";
   const verdictPath = path.join(state.rootDir, "controller-feasibility-verdict.json");
   const reportPath = path.join(state.rootDir, "controller-feasibility-verdict.md");
   return {
     schemaVersion: 1,
     generatedAtIso: nowIso(),
+    verdict: feasibilityGate.verdict,
     status,
     score,
+    confidence: feasibilityGate.confidence,
+    readinessLabel: feasibilityGate.readinessLabel,
+    primaryAction: feasibilityGate.primaryAction,
     summaryPath: verdictPath,
     reportPath,
     rowCount: summary.rowCount,
@@ -6038,14 +6101,22 @@ async function buildControllerFeasibilityVerdict(
     variableChecks,
     completeCase,
     outcomeDiagnostics,
+    domains: feasibilityGate.domains,
+    internalReviews: feasibilityGate.internalReviews,
     methodChecks,
     blockers: uniqueBlockers,
     warnings: uniqueWarnings,
     notes: uniqueNotes,
+    clarifyingQuestions: feasibilityGate.clarifyingQuestions,
+    requiredModifications: feasibilityGate.requiredModifications,
+    optionalModifications: feasibilityGate.optionalModifications,
+    alternativeStudyIdeas: feasibilityGate.alternativeStudyIdeas,
+    studyDesignAdvice: feasibilityGate.studyDesignAdvice,
+    evidenceRefs: uniqueText([summaryPath, ...(state.inputs.dataPath ? [state.inputs.dataPath] : []), ...feasibilityGate.evidenceRefs]),
     nextAction: status === "block"
-      ? "Revise the research question, variables, cohort, or dataset before execution."
+      ? feasibilityGate.verdict === "reject" ? feasibilityGate.nextAction : "Revise the research question, variables, cohort, or dataset before execution."
       : status === "warning"
-        ? "Continue only with explicit limitations and review the feasibility warnings before interpreting results."
+        ? feasibilityGate.nextAction
         : "Proceed to exploration and method selection.",
   };
 }
@@ -6255,17 +6326,36 @@ function renderControllerFeasibilityMarkdown(verdict: ControllerFeasibilityVerdi
   return [
     "# Controller Feasibility Verdict",
     "",
+    `Verdict: ${verdict.verdict}`,
     `Status: ${verdict.status}`,
     `Score: ${verdict.score}`,
+    `Confidence: ${verdict.confidence}`,
+    `Readiness: ${verdict.readinessLabel}`,
+    `Primary action: ${verdict.primaryAction}`,
     `Rows: ${verdict.rowCount}`,
     `Columns: ${verdict.columnCount}`,
     `Method: ${verdict.method ?? "(not selected)"}`,
+    "",
+    "## Domain Scores",
+    ...(verdict.domains.length ? verdict.domains.map(domain => `- [${domain.status}] ${domain.label}: ${domain.score} - ${domain.rationale}`) : ["- None"]),
+    "",
+    "## Internal Feasibility Reviews",
+    ...(verdict.internalReviews.length ? verdict.internalReviews.map(review => `- ${review.reviewerId}: ${review.stance}; suggests ${review.suggestedVerdict}; confidence=${review.confidence}; concerns=${review.primaryConcerns.join("; ")}`) : ["- None"]),
     "",
     "## Blockers",
     ...(verdict.blockers.length ? verdict.blockers.map(item => `- ${item}`) : ["- None"]),
     "",
     "## Warnings",
     ...(verdict.warnings.length ? verdict.warnings.map(item => `- ${item}`) : ["- None"]),
+    "",
+    "## Required Modifications",
+    ...(verdict.requiredModifications.length ? verdict.requiredModifications.map(item => `- ${item}`) : ["- None"]),
+    "",
+    "## Clarifying Questions",
+    ...(verdict.clarifyingQuestions.length ? verdict.clarifyingQuestions.map(item => `- ${item}`) : ["- None"]),
+    "",
+    "## Alternatives",
+    ...(verdict.alternativeStudyIdeas.length ? verdict.alternativeStudyIdeas.map(item => `- ${item.title}: ${item.reason} (${item.expectedVerdict})`) : ["- None"]),
     "",
     "## Required Variables",
     ...verdict.variableChecks.map(check => `- ${check.role} ${check.name}: ${check.present ? `${check.inferredType}, ${(check.missingFraction * 100).toFixed(1)}% missing, n=${check.nonMissingRows}` : "missing"}${check.issues.length ? `; issues=${check.issues.map(issue => issue.code).join(",")}` : ""}`),
@@ -6283,6 +6373,12 @@ function renderControllerFeasibilityMarkdown(verdict: ControllerFeasibilityVerdi
     "",
     "## Method Checks",
     ...verdict.methodChecks.map(check => `- [${check.status}] ${check.id}: ${check.message}`),
+    "",
+    "## Study Design Advice",
+    `- Recommended posture: ${verdict.studyDesignAdvice.recommendedPosture}`,
+    `- Method recommendation: ${verdict.studyDesignAdvice.methodRecommendation}`,
+    `- Estimand/design warning: ${verdict.studyDesignAdvice.estimandOrDesignWarning ?? "none"}`,
+    `- Reviewer risk: ${verdict.studyDesignAdvice.reviewerRiskSummary}`,
     "",
     `Next action: ${verdict.nextAction}`,
     "",
@@ -10779,10 +10875,16 @@ function renderControllerDecisionContextMarkdown(bundle: ControllerDecisionConte
     "## Feasibility",
     "",
     `- Present: ${bundle.feasibility.present}`,
+    `- Verdict: ${bundle.feasibility.verdict}`,
     `- Status: ${bundle.feasibility.status}`,
     `- Score: ${bundle.feasibility.score ?? "unknown"}`,
+    `- Confidence: ${bundle.feasibility.confidence ?? "unknown"}`,
+    `- Primary action: ${bundle.feasibility.primaryAction}`,
     ...(bundle.feasibility.blockers.length ? bundle.feasibility.blockers.map(item => `- Blocker: ${item}`) : ["- Blocker: none"]),
     ...(bundle.feasibility.warnings.length ? bundle.feasibility.warnings.map(item => `- Warning: ${item}`) : ["- Warning: none"]),
+    ...(bundle.feasibility.requiredModifications.length ? bundle.feasibility.requiredModifications.map(item => `- Required modification: ${item}`) : ["- Required modification: none"]),
+    ...(bundle.feasibility.clarifyingQuestions.length ? bundle.feasibility.clarifyingQuestions.map(item => `- Clarifying question: ${item}`) : ["- Clarifying question: none"]),
+    ...(bundle.feasibility.internalReviews.length ? bundle.feasibility.internalReviews.map(review => `- Internal review ${review.reviewerId}: ${review.stance}; suggests ${review.suggestedVerdict}; confidence=${review.confidence}`) : ["- Internal review: none"]),
     "",
     "## Deterministic Recommendation",
     "",
@@ -10822,12 +10924,19 @@ function controllerUserPrompt(bundle: ControllerDecisionContextBundle): string {
 async function loadControllerFeasibilitySummary(state: ControllerState): Promise<{
   present: boolean;
   path: string | null;
+  verdict: FeasibilityVerdict | "unknown";
   status: ControllerFeasibilityVerdict["status"] | "unknown";
   score: number | null;
+  confidence: number | null;
+  primaryAction: FeasibilityGateResult["primaryAction"] | "unknown";
   blockers: string[];
   warnings: string[];
   nextAction: string | null;
   requiredVariables: string[];
+  requiredModifications: string[];
+  clarifyingQuestions: string[];
+  alternativeStudyIdeas: Array<{ title: string; reason: string; expectedVerdict: FeasibilityVerdict }>;
+  internalReviews: Array<{ reviewerId: string; stance: string; suggestedVerdict: string; confidence: number; primaryConcerns: string[] }>;
   methodChecks: Array<{ id: string; status: "pass" | "warning" | "block"; message: string }>;
   outcomeDiagnostics: ControllerFeasibilityVerdict["outcomeDiagnostics"] | null;
 }> {
@@ -10838,26 +10947,64 @@ async function loadControllerFeasibilitySummary(state: ControllerState): Promise
     return {
       present: false,
       path: null,
+      verdict: "unknown",
       status: "unknown",
       score: null,
+      confidence: null,
+      primaryAction: "unknown",
       blockers: [],
       warnings: [],
       nextAction: null,
       requiredVariables: [],
+      requiredModifications: [],
+      clarifyingQuestions: [],
+      alternativeStudyIdeas: [],
+      internalReviews: [],
       methodChecks: [],
       outcomeDiagnostics: null,
     };
   }
   const status = verdict.status === "pass" || verdict.status === "warning" || verdict.status === "block" ? verdict.status : "unknown";
+  const verdictValue = verdict.verdict === "reject" || verdict.verdict === "needs_data_profiling" || verdict.verdict === "needs_phenotype_review" || verdict.verdict === "exploratory_only" || verdict.verdict === "formal_analysis_ready" ? verdict.verdict : "unknown";
   return {
     present: true,
     path: pathValue,
+    verdict: verdictValue,
     status,
     score: typeof verdict.score === "number" ? verdict.score : null,
+    confidence: typeof verdict.confidence === "number" ? verdict.confidence : null,
+    primaryAction: typeof verdict.primaryAction === "string" ? verdict.primaryAction : "unknown",
     blockers: Array.isArray(verdict.blockers) ? verdict.blockers.map(String).slice(0, 12) : [],
     warnings: Array.isArray(verdict.warnings) ? verdict.warnings.map(String).slice(0, 12) : [],
     nextAction: typeof verdict.nextAction === "string" ? verdict.nextAction : null,
     requiredVariables: Array.isArray(verdict.requiredVariables) ? verdict.requiredVariables.map(String) : [],
+    requiredModifications: Array.isArray(verdict.requiredModifications) ? verdict.requiredModifications.map(String).slice(0, 8) : [],
+    clarifyingQuestions: Array.isArray(verdict.clarifyingQuestions) ? verdict.clarifyingQuestions.map(String).slice(0, 8) : [],
+    alternativeStudyIdeas: Array.isArray(verdict.alternativeStudyIdeas)
+      ? verdict.alternativeStudyIdeas
+        .filter(item => item && typeof item === "object")
+        .map(item => ({
+          title: String((item as Record<string, unknown>).title ?? ""),
+          reason: String((item as Record<string, unknown>).reason ?? ""),
+          expectedVerdict: ((item as Record<string, unknown>).expectedVerdict === "reject" || (item as Record<string, unknown>).expectedVerdict === "needs_data_profiling" || (item as Record<string, unknown>).expectedVerdict === "needs_phenotype_review" || (item as Record<string, unknown>).expectedVerdict === "exploratory_only" || (item as Record<string, unknown>).expectedVerdict === "formal_analysis_ready" ? (item as { expectedVerdict: FeasibilityVerdict }).expectedVerdict : "exploratory_only"),
+        }))
+        .slice(0, 5)
+      : [],
+    internalReviews: Array.isArray(verdict.internalReviews)
+      ? verdict.internalReviews
+        .filter(item => item && typeof item === "object")
+        .map(item => {
+          const rawReview = item as unknown as Record<string, unknown>;
+          return {
+            reviewerId: String(rawReview.reviewerId ?? "unknown"),
+            stance: String(rawReview.stance ?? "unknown"),
+            suggestedVerdict: String(rawReview.suggestedVerdict ?? "unknown"),
+            confidence: typeof rawReview.confidence === "number" ? rawReview.confidence : 0,
+            primaryConcerns: Array.isArray(rawReview.primaryConcerns) ? rawReview.primaryConcerns.map(String).slice(0, 4) : [],
+          };
+        })
+        .slice(0, 5)
+      : [],
     methodChecks: Array.isArray(verdict.methodChecks)
       ? verdict.methodChecks.map(check => ({
           id: String((check as Record<string, unknown>).id ?? "unknown"),

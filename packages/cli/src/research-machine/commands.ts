@@ -98,6 +98,16 @@ import {
   type ReviewAutonomy,
   type ReviewStage,
 } from "./reviewer.js";
+export {
+  evaluateFeasibilityGate,
+  researchFeasibilityGateCommand,
+  renderResearchFeasibilityGate,
+  renderResearchFeasibilityGateJson,
+  renderResearchFeasibilityGateMarkdown,
+  type FeasibilityGateOptions,
+  type FeasibilityGateResult,
+  type FeasibilityVerdict,
+} from "./feasibility.js";
 import { runStatsMethod } from "./stats/runner.js";
 import type { StatsMethod, StatsRunRequest, StatsRunResult } from "./stats/schemas.js";
 import {
