@@ -56,6 +56,14 @@ describe("research stats methods expansion", () => {
     expect(cox.family).toBe("survival");
     expect(cox.requiredArguments).toEqual(expect.arrayContaining(["time", "event", "exposure"]));
     expect(cox.assumptions.join(" ")).toMatch(/time zero|censoring/i);
+    expect(cox.expectedFigures.filter(figure => figure.required).map(figure => figure.type)).toEqual(["forest"]);
+    expect(getStatisticalMethodSpec("log-rank").expectedFigures.filter(figure => figure.required).map(figure => figure.type)).toEqual(["survival"]);
+    expect(getStatisticalMethodSpec("recurrent-event-rate").expectedFigures.filter(figure => figure.required).map(figure => figure.id)).toEqual(["event-rate-summary"]);
+    expect(getStatisticalMethodSpec("ancova").requiredArguments).toEqual(expect.arrayContaining(["outcome", "group", "covariates"]));
+    expect(getStatisticalMethodSpec("partial-correlation").requiredArguments).toEqual(expect.arrayContaining(["outcome", "exposure", "covariates"]));
+    expect(getStatisticalMethodSpec("paired-t-test").requiredArguments).toEqual(["variables"]);
+    expect(getStatisticalMethodSpec("wilcoxon").requiredArguments).toEqual(["variables"]);
+    expect(getStatisticalMethodSpec("friedman").requiredArguments).toEqual(["variables"]);
   });
 
   it("exposes stats contracts through an operator-facing command renderer", () => {
@@ -434,6 +442,38 @@ describe("research stats methods expansion", () => {
       "survival-curve-artifact",
     ]));
 
+    const logRankOut = path.join(dir, "log-rank-reliability");
+    const logRank = await researchStatsRunCommand({
+      method: "log-rank",
+      dataPath,
+      outDir: logRankOut,
+      time: "time",
+      event: "event",
+      group: "g",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(logRank.status).toBe("succeeded");
+    expect(logRank.diagnostics).toMatchObject({
+      curve_path: expect.stringContaining("log-rank-survival-curve.csv"),
+      artifacts: expect.objectContaining({ survival_curve: expect.stringContaining("log-rank-survival-curve.csv") }),
+    });
+    expect(logRank.artifacts.some(artifact => artifact.kind === "table" && artifact.path.endsWith("log-rank-survival-curve.csv"))).toBe(true);
+    const logRankFigures = JSON.parse(await readFile(path.join(logRankOut, "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string; sourceColumns: string[] }> };
+    expect(logRankFigures.figures.map(figure => path.basename(figure.path))).toContain("log-rank-survival.png");
+    const logRankQa = JSON.parse(await readFile(path.join(logRankOut, "stats-qa.json"), "utf-8")) as { checks: Array<{ id: string; status: string }> };
+    expect(logRankQa.checks.find(check => check.id === "survival-curve-artifact")?.status).toBe("pass");
+
     const survivalOut = path.join(dir, "cox-reliability");
     const survival = await researchStatsRunCommand({
       method: "cox-proportional-hazards",
@@ -477,8 +517,13 @@ describe("research stats methods expansion", () => {
       "cox-discrimination-diagnostic",
       "cox-tie-burden",
       "cox-proportional-hazards-diagnostic",
+      "cox-hazard-ratio-figure",
     ]));
     expect(survivalQa.checks.find(check => check.id === "cox-proportional-hazards-diagnostic")?.status).toMatch(/pass|warning/);
+    expect(survivalQa.checks.find(check => check.id === "cox-hazard-ratio-figure")?.status).toBe("pass");
+    const survivalFigures = JSON.parse(await readFile(path.join(survivalOut, "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string; sourceColumns: string[] }> };
+    expect(survivalFigures.figures.map(figure => path.basename(figure.path))).toContain("cox-hazard-ratios.png");
+    expect(survivalFigures.figures.find(figure => path.basename(figure.path) === "cox-hazard-ratios.png")?.sourceColumns).toEqual(expect.arrayContaining(["time", "event", "x", "g"]));
 
     const recurrentOut = path.join(dir, "recurrent-reliability");
     const recurrent = await researchStatsRunCommand({
@@ -510,6 +555,8 @@ describe("research stats methods expansion", () => {
       rate_ci_high: expect.any(Number),
     });
     expect(recurrent.diagnostics).toMatchObject({ rate_ci_method: "exact Poisson interval", unique_subjects: expect.any(Number) });
+    const recurrentFigures = JSON.parse(await readFile(path.join(recurrentOut, "figures.json"), "utf-8")) as { figures: Array<{ path: string; title: string; sourceColumns: string[] }> };
+    expect(recurrentFigures.figures.map(figure => path.basename(figure.path))).toContain("recurrent-event-rate.png");
 
     const longitudinalOut = path.join(dir, "gee-reliability");
     const longitudinal = await researchStatsRunCommand({
@@ -1195,6 +1242,221 @@ describe("research stats methods expansion", () => {
     expect(result.issues.map(issue => issue.code)).toContain("STATS_BINARY_OUTCOME_INVALID");
   }, 60_000);
 
+  it("blocks group-comparison methods when a complete-case group is too small", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-group-support-"));
+    const dataPath = path.join(dir, "sparse-group.csv");
+    await writeFile(dataPath, [
+      "y,g",
+      ...Array.from({ length: 60 }, (_, index) => `${(10 + index / 10).toFixed(3)},0`),
+      "16.500,1",
+    ].join("\n"));
+    const result = await researchStatsRunCommand({
+      method: "welch-t-test",
+      dataPath,
+      outDir: path.join(dir, "run"),
+      outcome: "y",
+      group: "g",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.issues.map(issue => issue.code)).toContain("STATS_GROUP_COMPLETE_CASE_SUPPORT_LOW");
+    const preflight = result.diagnostics.preflight as { status?: string; checks?: Array<{ id: string; status: string; detail: string }> };
+    expect(preflight.status).toBe("block");
+    const groupSupport = preflight.checks?.find(check => check.id === "group-complete-case-support");
+    expect(groupSupport?.status).toBe("block");
+    expect(groupSupport?.detail).toContain("1: 1");
+  }, 60_000);
+
+  it("blocks 2x2-only categorical tests when the table shape is incompatible", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-categorical-shape-"));
+    const dataPath = path.join(dir, "three-level-outcome.csv");
+    await writeFile(dataPath, [
+      "outcome,exposure",
+      ...Array.from({ length: 90 }, (_, index) => `${index % 3},${index % 2}`),
+    ].join("\n"));
+    const result = await researchStatsRunCommand({
+      method: "fisher-exact",
+      dataPath,
+      outDir: path.join(dir, "run"),
+      outcome: "outcome",
+      exposure: "exposure",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.issues.map(issue => issue.code)).toContain("STATS_CATEGORICAL_TABLE_SHAPE_UNSUPPORTED");
+    const preflight = result.diagnostics.preflight as { status?: string; checks?: Array<{ id: string; status: string; detail: string }> };
+    expect(preflight.status).toBe("block");
+    const shape = preflight.checks?.find(check => check.id === "two-by-two-categorical-levels");
+    expect(shape?.status).toBe("block");
+    expect(shape?.detail).toContain("outcome=3");
+  }, 60_000);
+
+  it("blocks count and positive GLMs when outcome domains are invalid", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-outcome-domain-"));
+    const fractionalCountPath = path.join(dir, "fractional-count.csv");
+    await writeFile(fractionalCountPath, [
+      "y,x",
+      ...Array.from({ length: 80 }, (_, index) => `${(index % 5) + 0.5},${(index / 10).toFixed(3)}`),
+    ].join("\n"));
+    const count = await researchStatsRunCommand({
+      method: "poisson-regression",
+      dataPath: fractionalCountPath,
+      outDir: path.join(dir, "poisson"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(count.status).toBe("failed");
+    expect(count.issues.map(issue => issue.code)).toContain("STATS_COUNT_OUTCOME_DOMAIN_INVALID");
+    expect(JSON.stringify(count.diagnostics.preflight)).toContain("non-integer");
+
+    const zeroPath = path.join(dir, "zero-positive.csv");
+    await writeFile(zeroPath, [
+      "y,x",
+      ...Array.from({ length: 80 }, (_, index) => `${index === 0 ? 0 : (1 + index / 10).toFixed(3)},${(index / 10).toFixed(3)}`),
+    ].join("\n"));
+    const gamma = await researchStatsRunCommand({
+      method: "gamma-glm",
+      dataPath: zeroPath,
+      outDir: path.join(dir, "gamma"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(gamma.status).toBe("failed");
+    expect(gamma.issues.map(issue => issue.code)).toContain("STATS_POSITIVE_OUTCOME_REQUIRED");
+  }, 60_000);
+
+  it("blocks methods whose requested contrast has no complete-case variation", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-variation-"));
+    const constantExposurePath = path.join(dir, "constant-exposure.csv");
+    await writeFile(constantExposurePath, [
+      "y,x,z",
+      ...Array.from({ length: 80 }, (_, index) => `${(1 + index / 10).toFixed(3)},1,${index % 2}`),
+    ].join("\n"));
+    const regression = await researchStatsRunCommand({
+      method: "linear-regression",
+      dataPath: constantExposurePath,
+      outDir: path.join(dir, "constant-exposure-run"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: ["z"],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(regression.status).toBe("failed");
+    expect(regression.issues.map(issue => issue.code)).toContain("STATS_EXPOSURE_VARIATION_INSUFFICIENT");
+
+    const oneGroupPath = path.join(dir, "one-group.csv");
+    await writeFile(oneGroupPath, [
+      "y,g",
+      ...Array.from({ length: 80 }, (_, index) => `${(1 + index / 10).toFixed(3)},0`),
+    ].join("\n"));
+    const group = await researchStatsRunCommand({
+      method: "welch-t-test",
+      dataPath: oneGroupPath,
+      outDir: path.join(dir, "one-group-run"),
+      outcome: "y",
+      group: "g",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(group.status).toBe("failed");
+    expect(group.issues.map(issue => issue.code)).toContain("STATS_GROUP_LEVELS_INSUFFICIENT");
+
+    const constantCovariatePath = path.join(dir, "constant-covariate.csv");
+    await writeFile(constantCovariatePath, [
+      "y,x,z",
+      ...Array.from({ length: 80 }, (_, index) => `${(1 + index / 10).toFixed(3)},${(index / 10).toFixed(3)},1`),
+    ].join("\n"));
+    const partial = await researchStatsRunCommand({
+      method: "partial-correlation",
+      dataPath: constantCovariatePath,
+      outDir: path.join(dir, "constant-covariate-run"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: ["z"],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(partial.status).toBe("failed");
+    expect(partial.issues.map(issue => issue.code)).toContain("STATS_COVARIATE_VARIATION_INSUFFICIENT");
+  }, 60_000);
+
   it("blocks event models when event counts are too sparse for reliable inference", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-event-preflight-"));
     const dataPath = path.join(dir, "sparse-events.csv");
@@ -1316,6 +1578,92 @@ describe("research stats methods expansion", () => {
     expect(result.diagnostics.preflight).toMatchObject({ status: "block" });
     expect(result.diagnostics.preflight).toHaveProperty("checks");
     expect(JSON.stringify(result.diagnostics.preflight)).toContain("--instrument");
+
+    const partial = await researchStatsRunCommand({
+      method: "partial-correlation",
+      dataPath,
+      outDir: path.join(dir, "missing-partial-correlation-covariates"),
+      outcome: "y",
+      exposure: "x",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(partial.status).toBe("failed");
+    expect(partial.issues.map(issue => issue.code)).toContain("STATS_REQUIRED_ARGUMENT_MISSING");
+    expect(JSON.stringify(partial.diagnostics.preflight)).toContain("--covariate");
+
+    const rdd = await researchStatsRunCommand({
+      method: "regression-discontinuity",
+      dataPath,
+      outDir: path.join(dir, "missing-rdd-cutoff"),
+      outcome: "y",
+      runningVariable: "running",
+      variables: [],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(rdd.status).toBe("failed");
+    expect(rdd.issues.map(issue => issue.code)).toContain("STATS_REQUIRED_ARGUMENT_MISSING");
+    expect(JSON.stringify(rdd.diagnostics.preflight)).toContain("--cutoff");
+
+    const paired = await researchStatsRunCommand({
+      method: "paired-t-test",
+      dataPath,
+      outDir: path.join(dir, "missing-paired-measures"),
+      variables: ["wide1"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(paired.status).toBe("failed");
+    expect(paired.issues.map(issue => issue.code)).toContain("STATS_REPEATED_MEASURE_VARIABLES_MISSING");
+
+    const friedman = await researchStatsRunCommand({
+      method: "friedman",
+      dataPath,
+      outDir: path.join(dir, "missing-friedman-measures"),
+      variables: ["wide1", "wide2"],
+      covariates: [],
+      exactCovariates: [],
+      estimand: "ATT",
+      matchRatio: 1,
+      replacement: false,
+      trimThreshold: 0.01,
+      stabilizeWeights: true,
+      surveyDesign: false,
+      allowSurveyApproximation: false,
+      alpha: 0.05,
+      python,
+    });
+    expect(friedman.status).toBe("failed");
+    expect(friedman.issues.map(issue => issue.code)).toContain("STATS_REPEATED_MEASURE_VARIABLES_MISSING");
   });
 
   it("maps expanded method ontology ids to stats-run methods", () => {

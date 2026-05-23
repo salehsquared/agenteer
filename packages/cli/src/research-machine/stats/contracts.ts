@@ -173,10 +173,13 @@ function familyFor(method: StatsMethod): StatisticalMethodSpec["family"] {
 function requiredArgumentsFor(method: StatsMethod): string[] {
   const regression = ["outcome", "exposure"];
   if (method === "descriptive" || method === "missingness-summary" || method === "multiple-imputation-mice" || method === "pca" || method === "clustering-validation" || method === "cronbach-alpha" || method === "multiple-comparison-correction" || method === "power-sample-size" || method === "reliability-kappa" || method === "intraclass-correlation" || method === "bland-altman") return ["variables"];
-  if (["t-test", "welch-t-test", "mann-whitney", "anova", "ancova", "kruskal-wallis"].includes(method)) return ["outcome", "group"];
-  if (["paired-t-test", "wilcoxon", "mcnemar"].includes(method)) return ["outcome", "exposure"];
-  if (method === "friedman") return ["outcome", "group", "id"];
+  if (["t-test", "welch-t-test", "mann-whitney", "anova", "kruskal-wallis"].includes(method)) return ["outcome", "group"];
+  if (method === "ancova") return ["outcome", "group", "covariates"];
+  if (["paired-t-test", "wilcoxon"].includes(method)) return ["variables"];
+  if (method === "mcnemar") return ["outcome", "exposure"];
+  if (method === "friedman") return ["variables"];
   if (["chi-square", "fisher-exact", "cochran-armitage-trend", "diagnostic-accuracy", "prediction-evaluation"].includes(method)) return ["outcome", "exposure"];
+  if (method === "partial-correlation") return ["outcome", "exposure", "covariates"];
   if (correlations.has(method)) return ["outcome", "exposure"];
   if (regressionGlm.has(method)) return regression;
   if (method === "kaplan-meier" || method === "log-rank") return ["time", "event", "group"];
@@ -228,7 +231,7 @@ function figuresFor(method: StatsMethod, family: StatisticalMethodSpec["family"]
       figure("ph-diagnostic", "Proportional-hazards diagnostic", "diagnostic", ["time", "event", "exposure", "covariates"]),
     ];
     if (method === "recurrent-event-rate") return [
-      figure("event-rate-summary", "Event-rate summary", "line", ["time", "event", "id"]),
+      figure("event-rate-summary", "Event-rate summary", "line", ["time", "event", "id"], true),
     ];
     return [
       figure("survival-curve", "Survival curve", "survival", ["time", "event", "group"], true),

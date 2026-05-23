@@ -268,7 +268,7 @@ async function buildStatsPreflight(request: StatsRunRequest): Promise<StatsPrefl
       method: request.method,
       requiredVariables: variablesFor(request),
       variableChecks: [],
-      completeCase: { scanned: false, scannedRows: 0, completeRows: null, completeFraction: null, scanReason: "Stats preflight could not summarize the table." },
+      completeCase: { scanned: false, scannedRows: 0, completeRows: null, completeFraction: null, completeValueCounts: {}, scanReason: "Stats preflight could not summarize the table." },
       outcomeDiagnostics: { outcome: request.outcome ?? request.event ?? null, observedLevels: [], eventCount: null, nonEventCount: null, eventRate: null, usable: null },
       domains: [],
       internalReviews: [],
@@ -362,6 +362,7 @@ function preflightGateChecks(gate: FeasibilityGateResult): StatsPreflightCheck[]
 
 function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
   const checks: StatsPreflightCheck[] = [...preflightRequiredArgumentChecks(request)];
+  checks.push(...preflightRepeatedMeasureChecks(request));
   const completeRows = gate.completeCase.completeRows ?? gate.rowCount ?? 0;
   const variables = variableChecksByName(gate);
   const outcomeName = request.outcome ?? request.event ?? null;
@@ -392,6 +393,56 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
       detail: `Method ${request.method} requires a numeric/continuous outcome, but ${outcomeName} is ${outcome.inferredType}.`,
       evidenceRefs: [request.dataPath, outcomeName],
       suggestedAction: "Choose a categorical method or map a numeric outcome.",
+    });
+  }
+  if (outcomeName && outcome && countRegressionMethods().has(request.method)) {
+    const values = completeCaseNumericValues(gate, outcomeName);
+    const nonIntegerValues = values.filter(value => Math.abs(value - Math.round(value)) > 1e-8);
+    if (outcome.min !== null && outcome.min < 0) {
+      checks.push({
+        id: "count-outcome-domain",
+        status: "block",
+        detail: `${request.method} requires a nonnegative count outcome, but ${outcomeName} has minimum ${outcome.min}.`,
+        evidenceRefs: [request.dataPath, outcomeName],
+        suggestedAction: "Choose a continuous-outcome model or recode the outcome to a valid nonnegative count before count regression.",
+      });
+    } else if (nonIntegerValues.length > 0) {
+      checks.push({
+        id: "count-outcome-domain",
+        status: "block",
+        detail: `${request.method} requires integer counts, but ${outcomeName} includes non-integer observed complete-case values such as ${nonIntegerValues.slice(0, 5).map(value => value.toPrecision(4)).join(", ")}.`,
+        evidenceRefs: [request.dataPath, outcomeName],
+        suggestedAction: "Use a continuous/skewed-outcome model or define a true count endpoint.",
+      });
+    }
+    if (zeroInflatedCountMethods().has(request.method) && values.length) {
+      const zeroFraction = values.filter(value => value === 0).length / values.length;
+      if (zeroFraction === 0) {
+        checks.push({
+          id: "zero-inflation-support",
+          status: "block",
+          detail: `${request.method} was requested, but no zero counts were observed in complete cases.`,
+          evidenceRefs: [request.dataPath, outcomeName],
+          suggestedAction: "Use Poisson/negative-binomial regression unless zero inflation is visible in the analyzed outcome.",
+        });
+      } else if (zeroFraction < 0.05) {
+        checks.push({
+          id: "zero-inflation-support",
+          status: "warning",
+          detail: `${request.method} was requested, but only ${(zeroFraction * 100).toFixed(1)}% of complete-case outcome values are zero.`,
+          evidenceRefs: [request.dataPath, outcomeName],
+          suggestedAction: "Review whether a standard count model is preferable to a zero-inflated model.",
+        });
+      }
+    }
+  }
+  if (outcomeName && outcome && positiveContinuousGlmMethods().has(request.method) && outcome.min !== null && outcome.min <= 0) {
+    checks.push({
+      id: "positive-continuous-outcome-domain",
+      status: "block",
+      detail: `${request.method} requires a strictly positive outcome, but ${outcomeName} has minimum ${outcome.min}.`,
+      evidenceRefs: [request.dataPath, outcomeName],
+      suggestedAction: "Use a model that supports zero/nonpositive values, transform with a prespecified offset only if scientifically justified, or redefine the outcome.",
     });
   }
   if (binaryOutcomeMethods().has(request.method)) {
@@ -429,6 +480,30 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
       });
     }
   }
+  if (request.exposure && exposureVariationRequiredMethods().has(request.method)) {
+    const exposureLevels = completeCaseLevelCounts(gate, request.exposure);
+    if (exposureLevels.length > 0 && exposureLevels.length < 2) {
+      checks.push({
+        id: "exposure-variation",
+        status: "block",
+        detail: `${request.method} cannot estimate an exposure contrast because ${request.exposure} has only ${exposureLevels.length} observed complete-case level(s).`,
+        evidenceRefs: [request.dataPath, request.exposure],
+        suggestedAction: "Choose an exposure with variation in the analytic sample, broaden the cohort, or switch to descriptive reporting.",
+      });
+    }
+  }
+  for (const covariate of request.covariates) {
+    const covariateLevels = completeCaseLevelCounts(gate, covariate);
+    if (covariateLevels.length > 0 && covariateLevels.length < 2) {
+      checks.push({
+        id: "covariate-variation",
+        status: allAdjustmentCovariatesConstant(request, gate) ? "block" : "warning",
+        detail: `Adjustment covariate ${covariate} has only ${covariateLevels.length} observed complete-case level(s), so it cannot contribute model information.`,
+        evidenceRefs: [request.dataPath, covariate],
+        suggestedAction: "Remove constant adjustment variables before modeling, or revise the cohort/variable mapping.",
+      });
+    }
+  }
   if (groupRequiredMethods().has(request.method)) {
     const grouping = group ?? exposure;
     const levelCount = grouping ? variableLevelCount(grouping) : 0;
@@ -439,6 +514,14 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
         detail: `${request.method} requires a group/exposure variable.`,
         evidenceRefs: [request.dataPath],
         suggestedAction: "Provide --group or --exposure.",
+      });
+    } else if (levelCount < 2) {
+      checks.push({
+        id: "group-variable-levels",
+        status: "block",
+        detail: `${request.method} requires at least two observed groups, but ${grouping.name} appears to have ${levelCount} sampled level(s).`,
+        evidenceRefs: [request.dataPath, grouping.name],
+        suggestedAction: "Choose a grouping variable with variation, broaden the cohort, or switch to one-sample/descriptive analysis.",
       });
     } else if (twoGroupMethods().has(request.method) && levelCount > 2) {
       checks.push({
@@ -455,6 +538,71 @@ function preflightMethodChecks(request: StatsRunRequest, gate: FeasibilityGateRe
         detail: `${request.method} is usually for more than two groups; ${grouping.name} appears to have ${levelCount} sampled level(s).`,
         evidenceRefs: [request.dataPath, grouping.name],
         suggestedAction: "Use a two-sample test if the contrast is binary.",
+      });
+    }
+    const completeLevelCounts = grouping ? completeCaseLevelCounts(gate, grouping.name) : [];
+    if (grouping && completeLevelCounts.length) {
+      const minLevel = completeLevelCounts.reduce((min, item) => Math.min(min, item.count), Number.POSITIVE_INFINITY);
+      const countSummary = completeLevelCounts.map(item => `${item.value}: ${item.count}`).join(", ");
+      if (twoGroupMethods().has(request.method)) {
+        checks.push({
+          id: "group-complete-case-support",
+          status: minLevel < 2 ? "block" : minLevel < 10 ? "warning" : "pass",
+          detail: `${request.method} complete-case group counts: ${countSummary}.`,
+          evidenceRefs: [request.dataPath, grouping.name],
+          suggestedAction: "Broaden the cohort, collapse to a supported contrast, or switch to descriptive/exact reporting when a group has too few complete rows.",
+        });
+      } else if (multiGroupSupportMethods().has(request.method)) {
+        checks.push({
+          id: "group-complete-case-support",
+          status: minLevel < 2 ? "block" : minLevel < 5 ? "warning" : "pass",
+          detail: `${request.method} complete-case group counts: ${countSummary}.`,
+          evidenceRefs: [request.dataPath, grouping.name],
+          suggestedAction: "Broaden the cohort, combine sparse prespecified levels, or use descriptive reporting before formal group inference.",
+        });
+      }
+    }
+  }
+  if (categoricalAssociationMethods().has(request.method)) {
+    const grouping = exposure ?? group;
+    const outcomeLevelCount = outcome ? variableLevelCount(outcome) : 0;
+    const exposureLevelCount = grouping ? variableLevelCount(grouping) : 0;
+    if ((request.method === "fisher-exact" || request.method === "mcnemar") && (outcomeLevelCount !== 2 || exposureLevelCount !== 2)) {
+      checks.push({
+        id: "two-by-two-categorical-levels",
+        status: "block",
+        detail: `${request.method} requires a 2x2 table; observed level counts are outcome=${outcomeLevelCount}, exposure/group=${exposureLevelCount}.`,
+        evidenceRefs: [request.dataPath, outcomeName ?? "outcome", grouping?.name ?? "exposure"],
+        suggestedAction: "Use chi-square for larger categorical tables, collapse levels only with a prespecified rule, or choose Fisher/McNemar for a true 2x2 contrast.",
+      });
+    }
+    if (request.method === "cochran-armitage-trend") {
+      if (outcomeLevelCount !== 2) {
+        checks.push({
+          id: "trend-test-binary-outcome",
+          status: "block",
+          detail: `Cochran-Armitage trend requires a binary outcome; observed outcome level count is ${outcomeLevelCount}.`,
+          evidenceRefs: [request.dataPath, outcomeName ?? "outcome"],
+          suggestedAction: "Recode to a prespecified binary outcome or use a multinomial/ordinal model.",
+        });
+      }
+      if (exposureLevelCount < 3) {
+        checks.push({
+          id: "trend-test-ordered-groups",
+          status: "warning",
+          detail: `Cochran-Armitage trend is intended for ordered exposure groups; observed exposure/group level count is ${exposureLevelCount}.`,
+          evidenceRefs: [request.dataPath, grouping?.name ?? "exposure"],
+          suggestedAction: "Use chi-square/Fisher for a binary contrast or define at least three ordered exposure levels.",
+        });
+      }
+    }
+    if (request.method === "chi-square" && (outcomeLevelCount > 20 || exposureLevelCount > 20 || outcomeLevelCount * exposureLevelCount > 100)) {
+      checks.push({
+        id: "high-cardinality-categorical-table",
+        status: "warning",
+        detail: `Chi-square table is high-dimensional: outcome levels=${outcomeLevelCount}, exposure/group levels=${exposureLevelCount}.`,
+        evidenceRefs: [request.dataPath, outcomeName ?? "outcome", grouping?.name ?? "exposure"],
+        suggestedAction: "Review whether categories should be collapsed by a prespecified rule or modeled with regression instead of a wide contingency table.",
       });
     }
   }
@@ -491,8 +639,10 @@ type StatsArgumentName =
   | "period"
   | "post"
   | "runningVariable"
+  | "cutoff"
   | "instrument"
-  | "variables";
+  | "variables"
+  | "covariates";
 
 function preflightRequiredArgumentChecks(request: StatsRunRequest): StatsPreflightCheck[] {
   const missing = requiredArgumentsForMethod(request.method).filter(argument => !hasStatsArgument(request, argument));
@@ -506,9 +656,27 @@ function preflightRequiredArgumentChecks(request: StatsRunRequest): StatsPreflig
   }];
 }
 
+function preflightRepeatedMeasureChecks(request: StatsRunRequest): StatsPreflightCheck[] {
+  const requiredCount = request.method === "paired-t-test" || request.method === "wilcoxon"
+    ? 2
+    : request.method === "friedman"
+      ? 3
+      : null;
+  if (requiredCount === null || request.variables.length >= requiredCount) return [];
+  return [{
+    id: "required-repeated-measure-variables",
+    status: "block",
+    detail: `${request.method} requires at least ${requiredCount} repeated-measure variable(s), but ${request.variables.length} were provided.`,
+    evidenceRefs: ["method", request.method],
+    suggestedAction: `Provide at least ${requiredCount} --variable entries for repeated measurements, or choose a method for independent groups.`,
+  }];
+}
+
 function hasStatsArgument(request: StatsRunRequest, argument: StatsArgumentName): boolean {
   if (argument === "variables") return request.variables.length > 0;
+  if (argument === "covariates") return request.covariates.length > 0;
   if (argument === "clusterOrId") return Boolean(request.cluster?.trim() || request.id?.trim());
+  if (argument === "cutoff") return typeof request.cutoff === "number" && Number.isFinite(request.cutoff);
   const value = request[argument];
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -516,52 +684,66 @@ function hasStatsArgument(request: StatsRunRequest, argument: StatsArgumentName)
 function renderStatsArgument(argument: StatsArgumentName): string {
   if (argument === "runningVariable") return "--running-variable";
   if (argument === "variables") return "--variable";
+  if (argument === "covariates") return "--covariate";
   if (argument === "clusterOrId") return "--cluster or --id";
   return `--${argument}`;
 }
 
+function completeCaseLevelCounts(gate: FeasibilityGateResult, variable: string): Array<{ value: string; count: number }> {
+  const counts = gate.completeCase.completeValueCounts[variable];
+  if (!counts) return [];
+  return Object.entries(counts)
+    .map(([value, count]) => ({ value, count }))
+    .filter(item => item.count > 0)
+    .sort((a, b) => b.count - a.count);
+}
+
+function completeCaseNumericValues(gate: FeasibilityGateResult, variable: string): number[] {
+  return completeCaseLevelCounts(gate, variable)
+    .flatMap(item => {
+      const parsed = Number(item.value);
+      if (!Number.isFinite(parsed)) return [];
+      return Array.from({ length: Math.min(item.count, 5000) }, () => parsed);
+    });
+}
+
+function allAdjustmentCovariatesConstant(request: StatsRunRequest, gate: FeasibilityGateResult): boolean {
+  if (!request.covariates.length) return false;
+  return request.covariates.every(covariate => {
+    const levels = completeCaseLevelCounts(gate, covariate);
+    return levels.length > 0 && levels.length < 2;
+  });
+}
+
 function requiredArgumentsForMethod(method: StatsRunRequest["method"]): StatsArgumentName[] {
-  const commonRegression: StatsArgumentName[] = ["outcome", "exposure"];
-  const regression = new Set<StatsRunRequest["method"]>([
-    "linear-regression",
-    "robust-linear-regression",
-    "logistic-regression",
-    "ordinal-logistic-regression",
-    "multinomial-logistic-regression",
-    "poisson-regression",
-    "negative-binomial-regression",
-    "zero-inflated-poisson",
-    "zero-inflated-negative-binomial",
-    "gamma-glm",
-    "inverse-gaussian-glm",
-    "quantile-regression",
-    "penalized-linear-regression",
-    "penalized-logistic-regression",
-  ]);
-  if (method === "descriptive" || method === "missingness-summary" || method === "multiple-imputation-mice" || method === "pca" || method === "clustering-validation" || method === "cronbach-alpha" || method === "multiple-comparison-correction") return ["variables"];
-  if (method === "t-test" || method === "welch-t-test" || method === "mann-whitney" || method === "anova" || method === "ancova" || method === "kruskal-wallis") return ["outcome", "group"];
-  if (method === "paired-t-test" || method === "wilcoxon") return ["outcome", "exposure"];
-  if (method === "friedman") return ["outcome", "group", "id"];
-  if (method === "chi-square" || method === "fisher-exact" || method === "cochran-armitage-trend") return ["outcome", "exposure"];
-  if (method === "mcnemar") return ["outcome", "exposure"];
-  if (method === "pearson" || method === "spearman" || method === "kendall" || method === "partial-correlation") return ["outcome", "exposure"];
-  if (method === "diagnostic-accuracy" || method === "prediction-evaluation") return ["outcome", "exposure"];
-  if (regression.has(method)) return commonRegression;
-  if (method === "kaplan-meier" || method === "log-rank" || method === "aalen-johansen-cif") return method === "log-rank" || method === "kaplan-meier" ? ["time", "event", "group"] : ["time", "event"];
-  if (method === "cox-proportional-hazards" || method === "time-varying-cox") return ["time", "event", "exposure"];
-  if (method === "stratified-cox") return ["time", "event", "exposure", "strata"];
-  if (method === "fine-gray") return ["time", "event", "exposure"];
-  if (method === "recurrent-event-rate") return ["time", "event", "id"];
-  if (method === "linear-mixed-model" || method === "generalized-mixed-model" || method === "gee" || method === "repeated-measures-anova") return ["outcome", "exposure", "clusterOrId"];
-  if (method === "overlap-weighting" || method === "entropy-balancing" || method === "doubly-robust-aipw" || method === "propensity-score-matching" || method === "propensity-score-weighting") return ["outcome", "exposure"];
-  if (method === "difference-in-differences" || method === "event-study-did") return ["outcome", "exposure", "post"];
-  if (method === "interrupted-time-series") return ["outcome", "time", "post"];
-  if (method === "regression-discontinuity") return ["outcome", "runningVariable"];
-  if (method === "instrumental-variables-2sls") return ["outcome", "exposure", "instrument"];
-  if (method === "missingness-ipw" || method === "complete-case-sensitivity" || method === "mnar-sensitivity" || method === "model-diagnostics") return ["outcome"];
-  if (method === "power-sample-size") return ["variables"];
-  if (method === "reliability-kappa" || method === "intraclass-correlation" || method === "bland-altman") return ["variables"];
-  return [];
+  return getStatisticalMethodSpec(method).requiredArguments
+    .map(argument => {
+      const mapped = contractArgumentToStatsArgument(argument);
+      if (!mapped) {
+        throw new Error(`Stats method contract for ${method} declares unsupported required argument '${argument}'.`);
+      }
+      return mapped;
+    });
+}
+
+function contractArgumentToStatsArgument(argument: string): StatsArgumentName | null {
+  const normalized = argument.toLowerCase().trim();
+  if (normalized === "cluster or id") return "clusterOrId";
+  if (normalized === "running variable") return "runningVariable";
+  if (normalized === "outcome") return "outcome";
+  if (normalized === "exposure") return "exposure";
+  if (normalized === "group") return "group";
+  if (normalized === "time") return "time";
+  if (normalized === "event") return "event";
+  if (normalized === "id") return "id";
+  if (normalized === "strata") return "strata";
+  if (normalized === "period") return "period";
+  if (normalized === "post") return "post";
+  if (normalized === "cutoff") return "cutoff";
+  if (normalized === "instrument") return "instrument";
+  if (normalized === "variables") return "variables";
+  if (normalized === "covariates") return "covariates";
+  return null;
 }
 
 function preflightAlternativeChecks(request: StatsRunRequest, gate: FeasibilityGateResult): StatsPreflightCheck[] {
@@ -615,7 +797,17 @@ function issueCodeForCheck(id: string): string {
     "complete-case-count": "STATS_COMPLETE_CASE_TOO_SMALL",
     "required-variables-present": "STATS_REQUIRED_VARIABLE_MISSING",
     "required-method-arguments": "STATS_REQUIRED_ARGUMENT_MISSING",
+    "required-repeated-measure-variables": "STATS_REPEATED_MEASURE_VARIABLES_MISSING",
     "continuous-outcome-type": "STATS_NON_NUMERIC_OUTCOME",
+    "count-outcome-domain": "STATS_COUNT_OUTCOME_DOMAIN_INVALID",
+    "zero-inflation-support": "STATS_ZERO_INFLATION_UNSUPPORTED",
+    "positive-continuous-outcome-domain": "STATS_POSITIVE_OUTCOME_REQUIRED",
+    "exposure-variation": "STATS_EXPOSURE_VARIATION_INSUFFICIENT",
+    "covariate-variation": "STATS_COVARIATE_VARIATION_INSUFFICIENT",
+    "group-variable-levels": "STATS_GROUP_LEVELS_INSUFFICIENT",
+    "group-complete-case-support": "STATS_GROUP_COMPLETE_CASE_SUPPORT_LOW",
+    "two-by-two-categorical-levels": "STATS_CATEGORICAL_TABLE_SHAPE_UNSUPPORTED",
+    "trend-test-binary-outcome": "STATS_TREND_TEST_OUTCOME_NOT_BINARY",
   };
   return explicit[id] ?? `STATS_PREFLIGHT_${id.toUpperCase().replaceAll("-", "_")}`;
 }
@@ -718,11 +910,15 @@ function continuousOutcomeMethods(): Set<StatsRunRequest["method"]> {
 }
 
 function groupRequiredMethods(): Set<StatsRunRequest["method"]> {
-  return new Set(["t-test", "paired-t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "wilcoxon", "kruskal-wallis", "friedman", "chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "log-rank"]);
+  return new Set(["t-test", "welch-t-test", "anova", "ancova", "mann-whitney", "kruskal-wallis", "chi-square", "fisher-exact", "mcnemar", "cochran-armitage-trend", "log-rank"]);
 }
 
 function twoGroupMethods(): Set<StatsRunRequest["method"]> {
-  return new Set(["t-test", "paired-t-test", "welch-t-test", "mann-whitney", "wilcoxon", "fisher-exact", "mcnemar"]);
+  return new Set(["t-test", "welch-t-test", "mann-whitney", "fisher-exact", "mcnemar"]);
+}
+
+function multiGroupSupportMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["anova", "ancova", "kruskal-wallis", "chi-square", "cochran-armitage-trend", "log-rank"]);
 }
 
 function backendUnavailableMethods(): Set<StatsRunRequest["method"]> {
@@ -1797,7 +1993,7 @@ function survivalReliabilityQaChecks(result: StatsRunResult): Array<{ id: string
       detail: events === null || censored === null ? "Censoring/event context is incomplete." : `${events} event(s) and ${censored} censored observation(s) were recorded.`,
     },
   ];
-  if (result.method === "kaplan-meier" || result.method === "aalen-johansen-cif") {
+  if (result.method === "kaplan-meier" || result.method === "log-rank" || result.method === "aalen-johansen-cif") {
     checks.push({
       id: "survival-curve-artifact",
       status: result.artifacts.some(artifact => artifact.kind === "table" && /curve|incidence/i.test(artifact.path)) ? "pass" : "fail",
@@ -1807,6 +2003,14 @@ function survivalReliabilityQaChecks(result: StatsRunResult): Array<{ id: string
     });
   }
   if (result.method === "cox-proportional-hazards" || result.method === "stratified-cox") {
+    const hasHazardFigure = result.artifacts.some(artifact => artifact.kind === "figure" && path.basename(artifact.path) === "cox-hazard-ratios.png");
+    checks.push({
+      id: "cox-hazard-ratio-figure",
+      status: hasHazardFigure ? "pass" : "warning",
+      detail: hasHazardFigure
+        ? "Hazard-ratio forest plot artifact was rendered."
+        : "Cox route did not render a hazard-ratio forest plot artifact.",
+    });
     checks.push({
       id: "survival-events-per-predictor",
       status: epv === null ? "warning" : epv >= 10 ? "pass" : epv >= 3 ? "warning" : "fail",
@@ -1870,6 +2074,35 @@ function regressionFamilyMethods(): Set<StatsRunRequest["method"]> {
 
 function countRegressionMethods(): Set<StatsRunRequest["method"]> {
   return new Set(["poisson-regression", "negative-binomial-regression", "zero-inflated-poisson", "zero-inflated-negative-binomial"]);
+}
+
+function exposureVariationRequiredMethods(): Set<StatsRunRequest["method"]> {
+  return new Set([
+    ...correlationMethods(),
+    ...regressionFamilyMethods(),
+    "cox-proportional-hazards",
+    "stratified-cox",
+    "time-varying-cox",
+    "fine-gray",
+    "overlap-weighting",
+    "entropy-balancing",
+    "doubly-robust-aipw",
+    "propensity-score-matching",
+    "propensity-score-weighting",
+    "difference-in-differences",
+    "event-study-did",
+    "instrumental-variables-2sls",
+    "diagnostic-accuracy",
+    "prediction-evaluation",
+  ]);
+}
+
+function zeroInflatedCountMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["zero-inflated-poisson", "zero-inflated-negative-binomial"]);
+}
+
+function positiveContinuousGlmMethods(): Set<StatsRunRequest["method"]> {
+  return new Set(["gamma-glm", "inverse-gaussian-glm"]);
 }
 
 function survivalFamilyMethods(): Set<StatsRunRequest["method"]> {
@@ -2318,6 +2551,67 @@ def draw_influence_plot(rows):
             plt.scatter(flagged["leverage"].fillna(0), flagged["residual"], s=60, facecolors="none", edgecolors="red", linewidths=1.5, label="Cook's > 4/n")
             plt.legend(loc="best")
     plt.grid(alpha=0.25)
+
+def draw_hazard_ratio_plot(estimates):
+    frame = pd.DataFrame(estimates).copy()
+    if frame.empty or "term" not in frame.columns or "hazard_ratio" not in frame.columns:
+        plt.text(0.5, 0.5, "No hazard-ratio estimates available", ha="center", va="center")
+        return
+    frame["hazard_ratio"] = pd.to_numeric(frame["hazard_ratio"], errors="coerce")
+    frame["ci_low"] = pd.to_numeric(frame.get("ci_low"), errors="coerce") if "ci_low" in frame.columns else np.nan
+    frame["ci_high"] = pd.to_numeric(frame.get("ci_high"), errors="coerce") if "ci_high" in frame.columns else np.nan
+    frame = frame.replace([np.inf, -np.inf], np.nan).dropna(subset=["hazard_ratio"])
+    frame = frame[(frame["hazard_ratio"] > 0)]
+    if frame.empty:
+        plt.text(0.5, 0.5, "No finite positive hazard ratios available", ha="center", va="center")
+        return
+    frame["distance_from_null"] = np.abs(np.log(frame["hazard_ratio"]))
+    frame = frame.sort_values("distance_from_null", ascending=True).tail(25)
+    y = np.arange(len(frame))
+    plt.axvline(1.0, color="gray", linestyle="--", linewidth=1)
+    finite_ci = frame["ci_low"].notna() & frame["ci_high"].notna() & (frame["ci_low"] > 0) & (frame["ci_high"] > 0)
+    if finite_ci.any():
+        xerr = np.vstack([
+            (frame.loc[finite_ci, "hazard_ratio"] - frame.loc[finite_ci, "ci_low"]).clip(lower=0),
+            (frame.loc[finite_ci, "ci_high"] - frame.loc[finite_ci, "hazard_ratio"]).clip(lower=0),
+        ])
+        plt.errorbar(frame.loc[finite_ci, "hazard_ratio"], y[finite_ci.to_numpy()], xerr=xerr, fmt="o", capsize=3, label="HR with CI")
+    if (~finite_ci).any():
+        plt.scatter(frame.loc[~finite_ci, "hazard_ratio"], y[~finite_ci.to_numpy()], label="HR")
+    plt.yticks(y, frame["term"].astype(str))
+    upper = frame["ci_high"].where(finite_ci, frame["hazard_ratio"]).max()
+    lower = frame["ci_low"].where(finite_ci, frame["hazard_ratio"]).min()
+    if pd.notna(lower) and pd.notna(upper) and lower > 0 and upper / lower > 20:
+        plt.xscale("log")
+    plt.grid(axis="x", alpha=0.25)
+    plt.legend(loc="best")
+
+def draw_event_rate_plot(estimates):
+    frame = pd.DataFrame(estimates).copy()
+    if frame.empty or "rate" not in frame.columns:
+        plt.text(0.5, 0.5, "No event-rate estimate available", ha="center", va="center")
+        return
+    frame["rate"] = pd.to_numeric(frame["rate"], errors="coerce")
+    frame["rate_ci_low"] = pd.to_numeric(frame.get("rate_ci_low"), errors="coerce") if "rate_ci_low" in frame.columns else np.nan
+    frame["rate_ci_high"] = pd.to_numeric(frame.get("rate_ci_high"), errors="coerce") if "rate_ci_high" in frame.columns else np.nan
+    frame = frame.dropna(subset=["rate"])
+    if frame.empty:
+        plt.text(0.5, 0.5, "No finite event-rate estimate available", ha="center", va="center")
+        return
+    labels = frame["term"].astype(str) if "term" in frame.columns else pd.Series(["event_rate"] * len(frame))
+    x = np.arange(len(frame))
+    finite_ci = frame["rate_ci_low"].notna() & frame["rate_ci_high"].notna()
+    if finite_ci.any():
+        xerr = None
+        yerr = np.vstack([
+            (frame.loc[finite_ci, "rate"] - frame.loc[finite_ci, "rate_ci_low"]).clip(lower=0),
+            (frame.loc[finite_ci, "rate_ci_high"] - frame.loc[finite_ci, "rate"]).clip(lower=0),
+        ])
+        plt.errorbar(x[finite_ci.to_numpy()], frame.loc[finite_ci, "rate"], yerr=yerr, xerr=xerr, fmt="o", capsize=3)
+    if (~finite_ci).any():
+        plt.scatter(x[~finite_ci.to_numpy()], frame.loc[~finite_ci, "rate"])
+    plt.xticks(x, labels, rotation=20, ha="right")
+    plt.grid(axis="y", alpha=0.25)
 
 def require_columns(df, cols):
     missing = [c for c in cols if c and c not in df.columns]
@@ -3959,10 +4253,14 @@ def run(req):
                 diagnostics = {"test": "Kaplan-Meier", "curve_path": curve_path, "groups": sorted(set(r["group"] for r in rows), key=str), "events": int(ev.sum()), "censored": int((ev == 0).sum()), "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max()), "group_summary": survival_group_summary(data[time_col], data[event_col], data[group] if group else None), "ci_method": "Greenwood normal approximation", "artifacts": {"survival_curve": curve_path}}
                 figures.append(save_fig(out_dir, "kaplan-meier.png", "Kaplan-Meier Survival Curve", "Estimated survival curves by group.", variables, lambda: [plt.step([r["time"] for r in rows if r["group"] == g], [r["survival"] for r in rows if r["group"] == g], where="post", label=str(g)) for g in sorted(set(r["group"] for r in rows), key=str)] and plt.legend(title=group or "Group"), "Time", "Survival probability"))
             elif method == "log-rank":
+                rows = km_curve(data[time_col], data[event_col], data[group])
+                curve_path = os.path.join(out_dir, "log-rank-survival-curve.csv")
+                write_csv(curve_path, rows)
                 result = logrank_two_group(data[time_col], data[event_col], data[group])
                 estimates = [{"term": str(group), **result}]
                 ev = event_indicator(data[event_col])
-                diagnostics = {"test": "log-rank", "groups": list(data[group].dropna().unique()), "events": int(ev.sum()), "censored": int((ev == 0).sum()), "group_summary": survival_group_summary(data[time_col], data[event_col], data[group]), "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max())}
+                diagnostics = {"test": "log-rank", "curve_path": curve_path, "groups": list(data[group].dropna().unique()), "events": int(ev.sum()), "censored": int((ev == 0).sum()), "group_summary": survival_group_summary(data[time_col], data[event_col], data[group]), "time_min": clean_value(pd.to_numeric(data[time_col], errors="coerce").min()), "time_max": clean_value(pd.to_numeric(data[time_col], errors="coerce").max()), "artifacts": {"survival_curve": curve_path}}
+                figures.append(save_fig(out_dir, "log-rank-survival.png", "Log-Rank Survival Curves", "Kaplan-Meier curves used to contextualize the log-rank group comparison.", variables, lambda: [plt.step([r["time"] for r in rows if r["group"] == g], [r["survival"] for r in rows if r["group"] == g], where="post", label=str(g)) for g in sorted(set(r["group"] for r in rows), key=str)] and plt.legend(title=group or "Group"), "Time", "Survival probability"))
             elif method in ("cox-proportional-hazards", "stratified-cox"):
                 if PHReg is None:
                     raise ValueError("statsmodels PHReg is required for Cox models.")
@@ -3986,6 +4284,7 @@ def run(req):
                     issues.append({"severity": "warning", "code": "COX_PROPORTIONAL_HAZARDS_TIME_INTERACTION", "message": f"Approximate time-interaction screen flagged possible non-proportional hazards for: {terms or 'one or more terms'}.", "evidenceRefs": ["diagnostics.proportional_hazards_diagnostic"]})
                 elif ph_check.get("status") in ("underpowered", "not_available"):
                     issues.append({"severity": "warning", "code": "COX_PROPORTIONAL_HAZARDS_DIAGNOSTIC_LIMITED", "message": "Proportional-hazards diagnostic evidence is limited; use a dedicated survival backend for formal Schoenfeld residual review before strong inference.", "evidenceRefs": ["diagnostics.proportional_hazards_diagnostic"]})
+                figures.append(save_fig(out_dir, "cox-hazard-ratios.png", "Cox Hazard Ratio Forest Plot", "Hazard ratio estimates with confidence intervals for the fitted Cox model.", variables, lambda: draw_hazard_ratio_plot(estimates), "Hazard ratio", "Predictor"))
             elif method == "aalen-johansen-cif":
                 rows = cif_curve(data[time_col], data[event_col], event_of_interest=1, group=data[group] if group else None)
                 curve_path = os.path.join(out_dir, "cumulative-incidence.csv")
@@ -4001,6 +4300,7 @@ def run(req):
                 rate_low, rate_high = poisson_rate_interval(events, denom_time, params["alpha"])
                 estimates = [{"term": "event_rate", "events": clean_value(events), "person_time": clean_value(denom_time), "rate": safe_divide(events, denom_time), "rate_ci_low": rate_low, "rate_ci_high": rate_high, "ci_level": confidence_level(params["alpha"])}]
                 diagnostics = {"test": "recurrent event rate", "id": id_col, "events": int(events), "censored": int((event_indicator(data[event_col]) == 0).sum()), "person_time": clean_value(denom_time), "unique_subjects": int(data[id_col].nunique()) if id_col else None, "rate_ci_method": "exact Poisson interval"}
+                figures.append(save_fig(out_dir, "recurrent-event-rate.png", "Recurrent Event Rate", "Estimated event rate per unit person-time with exact Poisson confidence interval.", variables, lambda: draw_event_rate_plot(estimates), "Estimate", "Events per person-time"))
     elif method in ("linear-mixed-model", "generalized-mixed-model", "gee", "repeated-measures-anova"):
         outcome = req.get("outcome")
         exposure = req.get("exposure") or req.get("group")

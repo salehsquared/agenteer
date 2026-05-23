@@ -110,6 +110,7 @@ export interface FeasibilityGateResult {
     scannedRows: number;
     completeRows: number | null;
     completeFraction: number | null;
+    completeValueCounts: Record<string, Record<string, number>>;
     scanReason: string;
   };
   outcomeDiagnostics: {
@@ -146,6 +147,7 @@ interface RowScan {
   completeRows: number;
   truncated: boolean;
   valueCounts: Record<string, Record<string, number>>;
+  completeValueCounts: Record<string, Record<string, number>>;
 }
 
 export async function researchFeasibilityGateCommand(opts: FeasibilityGateOptions): Promise<FeasibilityGateResult> {
@@ -510,6 +512,7 @@ function buildCompleteCase(rowScan: RowScan | null, summary: ResearchTableSummar
       scannedRows: rowScan.scannedRows,
       completeRows: rowScan.completeRows,
       completeFraction: rowScan.scannedRows ? round(rowScan.completeRows / rowScan.scannedRows, 4) : null,
+      completeValueCounts: rowScan.completeValueCounts,
       scanReason: rowScan.truncated ? `Scanned first ${rowScan.scannedRows} rows for feasibility.` : `Scanned ${rowScan.scannedRows} rows for feasibility.`,
     };
   }
@@ -518,6 +521,7 @@ function buildCompleteCase(rowScan: RowScan | null, summary: ResearchTableSummar
     scannedRows: 0,
     completeRows: null,
     completeFraction: null,
+    completeValueCounts: {},
     scanReason: dataPath ? "Complete-case row scan is available for CSV/JSON inputs; this format could not be parsed cheaply." : summary ? "Only aggregate table summary was available." : "No data path or table summary was available.",
   };
 }
@@ -801,18 +805,22 @@ async function scanRows(dataPath: string | null, variables: string[], limit = 50
   }
   const scanned = rows.slice(0, limit);
   const valueCounts: Record<string, Record<string, number>> = {};
+  const completeValueCounts: Record<string, Record<string, number>> = {};
   for (const variable of variables) valueCounts[variable] = {};
+  for (const variable of variables) completeValueCounts[variable] = {};
   let completeRows = 0;
   for (const row of scanned) {
-    if (variables.every(variable => hasValue(row[variable]))) completeRows += 1;
+    const complete = variables.every(variable => hasValue(row[variable]));
+    if (complete) completeRows += 1;
     for (const variable of variables) {
       const value = row[variable];
       if (!hasValue(value)) continue;
       const key = String(value);
       valueCounts[variable]![key] = (valueCounts[variable]![key] ?? 0) + 1;
+      if (complete) completeValueCounts[variable]![key] = (completeValueCounts[variable]![key] ?? 0) + 1;
     }
   }
-  return { scannedRows: scanned.length, completeRows, truncated: rows.length > scanned.length, valueCounts };
+  return { scannedRows: scanned.length, completeRows, truncated: rows.length > scanned.length, valueCounts, completeValueCounts };
 }
 
 function parseCsv(raw: string): Array<Record<string, unknown>> {
