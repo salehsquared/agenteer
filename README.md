@@ -11,7 +11,7 @@ Status: **v1.0 release candidate.** Published to npm as `1.0.0-rc.2` under the `
 - **`@agenteer/core`** — Node primitive, runtime loop, context store (in-memory + FileContextStore), event bus, permission kernel, manifest schema, session persistence.
 - **`@agenteer/trust`** — evidence records, structured output with text-parse retry, filesystem access guard, cross-check engine. Zero dependency on core.
 - **`@agenteer/stdlib`** — 18 v1 nodes (5 primitives, 5 validators, 4 meta, 2 humans, 1 planner, 1 context).
-- **`@agenteer/cli`** — `agenteer run / resume / ctx / inspect / publish / install / search`, plus Anthropic + OpenAI `ProviderLike` adapters.
+- **`@agenteer/cli`** — `agenteer run / resume / ctx / inspect / publish / install / search`, plus modern `agent`, `research`, and `specialize` namespaces and Anthropic/OpenAI `ProviderLike` adapters.
 - **`@agenteer/registry`** — publishing, installing, permission-diff, `framework.lock`, ajv bridge.
 - **`@agenteer/create-node`** — `npx @agenteer/create-node @scope/node-name` scaffold.
 - **`agenteer`** — unscoped convenience package that installs the scoped packages together, exposes the CLI bins, and provides namespace/subpath exports.

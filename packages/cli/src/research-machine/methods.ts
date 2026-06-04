@@ -109,6 +109,26 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     keywords: ["t-test", "compare two groups", "two independent", "between two", "difference in means", "mean difference"],
   }),
   method({
+    id: "welch-t-test",
+    label: "Welch two-sample t-test",
+    category: "group_comparison",
+    modelFamily: "hypothesis_test",
+    purpose: "Compare the mean of a continuous outcome between two independent groups without assuming equal group variances.",
+    outcomeTypes: ["continuous"],
+    studyDesigns: ["cross_sectional", "randomized_trial", "cohort"],
+    dataStructures: ["single_table"],
+    compatibleBackends: ["python-scipy", "python-statsmodels"],
+    implementationStatus: "executable",
+    requiredFields: ["continuous outcome", "binary group"],
+    assumptions: ["Independent observations", "approximately normal residuals or adequate sample size", "unequal-variance policy declared"],
+    diagnostics: ["group sizes", "variance ratio", "histogram", "outlier check"],
+    effectMeasures: ["mean difference", "Welch confidence interval", "Cohen's d", "Hedges' g"],
+    qaGates: ["normality-review", "variance-review", "effect-size-reporting", ...commonClaimGates],
+    commonFailureModes: ["non-independent groups", "extreme skew", "small samples requiring exact/permutation review"],
+    stopForHumanReviewWhen: ["paired design detected"],
+    keywords: ["welch", "unequal variance", "heteroscedastic", "unequal variances", "variance imbalance"],
+  }),
+  method({
     id: "paired-t-test",
     label: "Paired t-test",
     category: "group_comparison",
@@ -191,6 +211,46 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     keywords: ["fisher", "small cell", "exact test", "2x2"],
   }),
   method({
+    id: "mcnemar-test",
+    label: "McNemar test",
+    category: "group_comparison",
+    modelFamily: "hypothesis_test",
+    purpose: "Compare two paired binary measurements within the same units.",
+    outcomeTypes: ["binary", "repeated_binary"],
+    studyDesigns: ["longitudinal_cohort", "randomized_trial", "measurement"],
+    dataStructures: ["paired", "repeated_measures"],
+    compatibleBackends: ["python-statsmodels", "python-scipy"],
+    implementationStatus: "contract-ready",
+    requiredFields: ["paired binary measurement A", "paired binary measurement B"],
+    assumptions: ["Pairing is correct", "discordant pairs are observed", "binary coding is reviewed"],
+    diagnostics: ["paired completeness", "discordant pair count", "2x2 paired table"],
+    effectMeasures: ["discordant-pair odds ratio", "McNemar chi-square", "p-value"],
+    qaGates: ["pairing-integrity", "binary-coding", "discordant-pair-support", ...commonClaimGates],
+    commonFailureModes: ["no discordant pairs", "unpaired records", "nonbinary repeated columns"],
+    stopForHumanReviewWhen: ["more than two repeated binary measurements require Cochran's Q or a longitudinal model"],
+    keywords: ["mcnemar", "paired binary", "pre post binary", "before after binary", "discordant pairs"],
+  }),
+  method({
+    id: "cochran-q-test",
+    label: "Cochran's Q test",
+    category: "group_comparison",
+    modelFamily: "hypothesis_test",
+    purpose: "Compare more than two related binary measurements within the same units.",
+    outcomeTypes: ["binary", "repeated_binary"],
+    studyDesigns: ["longitudinal_cohort", "randomized_trial", "measurement"],
+    dataStructures: ["repeated_measures", "paired"],
+    compatibleBackends: ["python-scipy", "python-statsmodels"],
+    implementationStatus: "contract-ready",
+    requiredFields: ["three or more paired binary measurement columns"],
+    assumptions: ["Rows represent the same units across repeated binary measurements", "binary coding is consistent across columns"],
+    diagnostics: ["complete repeated rows", "within-subject response variation", "condition positive rates"],
+    effectMeasures: ["Cochran's Q statistic", "degrees of freedom", "p-value"],
+    qaGates: ["pairing-integrity", "binary-coding", "within-subject-variation", ...commonClaimGates],
+    commonFailureModes: ["nonbinary repeated columns", "all subjects have identical responses across conditions", "too few complete rows"],
+    stopForHumanReviewWhen: ["missingness differs strongly across repeated conditions"],
+    keywords: ["cochran q", "cochran's q", "related proportions", "repeated binary", "more than two paired binary"],
+  }),
+  method({
     id: "mann-whitney-u",
     label: "Mann-Whitney U test",
     category: "nonparametric_resampling",
@@ -263,12 +323,54 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "executable",
     requiredFields: ["continuous outcome", "exposure", "covariates"],
     assumptions: ["Linearity", "model residual policy", "confounder set declared"],
-    diagnostics: ["residual plots", "influence", "VIF", "heteroscedasticity"],
+    diagnostics: ["residual plots", "QQ plot", "residual-pattern screen", "influence", "VIF", "heteroscedasticity"],
     effectMeasures: ["beta coefficient", "mean difference", "standardized beta"],
     qaGates: ["numeric-consistency", "diagnostics", "confounder-disclosure", ...commonClaimGates],
     commonFailureModes: ["multicollinearity", "nonlinearity", "outlier influence"],
     stopForHumanReviewWhen: ["causal interpretation requested without causal design"],
     keywords: ["linear regression", "continuous outcome", "adjusted mean", "slope", "biomarker"],
+  }),
+  method({
+    id: "robust-linear-regression",
+    label: "Robust linear regression",
+    category: "linear_regression",
+    modelFamily: "linear",
+    purpose: "Model continuous outcomes with reduced sensitivity to outliers or heavy-tailed residuals.",
+    outcomeTypes: ["continuous"],
+    studyDesigns: ["cross_sectional", "cohort", "randomized_trial"],
+    dataStructures: ["single_table"],
+    compatibleBackends: ["python-statsmodels"],
+    implementationStatus: "executable",
+    requiredFields: ["continuous outcome", "exposure", "covariates"],
+    assumptions: ["Continuous outcome scale is meaningful", "Outlier-resistant mean-scale modeling is appropriate", "Confounder set is declared"],
+    diagnostics: ["residual plots", "QQ plot", "influence review", "VIF", "outlier support", "Huber weight distribution", "downweighted row count"],
+    effectMeasures: ["robust slope coefficient", "adjusted mean-scale contrast"],
+    artifactExpectations: [...defaultArtifacts, "robust-linear-weights.csv", "robust-linear-weights.png"],
+    qaGates: ["numeric-consistency", "diagnostics", "robust-linear-weight-artifact", "robust-linear-downweighting", "robust-linear-residual-scale", "outlier-review", "confounder-disclosure", ...commonClaimGates],
+    commonFailureModes: ["nonlinearity", "high leverage points still dominate", "coefficient interpreted as median or quantile effect"],
+    stopForHumanReviewWhen: ["outlier handling changes the substantive conclusion", "causal interpretation requested without causal design"],
+    keywords: ["robust linear", "huber", "outlier", "heavy tailed", "continuous outcome"],
+  }),
+  method({
+    id: "quantile-regression",
+    label: "Quantile regression",
+    category: "linear_regression",
+    modelFamily: "linear",
+    purpose: "Model conditional quantiles, especially median effects for skewed, coarse, or outlier-prone continuous outcomes.",
+    outcomeTypes: ["continuous"],
+    studyDesigns: ["cross_sectional", "cohort", "randomized_trial"],
+    dataStructures: ["single_table"],
+    compatibleBackends: ["python-statsmodels"],
+    implementationStatus: "executable",
+    requiredFields: ["continuous outcome", "exposure", "covariates", "target quantile"],
+    assumptions: ["Target quantile is prespecified", "Conditional quantile interpretation is appropriate", "Covariate support is adequate across the outcome distribution"],
+    diagnostics: ["quantile residual balance", "pinball loss", "fitted-bin residual calibration", "design matrix support"],
+    effectMeasures: ["conditional median difference", "conditional quantile coefficient"],
+    artifactExpectations: [...defaultArtifacts, "quantile-fit-summary.csv", "quantile-residual-balance.png"],
+    qaGates: ["quantile-fit-artifact", "quantile-residual-balance", "quantile-pinball-loss", "confounder-disclosure", ...commonClaimGates],
+    commonFailureModes: ["interpreting median effects as mean effects", "unstable tail quantiles", "unsupported extrapolation across sparse covariate regions"],
+    stopForHumanReviewWhen: ["residual balance is poor", "tail quantiles are requested with sparse data"],
+    keywords: ["quantile", "median regression", "skewed", "outlier", "pinball", "check loss"],
   }),
   method({
     id: "interaction-regression",
@@ -344,9 +446,9 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["count outcome", "exposure", "offset when modeling rates"],
     assumptions: ["Mean-variance relationship is checked", "offset/exposure time is valid"],
-    diagnostics: ["overdispersion", "zero count frequency", "offset distribution"],
+    diagnostics: ["overdispersion", "zero count frequency", "offset distribution", "observed-versus-fitted count means", "observed-versus-expected zeros"],
     effectMeasures: ["incidence rate ratio", "count ratio"],
-    qaGates: ["overdispersion", "offset-validity", ...commonClaimGates],
+    qaGates: ["overdispersion", "offset-validity", "fitted-count-calibration", "zero-count-calibration", ...commonClaimGates],
     commonFailureModes: ["overdispersion", "excess zeros", "missing person-time"],
     stopForHumanReviewWhen: ["overdispersion suggests negative binomial or quasi-Poisson"],
     keywords: ["poisson", "count", "number of", "incidence rate", "visits"],
@@ -364,9 +466,9 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["count outcome", "exposure", "offset when modeling rates"],
     assumptions: ["Overdispersion is present", "zero inflation is assessed"],
-    diagnostics: ["dispersion parameter", "zero frequency", "residual plots"],
+    diagnostics: ["dispersion parameter", "zero frequency", "observed-versus-fitted count means", "observed-versus-expected zeros", "residual plots"],
     effectMeasures: ["incidence rate ratio"],
-    qaGates: ["overdispersion", "zero-inflation-review", ...commonClaimGates],
+    qaGates: ["overdispersion", "zero-inflation-review", "fitted-count-calibration", "zero-count-calibration", ...commonClaimGates],
     commonFailureModes: ["zero-inflated process", "unstable dispersion"],
     stopForHumanReviewWhen: ["hurdle or zero-inflated mechanism is clinically plausible"],
     keywords: ["negative binomial", "overdispersed", "count", "ed visits", "hospitalizations"],
@@ -412,6 +514,26 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     keywords: ["cox", "hazard", "time to death", "readmission", "survival"],
   }),
   method({
+    id: "recurrent-event-cox-andersen-gill",
+    label: "Recurrent-event Cox regression",
+    category: "survival_time_to_event",
+    modelFamily: "survival",
+    purpose: "Estimate covariate-adjusted hazard ratios for repeated events using subject-level start/stop risk intervals.",
+    outcomeTypes: ["time_to_event", "count"],
+    studyDesigns: ["longitudinal_cohort", "cohort", "randomized_trial"],
+    dataStructures: ["survival", "longitudinal", "clustered"],
+    compatibleBackends: ["python-statsmodels", "r-survival"],
+    implementationStatus: "contract-ready",
+    requiredFields: ["subject id", "interval start", "interval stop", "event indicator", "exposure", "baseline or interval covariates"],
+    assumptions: ["Counting-process interval construction is valid", "within-subject dependence is handled with robust variance or sensitivity review", "event ordering/gap-time estimand is appropriate"],
+    diagnostics: ["interval validity", "subject event burden", "events per predictor", "proportional hazards", "robust variance review"],
+    effectMeasures: ["Andersen-Gill hazard ratio"],
+    qaGates: ["interval-validity", "subject-event-burden", "robust-variance-boundary", "proportional-hazards", ...commonClaimGates],
+    commonFailureModes: ["using first-event data for recurrent-event claims", "overlapping risk intervals", "ignoring subject clustering", "event-order estimand mismatch"],
+    stopForHumanReviewWhen: ["subjects have recurrent events but no robust/frailty/PWP confirmation is available"],
+    keywords: ["recurrent event", "multiple events", "repeated events", "andersen gill", "readmissions", "hospitalizations", "start stop", "counting process"],
+  }),
+  method({
     id: "fine-gray-competing-risks",
     label: "Fine-Gray competing risks model",
     category: "survival_time_to_event",
@@ -444,9 +566,9 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["outcome", "time or cluster id", "subject id", "fixed effects"],
     assumptions: ["Random-effects structure is justified", "within-cluster correlation is modeled"],
-    diagnostics: ["random-effect variance", "residual diagnostics", "convergence"],
+    diagnostics: ["random-effect variance", "residual diagnostics", "cluster-size distribution", "ICC", "convergence"],
     effectMeasures: ["fixed-effect coefficient", "random-effect variance", "intraclass correlation"],
-    qaGates: ["cluster-id", "convergence", "random-effects-policy", ...commonClaimGates],
+    qaGates: ["cluster-id", "cluster-summary-artifact", "convergence", "random-effects-policy", ...commonClaimGates],
     commonFailureModes: ["singular fit", "non-convergence", "wrong correlation structure"],
     stopForHumanReviewWhen: ["cluster count is small"],
     keywords: ["mixed model", "random intercept", "random slope", "repeated measures", "longitudinal"],
@@ -464,9 +586,9 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["cluster id", "outcome", "exposure", "working correlation"],
     assumptions: ["Cluster correlation structure is declared", "robust variance is used"],
-    diagnostics: ["cluster count", "working correlation", "robust standard errors"],
+    diagnostics: ["cluster count", "cluster-size distribution", "working correlation", "dependence parameter", "robust standard errors"],
     effectMeasures: ["population-average coefficient", "odds ratio", "risk ratio"],
-    qaGates: ["cluster-count", "correlation-structure", ...commonClaimGates],
+    qaGates: ["cluster-count", "cluster-summary-artifact", "correlation-structure", ...commonClaimGates],
     commonFailureModes: ["too few clusters", "missing cluster id"],
     stopForHumanReviewWhen: ["cluster count below robust-variance threshold"],
     keywords: ["gee", "population average", "correlated", "repeated binary"],
@@ -501,15 +623,37 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     studyDesigns: ["cohort", "cross_sectional", "economic_evaluation"],
     dataStructures: ["single_table", "clustered"],
     compatibleBackends: ["python-statsmodels"],
-    implementationStatus: "contract-ready",
+    implementationStatus: "executable",
     requiredFields: ["positive continuous outcome", "link function", "covariates"],
     assumptions: ["Outcome is strictly positive", "link and variance family are justified"],
-    diagnostics: ["zero values", "skewness", "deviance residuals"],
+    diagnostics: ["zero values", "skewness", "coefficient of variation", "deviance residuals", "observed-versus-fitted mean calibration", "relative-error summary"],
     effectMeasures: ["mean ratio", "marginal mean"],
-    qaGates: ["positive-outcome", "link-policy", ...commonClaimGates],
+    artifactExpectations: [...defaultArtifacts, "positive-glm-fit-summary.csv", "positive-glm-observed-vs-fitted.png"],
+    qaGates: ["positive-outcome", "positive-glm-mean-ratio-semantics", "positive-glm-fit-artifact", "positive-glm-fitted-mean-calibration", "positive-glm-relative-error", "link-policy", ...commonClaimGates],
     commonFailureModes: ["zero-inflated cost", "wrong variance family"],
     stopForHumanReviewWhen: ["many zero costs require two-part model"],
     keywords: ["gamma", "skewed", "cost", "length of stay", "positive continuous"],
+  }),
+  method({
+    id: "inverse-gaussian-glm",
+    label: "Inverse-Gaussian GLM",
+    category: "generalized_linear_model",
+    modelFamily: "glm",
+    purpose: "Model strictly positive continuous outcomes with very strong right skew or variance growth on a multiplicative mean scale.",
+    outcomeTypes: ["continuous"],
+    studyDesigns: ["cohort", "cross_sectional", "economic_evaluation"],
+    dataStructures: ["single_table", "clustered"],
+    compatibleBackends: ["python-statsmodels"],
+    implementationStatus: "executable",
+    requiredFields: ["positive continuous outcome", "link function", "covariates"],
+    assumptions: ["Outcome is strictly positive", "Skewness and coefficient of variation support inverse-Gaussian variance behavior", "link and variance family are justified against Gamma, robust-linear, and quantile alternatives"],
+    diagnostics: ["zero values", "skewness", "coefficient of variation", "deviance residuals", "observed-versus-fitted mean calibration", "relative-error summary"],
+    effectMeasures: ["mean ratio", "marginal mean"],
+    artifactExpectations: [...defaultArtifacts, "positive-glm-fit-summary.csv", "positive-glm-observed-vs-fitted.png"],
+    qaGates: ["positive-outcome", "positive-glm-mean-ratio-semantics", "positive-glm-fit-artifact", "positive-glm-fitted-mean-calibration", "positive-glm-relative-error", "link-policy", ...commonClaimGates],
+    commonFailureModes: ["zero-inflated cost", "wrong variance family", "inverse-Gaussian route selected for only mildly skewed outcomes"],
+    stopForHumanReviewWhen: ["positive outcome support is weak", "Gamma and robust-linear sensitivity results materially disagree"],
+    keywords: ["inverse gaussian", "inverse-gaussian", "very skewed", "cost", "length of stay", "positive continuous"],
   }),
   method({
     id: "propensity-score-matching",
@@ -644,10 +788,10 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["binary outcome", "predicted probabilities"],
     assumptions: ["Validation sample is independent or resampling policy is declared"],
-    diagnostics: ["ROC curve", "calibration plot", "Brier score"],
-    effectMeasures: ["AUC", "C-statistic", "Brier score", "calibration slope"],
-    qaGates: ["validation-split", "calibration", "class-imbalance", ...commonClaimGates],
-    commonFailureModes: ["optimism bias", "rare outcome precision-recall mismatch"],
+    diagnostics: ["ROC curve", "precision-recall curve", "calibration plot", "Brier score", "decision curve", "bootstrap uncertainty intervals"],
+    effectMeasures: ["AUC", "C-statistic", "AUPRC", "Brier score", "calibration slope", "bootstrap confidence intervals"],
+    qaGates: ["validation-split", "calibration", "bootstrap-uncertainty", "class-imbalance", ...commonClaimGates],
+    commonFailureModes: ["optimism bias", "wide bootstrap uncertainty", "rare outcome precision-recall mismatch"],
     stopForHumanReviewWhen: ["clinical deployment or action threshold is proposed"],
     keywords: ["roc", "auc", "c-statistic", "calibration", "brier", "decision curve"],
   }),
@@ -664,9 +808,10 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["outcome", "feature matrix", "validation plan"],
     assumptions: ["Training/validation split prevents leakage", "preprocessing is fit inside resampling"],
-    diagnostics: ["cross-validation", "calibration", "coefficient path"],
-    effectMeasures: ["RMSE", "AUC", "calibration slope", "selected features"],
-    qaGates: ["leakage-check", "validation", "calibration", "model-card"],
+    diagnostics: ["standardized feature scaling", "coefficient sparsity profile", "bounded K-fold validation", "calibration where binary probabilities are produced"],
+    effectMeasures: ["RMSE", "AUC", "Brier score", "selected features", "standardized shrinkage coefficients"],
+    artifactExpectations: [...defaultArtifacts, "penalized-feature-scaling.csv", "penalized-coefficient-profile.csv", "penalized-cv-summary.csv", "penalized-coefficients.png", "penalized-cv-performance.png"],
+    qaGates: ["leakage-check", "penalty-scale-provenance", "penalized-validation-artifact", "penalized-inference-boundary", "calibration", "model-card"],
     commonFailureModes: ["data leakage", "unstable feature selection", "overfitting"],
     stopForHumanReviewWhen: ["clinical risk score is implied"],
     keywords: ["lasso", "ridge", "elastic net", "prediction", "feature selection"],
@@ -864,9 +1009,9 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["missingness map", "imputation model", "analysis model", "pooling rules"],
     assumptions: ["Missing at random is plausible or sensitivity analysis planned"],
-    diagnostics: ["missingness patterns", "trace plots", "imputed distribution checks"],
+    diagnostics: ["missingness patterns", "trace plots", "observed-vs-imputed distribution checks", "between-imputation variability"],
     effectMeasures: ["pooled estimate", "fraction missing information"],
-    qaGates: ["missingness-mechanism", "imputation-model", "pooling-rules"],
+    qaGates: ["missingness-mechanism", "imputation-model", "observed-vs-imputed-shift", "pooling-rules"],
     commonFailureModes: ["MNAR ignored", "outcome omitted from imputation model", "incompatible imputation model"],
     stopForHumanReviewWhen: ["missingness is likely MNAR"],
     keywords: ["multiple imputation", "mice", "missing data", "mar", "mnar"],
@@ -1245,7 +1390,7 @@ export const analysisMethodCatalog: AnalysisMethod[] = [
     implementationStatus: "contract-ready",
     requiredFields: ["fitted model", "design matrix", "residuals or influence metrics"],
     assumptions: ["Diagnostics match model family"],
-    diagnostics: ["residuals", "VIF", "influence", "overdispersion", "proportional hazards", "calibration"],
+    diagnostics: ["residuals", "QQ plot", "residual-pattern screen", "VIF", "influence", "overdispersion", "proportional hazards", "calibration"],
     effectMeasures: ["diagnostic status", "assumption violation flags"],
     qaGates: ["assumption-checks", "diagnostic-artifacts", "repair-plan"],
     commonFailureModes: ["diagnostics omitted", "failed convergence ignored"],
@@ -1442,6 +1587,27 @@ function scoreMethod(method: AnalysisMethod, request: MethodSelectionRequest): {
     score += 0.14;
     fitReasons.push(`matches goal ${request.goal}`);
   }
+  if (isIndependentTwoGroupMeanComparisonRequest(request, lower)) {
+    const equalVarianceIntent = explicitlyRequestsEqualVarianceTTest(lower);
+    if (method.id === "welch-t-test" && !equalVarianceIntent) {
+      score += 0.16;
+      fitReasons.push("Welch is the default independent two-group mean comparison unless equal variances are justified");
+    }
+    if (method.id === "two-sample-t-test") {
+      if (equalVarianceIntent) {
+        score += 0.12;
+        fitReasons.push("question explicitly requests an equal-variance/pooled Student t-test");
+      } else {
+        score -= 0.04;
+        cautions.push(issue(
+          "note",
+          "WELCH_PREFERRED_FOR_GENERIC_TWO_GROUP_MEAN_COMPARISON",
+          "Generic independent two-group mean comparisons should default to Welch's t-test unless an equal-variance policy is documented.",
+          ["method-selection", method.id],
+        ));
+      }
+    }
+  }
   if ((request.dataset === "nhanes" || request.dataset === "brfss" || request.surveyDesign) && method.compatibleBackends.includes("r-survey")) {
     score += 0.07;
     fitReasons.push("compatible with survey backend");
@@ -1458,6 +1624,19 @@ function scoreMethod(method: AnalysisMethod, request: MethodSelectionRequest): {
     score -= 0.08;
   }
   return { method, score: Math.max(0, Math.min(1, score)), fitReasons, cautions };
+}
+
+function isIndependentTwoGroupMeanComparisonRequest(request: MethodSelectionRequest, lower: string): boolean {
+  if (request.outcomeType !== "continuous") return false;
+  if (request.repeatedMeasures || request.dataStructures.some(structure => structure === "paired" || structure === "repeated_measures")) return false;
+  if (/\bpaired\b|matched pair|same participant|same patient|pre[- ]?post|before and after|within[- ]subject/.test(lower)) return false;
+  const groupIntent = request.goal === "compare_groups" || /\bcompare|difference between|between two|two groups|two independent|independent groups|mean difference|t[- ]test/.test(lower);
+  const meanIntent = /\bmean|average|continuous|hba1c|value|score|difference|t[- ]test/.test(lower);
+  return groupIntent && meanIntent;
+}
+
+function explicitlyRequestsEqualVarianceTTest(lower: string): boolean {
+  return /\bequal[- ]variance\b|\bassume(?:d)? equal variances?\b|\bpooled(?: two[- ]sample)? t[- ]test\b|\bstudent'?s? t[- ]test\b|\bstudent t[- ]test\b/.test(lower);
 }
 
 function requirementsBeforeExecution(method: AnalysisMethod, request: MethodSelectionRequest): string[] {

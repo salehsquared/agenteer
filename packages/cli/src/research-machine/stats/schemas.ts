@@ -14,6 +14,7 @@ export const statsMethodSchema = z.enum([
   "chi-square",
   "fisher-exact",
   "mcnemar",
+  "cochran-q",
   "cochran-armitage-trend",
   "pearson",
   "spearman",
@@ -41,6 +42,7 @@ export const statsMethodSchema = z.enum([
   "fine-gray",
   "aalen-johansen-cif",
   "recurrent-event-rate",
+  "recurrent-event-cox",
   "linear-mixed-model",
   "generalized-mixed-model",
   "gee",
@@ -76,6 +78,15 @@ export const statsMethodSchema = z.enum([
 ]);
 export type StatsMethod = z.infer<typeof statsMethodSchema>;
 
+export const statsRunnerCapabilitySchema = z.object({
+  method: statsMethodSchema,
+  status: z.enum(["executable", "bounded_approximation", "backend_blocked"]),
+  reason: z.string().min(1),
+  requiredFollowUp: z.array(z.string().min(1)),
+  cannotSupport: z.array(z.string().min(1)),
+});
+export type StatsRunnerCapabilityRecord = z.infer<typeof statsRunnerCapabilitySchema>;
+
 export const statsRunRequestSchema = z.object({
   schemaVersion: z.literal(1),
   method: statsMethodSchema,
@@ -88,6 +99,8 @@ export const statsRunRequestSchema = z.object({
   variables: z.array(z.string().min(1)).default([]),
   covariates: z.array(z.string().min(1)).default([]),
   time: z.string().min(1).optional(),
+  start: z.string().min(1).optional(),
+  stop: z.string().min(1).optional(),
   event: z.string().min(1).optional(),
   id: z.string().min(1).optional(),
   strata: z.string().min(1).optional(),
@@ -100,6 +113,7 @@ export const statsRunRequestSchema = z.object({
   alphaPenalty: z.number().min(0).optional(),
   l1Ratio: z.number().min(0).max(1).optional(),
   weight: z.string().min(1).optional(),
+  offset: z.string().min(1).optional(),
   exactCovariates: z.array(z.string().min(1)).default([]),
   estimand: z.enum(["ATE", "ATT"]).default("ATT"),
   matchRatio: z.number().int().min(1).max(10).default(1),
@@ -107,6 +121,12 @@ export const statsRunRequestSchema = z.object({
   replacement: z.boolean().default(false),
   trimThreshold: z.number().min(0).max(0.49).default(0.01),
   stabilizeWeights: z.boolean().default(true),
+  imputations: z.number().int().min(2).max(50).optional(),
+  bootstrapReplicates: z.number().int().min(20).max(5000).optional(),
+  validationColumn: z.string().min(1).optional(),
+  validationValue: z.string().min(1).optional(),
+  validationTime: z.string().min(1).optional(),
+  validationCutoff: z.number().optional(),
   surveyDesign: z.boolean().default(false),
   allowSurveyApproximation: z.boolean().default(false),
   methodSelectionPath: z.string().min(1).optional(),
@@ -118,7 +138,7 @@ export const statsRunRequestSchema = z.object({
 export type StatsRunRequest = z.infer<typeof statsRunRequestSchema>;
 
 export const statsArtifactSchema = z.object({
-  kind: z.enum(["config", "method-contract", "preflight", "preflight-report", "summary", "table", "diagnostics", "model-diagnostics", "report", "qa", "balance", "propensity-scores", "propensity-overlap", "matched-pairs", "weights", "figure", "figure-manifest", "figure-qa", "imputed-data"]),
+  kind: z.enum(["config", "method-contract", "preflight", "preflight-report", "method-decision-support", "method-decision-support-report", "summary", "table", "diagnostics", "model-diagnostics", "protocol", "report", "qa", "balance", "propensity-scores", "propensity-overlap", "matched-pairs", "weights", "figure", "figure-manifest", "figure-qa", "imputed-data"]),
   path: z.string().min(1),
   sha256: z.string().optional(),
 });
@@ -169,6 +189,7 @@ export const statsRunResultSchema = z.object({
   parameters: z.record(z.string(), z.unknown()),
   estimates: z.array(z.record(z.string(), z.unknown())),
   diagnostics: z.record(z.string(), z.unknown()),
+  runnerCapability: statsRunnerCapabilitySchema.optional(),
   issues: z.array(statsIssueSchema),
   warnings: z.array(z.string()),
   errors: z.array(z.string()),

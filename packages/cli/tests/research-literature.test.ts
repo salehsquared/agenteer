@@ -129,16 +129,12 @@ describe("MedBrevia literature search integration", () => {
       const dataPath = path.join(dir, "diagnostic.csv");
       await writeFile(dataPath, [
         "waist_cm,hba1c_pct",
-        "105,6.8",
-        "102,6.6",
-        "101,6.7",
-        "99,5.7",
-        "100,5.6",
-        "88,6.9",
-        "82,5.4",
-        "84,5.5",
-        "86,5.6",
-        "87,5.7",
+        ...Array.from({ length: 60 }, (_, index) => {
+          const elevated = index % 3 === 0;
+          const waist = elevated ? 101 + (index % 8) : 82 + (index % 16);
+          const hba1c = elevated ? 6.5 + (index % 5) / 10 : 5.3 + (index % 8) / 10;
+          return `${waist},${hba1c.toFixed(1)}`;
+        }),
       ].join("\n"));
       const literaturePath = path.join(dir, "literature-search.json");
       await writeFile(literaturePath, JSON.stringify({ schemaVersion: 1, literatureSearch: mockLiteratureSearch() }, null, 2));

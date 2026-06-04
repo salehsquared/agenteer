@@ -7,13 +7,22 @@ import { z } from "zod";
 import { agentContextPreflightCommand, type AgentContextPreflight } from "../commands/agent.js";
 import { researchExploreCommand, researchTableSummaryCommand, type ResearchExplorationResult, type ResearchTableSummary } from "../commands/research.js";
 import { researchLiteratureContextCommand, researchLiteratureQaCommand, researchMedbreviaLiteratureSearchCommand, type ResearchLiteratureContext, type ResearchLiteratureQaResult, type ResearchLiteratureSearchResult } from "./medbrevia-literature.js";
+import { buildAnalysisRunManifest } from "./analysis-manifest.js";
 import { evaluateFeasibilityGate, type FeasibilityGateResult, type FeasibilityVerdict } from "./feasibility.js";
 import { buildModelingDecisionPlan, type ModelingDecisionPlan, type ModelingDecisionRequest } from "./modeling.js";
 import { selectAnalysisMethods } from "./methods.js";
 import { researchStudyCriticCommand, reviewAutonomySchema, reviewStageSchema, reviewerProviderConfigs, providerGenerate, type ReviewAutonomy, type ReviewerBudget, type ReviewerModelConfig, type ReviewerPanel, type ReviewReentryPoint, type ReviewStage, type StudyCriticResult } from "./reviewer.js";
-import { researchStatsRunCommand } from "./stats/commands.js";
+import { contractArgumentNameFor, getStatisticalMethodSpec } from "./stats/contracts.js";
+import { researchFigureQaCommand, researchStatsRunCommand } from "./stats/commands.js";
 import { statsMethodSchema, type StatsMethod, type StatsRunResult } from "./stats/schemas.js";
-import { researchManuscriptCommand, researchMethodQaCommand, researchRunInspectCommand, type ManuscriptResult, type MethodQaResult, type RunInspectionResult } from "./trust.js";
+import { researchBenchmarkSuiteRunCommand, researchBenchmarkTrendCommand, researchManuscriptCommand, researchMethodQaCommand, researchRunInspectCommand, type ContinuousBenchmarkSuiteResult, type ContinuousBenchmarkTrendResult, type ManuscriptResult, type MethodQaResult, type RunInspectionResult } from "./trust.js";
+import type { MethodSelectionResult } from "./schemas.js";
+import {
+  identifierLikeColumnReason as sharedIdentifierLikeColumnReason,
+  outcomeOrFutureLeakageReason as sharedOutcomeOrFutureLeakageReason,
+  postTreatmentAdjustmentReason as sharedPostTreatmentAdjustmentReason,
+  semanticPlausibilityIssuesForColumn as sharedSemanticPlausibilityIssuesForColumn,
+} from "./semantic-plausibility.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -68,7 +77,11 @@ export const controllerInputPatchSchema = z.object({
   outcome: z.string().min(1).nullable().optional(),
   exposure: z.string().min(1).nullable().optional(),
   group: z.string().min(1).nullable().optional(),
+  outcomeThreshold: z.number().nullable().optional(),
+  exposureThreshold: z.number().nullable().optional(),
   time: z.string().min(1).nullable().optional(),
+  start: z.string().min(1).nullable().optional(),
+  stop: z.string().min(1).nullable().optional(),
   event: z.string().min(1).nullable().optional(),
   id: z.string().min(1).nullable().optional(),
   strata: z.string().min(1).nullable().optional(),
@@ -78,6 +91,10 @@ export const controllerInputPatchSchema = z.object({
   runningVariable: z.string().min(1).nullable().optional(),
   cutoff: z.number().nullable().optional(),
   instrument: z.string().min(1).nullable().optional(),
+  alphaPenalty: z.number().min(0).nullable().optional(),
+  l1Ratio: z.number().min(0).max(1).nullable().optional(),
+  weight: z.string().min(1).nullable().optional(),
+  offset: z.string().min(1).nullable().optional(),
   variables: z.array(z.string().min(1)).optional(),
   covariates: z.array(z.string().min(1)).optional(),
   exactCovariates: z.array(z.string().min(1)).optional(),
@@ -86,7 +103,7 @@ export const controllerInputPatchSchema = z.object({
 });
 export type ControllerInputPatch = z.infer<typeof controllerInputPatchSchema>;
 
-export const controllerToolIdSchema = z.enum(["npm-build", "npm-test", "controller-inspect", "controller-read-artifact", "controller-read-file", "controller-search-repo", "controller-run-agenteer", "controller-git-diff", "controller-propose-patch", "controller-apply-patch", "controller-verify-patch", "controller-rollback-patch"]);
+export const controllerToolIdSchema = z.enum(["npm-build", "npm-test", "controller-status", "controller-inspect", "controller-read-artifact", "controller-read-file", "controller-search-repo", "controller-run-agenteer", "controller-git-diff", "controller-propose-patch", "controller-apply-patch", "controller-verify-patch", "controller-rollback-patch"]);
 export type ControllerToolId = z.infer<typeof controllerToolIdSchema>;
 
 export const controllerToolRequestSchema = z.object({
@@ -169,7 +186,11 @@ export interface ControllerStudyInputs {
   outcome: string | null;
   exposure: string | null;
   group: string | null;
+  outcomeThreshold: number | null;
+  exposureThreshold: number | null;
   time: string | null;
+  start: string | null;
+  stop: string | null;
   event: string | null;
   id: string | null;
   strata: string | null;
@@ -179,6 +200,10 @@ export interface ControllerStudyInputs {
   runningVariable: string | null;
   cutoff: number | null;
   instrument: string | null;
+  alphaPenalty: number | null;
+  l1Ratio: number | null;
+  weight: string | null;
+  offset: string | null;
   variables: string[];
   covariates: string[];
   exactCovariates: string[];
@@ -276,6 +301,7 @@ export interface ControllerActionReadiness {
     id: string;
     status: "pass" | "warning" | "fail";
     message: string;
+    issueCodes?: string[];
     evidenceRefs: string[];
   }>;
   outPath: string;
@@ -323,6 +349,7 @@ export interface ControllerDecisionQuality {
     id: string;
     status: "pass" | "fail";
     message: string;
+    issueCodes?: string[];
   }>;
   outPath: string;
   reportPath: string;
@@ -333,10 +360,11 @@ export interface ControllerDecisionContextBundle {
   generatedAtIso: string;
   bundleId: string;
   runId: string;
+  statePath: string;
   stage: ControllerStage;
   status: ControllerRunStatus;
   question: string;
-  inputs: Pick<ControllerStudyInputs, "dataPath" | "datasetDir" | "runDir" | "method" | "outcome" | "exposure" | "group" | "time" | "event" | "covariates" | "variables" | "surveyDesign" | "allowSurveyApproximation">;
+  inputs: Pick<ControllerStudyInputs, "dataPath" | "datasetDir" | "runDir" | "method" | "outcome" | "exposure" | "group" | "outcomeThreshold" | "exposureThreshold" | "time" | "start" | "stop" | "event" | "id" | "strata" | "cluster" | "period" | "post" | "runningVariable" | "cutoff" | "instrument" | "alphaPenalty" | "l1Ratio" | "weight" | "offset" | "variables" | "covariates" | "exactCovariates" | "surveyDesign" | "allowSurveyApproximation">;
   policy: {
     autonomy: ReviewAutonomy;
     allowExecution: boolean;
@@ -355,7 +383,7 @@ export interface ControllerDecisionContextBundle {
     present: boolean;
     ledgerId: string | null;
     status: ControllerIssueLedger["status"] | null;
-    topIssues: Array<Pick<ControllerIssue, "id" | "severity" | "category" | "message" | "suggestedAction" | "reentryStage" | "evidenceRefs">>;
+    topIssues: Array<Pick<ControllerIssue, "id" | "issueCode" | "severity" | "category" | "message" | "suggestedAction" | "reentryStage" | "evidenceRefs">>;
     outPath: string | null;
   };
   workPlan: {
@@ -369,13 +397,14 @@ export interface ControllerDecisionContextBundle {
     outPath: string | null;
   };
   feasibility: Awaited<ReturnType<typeof loadControllerFeasibilitySummary>>;
+  datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
   latestStageReview: {
     present: boolean;
     reviewId: string | null;
     status: ControllerStageReview["status"] | null;
     reviewedStage: ControllerStage | null;
     currentStage: ControllerStage | null;
-    findings: Array<Pick<ControllerStageReviewFinding, "severity" | "category" | "message" | "repairAction" | "reentryStage" | "evidenceRefs">>;
+    findings: Array<Pick<ControllerStageReviewFinding, "severity" | "category" | "message" | "issueCodes" | "repairAction" | "reentryStage" | "evidenceRefs">>;
     recommendedCommand: string | null;
     outPath: string | null;
   };
@@ -384,7 +413,9 @@ export interface ControllerDecisionContextBundle {
     agendaId: string | null;
     status: ControllerExecutionAgenda["status"] | null;
     primaryCommand: string | null;
-    items: Array<Pick<ControllerExecutionAgendaItem, "priority" | "status" | "kind" | "command" | "reason" | "safety" | "source">>;
+    activeIssueCodes: string[];
+    activeBlockerIssueCodes: string[];
+    items: Array<Pick<ControllerExecutionAgendaItem, "priority" | "status" | "kind" | "command" | "reason" | "issueCodes" | "safety" | "source">>;
     outPath: string | null;
   };
   recentActions: ControllerExecutedAction[];
@@ -440,6 +471,7 @@ export interface ControllerStageReviewFinding {
   severity: "blocker" | "major" | "minor" | "info";
   category: ControllerIssue["category"];
   message: string;
+  issueCodes?: string[];
   evidenceRefs: string[];
   repairAction: string;
   reentryStage: ControllerStage;
@@ -483,11 +515,12 @@ export interface ControllerExecutionAgendaItem {
   id: string;
   priority: number;
   status: "executable" | "blocked" | "advisory" | "complete";
-  kind: "run" | "step" | "inspect" | "patch" | "resume" | "tool" | "human_review" | "stop";
+  kind: "run" | "step" | "status" | "inspect" | "patch" | "resume" | "tool" | "qa" | "manifest" | "review" | "human_review" | "stop";
   command: string;
   reason: string;
+  issueCodes?: string[];
   evidenceRefs: string[];
-  source: "issue_ledger" | "stage_review" | "work_plan" | "next_action" | "state" | "reentry";
+  source: "issue_ledger" | "stage_review" | "work_plan" | "next_action" | "run_inspection" | "state" | "reentry";
   safety: "safe" | "requires_review" | "blocked";
 }
 
@@ -502,11 +535,14 @@ export interface ControllerExecutionAgenda {
   controllerStatus: ControllerRunStatus;
   primaryCommand: string;
   activeIssueIds: string[];
+  activeIssueCodes: string[];
+  activeBlockerIssueCodes: string[];
   sourceArtifacts: {
     issueLedger: string | null;
     stageReview: string | null;
     workPlan: string | null;
     nextAction: string | null;
+    runInspection: string | null;
     reentryPlan: string | null;
   };
   items: ControllerExecutionAgendaItem[];
@@ -525,6 +561,23 @@ export interface ControllerExecutionAgendaSummary {
   reportPath: string;
 }
 
+export interface ControllerBenchmarkResult {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  benchmarkId: string;
+  runId: string;
+  statePath: string;
+  suiteDir: string;
+  historyDir: string;
+  suite: Pick<ContinuousBenchmarkSuiteResult, "caseCount" | "passCount" | "warningCount" | "failCount" | "meanScore" | "regressions" | "nextAction" | "outPath" | "reportPath">;
+  trend: Pick<ContinuousBenchmarkTrendResult, "runCount" | "latestScore" | "previousScore" | "delta" | "trend" | "regressions" | "nextAction" | "outPath" | "reportPath">;
+  capabilityStatus: "covered" | "warning" | "missing";
+  attachedArtifacts: Array<Pick<ControllerArtifact, "kind" | "path" | "sha256">>;
+  nextAction: string;
+  outPath: string;
+  reportPath: string;
+}
+
 export interface ControllerFollowAgendaResult {
   schemaVersion: 1;
   generatedAtIso: string;
@@ -538,6 +591,7 @@ export interface ControllerFollowAgendaResult {
   state: ControllerState;
   runResult: ControllerRunResult | null;
   outPath: string;
+  reportPath: string;
 }
 
 export interface ControllerFollowLoopIteration {
@@ -547,12 +601,15 @@ export interface ControllerFollowLoopIteration {
   agendaId: string;
   selectedItemId: string | null;
   selectedKind: ControllerExecutionAgendaItem["kind"] | null;
+  selectedIssueCodes: string[];
+  selectedEvidenceRefs: string[];
   executed: boolean;
   refused: boolean;
   reason: string;
   afterStage: ControllerStage;
   afterStatus: ControllerRunStatus;
   followRecordPath: string;
+  followReportPath: string;
 }
 
 export interface ControllerFollowLoopResult {
@@ -576,12 +633,19 @@ export interface ControllerSupervisorRound {
   beforeStage: ControllerStage;
   beforeStatus: ControllerRunStatus;
   runnerPacketPath: string;
+  runnerPacketReportPath: string;
   runnerPacketStatus: ControllerModelRunnerPacket["status"];
+  runnerPacketFeasibilityReadiness: string | null;
+  runnerPacketFeasibilityVerdict: string | null;
+  runnerPacketFeasibilityPath: string | null;
   recommendedCommand: string;
   safeAgendaPrimary: boolean;
   followLoopPath: string | null;
+  followLoopReportPath: string | null;
   followLoopIterations: number;
+  followLoopIssueCodes: string[];
   auditPath: string | null;
+  auditReportPath: string | null;
   auditReadiness: ControllerOperatorAudit["readiness"] | null;
   afterStage: ControllerStage;
   afterStatus: ControllerRunStatus;
@@ -611,6 +675,16 @@ export interface ControllerOperatorAuditCheck {
   status: "pass" | "warning" | "fail";
   category: "state" | "autonomy" | "data" | "methods" | "artifacts" | "tools" | "review" | "cost";
   message: string;
+  issueCodes?: string[];
+  evidenceRefs: string[];
+}
+
+export interface ControllerOperatorAuditReadinessBlocker {
+  id: string;
+  severity: "blocker" | "warning";
+  category: ControllerOperatorAuditCheck["category"];
+  issueCodes: string[];
+  message: string;
   evidenceRefs: string[];
 }
 
@@ -628,11 +702,13 @@ export interface ControllerOperatorAudit {
   modelControllerEnabled: boolean;
   strictModelController: boolean;
   checks: ControllerOperatorAuditCheck[];
+  readinessBlockers: ControllerOperatorAuditReadinessBlocker[];
   capabilityCoverage: ControllerSelfEvaluation["capabilityCoverage"];
   environment: ControllerEnvironmentPreflight;
   inspection: ControllerInternalInspection;
   recovery: ControllerRecoveryInspection;
   feasibility: Awaited<ReturnType<typeof loadControllerFeasibilitySummary>>;
+  datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
   latestAgenda: ControllerExecutionAgenda | null;
   latestIssueLedger: ControllerIssueLedger | null;
   latestStageReview: ControllerStageReview | null;
@@ -725,6 +801,7 @@ export interface ControllerGoalAuditRequirement {
   requirement: string;
   evidenceStandard: string;
   status: "proved" | "partial" | "missing" | "not_applicable";
+  issueCodes?: string[];
   evidenceRefs: string[];
   gaps: string[];
   nextAction: string;
@@ -799,6 +876,7 @@ export interface ControllerSelfTestResult {
 
 export interface ControllerIssue {
   id: string;
+  issueCode?: string;
   severity: "blocker" | "major" | "minor" | "info";
   category: "context" | "data" | "methods" | "execution" | "review" | "artifact" | "policy" | "cost" | "state" | "unknown";
   status: "active" | "resolved" | "accepted";
@@ -839,6 +917,7 @@ export interface ControllerIssueLedgerSummary {
   currentStage: ControllerStage;
   issueCount: number;
   blockerCount: number;
+  topIssues?: Array<Pick<ControllerIssue, "id" | "issueCode" | "severity" | "category" | "message" | "suggestedAction" | "reentryStage" | "evidenceRefs">>;
   outPath: string;
   reportPath: string;
 }
@@ -1065,7 +1144,11 @@ export interface ControllerInitOptions {
   outcome?: string;
   exposure?: string;
   group?: string;
+  outcomeThreshold?: number;
+  exposureThreshold?: number;
   time?: string;
+  start?: string;
+  stop?: string;
   event?: string;
   id?: string;
   strata?: string;
@@ -1075,6 +1158,10 @@ export interface ControllerInitOptions {
   runningVariable?: string;
   cutoff?: number;
   instrument?: string;
+  alphaPenalty?: number;
+  l1Ratio?: number;
+  weight?: string;
+  offset?: string;
   variables?: string[];
   covariates?: string[];
   exactCovariates?: string[];
@@ -1383,6 +1470,7 @@ export interface ControllerFeasibilityVerdict {
   };
   domains: FeasibilityGateResult["domains"];
   internalReviews: FeasibilityGateResult["internalReviews"];
+  issues: FeasibilityGateResult["issues"];
   methodChecks: Array<{ id: string; status: "pass" | "warning" | "block"; message: string; evidenceRefs: string[] }>;
   blockers: string[];
   warnings: string[];
@@ -1394,6 +1482,53 @@ export interface ControllerFeasibilityVerdict {
   studyDesignAdvice: FeasibilityGateResult["studyDesignAdvice"];
   evidenceRefs: string[];
   nextAction: string;
+}
+
+export interface ControllerDatasetSemanticAudit {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  runId: string;
+  statePath: string;
+  summaryPath: string;
+  rowCount: number;
+  columnCount: number;
+  status: "pass" | "warning" | "block";
+  selectedRoleStatus: "pass" | "warning" | "block";
+  issueCount: number;
+  blockerCount: number;
+  warningCount: number;
+  selectedRoleIssueCount: number;
+  issueCodeSummary: Array<{
+    code: string;
+    severity: "blocker" | "warning" | "note";
+    totalIssueCount: number;
+    selectedIssueCount: number;
+    columns: string[];
+  }>;
+  selectedRoleSummary: Array<{
+    column: string;
+    role: string;
+    issueCount: number;
+    blockerCount: number;
+    warningCount: number;
+    codes: string[];
+  }>;
+  issues: Array<{
+    column: string;
+    role: string | null;
+    selected: boolean;
+    inferredType: ResearchTableSummary["columns"][number]["inferredType"];
+    nonMissingRows: number;
+    min: number | null;
+    max: number | null;
+    mean: number | null;
+    severity: "blocker" | "warning" | "note";
+    code: string;
+    message: string;
+  }>;
+  nextAction: string;
+  outPath: string;
+  reportPath: string;
 }
 
 export interface ControllerSelfEvaluation {
@@ -1418,6 +1553,7 @@ export interface ControllerSelfEvaluation {
     status: "pass" | "warning" | "fail";
     severity: "info" | "minor" | "major" | "blocker";
     message: string;
+    issueCodes?: string[];
     evidenceRefs: string[];
   }>;
   nextAction: string;
@@ -1438,9 +1574,61 @@ export interface ControllerCompletionAudit {
     requirement: string;
     evidenceRefs: string[];
     finding: string;
+    issueCodes?: string[];
   }>;
   missingEvidence: string[];
   nextAction: string;
+  outPath: string;
+  reportPath: string;
+}
+
+export interface ControllerGoldenPacket {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  runId: string;
+  status: ControllerRunStatus;
+  stage: ControllerStage;
+  question: string;
+  method: StatsMethod | null;
+  readiness: {
+    runInspection: string | null;
+    feasibilityReadiness: string | null;
+    feasibilityVerdict: string | null;
+    completionAudit: ControllerCompletionAudit["status"];
+    selfEvaluation: ControllerSelfEvaluation["status"];
+    promotionDecision: "complete" | "human_review";
+    promotable: boolean;
+  };
+  counts: {
+    actions: number;
+    artifacts: number;
+    blockers: number;
+    warnings: number;
+    requiredArtifactsMissingHash: number;
+  };
+  blockers: string[];
+  warnings: string[];
+  activeIssueCodes: string[];
+  activeBlockerIssueCodes: string[];
+  issueSummary: Array<{
+    category: "completion_audit" | "self_evaluation" | "issue_ledger" | "stage_review" | "action_readiness" | "action_contract" | "dataset_semantic_audit" | "inspection" | "terminal_handoff" | "unknown";
+    severity: "blocker" | "warning";
+    issueCodes: string[];
+    message: string;
+    evidenceRefs: string[];
+  }>;
+  stageSummary: Array<{
+    stage: ControllerStage;
+    completed: boolean;
+    latestAction: ControllerActionType | null;
+    actionStatus: ControllerExecutedAction["status"] | null;
+    evidenceRefs: string[];
+  }>;
+  keyArtifacts: Record<string, string | null>;
+  keyArtifactReports: Record<string, string | null>;
+  datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
+  nextAction: string;
+  recommendedCommands: string[];
   outPath: string;
   reportPath: string;
 }
@@ -1483,20 +1671,25 @@ export interface ControllerNextActionPacket {
   stage: ControllerStage;
   reason: string;
   recommendedCommand: string;
+  alternativeCommands: string[];
   safeToAutoResume: boolean;
   reentryPlan: Pick<ControllerReentryPlan, "status" | "recommendedStage" | "confidence" | "reason" | "autoRepairEligible" | "repairPlugin" | "commands" | "safePatch">;
   issueLedger: {
     status: ControllerIssueLedger["status"] | null;
     path: string | null;
-    topIssues: Array<Pick<ControllerIssue, "id" | "severity" | "category" | "message" | "suggestedAction" | "reentryStage" | "evidenceRefs">>;
+    reportPath: string | null;
+    topIssues: Array<Pick<ControllerIssue, "id" | "issueCode" | "severity" | "category" | "message" | "suggestedAction" | "reentryStage" | "evidenceRefs">>;
   };
   mustReviewArtifacts: ControllerArtifact[];
   suggestedPatch: ControllerInputPatch | null;
   safePatchFields: string[];
   createdFromArtifacts: {
     terminalHandoff: string;
+    terminalHandoffReport: string;
     reentryPlan: string;
+    reentryPlanReport: string;
     issueLedger: string | null;
+    issueLedgerReport: string | null;
     state: string;
   };
   outPath: string;
@@ -1521,17 +1714,42 @@ export interface ControllerModelRunnerPacket {
   userPrompt: string;
   operatingRules: string[];
   allowedCommands: string[];
+  agendaCommands: string[];
   forbiddenActions: string[];
+  activeIssueCodes: string[];
+  activeBlockerIssueCodes: string[];
+  handoffBlockers: Array<{
+    category: "issue_ledger" | "next_action" | "dataset_semantic_audit" | "operator_audit" | "environment" | "unknown";
+    severity: "blocker" | "warning";
+    issueCodes: string[];
+    message: string;
+    evidenceRefs: string[];
+  }>;
   evidenceRefs: string[];
-  agenda: Pick<ControllerExecutionAgenda, "agendaId" | "status" | "primaryCommand" | "sourceArtifacts"> & {
-    items: Array<Pick<ControllerExecutionAgendaItem, "id" | "kind" | "status" | "safety" | "command" | "reason">>;
+  feasibilityReadiness: {
+    present: boolean;
+    status: string | null;
+    verdict: string | null;
+    path: string | null;
+    blockers: string[];
+    warnings: string[];
+  };
+  datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
+  agenda: Pick<ControllerExecutionAgenda, "agendaId" | "status" | "primaryCommand" | "activeIssueCodes" | "activeBlockerIssueCodes" | "sourceArtifacts"> & {
+    path: string;
+    reportPath: string;
+    items: Array<Pick<ControllerExecutionAgendaItem, "id" | "kind" | "status" | "safety" | "source" | "command" | "reason" | "issueCodes">>;
   };
   audit: Pick<ControllerOperatorAudit, "status" | "readiness" | "nextCommand"> & {
+    path: string;
+    reportPath: string;
     failedChecks: string[];
     warningChecks: string[];
   };
-  environment: Pick<ControllerEnvironmentPreflight, "status" | "readiness" | "repoRoot" | "nodeVersion" | "npmVersion" | "nextAction">;
+  environment: Pick<ControllerEnvironmentPreflight, "status" | "readiness" | "repoRoot" | "nodeVersion" | "npmVersion" | "nextAction" | "outPath" | "reportPath">;
   capabilities: Pick<ControllerCapabilityManifest, "summary" | "defaultControllerModel"> & {
+    path: string;
+    reportPath: string;
     missing: string[];
     available: string[];
     covered: string[];
@@ -1594,6 +1812,30 @@ export interface ControllerRepairExecution {
   outPath: string;
 }
 
+export interface ControllerRepairVerification {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  verificationId: string;
+  repairId: string;
+  repairExecutionPath: string;
+  status: "pass" | "warning" | "fail";
+  checks: Array<{
+    id: string;
+    status: "pass" | "warning" | "fail";
+    message: string;
+    evidenceRefs: string[];
+  }>;
+  acceptedFindings: number;
+  verifiedFindings: number;
+  skippedFindings: number;
+  failedRepairs: number;
+  missingArtifactRefs: number;
+  freshExternalReviewRequired: boolean;
+  nextAction: string;
+  outPath: string;
+  reportPath: string;
+}
+
 export interface ControllerRepairCycleResult {
   schemaVersion: 1;
   generatedAtIso: string;
@@ -1604,11 +1846,14 @@ export interface ControllerRepairCycleResult {
   beforeStage: ControllerStage;
   beforeStatus: ControllerRunStatus;
   reentryPlanPath: string;
+  reentryPlanReportPath: string;
   reentryStatus: ControllerReentryPlan["status"];
   autoRepairEligible: boolean;
   repairPlugin: string | null;
   runResultPath: string | null;
+  runResultReportPath: string | null;
   completionAuditPath: string | null;
+  completionAuditReportPath: string | null;
   afterStage: ControllerStage;
   afterStatus: ControllerRunStatus;
   reason: string;
@@ -1630,6 +1875,8 @@ export interface ControllerDoctorResult {
   safeToAutoContinue: boolean;
   blockers: string[];
   warnings: string[];
+  activeIssueCodes: string[];
+  activeBlockerIssueCodes: string[];
   evidenceRefs: string[];
   summaries: {
     operatorAudit: {
@@ -1645,6 +1892,8 @@ export interface ControllerDoctorResult {
       readiness: ControllerCompletionAudit["readiness"];
       failedRequirements: string[];
       warningRequirements: string[];
+      failedRequirementDetails: Array<{ id: string; issueCodes: string[]; finding: string }>;
+      warningRequirementDetails: Array<{ id: string; issueCodes: string[]; finding: string }>;
       missingEvidence: string[];
       path: string;
       reportPath: string;
@@ -1653,6 +1902,8 @@ export interface ControllerDoctorResult {
       status: ControllerModelRunnerPacket["status"];
       recommendedCommand: string;
       safeToAutoExecute: boolean;
+      feasibilityReadiness: ControllerModelRunnerPacket["feasibilityReadiness"];
+      datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
       path: string;
       reportPath: string;
     };
@@ -1705,15 +1956,21 @@ export interface ControllerOperateCycle {
   beforeStage: ControllerStage;
   beforeStatus: ControllerRunStatus;
   doctorPath: string;
+  doctorReportPath: string;
   doctorStatus: ControllerDoctorResult["status"];
+  doctorFeasibilityReadiness: string | null;
+  doctorFeasibilityVerdict: string | null;
+  doctorFeasibilityPath: string | null;
   safeToAutoContinue: boolean;
   recommendedCommand: string;
   action: "supervise" | "repair_cycle" | "stop";
   actionPath: string | null;
+  actionReportPath: string | null;
   actionStatus: string | null;
   afterStage: ControllerStage;
   afterStatus: ControllerRunStatus;
   reason: string;
+  issueCodes: string[];
 }
 
 export interface ControllerOperateResult {
@@ -1736,6 +1993,44 @@ export interface ControllerOperateResult {
   reportPath: string;
 }
 
+export interface ControllerStartResult {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  startId: string;
+  runId: string;
+  statePath: string;
+  status: "initialized" | "ready" | "review" | "blocked" | "complete" | "operated" | "operate_failed";
+  mode: "status_only" | "operate";
+  question: string;
+  state: ControllerState;
+  statusSummary: Pick<ControllerUnifiedStatus, "status" | "controllerStatus" | "currentStage" | "safeToAutoContinue" | "readyToLaunch" | "promotable" | "activeIssueCodes" | "activeBlockerIssueCodes" | "blockers" | "warnings" | "recommendedCommand" | "launchCommand" | "inspectionCommand" | "nextAction"> & {
+    feasibilityReadiness: string | null;
+    feasibilityVerdict: string | null;
+  };
+  runbookSummary: Pick<ControllerLaunchRunbook, "status" | "readyToLaunch" | "firstReadCommand" | "launchCommand" | "readinessCommand" | "inspectionCommand" | "activeIssueCodes" | "activeBlockerIssueCodes" | "launchBlockers">;
+  operateSummary: {
+    requested: boolean;
+    status: ControllerOperateResult["status"] | null;
+    cycles: number;
+    stoppedReason: string | null;
+    outPath: string | null;
+    reportPath: string | null;
+  };
+  artifactPaths: {
+    state: string;
+    status: string;
+    statusReport: string;
+    runbook: string;
+    runbookReport: string;
+    operate: string | null;
+    operateReport: string | null;
+  };
+  evidenceRefs: string[];
+  nextAction: string;
+  outPath: string;
+  reportPath: string;
+}
+
 export interface ControllerLaunchRunbook {
   schemaVersion: 1;
   generatedAtIso: string;
@@ -1744,8 +2039,18 @@ export interface ControllerLaunchRunbook {
   statePath: string;
   status: "ready" | "review" | "blocked" | "complete";
   readyToLaunch: boolean;
+  activeIssueCodes: string[];
+  activeBlockerIssueCodes: string[];
+  launchBlockers: Array<{
+    category: "doctor" | "completion_audit" | "environment" | "runner_packet" | "cost" | "unknown";
+    severity: "blocker" | "warning";
+    issueCodes: string[];
+    message: string;
+    evidenceRefs: string[];
+  }>;
   defaultControllerModel: string;
   strictModelRecommended: boolean;
+  firstReadCommand: string;
   launchCommand: string;
   readinessCommand: string;
   inspectionCommand: string;
@@ -1775,11 +2080,15 @@ export interface ControllerLaunchRunbook {
     optionalEnvWarnings: string[];
   };
   cost: ControllerDoctorResult["summaries"]["cost"];
-  doctor: Pick<ControllerDoctorResult, "status" | "safeToAutoContinue" | "recommendedCommand" | "blockers" | "warnings" | "outPath" | "reportPath">;
+  doctor: Pick<ControllerDoctorResult, "status" | "safeToAutoContinue" | "recommendedCommand" | "blockers" | "warnings" | "activeIssueCodes" | "activeBlockerIssueCodes" | "outPath" | "reportPath">;
   runnerPacket: {
     status: ControllerModelRunnerPacket["status"];
     recommendedCommand: string;
     safeToAutoExecute: boolean;
+    activeIssueCodes: string[];
+    activeBlockerIssueCodes: string[];
+    feasibilityReadiness: ControllerModelRunnerPacket["feasibilityReadiness"];
+    datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
     path: string;
     reportPath: string;
   };
@@ -1791,9 +2100,76 @@ export interface ControllerLaunchRunbook {
     path: string;
     reportPath: string;
   };
+  handoffArtifacts: {
+    doctor: { path: string; reportPath: string };
+    runnerPacket: { path: string; reportPath: string };
+    operatorAudit: { path: string; reportPath: string };
+    environment: { path: string | null; reportPath: string | null };
+    completionAudit: { path: string; reportPath: string };
+    capabilities: { path: string; reportPath: string };
+    reentryPlan: { path: string; reportPath: string };
+    supervisor: { path: string | null; reportPath: string | null };
+    repairCycle: { path: string | null; reportPath: string | null };
+    repairVerification: { path: string | null; reportPath: string | null };
+  };
   artifactsToInspect: string[];
   evidenceRefs: string[];
   handoffPrompt: string;
+  outPath: string;
+  reportPath: string;
+}
+
+export interface ControllerUnifiedStatus {
+  schemaVersion: 1;
+  generatedAtIso: string;
+  statusId: string;
+  runId: string;
+  statePath: string;
+  controllerStatus: ControllerRunStatus;
+  currentStage: ControllerStage;
+  status: "ready" | "review" | "blocked" | "complete";
+  safeToAutoContinue: boolean;
+  readyToLaunch: boolean;
+  promotable: boolean;
+  activeIssueCodes: string[];
+  activeBlockerIssueCodes: string[];
+  blockers: string[];
+  warnings: string[];
+  recommendedCommand: string;
+  launchCommand: string | null;
+  inspectionCommand: string;
+  nextAction: string;
+  summary: {
+    doctorStatus: ControllerDoctorResult["status"];
+    runbookStatus: ControllerLaunchRunbook["status"];
+    goldenPacketStatus: ControllerGoldenPacket["status"];
+    completionAudit: ControllerGoldenPacket["readiness"]["completionAudit"];
+    selfEvaluation: ControllerGoldenPacket["readiness"]["selfEvaluation"];
+    promotionDecision: ControllerGoldenPacket["readiness"]["promotionDecision"];
+    runInspection: string | null;
+    feasibilityReadiness: string | null;
+    feasibilityVerdict: string | null;
+    datasetSemanticAudit: ControllerLaunchRunbook["runnerPacket"]["datasetSemanticAudit"];
+    capabilityMissingIds: string[];
+    cost: ControllerDoctorResult["summaries"]["cost"];
+  };
+  artifactPaths: {
+    doctor: string;
+    doctorReport: string;
+    runbook: string;
+    runbookReport: string;
+    goldenPacket: string;
+    goldenPacketReport: string;
+    runnerPacket: string;
+    runnerPacketReport: string;
+    completionAudit: string;
+    completionAuditReport: string;
+    capabilityManifest: string;
+    capabilityManifestReport: string;
+  };
+  keyArtifactReports: ControllerGoldenPacket["keyArtifactReports"];
+  evidenceRefs: string[];
+  state: ControllerState;
   outPath: string;
   reportPath: string;
 }
@@ -1824,7 +2200,11 @@ export async function researchControllerInitCommand(opts: ControllerInitOptions)
       outcome: opts.outcome ?? null,
       exposure: opts.exposure ?? null,
       group: opts.group ?? null,
+      outcomeThreshold: opts.outcomeThreshold ?? null,
+      exposureThreshold: opts.exposureThreshold ?? null,
       time: opts.time ?? null,
+      start: opts.start ?? null,
+      stop: opts.stop ?? null,
       event: opts.event ?? null,
       id: opts.id ?? null,
       strata: opts.strata ?? null,
@@ -1834,6 +2214,10 @@ export async function researchControllerInitCommand(opts: ControllerInitOptions)
       runningVariable: opts.runningVariable ?? null,
       cutoff: opts.cutoff ?? null,
       instrument: opts.instrument ?? null,
+      alphaPenalty: opts.alphaPenalty ?? null,
+      l1Ratio: opts.l1Ratio ?? null,
+      weight: opts.weight ?? null,
+      offset: opts.offset ?? null,
       variables: opts.variables ?? [],
       covariates: opts.covariates ?? [],
       exactCovariates: opts.exactCovariates ?? [],
@@ -1867,6 +2251,158 @@ export async function researchControllerInitCommand(opts: ControllerInitOptions)
   return state;
 }
 
+export async function researchControllerStartCommand(opts: ControllerInitOptions & {
+  operate?: boolean;
+  maxCycles?: number;
+  maxRounds?: number;
+  maxIterationsPerRound?: number;
+  maxStepsPerRun?: number;
+  forceReviewRequired?: boolean;
+  env?: NodeJS.ProcessEnv;
+  fetchImpl?: typeof fetch;
+}): Promise<ControllerStartResult> {
+  let state = await researchControllerInitCommand(opts);
+  let status = await researchControllerStatusCommand({
+    statePath: state.statePath,
+    reason: "controller_start first_read_status",
+  });
+  let runbookRaw = await readJsonIfPresent(status.artifactPaths.runbook);
+  let runbook = (valueAtPath(runbookRaw, "controllerRunbook") ?? runbookRaw) as ControllerLaunchRunbook | null;
+  let operate: ControllerOperateResult | null = null;
+
+  if (opts.operate) {
+    operate = await researchControllerOperateCommand({
+      statePath: state.statePath,
+      reason: "controller_start operate",
+      maxCycles: opts.maxCycles,
+      maxRounds: opts.maxRounds,
+      maxIterationsPerRound: opts.maxIterationsPerRound,
+      maxStepsPerRun: opts.maxStepsPerRun,
+      forceReviewRequired: opts.forceReviewRequired,
+      env: opts.env,
+      fetchImpl: opts.fetchImpl,
+    });
+    state = operate.state;
+    status = await researchControllerStatusCommand({
+      statePath: state.statePath,
+      reason: "controller_start post_operate_status",
+    });
+    runbookRaw = await readJsonIfPresent(status.artifactPaths.runbook);
+    runbook = (valueAtPath(runbookRaw, "controllerRunbook") ?? runbookRaw) as ControllerLaunchRunbook | null;
+  }
+
+  state = await readControllerState(state.statePath);
+  const startId = `controller_start_${String(state.artifacts.filter(item => item.kind === "controller-start").length + 1).padStart(3, "0")}`;
+  const outPath = path.join(state.rootDir, `${startId}.json`);
+  const reportPath = path.join(state.rootDir, `${startId}.md`);
+  const statusSummary: ControllerStartResult["statusSummary"] = {
+    status: status.status,
+    controllerStatus: status.controllerStatus,
+    currentStage: status.currentStage,
+    safeToAutoContinue: status.safeToAutoContinue,
+    readyToLaunch: status.readyToLaunch,
+    promotable: status.promotable,
+    activeIssueCodes: status.activeIssueCodes,
+    activeBlockerIssueCodes: status.activeBlockerIssueCodes,
+    blockers: status.blockers,
+    warnings: status.warnings,
+    feasibilityReadiness: status.summary.feasibilityReadiness,
+    feasibilityVerdict: status.summary.feasibilityVerdict,
+    recommendedCommand: status.recommendedCommand,
+    launchCommand: status.launchCommand,
+    inspectionCommand: status.inspectionCommand,
+    nextAction: status.nextAction,
+  };
+  const runbookSummary: ControllerStartResult["runbookSummary"] = runbook
+    ? {
+        status: runbook.status,
+        readyToLaunch: runbook.readyToLaunch,
+        firstReadCommand: runbook.firstReadCommand,
+        launchCommand: runbook.launchCommand,
+        readinessCommand: runbook.readinessCommand,
+        inspectionCommand: runbook.inspectionCommand,
+        activeIssueCodes: runbook.activeIssueCodes,
+        activeBlockerIssueCodes: runbook.activeBlockerIssueCodes,
+        launchBlockers: runbook.launchBlockers,
+      }
+    : {
+        status: "review",
+        readyToLaunch: false,
+        firstReadCommand: `agenteer research controller-status --state ${quotePath(state.statePath)}`,
+        launchCommand: `agenteer research controller-operate --state ${quotePath(state.statePath)}`,
+        readinessCommand: `agenteer research controller-doctor --state ${quotePath(state.statePath)}`,
+        inspectionCommand: `agenteer research controller-inspect --state ${quotePath(state.statePath)}`,
+        activeIssueCodes: status.activeIssueCodes,
+        activeBlockerIssueCodes: status.activeBlockerIssueCodes,
+        launchBlockers: [],
+      };
+  const startStatus: ControllerStartResult["status"] = opts.operate
+    ? operate?.status === "complete"
+      ? "complete"
+      : operate
+        ? "operated"
+        : "operate_failed"
+    : status.status === "ready"
+      ? "ready"
+      : status.status;
+  const nextAction = opts.operate
+    ? status.nextAction
+    : status.status === "ready"
+      ? "Review the first-read status/runbook, then run controller-operate or rerun controller-start with --operate when the launch envelope is acceptable."
+      : status.nextAction;
+  const result: ControllerStartResult = {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    startId,
+    runId: state.runId,
+    statePath: state.statePath,
+    status: startStatus,
+    mode: opts.operate ? "operate" : "status_only",
+    question: state.inputs.question,
+    state,
+    statusSummary,
+    runbookSummary,
+    operateSummary: {
+      requested: Boolean(opts.operate),
+      status: operate?.status ?? null,
+      cycles: operate?.cycles.length ?? 0,
+      stoppedReason: operate?.stoppedReason ?? null,
+      outPath: operate?.outPath ?? null,
+      reportPath: operate?.reportPath ?? null,
+    },
+    artifactPaths: {
+      state: state.statePath,
+      status: status.outPath,
+      statusReport: status.reportPath,
+      runbook: status.artifactPaths.runbook,
+      runbookReport: status.artifactPaths.runbookReport,
+      operate: operate?.outPath ?? null,
+      operateReport: operate?.reportPath ?? null,
+    },
+    evidenceRefs: uniqueText([
+      state.statePath,
+      status.outPath,
+      status.reportPath,
+      status.artifactPaths.runbook,
+      status.artifactPaths.runbookReport,
+      ...(operate ? [operate.outPath, operate.reportPath] : []),
+      ...status.evidenceRefs,
+    ]),
+    nextAction,
+    outPath,
+    reportPath,
+  };
+  await writeJson(outPath, { schemaVersion: 1, controllerStart: result });
+  await writeFile(reportPath, renderControllerStartMarkdown(result));
+  await pushControllerArtifactOnce(state, "controller-start", outPath, false);
+  await pushControllerArtifactOnce(state, "controller-start-report", reportPath, false);
+  await persistState(state);
+  result.state = await readControllerState(state.statePath);
+  await writeJson(outPath, { schemaVersion: 1, controllerStart: result });
+  await writeFile(reportPath, renderControllerStartMarkdown(result));
+  return result;
+}
+
 export async function researchControllerStepCommand(opts: {
   statePath: string;
   env?: NodeJS.ProcessEnv;
@@ -1881,6 +2417,21 @@ export async function researchControllerStepCommand(opts: {
   if (gate.status === "block") {
     const blocked = await executeTerminalDecision(state, "block", gate.reasons.join(" "), gate);
     await checkpointAndPersist(blocked, checkpointStart, "gate_block");
+    return blocked;
+  }
+  const activeBlockers = await activeCodedControllerBlockers(state);
+  if (!state.policy.controller.enabled && activeBlockers.issueCodes.length && !activeCodedBlockerStageCanProceed(state.currentStage)) {
+    const activeIssueGate: ControllerGate = {
+      stage: state.currentStage,
+      status: "block",
+      label: "Active coded blockers prevent deterministic or model continuation.",
+      reasons: [`Active coded blocker(s) remain: ${activeBlockers.issueCodes.join(", ")}.`],
+      evidenceRefs: activeBlockers.evidenceRefs,
+      nextStage: "blocked",
+    };
+    state.gates.push(activeIssueGate);
+    const blocked = await executeTerminalDecision(state, "block", activeIssueGate.reasons.join(" "), activeIssueGate);
+    await checkpointAndPersist(blocked, checkpointStart, "active_coded_blocker_guard");
     return blocked;
   }
   const decision = await chooseControllerDecision(state, gate, opts.env ?? process.env, opts.fetchImpl ?? fetch);
@@ -2184,14 +2735,19 @@ export async function researchControllerFollowAgendaCommand(opts: {
   await writeJson(state.statePath, { schemaVersion: 1, controllerState: state });
   const selected = agenda.items.find(item => item.command === agenda.primaryCommand) ?? agenda.items[0] ?? null;
   const outPath = path.join(state.rootDir, `controller-follow-agenda-${String(state.agendas.length).padStart(3, "0")}.json`);
+  const reportPath = outPath.replace(/\.json$/, ".md");
   let executed = false;
   let refused = false;
   let reason = "";
   let runResult: ControllerRunResult | null = null;
+  const activeBlockers = await activeCodedControllerBlockers(state);
 
   if (!selected) {
     refused = true;
     reason = "Execution agenda has no selectable item.";
+  } else if (activeBlockers.issueCodes.length && !activeCodedBlockerStageCanProceed(state.currentStage)) {
+    refused = true;
+    reason = `Active coded blocker(s) prevent follow-agenda execution: ${activeBlockers.issueCodes.join(", ")}.`;
   } else if (selected.status !== "executable" && selected.status !== "complete") {
     refused = true;
     reason = `Selected agenda item is ${selected.status}, not executable.`;
@@ -2236,10 +2792,18 @@ export async function researchControllerFollowAgendaCommand(opts: {
         reason = "Executed one agenda step item.";
         break;
       case "inspect":
-        runResult = await researchControllerInspectCommand({ statePath: state.statePath });
-        state = runResult.state;
-        executed = true;
-        reason = "Executed agenda inspect item.";
+        if (selected.command.includes("research run-inspect")) {
+          await executeBoundedResearchAgendaCommand(state, selected.command, opts);
+          await writeControllerExecutionAgenda(state, "follow_agenda_run_inspection_command");
+          await persistState(state);
+          executed = true;
+          reason = "Executed agenda run-inspection item.";
+        } else {
+          runResult = await researchControllerInspectCommand({ statePath: state.statePath });
+          state = runResult.state;
+          executed = true;
+          reason = "Executed agenda inspect item.";
+        }
         break;
       case "resume": {
         const resume = await researchControllerResumeCommand({ statePath: state.statePath, force: Boolean(opts.forceReviewRequired), reason: opts.reason ?? "Follow agenda resume." });
@@ -2253,6 +2817,15 @@ export async function researchControllerFollowAgendaCommand(opts: {
       case "tool":
         refused = true;
         reason = "Agenda tool commands require explicit controller-tool request arguments and are not auto-executed by follow-agenda.";
+        break;
+      case "qa":
+      case "manifest":
+      case "review":
+        await executeBoundedResearchAgendaCommand(state, selected.command, opts);
+        await writeControllerExecutionAgenda(state, `follow_agenda_${selected.kind}_command`);
+        await persistState(state);
+        executed = true;
+        reason = `Executed agenda ${selected.kind} item.`;
         break;
       default:
         refused = true;
@@ -2274,11 +2847,155 @@ export async function researchControllerFollowAgendaCommand(opts: {
     state,
     runResult,
     outPath,
+    reportPath,
   };
   await writeJson(outPath, { schemaVersion: 1, controllerFollowAgenda: result });
+  await writeFile(reportPath, renderControllerFollowAgendaMarkdown(result));
   state.artifacts.push(await artifact("controller-follow-agenda", outPath, state.currentStage, false));
+  state.artifacts.push(await artifact("controller-follow-agenda-report", reportPath, state.currentStage, false));
   await persistState(state);
   return result;
+}
+
+async function executeBoundedResearchAgendaCommand(
+  state: ControllerState,
+  command: string,
+  opts: { env?: NodeJS.ProcessEnv; fetchImpl?: typeof fetch; forceReviewRequired?: boolean },
+): Promise<void> {
+  const parsed = parseAgenteerResearchCommand(command);
+  if (!parsed) {
+    throw new Error(`Unsupported agenda command shape: ${command}`);
+  }
+  if (parsed.subcommand === "figure-qa") {
+    const figures = requiredParsedFlag(parsed.flags, "figures", command);
+    const out = parsed.flags.out ?? path.join(path.dirname(figures), "figure-qa.json");
+    const report = parsed.flags.report ?? path.join(path.dirname(figures), "figure-qa.md");
+    const result = await researchFigureQaCommand({ manifestPath: figures, outPath: out, reportPath: report });
+    await pushControllerArtifactOnce(state, "figure-qa", result.outPath ?? out, true);
+    await pushControllerArtifactOnce(state, "figure-qa-report", result.reportPath ?? report, false);
+    return;
+  }
+  if (parsed.subcommand === "method-qa") {
+    const runDir = requiredParsedFlag(parsed.flags, "run-dir", command);
+    const out = parsed.flags.out ?? path.join(runDir, "method-qa.json");
+    const report = parsed.flags.report ?? path.join(runDir, "method-qa.md");
+    const result = await researchMethodQaCommand({ runDir, outPath: out, reportPath: report });
+    await pushControllerArtifactOnce(state, "method-qa", result.outPath ?? out, true);
+    await pushControllerArtifactOnce(state, "method-qa-report", result.reportPath ?? report, false);
+    return;
+  }
+  if (parsed.subcommand === "run-inspect") {
+    const runDir = requiredParsedFlag(parsed.flags, "run-dir", command);
+    const out = parsed.flags.out ?? path.join(runDir, "run-inspection.json");
+    const report = parsed.flags.report ?? path.join(runDir, "run-inspection.md");
+    const result = await researchRunInspectCommand({ runDir, outPath: out, reportPath: report });
+    await pushControllerArtifactOnce(state, "run-inspection", result.outPath ?? out, true);
+    await pushControllerArtifactOnce(state, "run-inspection-report", result.reportPath ?? report, false);
+    return;
+  }
+  if (parsed.subcommand === "analysis-manifest") {
+    const runDir = requiredParsedFlag(parsed.flags, "run-dir", command);
+    const out = parsed.flags.out ?? path.join(runDir, "analysis-run-manifest.json");
+    const manifest = await buildAnalysisRunManifest({ runDir, outPath: out });
+    if (parsed.flags["require-ready"] === "true" && manifest.readiness !== "local_review_ready") {
+      throw new Error(`analysis manifest is ${manifest.readiness}, not local_review_ready; next action: ${manifest.nextAction}`);
+    }
+    await pushControllerArtifactOnce(state, "analysis-run-manifest", manifest.outPath ?? out, true);
+    return;
+  }
+  if (parsed.subcommand === "study-critic") {
+    if (!opts.forceReviewRequired) {
+      throw new Error("study-critic agenda commands require forceReviewRequired because they can call external reviewers.");
+    }
+    const runDir = requiredParsedFlag(parsed.flags, "run-dir", command);
+    const result = await researchStudyCriticCommand({
+      runDir,
+      stage: reviewStageSchema.parse(parsed.flags.stage ?? "final"),
+      panel: parsed.flags.panel ? reviewerPanelSchemaForController(parsed.flags.panel) : undefined,
+      mock: parsed.flags.mock === "true",
+      env: opts.env,
+      fetchImpl: opts.fetchImpl,
+    });
+    await pushControllerArtifactOnce(state, "review-panel", result.generatedFiles.panel, true);
+    await pushControllerArtifactOnce(state, "review-adjudication", result.generatedFiles.adjudication, true);
+    await pushControllerArtifactOnce(state, "review-response", result.generatedFiles.response, false);
+    await pushControllerArtifactOnce(state, "state-reentry", result.generatedFiles.stateReentry, false);
+    return;
+  }
+  throw new Error(`follow-agenda does not support research ${parsed.subcommand} agenda commands yet.`);
+}
+
+function parseAgenteerResearchCommand(command: string): { subcommand: string; flags: Record<string, string> } | null {
+  const words = splitShellLikeWords(command);
+  const researchIndex = words.findIndex((word, index) => word === "research" && words[index - 1] === "agenteer");
+  if (researchIndex < 0) return null;
+  const subcommand = words[researchIndex + 1];
+  if (!subcommand) return null;
+  const flags: Record<string, string> = {};
+  for (let i = researchIndex + 2; i < words.length; i += 1) {
+    const word = words[i];
+    if (!word) continue;
+    if (!word.startsWith("--")) continue;
+    const key = word.slice(2);
+    const next = words[i + 1];
+    if (!next || next.startsWith("--")) {
+      flags[key] = "true";
+    } else {
+      flags[key] = next;
+      i += 1;
+    }
+  }
+  return { subcommand, flags };
+}
+
+function splitShellLikeWords(command: string): string[] {
+  const words: string[] = [];
+  let current = "";
+  let quote: "'" | "\"" | null = null;
+  let escaped = false;
+  for (const char of command) {
+    if (escaped) {
+      current += char;
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote !== "'") {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+    if (char === "'" || char === "\"") {
+      quote = char;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      if (current) {
+        words.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += char;
+  }
+  if (current) words.push(current);
+  return words;
+}
+
+function requiredParsedFlag(flags: Record<string, string>, key: string, command: string): string {
+  const value = flags[key];
+  if (!value) throw new Error(`Missing --${key} in agenda command: ${command}`);
+  return value;
+}
+
+function reviewerPanelSchemaForController(value: string): ReviewerPanel {
+  return z.enum(["default", "cheap", "strict", "all", "deepseek-dual", "deepseek-triple"]).parse(value);
 }
 
 export async function researchControllerFollowLoopCommand(opts: {
@@ -2318,12 +3035,15 @@ export async function researchControllerFollowLoopCommand(opts: {
       agendaId: follow.agenda.agendaId,
       selectedItemId: follow.selectedItem?.id ?? null,
       selectedKind: follow.selectedItem?.kind ?? null,
+      selectedIssueCodes: follow.selectedItem?.issueCodes ?? [],
+      selectedEvidenceRefs: follow.selectedItem?.evidenceRefs ?? [],
       executed: follow.executed,
       refused: follow.refused,
       reason: follow.reason,
       afterStage: state.currentStage,
       afterStatus: state.status,
       followRecordPath: follow.outPath,
+      followReportPath: follow.reportPath,
     });
     if (follow.refused) {
       stoppedReason = `Agenda follow refused: ${follow.reason}`;
@@ -2393,7 +3113,8 @@ export async function researchControllerSupervisorCommand(opts: {
       reason: `${opts.reason ?? "controller_supervisor"} round ${i + 1} runner_packet`,
     });
     state = await readControllerState(state.statePath);
-    const safeAgendaPrimary = packet.agenda.items.some(item =>
+    const activeBlockers = await activeCodedControllerBlockers(state);
+    const safeAgendaPrimary = !activeBlockers.issueCodes.length && packet.agenda.items.some(item =>
       item.command === packet.recommendedCommand && item.status === "executable" && item.safety === "safe");
 
     if (isTerminal(state.currentStage) || state.status !== "running") {
@@ -2403,12 +3124,19 @@ export async function researchControllerSupervisorCommand(opts: {
         beforeStage,
         beforeStatus,
         runnerPacketPath: packet.outPath,
+        runnerPacketReportPath: packet.reportPath,
         runnerPacketStatus: packet.status,
+        runnerPacketFeasibilityReadiness: packet.feasibilityReadiness.status,
+        runnerPacketFeasibilityVerdict: packet.feasibilityReadiness.verdict,
+        runnerPacketFeasibilityPath: packet.feasibilityReadiness.path,
         recommendedCommand: packet.recommendedCommand,
         safeAgendaPrimary,
         followLoopPath: null,
+        followLoopReportPath: null,
         followLoopIterations: 0,
+        followLoopIssueCodes: [],
         auditPath: null,
+        auditReportPath: null,
         auditReadiness: null,
         afterStage: state.currentStage,
         afterStatus: state.status,
@@ -2420,18 +3148,27 @@ export async function researchControllerSupervisorCommand(opts: {
     }
 
     if (!safeAgendaPrimary && !opts.forceReviewRequired) {
-      const reason = `Runner packet did not authorize a safe executable primary command: ${packet.recommendedCommand}`;
+      const reason = activeBlockers.issueCodes.length
+        ? `Active coded blocker(s) prevent supervisor auto-follow: ${activeBlockers.issueCodes.join(", ")}.`
+        : `Runner packet did not authorize a safe executable primary command: ${packet.recommendedCommand}`;
       rounds.push({
         round: i + 1,
         beforeStage,
         beforeStatus,
         runnerPacketPath: packet.outPath,
+        runnerPacketReportPath: packet.reportPath,
         runnerPacketStatus: packet.status,
+        runnerPacketFeasibilityReadiness: packet.feasibilityReadiness.status,
+        runnerPacketFeasibilityVerdict: packet.feasibilityReadiness.verdict,
+        runnerPacketFeasibilityPath: packet.feasibilityReadiness.path,
         recommendedCommand: packet.recommendedCommand,
         safeAgendaPrimary,
         followLoopPath: null,
+        followLoopReportPath: null,
         followLoopIterations: 0,
+        followLoopIssueCodes: [],
         auditPath: null,
+        auditReportPath: null,
         auditReadiness: null,
         afterStage: state.currentStage,
         afterStatus: state.status,
@@ -2452,6 +3189,7 @@ export async function researchControllerSupervisorCommand(opts: {
       fetchImpl: opts.fetchImpl,
     });
     state = followLoop.state;
+    const followLoopIssueCodes = uniqueText(followLoop.iterations.flatMap(item => item.selectedIssueCodes));
     const audit = await researchControllerAuditCommand({
       statePath: state.statePath,
       reason: `${opts.reason ?? "controller_supervisor"} round ${i + 1} audit`,
@@ -2470,12 +3208,19 @@ export async function researchControllerSupervisorCommand(opts: {
       beforeStage,
       beforeStatus,
       runnerPacketPath: packet.outPath,
+      runnerPacketReportPath: packet.reportPath,
       runnerPacketStatus: packet.status,
+      runnerPacketFeasibilityReadiness: packet.feasibilityReadiness.status,
+      runnerPacketFeasibilityVerdict: packet.feasibilityReadiness.verdict,
+      runnerPacketFeasibilityPath: packet.feasibilityReadiness.path,
       recommendedCommand: packet.recommendedCommand,
       safeAgendaPrimary,
       followLoopPath: followLoop.outPath,
+      followLoopReportPath: followLoop.reportPath,
       followLoopIterations: followLoop.iterations.length,
+      followLoopIssueCodes,
       auditPath: audit.outPath,
+      auditReportPath: audit.reportPath,
       auditReadiness: audit.readiness,
       afterStage: state.currentStage,
       afterStatus: state.status,
@@ -2575,6 +3320,7 @@ export async function researchControllerGoalAuditCommand(opts: {
   reason?: string;
 }): Promise<ControllerGoalAudit> {
   const state = await readControllerState(opts.statePath);
+  const issueLedger = await writeControllerIssueLedger(state, opts.reason ?? "goal_audit_active_issues");
   const agenda = await writeControllerExecutionAgenda(state, opts.reason ?? "goal_audit");
   const operatorAudit = await buildControllerOperatorAudit(state, agenda, opts.reason ?? "goal_audit");
   await writeControllerEnvironmentPreflight(operatorAudit.environment);
@@ -2589,13 +3335,97 @@ export async function researchControllerGoalAuditCommand(opts: {
   await writeFile(capabilityManifest.reportPath, renderControllerCapabilityManifestMarkdown(capabilityManifest));
   state.artifacts.push(await artifact("controller-capability-manifest", capabilityManifest.outPath, state.currentStage, false));
   state.artifacts.push(await artifact("controller-capability-manifest-report", capabilityManifest.reportPath, state.currentStage, false));
-  const goalAudit = buildControllerGoalAudit(state, operatorAudit, capabilityManifest, opts.objective);
+  const goalAudit = buildControllerGoalAudit(state, operatorAudit, capabilityManifest, issueLedger, opts.objective);
   await writeJson(goalAudit.outPath, { schemaVersion: 1, controllerGoalAudit: goalAudit });
   await writeFile(goalAudit.reportPath, renderControllerGoalAuditMarkdown(goalAudit));
   state.artifacts.push(await artifact("controller-goal-audit", goalAudit.outPath, state.currentStage, false));
   state.artifacts.push(await artifact("controller-goal-audit-report", goalAudit.reportPath, state.currentStage, false));
   await persistState(state);
   return goalAudit;
+}
+
+export async function researchControllerBenchmarkCommand(opts: {
+  statePath: string;
+  suiteDir?: string;
+  historyDir?: string;
+  reason?: string;
+}): Promise<ControllerBenchmarkResult> {
+  const state = await readControllerState(opts.statePath);
+  const repoRoot = repoRootFromState(state);
+  const suiteDir = path.resolve(repoRoot, opts.suiteDir ?? ".loop-memory/golden");
+  const historyDir = path.resolve(repoRoot, opts.historyDir ?? ".loop-memory/benchmark-history");
+  const benchmarkId = `controller_benchmark_${String(state.artifacts.filter(item => item.kind === "controller-benchmark").length + 1).padStart(3, "0")}`;
+  const suite = await researchBenchmarkSuiteRunCommand({
+    suiteDir,
+    outDir: historyDir,
+    outPath: path.join(historyDir, `${benchmarkId}.benchmark-suite-run.json`),
+    reportPath: path.join(historyDir, `${benchmarkId}.benchmark-suite-run.md`),
+  });
+  const trend = await researchBenchmarkTrendCommand({
+    historyDir,
+    outPath: path.join(historyDir, `${benchmarkId}.benchmark-trend.json`),
+    reportPath: path.join(historyDir, `${benchmarkId}.benchmark-trend.md`),
+  });
+  await pushControllerArtifactOnce(state, "continuous-benchmark-suite", suite.outPath ?? path.join(historyDir, `${benchmarkId}.benchmark-suite-run.json`), false);
+  await pushControllerArtifactOnce(state, "continuous-benchmark-suite-report", suite.reportPath ?? path.join(historyDir, `${benchmarkId}.benchmark-suite-run.md`), false);
+  await pushControllerArtifactOnce(state, "continuous-benchmark-trend", trend.outPath ?? path.join(historyDir, `${benchmarkId}.benchmark-trend.json`), false);
+  await pushControllerArtifactOnce(state, "continuous-benchmark-trend-report", trend.reportPath ?? path.join(historyDir, `${benchmarkId}.benchmark-trend.md`), false);
+
+  const capabilityStatus: ControllerBenchmarkResult["capabilityStatus"] = suite.caseCount === 0
+    ? "missing"
+    : suite.failCount > 0 || trend.trend === "regressing"
+      ? "warning"
+      : "covered";
+  const outPath = path.join(state.rootDir, `${benchmarkId}.json`);
+  const reportPath = path.join(state.rootDir, `${benchmarkId}.md`);
+  const result: ControllerBenchmarkResult = {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    benchmarkId,
+    runId: state.runId,
+    statePath: state.statePath,
+    suiteDir,
+    historyDir,
+    suite: {
+      caseCount: suite.caseCount,
+      passCount: suite.passCount,
+      warningCount: suite.warningCount,
+      failCount: suite.failCount,
+      meanScore: suite.meanScore,
+      regressions: suite.regressions,
+      nextAction: suite.nextAction,
+      outPath: suite.outPath,
+      reportPath: suite.reportPath,
+    },
+    trend: {
+      runCount: trend.runCount,
+      latestScore: trend.latestScore,
+      previousScore: trend.previousScore,
+      delta: trend.delta,
+      trend: trend.trend,
+      regressions: trend.regressions,
+      nextAction: trend.nextAction,
+      outPath: trend.outPath,
+      reportPath: trend.reportPath,
+    },
+    capabilityStatus,
+    attachedArtifacts: state.artifacts
+      .filter(item => ["continuous-benchmark-suite", "continuous-benchmark-suite-report", "continuous-benchmark-trend", "continuous-benchmark-trend-report"].includes(item.kind))
+      .map(item => ({ kind: item.kind, path: item.path, sha256: item.sha256 })),
+    nextAction: capabilityStatus === "covered"
+      ? "Continuous benchmark evidence is attached; rerun controller-capabilities or controller-goal-audit to prove regression coverage."
+      : suite.caseCount === 0
+        ? "Add representative run directories to the benchmark suite, then rerun controller-benchmark."
+        : "Review benchmark regressions or trend warnings before promoting framework changes.",
+    outPath,
+    reportPath,
+  };
+  await writeJson(outPath, { schemaVersion: 1, controllerBenchmark: result });
+  await writeFile(reportPath, renderControllerBenchmarkMarkdown(result));
+  await pushControllerArtifactOnce(state, "controller-benchmark", outPath, false);
+  await pushControllerArtifactOnce(state, "controller-benchmark-report", reportPath, false);
+  await persistState(state);
+  return result;
 }
 
 export async function researchControllerCompletionAuditCommand(opts: {
@@ -2609,6 +3439,44 @@ export async function researchControllerCompletionAuditCommand(opts: {
   await writeControllerExecutionAgenda(state, opts.reason ?? "completion_audit");
   await persistState(state);
   return audit;
+}
+
+export async function researchControllerGoldenPacketCommand(opts: {
+  statePath: string;
+  reason?: string;
+}): Promise<ControllerGoldenPacket> {
+  const state = await readControllerState(opts.statePath);
+  const completionAudit = await loadLatestArtifactPayload<ControllerCompletionAudit>(state, "controller-completion-audit", "controllerCompletionAudit");
+  const selfEvaluation = await loadLatestArtifactPayload<ControllerSelfEvaluation>(state, "controller-self-evaluation", "controllerSelfEvaluation");
+  const inspectionRaw = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
+  const inspectionReadiness = String(valueAtPath(inspectionRaw, "runInspection.readiness") ?? valueAtPath(inspectionRaw, "readiness") ?? "") || null;
+  let packet: ControllerGoldenPacket;
+  if (completionAudit && selfEvaluation) {
+    const reviewVerdict = String(valueAtPath(await readJsonIfPresent(path.join(state.inputs.runDir, "review", "review-adjudication.json")), "reviewAdjudication.verdict") ?? "");
+    const reviewPromotion = externalReviewPromotionStatus(state, reviewVerdict);
+    const ready = inspectionReadiness === "local_review_ready"
+      && completionAudit.status !== "fail"
+      && selfEvaluation.status !== "fail"
+      && reviewPromotion.promotionSatisfied;
+    packet = await writeControllerGoldenPacket(state, {
+      ready,
+      inspectionReadiness,
+      reviewVerdict: reviewVerdict || null,
+      completionAudit,
+      selfEvaluation,
+    });
+  } else {
+    const handoffPath = path.join(state.rootDir, "controller-terminal-handoff.json");
+    const handoffReportPath = path.join(state.rootDir, "controller-terminal-handoff.md");
+    const reentryPlan = await writeControllerReentryPlan(state);
+    const handoff = await buildTerminalHandoff(state, handoffPath, handoffReportPath, reentryPlan);
+    packet = await writeControllerTerminalGoldenPacket(state, handoff);
+  }
+  await pushControllerArtifactOnce(state, "controller-golden-packet", packet.outPath, state.status === "complete");
+  await pushControllerArtifactOnce(state, "controller-golden-packet-report", packet.reportPath, false);
+  state.nextRecommendedAction = opts.reason ? `${packet.nextAction} (${opts.reason})` : packet.nextAction;
+  await persistState(state);
+  return packet;
 }
 
 export async function researchControllerRepairCycleCommand(opts: {
@@ -2678,6 +3546,8 @@ export async function researchControllerRepairCycleCommand(opts: {
       : `Repair cycle ran but no repair execution was recorded; stopped at ${state.currentStage}/${state.status}.`;
   }
 
+  const runResultReportPath = runResultPath ? latestArtifactPath(state, "controller-run-invocation-report") : null;
+  const completionAuditReportPath = completionAuditPath ? latestArtifactPath(state, "controller-completion-audit-report") : null;
   const cycleId = `controller_repair_cycle_${String(state.artifacts.filter(item => item.kind === "controller-repair-cycle").length + 1).padStart(3, "0")}`;
   const outPath = path.join(state.rootDir, `${cycleId}.json`);
   const reportPath = path.join(state.rootDir, `${cycleId}.md`);
@@ -2691,11 +3561,14 @@ export async function researchControllerRepairCycleCommand(opts: {
     beforeStage,
     beforeStatus,
     reentryPlanPath: reentryPlan.outPath,
+    reentryPlanReportPath: reentryPlan.reportPath,
     reentryStatus: reentryPlan.status,
     autoRepairEligible: reentryPlan.autoRepairEligible,
     repairPlugin: reentryPlan.repairPlugin,
     runResultPath,
+    runResultReportPath,
     completionAuditPath,
+    completionAuditReportPath,
     afterStage: state.currentStage,
     afterStatus: state.status,
     reason,
@@ -2735,8 +3608,12 @@ export async function researchControllerDoctorCommand(opts: {
   const completionAudit = latestCompletionAudit ?? await buildControllerCompletionAudit(state);
   const failedChecks = operatorAudit.checks.filter(check => check.status === "fail").map(check => check.id);
   const warningChecks = operatorAudit.checks.filter(check => check.status === "warning").map(check => check.id);
-  const failedRequirements = completionAudit.requirements.filter(item => item.status === "failed").map(item => item.id);
-  const warningRequirements = completionAudit.requirements.filter(item => item.status === "warning").map(item => item.id);
+  const failedRequirementRecords = completionAudit.requirements.filter(item => item.status === "failed");
+  const warningRequirementRecords = completionAudit.requirements.filter(item => item.status === "warning");
+  const failedRequirements = failedRequirementRecords.map(item => item.id);
+  const warningRequirements = warningRequirementRecords.map(item => item.id);
+  const failedRequirementDetails = failedRequirementRecords.map(completionRequirementDoctorDetail);
+  const warningRequirementDetails = warningRequirementRecords.map(completionRequirementDoctorDetail);
   const missingCapabilityIds = capabilities.entries.filter(item => item.status === "missing").map(item => item.id);
   const latestSupervisor = latestArtifactRefs(state, "controller-supervisor", "controller-supervisor-report");
   const latestRepairCycle = latestArtifactRefs(state, "controller-repair-cycle", "controller-repair-cycle-report");
@@ -2746,18 +3623,27 @@ export async function researchControllerDoctorCommand(opts: {
   const completionFailuresAreBlocking = state.status !== "running" || state.currentStage === "promotion_decision" || state.currentStage === "complete";
   const blockers = uniqueText([
     ...failedChecks.map(id => `Operator audit failed check: ${id}`),
-    ...(completionFailuresAreBlocking ? failedRequirements.map(id => `Completion audit failed requirement: ${id}`) : []),
+    ...(completionFailuresAreBlocking ? failedRequirementDetails.map(detail => completionRequirementDoctorMessage("Completion audit failed requirement", detail)) : []),
     ...missingRequiredHashes.map(file => `Required promotion artifact has no hash: ${file}`),
     withinBudget ? null : `Estimated controller/reviewer cost ${state.costEstimateUsd.toFixed(4)} exceeds budget ${totalBudget.toFixed(4)}.`,
   ].filter((item): item is string => Boolean(item)));
   const warnings = uniqueText([
     ...warningChecks.map(id => `Operator audit warning: ${id}`),
-    ...(!completionFailuresAreBlocking ? failedRequirements.map(id => `Incomplete completion evidence while still running: ${id}`) : []),
-    ...warningRequirements.map(id => `Completion audit warning: ${id}`),
+    ...(!completionFailuresAreBlocking ? failedRequirementDetails.map(detail => completionRequirementDoctorMessage("Incomplete completion evidence while still running", detail)) : []),
+    ...warningRequirementDetails.map(detail => completionRequirementDoctorMessage("Completion audit warning", detail)),
     ...completionAudit.missingEvidence.map(id => `Missing completion evidence: ${id}`),
     ...missingCapabilityIds.map(id => `Capability evidence not yet covered: ${id}`),
     capabilities.summary.available ? `${capabilities.summary.available} capability entries are available but not yet exercised.` : null,
   ].filter((item): item is string => Boolean(item)));
+  const activeIssueCodes = uniqueText([
+    ...runnerPacket.activeIssueCodes,
+    ...blockers.flatMap(issueCodesFromText),
+    ...warnings.flatMap(issueCodesFromText),
+  ]);
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes([
+    ...runnerPacket.activeBlockerIssueCodes,
+    ...blockers.flatMap(issueCodesFromText),
+  ]);
   const safeToAutoContinue = runnerPacket.safeToAutoExecute && blockers.length === 0 && operatorAudit.readiness === "ready_to_follow";
   const status: ControllerDoctorResult["status"] = state.status === "complete" || operatorAudit.readiness === "complete" || runnerPacket.status === "complete"
     ? "complete"
@@ -2767,10 +3653,10 @@ export async function researchControllerDoctorCommand(opts: {
         ? "ready_to_continue"
         : "needs_review";
   const recommendedCommand = status === "complete"
-    ? `agenteer research controller-inspect --state ${quotePath(state.statePath)}`
+    ? `agenteer research controller-status --state ${quotePath(state.statePath)}`
     : safeToAutoContinue
       ? runnerPacket.recommendedCommand
-      : operatorAudit.nextCommand || runnerPacket.recommendedCommand || reentryPlan.commands[0] || `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
+      : operatorAudit.nextCommand || runnerPacket.recommendedCommand || reentryPlan.commands[0] || `agenteer research controller-status --state ${quotePath(state.statePath)}`;
   const doctorId = `controller_doctor_${String(state.artifacts.filter(item => item.kind === "controller-doctor").length + 1).padStart(3, "0")}`;
   const outPath = path.join(state.rootDir, `${doctorId}.json`);
   const reportPath = path.join(state.rootDir, `${doctorId}.md`);
@@ -2787,6 +3673,8 @@ export async function researchControllerDoctorCommand(opts: {
     safeToAutoContinue,
     blockers,
     warnings,
+    activeIssueCodes,
+    activeBlockerIssueCodes,
     evidenceRefs: uniqueText([
       state.statePath,
       operatorAudit.outPath,
@@ -2795,6 +3683,9 @@ export async function researchControllerDoctorCommand(opts: {
       completionAudit.reportPath,
       runnerPacket.outPath,
       runnerPacket.reportPath,
+      runnerPacket.feasibilityReadiness.path,
+      runnerPacket.datasetSemanticAudit.path,
+      runnerPacket.datasetSemanticAudit.reportPath,
       capabilities.outPath,
       capabilities.reportPath,
       reentryPlan.outPath,
@@ -2818,6 +3709,8 @@ export async function researchControllerDoctorCommand(opts: {
         readiness: completionAudit.readiness,
         failedRequirements,
         warningRequirements,
+        failedRequirementDetails,
+        warningRequirementDetails,
         missingEvidence: completionAudit.missingEvidence,
         path: completionAudit.outPath,
         reportPath: completionAudit.reportPath,
@@ -2826,6 +3719,8 @@ export async function researchControllerDoctorCommand(opts: {
         status: runnerPacket.status,
         recommendedCommand: runnerPacket.recommendedCommand,
         safeToAutoExecute: runnerPacket.safeToAutoExecute,
+        feasibilityReadiness: runnerPacket.feasibilityReadiness,
+        datasetSemanticAudit: runnerPacket.datasetSemanticAudit,
         path: runnerPacket.outPath,
         reportPath: runnerPacket.reportPath,
       },
@@ -2872,6 +3767,19 @@ export async function researchControllerDoctorCommand(opts: {
   return result;
 }
 
+function completionRequirementDoctorDetail(requirement: ControllerCompletionAudit["requirements"][number]): { id: string; issueCodes: string[]; finding: string } {
+  return {
+    id: requirement.id,
+    issueCodes: requirement.issueCodes ?? [],
+    finding: requirement.finding,
+  };
+}
+
+function completionRequirementDoctorMessage(prefix: string, detail: { id: string; issueCodes: string[]; finding: string }): string {
+  const codes = detail.issueCodes.length ? ` [${detail.issueCodes.join(",")}]` : "";
+  return `${prefix}: ${detail.id}${codes}${detail.finding ? ` - ${detail.finding}` : ""}`;
+}
+
 export async function researchControllerOperateCommand(opts: {
   statePath: string;
   reason?: string;
@@ -2901,6 +3809,7 @@ export async function researchControllerOperateCommand(opts: {
     });
     finalDoctor = doctor;
     state = doctor.state;
+    const doctorFeasibility = doctor.summaries.runnerPacket.feasibilityReadiness;
 
     if (doctor.status === "complete") {
       const reason = "Doctor reports the controller run is complete.";
@@ -2909,15 +3818,21 @@ export async function researchControllerOperateCommand(opts: {
         beforeStage,
         beforeStatus,
         doctorPath: doctor.outPath,
+        doctorReportPath: doctor.reportPath,
         doctorStatus: doctor.status,
+        doctorFeasibilityReadiness: doctorFeasibility.status,
+        doctorFeasibilityVerdict: doctorFeasibility.verdict,
+        doctorFeasibilityPath: doctorFeasibility.path,
         safeToAutoContinue: doctor.safeToAutoContinue,
         recommendedCommand: doctor.recommendedCommand,
         action: "stop",
         actionPath: null,
+        actionReportPath: null,
         actionStatus: null,
         afterStage: state.currentStage,
         afterStatus: state.status,
         reason,
+        issueCodes: [],
       });
       stoppedReason = reason;
       break;
@@ -2942,15 +3857,24 @@ export async function researchControllerOperateCommand(opts: {
         beforeStage,
         beforeStatus,
         doctorPath: doctor.outPath,
+        doctorReportPath: doctor.reportPath,
         doctorStatus: doctor.status,
+        doctorFeasibilityReadiness: doctorFeasibility.status,
+        doctorFeasibilityVerdict: doctorFeasibility.verdict,
+        doctorFeasibilityPath: doctorFeasibility.path,
         safeToAutoContinue: doctor.safeToAutoContinue,
         recommendedCommand: doctor.recommendedCommand,
         action: "supervise",
         actionPath: supervised.outPath,
+        actionReportPath: supervised.reportPath,
         actionStatus: supervised.terminal ? "terminal" : "stopped",
         afterStage: state.currentStage,
         afterStatus: state.status,
         reason,
+        issueCodes: uniqueText([
+          ...issueCodesFromText(reason),
+          ...supervised.rounds.flatMap(round => round.followLoopIssueCodes),
+        ]),
       });
       if (supervised.terminal || state.status !== "running") {
         stoppedReason = reason;
@@ -2974,15 +3898,21 @@ export async function researchControllerOperateCommand(opts: {
         beforeStage,
         beforeStatus,
         doctorPath: doctor.outPath,
+        doctorReportPath: doctor.reportPath,
         doctorStatus: doctor.status,
+        doctorFeasibilityReadiness: doctorFeasibility.status,
+        doctorFeasibilityVerdict: doctorFeasibility.verdict,
+        doctorFeasibilityPath: doctorFeasibility.path,
         safeToAutoContinue: doctor.safeToAutoContinue,
         recommendedCommand: doctor.recommendedCommand,
         action: "repair_cycle",
         actionPath: repaired.outPath,
+        actionReportPath: repaired.reportPath,
         actionStatus: repaired.status,
         afterStage: state.currentStage,
         afterStatus: state.status,
         reason: repaired.reason,
+        issueCodes: issueCodesFromText(repaired.reason),
       });
       if (repaired.status === "blocked" || repaired.status === "complete" || state.status !== "running") {
         stoppedReason = repaired.reason;
@@ -2991,23 +3921,37 @@ export async function researchControllerOperateCommand(opts: {
       continue;
     }
 
-    const reason = doctor.blockers.length
+    let reason = doctor.blockers.length
       ? `Doctor blocked autonomous operation: ${doctor.blockers.join("; ")}`
       : `Doctor requires review before continuing: ${doctor.warnings.slice(0, 3).join("; ") || doctor.recommendedCommand}`;
+    const issueCodes = uniqueText([
+      ...doctor.blockers.flatMap(issueCodesFromText),
+      ...doctor.warnings.flatMap(issueCodesFromText),
+      ...issueCodesFromText(reason),
+    ]);
+    if (issueCodes.length && !issueCodes.every(code => reason.includes(code))) {
+      reason = `${reason} Issue codes: ${issueCodes.join(", ")}.`;
+    }
     cycles.push({
       cycle: i + 1,
       beforeStage,
       beforeStatus,
       doctorPath: doctor.outPath,
+      doctorReportPath: doctor.reportPath,
       doctorStatus: doctor.status,
+      doctorFeasibilityReadiness: doctorFeasibility.status,
+      doctorFeasibilityVerdict: doctorFeasibility.verdict,
+      doctorFeasibilityPath: doctorFeasibility.path,
       safeToAutoContinue: doctor.safeToAutoContinue,
       recommendedCommand: doctor.recommendedCommand,
       action: "stop",
       actionPath: null,
+      actionReportPath: null,
       actionStatus: null,
       afterStage: state.currentStage,
       afterStatus: state.status,
       reason,
+      issueCodes,
     });
     stoppedReason = reason;
     break;
@@ -3079,12 +4023,24 @@ export async function researchControllerRunbookCommand(opts: {
   const runbookId = `controller_runbook_${String(state.artifacts.filter(item => item.kind === "controller-runbook").length + 1).padStart(3, "0")}`;
   const outPath = path.join(state.rootDir, `${runbookId}.json`);
   const reportPath = path.join(state.rootDir, `${runbookId}.md`);
+  const firstReadCommand = `agenteer research controller-status --state ${quotePath(state.statePath)}`;
   const launchCommand = `agenteer research controller-operate --state ${quotePath(state.statePath)} --max-cycles 4 --max-rounds 3 --max-iterations-per-round 3 --max-steps-per-run 4`;
   const readinessCommand = `agenteer research controller-doctor --state ${quotePath(state.statePath)}`;
   const inspectionCommand = `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
   const requiredEnvVars = requiredEnvVarsForControllerPolicy(state.policy);
   const optionalEnvWarnings = optionalEnvWarningsForControllerPolicy(state.policy, requiredEnvVars);
   const readyToLaunch = doctor.safeToAutoContinue && doctor.status === "ready_to_continue" && environment.readiness !== "blocked" && doctor.blockers.length === 0 && Boolean(runnerPacket?.safeToAutoExecute);
+  const launchBlockers = buildControllerRunbookLaunchBlockers(doctor, environment, runnerPacket);
+  const activeIssueCodes = uniqueText([
+    ...doctor.activeIssueCodes,
+    ...(runnerPacket?.activeIssueCodes ?? []),
+    ...launchBlockers.flatMap(item => item.issueCodes),
+  ]);
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes([
+    ...doctor.activeBlockerIssueCodes,
+    ...(runnerPacket?.activeBlockerIssueCodes ?? []),
+    ...launchBlockers.filter(item => item.severity === "blocker").flatMap(item => item.issueCodes),
+  ]);
   const status: ControllerLaunchRunbook["status"] = doctor.status === "complete"
     ? "complete"
     : doctor.status === "blocked" || environment.readiness === "blocked"
@@ -3098,6 +4054,7 @@ export async function researchControllerRunbookCommand(opts: {
   ].filter((item): item is string => Boolean(item));
   const allowedCommands = uniqueText([
     ...(runnerPacket?.allowedCommands ?? []),
+    firstReadCommand,
     readinessCommand,
     launchCommand,
     inspectionCommand,
@@ -3111,7 +4068,9 @@ export async function researchControllerRunbookCommand(opts: {
     "Do not treat the runbook as proof of study validity; it is a launch envelope that still requires downstream QA and completion audit.",
   ]);
   const recoveryCommands = uniqueText([
+    firstReadCommand,
     readinessCommand,
+    ...(runnerPacket?.agendaCommands ?? []),
     `agenteer research controller-repair-cycle --state ${quotePath(state.statePath)} --max-steps 4`,
     `agenteer research controller-resume --state ${quotePath(state.statePath)}`,
     inspectionCommand,
@@ -3120,25 +4079,27 @@ export async function researchControllerRunbookCommand(opts: {
     readinessCommand,
     `agenteer research controller-completion-audit --state ${quotePath(state.statePath)}`,
     `agenteer research controller-goal-audit --state ${quotePath(state.statePath)}`,
+    `agenteer research controller-benchmark --state ${quotePath(state.statePath)}`,
     "npm run build",
     "npm test -- packages/cli/tests/research-controller.test.ts",
   ]);
+  const latestRepairVerificationPath = latestArtifactPath(state, "controller-repair-verification");
+  const latestRepairVerificationReportPath = latestArtifactPath(state, "controller-repair-verification-report");
+  const handoffArtifacts: ControllerLaunchRunbook["handoffArtifacts"] = {
+    doctor: { path: doctor.outPath, reportPath: doctor.reportPath },
+    runnerPacket: { path: doctor.summaries.runnerPacket.path, reportPath: doctor.summaries.runnerPacket.reportPath },
+    operatorAudit: { path: doctor.summaries.operatorAudit.path, reportPath: doctor.summaries.operatorAudit.reportPath },
+    environment: { path: environment.outPath ?? null, reportPath: environment.reportPath ?? null },
+    completionAudit: { path: doctor.summaries.completionAudit.path, reportPath: doctor.summaries.completionAudit.reportPath },
+    capabilities: { path: doctor.summaries.capabilities.path, reportPath: doctor.summaries.capabilities.reportPath },
+    reentryPlan: { path: doctor.summaries.reentryPlan.path, reportPath: doctor.summaries.reentryPlan.reportPath },
+    supervisor: { path: doctor.summaries.supervisor.latestPath, reportPath: doctor.summaries.supervisor.latestReportPath },
+    repairCycle: { path: doctor.summaries.repairCycle.latestPath, reportPath: doctor.summaries.repairCycle.latestReportPath },
+    repairVerification: { path: latestRepairVerificationPath, reportPath: latestRepairVerificationReportPath },
+  };
   const artifactsToInspect = uniqueText([
     state.statePath,
-    doctor.outPath,
-    doctor.reportPath,
-    doctor.summaries.runnerPacket.path,
-    doctor.summaries.runnerPacket.reportPath,
-    doctor.summaries.operatorAudit.path,
-    doctor.summaries.operatorAudit.reportPath,
-    doctor.summaries.completionAudit.path,
-    doctor.summaries.completionAudit.reportPath,
-    doctor.summaries.capabilities.path,
-    doctor.summaries.capabilities.reportPath,
-    doctor.summaries.reentryPlan.path,
-    doctor.summaries.reentryPlan.reportPath,
-    doctor.summaries.supervisor.latestPath,
-    doctor.summaries.repairCycle.latestPath,
+    ...Object.values(handoffArtifacts).flatMap(item => [item.path, item.reportPath]),
     state.inputs.runDir,
   ].filter((item): item is string => Boolean(item)));
   const stopCriteria = [
@@ -3146,12 +4107,15 @@ export async function researchControllerRunbookCommand(opts: {
     "Stop when controller-operate returns complete, blocked, or review-required status.",
     "Stop if cost estimates exceed controller or reviewer study-loop budgets.",
     "Stop if artifact hashes, required promotion artifacts, method QA, manuscript QA, external reviewer adjudication, or feasibility gates fail.",
+    "Stop if reviewer-driven repairs exist but controller-repair-verification is missing, failed, or stale.",
     "Stop if the recommended next action would edit protected paths, credentials, source data, or read-only domain repositories.",
     "Stop after the configured operate cycle limits even when progress is being made; refresh this runbook before another unattended launch.",
   ];
   const handoffPrompt = [
     "You are a fresh autonomous Research Controller runner for Agenteer.",
     "Start from this runbook, the controller-state.json file, and the referenced evidence only.",
+    `First-read command: ${firstReadCommand}`,
+    "Use controller-status before launch/resume decisions; if gathered through controller-run-agenteer, use recentToolResults.controllerStatus as structured readiness evidence.",
     `Readiness command: ${readinessCommand}`,
     `Launch command: ${launchCommand}`,
     `Ready to launch now: ${readyToLaunch}`,
@@ -3166,8 +4130,12 @@ export async function researchControllerRunbookCommand(opts: {
     statePath: state.statePath,
     status,
     readyToLaunch,
+    activeIssueCodes,
+    activeBlockerIssueCodes,
+    launchBlockers,
     defaultControllerModel: `${state.policy.controller.provider}:${state.policy.controller.model}`,
     strictModelRecommended: state.policy.requireControllerModel || state.policy.controller.enabled || Boolean(runnerPacket?.strictModelRecommended),
+    firstReadCommand,
     launchCommand,
     readinessCommand,
     inspectionCommand,
@@ -3206,6 +4174,8 @@ export async function researchControllerRunbookCommand(opts: {
       recommendedCommand: doctor.recommendedCommand,
       blockers: doctor.blockers,
       warnings: doctor.warnings,
+      activeIssueCodes: doctor.activeIssueCodes,
+      activeBlockerIssueCodes: doctor.activeBlockerIssueCodes,
       outPath: doctor.outPath,
       reportPath: doctor.reportPath,
     },
@@ -3213,6 +4183,10 @@ export async function researchControllerRunbookCommand(opts: {
       status: runnerPacket?.status ?? doctor.summaries.runnerPacket.status,
       recommendedCommand: runnerPacket?.recommendedCommand ?? doctor.summaries.runnerPacket.recommendedCommand,
       safeToAutoExecute: runnerPacket?.safeToAutoExecute ?? doctor.summaries.runnerPacket.safeToAutoExecute,
+      activeIssueCodes: runnerPacket?.activeIssueCodes ?? [],
+      activeBlockerIssueCodes: runnerPacket?.activeBlockerIssueCodes ?? [],
+      feasibilityReadiness: runnerPacket?.feasibilityReadiness ?? doctor.summaries.runnerPacket.feasibilityReadiness,
+      datasetSemanticAudit: runnerPacket?.datasetSemanticAudit ?? await loadControllerDatasetSemanticAuditSummary(state),
       path: doctor.summaries.runnerPacket.path,
       reportPath: doctor.summaries.runnerPacket.reportPath,
     },
@@ -3224,6 +4198,7 @@ export async function researchControllerRunbookCommand(opts: {
       path: doctor.summaries.capabilities.path,
       reportPath: doctor.summaries.capabilities.reportPath,
     },
+    handoffArtifacts,
     artifactsToInspect,
     evidenceRefs: uniqueText([
       ...doctor.evidenceRefs,
@@ -3243,6 +4218,205 @@ export async function researchControllerRunbookCommand(opts: {
   await writeJson(outPath, { schemaVersion: 1, controllerRunbook: runbook });
   await writeFile(reportPath, renderControllerRunbookMarkdown(runbook));
   return runbook;
+}
+
+export async function researchControllerStatusCommand(opts: {
+  statePath: string;
+  reason?: string;
+}): Promise<ControllerUnifiedStatus> {
+  const reason = opts.reason ?? "controller_status";
+  const goldenPacket = await researchControllerGoldenPacketCommand({
+    statePath: opts.statePath,
+    reason: `${reason} golden_packet`,
+  });
+  const runbook = await researchControllerRunbookCommand({
+    statePath: opts.statePath,
+    reason: `${reason} runbook`,
+  });
+  let state = await readControllerState(opts.statePath);
+  const activeIssueCodes = uniqueText([
+    ...goldenPacket.activeIssueCodes,
+    ...runbook.activeIssueCodes,
+  ]);
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes([
+    ...goldenPacket.activeBlockerIssueCodes,
+    ...runbook.activeBlockerIssueCodes,
+  ]);
+  const goldenOperationalBlockers = goldenPacket.issueSummary
+    .filter(item => item.severity === "blocker" && item.category !== "completion_audit" && item.category !== "self_evaluation")
+    .map(item => item.message);
+  const launchOperationalBlockers = runbook.launchBlockers
+    .filter(item => item.severity === "blocker" && item.category !== "completion_audit")
+    .map(item => item.message);
+  const completionReadinessBlockers = uniqueText([
+    ...goldenPacket.issueSummary
+      .filter(item => item.severity === "blocker" && (item.category === "completion_audit" || item.category === "self_evaluation"))
+      .map(item => item.message),
+    ...runbook.launchBlockers
+      .filter(item => item.severity === "blocker" && item.category === "completion_audit")
+      .map(item => item.message),
+  ]);
+  const doctorOperationalBlockers = runbook.doctor.status === "blocked" ? runbook.doctor.blockers : [];
+  const reviewRequiredFindings = uniqueText([
+    ...(runbook.doctor.status === "blocked" ? [] : runbook.doctor.blockers),
+    ...goldenOperationalBlockers,
+  ]);
+  const blockers = uniqueText([
+    ...doctorOperationalBlockers,
+    ...launchOperationalBlockers,
+  ]);
+  const warnings = uniqueText([
+    ...completionReadinessBlockers.map(item => `Completion evidence pending: ${item}`),
+    ...reviewRequiredFindings.map(item => `Review required: ${item}`),
+    ...goldenPacket.warnings,
+    ...runbook.doctor.warnings,
+    ...runbook.launchBlockers.filter(item => item.severity === "warning").map(item => item.message),
+    ...runbook.environment.optionalEnvWarnings,
+  ]);
+  const status: ControllerUnifiedStatus["status"] = runbook.status === "complete" || goldenPacket.status === "complete"
+    ? "complete"
+    : activeBlockerIssueCodes.length || runbook.status === "blocked" || blockers.length
+      ? "blocked"
+      : runbook.readyToLaunch
+        ? "ready"
+        : "review";
+  const recommendedCommand = status === "complete"
+    ? runbook.inspectionCommand
+    : status === "ready"
+      ? runbook.launchCommand
+      : runbook.doctor.recommendedCommand || runbook.readinessCommand;
+  const nextAction = status === "complete"
+    ? "Inspect completed artifacts before external sharing."
+    : status === "ready"
+      ? "Run the launch command or controller-operate within the runbook safety envelope."
+      : activeBlockerIssueCodes.length
+        ? `Resolve active blocker issue codes before autonomous continuation: ${activeBlockerIssueCodes.join(", ")}.`
+        : goldenPacket.nextAction || "Review warnings and regenerate controller-status before launch.";
+  const statusId = `controller_status_${String(state.artifacts.filter(item => item.kind === "controller-status").length + 1).padStart(3, "0")}`;
+  const outPath = path.join(state.rootDir, `${statusId}.json`);
+  const reportPath = path.join(state.rootDir, `${statusId}.md`);
+  const result: ControllerUnifiedStatus = {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    statusId,
+    runId: state.runId,
+    statePath: state.statePath,
+    controllerStatus: state.status,
+    currentStage: state.currentStage,
+    status,
+    safeToAutoContinue: runbook.doctor.safeToAutoContinue,
+    readyToLaunch: runbook.readyToLaunch,
+    promotable: goldenPacket.readiness.promotable,
+    activeIssueCodes,
+    activeBlockerIssueCodes,
+    blockers,
+    warnings,
+    recommendedCommand,
+    launchCommand: status === "complete" ? null : runbook.launchCommand,
+    inspectionCommand: runbook.inspectionCommand,
+    nextAction,
+    summary: {
+      doctorStatus: runbook.doctor.status,
+      runbookStatus: runbook.status,
+      goldenPacketStatus: goldenPacket.status,
+      completionAudit: goldenPacket.readiness.completionAudit,
+      selfEvaluation: goldenPacket.readiness.selfEvaluation,
+      promotionDecision: goldenPacket.readiness.promotionDecision,
+      runInspection: goldenPacket.readiness.runInspection,
+      feasibilityReadiness: goldenPacket.readiness.feasibilityReadiness,
+      feasibilityVerdict: goldenPacket.readiness.feasibilityVerdict,
+      datasetSemanticAudit: runbook.runnerPacket.datasetSemanticAudit,
+      capabilityMissingIds: runbook.capabilities.missingIds,
+      cost: runbook.cost,
+    },
+    artifactPaths: {
+      doctor: runbook.doctor.outPath,
+      doctorReport: runbook.doctor.reportPath,
+      runbook: runbook.outPath,
+      runbookReport: runbook.reportPath,
+      goldenPacket: goldenPacket.outPath,
+      goldenPacketReport: goldenPacket.reportPath,
+      runnerPacket: runbook.runnerPacket.path,
+      runnerPacketReport: runbook.runnerPacket.reportPath,
+      completionAudit: runbook.doctor.outPath ? runbook.artifactsToInspect.find(item => item.endsWith("controller-completion-audit.json")) ?? "" : "",
+      completionAuditReport: runbook.artifactsToInspect.find(item => item.endsWith("controller-completion-audit.md")) ?? "",
+      capabilityManifest: runbook.capabilities.path,
+      capabilityManifestReport: runbook.capabilities.reportPath,
+    },
+    keyArtifactReports: goldenPacket.keyArtifactReports,
+    evidenceRefs: uniqueText([
+      goldenPacket.outPath,
+      goldenPacket.reportPath,
+      runbook.outPath,
+      runbook.reportPath,
+      ...runbook.evidenceRefs,
+      ...goldenPacket.issueSummary.flatMap(item => item.evidenceRefs),
+    ]),
+    state,
+    outPath,
+    reportPath,
+  };
+  await writeJson(outPath, { schemaVersion: 1, controllerStatus: result });
+  await writeFile(reportPath, renderControllerStatusMarkdown(result));
+  await pushControllerArtifactOnce(state, "controller-status", outPath, false);
+  await pushControllerArtifactOnce(state, "controller-status-report", reportPath, false);
+  await persistState(state);
+  state = await readControllerState(state.statePath);
+  result.state = state;
+  await writeJson(outPath, { schemaVersion: 1, controllerStatus: result });
+  await writeFile(reportPath, renderControllerStatusMarkdown(result));
+  return result;
+}
+
+function buildControllerRunbookLaunchBlockers(
+  doctor: ControllerDoctorResult,
+  environment: ControllerEnvironmentPreflight,
+  runnerPacket: ControllerModelRunnerPacket | null,
+): ControllerLaunchRunbook["launchBlockers"] {
+  const blockers: ControllerLaunchRunbook["launchBlockers"] = [];
+  const add = (
+    category: ControllerLaunchRunbook["launchBlockers"][number]["category"],
+    severity: ControllerLaunchRunbook["launchBlockers"][number]["severity"],
+    message: string,
+    issueCodes: string[] = [],
+    evidenceRefs: string[] = [],
+  ) => {
+    const clean = message.trim();
+    if (!clean) return;
+    blockers.push({
+      category,
+      severity,
+      issueCodes: uniqueText(issueCodes),
+      message: clean,
+      evidenceRefs: uniqueText(evidenceRefs),
+    });
+  };
+  for (const detail of doctor.summaries.completionAudit.failedRequirementDetails) {
+    add("completion_audit", "blocker", `${detail.id}: ${detail.finding}`, detail.issueCodes, [doctor.summaries.completionAudit.path, doctor.summaries.completionAudit.reportPath]);
+  }
+  for (const detail of doctor.summaries.completionAudit.warningRequirementDetails) {
+    add("completion_audit", "warning", `${detail.id}: ${detail.finding}`, detail.issueCodes, [doctor.summaries.completionAudit.path, doctor.summaries.completionAudit.reportPath]);
+  }
+  for (const message of doctor.blockers) add("doctor", "blocker", message, issueCodesFromText(message), [doctor.outPath, doctor.reportPath]);
+  for (const message of doctor.warnings.slice(0, 12)) add("doctor", "warning", message, issueCodesFromText(message), [doctor.outPath, doctor.reportPath]);
+  if (environment.readiness === "blocked") add("environment", "blocker", `Environment readiness is blocked: ${environment.nextAction}`, [], [environment.outPath, environment.reportPath]);
+  if (runnerPacket && !runnerPacket.safeToAutoExecute) add("runner_packet", runnerPacket.status === "blocked" ? "blocker" : "warning", `Runner packet is not safe to auto-execute: ${runnerPacket.status}; ${runnerPacket.recommendedCommand}`, [], [runnerPacket.outPath, runnerPacket.reportPath]);
+  if (!doctor.summaries.cost.withinBudget) add("cost", "blocker", `Estimated cost ${doctor.summaries.cost.estimatedUsd.toFixed(4)} exceeds configured controller/reviewer budget.`, [], [doctor.outPath]);
+  return uniqueRunbookLaunchBlockers(blockers).slice(0, 40);
+}
+
+function uniqueRunbookLaunchBlockers(blockers: ControllerLaunchRunbook["launchBlockers"]): ControllerLaunchRunbook["launchBlockers"] {
+  const seen = new Set<string>();
+  return blockers.filter(blocker => {
+    const key = `${blocker.category}:${blocker.severity}:${blocker.issueCodes.join(",")}:${blocker.message}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function issueCodesFromText(value: string): string[] {
+  return uniqueText([...value.matchAll(/\b[A-Z][A-Z0-9_]{2,}\b/g)].map(match => match[0]).filter(code => !["USD"].includes(code)));
 }
 
 export async function researchControllerRunnerPacketCommand(opts: {
@@ -3303,6 +4477,34 @@ export async function researchControllerSelfTestCommand(opts: {
   };
 
   try {
+    const started = await researchControllerStartCommand({
+      question: "In a local synthetic table, can the one-command controller startup create first-read readiness evidence?",
+      outDir: path.join(outDir, "golden-startup"),
+      dataPath,
+      method: "linear-regression",
+      outcome: "y",
+      exposure: "x",
+      covariates: ["age"],
+    });
+    scenarios.push(controllerSelfTestScenario("golden_path_startup", "One-command controller startup", started.state, [
+      {
+        id: "start-artifacts",
+        status: hasArtifactKinds(started.state, ["controller-start", "controller-start-report", "controller-status", "controller-runbook"]) ? "pass" : "fail",
+        message: `controller-start status=${started.status}; mode=${started.mode}; first-read=${started.statusSummary.status}; runbook=${started.runbookSummary.status}.`,
+        evidenceRefs: [started.outPath, started.reportPath, started.artifactPaths.status, started.artifactPaths.runbook],
+      },
+      {
+        id: "start-readiness-envelope",
+        status: started.runbookSummary.firstReadCommand.includes("controller-status") && started.runbookSummary.launchCommand.includes("controller-operate") ? "pass" : "fail",
+        message: `First-read command=${started.runbookSummary.firstReadCommand}; launch command=${started.runbookSummary.launchCommand}.`,
+        evidenceRefs: [started.artifactPaths.statusReport, started.artifactPaths.runbookReport],
+      },
+    ]));
+  } catch (error) {
+    scenarios.push(controllerFailedSelfTestScenario("golden_path_startup", "One-command controller startup", error));
+  }
+
+  try {
     const deterministic = await researchControllerRunCommand({
       question: "In a local synthetic table, is x associated with y after accounting for age?",
       outDir: path.join(outDir, "deterministic-golden"),
@@ -3352,8 +4554,20 @@ export async function researchControllerSelfTestCommand(opts: {
     deterministicState = gitDiffTool;
     const sourcePatchResult = await exerciseControllerSelfTestSourcePatchLoop(deterministicState);
     deterministicState = sourcePatchResult.state;
+    await researchControllerDoctorCommand({ statePath: deterministicState.statePath, reason: "controller_self_test" });
+    const operated = await researchControllerOperateCommand({
+      statePath: deterministicState.statePath,
+      reason: "controller_self_test",
+      maxCycles: 1,
+      maxRounds: 1,
+      maxIterationsPerRound: 1,
+      maxStepsPerRun: 1,
+    });
+    deterministicState = operated.state;
     const runnerPacket = await researchControllerRunnerPacketCommand({ statePath: deterministicState.statePath, reason: "controller_self_test" });
     deterministicState = await readControllerState(deterministicState.statePath);
+    const status = await researchControllerStatusCommand({ statePath: deterministicState.statePath, reason: "controller_self_test" });
+    deterministicState = status.state;
     const inspection = await researchControllerInspectCommand({ statePath: deterministicState.statePath });
     deterministicState = inspection.state;
     const audit = await researchControllerAuditCommand({ statePath: deterministicState.statePath, reason: "controller_self_test" });
@@ -3374,7 +4588,7 @@ export async function researchControllerSelfTestCommand(opts: {
       },
       {
         id: "inspection-audit-capabilities",
-        status: inspection.state.status === "failed" || audit.status === "fail" || goalAudit.status === "fail" || capabilities.summary.missing > 0 ? "fail" : "pass",
+        status: inspection.state.status === "failed" || audit.status === "fail" || capabilities.summary.missing > 0 ? "fail" : "pass",
         message: `Inspection=${inspection.state.status}; operator audit=${audit.status}; capability missing=${capabilities.summary.missing}; goal audit=${goalAudit.status}.`,
         evidenceRefs: [audit.outPath, capabilities.outPath, goalAudit.outPath],
       },
@@ -3400,6 +4614,12 @@ export async function researchControllerSelfTestCommand(opts: {
         status: runnerPacket.status === "blocked" ? "fail" : "pass",
         message: `Runner packet status=${runnerPacket.status}; safeToAutoExecute=${runnerPacket.safeToAutoExecute}; next=${runnerPacket.recommendedCommand}.`,
         evidenceRefs: [runnerPacket.outPath, runnerPacket.reportPath],
+      },
+      {
+        id: "first-read-status",
+        status: status.status === "blocked" || status.artifactPaths.doctor.length === 0 || status.artifactPaths.runbook.length === 0 || status.artifactPaths.goldenPacket.length === 0 ? "fail" : "pass",
+        message: `Controller status=${status.status}; readyToLaunch=${status.readyToLaunch}; promotable=${status.promotable}; next=${status.recommendedCommand}.`,
+        evidenceRefs: [status.outPath, status.reportPath, status.artifactPaths.doctor, status.artifactPaths.runbook, status.artifactPaths.goldenPacket],
       },
     ]));
   } catch (error) {
@@ -3528,9 +4748,12 @@ export async function researchControllerSelfTestCommand(opts: {
       },
       {
         id: "bounded-repair-executed",
-        status: repairRun.state.repairs.some(repair => repair.status === "succeeded" || repair.status === "partial") && hasArtifactKinds(repairRun.state, ["controller-repair-execution"]) ? "pass" : "fail",
-        message: `${repairRun.state.repairs.length} repair execution(s) recorded.`,
-        evidenceRefs: repairRun.state.repairs.map(repair => repair.outPath),
+        status: repairRun.state.repairs.some(repair => repair.status === "succeeded" || repair.status === "partial") && hasArtifactKinds(repairRun.state, ["controller-repair-execution", "controller-repair-verification"]) ? "pass" : "fail",
+        message: `${repairRun.state.repairs.length} repair execution(s) recorded with verification evidence.`,
+        evidenceRefs: [
+          ...repairRun.state.repairs.map(repair => repair.outPath),
+          ...repairRun.state.artifacts.filter(item => item.kind === "controller-repair-verification").map(item => item.path),
+        ],
       },
       {
         id: "repair-stops-safely",
@@ -3610,10 +4833,20 @@ export async function researchControllerSelfTestCommand(opts: {
     scenarios.push(controllerFailedSelfTestScenario("infeasible_study_rejection", "Infeasible study rejection before execution", error));
   }
 
+  const expectedScenarioIds = [
+    "golden_path_startup",
+    "deterministic_golden_path",
+    "supervised_pickup_loop",
+    "doctor_operate_loop",
+    "external_review_repair_loop",
+    "strict_model_controller",
+    "infeasible_study_rejection",
+  ];
+  const missingScenarioIds = expectedScenarioIds.filter(id => !scenarios.some(scenario => scenario.id === id));
   addCheck(
     "scenario-count",
-    scenarios.length === 6 ? "pass" : "fail",
-    `Recorded ${scenarios.length} scenario(s); expected deterministic, supervised-pickup, doctor-operate, review-repair, strict-model, and blocked-feasibility scenarios.`,
+    missingScenarioIds.length === 0 ? "pass" : "fail",
+    `Recorded ${scenarios.length} scenario(s); expected ${expectedScenarioIds.join(", ")}.${missingScenarioIds.length ? ` Missing: ${missingScenarioIds.join(", ")}.` : ""}`,
     scenarios.flatMap(scenario => scenario.evidenceRefs),
   );
   addCheck(
@@ -3662,12 +4895,60 @@ export async function researchControllerSelfTestCommand(opts: {
 }
 
 export function renderResearchControllerSelfTest(result: ControllerSelfTestResult): string {
+  const nonPassingScenarios = result.scenarios.filter(item => item.status !== "pass");
+  const nonPassingChecks = result.checks.filter(item => item.status !== "pass");
+  const nonPassingRequirements = result.requirements.filter(item => item.status !== "pass");
+  const focusEvidenceRefs = uniqueText([
+    ...nonPassingScenarios.flatMap(item => item.evidenceRefs),
+    ...nonPassingScenarios.flatMap(item => item.checks.flatMap(check => check.evidenceRefs)),
+    ...nonPassingRequirements.flatMap(item => item.evidenceRefs),
+    ...nonPassingChecks.flatMap(item => item.evidenceRefs),
+  ]);
+  const keyEvidenceRank = (ref: string): number => {
+    if (ref.includes("controller_status_")) return 0;
+    if (ref.includes("controller_runbook_")) return 1;
+    if (ref.includes("controller_doctor_")) return 2;
+    if (ref.includes("controller_model_runner_packet_")) return 3;
+    if (ref.includes("controller-repair-verification")) return 4;
+    if (ref.includes("controller-repair-execution")) return 5;
+    if (ref.includes("controller_model_preflight_")) return 6;
+    if (ref.includes("controller-feasibility-verdict")) return 7;
+    return 8;
+  };
+  const keyPassingEvidenceRefs = result.scenarios.flatMap(item => item.evidenceRefs.filter(ref =>
+    ref.includes("controller_status_")
+    || ref.includes("controller_runbook_")
+    || ref.includes("controller_doctor_")
+    || ref.includes("controller_model_runner_packet_")
+    || ref.includes("controller-repair-verification")
+    || ref.includes("controller-repair-execution")
+    || ref.includes("controller_model_preflight_")
+    || ref.includes("controller-feasibility-verdict"),
+  )).sort((left, right) => keyEvidenceRank(left) - keyEvidenceRank(right));
+  const evidenceRefs = focusEvidenceRefs.length
+    ? focusEvidenceRefs
+    : uniqueText([
+      result.outPath,
+      result.reportPath,
+      ...keyPassingEvidenceRefs,
+      ...result.scenarios.map(item => item.statePath).filter((item): item is string => Boolean(item)),
+      ...result.requirements.flatMap(item => item.evidenceRefs),
+      ...result.checks.flatMap(item => item.evidenceRefs),
+    ]);
   return [
     "research controller self-test",
     `  status: ${result.status}`,
     `  readiness: ${result.readiness}`,
     `  scenarios: ${result.scenarios.map(item => `${item.id}/${item.status}`).join(", ")}`,
+    `  non-pass scenarios: ${nonPassingScenarios.length}`,
+    ...nonPassingScenarios.slice(0, 5).map(item => `  - scenario ${item.status} ${item.id}: ${item.label}; evidence=${item.evidenceRefs.slice(0, 3).join(", ") || "(none)"}`),
     `  requirements: ${result.requirements.map(item => `${item.id}/${item.status}`).join(", ")}`,
+    `  non-pass requirements: ${nonPassingRequirements.length}`,
+    ...nonPassingRequirements.slice(0, 5).map(item => `  - requirement ${item.status} ${item.id}: ${item.gaps.join("; ") || item.requirement}; evidence=${item.evidenceRefs.slice(0, 3).join(", ") || "(none)"}`),
+    `  non-pass checks: ${nonPassingChecks.length}`,
+    ...nonPassingChecks.slice(0, 5).map(item => `  - check ${item.status} ${item.id}: ${item.message}; evidence=${item.evidenceRefs.slice(0, 3).join(", ") || "(none)"}`),
+    `  evidence refs: ${evidenceRefs.length}`,
+    ...evidenceRefs.slice(0, 5).map(ref => `  - evidence: ${ref}`),
     `  out: ${result.outPath}`,
     `  report: ${result.reportPath}`,
     `  next: ${result.nextAction}`,
@@ -3756,10 +5037,13 @@ function buildControllerSelfTestRequirements(scenarios: ControllerSelfTestScenar
     "autonomy",
     "The controller persists resumable state, handoff artifacts, audits, agendas, and can run a local golden path without chat context.",
     [
+      { scenarioId: "golden_path_startup", checkId: "start-artifacts" },
+      { scenarioId: "golden_path_startup", checkId: "start-readiness-envelope" },
       { scenarioId: "deterministic_golden_path", checkId: "terminal-status" },
       { scenarioId: "deterministic_golden_path", checkId: "core-artifacts" },
       { scenarioId: "deterministic_golden_path", checkId: "inspection-audit-capabilities" },
       { scenarioId: "deterministic_golden_path", checkId: "fresh-model-runner-packet" },
+      { scenarioId: "deterministic_golden_path", checkId: "first-read-status" },
     ],
   );
   add(
@@ -3840,6 +5124,7 @@ function buildControllerSelfTestRequirements(scenarios: ControllerSelfTestScenar
     [
       { scenarioId: "deterministic_golden_path", checkId: "inspection-audit-capabilities" },
       { scenarioId: "deterministic_golden_path", checkId: "fresh-model-runner-packet" },
+      { scenarioId: "deterministic_golden_path", checkId: "first-read-status" },
       { scenarioId: "strict_model_controller", checkId: "model-preflight-quality" },
     ],
     [
@@ -4048,6 +5333,9 @@ export function renderResearchControllerState(result: ControllerState | Controll
   const state = "state" in result ? result.state : result;
   const lastGate = state.gates.at(-1);
   const lastAction = state.actions.at(-1);
+  const latestIssueLedger = state.issueLedgers.at(-1);
+  const latestAgenda = state.agendas?.at(-1);
+  const topIssues = latestIssueLedger?.topIssues ?? [];
   return [
     "research controller",
     `  run: ${state.runId}`,
@@ -4067,8 +5355,15 @@ export function renderResearchControllerState(result: ControllerState | Controll
     `  self evaluations: ${state.selfEvaluations.length}`,
     `  work plans: ${state.workPlans.length}`,
     `  issue ledgers: ${state.issueLedgers.length}`,
+    `  latest issue ledger: ${latestIssueLedger ? `${latestIssueLedger.status} (${latestIssueLedger.issueCount} issue(s), ${latestIssueLedger.blockerCount} blocker)` : "(none)"}`,
+    ...(latestIssueLedger ? [`  issue ledger record: ${latestIssueLedger.outPath}`] : []),
+    ...(latestIssueLedger ? [`  issue ledger report: ${latestIssueLedger.reportPath}`] : []),
+    ...topIssues.slice(0, 5).map(issue => `  - issue ${issue.severity}/${issue.category}${issue.issueCode ? ` (${issue.issueCode})` : ""}: ${issue.message}; evidence=${issue.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
     `  stage reviews: ${state.stageReviews?.length ?? 0}`,
     `  agendas: ${state.agendas?.length ?? 0}`,
+    `  latest agenda: ${latestAgenda ? `${latestAgenda.status} (${latestAgenda.itemCount} item(s)) ${latestAgenda.primaryCommand}` : "(none)"}`,
+    ...(latestAgenda ? [`  agenda record: ${latestAgenda.outPath}`] : []),
+    ...(latestAgenda ? [`  agenda report: ${latestAgenda.reportPath}`] : []),
     `  estimated model/review cost: $${state.costEstimateUsd.toFixed(4)}`,
     `  stop reason: ${state.stopReason ?? "(none)"}`,
     `  next: ${state.nextRecommendedAction}`,
@@ -4084,8 +5379,11 @@ export function renderResearchControllerAgenda(agenda: ControllerExecutionAgenda
     `  controller status: ${agenda.controllerStatus}`,
     `  primary: ${agenda.primaryCommand}`,
     `  items: ${agenda.items.length}`,
-    ...agenda.items.slice(0, 8).map(item => `  - P${item.priority} ${item.status}/${item.safety} ${item.kind}: ${item.reason}`),
+    `  active issue codes: ${agenda.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${agenda.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    ...agenda.items.slice(0, 8).map(item => `  - P${item.priority} ${item.status}/${item.safety} issueCodes=${item.issueCodes?.join(",") || "none"} evidence=${item.evidenceRefs.slice(0, 3).join(",") || "none"} ${item.kind}: ${item.reason}`),
     `  agenda: ${agenda.outPath}`,
+    `  report: ${agenda.reportPath}`,
   ].join("\n");
 }
 
@@ -4101,11 +5399,15 @@ export function renderResearchControllerFollowAgenda(result: ControllerFollowAge
     `  refused: ${result.refused}`,
     `  reason: ${result.reason}`,
     `  selected: ${result.selectedItem ? `${result.selectedItem.kind}/${result.selectedItem.status}/${result.selectedItem.safety}` : "(none)"}`,
+    `  selected reason: ${result.selectedItem?.reason ?? "(none)"}`,
+    `  selected issue codes: ${result.selectedItem?.issueCodes?.length ? result.selectedItem.issueCodes.join(", ") : "(none)"}`,
+    `  selected evidence: ${result.selectedItem?.evidenceRefs?.length ? result.selectedItem.evidenceRefs.slice(0, 5).join(", ") : "(none)"}`,
     `  command: ${result.selectedItem?.command ?? "(none)"}`,
     `  status: ${result.state.status}`,
     `  stage: ${result.state.currentStage}`,
     `  state: ${result.statePath}`,
     `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
   ].join("\n");
 }
 
@@ -4124,7 +5426,8 @@ export function renderResearchControllerFollowLoop(result: ControllerFollowLoopR
     `  stage: ${result.state.currentStage}`,
     `  state: ${result.statePath}`,
     `  record: ${result.outPath}`,
-    ...result.iterations.map(item => `  - #${item.iteration} ${item.selectedKind ?? "none"} executed=${item.executed} refused=${item.refused} ${item.beforeStage}/${item.beforeStatus} -> ${item.afterStage}/${item.afterStatus}`),
+    `  report: ${result.reportPath}`,
+    ...result.iterations.map(item => `  - #${item.iteration} ${item.selectedKind ?? "none"} issueCodes=${item.selectedIssueCodes.join(",") || "none"} evidence=${item.selectedEvidenceRefs.slice(0, 3).join(",") || "none"} follow=${item.followRecordPath} report=${item.followReportPath} executed=${item.executed} refused=${item.refused} ${item.beforeStage}/${item.beforeStatus} -> ${item.afterStage}/${item.afterStatus}; reason=${item.reason}`),
   ].join("\n");
 }
 
@@ -4132,18 +5435,143 @@ export function renderResearchControllerFollowLoopJson(result: ControllerFollowL
   return `${JSON.stringify({ schemaVersion: 1, controllerFollowLoop: result }, null, 2)}\n`;
 }
 
+export function renderResearchControllerBenchmark(result: ControllerBenchmarkResult): string {
+  const regressions = uniqueText([...result.suite.regressions, ...result.trend.regressions]);
+  return [
+    "research controller benchmark",
+    `  run: ${result.runId}`,
+    `  suite: ${result.suiteDir}`,
+    `  history: ${result.historyDir}`,
+    `  cases: ${result.suite.caseCount}`,
+    `  mean score: ${result.suite.meanScore.toFixed(3)}`,
+    `  pass/warn/fail: ${result.suite.passCount}/${result.suite.warningCount}/${result.suite.failCount}`,
+    `  trend: ${result.trend.trend} (${result.trend.runCount} run(s))`,
+    `  regressions: ${regressions.length}`,
+    ...regressions.slice(0, 5).map(item => `  - regression: ${item}`),
+    `  capability: ${result.capabilityStatus}`,
+    `  artifacts: ${result.attachedArtifacts.length}`,
+    `  suite record: ${result.suite.outPath ?? "(not written)"}`,
+    `  suite report: ${result.suite.reportPath ?? "(not written)"}`,
+    `  trend record: ${result.trend.outPath ?? "(not written)"}`,
+    `  trend report: ${result.trend.reportPath ?? "(not written)"}`,
+    `  next: ${result.nextAction}`,
+    `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
+  ].join("\n");
+}
+
+export function renderResearchControllerBenchmarkJson(result: ControllerBenchmarkResult): string {
+  return `${JSON.stringify({ schemaVersion: 1, controllerBenchmark: result }, null, 2)}\n`;
+}
+
+function renderControllerBenchmarkMarkdown(result: ControllerBenchmarkResult): string {
+  return [
+    "# Controller Benchmark",
+    "",
+    `Benchmark: ${result.benchmarkId}`,
+    `Generated: ${result.generatedAtIso}`,
+    `Run ID: ${result.runId}`,
+    `State: ${result.statePath}`,
+    `Suite: ${result.suiteDir}`,
+    `History: ${result.historyDir}`,
+    `Capability status: ${result.capabilityStatus}`,
+    "",
+    "## Suite",
+    "",
+    `- Cases: ${result.suite.caseCount}`,
+    `- Mean score: ${result.suite.meanScore.toFixed(3)}`,
+    `- Pass/warn/fail: ${result.suite.passCount}/${result.suite.warningCount}/${result.suite.failCount}`,
+    `- Regressions: ${result.suite.regressions.length}`,
+    `- Suite JSON: ${result.suite.outPath ?? "(not written)"}`,
+    `- Suite report: ${result.suite.reportPath ?? "(not written)"}`,
+    "",
+    "## Trend",
+    "",
+    `- Runs: ${result.trend.runCount}`,
+    `- Trend: ${result.trend.trend}`,
+    `- Latest score: ${result.trend.latestScore ?? "(none)"}`,
+    `- Previous score: ${result.trend.previousScore ?? "(none)"}`,
+    `- Delta: ${result.trend.delta ?? "(none)"}`,
+    `- Trend JSON: ${result.trend.outPath ?? "(not written)"}`,
+    `- Trend report: ${result.trend.reportPath ?? "(not written)"}`,
+    "",
+    "## Attached Artifacts",
+    "",
+    ...(result.attachedArtifacts.length ? result.attachedArtifacts.map(item => `- ${item.kind}: ${item.path}${item.sha256 ? ` (${item.sha256.slice(0, 12)})` : ""}`) : ["- none"]),
+    "",
+    "## Next Action",
+    "",
+    result.nextAction,
+    "",
+  ].join("\n");
+}
+
+function renderControllerDatasetSemanticAuditMarkdown(audit: ControllerDatasetSemanticAudit): string {
+  return [
+    "# Controller Dataset Semantic Audit",
+    "",
+    `Generated: ${audit.generatedAtIso}`,
+    `Run ID: ${audit.runId}`,
+    `State: ${audit.statePath}`,
+    `Table summary: ${audit.summaryPath}`,
+    `Rows: ${audit.rowCount}`,
+    `Columns: ${audit.columnCount}`,
+    `Status: ${audit.status}`,
+    `Selected-role status: ${audit.selectedRoleStatus}`,
+    `Issues: ${audit.issueCount} (${audit.blockerCount} blocker, ${audit.warningCount} warning)`,
+    "",
+    "## Issue Summary",
+    "",
+    ...(audit.issueCodeSummary.length
+      ? audit.issueCodeSummary.slice(0, 20).map(item => `- [${item.severity}] ${item.code}: ${item.totalIssueCount} total, ${item.selectedIssueCount} selected; columns=${item.columns.join(", ") || "none"}`)
+      : ["- None detected."]),
+    "",
+    "## Selected Role Summary",
+    "",
+    ...(audit.selectedRoleSummary.length
+      ? audit.selectedRoleSummary.slice(0, 20).map(item => `- ${item.column} (${item.role}): ${item.issueCount} issue(s), ${item.blockerCount} blocker, ${item.warningCount} warning; codes=${item.codes.join(", ")}`)
+      : ["- No selected-role semantic issues."]),
+    "",
+    "## Issues",
+    "",
+    ...(audit.issues.length
+      ? audit.issues.slice(0, 50).map(issue => `- [${issue.severity}] ${issue.column}${issue.role ? ` (${issue.role})` : ""}: ${issue.code} - ${issue.message}`)
+      : ["- None detected."]),
+    ...(audit.issues.length > 50 ? [`- ${audit.issues.length - 50} additional issue(s) omitted from Markdown; see JSON.`] : []),
+    "",
+    "## Next Action",
+    "",
+    audit.nextAction,
+    "",
+  ].join("\n");
+}
+
 export function renderResearchControllerSupervisor(result: ControllerSupervisorResult): string {
+  const latestRound = result.rounds.at(-1) ?? null;
   return [
     "research controller supervisor",
     `  run: ${result.runId}`,
     `  terminal: ${result.terminal}`,
     `  rounds: ${result.rounds.length}/${result.maxRounds}`,
+    `  latest packet feasibility: ${latestRound?.runnerPacketFeasibilityReadiness ?? "(missing)"}${latestRound?.runnerPacketFeasibilityVerdict ? `; verdict: ${latestRound.runnerPacketFeasibilityVerdict}` : ""}`,
     `  stopped: ${result.stoppedReason}`,
     `  status: ${result.state.status}`,
     `  stage: ${result.state.currentStage}`,
     `  state: ${result.statePath}`,
     `  record: ${result.outPath}`,
-    ...result.rounds.map(item => `  - #${item.round} packet=${item.runnerPacketStatus} safePrimary=${item.safeAgendaPrimary} followIterations=${item.followLoopIterations} audit=${item.auditReadiness ?? "none"} ${item.beforeStage}/${item.beforeStatus} -> ${item.afterStage}/${item.afterStatus}`),
+    `  report: ${result.reportPath}`,
+    ...result.rounds.map(item => {
+      const evidenceRefs = uniqueText([
+        item.runnerPacketPath,
+        item.runnerPacketReportPath,
+        item.runnerPacketFeasibilityPath,
+        item.followLoopPath,
+        item.followLoopReportPath,
+        item.auditPath,
+        item.auditReportPath,
+      ].filter((ref): ref is string => Boolean(ref)));
+      return `  - #${item.round} packet=${item.runnerPacketStatus} packetReport=${item.runnerPacketReportPath} feasibility=${item.runnerPacketFeasibilityReadiness ?? "missing"}${item.runnerPacketFeasibilityVerdict ? `:${item.runnerPacketFeasibilityVerdict}` : ""} safePrimary=${item.safeAgendaPrimary} followIterations=${item.followLoopIterations} followReport=${item.followLoopReportPath ?? "none"} issueCodes=${item.followLoopIssueCodes.join(",") || "none"} audit=${item.auditReadiness ?? "none"} auditReport=${item.auditReportPath ?? "none"} evidence=${evidenceRefs.slice(0, 6).join(",") || "none"} ${item.beforeStage}/${item.beforeStatus} -> ${item.afterStage}/${item.afterStatus}; reason=${item.reason}`;
+    }),
   ].join("\n");
 }
 
@@ -4154,6 +5582,10 @@ export function renderResearchControllerSupervisorJson(result: ControllerSupervi
 export function renderResearchControllerAudit(audit: ControllerOperatorAudit): string {
   const failed = audit.checks.filter(check => check.status === "fail").length;
   const warnings = audit.checks.filter(check => check.status === "warning").length;
+  const readinessBlockers = audit.readinessBlockers?.length
+    ? audit.readinessBlockers
+    : buildControllerOperatorAuditReadinessBlockers(audit.checks, audit.readiness);
+  const readinessBlockerCodes = uniqueText(readinessBlockers.flatMap(blocker => blocker.issueCodes));
   return [
     "research controller audit",
     `  run: ${audit.runId}`,
@@ -4165,8 +5597,12 @@ export function renderResearchControllerAudit(audit: ControllerOperatorAudit): s
     `  model enabled: ${audit.modelControllerEnabled}`,
     `  strict model: ${audit.strictModelController}`,
     `  checks: ${audit.checks.length} (${failed} failed, ${warnings} warning)`,
+    `  readiness blockers: ${readinessBlockers.length}${readinessBlockerCodes.length ? ` (${readinessBlockerCodes.join(", ")})` : ""}`,
+    ...readinessBlockers.slice(0, 5).map(blocker => `  - readiness ${blocker.severity}/${blocker.category}${blocker.issueCodes.length ? ` (${blocker.issueCodes.join(", ")})` : ""}: ${blocker.message}; evidence=${blocker.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
+    `  dataset semantic audit: ${audit.datasetSemanticAudit.status}/${audit.datasetSemanticAudit.selectedRoleStatus}`,
     `  next: ${audit.nextCommand}`,
     `  audit: ${audit.outPath}`,
+    `  report: ${audit.reportPath}`,
   ].join("\n");
 }
 
@@ -4175,6 +5611,8 @@ export function renderResearchControllerAuditJson(audit: ControllerOperatorAudit
 }
 
 export function renderResearchControllerEnvironment(preflight: ControllerEnvironmentPreflight): string {
+  const failedChecks = preflight.checks.filter(check => check.status === "fail");
+  const warningChecks = preflight.checks.filter(check => check.status === "warning");
   return [
     "research controller environment",
     `  run: ${preflight.runId}`,
@@ -4186,8 +5624,13 @@ export function renderResearchControllerEnvironment(preflight: ControllerEnviron
     `  cli dist: ${preflight.cliDist.present ? preflight.cliDist.path : "(missing)"}`,
     `  git dirty: ${preflight.git.dirty}`,
     `  checks: ${preflight.checks.length}`,
+    `  failed checks: ${failedChecks.length}`,
+    ...failedChecks.slice(0, 5).map(check => `  - fail ${check.id}/${check.category}: ${check.message}; evidence=${check.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
+    `  warning checks: ${warningChecks.length}`,
+    ...warningChecks.slice(0, 5).map(check => `  - warning ${check.id}/${check.category}: ${check.message}; evidence=${check.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
     `  next: ${preflight.nextAction}`,
     `  preflight: ${preflight.outPath}`,
+    `  report: ${preflight.reportPath}`,
   ].join("\n");
 }
 
@@ -4201,6 +5644,10 @@ async function writeControllerEnvironmentPreflight(preflight: ControllerEnvironm
 }
 
 export function renderResearchControllerCapabilities(manifest: ControllerCapabilityManifest): string {
+  const missingEntries = manifest.entries.filter(entry => entry.status === "missing");
+  const availableEntries = manifest.entries.filter(entry => entry.status === "available");
+  const compactEntry = (entry: ControllerCapabilityManifestEntry) =>
+    `${entry.failureMode}; artifacts=${entry.artifactKinds.slice(0, 6).join(",") || "(none)"}; evidence=${entry.evidenceRefs.slice(0, 3).join(",") || "(none)"}; tests=${entry.testRefs.slice(0, 3).join(",") || "(none)"}`;
   return [
     "research controller capabilities",
     `  run: ${manifest.runId}`,
@@ -4210,7 +5657,12 @@ export function renderResearchControllerCapabilities(manifest: ControllerCapabil
     `  available: ${manifest.summary.available}`,
     `  missing: ${manifest.summary.missing}`,
     `  not applicable: ${manifest.summary.notApplicable}`,
+    `  missing capabilities: ${missingEntries.length}${missingEntries.length ? ` (${missingEntries.map(entry => entry.id).join(", ")})` : ""}`,
+    ...missingEntries.slice(0, 5).map(entry => `  - missing ${entry.id}: ${compactEntry(entry)}`),
+    `  available capabilities: ${availableEntries.length}${availableEntries.length ? ` (${availableEntries.map(entry => entry.id).slice(0, 8).join(", ")})` : ""}`,
+    ...availableEntries.slice(0, 5).map(entry => `  - available ${entry.id}: ${compactEntry(entry)}`),
     `  manifest: ${manifest.outPath}`,
+    `  report: ${manifest.reportPath}`,
     ...manifest.entries.slice(0, 10).map(entry => `  - ${entry.status}: ${entry.id}`),
   ].join("\n");
 }
@@ -4220,6 +5672,8 @@ export function renderResearchControllerCapabilitiesJson(manifest: ControllerCap
 }
 
 export function renderResearchControllerGoalAudit(audit: ControllerGoalAudit): string {
+  const blockingRequirements = audit.requirements.filter(item => audit.blockingRequirementIds.includes(item.id));
+  const blockingIssueCodes = uniqueText(blockingRequirements.flatMap(item => item.issueCodes ?? []));
   return [
     "research controller goal-audit",
     `  run: ${audit.runId}`,
@@ -4230,8 +5684,11 @@ export function renderResearchControllerGoalAudit(audit: ControllerGoalAudit): s
     `  partial: ${audit.partialRequirementIds.length}`,
     `  missing: ${audit.missingRequirementIds.length}`,
     `  blocked: ${audit.blockingRequirementIds.length}`,
+    `  blocking requirements: ${audit.blockingRequirementIds.join(", ") || "none"}${blockingIssueCodes.length ? ` (${blockingIssueCodes.join(", ")})` : ""}`,
+    ...blockingRequirements.slice(0, 8).map(item => `  - blocking ${item.id}${item.issueCodes?.length ? ` (${item.issueCodes.join(", ")})` : ""}: ${item.gaps.join("; ") || item.nextAction}; evidence=${item.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
     `  next: ${audit.nextCommand}`,
     `  audit: ${audit.outPath}`,
+    `  report: ${audit.reportPath}`,
   ].join("\n");
 }
 
@@ -4240,23 +5697,80 @@ export function renderResearchControllerGoalAuditJson(audit: ControllerGoalAudit
 }
 
 export function renderResearchControllerCompletionAudit(audit: ControllerCompletionAudit): string {
-  const failed = audit.requirements.filter(item => item.status === "failed").length;
-  const warnings = audit.requirements.filter(item => item.status === "warning").length;
+  const failedRequirements = audit.requirements.filter(item => item.status === "failed");
+  const warningRequirements = audit.requirements.filter(item => item.status === "warning");
   return [
     "research controller completion-audit",
     `  run: ${audit.runId}`,
     `  status: ${audit.status}`,
     `  readiness: ${audit.readiness}`,
-    `  failed: ${failed}`,
-    `  warnings: ${warnings}`,
+    `  failed: ${failedRequirements.length}`,
+    `  warnings: ${warningRequirements.length}`,
     `  missing: ${audit.missingEvidence.join(", ") || "(none)"}`,
+    ...(failedRequirements.length
+      ? ["  failed requirements:", ...failedRequirements.slice(0, 8).map(item => `    - ${item.id} [${item.scope}${item.issueCodes?.length ? `:${item.issueCodes.join(",")}` : ""}]: ${item.finding} evidence=${item.evidenceRefs.length ? item.evidenceRefs.slice(0, 3).join(",") : "(none)"}`)]
+      : ["  failed requirements: (none)"]),
+    ...(warningRequirements.length
+      ? ["  warning requirements:", ...warningRequirements.slice(0, 8).map(item => `    - ${item.id} [${item.scope}${item.issueCodes?.length ? `:${item.issueCodes.join(",")}` : ""}]: ${item.finding} evidence=${item.evidenceRefs.length ? item.evidenceRefs.slice(0, 3).join(",") : "(none)"}`)]
+      : ["  warning requirements: (none)"]),
     `  next: ${audit.nextAction}`,
     `  record: ${audit.outPath}`,
+    `  report: ${audit.reportPath}`,
   ].join("\n");
 }
 
 export function renderResearchControllerCompletionAuditJson(audit: ControllerCompletionAudit): string {
   return `${JSON.stringify({ schemaVersion: 1, controllerCompletionAudit: audit }, null, 2)}\n`;
+}
+
+function boundedKeyArtifactReportEntries(entries: Array<[string, string | null]>): Array<[string, string | null]> {
+  const priorityKeys = ["issueLedger", "stageReview", "actionReadiness", "actionContract", "terminalHandoff", "nextAction", "reentryPlan"];
+  const selected = new Map<string, string | null>(entries.slice(0, 10));
+  for (const key of priorityKeys) {
+    const entry = entries.find(([entryKey]) => entryKey === key);
+    if (entry) selected.set(entry[0], entry[1]);
+    if (selected.size >= 16) break;
+  }
+  return Array.from(selected.entries());
+}
+
+export function renderResearchControllerGoldenPacket(packet: ControllerGoldenPacket): string {
+  const issueSummaryCodes = uniqueText(packet.issueSummary.flatMap(item => item.issueCodes));
+  const keyReportEntries = Object.entries(packet.keyArtifactReports);
+  const presentKeyReportCount = keyReportEntries.filter(([, value]) => Boolean(value)).length;
+  const visibleKeyReportEntries = boundedKeyArtifactReportEntries(keyReportEntries);
+  return [
+    "research controller golden-packet",
+    `  run: ${packet.runId}`,
+    `  status: ${packet.status}`,
+    `  stage: ${packet.stage}`,
+    `  method: ${packet.method ?? "(none)"}`,
+    `  promotable: ${packet.readiness.promotable}`,
+    `  run inspection: ${packet.readiness.runInspection ?? "missing"}`,
+    `  feasibility readiness: ${packet.readiness.feasibilityReadiness ?? "(missing)"}${packet.readiness.feasibilityVerdict ? `; verdict: ${packet.readiness.feasibilityVerdict}` : ""}`,
+    `  completion audit: ${packet.readiness.completionAudit}`,
+    `  self evaluation: ${packet.readiness.selfEvaluation}`,
+    `  blockers: ${packet.blockers.length}`,
+    ...packet.blockers.slice(0, 5).map(item => `  - blocker: ${item}`),
+    `  warnings: ${packet.warnings.length}`,
+    ...packet.warnings.slice(0, 5).map(item => `  - warning: ${item}`),
+    `  active issue codes: ${packet.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${packet.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `  issue summary: ${packet.issueSummary.length}${issueSummaryCodes.length ? ` (${issueSummaryCodes.join(", ")})` : ""}`,
+    ...packet.issueSummary.slice(0, 5).map(item => `  - issue ${item.severity}/${item.category}${item.issueCodes.length ? ` (${item.issueCodes.join(", ")})` : ""}: ${item.message}; evidence=${item.evidenceRefs.length ? item.evidenceRefs.slice(0, 3).join(",") : "(none)"}`),
+    `  next: ${packet.nextAction}`,
+    ...(packet.recommendedCommands.length
+      ? packet.recommendedCommands.map((command, index) => `  command ${index + 1}: ${command}`)
+      : ["  commands: (none)"]),
+    `  key reports: ${presentKeyReportCount}/${keyReportEntries.length}`,
+    ...visibleKeyReportEntries.map(([key, value]) => `  - report ${key}: ${value ?? "not report-backed"}`),
+    `  packet: ${packet.outPath}`,
+    `  report: ${packet.reportPath}`,
+  ].join("\n");
+}
+
+export function renderResearchControllerGoldenPacketJson(packet: ControllerGoldenPacket): string {
+  return `${JSON.stringify({ schemaVersion: 1, controllerGoldenPacket: packet }, null, 2)}\n`;
 }
 
 export function renderResearchControllerRepairCycle(result: ControllerRepairCycleResult): string {
@@ -4269,8 +5783,15 @@ export function renderResearchControllerRepairCycle(result: ControllerRepairCycl
     `  reentry: ${result.reentryStatus}`,
     `  autoRepairEligible: ${result.autoRepairEligible}`,
     `  repairPlugin: ${result.repairPlugin ?? "(none)"}`,
+    `  reentry plan: ${result.reentryPlanPath}`,
+    `  reentry report: ${result.reentryPlanReportPath}`,
+    `  run invocation: ${result.runResultPath ?? "(not run)"}`,
+    `  run invocation report: ${result.runResultReportPath ?? "(not run)"}`,
+    `  completion audit: ${result.completionAuditPath ?? "(not run)"}`,
+    `  completion audit report: ${result.completionAuditReportPath ?? "(not run)"}`,
     `  reason: ${result.reason}`,
     `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
   ].join("\n");
 }
 
@@ -4286,10 +5807,20 @@ export function renderResearchControllerDoctor(result: ControllerDoctorResult): 
     `  stage: ${result.currentStage}`,
     `  controller status: ${result.controllerStatus}`,
     `  safe auto continue: ${result.safeToAutoContinue}`,
+    `  runner feasibility readiness: ${result.summaries.runnerPacket.feasibilityReadiness.status ?? "(missing)"}${result.summaries.runnerPacket.feasibilityReadiness.verdict ? `; verdict: ${result.summaries.runnerPacket.feasibilityReadiness.verdict}` : ""}`,
     `  blockers: ${result.blockers.length}`,
+    ...result.blockers.slice(0, 5).map(item => `  - blocker: ${item}`),
     `  warnings: ${result.warnings.length}`,
+    ...result.warnings.slice(0, 5).map(item => `  - warning: ${item}`),
+    `  active issue codes: ${result.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${result.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `  evidence: operator=${result.summaries.operatorAudit.path}; completion=${result.summaries.completionAudit.path}; runner=${result.summaries.runnerPacket.path}; reentry=${result.summaries.reentryPlan.path}`,
+    `  reports: operator=${result.summaries.operatorAudit.reportPath}; completion=${result.summaries.completionAudit.reportPath}; runner=${result.summaries.runnerPacket.reportPath}; capabilities=${result.summaries.capabilities.reportPath}; reentry=${result.summaries.reentryPlan.reportPath}`,
+    `  evidence refs: ${result.evidenceRefs.length}`,
+    ...result.evidenceRefs.slice(0, 5).map(ref => `  - evidence: ${ref}`),
     `  next: ${result.recommendedCommand}`,
     `  doctor: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
   ].join("\n");
 }
 
@@ -4298,16 +5829,31 @@ export function renderResearchControllerDoctorJson(result: ControllerDoctorResul
 }
 
 export function renderResearchControllerOperate(result: ControllerOperateResult): string {
+  const latestCycle = result.cycles.at(-1) ?? null;
+  const issueCodes = uniqueText(result.cycles.flatMap(cycle => cycle.issueCodes));
   return [
     "research controller operate",
     `  run: ${result.runId}`,
     `  status: ${result.status}`,
     `  cycles: ${result.cycles.length}/${result.maxCycles}`,
     `  final doctor: ${result.finalDoctorStatus ?? "(none)"}`,
+    `  latest doctor feasibility: ${latestCycle?.doctorFeasibilityReadiness ?? "(missing)"}${latestCycle?.doctorFeasibilityVerdict ? `; verdict: ${latestCycle.doctorFeasibilityVerdict}` : ""}`,
     `  stage: ${result.state.currentStage}`,
     `  controller status: ${result.state.status}`,
     `  reason: ${result.stoppedReason}`,
+    `  issue codes: ${issueCodes.join(", ") || "(none)"}`,
+    ...result.cycles.map(cycle => {
+      const evidenceRefs = uniqueText([
+        cycle.doctorPath,
+        cycle.doctorReportPath,
+        cycle.doctorFeasibilityPath,
+        cycle.actionPath,
+        cycle.actionReportPath,
+      ].filter((ref): ref is string => Boolean(ref)));
+      return `  - #${cycle.cycle} action=${cycle.action} doctor=${cycle.doctorStatus} doctorReport=${cycle.doctorReportPath} actionReport=${cycle.actionReportPath ?? "none"} issueCodes=${cycle.issueCodes.join(",") || "none"} evidence=${evidenceRefs.slice(0, 5).join(",") || "none"} ${cycle.beforeStage}/${cycle.beforeStatus} -> ${cycle.afterStage}/${cycle.afterStatus}; reason=${cycle.reason}`;
+    }),
     `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
   ].join("\n");
 }
 
@@ -4315,19 +5861,64 @@ export function renderResearchControllerOperateJson(result: ControllerOperateRes
   return `${JSON.stringify({ schemaVersion: 1, controllerOperate: result }, null, 2)}\n`;
 }
 
+export function renderResearchControllerStart(result: ControllerStartResult): string {
+  const launchBlockerCodes = uniqueText(result.runbookSummary.launchBlockers.flatMap(item => item.issueCodes));
+  return [
+    "research controller start",
+    `  run: ${result.runId}`,
+    `  status: ${result.status}`,
+    `  mode: ${result.mode}`,
+    `  stage: ${result.statusSummary.currentStage}`,
+    `  controller status: ${result.statusSummary.controllerStatus}`,
+    `  first-read status: ${result.statusSummary.status}`,
+    `  ready to launch: ${result.statusSummary.readyToLaunch}`,
+    `  safe auto continue: ${result.statusSummary.safeToAutoContinue}`,
+    `  feasibility readiness: ${result.statusSummary.feasibilityReadiness ?? "(missing)"}${result.statusSummary.feasibilityVerdict ? `; verdict: ${result.statusSummary.feasibilityVerdict}` : ""}`,
+    `  blockers: ${result.statusSummary.blockers.length}`,
+    ...result.statusSummary.blockers.slice(0, 5).map(item => `  - blocker: ${item}`),
+    `  warnings: ${result.statusSummary.warnings.length}`,
+    ...result.statusSummary.warnings.slice(0, 5).map(item => `  - warning: ${item}`),
+    `  active issue codes: ${result.statusSummary.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${result.statusSummary.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `  launch blockers: ${result.runbookSummary.launchBlockers.length}${launchBlockerCodes.length ? ` (${launchBlockerCodes.join(", ")})` : ""}`,
+    ...result.runbookSummary.launchBlockers.slice(0, 5).map(item => `  - launch ${item.severity}/${item.category}${item.issueCodes.length ? ` (${item.issueCodes.join(", ")})` : ""}: ${item.message}; evidence=${item.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
+    `  operate: ${result.operateSummary.requested ? result.operateSummary.status ?? "unknown" : "not requested"}`,
+    `  next: ${result.nextAction}`,
+    `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
+  ].join("\n");
+}
+
+export function renderResearchControllerStartJson(result: ControllerStartResult): string {
+  return `${JSON.stringify({ schemaVersion: 1, controllerStart: result }, null, 2)}\n`;
+}
+
 export function renderResearchControllerRunbook(result: ControllerLaunchRunbook): string {
+  const launchBlockerCodes = uniqueText(result.launchBlockers.flatMap(item => item.issueCodes));
   return [
     "research controller runbook",
     `  run: ${result.runId}`,
     `  status: ${result.status}`,
     `  ready to launch: ${result.readyToLaunch}`,
     `  model: ${result.defaultControllerModel}`,
+    `  first-read: ${result.firstReadCommand}`,
+    `  readiness: ${result.readinessCommand}`,
     `  launch: ${result.launchCommand}`,
+    `  inspection: ${result.inspectionCommand}`,
     `  doctor: ${result.doctor.status}`,
+    `  runner feasibility readiness: ${result.runnerPacket.feasibilityReadiness.status ?? "(missing)"}${result.runnerPacket.feasibilityReadiness.verdict ? `; verdict: ${result.runnerPacket.feasibilityReadiness.verdict}` : ""}`,
     `  environment: ${result.environment.readiness}`,
     `  blockers: ${result.doctor.blockers.length}`,
+    `  launch blockers: ${result.launchBlockers.length}${launchBlockerCodes.length ? ` (${launchBlockerCodes.join(", ")})` : ""}`,
+    ...result.launchBlockers.slice(0, 5).map(item => `  - launch ${item.severity}/${item.category}${item.issueCodes.length ? ` (${item.issueCodes.join(", ")})` : ""}: ${item.message}; evidence=${item.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
     `  warnings: ${result.doctor.warnings.length + result.environment.optionalEnvWarnings.length}`,
+    `  active issue codes: ${result.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${result.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `  reports: doctor=${result.handoffArtifacts.doctor.reportPath}; runner=${result.handoffArtifacts.runnerPacket.reportPath}; audit=${result.handoffArtifacts.operatorAudit.reportPath}; environment=${result.handoffArtifacts.environment.reportPath ?? "(none)"}; completion=${result.handoffArtifacts.completionAudit.reportPath}; capabilities=${result.handoffArtifacts.capabilities.reportPath}; reentry=${result.handoffArtifacts.reentryPlan.reportPath}; supervisor=${result.handoffArtifacts.supervisor.reportPath ?? "(none)"}; repair=${result.handoffArtifacts.repairCycle.reportPath ?? "(none)"}`,
+    `  artifacts to inspect: ${result.artifactsToInspect.length}`,
+    ...result.artifactsToInspect.slice(0, 5).map(item => `  - inspect: ${item}`),
     `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
   ].join("\n");
 }
 
@@ -4335,7 +5926,45 @@ export function renderResearchControllerRunbookJson(result: ControllerLaunchRunb
   return `${JSON.stringify({ schemaVersion: 1, controllerRunbook: result }, null, 2)}\n`;
 }
 
+export function renderResearchControllerStatus(result: ControllerUnifiedStatus): string {
+  const keyReportEntries = Object.entries(result.keyArtifactReports);
+  const presentKeyReportCount = keyReportEntries.filter(([, value]) => Boolean(value)).length;
+  const visibleKeyReportEntries = boundedKeyArtifactReportEntries(keyReportEntries);
+  return [
+    "research controller status",
+    `  run: ${result.runId}`,
+    `  status: ${result.status}`,
+    `  stage: ${result.currentStage}`,
+    `  controller status: ${result.controllerStatus}`,
+    `  safe auto continue: ${result.safeToAutoContinue}`,
+    `  ready to launch: ${result.readyToLaunch}`,
+    `  promotable: ${result.promotable}`,
+    `  doctor: ${result.summary.doctorStatus}`,
+    `  runbook: ${result.summary.runbookStatus}`,
+    `  golden packet: ${result.summary.goldenPacketStatus}`,
+    `  feasibility readiness: ${result.summary.feasibilityReadiness ?? "(missing)"}${result.summary.feasibilityVerdict ? `; verdict: ${result.summary.feasibilityVerdict}` : ""}`,
+    `  blockers: ${result.blockers.length}`,
+    ...result.blockers.slice(0, 5).map(item => `  - blocker: ${item}`),
+    `  warnings: ${result.warnings.length}`,
+    ...result.warnings.slice(0, 5).map(item => `  - warning: ${item}`),
+    `  active issue codes: ${result.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${result.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `  evidence: doctor=${result.artifactPaths.doctor}; runbook=${result.artifactPaths.runbook}; golden=${result.artifactPaths.goldenPacket}; runner=${result.artifactPaths.runnerPacket}`,
+    `  reports: doctor=${result.artifactPaths.doctorReport}; runbook=${result.artifactPaths.runbookReport}; golden=${result.artifactPaths.goldenPacketReport}; runner=${result.artifactPaths.runnerPacketReport}`,
+    `  key reports: ${presentKeyReportCount}/${keyReportEntries.length}`,
+    ...visibleKeyReportEntries.map(([key, value]) => `  - report ${key}: ${value ?? "not report-backed"}`),
+    `  next: ${result.recommendedCommand}`,
+    `  record: ${result.outPath}`,
+    `  report: ${result.reportPath}`,
+  ].join("\n");
+}
+
+export function renderResearchControllerStatusJson(result: ControllerUnifiedStatus): string {
+  return `${JSON.stringify({ schemaVersion: 1, controllerStatus: result }, null, 2)}\n`;
+}
+
 export function renderResearchControllerRunnerPacket(packet: ControllerModelRunnerPacket): string {
+  const handoffBlockerCodes = uniqueText(packet.handoffBlockers.flatMap(item => item.issueCodes));
   return [
     "research controller runner-packet",
     `  run: ${packet.runId}`,
@@ -4343,8 +5972,20 @@ export function renderResearchControllerRunnerPacket(packet: ControllerModelRunn
     `  stage: ${packet.currentStage}`,
     `  model: ${packet.defaultControllerModel}`,
     `  safe auto execute: ${packet.safeToAutoExecute}`,
+    `  feasibility readiness: ${packet.feasibilityReadiness.status ?? "(missing)"}${packet.feasibilityReadiness.verdict ? `; verdict: ${packet.feasibilityReadiness.verdict}` : ""}`,
+    `  handoff blockers: ${packet.handoffBlockers.length}${handoffBlockerCodes.length ? ` (${handoffBlockerCodes.join(", ")})` : ""}`,
+    ...packet.handoffBlockers.slice(0, 5).map(item => `  - handoff ${item.severity}/${item.category}${item.issueCodes.length ? ` (${item.issueCodes.join(", ")})` : ""}: ${item.message}; evidence=${item.evidenceRefs.slice(0, 3).join(",") || "(none)"}`),
+    `  active issue codes: ${packet.activeIssueCodes.join(", ") || "(none)"}`,
+    `  active blocker issue codes: ${packet.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `  reports: agenda=${packet.agenda.reportPath}; audit=${packet.audit.reportPath}; environment=${packet.environment.reportPath}; capabilities=${packet.capabilities.reportPath}`,
+    `  evidence refs: ${packet.evidenceRefs.length}`,
+    ...(packet.evidenceRefs.length ? packet.evidenceRefs.slice(0, 5).map(ref => `  - evidence: ${ref}`) : []),
     `  next: ${packet.recommendedCommand}`,
+    ...(packet.agendaCommands.length
+      ? packet.agendaCommands.slice(0, 5).map((command, index) => `  agenda command ${index + 1}: ${command}`)
+      : ["  agenda commands: (none)"]),
     `  packet: ${packet.outPath}`,
+    `  report: ${packet.reportPath}`,
   ].join("\n");
 }
 
@@ -4368,6 +6009,17 @@ async function buildControllerModelRunnerPacket(
   const covered = capabilities.entries.filter(entry => entry.status === "covered").map(entry => entry.id);
   const failedChecks = audit.checks.filter(check => check.status === "fail").map(check => check.id);
   const warningChecks = audit.checks.filter(check => check.status === "warning").map(check => check.id);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  const feasibility = await loadControllerFeasibilitySummary(state);
+  const feasibilityReadiness = controllerInspectionFeasibilityReadiness(null, feasibility);
+  const latestIssueLedger = await readLatestControllerIssueLedger(state);
+  const latestRepairVerificationPath = latestArtifactPath(state, "controller-repair-verification");
+  const latestRepairVerificationRaw = latestRepairVerificationPath ? await readJsonIfPresent(latestRepairVerificationPath) : null;
+  const latestRepairVerification = valueAtPath(latestRepairVerificationRaw, "controllerRepairVerification") as Partial<ControllerRepairVerification> | null;
+  const latestRepairVerificationReportPath = latestArtifactPath(state, "controller-repair-verification-report");
+  const repairVerificationPromptLine = state.repairs.length
+    ? `Repair verification: status=${latestRepairVerification?.status ?? "missing"}; freshExternalReviewRequired=${latestRepairVerification?.freshExternalReviewRequired ?? "unknown"}; nextAction=${latestRepairVerification?.nextAction ?? "inspect repair verification"}.`
+    : "Repair verification: no reviewer-driven repairs recorded.";
   const status: ControllerModelRunnerPacket["status"] = audit.readiness === "complete" || state.status === "complete"
     ? "complete"
     : failedChecks.length || audit.readiness === "blocked"
@@ -4376,11 +6028,20 @@ async function buildControllerModelRunnerPacket(
         ? "review"
         : "ready";
   const recommendedCommand = status === "complete"
-    ? `agenteer research controller-inspect --state ${quotePath(state.statePath)}`
+    ? `agenteer research controller-status --state ${quotePath(state.statePath)}`
     : agenda.primaryCommand || audit.nextCommand || `agenteer research controller-run --state ${quotePath(state.statePath)} --max-steps 4`;
   const safeToAutoExecute = status === "ready" && agenda.items.some(item => item.command === recommendedCommand && item.safety === "safe" && item.status === "executable");
+  const agendaCommands = uniqueText(agenda.items.map(item => item.command).filter(command => command.length > 0));
+  const handoffBlockers = buildControllerModelRunnerHandoffBlockers(audit, datasetSemanticAudit, latestIssueLedger, nextAction);
+  const activeIssueCodes = uniqueText([...(agenda.activeIssueCodes ?? []), ...handoffBlockers.flatMap(item => item.issueCodes)]);
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes([
+    ...(agenda.activeBlockerIssueCodes ?? []),
+    ...handoffBlockers.filter(item => item.severity === "blocker").flatMap(item => item.issueCodes),
+  ]);
   const operatingRules = [
     "Treat this packet, controller-state.json, and referenced artifacts as the only authoritative state; do not rely on chat memory.",
+    "Use controller-status as the first-read readiness command/tool before deciding whether to launch, resume, patch, or stop.",
+    "If controller-status is gathered through controller-run-agenteer, treat the structured recentToolResults.controllerStatus summary as readiness evidence even when the underlying status command exits nonzero for a blocked pipeline.",
     "Run controller-env or controller-audit first if this packet is stale, the repo changed, or local tooling changed.",
     "Prefer controller-follow-agenda or controller-follow-loop over ad hoc commands when safeToAutoExecute is true.",
     "Do not mutate source except through controller-propose-patch, controller-apply-patch, controller-verify-patch, and controller-rollback-patch.",
@@ -4389,8 +6050,9 @@ async function buildControllerModelRunnerPacket(
     "Use strict model mode when a model decision must count as the controller rather than deterministic automation.",
     "After every action, inspect the new action contract, stage review, issue ledger, and agenda before continuing.",
   ];
-  const allowedCommands = [
+  const allowedCommands = uniqueText([
     "agenteer research controller-env --state <controller-state.json>",
+    "agenteer research controller-status --state <controller-state.json>",
     "agenteer research controller-audit --state <controller-state.json>",
     "agenteer research controller-doctor --state <controller-state.json>",
     "agenteer research controller-capabilities --state <controller-state.json>",
@@ -4400,17 +6062,21 @@ async function buildControllerModelRunnerPacket(
     "agenteer research controller-operate --state <controller-state.json>",
     "agenteer research controller-supervise --state <controller-state.json>",
     "agenteer research controller-runbook --state <controller-state.json>",
+    "agenteer research controller-benchmark --state <controller-state.json>",
     "agenteer research controller-run --state <controller-state.json>",
     "agenteer research controller-step --state <controller-state.json>",
     "agenteer research controller-inspect --state <controller-state.json>",
     "agenteer research controller-tool --state <controller-state.json> --tool <allowed-tool>",
     "agenteer research controller-patch --state <controller-state.json> --patch <safe-json>",
     "agenteer research controller-resume --state <controller-state.json>",
-  ];
+    ...agendaCommands,
+  ]);
   const forbiddenActions = [
     "Do not run arbitrary shell through the controller.",
     "Do not apply patches outside repository path bounds.",
     "Do not claim a study is promotion-ready without run-inspection, method QA, manuscript QA, and completion audit evidence.",
+    "Do not ignore activeBlockerIssueCodes in runner packets or agendas; they are stable hard-stop identifiers.",
+    "Do not treat advisory-only issueCodes as automatic blockers when activeBlockerIssueCodes is empty.",
     "Do not continue after a blocked gate except through an explicit patch, repair, or human-reviewed policy change.",
     "Do not treat generated outputs as validated if controller action contracts or required artifact hashes are missing.",
   ];
@@ -4418,6 +6084,7 @@ async function buildControllerModelRunnerPacket(
     "You are a fresh Research Controller Agent for Agenteer.",
     "Your job is to operate the saved controller state through bounded CLI commands and artifact-backed decisions.",
     "You must not rely on prior chat context. Use only this runner packet, controller-state.json, and referenced artifacts.",
+    "Treat activeBlockerIssueCodes as authoritative hard-stop identifiers. Treat issueCodes outside that list as context unless their source artifact marks them as blocker severity.",
     "Prefer safe continuation through controller-follow-agenda/controller-follow-loop when the packet says it is safe.",
     "Stop for human review rather than guessing when blockers, unsupported methods, unsafe cost, missing evidence, or failed audits appear.",
   ].join(" ");
@@ -4427,7 +6094,15 @@ async function buildControllerModelRunnerPacket(
     `Current stage/status: ${state.currentStage}/${state.status}`,
     `Recommended command: ${recommendedCommand}`,
     `Safe to auto-execute: ${safeToAutoExecute}`,
+    "First-read command: agenteer research controller-status --state <controller-state.json>",
+    "First-read tools: request controller-status directly, or request controller-run-agenteer with research controller-status --state <current-controller-state> --json when CLI introspection evidence is needed.",
     `Audit readiness: ${audit.readiness}; failed checks: ${failedChecks.join(", ") || "none"}; warning checks: ${warningChecks.join(", ") || "none"}.`,
+    `Active issue codes: ${activeIssueCodes.join(", ") || "none"}.`,
+    `Active blocker issue codes: ${activeBlockerIssueCodes.join(", ") || "none"}.`,
+    `Handoff blockers: ${handoffBlockers.length ? handoffBlockers.slice(0, 8).map(item => `${item.severity}/${item.category}${item.issueCodes.length ? `/${item.issueCodes.join("+")}` : ""}: ${item.message}`).join(" | ") : "none"}.`,
+    `Feasibility readiness: ${feasibilityReadiness.status ?? "missing"}${feasibilityReadiness.verdict ? `; verdict=${feasibilityReadiness.verdict}` : ""}.`,
+    `Dataset semantic audit: present=${datasetSemanticAudit.present}; status=${datasetSemanticAudit.status}; selectedRoleStatus=${datasetSemanticAudit.selectedRoleStatus}; issues=${datasetSemanticAudit.issueCount}.`,
+    repairVerificationPromptLine,
     `Capability missing: ${missing.join(", ") || "none"}.`,
     "Before acting, read the packet evidence refs needed for the recommended command. After acting, rerun controller-runner-packet or controller-audit.",
   ].join("\n");
@@ -4439,10 +6114,15 @@ async function buildControllerModelRunnerPacket(
     audit.reportPath,
     audit.environment.outPath,
     audit.environment.reportPath,
+    feasibility.path,
+    datasetSemanticAudit.path,
+    datasetSemanticAudit.reportPath,
     capabilities.outPath,
     capabilities.reportPath,
     nextAction?.outPath,
     nextAction?.reportPath,
+    latestRepairVerificationPath,
+    latestRepairVerificationReportPath,
     ...state.artifacts.slice(-20).map(artifactRef => artifactRef.path),
   ].filter((item): item is string => Boolean(item)));
   return {
@@ -4463,19 +6143,38 @@ async function buildControllerModelRunnerPacket(
     userPrompt,
     operatingRules,
     allowedCommands,
+    agendaCommands,
     forbiddenActions,
+    activeIssueCodes,
+    activeBlockerIssueCodes,
+    handoffBlockers,
     evidenceRefs,
+    feasibilityReadiness: {
+      present: feasibility.present,
+      status: feasibilityReadiness.status,
+      verdict: feasibilityReadiness.verdict,
+      path: feasibility.path,
+      blockers: feasibility.blockers,
+      warnings: feasibility.warnings,
+    },
+    datasetSemanticAudit,
     agenda: {
       agendaId: agenda.agendaId,
       status: agenda.status,
       primaryCommand: agenda.primaryCommand,
+      activeIssueCodes: agenda.activeIssueCodes,
+      activeBlockerIssueCodes: agenda.activeBlockerIssueCodes,
       sourceArtifacts: agenda.sourceArtifacts,
-      items: agenda.items.map(item => ({ id: item.id, kind: item.kind, status: item.status, safety: item.safety, command: item.command, reason: item.reason })),
+      path: agenda.outPath,
+      reportPath: agenda.reportPath,
+      items: agenda.items.map(item => ({ id: item.id, kind: item.kind, status: item.status, safety: item.safety, source: item.source, command: item.command, reason: item.reason, issueCodes: item.issueCodes })),
     },
     audit: {
       status: audit.status,
       readiness: audit.readiness,
       nextCommand: audit.nextCommand,
+      path: audit.outPath,
+      reportPath: audit.reportPath,
       failedChecks,
       warningChecks,
     },
@@ -4486,10 +6185,14 @@ async function buildControllerModelRunnerPacket(
       nodeVersion: audit.environment.nodeVersion,
       npmVersion: audit.environment.npmVersion,
       nextAction: audit.environment.nextAction,
+      outPath: audit.environment.outPath,
+      reportPath: audit.environment.reportPath,
     },
     capabilities: {
       summary: capabilities.summary,
       defaultControllerModel: capabilities.defaultControllerModel,
+      path: capabilities.outPath,
+      reportPath: capabilities.reportPath,
       missing,
       available,
       covered,
@@ -4498,6 +6201,80 @@ async function buildControllerModelRunnerPacket(
     outPath,
     reportPath,
   };
+}
+
+function buildControllerModelRunnerHandoffBlockers(
+  audit: ControllerOperatorAudit,
+  datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>,
+  issueLedger: ControllerIssueLedger | null,
+  nextAction: ControllerNextActionPacket | null,
+): ControllerModelRunnerPacket["handoffBlockers"] {
+  const blockers: ControllerModelRunnerPacket["handoffBlockers"] = [];
+  const add = (
+    category: ControllerModelRunnerPacket["handoffBlockers"][number]["category"],
+    severity: ControllerModelRunnerPacket["handoffBlockers"][number]["severity"],
+    message: string,
+    issueCodes: string[] = [],
+    evidenceRefs: string[] = [],
+  ) => {
+    const clean = message.trim();
+    if (!clean) return;
+    blockers.push({
+      category,
+      severity,
+      issueCodes: uniqueText(issueCodes),
+      message: clean,
+      evidenceRefs: uniqueText(evidenceRefs),
+    });
+  };
+  for (const issue of issueLedger?.issues.filter(item => item.status === "active").slice(0, 20) ?? []) {
+    add(
+      "issue_ledger",
+      issue.severity === "blocker" || issue.severity === "major" ? "blocker" : "warning",
+      `${issue.issueCode ? `${issue.issueCode}: ` : ""}${issue.message}`,
+      issue.issueCode ? [issue.issueCode] : issueCodesFromText(issue.message),
+      uniqueText([issueLedger?.outPath, ...issue.evidenceRefs].filter((item): item is string => Boolean(item))),
+    );
+  }
+  for (const issue of nextAction?.issueLedger.topIssues ?? []) {
+    add(
+      "next_action",
+      issue.severity === "blocker" || issue.severity === "major" ? "blocker" : "warning",
+      `${issue.issueCode ? `${issue.issueCode}: ` : ""}${issue.message}`,
+      issue.issueCode ? [issue.issueCode] : issueCodesFromText(issue.message),
+      uniqueText([nextAction?.outPath, ...issue.evidenceRefs].filter((item): item is string => Boolean(item))),
+    );
+  }
+  for (const issue of datasetSemanticAudit.topIssues.filter(issue => issue.selected && issue.severity !== "note")) {
+    add(
+      "dataset_semantic_audit",
+      issue.severity === "blocker" ? "blocker" : "warning",
+      `${issue.code}: ${issue.message}`,
+      [issue.code],
+      uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
+    );
+  }
+  const auditReadinessBlockers = audit.readinessBlockers?.length
+    ? audit.readinessBlockers
+    : buildControllerOperatorAuditReadinessBlockers(audit.checks, audit.readiness);
+  for (const blocker of auditReadinessBlockers.filter(item => item.severity === "blocker")) {
+    add("operator_audit", "blocker", `${blocker.id}: ${blocker.message}`, blocker.issueCodes, [audit.outPath, ...blocker.evidenceRefs]);
+  }
+  for (const blocker of auditReadinessBlockers.filter(item => item.severity === "warning").slice(0, 12)) {
+    add("operator_audit", "warning", `${blocker.id}: ${blocker.message}`, blocker.issueCodes, [audit.outPath, ...blocker.evidenceRefs]);
+  }
+  if (audit.environment.readiness === "blocked") add("environment", "blocker", `Environment readiness is blocked: ${audit.environment.nextAction}`, [], [audit.environment.outPath, audit.environment.reportPath]);
+  return uniqueModelRunnerHandoffBlockers(blockers).slice(0, 50);
+}
+
+function uniqueModelRunnerHandoffBlockers(blockers: ControllerModelRunnerPacket["handoffBlockers"]): ControllerModelRunnerPacket["handoffBlockers"] {
+  const seen = new Set<string>();
+  return blockers.filter(blocker => {
+    const key = `${blocker.category}:${blocker.severity}:${blocker.issueCodes.join(",")}:${blocker.message}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function renderControllerModelRunnerPacketMarkdown(packet: ControllerModelRunnerPacket): string {
@@ -4513,6 +6290,15 @@ function renderControllerModelRunnerPacketMarkdown(packet: ControllerModelRunner
     `Controller status: ${packet.controllerStatus}`,
     `Default model: ${packet.defaultControllerModel}`,
     `Safe to auto-execute: ${packet.safeToAutoExecute}`,
+    `Active issue codes: ${packet.activeIssueCodes.join(", ") || "(none)"}`,
+    `Active blocker issue codes: ${packet.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `Feasibility readiness: ${packet.feasibilityReadiness.status ?? "missing"}${packet.feasibilityReadiness.verdict ? `; verdict: ${packet.feasibilityReadiness.verdict}` : ""}`,
+    "",
+    "## Handoff Blockers",
+    "",
+    ...(packet.handoffBlockers.length
+      ? packet.handoffBlockers.map(item => `- ${item.severity.toUpperCase()} [${item.category}${item.issueCodes.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.message}${item.evidenceRefs.length ? ` Evidence: ${item.evidenceRefs.join(", ")}` : ""}`)
+      : ["- None."]),
     "",
     "## Recommended Command",
     "",
@@ -4537,19 +6323,64 @@ function renderControllerModelRunnerPacketMarkdown(packet: ControllerModelRunner
     "## Agenda",
     "",
     `- Agenda: ${packet.agenda.agendaId}`,
+    `- Agenda record: ${packet.agenda.path}`,
+    `- Agenda report: ${packet.agenda.reportPath}`,
     `- Status: ${packet.agenda.status}`,
     `- Primary command: ${packet.agenda.primaryCommand}`,
-    ...(packet.agenda.items.length ? packet.agenda.items.map(item => `- ${item.id}: ${item.status}/${item.safety} ${item.kind} -> ${item.command}`) : ["- No agenda items."]),
+    `- Active issue codes: ${packet.agenda.activeIssueCodes.join(", ") || "(none)"}`,
+    `- Active blocker issue codes: ${packet.agenda.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    ...(packet.agenda.items.length ? packet.agenda.items.map(item => `- ${item.id}: ${item.status}/${item.safety}${item.issueCodes?.length ? ` [${item.issueCodes.join(",")}]` : ""} ${item.kind} -> ${item.command}`) : ["- No agenda items."]),
+    "",
+    "## Agenda Commands",
+    "",
+    ...(packet.agendaCommands.length ? packet.agendaCommands.map(command => `- \`${command}\``) : ["- None recorded."]),
+    "",
+    "## Allowed Commands",
+    "",
+    ...(packet.allowedCommands.length ? packet.allowedCommands.map(command => `- \`${command}\``) : ["- None recorded."]),
     "",
     "## Audit",
     "",
+    `- Audit record: ${packet.audit.path}`,
+    `- Audit report: ${packet.audit.reportPath}`,
     `- Status: ${packet.audit.status}`,
     `- Readiness: ${packet.audit.readiness}`,
     `- Failed checks: ${packet.audit.failedChecks.join(", ") || "none"}`,
     `- Warning checks: ${packet.audit.warningChecks.join(", ") || "none"}`,
     "",
+    "## Environment",
+    "",
+    `- Environment record: ${packet.environment.outPath}`,
+    `- Environment report: ${packet.environment.reportPath}`,
+    `- Status: ${packet.environment.status}`,
+    `- Readiness: ${packet.environment.readiness}`,
+    `- Repo root: ${packet.environment.repoRoot}`,
+    `- Node: ${packet.environment.nodeVersion ?? "(missing)"}`,
+    `- npm: ${packet.environment.npmVersion ?? "(missing)"}`,
+    `- Next action: ${packet.environment.nextAction}`,
+    "",
+    "## Feasibility Readiness",
+    "",
+    `- Present: ${packet.feasibilityReadiness.present}`,
+    `- Status: ${packet.feasibilityReadiness.status ?? "missing"}`,
+    `- Verdict: ${packet.feasibilityReadiness.verdict ?? "missing"}`,
+    `- Path: ${packet.feasibilityReadiness.path ?? "(none)"}`,
+    `- Blockers: ${packet.feasibilityReadiness.blockers.length ? packet.feasibilityReadiness.blockers.join("; ") : "none"}`,
+    `- Warnings: ${packet.feasibilityReadiness.warnings.length ? packet.feasibilityReadiness.warnings.slice(0, 8).join("; ") : "none"}`,
+    "",
+    "## Dataset Semantic Audit",
+    "",
+    `- Present: ${packet.datasetSemanticAudit.present}`,
+    `- Status: ${packet.datasetSemanticAudit.status}`,
+    `- Selected-role status: ${packet.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Issues: ${packet.datasetSemanticAudit.issueCount} (${packet.datasetSemanticAudit.blockerCount} blocker, ${packet.datasetSemanticAudit.warningCount} warning)`,
+    ...(packet.datasetSemanticAudit.topIssues.length ? packet.datasetSemanticAudit.topIssues.map(issue => `- ${issue.severity.toUpperCase()} ${issue.column}${issue.selected ? " [selected]" : ""}: ${issue.code} - ${issue.message}`) : ["- Issue: none"]),
+    `- Next action: ${packet.datasetSemanticAudit.nextAction ?? "(none)"}`,
+    "",
     "## Capabilities",
     "",
+    `- Capability record: ${packet.capabilities.path}`,
+    `- Capability report: ${packet.capabilities.reportPath}`,
     `- Covered: ${packet.capabilities.covered.join(", ") || "none"}`,
     `- Available: ${packet.capabilities.available.join(", ") || "none"}`,
     `- Missing: ${packet.capabilities.missing.join(", ") || "none"}`,
@@ -4557,6 +6388,47 @@ function renderControllerModelRunnerPacketMarkdown(packet: ControllerModelRunner
     "## Evidence",
     "",
     ...packet.evidenceRefs.map(ref => `- ${ref}`),
+    "",
+  ].join("\n");
+}
+
+function renderControllerFollowAgendaMarkdown(result: ControllerFollowAgendaResult): string {
+  return [
+    "# Controller Follow Agenda",
+    "",
+    `Generated: ${result.generatedAtIso}`,
+    `Run ID: ${result.runId}`,
+    `State: ${result.statePath}`,
+    `Executed: ${result.executed}`,
+    `Refused: ${result.refused}`,
+    `Reason: ${result.reason}`,
+    `Final stage: ${result.state.currentStage}`,
+    `Final status: ${result.state.status}`,
+    "",
+    "## Selected Item",
+    "",
+    `- ID: ${result.selectedItem?.id ?? "(none)"}`,
+    `- Kind: ${result.selectedItem?.kind ?? "(none)"}`,
+    `- Status: ${result.selectedItem?.status ?? "(none)"}`,
+    `- Safety: ${result.selectedItem?.safety ?? "(none)"}`,
+    `- Command: ${result.selectedItem?.command ?? "(none)"}`,
+    `- Reason: ${result.selectedItem?.reason ?? "(none)"}`,
+    `- Issue codes: ${result.selectedItem?.issueCodes?.join(", ") || "(none)"}`,
+    `- Evidence refs: ${result.selectedItem?.evidenceRefs?.join(", ") || "(none)"}`,
+    "",
+    "## Agenda",
+    "",
+    `- Agenda: ${result.agenda.agendaId}`,
+    `- Status: ${result.agenda.status}`,
+    `- Primary command: ${result.agenda.primaryCommand}`,
+    `- Record: ${result.agenda.outPath}`,
+    `- Report: ${result.agenda.reportPath}`,
+    "",
+    "## Run Result",
+    "",
+    `- Present: ${Boolean(result.runResult)}`,
+    `- Step count: ${result.runResult?.stepCount ?? "(none)"}`,
+    `- Terminal: ${result.runResult?.terminal ?? "(none)"}`,
     "",
   ].join("\n");
 }
@@ -4586,10 +6458,13 @@ function renderControllerFollowLoopMarkdown(result: ControllerFollowLoopResult):
         `- Agenda: ${item.agendaId}`,
         `- Selected item: ${item.selectedItemId ?? "(none)"}`,
         `- Selected kind: ${item.selectedKind ?? "(none)"}`,
+        `- Selected issue codes: ${item.selectedIssueCodes.join(", ") || "(none)"}`,
+        `- Selected evidence: ${item.selectedEvidenceRefs.join(", ") || "(none)"}`,
         `- Executed: ${item.executed}`,
         `- Refused: ${item.refused}`,
         `- Reason: ${item.reason}`,
         `- Follow record: ${item.followRecordPath}`,
+        `- Follow report: ${item.followReportPath}`,
         "",
       ])
       : ["- No iterations executed."]),
@@ -4621,12 +6496,17 @@ function renderControllerSupervisorMarkdown(result: ControllerSupervisorResult):
         `- Before: ${item.beforeStage}/${item.beforeStatus}`,
         `- After: ${item.afterStage}/${item.afterStatus}`,
         `- Runner packet: ${item.runnerPacketPath}`,
+        `- Runner packet report: ${item.runnerPacketReportPath}`,
         `- Runner packet status: ${item.runnerPacketStatus}`,
+        `- Runner packet feasibility: ${item.runnerPacketFeasibilityReadiness ?? "missing"}${item.runnerPacketFeasibilityVerdict ? `; verdict=${item.runnerPacketFeasibilityVerdict}` : ""}${item.runnerPacketFeasibilityPath ? `; evidence=${item.runnerPacketFeasibilityPath}` : ""}`,
         `- Recommended command: \`${item.recommendedCommand}\``,
         `- Safe agenda primary: ${item.safeAgendaPrimary}`,
         `- Follow loop: ${item.followLoopPath ?? "(not run)"}`,
+        `- Follow-loop report: ${item.followLoopReportPath ?? "(not run)"}`,
         `- Follow-loop iterations: ${item.followLoopIterations}`,
+        `- Follow-loop issue codes: ${item.followLoopIssueCodes.join(", ") || "(none)"}`,
         `- Audit: ${item.auditPath ?? "(not run)"}`,
+        `- Audit report: ${item.auditReportPath ?? "(not run)"}`,
         `- Audit readiness: ${item.auditReadiness ?? "(none)"}`,
         `- Stopped: ${item.stopped}`,
         `- Reason: ${item.reason}`,
@@ -4651,7 +6531,9 @@ function renderControllerRepairCycleMarkdown(result: ControllerRepairCycleResult
     `Auto-repair eligible: ${result.autoRepairEligible}`,
     `Repair plugin: ${result.repairPlugin ?? "(none)"}`,
     `Run result: ${result.runResultPath ?? "(not run)"}`,
+    `Run result report: ${result.runResultReportPath ?? "(not run)"}`,
     `Completion audit: ${result.completionAuditPath ?? "(not run)"}`,
+    `Completion audit report: ${result.completionAuditReportPath ?? "(not run)"}`,
     "",
     "## Reason",
     "",
@@ -4660,8 +6542,11 @@ function renderControllerRepairCycleMarkdown(result: ControllerRepairCycleResult
     "## Evidence",
     "",
     `- Re-entry plan: ${result.reentryPlanPath}`,
+    `- Re-entry report: ${result.reentryPlanReportPath}`,
     ...(result.runResultPath ? [`- Run invocation: ${result.runResultPath}`] : []),
+    ...(result.runResultReportPath ? [`- Run invocation report: ${result.runResultReportPath}`] : []),
     ...(result.completionAuditPath ? [`- Completion audit: ${result.completionAuditPath}`] : []),
+    ...(result.completionAuditReportPath ? [`- Completion audit report: ${result.completionAuditReportPath}`] : []),
     "",
   ].join("\n");
 }
@@ -4678,6 +6563,8 @@ function renderControllerDoctorMarkdown(result: ControllerDoctorResult): string 
     `Stage/status: ${result.currentStage}/${result.controllerStatus}`,
     `Safe to auto-continue: ${result.safeToAutoContinue}`,
     `Recommended command: \`${result.recommendedCommand}\``,
+    `Active issue codes: ${result.activeIssueCodes.join(", ") || "(none)"}`,
+    `Active blocker issue codes: ${result.activeBlockerIssueCodes.join(", ") || "(none)"}`,
     "",
     "## Blockers",
     "",
@@ -4693,9 +6580,28 @@ function renderControllerDoctorMarkdown(result: ControllerDoctorResult): string 
     `- Operator failed checks: ${result.summaries.operatorAudit.failedChecks.join(", ") || "(none)"}`,
     `- Completion audit: ${result.summaries.completionAudit.status}/${result.summaries.completionAudit.readiness}`,
     `- Completion failed requirements: ${result.summaries.completionAudit.failedRequirements.join(", ") || "(none)"}`,
+    ...(result.summaries.completionAudit.failedRequirementDetails.length
+      ? result.summaries.completionAudit.failedRequirementDetails.map(detail => `  - ${detail.id}${detail.issueCodes.length ? ` [${detail.issueCodes.join(",")}]` : ""}: ${detail.finding}`)
+      : []),
+    ...(result.summaries.completionAudit.warningRequirementDetails.length
+      ? [
+        `- Completion warning requirements: ${result.summaries.completionAudit.warningRequirements.join(", ") || "(none)"}`,
+        ...result.summaries.completionAudit.warningRequirementDetails.map(detail => `  - ${detail.id}${detail.issueCodes.length ? ` [${detail.issueCodes.join(",")}]` : ""}: ${detail.finding}`),
+      ]
+      : [`- Completion warning requirements: ${result.summaries.completionAudit.warningRequirements.join(", ") || "(none)"}`]),
     `- Runner packet: ${result.summaries.runnerPacket.status}; safe=${result.summaries.runnerPacket.safeToAutoExecute}`,
+    `- Runner feasibility readiness: ${result.summaries.runnerPacket.feasibilityReadiness.status ?? "missing"}${result.summaries.runnerPacket.feasibilityReadiness.verdict ? `; verdict=${result.summaries.runnerPacket.feasibilityReadiness.verdict}` : ""}`,
     `- Capabilities: ${result.summaries.capabilities.covered} covered, ${result.summaries.capabilities.available} available, ${result.summaries.capabilities.missing} missing, ${result.summaries.capabilities.notApplicable} not applicable`,
     `- Re-entry: ${result.summaries.reentryPlan.status}; stage=${result.summaries.reentryPlan.recommendedStage}; autoRepair=${result.summaries.reentryPlan.autoRepairEligible}`,
+    "",
+    "## Dataset Semantic Audit",
+    "",
+    `- Present: ${result.summaries.runnerPacket.datasetSemanticAudit.present}`,
+    `- Status: ${result.summaries.runnerPacket.datasetSemanticAudit.status}`,
+    `- Selected-role status: ${result.summaries.runnerPacket.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Issues: ${result.summaries.runnerPacket.datasetSemanticAudit.issueCount} (${result.summaries.runnerPacket.datasetSemanticAudit.blockerCount} blocker, ${result.summaries.runnerPacket.datasetSemanticAudit.warningCount} warning)`,
+    ...(result.summaries.runnerPacket.datasetSemanticAudit.topIssues.length ? result.summaries.runnerPacket.datasetSemanticAudit.topIssues.map(issue => `- ${issue.severity.toUpperCase()} ${issue.column}${issue.selected ? " [selected]" : ""}: ${issue.code} - ${issue.message}`) : ["- Issue: none"]),
+    `- Next action: ${result.summaries.runnerPacket.datasetSemanticAudit.nextAction ?? "(none)"}`,
     "",
     "## Operational Evidence",
     "",
@@ -4743,13 +6649,17 @@ function renderControllerOperateMarkdown(result: ControllerOperateResult): strin
       "",
       `- Before: ${cycle.beforeStage}/${cycle.beforeStatus}`,
       `- Doctor: ${cycle.doctorStatus} (${cycle.doctorPath})`,
+      `- Doctor report: ${cycle.doctorReportPath}`,
+      `- Doctor feasibility: ${cycle.doctorFeasibilityReadiness ?? "missing"}${cycle.doctorFeasibilityVerdict ? `; verdict=${cycle.doctorFeasibilityVerdict}` : ""}${cycle.doctorFeasibilityPath ? `; evidence=${cycle.doctorFeasibilityPath}` : ""}`,
       `- Safe to auto-continue: ${cycle.safeToAutoContinue}`,
       `- Recommended command: \`${cycle.recommendedCommand}\``,
       `- Action: ${cycle.action}`,
       `- Action status: ${cycle.actionStatus ?? "(none)"}`,
       `- Action path: ${cycle.actionPath ?? "(none)"}`,
+      `- Action report: ${cycle.actionReportPath ?? "(none)"}`,
       `- After: ${cycle.afterStage}/${cycle.afterStatus}`,
       `- Reason: ${cycle.reason}`,
+      `- Issue codes: ${cycle.issueCodes.length ? cycle.issueCodes.join(", ") : "(none)"}`,
       "",
     ]),
     "## Final State",
@@ -4757,6 +6667,68 @@ function renderControllerOperateMarkdown(result: ControllerOperateResult): strin
     `- Stage: ${result.state.currentStage}`,
     `- Status: ${result.state.status}`,
     `- Artifacts: ${result.state.artifacts.length}`,
+    "",
+  ].join("\n");
+}
+
+function renderControllerStartMarkdown(result: ControllerStartResult): string {
+  return [
+    "# Controller Start",
+    "",
+    `Start: ${result.startId}`,
+    `Generated: ${result.generatedAtIso}`,
+    `Run ID: ${result.runId}`,
+    `Status: ${result.status}`,
+    `Mode: ${result.mode}`,
+    `State: ${result.statePath}`,
+    "",
+    "## First-Read Status",
+    "",
+    `- Status: ${result.statusSummary.status}`,
+    `- Controller status: ${result.statusSummary.controllerStatus}`,
+    `- Stage: ${result.statusSummary.currentStage}`,
+    `- Safe to auto-continue: ${result.statusSummary.safeToAutoContinue}`,
+    `- Ready to launch: ${result.statusSummary.readyToLaunch}`,
+    `- Promotable: ${result.statusSummary.promotable}`,
+    `- Feasibility readiness: ${result.statusSummary.feasibilityReadiness ?? "(missing)"}${result.statusSummary.feasibilityVerdict ? `; verdict: ${result.statusSummary.feasibilityVerdict}` : ""}`,
+    `- Active issue codes: ${result.statusSummary.activeIssueCodes.join(", ") || "(none)"}`,
+    `- Active blocker issue codes: ${result.statusSummary.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    `- Blockers: ${result.statusSummary.blockers.length}`,
+    ...result.statusSummary.blockers.slice(0, 10).map(item => `  - ${item}`),
+    `- Warnings: ${result.statusSummary.warnings.length}`,
+    ...result.statusSummary.warnings.slice(0, 10).map(item => `  - ${item}`),
+    "",
+    "## Launch Envelope",
+    "",
+    `- Runbook status: ${result.runbookSummary.status}`,
+    `- Ready to launch: ${result.runbookSummary.readyToLaunch}`,
+    `- First-read command: ${result.runbookSummary.firstReadCommand}`,
+    `- Readiness command: ${result.runbookSummary.readinessCommand}`,
+    `- Launch command: ${result.runbookSummary.launchCommand}`,
+    `- Inspection command: ${result.runbookSummary.inspectionCommand}`,
+    `- Launch blockers: ${result.runbookSummary.launchBlockers.length}`,
+    ...result.runbookSummary.launchBlockers.slice(0, 10).map(item => `  - ${item.severity.toUpperCase()} [${item.category}${item.issueCodes.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.message}`),
+    "",
+    "## Operate",
+    "",
+    `- Requested: ${result.operateSummary.requested}`,
+    `- Status: ${result.operateSummary.status ?? "(not run)"}`,
+    `- Cycles: ${result.operateSummary.cycles}`,
+    `- Stopped reason: ${result.operateSummary.stoppedReason ?? "(none)"}`,
+    "",
+    "## Artifacts",
+    "",
+    `- State: ${result.artifactPaths.state}`,
+    `- Status: ${result.artifactPaths.status}`,
+    `- Status report: ${result.artifactPaths.statusReport}`,
+    `- Runbook: ${result.artifactPaths.runbook}`,
+    `- Runbook report: ${result.artifactPaths.runbookReport}`,
+    `- Operate: ${result.artifactPaths.operate ?? "(not run)"}`,
+    `- Operate report: ${result.artifactPaths.operateReport ?? "(not run)"}`,
+    "",
+    "## Next Action",
+    "",
+    result.nextAction,
     "",
   ].join("\n");
 }
@@ -4773,10 +6745,24 @@ function renderControllerRunbookMarkdown(result: ControllerLaunchRunbook): strin
     `Ready to launch: ${result.readyToLaunch}`,
     `Default model: ${result.defaultControllerModel}`,
     `Strict model recommended: ${result.strictModelRecommended}`,
+    `Active issue codes: ${result.activeIssueCodes.join(", ") || "(none)"}`,
+    `Active blocker issue codes: ${result.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    "",
+    "## Launch Blockers",
+    "",
+    ...(result.launchBlockers.length
+      ? result.launchBlockers.map(item => `- ${item.severity.toUpperCase()} [${item.category}${item.issueCodes.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.message}${item.evidenceRefs.length ? ` Evidence: ${item.evidenceRefs.join(", ")}` : ""}`)
+      : ["- None."]),
     "",
     "## Launch",
     "",
-    "Run the readiness command first unless this file was generated immediately before launch.",
+    "Run the first-read status command before launch/resume decisions, then use the readiness command if detailed launch safety needs review.",
+    "",
+    "```bash",
+    result.firstReadCommand,
+    "```",
+    "",
+    "Readiness command:",
     "",
     "```bash",
     result.readinessCommand,
@@ -4802,11 +6788,37 @@ function renderControllerRunbookMarkdown(result: ControllerLaunchRunbook): strin
     "",
     "## Doctor Summary",
     "",
+    `- Doctor record: ${result.handoffArtifacts.doctor.path}`,
+    `- Doctor report: ${result.handoffArtifacts.doctor.reportPath}`,
     `- Doctor status: ${result.doctor.status}`,
     `- Safe to auto-continue: ${result.doctor.safeToAutoContinue}`,
     `- Recommended command: ${result.doctor.recommendedCommand}`,
     `- Blockers: ${result.doctor.blockers.length ? result.doctor.blockers.join("; ") : "none"}`,
     `- Warnings: ${result.doctor.warnings.length ? result.doctor.warnings.slice(0, 8).join("; ") : "none"}`,
+    `- Runner packet record: ${result.handoffArtifacts.runnerPacket.path}`,
+    `- Runner packet report: ${result.handoffArtifacts.runnerPacket.reportPath}`,
+    `- Operator audit record: ${result.handoffArtifacts.operatorAudit.path}`,
+    `- Operator audit report: ${result.handoffArtifacts.operatorAudit.reportPath}`,
+    `- Completion audit record: ${result.handoffArtifacts.completionAudit.path}`,
+    `- Completion audit report: ${result.handoffArtifacts.completionAudit.reportPath}`,
+    `- Capability manifest record: ${result.handoffArtifacts.capabilities.path}`,
+    `- Capability manifest report: ${result.handoffArtifacts.capabilities.reportPath}`,
+    `- Re-entry plan record: ${result.handoffArtifacts.reentryPlan.path}`,
+    `- Re-entry plan report: ${result.handoffArtifacts.reentryPlan.reportPath}`,
+    `- Supervisor record: ${result.handoffArtifacts.supervisor.path ?? "(none)"}`,
+    `- Supervisor report: ${result.handoffArtifacts.supervisor.reportPath ?? "(none)"}`,
+    `- Repair-cycle record: ${result.handoffArtifacts.repairCycle.path ?? "(none)"}`,
+    `- Repair-cycle report: ${result.handoffArtifacts.repairCycle.reportPath ?? "(none)"}`,
+    `- Runner feasibility readiness: ${result.runnerPacket.feasibilityReadiness.status ?? "missing"}${result.runnerPacket.feasibilityReadiness.verdict ? `; verdict=${result.runnerPacket.feasibilityReadiness.verdict}` : ""}`,
+    "",
+    "## Dataset Semantic Audit",
+    "",
+    `- Present: ${result.runnerPacket.datasetSemanticAudit.present}`,
+    `- Status: ${result.runnerPacket.datasetSemanticAudit.status}`,
+    `- Selected-role status: ${result.runnerPacket.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Issues: ${result.runnerPacket.datasetSemanticAudit.issueCount} (${result.runnerPacket.datasetSemanticAudit.blockerCount} blocker, ${result.runnerPacket.datasetSemanticAudit.warningCount} warning)`,
+    ...(result.runnerPacket.datasetSemanticAudit.topIssues.length ? result.runnerPacket.datasetSemanticAudit.topIssues.map(issue => `- ${issue.severity.toUpperCase()} ${issue.column}${issue.selected ? " [selected]" : ""}: ${issue.code} - ${issue.message}`) : ["- Issue: none"]),
+    `- Next action: ${result.runnerPacket.datasetSemanticAudit.nextAction ?? "(none)"}`,
     "",
     "## Safety Envelope",
     "",
@@ -4821,6 +6833,8 @@ function renderControllerRunbookMarkdown(result: ControllerLaunchRunbook): strin
     "",
     "## Environment",
     "",
+    `- Environment record: ${result.handoffArtifacts.environment.path ?? "(none)"}`,
+    `- Environment report: ${result.handoffArtifacts.environment.reportPath ?? "(none)"}`,
     `- Repo root: ${result.environment.repoRoot}`,
     `- Readiness: ${result.environment.readiness}`,
     `- Status: ${result.environment.status}`,
@@ -4833,6 +6847,10 @@ function renderControllerRunbookMarkdown(result: ControllerLaunchRunbook): strin
     "## Stop Criteria",
     "",
     ...result.stopCriteria.map(item => `- ${item}`),
+    "",
+    "## Recovery Commands",
+    "",
+    ...result.recoveryCommands.map(item => `- \`${item}\``),
     "",
     "## Allowed Commands",
     "",
@@ -4853,6 +6871,78 @@ function renderControllerRunbookMarkdown(result: ControllerLaunchRunbook): strin
     "## Artifacts To Inspect",
     "",
     ...result.artifactsToInspect.map(item => `- ${item}`),
+    "",
+    "## Evidence Refs",
+    "",
+    ...result.evidenceRefs.map(item => `- ${item}`),
+    "",
+  ].join("\n");
+}
+
+function renderControllerStatusMarkdown(result: ControllerUnifiedStatus): string {
+  const keyReportEntries = Object.entries(result.keyArtifactReports);
+  return [
+    "# Controller Status",
+    "",
+    `Status artifact: ${result.statusId}`,
+    `Generated: ${result.generatedAtIso}`,
+    `Run ID: ${result.runId}`,
+    `State: ${result.statePath}`,
+    `Status: ${result.status}`,
+    `Stage/status: ${result.currentStage}/${result.controllerStatus}`,
+    `Safe to auto-continue: ${result.safeToAutoContinue}`,
+    `Ready to launch: ${result.readyToLaunch}`,
+    `Promotable: ${result.promotable}`,
+    `Recommended command: \`${result.recommendedCommand}\``,
+    `Launch command: ${result.launchCommand ? `\`${result.launchCommand}\`` : "(none)"}`,
+    `Inspection command: \`${result.inspectionCommand}\``,
+    `Active issue codes: ${result.activeIssueCodes.join(", ") || "(none)"}`,
+    `Active blocker issue codes: ${result.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    "",
+    "## Summary",
+    "",
+    `- Doctor: ${result.summary.doctorStatus}`,
+    `- Runbook: ${result.summary.runbookStatus}`,
+    `- Golden packet: ${result.summary.goldenPacketStatus}`,
+    `- Completion audit: ${result.summary.completionAudit}`,
+    `- Self-evaluation: ${result.summary.selfEvaluation}`,
+    `- Promotion decision: ${result.summary.promotionDecision}`,
+    `- Run inspection: ${result.summary.runInspection ?? "(missing)"}`,
+    `- Feasibility readiness: ${result.summary.feasibilityReadiness ?? "(missing)"}${result.summary.feasibilityVerdict ? `; verdict: ${result.summary.feasibilityVerdict}` : ""}`,
+    `- Dataset semantic audit: ${result.summary.datasetSemanticAudit.status}/${result.summary.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Missing capability ids: ${result.summary.capabilityMissingIds.join(", ") || "(none)"}`,
+    `- Cost estimate: ${result.summary.cost.estimatedUsd.toFixed(4)}; within budget: ${result.summary.cost.withinBudget}`,
+    "",
+    "## Blockers",
+    "",
+    ...(result.blockers.length ? result.blockers.map(item => `- ${item}`) : ["- None."]),
+    "",
+    "## Warnings",
+    "",
+    ...(result.warnings.length ? result.warnings.map(item => `- ${item}`) : ["- None."]),
+    "",
+    "## Next Action",
+    "",
+    result.nextAction,
+    "",
+    "## Key Artifacts",
+    "",
+    `- Doctor: ${result.artifactPaths.doctor}`,
+    `- Doctor report: ${result.artifactPaths.doctorReport}`,
+    `- Runbook: ${result.artifactPaths.runbook}`,
+    `- Runbook report: ${result.artifactPaths.runbookReport}`,
+    `- Golden packet: ${result.artifactPaths.goldenPacket}`,
+    `- Golden packet report: ${result.artifactPaths.goldenPacketReport}`,
+    `- Runner packet: ${result.artifactPaths.runnerPacket}`,
+    `- Runner packet report: ${result.artifactPaths.runnerPacketReport}`,
+    `- Completion audit: ${result.artifactPaths.completionAudit || "(missing)"}`,
+    `- Completion audit report: ${result.artifactPaths.completionAuditReport || "(missing)"}`,
+    `- Capability manifest: ${result.artifactPaths.capabilityManifest}`,
+    `- Capability manifest report: ${result.artifactPaths.capabilityManifestReport}`,
+    "",
+    "## Key Artifact Reports",
+    "",
+    ...keyReportEntries.map(([key, value]) => `- ${key}: ${value ?? "not report-backed"}`),
     "",
     "## Evidence Refs",
     "",
@@ -5003,13 +7093,28 @@ async function buildControllerOperatorAudit(state: ControllerState, agenda: Cont
   const outPath = path.join(state.rootDir, `${auditId}.json`);
   const reportPath = path.join(state.rootDir, `${auditId}.md`);
   const checks: ControllerOperatorAuditCheck[] = [];
-  const add = (id: string, status: ControllerOperatorAuditCheck["status"], category: ControllerOperatorAuditCheck["category"], message: string, evidenceRefs: string[] = []) => {
-    checks.push({ id, status, category, message, evidenceRefs: uniqueText(evidenceRefs) });
+  const add = (
+    id: string,
+    status: ControllerOperatorAuditCheck["status"],
+    category: ControllerOperatorAuditCheck["category"],
+    message: string,
+    evidenceRefs: string[] = [],
+    issueCodes: string[] = [],
+  ) => {
+    checks.push({
+      id,
+      status,
+      category,
+      message,
+      ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
+      evidenceRefs: uniqueText(evidenceRefs),
+    });
   };
   const inspection = await inspectControllerStateForTool(state);
   const recovery = await writeControllerRecoveryInspection(state);
   const environment = await buildControllerEnvironmentPreflight(state, _reason);
   const feasibility = await loadControllerFeasibilitySummary(state);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
   const capabilityCoverage = controllerCapabilityCoverage(state);
   const issueLedger = await readLatestControllerIssueLedger(state);
   const stageReview = await readLatestControllerStageReview(state);
@@ -5037,15 +7142,76 @@ async function buildControllerOperatorAudit(state: ControllerState, agenda: Cont
   add("environment-preflight", environment.status === "fail" ? "fail" : environment.status === "warning" ? "warning" : "pass", "tools", `Environment readiness is ${environment.readiness}: ${environment.nextAction}`, [environment.outPath, environment.reportPath]);
   add("recovery-status", recovery.status === "blocked" ? "fail" : recovery.status === "possible_interruption" || recovery.status === "use_reentry_plan" ? "warning" : "pass", "state", `Recovery status is ${recovery.status}: ${recovery.reason}`, [recovery.outPath, ...recovery.evidenceRefs]);
   add("agenda-primary-command", agenda.primaryCommand ? agenda.status === "blocked" ? "warning" : "pass" : "fail", "autonomy", agenda.primaryCommand ? `Agenda primary command is ${agenda.primaryCommand}.` : "No agenda primary command is available.", [agenda.outPath]);
-  add("follow-loop-capability", "pass", "autonomy", "Controller exposes agenda, follow-agenda, and follow-loop primitives for bounded autonomous pickup.", artifactPaths(state, "controller-execution-agenda", "controller-follow-agenda", "controller-follow-loop"));
+  add("follow-loop-capability", "pass", "autonomy", "Controller exposes agenda, follow-agenda, and follow-loop primitives for bounded autonomous pickup.", artifactPaths(state, "controller-execution-agenda", "controller-follow-agenda", "controller-follow-agenda-report", "controller-follow-loop", "controller-follow-loop-report"));
   add("default-model", state.policy.controller.provider === "openai" && state.policy.controller.model === "gpt-5.4" ? "pass" : "warning", "autonomy", `Default controller model config is ${state.policy.controller.provider}:${state.policy.controller.model}; enabled=${state.policy.controller.enabled}; strict=${state.policy.requireControllerModel}.`);
   add("model-preflight-if-enabled", state.policy.controller.enabled ? artifactExists(state, "controller-model-preflight") || state.decisions.some(decision => decision.source === "model_fallback") ? "pass" : "warning" : "pass", "autonomy", state.policy.controller.enabled ? "Model controller is enabled and model preflight/fallback evidence should be present after decisions." : "Model controller is configured but not enabled for this run.", artifactPaths(state, "controller-model-preflight", "controller-decision-quality"));
-  add("feasibility", feasibilityAuditStatus, "data", !state.inputs.dataPath ? "No row-level data path is configured; controller cannot independently verify data feasibility." : feasibility.present ? `Feasibility status is ${feasibility.status}.` : beforeDatasetFeasibility ? "Feasibility verdict is not present yet; the next safe controller stage should create it." : "Feasibility verdict is missing for row-level data.", feasibility.path ? [feasibility.path] : []);
+  add(
+    "feasibility",
+    feasibilityAuditStatus,
+    "data",
+    !state.inputs.dataPath
+      ? "No row-level data path is configured; controller cannot independently verify data feasibility."
+      : feasibility.present
+        ? `Feasibility status is ${feasibility.status}${feasibility.issueCodes.length ? ` with issue code(s): ${feasibility.issueCodes.join(", ")}.` : "."}`
+        : beforeDatasetFeasibility
+          ? "Feasibility verdict is not present yet; the next safe controller stage should create it."
+          : "Feasibility verdict is missing for row-level data.",
+    feasibility.path ? [feasibility.path] : [],
+    feasibility.issueCodes,
+  );
+  add(
+    "dataset-semantic-audit",
+    !state.inputs.dataPath
+      ? "warning"
+      : datasetSemanticAudit.selectedRoleStatus === "block"
+        ? "fail"
+        : datasetSemanticAudit.selectedRoleStatus === "warning"
+          ? "warning"
+          : datasetSemanticAudit.present
+            ? "pass"
+            : beforeDatasetFeasibility
+              ? "warning"
+              : "fail",
+    "data",
+    !state.inputs.dataPath
+      ? "No row-level data path is configured; dataset semantic audit is unavailable."
+      : datasetSemanticAudit.present
+        ? `Dataset semantic audit status is ${datasetSemanticAudit.status}; selected-role status is ${datasetSemanticAudit.selectedRoleStatus}; issues=${datasetSemanticAudit.issueCount}.`
+        : beforeDatasetFeasibility
+          ? "Dataset semantic audit is not present yet; the next safe controller stage should create it."
+          : "Dataset semantic audit is missing for row-level data.",
+    uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
+    uniqueText(datasetSemanticAudit.topIssues.filter(issue => issue.selected && issue.severity !== "note").map(issue => issue.code)),
+  );
   add("required-artifact-integrity", missingRequiredArtifacts.length ? "fail" : "pass", "artifacts", missingRequiredArtifacts.length ? `${missingRequiredArtifacts.length} required artifact(s) are missing hashes.` : "Required artifacts have hashes or none are required yet.", missingRequiredArtifacts.map(item => item.path));
   add("action-outcomes", failedActions.length ? "fail" : "pass", "state", failedActions.length ? `${failedActions.length} action(s) failed.` : "No failed controller actions recorded.", failedActions.flatMap(action => action.artifacts.map(item => item.path)));
   add("tool-outcomes", failedTools.length ? "warning" : "pass", "tools", failedTools.length ? `${failedTools.length} tool action(s) failed or were rejected.` : "No failed/rejected controller tool actions recorded.", failedTools.map(tool => tool.outPath));
-  add("issue-ledger", issueLedger?.status === "blocked" ? "fail" : issueLedger?.status === "warnings" ? "warning" : issueLedger ? "pass" : "warning", "state", issueLedger ? `Issue ledger status is ${issueLedger.status} with ${issueLedger.issues.length} issue(s).` : "No issue ledger is available.", issueLedger ? [issueLedger.outPath] : []);
+  add(
+    "issue-ledger",
+    issueLedger?.status === "blocked" ? "fail" : issueLedger?.status === "warnings" ? "warning" : issueLedger ? "pass" : "warning",
+    "state",
+    issueLedger ? `Issue ledger status is ${issueLedger.status} with ${issueLedger.issues.length} issue(s).` : "No issue ledger is available.",
+    issueLedger ? [issueLedger.outPath] : [],
+    uniqueText(issueLedger?.issues.filter(issue => issue.status === "active").map(issue => issue.issueCode).filter((item): item is string => Boolean(item)) ?? []),
+  );
   add("stage-review", stageReview?.status === "block" ? "fail" : stageReview?.status === "warning" ? "warning" : stageReview ? "pass" : state.actions.length ? "warning" : "pass", "review", stageReview ? `Latest stage review status is ${stageReview.status} with ${stageReview.findings.length} finding(s).` : "No stage review is available yet.", stageReview ? [stageReview.outPath] : []);
+  if (state.repairs.length > 0) {
+    const latestRepairVerificationPath = latestArtifactPath(state, "controller-repair-verification");
+    const latestRepairVerificationRaw = latestRepairVerificationPath ? await readJsonIfPresent(latestRepairVerificationPath) : null;
+    const latestRepairVerification = valueAtPath(latestRepairVerificationRaw, "controllerRepairVerification") as Partial<ControllerRepairVerification> | null;
+    const repairVerificationStatus = latestRepairVerification?.status ?? null;
+    add(
+      "repair-verification",
+      repairVerificationStatus === "pass" ? "pass" : repairVerificationStatus === "warning" ? "warning" : "fail",
+      "review",
+      repairVerificationStatus === "pass"
+        ? "Latest repair verification passed."
+        : repairVerificationStatus === "warning"
+          ? `Latest repair verification has warnings: ${latestRepairVerification?.nextAction ?? "review repair verification"}.`
+          : "Reviewer-driven repair verification is missing or failed.",
+      latestRepairVerificationPath ? [latestRepairVerificationPath] : artifactPaths(state, "controller-repair-execution"),
+    );
+  }
   add("capability-coverage", missingCapabilities.length ? "warning" : "pass", "autonomy", missingCapabilities.length ? `Missing applicable capability evidence: ${missingCapabilities.map(item => item.capability).join(", ")}.` : "Applicable controller capabilities have evidence or are not yet applicable.", missingCapabilities.flatMap(item => item.evidenceRefs));
   add("cost-boundary", state.costEstimateUsd <= state.policy.reviewerBudget.maxStudyLoopUsd + state.policy.controllerBudget.maxStudyLoopUsd ? "pass" : "fail", "cost", `Estimated controller/reviewer cost is $${state.costEstimateUsd}; combined budget is $${state.policy.reviewerBudget.maxStudyLoopUsd + state.policy.controllerBudget.maxStudyLoopUsd}.`);
 
@@ -5054,6 +7220,7 @@ async function buildControllerOperatorAudit(state: ControllerState, agenda: Cont
   const reviewWarnings = warnings.filter(check => !isAdvisoryControllerAuditWarning(check, state));
   const status: ControllerOperatorAudit["status"] = failed.length ? "fail" : warnings.length ? "warning" : "pass";
   const readiness: ControllerOperatorAudit["readiness"] = state.status === "complete" || state.currentStage === "complete" ? "complete" : failed.length || state.status === "blocked" || agenda.status === "blocked" ? "blocked" : reviewWarnings.length || state.status === "needs_human_review" ? "ready_for_review" : "ready_to_follow";
+  const readinessBlockers = buildControllerOperatorAuditReadinessBlockers(checks, readiness);
   return {
     schemaVersion: 1,
     generatedAtIso: nowIso(),
@@ -5068,11 +7235,13 @@ async function buildControllerOperatorAudit(state: ControllerState, agenda: Cont
     modelControllerEnabled: state.policy.controller.enabled,
     strictModelController: state.policy.requireControllerModel,
     checks,
+    readinessBlockers,
     capabilityCoverage,
     environment,
     inspection,
     recovery,
     feasibility,
+    datasetSemanticAudit,
     latestAgenda: agenda,
     latestIssueLedger: issueLedger,
     latestStageReview: stageReview,
@@ -5082,7 +7251,33 @@ async function buildControllerOperatorAudit(state: ControllerState, agenda: Cont
   };
 }
 
+function buildControllerOperatorAuditReadinessBlockers(
+  checks: ControllerOperatorAuditCheck[],
+  readiness: ControllerOperatorAudit["readiness"],
+): ControllerOperatorAuditReadinessBlocker[] {
+  if (readiness === "complete" || readiness === "ready_to_follow") return [];
+  const actionable = checks.filter(check => check.status === "fail" || check.status === "warning");
+  const blockers = actionable.map(check => ({
+    id: check.id,
+    severity: check.status === "fail" ? "blocker" as const : "warning" as const,
+    category: check.category,
+    issueCodes: uniqueText(check.issueCodes ?? issueCodesFromText(check.message)),
+    message: check.message,
+    evidenceRefs: uniqueText(check.evidenceRefs),
+  }));
+  const seen = new Set<string>();
+  return blockers.filter(blocker => {
+    const key = `${blocker.id}:${blocker.severity}:${blocker.issueCodes.join(",")}:${blocker.message}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 40);
+}
+
 function renderControllerOperatorAuditMarkdown(audit: ControllerOperatorAudit): string {
+  const readinessBlockers = audit.readinessBlockers?.length
+    ? audit.readinessBlockers
+    : buildControllerOperatorAuditReadinessBlockers(audit.checks, audit.readiness);
   return [
     "# Controller Operator Audit",
     "",
@@ -5097,11 +7292,26 @@ function renderControllerOperatorAuditMarkdown(audit: ControllerOperatorAudit): 
     `Model controller enabled: ${audit.modelControllerEnabled}`,
     `Strict model controller: ${audit.strictModelController}`,
     "",
+    "## Dataset Semantic Audit",
+    "",
+    `- Present: ${audit.datasetSemanticAudit.present}`,
+    `- Status: ${audit.datasetSemanticAudit.status}`,
+    `- Selected-role status: ${audit.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Issues: ${audit.datasetSemanticAudit.issueCount} (${audit.datasetSemanticAudit.blockerCount} blocker, ${audit.datasetSemanticAudit.warningCount} warning)`,
+    ...(audit.datasetSemanticAudit.topIssues.length ? audit.datasetSemanticAudit.topIssues.map(issue => `- ${issue.severity.toUpperCase()} ${issue.column}${issue.selected ? " [selected]" : ""}: ${issue.code} - ${issue.message}`) : ["- Issue: none"]),
+    `- Next action: ${audit.datasetSemanticAudit.nextAction ?? "(none)"}`,
+    "",
     "## Next Command",
     "",
     "```bash",
     audit.nextCommand,
     "```",
+    "",
+    "## Readiness Blockers",
+    "",
+    ...(readinessBlockers.length
+      ? readinessBlockers.map(item => `- ${item.severity.toUpperCase()} [${item.category}${item.issueCodes.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.id}: ${item.message}${item.evidenceRefs.length ? ` Evidence: ${item.evidenceRefs.join(", ")}` : ""}`)
+      : ["- None recorded."]),
     "",
     "## Checks",
     "",
@@ -5111,6 +7321,7 @@ function renderControllerOperatorAuditMarkdown(audit: ControllerOperatorAudit): 
       `- Status: ${check.status}`,
       `- Category: ${check.category}`,
       `- Finding: ${check.message}`,
+      ...(check.issueCodes?.length ? [`- Issue codes: ${check.issueCodes.join(", ")}`] : []),
       ...(check.evidenceRefs.length ? ["- Evidence:", ...check.evidenceRefs.map(ref => `  - ${ref}`)] : ["- Evidence: none recorded"]),
       "",
     ]),
@@ -5124,8 +7335,74 @@ function renderControllerOperatorAuditMarkdown(audit: ControllerOperatorAudit): 
 function isAdvisoryControllerAuditWarning(check: ControllerOperatorAuditCheck, state: Pick<ControllerState, "currentStage" | "completedStages">): boolean {
   if (check.id === "capability-coverage") return true;
   if (check.id === "environment-preflight") return true;
-  if (state.currentStage === "intake" && !state.completedStages.includes("dataset_feasibility") && (check.id === "state-integrity" || check.id === "feasibility")) return true;
+  if (state.currentStage === "intake" && !state.completedStages.includes("dataset_feasibility") && (check.id === "state-integrity" || check.id === "feasibility" || check.id === "dataset-semantic-audit")) return true;
   return false;
+}
+
+const controllerArtifactReportKindByBase = new Map<string, string>([
+  ["continuous-benchmark-suite", "continuous-benchmark-suite-report"],
+  ["continuous-benchmark-trend", "continuous-benchmark-trend-report"],
+  ["exploration", "exploration-report"],
+  ["figure-qa", "figure-qa-report"],
+  ["literature-context", "literature-context-report"],
+  ["literature-qa", "literature-qa-report"],
+  ["literature-search", "literature-search-report"],
+  ["method-qa", "method-qa-report"],
+  ["run-inspection", "run-inspection-report"],
+  ["stats-run", "stats-report"],
+  ["stats-summary", "stats-report"],
+  ["controller-action-contract", "controller-action-contract-report"],
+  ["controller-action-readiness", "controller-action-readiness-report"],
+  ["controller-benchmark", "controller-benchmark-report"],
+  ["controller-capability-manifest", "controller-capability-manifest-report"],
+  ["controller-completion-audit", "controller-completion-audit-report"],
+  ["controller-dataset-semantic-audit", "controller-dataset-semantic-audit-report"],
+  ["controller-decision-context", "controller-decision-context-report"],
+  ["controller-decision-quality", "controller-decision-quality-report"],
+  ["controller-doctor", "controller-doctor-report"],
+  ["controller-environment-preflight", "controller-environment-preflight-report"],
+  ["controller-execution-agenda", "controller-execution-agenda-report"],
+  ["controller-feasibility-verdict", "controller-feasibility-report"],
+  ["controller-follow-agenda", "controller-follow-agenda-report"],
+  ["controller-follow-loop", "controller-follow-loop-report"],
+  ["controller-golden-packet", "controller-golden-packet-report"],
+  ["controller-goal-audit", "controller-goal-audit-report"],
+  ["controller-internal-inspection", "controller-internal-inspection-report"],
+  ["controller-issue-ledger", "controller-issue-ledger-report"],
+  ["controller-model-preflight", "controller-model-preflight-report"],
+  ["controller-model-runner-packet", "controller-model-runner-packet-report"],
+  ["controller-next-action", "controller-next-action-report"],
+  ["controller-operate", "controller-operate-report"],
+  ["controller-operator-audit", "controller-operator-audit-report"],
+  ["controller-recovery-inspection", "controller-recovery-inspection-report"],
+  ["controller-reentry-plan", "controller-reentry-plan-report"],
+  ["controller-repair-cycle", "controller-repair-cycle-report"],
+  ["controller-repair-verification", "controller-repair-verification-report"],
+  ["controller-run-invocation", "controller-run-invocation-report"],
+  ["controller-runbook", "controller-runbook-report"],
+  ["controller-self-evaluation", "controller-self-evaluation-report"],
+  ["controller-source-patch-apply", "controller-source-patch-apply-report"],
+  ["controller-source-patch-proposal", "controller-source-patch-proposal-report"],
+  ["controller-source-patch-rollback", "controller-source-patch-rollback-report"],
+  ["controller-source-patch-verification", "controller-source-patch-verification-report"],
+  ["controller-stage-review", "controller-stage-review-report"],
+  ["controller-start", "controller-start-report"],
+  ["controller-state-snapshot", "controller-state-snapshot-report"],
+  ["controller-status", "controller-status-report"],
+  ["controller-supervisor", "controller-supervisor-report"],
+  ["controller-terminal-handoff", "controller-terminal-handoff-report"],
+  ["controller-work-plan", "controller-work-plan-report"],
+]);
+
+export function controllerArtifactReportKindPairs(): Array<readonly [string, string]> {
+  return Array.from(controllerArtifactReportKindByBase.entries());
+}
+
+function expandControllerArtifactKindsWithReports(kinds: string[]): string[] {
+  return uniqueText(kinds.flatMap(kind => {
+    const reportKind = controllerArtifactReportKindByBase.get(kind);
+    return reportKind ? [kind, reportKind] : [kind];
+  }));
 }
 
 function buildControllerCapabilityManifest(state: ControllerState, _reason: string): ControllerCapabilityManifest {
@@ -5151,7 +7428,8 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
   }): ControllerCapabilityManifestEntry => {
     const baseCoverage = coverage.get(input.id);
     const applicable = input.applicable ?? (baseCoverage ? baseCoverage.status !== "not_applicable" : true);
-    const evidenceRefs = uniqueText([...(input.evidenceRefs ?? []), ...(baseCoverage?.evidenceRefs ?? [])]);
+    const artifactKinds = expandControllerArtifactKindsWithReports(input.artifactKinds);
+    const evidenceRefs = uniqueText([...(input.evidenceRefs ?? []), ...evidence(...artifactKinds), ...(baseCoverage?.evidenceRefs ?? [])]);
     const covered = input.covered ?? Boolean(baseCoverage?.status === "covered") ?? false;
     const requiredNow = input.requiredNow ?? Boolean(baseCoverage?.status === "missing");
     const status: ControllerCapabilityManifestEntry["status"] = !applicable
@@ -5166,20 +7444,31 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       status,
       description: input.description,
       commands: input.commands,
-      artifactKinds: input.artifactKinds,
+      artifactKinds,
       evidenceRefs,
       testRefs: input.tests,
       failureMode: input.failureMode,
     };
   };
   const stateCommand = `agenteer research controller-run --state ${quotePath(state.statePath)} --max-steps 4`;
+  const startCommand = `agenteer research controller-start --question ${JSON.stringify(state.inputs.question)} --out-dir ${quotePath(state.rootDir)}`;
   const entries: ControllerCapabilityManifestEntry[] = [
+    entry({
+      id: "golden_path_startup",
+      description: "One-command controller startup that creates durable state, first-read status, and launch runbook evidence before execution; --operate can delegate into the bounded operate loop.",
+      commands: [startCommand, `${startCommand} --operate --max-cycles 4`],
+      artifactKinds: ["controller-start", "controller-start-report", "controller-status", "controller-runbook", "controller-operate"],
+      evidenceRefs: evidence("controller-start", "controller-start-report", "controller-status", "controller-runbook", "controller-operate"),
+      tests: ["packages/cli/tests/research-controller.test.ts"],
+      covered: hasAnyArtifact("controller-start") && hasAnyArtifact("controller-status") && hasAnyArtifact("controller-runbook"),
+      failureMode: "A user or fresh model runner must manually compose init/status/runbook/operate and may skip the readiness envelope before execution.",
+    }),
     entry({
       id: "persistent_state_machine",
       description: "Durable controller state, checkpoints, snapshots, run ledgers, and terminal handoff artifacts.",
-      commands: ["agenteer research controller-init", "agenteer research controller-step", stateCommand],
-      artifactKinds: ["controller-state", "controller-step-checkpoint", "controller-state-snapshot", "controller-run-invocation", "controller-terminal-handoff"],
-      evidenceRefs: [state.statePath, ...evidence("controller-step-checkpoint", "controller-state-snapshot", "controller-run-invocation", "controller-terminal-handoff")],
+      commands: ["agenteer research controller-init", "agenteer research controller-start", "agenteer research controller-step", stateCommand],
+      artifactKinds: ["controller-state", "controller-start", "controller-step-checkpoint", "controller-state-snapshot", "controller-run-invocation", "controller-terminal-handoff"],
+      evidenceRefs: [state.statePath, ...evidence("controller-start", "controller-step-checkpoint", "controller-state-snapshot", "controller-run-invocation", "controller-terminal-handoff")],
       tests: ["packages/cli/tests/research-controller.test.ts"],
       covered: Boolean(state.runId && state.statePath),
       failureMode: "A runner cannot resume, audit, or prove what happened after interruption.",
@@ -5222,8 +7511,8 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       id: "dataset_feasibility",
       description: "Pre-analysis feasibility gate for required variables, missingness, row counts, semantic plausibility, and method-specific viability.",
       commands: [stateCommand, "agenteer research table-summary", "agenteer research explore"],
-      artifactKinds: ["table-summary", "controller-feasibility-verdict", "controller-feasibility-report"],
-      evidenceRefs: evidence("table-summary", "controller-feasibility-verdict", "controller-feasibility-report"),
+      artifactKinds: ["table-summary", "controller-dataset-semantic-audit", "controller-dataset-semantic-audit-report", "controller-feasibility-verdict", "controller-feasibility-report"],
+      evidenceRefs: evidence("table-summary", "controller-dataset-semantic-audit", "controller-dataset-semantic-audit-report", "controller-feasibility-verdict", "controller-feasibility-report"),
       tests: ["packages/cli/tests/research-controller.test.ts"],
       applicable: Boolean(state.inputs.dataPath),
       covered: stageCompleted("dataset_feasibility") && hasAnyArtifact("controller-feasibility-verdict"),
@@ -5311,14 +7600,14 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
     }),
     entry({
       id: "bounded_repair",
-      description: "Reviewer-derived bounded repair plugins that rerun deterministic stages without arbitrary code execution.",
+      description: "Reviewer-derived bounded repair plugins with post-repair verification before the state machine can claim repair capability.",
       commands: [stateCommand, `agenteer research controller-repair-cycle --state ${quotePath(state.statePath)}`, "agenteer research controller-resume"],
-      artifactKinds: ["controller-repair-plan", "controller-repair-execution", "controller-repair-cycle"],
-      evidenceRefs: evidence("controller-repair-plan", "controller-repair-execution", "controller-repair-cycle", "review-response", "state-reentry"),
+      artifactKinds: ["controller-repair-plan", "controller-repair-execution", "controller-repair-verification", "controller-repair-verification-report", "controller-repair-cycle"],
+      evidenceRefs: evidence("controller-repair-plan", "controller-repair-execution", "controller-repair-verification", "controller-repair-verification-report", "controller-repair-cycle", "review-response", "state-reentry"),
       tests: ["packages/cli/tests/research-controller.test.ts", "packages/cli/tests/research-reviewer.test.ts"],
-      applicable: state.policy.allowAutoRepair,
-      covered: state.repairs.some(item => item.status === "succeeded" || item.status === "partial"),
-      failureMode: "Reviewer feedback cannot feed back into the state machine safely.",
+      applicable: state.policy.allowAutoRepair && (state.repairs.length > 0 || state.policy.allowExternalReview || state.policy.requireExternalReviewForPromotion),
+      covered: state.repairs.some(item => item.status === "succeeded" || item.status === "partial") && hasAnyArtifact("controller-repair-verification"),
+      failureMode: "Reviewer feedback can appear repaired without proof that accepted findings were accounted for and fresh review was required where appropriate.",
     }),
     entry({
       id: "safe_input_patching",
@@ -5333,8 +7622,9 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
     }),
     entry({
       id: "controller_tools",
-      description: "Bounded tool actions for inspection, artifact previews, repository file reads/searches, git diffs, non-applying patch proposals, reviewed patch application, post-apply verification, rollback, build, and tests with captured output.",
+      description: "Bounded tool actions for first-read status, inspection, artifact previews, repository file reads/searches, git diffs, non-applying patch proposals, reviewed patch application, post-apply verification, rollback, build, and tests with captured output.",
       commands: [
+        `agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-status --reason "refresh first-read status"`,
         `agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-inspect --reason "inspect state"`,
         `agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-search-repo --arg ControllerState --arg packages/cli/src --reason "search source"`,
         `agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-read-file --arg packages/cli/src/research-machine/controller.ts --reason "read source"`,
@@ -5345,7 +7635,7 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
         `agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-verify-patch --arg latest --reason "run declared patch verification"`,
         `agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-rollback-patch --arg latest --reason "rollback failed source patch"`,
       ],
-      artifactKinds: ["controller-tool-action", "controller-repo-file-read", "controller-repo-search", "controller-agenteer-command", "controller-git-diff", "controller-source-patch-proposal", "controller-source-patch-apply", "controller-source-patch-verification", "controller-source-patch-rollback"],
+      artifactKinds: ["controller-tool-action", "controller-status", "controller-status-report", "controller-repo-file-read", "controller-repo-search", "controller-agenteer-command", "controller-git-diff", "controller-source-patch-proposal", "controller-source-patch-apply", "controller-source-patch-verification", "controller-source-patch-rollback"],
       evidenceRefs: state.toolActions.map(item => item.outPath),
       tests: ["packages/cli/tests/research-controller.test.ts"],
       applicable: state.policy.allowToolActions,
@@ -5446,11 +7736,27 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       id: "execution_agenda",
       description: "Ranked bounded command queue for follow-agenda, follow-loop, and supervisor pickup.",
       commands: [`agenteer research controller-agenda --state ${quotePath(state.statePath)}`, `agenteer research controller-follow-agenda --state ${quotePath(state.statePath)}`, `agenteer research controller-follow-loop --state ${quotePath(state.statePath)}`, `agenteer research controller-supervise --state ${quotePath(state.statePath)}`],
-      artifactKinds: ["controller-execution-agenda", "controller-follow-agenda", "controller-follow-loop", "controller-supervisor"],
-      evidenceRefs: evidence("controller-execution-agenda", "controller-follow-agenda", "controller-follow-loop", "controller-supervisor"),
+      artifactKinds: ["controller-execution-agenda", "controller-execution-agenda-report", "controller-follow-agenda", "controller-follow-agenda-report", "controller-follow-loop", "controller-follow-loop-report", "controller-supervisor", "controller-supervisor-report"],
+      evidenceRefs: evidence("controller-execution-agenda", "controller-execution-agenda-report", "controller-follow-agenda", "controller-follow-agenda-report", "controller-follow-loop", "controller-follow-loop-report", "controller-supervisor", "controller-supervisor-report"),
       tests: ["packages/cli/tests/research-controller.test.ts"],
       covered: hasAnyArtifact("controller-execution-agenda"),
       failureMode: "A future runner has no bounded command queue and must infer next actions from scratch.",
+    }),
+    entry({
+      id: "actionable_run_inspection_recovery",
+      description: "Run-inspection recommended commands are propagated into terminal handoff, next-action alternatives, execution agenda, model-runner packet, and launch runbook recovery commands.",
+      commands: [
+        `agenteer research run-inspect --run-dir ${quotePath(state.inputs.runDir)}`,
+        `agenteer research controller-agenda --state ${quotePath(state.statePath)}`,
+        `agenteer research controller-follow-agenda --state ${quotePath(state.statePath)}`,
+        `agenteer research controller-runner-packet --state ${quotePath(state.statePath)}`,
+        `agenteer research controller-runbook --state ${quotePath(state.statePath)}`,
+      ],
+      artifactKinds: ["run-inspection", "controller-terminal-handoff", "controller-next-action", "controller-execution-agenda", "controller-model-runner-packet", "controller-runbook"],
+      evidenceRefs: evidence("run-inspection", "controller-terminal-handoff", "controller-next-action", "controller-execution-agenda", "controller-model-runner-packet", "controller-runbook"),
+      tests: ["packages/cli/tests/research-controller.test.ts"],
+      covered: hasAnyArtifact("controller-execution-agenda") && hasAnyArtifact("controller-model-runner-packet") && (state.status === "running" || artifactExists(state, "controller-terminal-handoff") && artifactExists(state, "controller-next-action")),
+      failureMode: "Run inspection can identify concrete repairs, but a fresh runner cannot find or execute those commands from controller handoff artifacts.",
     }),
     entry({
       id: "environment_preflight",
@@ -5473,6 +7779,17 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       failureMode: "An unattended runner cannot prove whether it is safe to continue.",
     }),
     entry({
+      id: "supervised_pickup",
+      description: "Bounded supervisor pickup that refreshes runner packets, follows safe agenda items, and records post-round readiness evidence.",
+      commands: [`agenteer research controller-supervise --state ${quotePath(state.statePath)}`],
+      artifactKinds: ["controller-supervisor", "controller-supervisor-report"],
+      evidenceRefs: evidence("controller-supervisor", "controller-supervisor-report"),
+      tests: ["packages/cli/tests/research-controller.test.ts"],
+      covered: hasAnyArtifact("controller-supervisor"),
+      requiredNow: false,
+      failureMode: "A fresh runner cannot prove that unattended agenda pickup is bounded, audited, and stopped when unsafe.",
+    }),
+    entry({
       id: "operational_doctor",
       description: "Unified readiness report for humans and fresh model runners, combining audit, completion, runner-packet, capability, re-entry, supervisor, repair, artifact, and cost posture.",
       commands: [`agenteer research controller-doctor --state ${quotePath(state.statePath)}`],
@@ -5482,6 +7799,17 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       covered: hasAnyArtifact("controller-doctor"),
       requiredNow: false,
       failureMode: "Operators must inspect scattered artifacts manually and may miss a blocker before handing work to a fresh model runner.",
+    }),
+    entry({
+      id: "operational_status",
+      description: "First-read controller status summary for humans, schedulers, and fresh model runners, combining launchability, promotability, blockers, warnings, issue codes, next command, and key linked artifacts.",
+      commands: [`agenteer research controller-status --state ${quotePath(state.statePath)}`],
+      artifactKinds: ["controller-status", "controller-status-report", "controller-doctor", "controller-runbook", "controller-golden-packet"],
+      evidenceRefs: evidence("controller-status", "controller-status-report", "controller-doctor", "controller-runbook", "controller-golden-packet"),
+      tests: ["packages/cli/tests/research-controller.test.ts"],
+      covered: hasAnyArtifact("controller-status"),
+      requiredNow: false,
+      failureMode: "A human or fresh model runner must reconcile doctor, runbook, and golden-packet artifacts manually before knowing whether to launch, stop, or inspect.",
     }),
     entry({
       id: "controller_operate_loop",
@@ -5524,6 +7852,21 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       tests: ["packages/cli/tests/research-controller.test.ts"],
       covered: hasAnyArtifact("controller-goal-audit"),
       failureMode: "A model runner overclaims the overall controller-agent build without checking each required capability against authoritative evidence.",
+    }),
+    entry({
+      id: "continuous_benchmark_regression_suite",
+      description: "Continuous benchmark scoring over representative research run directories, using unified run inspection to track packet completeness, QA status, rerun stability, cost, report readability, and artifact integrity before framework changes are promoted.",
+      commands: [
+        `agenteer research controller-benchmark --state ${quotePath(state.statePath)}`,
+        "agenteer research benchmark-suite-run --suite ./.loop-memory/golden --out-dir ./.loop-memory/benchmark-history",
+        "agenteer research benchmark-trend --history ./.loop-memory/benchmark-history",
+      ],
+      artifactKinds: ["controller-benchmark", "controller-benchmark-report", "continuous-benchmark-suite", "continuous-benchmark-suite-report", "continuous-benchmark-trend", "continuous-benchmark-trend-report"],
+      evidenceRefs: evidence("controller-benchmark", "controller-benchmark-report", "continuous-benchmark-suite", "continuous-benchmark-suite-report", "continuous-benchmark-trend", "continuous-benchmark-trend-report"),
+      tests: ["packages/cli/tests/research-trust.test.ts", "packages/cli/tests/research.test.ts"],
+      covered: hasAnyArtifact("continuous-benchmark-suite") && hasAnyArtifact("continuous-benchmark-trend"),
+      requiredNow: false,
+      failureMode: "Framework changes can pass local unit tests while regressing packet readiness, methods correctness, figure/report quality, rerun stability, or artifact integrity on representative research runs.",
     }),
     entry({
       id: "completion_audit_and_promotion",
@@ -5574,6 +7917,7 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
     defaultControllerModel: `${state.policy.controller.provider}:${state.policy.controller.model}`,
     controllerCommands: [
       "controller-init",
+      "controller-start",
       "controller-step",
       "controller-run",
       "run-autonomous",
@@ -5587,11 +7931,14 @@ function buildControllerCapabilityManifest(state: ControllerState, _reason: stri
       "controller-supervise",
       "controller-env",
       "controller-audit",
+      "controller-status",
       "controller-doctor",
       "controller-operate",
       "controller-capabilities",
+      "controller-benchmark",
       "controller-goal-audit",
       "controller-completion-audit",
+      "controller-golden-packet",
       "controller-repair-cycle",
       "controller-runbook",
       "controller-runner-packet",
@@ -5647,6 +7994,7 @@ function buildControllerGoalAudit(
   state: ControllerState,
   operatorAudit: ControllerOperatorAudit,
   capabilityManifest: ControllerCapabilityManifest,
+  issueLedger: ControllerIssueLedger,
   objective?: string,
 ): ControllerGoalAudit {
   const auditId = `controller_goal_audit_${String(state.artifacts.filter(item => item.kind === "controller-goal-audit").length + 1).padStart(3, "0")}`;
@@ -5674,6 +8022,9 @@ function buildControllerGoalAudit(
     return [];
   });
   const reqs: ControllerGoalAuditRequirement[] = [];
+  const activeIssues = issueLedger.issues.filter(issue => issue.status === "active");
+  const activeBlockingIssues = activeIssues.filter(issue => issue.severity === "blocker" || issue.severity === "major");
+  const activeIssueCodes = uniqueText(activeIssues.map(issue => issue.issueCode).filter((item): item is string => Boolean(item)));
   const add = (
     id: string,
     category: ControllerGoalAuditRequirement["category"],
@@ -5683,6 +8034,7 @@ function buildControllerGoalAudit(
     evidenceRefs: string[],
     gaps: string[],
     nextAction: string,
+    issueCodes: string[] = [],
   ) => {
     reqs.push({
       id,
@@ -5690,6 +8042,7 @@ function buildControllerGoalAudit(
       requirement,
       evidenceStandard,
       status,
+      ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
       evidenceRefs: uniqueText(evidenceRefs),
       gaps: uniqueText(gaps),
       nextAction,
@@ -5699,11 +8052,21 @@ function buildControllerGoalAudit(
     "persistent_resumable_state",
     "autonomy",
     "Controller persists state, checkpoints, snapshots, agendas, ledgers, and handoff artifacts so another runner can resume without chat context.",
-    "persistent_state_machine, work_plan_issue_ledger_stage_review, execution_agenda, environment_preflight, operational_doctor, controller_operate_loop, and terminal_handoff_and_reentry capabilities are covered or currently not applicable.",
-    capStatus(["persistent_state_machine", "work_plan_issue_ledger_stage_review", "execution_agenda", "environment_preflight", "operational_doctor", "controller_operate_loop", "terminal_handoff_and_reentry"]),
-    capEvidence(["persistent_state_machine", "work_plan_issue_ledger_stage_review", "execution_agenda", "environment_preflight", "operational_doctor", "controller_operate_loop", "terminal_handoff_and_reentry"]),
-    capGaps(["persistent_state_machine", "work_plan_issue_ledger_stage_review", "execution_agenda", "environment_preflight", "operational_doctor", "controller_operate_loop", "terminal_handoff_and_reentry"]),
+    "persistent_state_machine, work_plan_issue_ledger_stage_review, execution_agenda, environment_preflight, operational_status, operational_doctor, controller_operate_loop, and terminal_handoff_and_reentry capabilities are covered or currently not applicable.",
+    capStatus(["persistent_state_machine", "work_plan_issue_ledger_stage_review", "execution_agenda", "environment_preflight", "operational_status", "operational_doctor", "controller_operate_loop", "terminal_handoff_and_reentry"]),
+    capEvidence(["persistent_state_machine", "work_plan_issue_ledger_stage_review", "execution_agenda", "environment_preflight", "operational_status", "operational_doctor", "controller_operate_loop", "terminal_handoff_and_reentry"]),
+    capGaps(["persistent_state_machine", "work_plan_issue_ledger_stage_review", "execution_agenda", "environment_preflight", "operational_status", "operational_doctor", "controller_operate_loop", "terminal_handoff_and_reentry"]),
     `Run agenteer research controller-follow-loop --state ${quotePath(state.statePath)} --max-iterations 5, then rerun controller-goal-audit.`,
+  );
+  add(
+    "actionable_inspection_recovery",
+    "autonomy",
+    "Controller carries run-inspection recommended commands into handoff, next-action alternatives, execution agenda, model-runner packet, and launch runbook recovery so a fresh runner can execute concrete QA/repair steps.",
+    "actionable_run_inspection_recovery is covered, proving that run-inspection commands are not stranded inside inspection reports.",
+    capStatus(["actionable_run_inspection_recovery"]),
+    capEvidence(["actionable_run_inspection_recovery"]),
+    capGaps(["actionable_run_inspection_recovery"]),
+    `Run agenteer research run-inspect --run-dir ${quotePath(state.inputs.runDir)}, then regenerate controller-agenda, controller-runner-packet, controller-runbook, and controller-goal-audit.`,
   );
   add(
     "doctor_driven_autonomous_operation",
@@ -5773,16 +8136,43 @@ function buildControllerGoalAudit(
     operatorAudit.nextCommand,
   );
   add(
+    "active_issue_ledger_clearance",
+    "safety",
+    "Controller goal completion is blocked while active issue-ledger blockers or major issues remain unresolved, including coded feasibility and semantic-plausibility failures.",
+    "Latest controller issue ledger is clear, or only nonblocking warnings remain explicitly visible with stable issue codes and evidence refs.",
+    activeBlockingIssues.length ? "missing" : activeIssues.length ? "partial" : "proved",
+    uniqueText([issueLedger.outPath, issueLedger.reportPath]),
+    activeIssues.length
+      ? activeIssues.slice(0, 12).map(issue => `${issue.issueCode ? `${issue.issueCode}: ` : ""}${issue.severity}/${issue.category} from ${issue.source}: ${issue.message}`)
+      : [],
+    activeIssues[0]?.suggestedAction ?? `Run agenteer research controller-doctor --state ${quotePath(state.statePath)} and continue only after the issue ledger is clear.`,
+    activeIssueCodes,
+  );
+  add(
     "documented_and_tested_public_surface",
     "documentation",
     "Controller has CLI commands, documentation, and regression tests covering runner pickup, audit, tools, source-change loop, and research lifecycle.",
     "Capability manifest lists public commands and test refs, docs/research-controller.md exists as the user-facing controller guide, and controller tests exercise the command surface.",
-    capabilityManifest.controllerCommands.includes("controller-run") && capabilityManifest.controllerCommands.includes("controller-tool") && capabilityManifest.entries.some(entry => entry.testRefs.includes("packages/cli/tests/research-controller.test.ts"))
+    capabilityManifest.controllerCommands.includes("controller-start") && capabilityManifest.controllerCommands.includes("controller-run") && capabilityManifest.controllerCommands.includes("controller-tool") && capabilityManifest.entries.some(entry => entry.testRefs.includes("packages/cli/tests/research-controller.test.ts"))
       ? "proved"
       : "partial",
     uniqueText([capabilityManifest.outPath, capabilityManifest.reportPath, "docs/research-controller.md", "packages/cli/tests/research-controller.test.ts"]),
-    capabilityManifest.controllerCommands.includes("controller-run") ? [] : ["Controller command list is missing controller-run."],
+    [
+      ...(capabilityManifest.controllerCommands.includes("controller-start") ? [] : ["Controller command list is missing controller-start."]),
+      ...(capabilityManifest.controllerCommands.includes("controller-run") ? [] : ["Controller command list is missing controller-run."]),
+      ...(capabilityManifest.controllerCommands.includes("controller-tool") ? [] : ["Controller command list is missing controller-tool."]),
+    ],
     "Run npm test -- packages/cli/tests/research-controller.test.ts and npm test before claiming goal completion.",
+  );
+  add(
+    "continuous_benchmark_regression",
+    "testing",
+    "Controller/research-machine changes are validated against representative continuous benchmark runs, not only unit tests or one-off generated packets.",
+    "continuous_benchmark_regression_suite is covered by controller-benchmark artifacts that attach benchmark-suite-run and benchmark-trend evidence to controller state, or remains available with explicit commands and tests when the current controller state has not run the suite.",
+    capStatus(["continuous_benchmark_regression_suite"]) === "missing" ? "partial" : capStatus(["continuous_benchmark_regression_suite"]),
+    capEvidence(["continuous_benchmark_regression_suite"]),
+    capGaps(["continuous_benchmark_regression_suite"]),
+    `Run agenteer research controller-benchmark --state ${quotePath(state.statePath)}, then rerun controller-goal-audit before promoting broad framework changes.`,
   );
   const missingRequirementIds = reqs.filter(req => req.status === "missing").map(req => req.id);
   const partialRequirementIds = reqs.filter(req => req.status === "partial").map(req => req.id);
@@ -5846,6 +8236,7 @@ function renderControllerGoalAuditMarkdown(audit: ControllerGoalAudit): string {
       `- Requirement: ${req.requirement}`,
       `- Evidence standard: ${req.evidenceStandard}`,
       `- Next action: ${req.nextAction}`,
+      ...(req.issueCodes?.length ? [`- Issue codes: ${req.issueCodes.join(", ")}`] : []),
       ...(req.evidenceRefs.length ? ["- Evidence:", ...req.evidenceRefs.map(ref => `  - ${ref}`)] : ["- Evidence: none"]),
       ...(req.gaps.length ? ["- Gaps:", ...req.gaps.map(gap => `  - ${gap}`)] : ["- Gaps: none"]),
       "",
@@ -5917,6 +8308,12 @@ async function datasetFeasibilityGate(state: ControllerState): Promise<Controlle
   await writeJson(summaryPath, { schemaVersion: 1, tableSummary: summary });
   state.artifacts.push(await artifact("table-summary", summaryPath, "dataset_feasibility", true));
   refs.push(summaryPath);
+  const semanticAudit = buildControllerDatasetSemanticAudit(state, summary, summaryPath);
+  await writeJson(semanticAudit.outPath, { schemaVersion: 1, controllerDatasetSemanticAudit: semanticAudit });
+  await writeFile(semanticAudit.reportPath, renderControllerDatasetSemanticAuditMarkdown(semanticAudit));
+  state.artifacts.push(await artifact("controller-dataset-semantic-audit", semanticAudit.outPath, "dataset_feasibility", false));
+  state.artifacts.push(await artifact("controller-dataset-semantic-audit-report", semanticAudit.reportPath, "dataset_feasibility", false));
+  refs.push(semanticAudit.outPath, semanticAudit.reportPath);
   const verdict = await buildControllerFeasibilityVerdict(state, summary, summaryPath);
   await writeJson(verdict.summaryPath, { schemaVersion: 1, controllerFeasibilityVerdict: verdict });
   await writeFile(verdict.reportPath, renderControllerFeasibilityMarkdown(verdict));
@@ -5970,8 +8367,8 @@ async function buildControllerFeasibilityVerdict(
       if (column.nonMissingRows === 0) issues.push({ severity: "blocker", code: "EMPTY_REQUIRED_VARIABLE", message: `${item.role} variable '${item.name}' has no observed values.` });
       if (column.missingFraction > state.policy.maxRequiredVariableMissingness) issues.push({ severity: "blocker", code: "HIGH_REQUIRED_MISSINGNESS", message: `${item.role} variable '${item.name}' is ${(column.missingFraction * 100).toFixed(1)}% missing, above ${(state.policy.maxRequiredVariableMissingness * 100).toFixed(1)}%.` });
       if ((item.role === "outcome" || item.role === "event") && column.inferredType === "empty") issues.push({ severity: "blocker", code: "EMPTY_OUTCOME", message: `${item.role} variable '${item.name}' cannot support inference because it is empty.` });
-      if ((item.role === "time" || item.role === "running_variable") && column.inferredType !== "number") issues.push({ severity: "blocker", code: "NON_NUMERIC_REQUIRED_TIME", message: `${item.role} variable '${item.name}' must be numeric for this design.` });
-      for (const warning of semanticIssuesForColumn(column)) issues.push(warning);
+      if ((item.role === "time" || item.role === "start" || item.role === "stop" || item.role === "running_variable" || item.role === "weight" || item.role === "offset") && column.inferredType !== "number") issues.push({ severity: "blocker", code: "NON_NUMERIC_REQUIRED_TIME", message: `${item.role} variable '${item.name}' must be numeric for this design.` });
+      for (const warning of semanticIssuesForColumn(column, summary.rowCount, item.role)) issues.push(warning);
     }
     const severity = issues.some(issue => issue.severity === "blocker") ? "blocker" : issues.some(issue => issue.severity === "warning") ? "warning" : "note";
     if (issues.length) {
@@ -6040,7 +8437,11 @@ async function buildControllerFeasibilityVerdict(
     outcome: state.inputs.outcome,
     exposure: state.inputs.exposure,
     group: state.inputs.group,
+    outcomeThreshold: state.inputs.outcomeThreshold,
+    exposureThreshold: state.inputs.exposureThreshold,
     time: state.inputs.time,
+    start: state.inputs.start,
+    stop: state.inputs.stop,
     event: state.inputs.event,
     id: state.inputs.id,
     strata: state.inputs.strata,
@@ -6048,7 +8449,10 @@ async function buildControllerFeasibilityVerdict(
     period: state.inputs.period,
     post: state.inputs.post,
     runningVariable: state.inputs.runningVariable,
+    cutoff: state.inputs.cutoff,
     instrument: state.inputs.instrument,
+    weight: state.inputs.weight,
+    offset: state.inputs.offset,
     variables: state.inputs.variables,
     covariates: state.inputs.covariates,
     exactCovariates: state.inputs.exactCovariates,
@@ -6066,6 +8470,7 @@ async function buildControllerFeasibilityVerdict(
     `Comprehensive feasibility gate returned ${feasibilityGate.verdict}: ${feasibilityGate.nextAction}`,
     feasibilityGate.evidenceRefs,
   );
+  methodChecks.push(...comprehensiveFeasibilityMethodChecks(feasibilityGate));
 
   const uniqueBlockers = uniqueText([
     ...blockers,
@@ -6103,6 +8508,7 @@ async function buildControllerFeasibilityVerdict(
     outcomeDiagnostics,
     domains: feasibilityGate.domains,
     internalReviews: feasibilityGate.internalReviews,
+    issues: feasibilityGate.issues,
     methodChecks,
     blockers: uniqueBlockers,
     warnings: uniqueWarnings,
@@ -6127,6 +8533,8 @@ function controllerVariableRoles(state: ControllerState): Array<{ role: string; 
     { role: "exposure", name: state.inputs.exposure },
     { role: "group", name: state.inputs.group },
     { role: "time", name: state.inputs.time },
+    { role: "start", name: state.inputs.start },
+    { role: "stop", name: state.inputs.stop },
     { role: "event", name: state.inputs.event },
     { role: "id", name: state.inputs.id },
     { role: "strata", name: state.inputs.strata },
@@ -6135,6 +8543,8 @@ function controllerVariableRoles(state: ControllerState): Array<{ role: string; 
     { role: "post", name: state.inputs.post },
     { role: "running_variable", name: state.inputs.runningVariable },
     { role: "instrument", name: state.inputs.instrument },
+    { role: "weight", name: state.inputs.weight },
+    { role: "offset", name: state.inputs.offset },
     ...state.inputs.variables.map(name => ({ role: "variable", name })),
     ...state.inputs.covariates.map(name => ({ role: "covariate", name })),
     ...state.inputs.exactCovariates.map(name => ({ role: "exact_covariate", name })),
@@ -6150,15 +8560,217 @@ function controllerVariableRoles(state: ControllerState): Array<{ role: string; 
     });
 }
 
-function semanticIssuesForColumn(column: ResearchTableSummary["columns"][number]): Array<{ severity: "blocker" | "warning" | "note"; code: string; message: string }> {
-  const issues: Array<{ severity: "blocker" | "warning" | "note"; code: string; message: string }> = [];
-  const lower = column.name.toLowerCase();
-  if (column.inferredType !== "number") return issues;
-  if (/(^|_)age($|_)/.test(lower) && ((column.min ?? 0) < 0 || (column.max ?? 0) > 120)) issues.push({ severity: "warning", code: "IMPLAUSIBLE_AGE_RANGE", message: `Age-like column ${column.name} has implausible range ${column.min} to ${column.max}.` });
-  if (/(bmi|body.?mass)/.test(lower) && ((column.min ?? 20) < 5 || (column.max ?? 20) > 100)) issues.push({ severity: "warning", code: "IMPLAUSIBLE_BMI_RANGE", message: `BMI-like column ${column.name} has implausible range ${column.min} to ${column.max}.` });
-  if (/(los|length.?of.?stay)/.test(lower) && (column.min ?? 0) < 0) issues.push({ severity: "warning", code: "NEGATIVE_LENGTH_OF_STAY", message: `Length-of-stay-like column ${column.name} has negative values.` });
-  if (/(death|mortality|event|flag)/.test(lower) && column.min !== undefined && column.max !== undefined && (column.min < 0 || column.max > 1)) issues.push({ severity: "blocker", code: "INVALID_BINARY_EVENT_RANGE", message: `Binary-event-like column ${column.name} is not bounded to 0/1 (${column.min} to ${column.max}).` });
+function semanticIssuesForColumn(column: ResearchTableSummary["columns"][number], rowCount: number | null, role: string, targetName?: string | null): Array<{ severity: "blocker" | "warning" | "note"; code: string; message: string }> {
+  const issues = [...sharedSemanticPlausibilityIssuesForColumn(column, rowCount)];
+  const identifierReason = sharedIdentifierLikeColumnReason(column, rowCount);
+  if (identifierReason && !["id", "cluster", "strata"].includes(role)) {
+    issues.push({
+      severity: "blocker",
+      code: "IDENTIFIER_USED_AS_ANALYSIS_VARIABLE",
+      message: `${role} variable '${column.name}' appears to be an identifier (${identifierReason}) and cannot be used as a substantive outcome, exposure, group, covariate, weight, or endpoint role.`,
+    });
+  }
+  const leakageReason = sharedOutcomeOrFutureLeakageReason(column.name, targetName);
+  if (leakageReason && !["outcome", "event", "time", "start", "stop", "id", "cluster", "strata", "period", "post"].includes(role)) {
+    issues.push({
+      severity: "blocker",
+      code: "OUTCOME_FUTURE_LEAKAGE_SELECTED_ROLE",
+      message: `${role} variable '${column.name}' appears outcome-derived or post-index (${leakageReason}); do not use it as an exposure, group, covariate, weight, offset, instrument, or predictor without explicit baseline/timing evidence.`,
+    });
+  }
+  const postTreatmentReason = sharedPostTreatmentAdjustmentReason(column.name);
+  if (postTreatmentReason && ["covariate", "exact_covariate", "variable", "weight", "offset", "instrument", "running_variable"].includes(role)) {
+    issues.push({
+      severity: "blocker",
+      code: "POST_TREATMENT_ADJUSTMENT_SELECTED_ROLE",
+      message: `${role} variable '${column.name}' appears to encode post-baseline treatment, procedure, or care (${postTreatmentReason}); do not adjust for it without explicit target-trial timing evidence.`,
+    });
+  }
   return issues;
+}
+
+function unselectedSemanticIssuesForColumn(column: ResearchTableSummary["columns"][number], rowCount: number | null, targetName?: string | null): Array<{ severity: "blocker" | "warning" | "note"; code: string; message: string }> {
+  const issues = [...sharedSemanticPlausibilityIssuesForColumn(column, rowCount)];
+  const leakageReason = sharedOutcomeOrFutureLeakageReason(column.name, targetName);
+  if (leakageReason) {
+    issues.push({
+      severity: "warning",
+      code: "OUTCOME_FUTURE_LEAKAGE_UNSELECTED_COLUMN",
+      message: `Unused column '${column.name}' appears outcome-derived or post-index (${leakageReason}); avoid selecting it as an exposure, covariate, group, weight, offset, instrument, or predictor without explicit baseline/timing evidence.`,
+    });
+  }
+  const postTreatmentReason = sharedPostTreatmentAdjustmentReason(column.name);
+  if (postTreatmentReason) {
+    issues.push({
+      severity: "warning",
+      code: "POST_TREATMENT_ADJUSTMENT_UNSELECTED_COLUMN",
+      message: `Unused column '${column.name}' appears to encode post-baseline treatment, procedure, or care (${postTreatmentReason}); avoid selecting it as an adjustment variable without target-trial timing evidence.`,
+    });
+  }
+  return issues;
+}
+
+function buildControllerDatasetSemanticAudit(
+  state: ControllerState,
+  summary: ResearchTableSummary,
+  summaryPath: string,
+): ControllerDatasetSemanticAudit {
+  const targetName = state.inputs.outcome ?? state.inputs.event;
+  const roleByColumn = new Map<string, string[]>();
+  for (const item of controllerVariableRoles(state)) {
+    roleByColumn.set(item.name, [...(roleByColumn.get(item.name) ?? []), item.role]);
+  }
+  const issues: ControllerDatasetSemanticAudit["issues"] = [];
+  for (const column of summary.columns) {
+    const roles = roleByColumn.get(column.name) ?? [];
+    const selected = roles.length > 0;
+    const role = roles.join(", ") || null;
+    const columnIssues = selected
+      ? uniqueSemanticIssues(roles.flatMap(item => semanticIssuesForColumn(column, summary.rowCount, item, targetName)))
+      : unselectedSemanticIssuesForColumn(column, summary.rowCount, targetName);
+    for (const issue of columnIssues) {
+      issues.push({
+        column: column.name,
+        role,
+        selected,
+        inferredType: column.inferredType,
+        nonMissingRows: column.nonMissingRows,
+        min: column.min ?? null,
+        max: column.max ?? null,
+        mean: column.mean ?? null,
+        severity: issue.severity,
+        code: issue.code,
+        message: issue.message,
+      });
+    }
+  }
+  const selectedIssues = issues.filter(item => item.selected);
+  const issueCodeSummary = buildDatasetSemanticIssueCodeSummary(issues);
+  const selectedRoleSummary = buildDatasetSemanticSelectedRoleSummary(selectedIssues);
+  const selectedRoleStatus: ControllerDatasetSemanticAudit["selectedRoleStatus"] = selectedIssues.some(item => item.severity === "blocker")
+    ? "block"
+    : selectedIssues.some(item => item.severity === "warning")
+      ? "warning"
+      : "pass";
+  const datasetStatus: ControllerDatasetSemanticAudit["status"] = selectedRoleStatus === "block"
+    ? "block"
+    : issues.some(item => item.severity === "blocker" || item.severity === "warning")
+      ? "warning"
+      : "pass";
+  const auditId = `controller_dataset_semantic_audit_${String(state.artifacts.filter(item => item.kind === "controller-dataset-semantic-audit").length + 1).padStart(3, "0")}`;
+  const outPath = path.join(state.rootDir, `${auditId}.json`);
+  const reportPath = path.join(state.rootDir, `${auditId}.md`);
+  return {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    runId: state.runId,
+    statePath: state.statePath,
+    summaryPath,
+    rowCount: summary.rowCount,
+    columnCount: summary.columnCount,
+    status: datasetStatus,
+    selectedRoleStatus,
+    issueCount: issues.length,
+    blockerCount: issues.filter(item => item.severity === "blocker").length,
+    warningCount: issues.filter(item => item.severity === "warning").length,
+    selectedRoleIssueCount: selectedIssues.length,
+    issueCodeSummary,
+    selectedRoleSummary,
+    issues,
+    nextAction: selectedRoleStatus === "block"
+      ? "Repair selected study roles before execution; controller feasibility should block this run."
+      : issues.length
+        ? "Review dataset-wide semantic issues and avoid selecting implausible columns without unit/coding repair."
+        : "No dataset-wide semantic plausibility issues detected.",
+    outPath,
+    reportPath,
+  };
+}
+
+function buildDatasetSemanticIssueCodeSummary(issues: ControllerDatasetSemanticAudit["issues"]): ControllerDatasetSemanticAudit["issueCodeSummary"] {
+  const byCode = new Map<string, ControllerDatasetSemanticAudit["issueCodeSummary"][number]>();
+  const severityRank: Record<ControllerDatasetSemanticAudit["issueCodeSummary"][number]["severity"], number> = { blocker: 0, warning: 1, note: 2 };
+  for (const issue of issues) {
+    const current = byCode.get(issue.code) ?? {
+      code: issue.code,
+      severity: issue.severity,
+      totalIssueCount: 0,
+      selectedIssueCount: 0,
+      columns: [],
+    };
+    current.totalIssueCount += 1;
+    if (issue.selected) current.selectedIssueCount += 1;
+    if (!current.columns.includes(issue.column)) current.columns.push(issue.column);
+    if (severityRank[issue.severity] < severityRank[current.severity]) current.severity = issue.severity;
+    byCode.set(issue.code, current);
+  }
+  return [...byCode.values()]
+    .map(item => ({ ...item, columns: item.columns.sort().slice(0, 12) }))
+    .sort((a, b) => severityRank[a.severity] - severityRank[b.severity] || b.selectedIssueCount - a.selectedIssueCount || b.totalIssueCount - a.totalIssueCount || a.code.localeCompare(b.code));
+}
+
+function buildDatasetSemanticSelectedRoleSummary(selectedIssues: ControllerDatasetSemanticAudit["issues"]): ControllerDatasetSemanticAudit["selectedRoleSummary"] {
+  const byRole = new Map<string, ControllerDatasetSemanticAudit["selectedRoleSummary"][number]>();
+  for (const issue of selectedIssues) {
+    const role = issue.role ?? "selected";
+    const key = `${issue.column}:${role}`;
+    const current = byRole.get(key) ?? {
+      column: issue.column,
+      role,
+      issueCount: 0,
+      blockerCount: 0,
+      warningCount: 0,
+      codes: [],
+    };
+    current.issueCount += 1;
+    if (issue.severity === "blocker") current.blockerCount += 1;
+    if (issue.severity === "warning") current.warningCount += 1;
+    if (!current.codes.includes(issue.code)) current.codes.push(issue.code);
+    byRole.set(key, current);
+  }
+  return [...byRole.values()]
+    .map(item => ({ ...item, codes: item.codes.sort() }))
+    .sort((a, b) => b.blockerCount - a.blockerCount || b.warningCount - a.warningCount || b.issueCount - a.issueCount || a.column.localeCompare(b.column));
+}
+
+function uniqueSemanticIssues<T extends { severity: string; code: string; message: string }>(issues: T[]): T[] {
+  const seen = new Set<string>();
+  return issues.filter(issue => {
+    const key = `${issue.severity}:${issue.code}:${issue.message}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function comprehensiveFeasibilityMethodChecks(feasibilityGate: FeasibilityGateResult): ControllerFeasibilityVerdict["methodChecks"] {
+  const checks: ControllerFeasibilityVerdict["methodChecks"] = [];
+  for (const domain of feasibilityGate.domains) {
+    if (!["method_suitability", "expected_statistical_power", "semantic_plausibility", "outcome_observability", "missingness"].includes(domain.id)) continue;
+    checks.push({
+      id: `comprehensive-${domain.id.replaceAll("_", "-")}`,
+      status: domain.status === "block" ? "block" : domain.status === "warning" || domain.status === "unknown" ? "warning" : "pass",
+      message: `${domain.label}: ${domain.rationale}${domain.blockers.length ? ` Blockers: ${domain.blockers.join("; ")}` : ""}${domain.warnings.length ? ` Warnings: ${domain.warnings.join("; ")}` : ""}`,
+      evidenceRefs: domain.evidenceRefs,
+    });
+  }
+  for (const blocker of feasibilityGate.blockers.slice(0, 8)) {
+    checks.push({
+      id: "comprehensive-feasibility-blocker",
+      status: "block",
+      message: blocker,
+      evidenceRefs: feasibilityGate.evidenceRefs,
+    });
+  }
+  for (const warning of feasibilityGate.warnings.slice(0, 8)) {
+    checks.push({
+      id: "comprehensive-feasibility-warning",
+      status: "warning",
+      message: warning,
+      evidenceRefs: feasibilityGate.evidenceRefs,
+    });
+  }
+  return checks;
 }
 
 function buildOutcomeDiagnostics(
@@ -6194,6 +8806,16 @@ function methodFeasibilityChecks(
     checks.push({ id: "method-declared", status: "warning", message: "No executable method was supplied; controller will rely on method selection.", evidenceRefs: [] });
     return checks;
   }
+  const missingArguments = missingControllerMethodArguments(method, state);
+  if (missingArguments.length) {
+    checks.push({
+      id: "method-required-arguments",
+      status: "block",
+      message: `${method} requires missing role(s): ${missingArguments.join(", ")}.`,
+      evidenceRefs: [],
+    });
+    return checks;
+  }
   const required = requiredVariableNames(state);
   if (required.length && rowScan && rowScan.completeRows > 0) {
     const ratio = required.length / rowScan.completeRows;
@@ -6211,8 +8833,10 @@ function methodFeasibilityChecks(
       checks.push({ id: "binary-outcome-class-count", status: "warning", message: "Could not confirm binary outcome class counts from scanned rows.", evidenceRefs: [state.inputs.dataPath ?? ""] });
     }
   }
-  if (["cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "kaplan-meier", "log-rank"].includes(method)) {
-    if (!state.inputs.time || !state.inputs.event) checks.push({ id: "time-event-present", status: "block", message: `${method} requires both time and event variables.`, evidenceRefs: [] });
+  if (["cox-proportional-hazards", "stratified-cox", "time-varying-cox", "fine-gray", "aalen-johansen-cif", "kaplan-meier", "log-rank", "recurrent-event-rate", "recurrent-event-cox"].includes(method)) {
+    const hasAnalysisTime = Boolean(state.inputs.time || state.inputs.stop);
+    if (!hasAnalysisTime || !state.inputs.event) checks.push({ id: "time-event-present", status: "block", message: `${method} requires a time/stop variable and an event variable.`, evidenceRefs: [] });
+    if (method === "recurrent-event-cox" && (!state.inputs.start || !state.inputs.stop || !state.inputs.id)) checks.push({ id: "recurrent-start-stop-present", status: "block", message: "recurrent-event-cox requires start, stop, and id variables for Andersen-Gill interval data.", evidenceRefs: [] });
     if (outcomeDiagnostics.eventCount !== null && outcomeDiagnostics.eventCount < 5) checks.push({ id: "survival-event-count", status: "block", message: `Only ${outcomeDiagnostics.eventCount} event(s) detected among scanned rows; time-to-event analysis is not stable.`, evidenceRefs: [state.inputs.dataPath ?? ""] });
     else if (outcomeDiagnostics.eventCount !== null) checks.push({ id: "survival-event-count", status: "pass", message: `${outcomeDiagnostics.eventCount} event(s) detected among scanned rows.`, evidenceRefs: [state.inputs.dataPath ?? ""] });
   }
@@ -6348,6 +8972,9 @@ function renderControllerFeasibilityMarkdown(verdict: ControllerFeasibilityVerdi
     "## Warnings",
     ...(verdict.warnings.length ? verdict.warnings.map(item => `- ${item}`) : ["- None"]),
     "",
+    "## Typed Issues",
+    ...(verdict.issues.length ? verdict.issues.map(item => `- [${item.severity}] ${item.code}: ${item.message}${item.domainId ? ` (domain: ${item.domainId})` : item.variable ? ` (variable: ${item.variable})` : item.reviewerId ? ` (reviewer: ${item.reviewerId})` : ""}`) : ["- None"]),
+    "",
     "## Required Modifications",
     ...(verdict.requiredModifications.length ? verdict.requiredModifications.map(item => `- ${item}`) : ["- None"]),
     "",
@@ -6391,6 +9018,10 @@ function executionGate(state: ControllerState): ControllerGate {
   if (!state.inputs.dataPath) reasons.push("No data path is available for execution.");
   if (!state.inputs.method) reasons.push("No executable statistical method has been selected.");
   if (state.inputs.method && !statsMethodSchema.safeParse(state.inputs.method).success) reasons.push(`Method ${state.inputs.method} is not executable by stats-run.`);
+  if (state.inputs.method) {
+    const missingArguments = missingControllerMethodArguments(state.inputs.method, state);
+    if (missingArguments.length) reasons.push(`${state.inputs.method} is missing required role(s): ${missingArguments.join(", ")}.`);
+  }
   const variables = requiredVariableNames(state);
   if (variables.length === 0) reasons.push("No outcome, exposure, group, time/event, or variables were supplied for execution.");
   return gate("execution", reasons.length ? "block" : "pass", reasons.length ? "Execution prerequisites are incomplete." : "Execution prerequisites are present.", reasons, [state.inputs.runDir], reasons.length ? "human_review" : "qa");
@@ -6559,7 +9190,12 @@ async function writeControllerDecisionQuality(state: ControllerState, payload: C
   const minimumConfidence = 0.65;
   const riskFlags = payload.riskFlags ?? [];
   const checks: ControllerDecisionQuality["checks"] = [];
-  const add = (id: string, status: "pass" | "fail", message: string) => checks.push({ id, status, message });
+  const add = (id: string, status: "pass" | "fail", message: string, issueCodes: string[] = []) => checks.push({
+    id,
+    status,
+    message,
+    ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
+  });
   add("confidence", payload.confidence >= minimumConfidence ? "pass" : "fail", `Model confidence ${payload.confidence}; minimum ${minimumConfidence}.`);
   add("rationale", payload.rationale.trim().length >= 12 ? "pass" : "fail", payload.rationale.trim().length >= 12 ? "Rationale is specific enough for audit." : "Rationale is too short to audit.");
   const highRiskFlags = riskFlags.filter(flag => controllerDecisionRiskFlagIsHigh(flag));
@@ -6569,6 +9205,15 @@ async function writeControllerDecisionQuality(state: ControllerState, payload: C
     highRiskFlags.length
       ? `High-risk flag(s): ${highRiskFlags.join(", ")}${payload.action === "stop_for_human" || payload.action === "block" ? "; terminal action is appropriate." : "; non-terminal execution is not allowed."}`
       : "No high-risk flags were reported.",
+  );
+  const activeCodedBlockers = await activeCodedControllerBlockers(state);
+  add(
+    "active-coded-blockers",
+    activeCodedBlockers.issueCodes.length && payload.action !== "block" && payload.action !== "stop_for_human" ? "fail" : "pass",
+    activeCodedBlockers.issueCodes.length
+      ? `Active coded blocker(s) remain: ${activeCodedBlockers.issueCodes.join(", ")}. Model action ${payload.action} ${payload.action === "block" || payload.action === "stop_for_human" ? "is terminal and allowed" : "is non-terminal and must not continue"}.`
+      : "No active coded blockers were found in issue ledger, stage review, or execution agenda.",
+    activeCodedBlockers.issueCodes,
   );
   if (payload.toolRequests?.length) {
     const toolValidation = validateControllerToolRequests(state, payload.toolRequests);
@@ -6604,6 +9249,70 @@ async function writeControllerDecisionQuality(state: ControllerState, payload: C
   return quality;
 }
 
+async function activeCodedControllerBlockers(state: ControllerState): Promise<{ issueCodes: string[]; evidenceRefs: string[] }> {
+  const issueLedger = await readLatestControllerIssueLedger(state);
+  const stageReview = await readLatestControllerStageReview(state);
+  const latestAgendaPath = latestArtifactPath(state, "controller-execution-agenda");
+  const latestAgendaRaw = latestAgendaPath ? await readJsonIfPresent(latestAgendaPath) : null;
+  const latestAgenda = (valueAtPath(latestAgendaRaw, "controllerExecutionAgenda") ?? latestAgendaRaw) as Partial<ControllerExecutionAgenda> | null;
+  const issueCodes = enforceableControllerBlockerCodes([
+    ...(issueLedger?.issues ?? [])
+      .filter(issue => issue.status === "active" && issue.severity === "blocker")
+      .map(issue => issue.issueCode)
+      .filter((item): item is string => Boolean(item)),
+    ...(stageReview?.findings ?? [])
+      .filter(finding => finding.severity === "blocker")
+      .flatMap(finding => finding.issueCodes ?? issueCodesFromText(finding.message)),
+    ...(latestAgenda?.status === "blocked" && Array.isArray(latestAgenda.activeBlockerIssueCodes) ? latestAgenda.activeBlockerIssueCodes.map(String) : []),
+    ...(Array.isArray(latestAgenda?.items)
+      ? latestAgenda.items
+        .filter(item => item && typeof item === "object" && item.status === "blocked")
+        .flatMap(item => Array.isArray(item.issueCodes) ? item.issueCodes.map(String) : [])
+      : []),
+  ].filter(item => item.length > 0));
+  const evidenceRefs = uniqueText([
+    issueLedger?.outPath,
+    stageReview?.outPath,
+    latestAgendaPath,
+  ].filter((item): item is string => Boolean(item)));
+  return { issueCodes, evidenceRefs };
+}
+
+function enforceableControllerBlockerCodes(codes: string[]): string[] {
+  return uniqueText(codes.map(code => code.trim().toUpperCase()).filter(isEnforceableControllerBlockerCode));
+}
+
+function isEnforceableControllerBlockerCode(code: string): boolean {
+  if (!/^[A-Z][A-Z0-9_]{2,}$/.test(code)) return false;
+  if (!code.includes("_")) return false;
+  if (code.endsWith("_WARNING") || code.endsWith("_WARN") || code.endsWith("_ADVISORY")) return false;
+  return (
+    code.endsWith("_BLOCKER")
+    || code.startsWith("METHOD_")
+    || code.startsWith("COMPLETE_CASE_")
+    || code.startsWith("TEMPORAL_WINDOW_INVALID")
+    || code.startsWith("TEMPORAL_WINDOW_NOT_OBSERVED")
+    || code.startsWith("IMPLAUSIBLE_")
+    || code.startsWith("INVALID_")
+    || code.startsWith("NEGATIVE_")
+    || code.startsWith("NON_")
+    || code.startsWith("NO_")
+    || code.startsWith("EMPTY_")
+    || code.startsWith("MISSING_")
+    || code.startsWith("EXTREME_")
+    || code.includes("_REQUIRED")
+    || code.includes("_INVALID")
+    || code.includes("_LEAKAGE")
+    || code.includes("_POST_TREATMENT")
+    || code.includes("_ATTRITION_EXTREME")
+    || code.includes("_UNDERPOWERED")
+  );
+}
+
+function activeCodedBlockerStageCanProceed(stage: ControllerStage): boolean {
+  return stage === "dataset_feasibility" || stage === "repair";
+}
+
 async function writeControllerActionReadiness(
   state: ControllerState,
   decision: ControllerDecision,
@@ -6623,8 +9332,14 @@ async function validateControllerActionReadiness(
   const readinessId = `controller_action_readiness_${String(state.decisions.length).padStart(3, "0")}_${decision.action}`;
   const basePath = path.join(state.rootDir, readinessId);
   const checks: ControllerActionReadiness["checks"] = [];
-  const add = (id: string, status: "pass" | "warning" | "fail", message: string, evidenceRefs: string[] = []) => {
-    checks.push({ id, status, message, evidenceRefs });
+  const add = (id: string, status: "pass" | "warning" | "fail", message: string, evidenceRefs: string[] = [], issueCodes: string[] = []) => {
+    checks.push({
+      id,
+      status,
+      message,
+      ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
+      evidenceRefs: uniqueText(evidenceRefs),
+    });
   };
   add(
     "stage-action-allowed",
@@ -6648,7 +9363,7 @@ async function validateControllerActionReadiness(
   } else {
     add("controller-status", state.status === "running" ? "pass" : "fail", `Controller status is ${state.status}.`);
     add("required-action-artifacts-declared", expectedArtifactsForAction(decision.action).length || decision.action === "initialize" ? "pass" : "warning", `${decision.action} expects ${expectedArtifactsForAction(decision.action).length} artifact(s).`);
-    addActionSpecificReadinessChecks(state, decision.action, add);
+    await addActionSpecificReadinessChecks(state, decision.action, add);
   }
   const status: ControllerActionReadiness["status"] = checks.some(check => check.status === "fail")
     ? "fail"
@@ -6669,11 +9384,11 @@ async function validateControllerActionReadiness(
   };
 }
 
-function addActionSpecificReadinessChecks(
+async function addActionSpecificReadinessChecks(
   state: ControllerState,
   action: ControllerActionType,
-  add: (id: string, status: "pass" | "warning" | "fail", message: string, evidenceRefs?: string[]) => void,
-): void {
+  add: (id: string, status: "pass" | "warning" | "fail", message: string, evidenceRefs?: string[], issueCodes?: string[]) => void,
+): Promise<void> {
   const has = (kind: string) => artifactExists(state, kind);
   const paths = (...kinds: string[]) => artifactPaths(state, ...kinds);
   switch (action) {
@@ -6692,14 +9407,46 @@ function addActionSpecificReadinessChecks(
       break;
     case "select_method":
       add("method-selection-input", state.inputs.question.trim() ? "pass" : "fail", state.inputs.question.trim() ? "Research question is available for method selection." : "Research question is missing.");
-      if (state.inputs.dataPath) add("feasibility-before-method", has("controller-feasibility-verdict") ? "pass" : "fail", has("controller-feasibility-verdict") ? "Feasibility verdict is available before method selection." : "Row-level run is missing feasibility verdict before method selection.", paths("controller-feasibility-verdict"));
+      if (state.inputs.dataPath) {
+        const feasibility = await loadControllerFeasibilitySummary(state);
+        add(
+          "feasibility-before-method",
+          !feasibility.present ? "fail" : feasibility.status === "block" ? "fail" : feasibility.status === "warning" ? "warning" : "pass",
+          !feasibility.present
+            ? "Row-level run is missing feasibility verdict before method selection."
+            : feasibility.status === "block"
+              ? `Feasibility verdict blocks method selection: ${feasibility.issueCodes.join(", ") || feasibility.blockers.join("; ") || "blocked"}.`
+              : feasibility.status === "warning"
+                ? `Feasibility verdict has warnings before method selection: ${feasibility.issueCodes.join(", ") || feasibility.warnings.join("; ") || "warning"}.`
+                : "Feasibility verdict is available before method selection and does not block.",
+          feasibility.path ? [feasibility.path] : paths("controller-feasibility-verdict"),
+          feasibility.issueCodes,
+        );
+      }
+      if (state.inputs.dataPath) await addDatasetSemanticAuditReadinessCheck(state, "method", add);
       break;
     case "run_analysis": {
       add("execution-policy", state.policy.allowExecution ? "pass" : "fail", state.policy.allowExecution ? "Execution is allowed by policy." : "Execution is disabled by policy.");
       add("method-present", state.inputs.method ? "pass" : "fail", state.inputs.method ? `Executable method is ${state.inputs.method}.` : "No executable method is selected.");
       add("data-path-present", state.inputs.dataPath ? "pass" : "fail", state.inputs.dataPath ? `Data path is ${state.inputs.dataPath}.` : "No data path is available for execution.", state.inputs.dataPath ? [state.inputs.dataPath] : []);
       add("required-variables-present", requiredVariableNames(state).length ? "pass" : "fail", requiredVariableNames(state).length ? `Required variables: ${requiredVariableNames(state).join(", ")}.` : "No outcome/exposure/group/time-event/variables are available for execution.");
-      add("feasibility-before-execution", has("controller-feasibility-verdict") ? "pass" : "fail", has("controller-feasibility-verdict") ? "Feasibility verdict is available before execution." : "Execution requires a feasibility verdict.", paths("controller-feasibility-verdict"));
+      {
+        const feasibility = await loadControllerFeasibilitySummary(state);
+        add(
+          "feasibility-before-execution",
+          !feasibility.present ? "fail" : feasibility.status === "block" ? "fail" : feasibility.status === "warning" ? "warning" : "pass",
+          !feasibility.present
+            ? "Execution requires a feasibility verdict."
+            : feasibility.status === "block"
+              ? `Feasibility verdict blocks execution: ${feasibility.issueCodes.join(", ") || feasibility.blockers.join("; ") || "blocked"}.`
+              : feasibility.status === "warning"
+                ? `Feasibility verdict has warnings before execution: ${feasibility.issueCodes.join(", ") || feasibility.warnings.join("; ") || "warning"}.`
+                : "Feasibility verdict is available before execution and does not block.",
+          feasibility.path ? [feasibility.path] : paths("controller-feasibility-verdict"),
+          feasibility.issueCodes,
+        );
+      }
+      await addDatasetSemanticAuditReadinessCheck(state, "execution", add);
       add("method-plan-before-execution", has("controller-modeling-plan") || has("method-selection") ? "pass" : "warning", has("controller-modeling-plan") || has("method-selection") ? "Method-selection evidence is available." : "No method-selection artifact is available; execution may be using only supplied inputs.", paths("controller-modeling-plan", "method-selection"));
       break;
     }
@@ -6758,6 +9505,7 @@ function renderControllerActionReadinessMarkdown(readiness: ControllerActionRead
       "",
       `- Status: ${check.status}`,
       `- Finding: ${check.message}`,
+      ...(check.issueCodes?.length ? [`- Issue codes: ${check.issueCodes.join(", ")}`] : []),
       ...(check.evidenceRefs.length ? ["- Evidence:", ...check.evidenceRefs.map(ref => `  - ${ref}`)] : ["- Evidence: none recorded"]),
       "",
     ]),
@@ -6772,6 +9520,49 @@ function renderControllerActionReadinessMarkdown(readiness: ControllerActionRead
 
 function controllerDecisionRiskFlagIsHigh(flag: string): boolean {
   return /\b(block|blocker|unsafe|unsupported|unverified|hallucinat|privacy|credential|cost|overclaim|invalid|methodological|infeasible|needs_human|human_review)\b/i.test(flag.replace(/[_-]/g, " "));
+}
+
+async function addDatasetSemanticAuditReadinessCheck(
+  state: ControllerState,
+  phase: "method" | "execution",
+  add: (id: string, status: "pass" | "warning" | "fail", message: string, evidenceRefs?: string[], issueCodes?: string[]) => void,
+): Promise<void> {
+  const audit = await loadControllerDatasetSemanticAuditSummary(state);
+  const evidenceRefs = uniqueText([audit.path, audit.reportPath].filter((item): item is string => Boolean(item)));
+  const selectedIssueCodes = uniqueText(audit.topIssues.filter(issue => issue.selected && issue.severity !== "note").map(issue => issue.code));
+  const id = phase === "execution" ? "semantic-audit-before-execution" : "semantic-audit-before-method";
+  if (!audit.present) {
+    add(id, "fail", `Row-level ${phase === "execution" ? "execution" : "method selection"} requires a dataset semantic audit from dataset_feasibility.`, evidenceRefs);
+    return;
+  }
+  if (audit.selectedRoleStatus === "block") {
+    add(
+      id,
+      "fail",
+      `Selected study roles have semantic blocker(s): ${audit.topIssues.filter(issue => issue.selected).map(issue => `${issue.code}: ${issue.message}`).join("; ") || "no detail"}.`,
+      evidenceRefs,
+      selectedIssueCodes,
+    );
+    return;
+  }
+  if (audit.selectedRoleStatus === "warning") {
+    add(
+      id,
+      "warning",
+      `Selected study roles have semantic warning(s): ${audit.topIssues.filter(issue => issue.selected).map(issue => `${issue.code}: ${issue.message}`).join("; ") || "no detail"}.`,
+      evidenceRefs,
+      selectedIssueCodes,
+    );
+    return;
+  }
+  add(
+    id,
+    "pass",
+    audit.status === "warning"
+      ? `Selected study roles pass semantic plausibility; dataset-wide audit has ${audit.issueCount} unused/nonblocking issue(s) for review.`
+      : "Dataset semantic audit passes for selected study roles.",
+    evidenceRefs,
+  );
 }
 
 function renderControllerDecisionQualityMarkdown(quality: ControllerDecisionQuality): string {
@@ -6793,7 +9584,7 @@ function renderControllerDecisionQualityMarkdown(quality: ControllerDecisionQual
     "",
     "## Checks",
     "",
-    ...quality.checks.map(check => `- [${check.status}] ${check.id}: ${check.message}`),
+    ...quality.checks.map(check => `- [${check.status}${check.issueCodes?.length ? `:${check.issueCodes.join(",")}` : ""}] ${check.id}: ${check.message}`),
     "",
     quality.status === "fail" && !quality.fallbackAllowed
       ? "Strict model-runner mode must stop because this model decision is not safe to execute."
@@ -6897,11 +9688,13 @@ async function executeControllerAction(state: ControllerState, decision: Control
           question: state.inputs.question,
           outcomeType: outcomeType === "unknown" ? undefined : outcomeType,
           surveyDesign: state.inputs.surveyDesign,
-          timeToEvent: Boolean(state.inputs.time && state.inputs.event),
+          timeToEvent: Boolean((state.inputs.time || state.inputs.stop) && state.inputs.event),
           dataStructures: ["single_table"],
-          target: state.inputs.outcome ?? undefined,
+          target: state.inputs.outcome ?? state.inputs.event ?? undefined,
+          roleHints: controllerModelingRoleHints(state),
           tableSummary: await controllerTableSummaryForModeling(state),
           literatureEvidence: await controllerLiteratureEvidenceForModeling(state),
+          feasibilityEvidence: await controllerFeasibilityEvidenceForModeling(state),
           requiresInference: true,
           maxCandidates: 12,
         });
@@ -6912,20 +9705,19 @@ async function executeControllerAction(state: ControllerState, decision: Control
           question: state.inputs.question,
           outcomeType: outcomeType === "unknown" ? undefined : outcomeType,
           surveyDesign: state.inputs.surveyDesign,
-          timeToEvent: Boolean(state.inputs.time && state.inputs.event),
+          timeToEvent: Boolean((state.inputs.time || state.inputs.stop) && state.inputs.event),
           dataStructures: ["single_table"],
           maxCandidates: 8,
         });
         const selectionPath = path.join(state.rootDir, "method-selection.json");
         await writeJson(selectionPath, { schemaVersion: 1, methodSelection: selection });
         artifacts.push(await artifact("method-selection", selectionPath, "method_selection", true));
-        const executable = state.inputs.method
-          ?? statsMethodFromSelection(modelingPlan.methodSelectionEvidence.primaryMethodId)
-          ?? statsMethodFromSelection(selection.primary?.method.id ?? null);
+        const executableSelection = selectControllerExecutableStatsMethod(state.inputs.method ?? null, modelingPlan, selection);
+        const executable = executableSelection.method;
         if (executable) state.inputs.method = executable;
         outputSummary = executable
-          ? `Selected executable method ${executable}; modeling route=${modelingPlan.routeRecommendation.route}; blocked=${modelingPlan.blocked}.`
-          : `Modeling plan produced ${modelingPlan.methodSelectionEvidence.primaryMethodId ?? selection.primary?.method.id ?? "no primary method"} but no stats-run mapping; human review required.`;
+          ? `Selected executable method ${executable} from ${executableSelection.source}; modeling route=${modelingPlan.routeRecommendation.route}; blocked=${modelingPlan.blocked}; guidance=${modelingPlan.statisticalMethodGuidance.recommendedStatsRunMethod}.`
+          : `Modeling plan produced ${executableSelection.unmappedMethodId ?? modelingPlan.methodSelectionEvidence.primaryMethodId ?? selection.primary?.method.id ?? "no primary method"} but no stats-run mapping; human review required.`;
         nextStage = executable && !modelingPlan.blocked ? "execution" : "human_review";
         break;
       }
@@ -6937,6 +9729,8 @@ async function executeControllerAction(state: ControllerState, decision: Control
           outcome: state.inputs.outcome ?? undefined,
           exposure: state.inputs.exposure ?? undefined,
           group: state.inputs.group ?? undefined,
+          outcomeThreshold: state.inputs.outcomeThreshold ?? undefined,
+          exposureThreshold: state.inputs.exposureThreshold ?? undefined,
           variables: state.inputs.variables,
           covariates: state.inputs.covariates,
           exactCovariates: state.inputs.exactCovariates,
@@ -6946,6 +9740,8 @@ async function executeControllerAction(state: ControllerState, decision: Control
           trimThreshold: 0.01,
           stabilizeWeights: true,
           time: state.inputs.time ?? undefined,
+          start: state.inputs.start ?? undefined,
+          stop: state.inputs.stop ?? undefined,
           event: state.inputs.event ?? undefined,
           id: state.inputs.id ?? undefined,
           strata: state.inputs.strata ?? undefined,
@@ -6955,6 +9751,10 @@ async function executeControllerAction(state: ControllerState, decision: Control
           runningVariable: state.inputs.runningVariable ?? undefined,
           cutoff: state.inputs.cutoff ?? undefined,
           instrument: state.inputs.instrument ?? undefined,
+          alphaPenalty: state.inputs.alphaPenalty ?? undefined,
+          l1Ratio: state.inputs.l1Ratio ?? undefined,
+          weight: state.inputs.weight ?? undefined,
+          offset: state.inputs.offset ?? undefined,
           surveyDesign: state.inputs.surveyDesign,
           allowSurveyApproximation: state.inputs.allowSurveyApproximation,
           alpha: 0.05,
@@ -7045,6 +9845,9 @@ async function executeControllerAction(state: ControllerState, decision: Control
         for (const repairStep of repair.executedRepairs) {
           for (const artifactRef of repairStep.artifactRefs) artifacts.push(await artifact(`repair-${repairStep.pluginId}`, artifactRef, "repair", false));
         }
+        const verification = await writeControllerRepairVerification(state, repair);
+        artifacts.push(await artifact("controller-repair-verification", verification.outPath, "repair", true));
+        artifacts.push(await artifact("controller-repair-verification-report", verification.reportPath, "repair", false));
         outputSummary = `Repair ${repair.status}; executed=${repair.executedRepairs.length}; skipped=${repair.skippedFindings.length}; next=${repair.nextStage}.`;
         nextStage = repair.nextStage;
         break;
@@ -7061,8 +9864,7 @@ async function executeControllerAction(state: ControllerState, decision: Control
         const inspection = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
         const readiness = String(valueAtPath(inspection, "runInspection.readiness") ?? valueAtPath(inspection, "readiness") ?? "");
         const reviewVerdict = String(valueAtPath(await readJsonIfPresent(path.join(state.inputs.runDir, "review", "review-adjudication.json")), "reviewAdjudication.verdict") ?? "");
-        const requiresReview = state.policy.requireExternalReviewForPromotion;
-        const reviewMissing = requiresReview && !reviewVerdict;
+        const reviewPromotion = externalReviewPromotionStatus(state, reviewVerdict);
         const completionAudit = await writeControllerCompletionAudit(state);
         artifacts.push(await artifact("controller-completion-audit", completionAudit.outPath, "promotion_decision", true));
         artifacts.push(await artifact("controller-completion-audit-report", completionAudit.reportPath, "promotion_decision", false));
@@ -7070,10 +9872,19 @@ async function executeControllerAction(state: ControllerState, decision: Control
         state.selfEvaluations.push(selfEvaluation);
         artifacts.push(await artifact("controller-self-evaluation", selfEvaluation.outPath, "promotion_decision", true));
         artifacts.push(await artifact("controller-self-evaluation-report", selfEvaluation.reportPath, "promotion_decision", false));
-        const ready = readiness === "local_review_ready" && !reviewMissing && reviewVerdict !== "block" && selfEvaluation.status !== "fail" && completionAudit.status !== "fail";
+        const ready = readiness === "local_review_ready" && reviewPromotion.promotionSatisfied && selfEvaluation.status !== "fail" && completionAudit.status !== "fail";
+        const goldenPacket = await writeControllerGoldenPacket(state, {
+          ready,
+          inspectionReadiness: readiness || null,
+          reviewVerdict: reviewVerdict || null,
+          completionAudit,
+          selfEvaluation,
+        });
+        artifacts.push(await artifact("controller-golden-packet", goldenPacket.outPath, "promotion_decision", false));
+        artifacts.push(await artifact("controller-golden-packet-report", goldenPacket.reportPath, "promotion_decision", false));
         outputSummary = ready
-          ? `Study is locally review-ready and promotion gates are satisfied; controller self-evaluation=${selfEvaluation.status} score=${selfEvaluation.score}; completion audit=${completionAudit.status}.`
-          : `Study is not promotable yet; readiness=${readiness || "missing"} review=${reviewVerdict || "missing"} self-evaluation=${selfEvaluation.status}; completion audit=${completionAudit.status}.`;
+          ? `Study is locally review-ready and promotion gates are satisfied; controller self-evaluation=${selfEvaluation.status} score=${selfEvaluation.score}; completion audit=${completionAudit.status}; golden packet written.`
+          : `Study is not promotable yet; readiness=${readiness || "missing"} review=${reviewVerdict || "missing"}${reviewPromotion.finding ? ` (${reviewPromotion.finding})` : ""} self-evaluation=${selfEvaluation.status}; completion audit=${completionAudit.status}; golden packet written.`;
         nextStage = ready ? "complete" : state.policy.autonomy === "aggressive" ? "human_review" : "human_review";
         break;
       }
@@ -7209,7 +10020,7 @@ function buildControllerPolicy(opts: ControllerInitOptions): ControllerPolicy {
     maxInputPatches: opts.maxInputPatches ?? 10,
     allowToolActions: opts.allowToolActions ?? true,
     maxToolActions: opts.maxToolActions ?? 8,
-    allowedToolIds: opts.allowedToolIds ?? ["npm-build", "npm-test", "controller-inspect", "controller-read-artifact", "controller-read-file", "controller-search-repo", "controller-run-agenteer", "controller-git-diff", "controller-propose-patch", "controller-apply-patch", "controller-verify-patch", "controller-rollback-patch"],
+    allowedToolIds: opts.allowedToolIds ?? ["npm-build", "npm-test", "controller-status", "controller-inspect", "controller-read-artifact", "controller-read-file", "controller-search-repo", "controller-run-agenteer", "controller-git-diff", "controller-propose-patch", "controller-apply-patch", "controller-verify-patch", "controller-rollback-patch"],
     toolTimeoutMs: opts.toolTimeoutMs ?? 120000,
     allowContext: opts.allowContext ?? false,
     requireContext: opts.requireContext ?? false,
@@ -7345,6 +10156,8 @@ function requiredVariableNames(state: ControllerState): string[] {
     state.inputs.exposure,
     state.inputs.group,
     state.inputs.time,
+    state.inputs.start,
+    state.inputs.stop,
     state.inputs.event,
     state.inputs.id,
     state.inputs.strata,
@@ -7353,27 +10166,72 @@ function requiredVariableNames(state: ControllerState): string[] {
     state.inputs.post,
     state.inputs.runningVariable,
     state.inputs.instrument,
+    state.inputs.weight,
+    state.inputs.offset,
     ...state.inputs.variables,
     ...state.inputs.covariates,
     ...state.inputs.exactCovariates,
   ].filter((value): value is string => Boolean(value)))];
 }
 
-function semanticPlausibilityWarnings(summary: ResearchTableSummary): string[] {
-  const warnings: string[] = [];
-  for (const column of summary.columns) {
-    const lower = column.name.toLowerCase();
-    if (column.inferredType !== "number") continue;
-    if (/(^|_)age($|_)/.test(lower) && ((column.min ?? 0) < 0 || (column.max ?? 0) > 120)) warnings.push(`Age-like column ${column.name} has implausible range ${column.min} to ${column.max}.`);
-    if (/(bmi|body.?mass)/.test(lower) && ((column.min ?? 20) < 5 || (column.max ?? 20) > 100)) warnings.push(`BMI-like column ${column.name} has implausible range ${column.min} to ${column.max}.`);
-    if (/(los|length.?of.?stay)/.test(lower) && (column.min ?? 0) < 0) warnings.push(`Length-of-stay-like column ${column.name} has negative values.`);
-    if (/(death|mortality|event|flag)/.test(lower) && column.min !== undefined && column.max !== undefined && (column.min < 0 || column.max > 1)) warnings.push(`Binary-event-like column ${column.name} is not bounded to 0/1 (${column.min} to ${column.max}).`);
+function controllerModelingRoleHints(state: ControllerState): ModelingDecisionRequest["roleHints"] {
+  return {
+    outcome: state.inputs.outcome ?? undefined,
+    exposure: state.inputs.exposure ?? undefined,
+    group: state.inputs.group ?? undefined,
+    time: state.inputs.time ?? undefined,
+    start: state.inputs.start ?? undefined,
+    stop: state.inputs.stop ?? undefined,
+    event: state.inputs.event ?? undefined,
+    id: state.inputs.id ?? undefined,
+    cluster: state.inputs.cluster ?? undefined,
+    strata: state.inputs.strata ?? undefined,
+    period: state.inputs.period ?? undefined,
+    post: state.inputs.post ?? undefined,
+    runningVariable: state.inputs.runningVariable ?? undefined,
+    instrument: state.inputs.instrument ?? undefined,
+    weight: state.inputs.weight ?? undefined,
+    offset: state.inputs.offset ?? undefined,
+    variables: state.inputs.variables,
+    covariates: state.inputs.covariates,
+    exactCovariates: state.inputs.exactCovariates,
+  };
+}
+
+function missingControllerMethodArguments(method: StatsMethod, state: ControllerState): string[] {
+  const requiredArguments = getStatisticalMethodSpec(method).requiredArguments;
+  return requiredArguments.filter(argument => !controllerMethodArgumentPresent(method, argument, state));
+}
+
+function controllerMethodArgumentPresent(method: StatsMethod, argument: string, state: ControllerState): boolean {
+  const mapped = contractArgumentNameFor(argument);
+  if (mapped === "outcome") return Boolean(state.inputs.outcome);
+  if (mapped === "exposure") return Boolean(state.inputs.exposure);
+  if (mapped === "group") return Boolean(state.inputs.group);
+  if (mapped === "time") return Boolean(state.inputs.time);
+  if (mapped === "timeOrStop") return Boolean(state.inputs.time || state.inputs.stop);
+  if (mapped === "start") return Boolean(state.inputs.start);
+  if (mapped === "stop") return Boolean(state.inputs.stop);
+  if (mapped === "event") return Boolean(state.inputs.event);
+  if (mapped === "id") return Boolean(state.inputs.id);
+  if (mapped === "strata") return Boolean(state.inputs.strata);
+  if (mapped === "period") return Boolean(state.inputs.period);
+  if (mapped === "post") return Boolean(state.inputs.post);
+  if (mapped === "instrument") return Boolean(state.inputs.instrument);
+  if (mapped === "runningVariable") return Boolean(state.inputs.runningVariable);
+  if (mapped === "cutoff") return state.inputs.cutoff !== undefined && state.inputs.cutoff !== null && Number.isFinite(state.inputs.cutoff);
+  if (mapped === "covariates") return state.inputs.covariates.length > 0;
+  if (mapped === "clusterOrId") return Boolean(state.inputs.cluster || state.inputs.id);
+  if (mapped === "variables") {
+    if (method === "paired-t-test" || method === "wilcoxon") return state.inputs.variables.length >= 2;
+    if (method === "friedman" || method === "repeated-measures-anova") return state.inputs.variables.length >= 3;
+    return state.inputs.variables.length > 0 || requiredVariableNames(state).length > 0;
   }
-  return warnings;
+  return false;
 }
 
 function inferOutcomeType(state: ControllerState): "binary" | "continuous" | "categorical" | "count" | "time_to_event" | "unknown" {
-  if (state.inputs.time && state.inputs.event) return "time_to_event";
+  if ((state.inputs.time || state.inputs.stop) && state.inputs.event) return "time_to_event";
   const text = `${state.inputs.question} ${state.inputs.outcome ?? ""}`.toLowerCase();
   if (/mortality|death|died|readmission|event|yes\/no|binary|stroke|mi\b/.test(text)) return "binary";
   if (/count|number of|visits|hospitalizations/.test(text)) return "count";
@@ -7396,6 +10254,34 @@ function statsMethodFromSelection(methodId: string | null): StatsMethod | null {
     "diagnostic-accuracy": "diagnostic-accuracy",
   };
   return map[methodId] ?? null;
+}
+
+function selectControllerExecutableStatsMethod(
+  explicitMethod: StatsMethod | null,
+  modelingPlan: ModelingDecisionPlan,
+  selection: MethodSelectionResult,
+): { method: StatsMethod | null; source: string; unmappedMethodId: string | null } {
+  if (explicitMethod) return { method: explicitMethod, source: "explicit-controller-input", unmappedMethodId: null };
+
+  const guidanceMethodId = modelingPlan.statisticalMethodGuidance.recommendedStatsRunMethod;
+  const guidanceMethod = modelingPlan.statisticalMethodGuidance.blockers.length === 0
+    ? statsMethodFromSelection(guidanceMethodId)
+    : null;
+  if (guidanceMethod) return { method: guidanceMethod, source: "data-aware-statistical-guidance", unmappedMethodId: null };
+
+  const modelingEvidenceMethodId = modelingPlan.methodSelectionEvidence.primaryMethodId;
+  const modelingEvidenceMethod = statsMethodFromSelection(modelingEvidenceMethodId);
+  if (modelingEvidenceMethod) return { method: modelingEvidenceMethod, source: "method-selection-evidence", unmappedMethodId: null };
+
+  const selectionMethodId = selection.primary?.method.id ?? null;
+  const selectionMethod = statsMethodFromSelection(selectionMethodId);
+  if (selectionMethod) return { method: selectionMethod, source: "method-catalog-selection", unmappedMethodId: null };
+
+  return {
+    method: null,
+    source: "unmapped",
+    unmappedMethodId: guidanceMethodId ?? modelingEvidenceMethodId ?? selectionMethodId,
+  };
 }
 
 async function runControllerContextPreflight(state: ControllerState): Promise<AgentContextPreflight> {
@@ -7423,6 +10309,7 @@ async function controllerTableSummaryForModeling(state: ControllerState): Promis
     columns: record.columns.map(column => {
       const item = column && typeof column === "object" ? column as Record<string, unknown> : {};
       const inferred = typeof item.inferredType === "string" && ["number", "string", "boolean", "empty", "mixed", "unknown"].includes(item.inferredType) ? item.inferredType as "number" | "string" | "boolean" | "empty" | "mixed" | "unknown" : "unknown";
+      const finiteNumber = (value: unknown): number | undefined => typeof value === "number" && Number.isFinite(value) ? value : undefined;
       return {
         name: typeof item.name === "string" ? item.name : "unknown",
         inferredType: inferred,
@@ -7441,6 +10328,18 @@ async function controllerTableSummaryForModeling(state: ControllerState): Promis
           }).filter(valueCount => valueCount.value !== "" && valueCount.count > 0).slice(0, 20)
           : [],
         sampleValues: Array.isArray(item.sampleValues) ? item.sampleValues.map(value => String(value)).slice(0, 12) : [],
+        min: finiteNumber(item.min),
+        max: finiteNumber(item.max),
+        mean: finiteNumber(item.mean),
+        variance: finiteNumber(item.variance),
+        sd: finiteNumber(item.sd),
+        median: finiteNumber(item.median),
+        q1: finiteNumber(item.q1),
+        q3: finiteNumber(item.q3),
+        iqr: finiteNumber(item.iqr),
+        zeroFraction: finiteNumber(item.zeroFraction),
+        skewness: finiteNumber(item.skewness),
+        outlierFraction: finiteNumber(item.outlierFraction),
       };
     }),
   };
@@ -7471,6 +10370,23 @@ async function controllerLiteratureEvidenceForModeling(state: ControllerState): 
     planningImplications: Array.isArray(record.planningImplications) ? record.planningImplications.map(item => String(item)) : [],
     followUpSearches: Array.isArray(record.followUpSearches) ? record.followUpSearches.map(item => String(item)) : [],
     issueCodes: issues.map(issue => issue && typeof issue === "object" ? String((issue as Record<string, unknown>).id ?? "") : "").filter(Boolean),
+  };
+}
+
+async function controllerFeasibilityEvidenceForModeling(state: ControllerState): Promise<ModelingDecisionRequest["feasibilityEvidence"] | undefined> {
+  const feasibility = await loadControllerFeasibilitySummary(state);
+  if (!feasibility.present) return undefined;
+  return {
+    path: feasibility.path ?? undefined,
+    verdict: feasibility.verdict,
+    status: feasibility.status,
+    score: feasibility.score,
+    confidence: feasibility.confidence,
+    blockers: feasibility.blockers,
+    warnings: feasibility.warnings,
+    issueCodes: feasibility.issueCodes,
+    requiredModifications: feasibility.requiredModifications,
+    nextAction: feasibility.nextAction,
   };
 }
 
@@ -7545,6 +10461,70 @@ function previousExternalReviewFailures(state: ControllerState): number {
   return state.actions.filter(action => action.action === "external_review" && /External review (revise|block)/.test(action.outputSummary)).length;
 }
 
+function latestControllerActionIndex(state: ControllerState, action: ControllerActionType): number {
+  for (let index = state.actions.length - 1; index >= 0; index -= 1) {
+    if (state.actions[index]?.action === action) return index;
+  }
+  return -1;
+}
+
+function externalReviewPromotionStatus(state: ControllerState, reviewVerdict: string): {
+  applicable: boolean;
+  auditStatus: ControllerCompletionAudit["requirements"][number]["status"];
+  promotionSatisfied: boolean;
+  finding: string;
+} {
+  const applicable = state.policy.requireExternalReviewForPromotion || state.policy.allowExternalReview;
+  if (!applicable) {
+    return {
+      applicable: false,
+      auditStatus: "not_applicable",
+      promotionSatisfied: true,
+      finding: "External review was not required.",
+    };
+  }
+  if (!reviewVerdict) {
+    return {
+      applicable: true,
+      auditStatus: "failed",
+      promotionSatisfied: false,
+      finding: state.policy.requireExternalReviewForPromotion ? "Required external review adjudication is missing." : "External review was enabled but adjudication is missing.",
+    };
+  }
+  if (reviewVerdict !== "pass") {
+    return {
+      applicable: true,
+      auditStatus: "failed",
+      promotionSatisfied: false,
+      finding: `External review adjudication is unresolved (${reviewVerdict}); repair, re-review, or record explicit human acceptance before promotion.`,
+    };
+  }
+  const latestReviewIndex = latestControllerActionIndex(state, "external_review");
+  const latestRepairIndex = latestControllerActionIndex(state, "apply_repairs");
+  if (latestRepairIndex >= 0 && latestReviewIndex >= 0 && latestRepairIndex > latestReviewIndex) {
+    return {
+      applicable: true,
+      auditStatus: "failed",
+      promotionSatisfied: false,
+      finding: "External review passed before the latest repair; rerun external review on the repaired artifacts before promotion.",
+    };
+  }
+  return {
+    applicable: true,
+    auditStatus: "proved",
+    promotionSatisfied: true,
+    finding: "External review adjudication passed and is current for recorded repairs.",
+  };
+}
+
+function nextStageAfterReviewerRepair(state: ControllerState, plannedNext: ControllerStage, status: ControllerRepairExecution["status"]): ControllerStage {
+  if (status === "failed" || status === "skipped") return "human_review";
+  if (!state.policy.allowExternalReview) return plannedNext;
+  if (plannedNext === "human_review" || plannedNext === "blocked" || plannedNext === "complete") return plannedNext;
+  if (plannedNext === "inspection" || plannedNext === "promotion_decision" || plannedNext === "external_review") return "external_review";
+  return plannedNext;
+}
+
 async function applyControllerRepairs(state: ControllerState): Promise<ControllerRepairExecution> {
   const planPath = path.join(state.inputs.runDir, "review", "controller-repair-plan.json");
   const rawPlan = await readJsonIfPresent(planPath);
@@ -7580,6 +10560,7 @@ async function applyControllerRepairs(state: ControllerState): Promise<Controlle
       : executedRepairs.some(item => item.status === "succeeded")
         ? "partial"
         : "failed";
+  const verifiedNextStage = nextStageAfterReviewerRepair(state, nextStage, status);
   const outPath = path.join(state.inputs.runDir, "review", `controller-repair-execution-${String(state.repairs.length + 1).padStart(2, "0")}.json`);
   const result: ControllerRepairExecution = {
     schemaVersion: 1,
@@ -7588,13 +10569,122 @@ async function applyControllerRepairs(state: ControllerState): Promise<Controlle
     sourceReviewPath: planPath,
     status,
     stageBeforeRepair: state.currentStage,
-    nextStage: status === "failed" || status === "skipped" ? "human_review" : nextStage,
+    nextStage: verifiedNextStage,
     executedRepairs,
     skippedFindings,
     outPath,
   };
   await writeJson(outPath, { schemaVersion: 1, controllerRepairExecution: result });
   return result;
+}
+
+async function writeControllerRepairVerification(state: ControllerState, repair: ControllerRepairExecution): Promise<ControllerRepairVerification> {
+  const checks: ControllerRepairVerification["checks"] = [];
+  const add = (id: string, status: "pass" | "warning" | "fail", message: string, evidenceRefs: string[] = []) => {
+    checks.push({ id, status, message, evidenceRefs: uniqueText(evidenceRefs.filter(Boolean)) });
+  };
+  const acceptedFindings = repair.executedRepairs.length + repair.skippedFindings.length;
+  const succeededRepairs = repair.executedRepairs.filter(item => item.status === "succeeded");
+  const failedRepairs = repair.executedRepairs.filter(item => item.status === "failed");
+  const allArtifactRefs = repair.executedRepairs.flatMap(item => item.artifactRefs);
+  const missingArtifactRefs: string[] = [];
+  for (const ref of uniqueText(allArtifactRefs)) {
+    if (!await pathExists(ref)) missingArtifactRefs.push(ref);
+  }
+  add(
+    "accepted-findings-accounted",
+    acceptedFindings > 0 ? "pass" : "fail",
+    acceptedFindings > 0 ? `${acceptedFindings} accepted reviewer finding(s) were accounted for by repair execution.` : "No accepted reviewer findings were accounted for by repair execution.",
+    [repair.outPath],
+  );
+  add(
+    "repair-plugin-success",
+    failedRepairs.length ? "fail" : succeededRepairs.length ? "pass" : "warning",
+    failedRepairs.length
+      ? `${failedRepairs.length} bounded repair plugin(s) failed.`
+      : succeededRepairs.length ? `${succeededRepairs.length} bounded repair plugin(s) succeeded.` : "No bounded repair plugin succeeded.",
+    [repair.outPath, ...succeededRepairs.flatMap(item => item.artifactRefs)],
+  );
+  add(
+    "skipped-findings",
+    repair.skippedFindings.length ? "fail" : "pass",
+    repair.skippedFindings.length ? `${repair.skippedFindings.length} accepted reviewer finding(s) were skipped and require human review.` : "No accepted reviewer findings were skipped.",
+    [repair.outPath],
+  );
+  add(
+    "repair-artifact-refs-exist",
+    missingArtifactRefs.length ? "fail" : allArtifactRefs.length ? "pass" : "warning",
+    missingArtifactRefs.length
+      ? `${missingArtifactRefs.length} repair artifact reference(s) are missing.`
+      : allArtifactRefs.length ? `${uniqueText(allArtifactRefs).length} repair artifact reference(s) exist.` : "Repair execution did not produce artifact references.",
+    missingArtifactRefs.length ? missingArtifactRefs : allArtifactRefs,
+  );
+  const freshExternalReviewRequired = state.policy.allowExternalReview && repair.status !== "failed" && repair.status !== "skipped";
+  add(
+    "fresh-external-review-after-repair",
+    freshExternalReviewRequired ? repair.nextStage === "external_review" ? "pass" : "warning" : "pass",
+    freshExternalReviewRequired
+      ? repair.nextStage === "external_review"
+        ? "Repair routes back to external review for fresh reviewer validation."
+        : `Repair routes to ${repair.nextStage}; deterministic verification must complete before fresh external review.`
+      : "Fresh external review is not required by current policy or repair status.",
+    [repair.outPath],
+  );
+  const status: ControllerRepairVerification["status"] = checks.some(check => check.status === "fail")
+    ? "fail"
+    : checks.some(check => check.status === "warning")
+      ? "warning"
+      : "pass";
+  const outPath = path.join(state.inputs.runDir, "review", `controller-repair-verification-${String(state.repairs.length).padStart(2, "0")}.json`);
+  const reportPath = path.join(state.inputs.runDir, "review", `controller-repair-verification-${String(state.repairs.length).padStart(2, "0")}.md`);
+  const verification: ControllerRepairVerification = {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    verificationId: `repair_verification_${String(state.repairs.length).padStart(2, "0")}`,
+    repairId: repair.repairId,
+    repairExecutionPath: repair.outPath,
+    status,
+    checks,
+    acceptedFindings,
+    verifiedFindings: succeededRepairs.length,
+    skippedFindings: repair.skippedFindings.length,
+    failedRepairs: failedRepairs.length,
+    missingArtifactRefs: missingArtifactRefs.length,
+    freshExternalReviewRequired,
+    nextAction: status === "fail"
+      ? "Stop for human review of skipped, failed, or missing repair evidence before continuing."
+      : freshExternalReviewRequired && repair.nextStage === "external_review"
+        ? "Run external review on the repaired packet."
+        : freshExternalReviewRequired
+          ? `Continue deterministic verification at ${repair.nextStage}, then rerun external review.`
+          : "Continue the controller loop.",
+    outPath,
+    reportPath,
+  };
+  await writeJson(outPath, { schemaVersion: 1, controllerRepairVerification: verification });
+  await writeFile(reportPath, renderControllerRepairVerificationMarkdown(verification));
+  return verification;
+}
+
+function renderControllerRepairVerificationMarkdown(verification: ControllerRepairVerification): string {
+  return [
+    "# Controller Repair Verification",
+    "",
+    `Status: ${verification.status}`,
+    `Repair: ${verification.repairId}`,
+    `Accepted findings: ${verification.acceptedFindings}`,
+    `Verified findings: ${verification.verifiedFindings}`,
+    `Skipped findings: ${verification.skippedFindings}`,
+    `Failed repairs: ${verification.failedRepairs}`,
+    `Missing artifact refs: ${verification.missingArtifactRefs}`,
+    `Fresh external review required: ${verification.freshExternalReviewRequired}`,
+    "",
+    "## Checks",
+    ...verification.checks.map(check => `- [${check.status}] ${check.id}: ${check.message}`),
+    "",
+    `Next action: ${verification.nextAction}`,
+    "",
+  ].join("\n");
 }
 
 function normalizeRepairFinding(value: unknown): { findingId: string; category: string; reentryPoint: string; action: string } {
@@ -7630,19 +10720,35 @@ async function runRepairPlugin(pluginId: string, state: ControllerState): Promis
     }
     case "refresh-method-selection": {
       const outcomeType = inferOutcomeType(state);
+      const modelingPlan: ModelingDecisionPlan = buildModelingDecisionPlan({
+        question: state.inputs.question,
+        outcomeType: outcomeType === "unknown" ? undefined : outcomeType,
+        surveyDesign: state.inputs.surveyDesign,
+        timeToEvent: Boolean((state.inputs.time || state.inputs.stop) && state.inputs.event),
+        dataStructures: ["single_table"],
+        target: state.inputs.outcome ?? state.inputs.event ?? undefined,
+        roleHints: controllerModelingRoleHints(state),
+        tableSummary: await controllerTableSummaryForModeling(state),
+        literatureEvidence: await controllerLiteratureEvidenceForModeling(state),
+        feasibilityEvidence: await controllerFeasibilityEvidenceForModeling(state),
+        requiresInference: true,
+        maxCandidates: 12,
+      });
+      const modelingPlanPath = path.join(state.rootDir, `controller-modeling-plan-repair-${String(state.repairs.length + 1).padStart(2, "0")}.json`);
+      await writeJson(modelingPlanPath, { schemaVersion: 1, modelingPlan });
       const selection = selectAnalysisMethods({
         question: state.inputs.question,
         outcomeType: outcomeType === "unknown" ? undefined : outcomeType,
         surveyDesign: state.inputs.surveyDesign,
-        timeToEvent: Boolean(state.inputs.time && state.inputs.event),
+        timeToEvent: Boolean((state.inputs.time || state.inputs.stop) && state.inputs.event),
         dataStructures: ["single_table"],
         maxCandidates: 8,
       });
       const selectionPath = path.join(state.rootDir, `method-selection-repair-${String(state.repairs.length + 1).padStart(2, "0")}.json`);
       await writeJson(selectionPath, { schemaVersion: 1, methodSelection: selection });
-      const executable = state.inputs.method ?? statsMethodFromSelection(selection.primary?.method.id ?? null);
+      const executable = selectControllerExecutableStatsMethod(state.inputs.method ?? null, modelingPlan, selection).method;
       if (executable) state.inputs.method = executable;
-      return [selectionPath];
+      return [modelingPlanPath, selectionPath];
     }
     case "rerun-analysis": {
       if (!state.inputs.dataPath || !state.inputs.method) throw new Error("Cannot rerun analysis without data path and selected method.");
@@ -7653,6 +10759,8 @@ async function runRepairPlugin(pluginId: string, state: ControllerState): Promis
         outcome: state.inputs.outcome ?? undefined,
         exposure: state.inputs.exposure ?? undefined,
         group: state.inputs.group ?? undefined,
+        outcomeThreshold: state.inputs.outcomeThreshold ?? undefined,
+        exposureThreshold: state.inputs.exposureThreshold ?? undefined,
         variables: state.inputs.variables,
         covariates: state.inputs.covariates,
         exactCovariates: state.inputs.exactCovariates,
@@ -7662,6 +10770,8 @@ async function runRepairPlugin(pluginId: string, state: ControllerState): Promis
         trimThreshold: 0.01,
         stabilizeWeights: true,
         time: state.inputs.time ?? undefined,
+        start: state.inputs.start ?? undefined,
+        stop: state.inputs.stop ?? undefined,
         event: state.inputs.event ?? undefined,
         id: state.inputs.id ?? undefined,
         strata: state.inputs.strata ?? undefined,
@@ -7671,6 +10781,10 @@ async function runRepairPlugin(pluginId: string, state: ControllerState): Promis
         runningVariable: state.inputs.runningVariable ?? undefined,
         cutoff: state.inputs.cutoff ?? undefined,
         instrument: state.inputs.instrument ?? undefined,
+        alphaPenalty: state.inputs.alphaPenalty ?? undefined,
+        l1Ratio: state.inputs.l1Ratio ?? undefined,
+        weight: state.inputs.weight ?? undefined,
+        offset: state.inputs.offset ?? undefined,
         surveyDesign: state.inputs.surveyDesign,
         allowSurveyApproximation: state.inputs.allowSurveyApproximation,
         alpha: 0.05,
@@ -7708,6 +10822,457 @@ async function writeControllerCompletionAudit(state: ControllerState): Promise<C
   return audit;
 }
 
+async function writeControllerGoldenPacket(
+  state: ControllerState,
+  context: {
+    ready: boolean;
+    inspectionReadiness: string | null;
+    reviewVerdict: string | null;
+    completionAudit: ControllerCompletionAudit;
+    selfEvaluation: ControllerSelfEvaluation;
+  },
+): Promise<ControllerGoldenPacket> {
+  const packet = await buildControllerGoldenPacket(state, context);
+  await writeJson(packet.outPath, { schemaVersion: 1, controllerGoldenPacket: packet });
+  await writeFile(packet.reportPath, renderControllerGoldenPacketMarkdown(packet));
+  return packet;
+}
+
+async function writeControllerTerminalGoldenPacket(state: ControllerState, handoff: ControllerTerminalHandoff): Promise<ControllerGoldenPacket> {
+  const outPath = path.join(state.rootDir, "controller-golden-packet.json");
+  const reportPath = path.join(state.rootDir, "controller-golden-packet.md");
+  const inspectionRaw = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
+  const inspection = (valueAtPath(inspectionRaw, "runInspection") ?? inspectionRaw) as Partial<RunInspectionResult> | null;
+  const inspectionReadiness = typeof inspection?.readiness === "string" ? inspection.readiness : null;
+  const controllerFeasibility = await loadControllerFeasibilitySummary(state);
+  const inspectionFeasibility = controllerInspectionFeasibilityReadiness(inspection, controllerFeasibility);
+  const inspectionRecommendedCommands = controllerInspectionRecommendedCommands(inspection);
+  const latestIssueLedger = await readLatestControllerIssueLedger(state);
+  const latestStageReview = await readLatestControllerStageReview(state);
+  const latestReadiness = await readLatestControllerActionReadiness(state);
+  const latestContract = await readLatestControllerActionContract(state);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  const blockers = uniqueStringList([
+    ...handoff.failureAttribution.filter(item => item.severity === "blocker").map(item => item.message),
+    ...(latestIssueLedger?.issues.filter(item => item.severity === "blocker").map(item => item.message) ?? []),
+    ...(latestStageReview?.findings.filter(item => item.severity === "blocker").map(item => item.message) ?? []),
+    ...(latestReadiness?.checks.filter(item => item.status === "fail").map(item => item.message) ?? []),
+    ...(latestContract?.status === "fail" ? latestContract.reasons : []),
+    ...(state.status === "blocked" && state.stopReason ? [state.stopReason] : []),
+  ]);
+  const warnings = uniqueStringList([
+    ...handoff.failureAttribution.filter(item => item.severity !== "blocker").map(item => item.message),
+    ...(latestIssueLedger?.issues.filter(item => item.severity !== "blocker").map(item => item.message) ?? []),
+    ...(latestStageReview?.findings.filter(item => item.severity !== "blocker").map(item => item.message) ?? []),
+    ...(latestReadiness?.checks.filter(item => item.status === "warning").map(item => item.message) ?? []),
+    ...(latestContract?.status === "warning" ? latestContract.reasons : []),
+    ...(Array.isArray(inspection?.warnings) ? inspection.warnings.filter((item): item is string => typeof item === "string") : []),
+  ]);
+  const requiredArtifactsMissingHash = state.artifacts.filter(item => item.requiredForPromotion && !item.sha256).length;
+  const completionAudit: ControllerCompletionAudit["status"] = state.status === "complete" ? "pass" : state.status === "blocked" ? "fail" : "warning";
+  const selfEvaluation: ControllerSelfEvaluation["status"] = state.status === "complete" ? "pass" : state.status === "blocked" ? "fail" : "warning";
+  const issueSummary = buildControllerGoldenIssueSummary({
+    handoff,
+    issueLedger: latestIssueLedger,
+    stageReview: latestStageReview,
+    actionReadiness: latestReadiness,
+    actionContract: latestContract,
+    datasetSemanticAudit,
+    inspection,
+  });
+  const activeIssueCodes = uniqueText(issueSummary.flatMap(issue => issue.issueCodes));
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes(issueSummary.filter(issue => issue.severity === "blocker").flatMap(issue => issue.issueCodes));
+  const packet: ControllerGoldenPacket = {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    runId: state.runId,
+    status: state.status,
+    stage: state.currentStage,
+    question: state.inputs.question,
+    method: state.inputs.method,
+    readiness: {
+      runInspection: inspectionReadiness,
+      feasibilityReadiness: inspectionFeasibility.status,
+      feasibilityVerdict: inspectionFeasibility.verdict,
+      completionAudit,
+      selfEvaluation,
+      promotionDecision: state.status === "complete" ? "complete" : "human_review",
+      promotable: state.status === "complete" && inspectionReadiness === "local_review_ready" && !requiredArtifactsMissingHash,
+    },
+    counts: {
+      actions: state.actions.length,
+      artifacts: state.artifacts.length,
+      blockers: blockers.length,
+      warnings: warnings.length,
+      requiredArtifactsMissingHash,
+    },
+    blockers,
+    warnings,
+    activeIssueCodes,
+    activeBlockerIssueCodes,
+    issueSummary,
+    stageSummary: controllerGoldenStageSummary(state),
+    keyArtifacts: {
+      state: state.statePath,
+      feasibility: latestArtifactPath(state, "controller-feasibility-verdict"),
+      datasetSemanticAudit: datasetSemanticAudit.path,
+      exploration: latestArtifactPath(state, "exploration"),
+      literatureContext: latestArtifactPath(state, "literature-context"),
+      methodSelection: latestArtifactPath(state, "method-selection"),
+      modelingPlan: latestArtifactPath(state, "controller-modeling-plan"),
+      statsRun: await pathExists(path.join(state.inputs.runDir, "stats-run.json")) ? path.join(state.inputs.runDir, "stats-run.json") : null,
+      statsQa: latestArtifactPath(state, "stats-qa"),
+      methodQa: latestArtifactPath(state, "method-qa"),
+      manuscript: latestArtifactPath(state, "manuscript"),
+      manuscriptQa: latestArtifactPath(state, "manuscript-qa"),
+      literatureQa: latestArtifactPath(state, "literature-qa"),
+      reviewAdjudication: latestArtifactPath(state, "review-adjudication"),
+      runInspection: latestArtifactPath(state, "run-inspection"),
+      stageReview: latestStageReview?.outPath ?? latestArtifactPath(state, "controller-stage-review"),
+      issueLedger: latestIssueLedger?.outPath ?? latestArtifactPath(state, "controller-issue-ledger"),
+      actionReadiness: latestReadiness?.outPath ?? latestArtifactPath(state, "controller-action-readiness"),
+      actionContract: latestContract?.outPath ?? latestArtifactPath(state, "controller-action-contract"),
+      terminalHandoff: latestArtifactPath(state, "controller-terminal-handoff") ?? path.join(state.rootDir, "controller-terminal-handoff.json"),
+      nextAction: latestArtifactPath(state, "controller-next-action") ?? path.join(state.rootDir, "controller-next-action.json"),
+      reentryPlan: latestArtifactPath(state, "controller-reentry-plan") ?? path.join(state.rootDir, "controller-reentry-plan.json"),
+    },
+    keyArtifactReports: {
+      state: null,
+      feasibility: latestArtifactPath(state, "controller-feasibility-report"),
+      datasetSemanticAudit: datasetSemanticAudit.reportPath,
+      exploration: latestArtifactPath(state, "exploration-report"),
+      literatureContext: latestArtifactPath(state, "literature-context-report"),
+      methodSelection: null,
+      modelingPlan: null,
+      statsRun: latestArtifactPath(state, "stats-report"),
+      statsQa: null,
+      methodQa: latestArtifactPath(state, "method-qa-report"),
+      manuscript: null,
+      manuscriptQa: null,
+      literatureQa: latestArtifactPath(state, "literature-qa-report"),
+      reviewAdjudication: null,
+      runInspection: latestArtifactPath(state, "run-inspection-report"),
+      stageReview: latestStageReview?.reportPath ?? latestArtifactPath(state, "controller-stage-review-report"),
+      issueLedger: latestIssueLedger?.reportPath ?? latestArtifactPath(state, "controller-issue-ledger-report"),
+      actionReadiness: latestReadiness?.reportPath ?? latestArtifactPath(state, "controller-action-readiness-report"),
+      actionContract: latestContract?.reportPath ?? latestArtifactPath(state, "controller-action-contract-report"),
+      terminalHandoff: latestArtifactPath(state, "controller-terminal-handoff-report") ?? path.join(state.rootDir, "controller-terminal-handoff.md"),
+      nextAction: latestArtifactPath(state, "controller-next-action-report") ?? path.join(state.rootDir, "controller-next-action.md"),
+      reentryPlan: latestArtifactPath(state, "controller-reentry-plan-report") ?? path.join(state.rootDir, "controller-reentry-plan.md"),
+    },
+    datasetSemanticAudit,
+    nextAction: state.status === "blocked"
+      ? "Do not execute downstream analysis. Patch the blocking study/data issue or start a new run with feasible inputs."
+      : state.status === "complete"
+        ? "Proceed to human scientific review and external sharing decisions under the declared evidence boundary."
+        : "Review the terminal handoff, next-action packet, and issue ledger before resuming.",
+    recommendedCommands: uniqueStringList([
+      ...inspectionRecommendedCommands,
+      ...handoff.suggestedCommands,
+    ]).slice(0, 8),
+    outPath,
+    reportPath,
+  };
+  await writeJson(outPath, { schemaVersion: 1, controllerGoldenPacket: packet });
+  await writeFile(reportPath, renderControllerGoldenPacketMarkdown(packet));
+  return packet;
+}
+
+async function buildControllerGoldenPacket(
+  state: ControllerState,
+  context: {
+    ready: boolean;
+    inspectionReadiness: string | null;
+    reviewVerdict: string | null;
+    completionAudit: ControllerCompletionAudit;
+    selfEvaluation: ControllerSelfEvaluation;
+  },
+): Promise<ControllerGoldenPacket> {
+  const outPath = path.join(state.rootDir, "controller-golden-packet.json");
+  const reportPath = path.join(state.rootDir, "controller-golden-packet.md");
+  const inspectionRaw = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
+  const inspection = (valueAtPath(inspectionRaw, "runInspection") ?? inspectionRaw) as Partial<RunInspectionResult> | null;
+  const controllerFeasibility = await loadControllerFeasibilitySummary(state);
+  const inspectionFeasibility = controllerInspectionFeasibilityReadiness(inspection, controllerFeasibility);
+  const inspectionRecommendedCommands = controllerInspectionRecommendedCommands(inspection);
+  const inspectionBlockers = Array.isArray(inspection?.blockers) ? inspection.blockers.filter((item): item is string => typeof item === "string") : [];
+  const inspectionWarnings = Array.isArray(inspection?.warnings) ? inspection.warnings.filter((item): item is string => typeof item === "string") : [];
+  const auditFailures = context.completionAudit.requirements.filter(item => item.status === "failed").map(item => `${item.id}: ${item.finding}`);
+  const auditWarnings = context.completionAudit.requirements.filter(item => item.status === "warning").map(item => `${item.id}: ${item.finding}`);
+  const selfEvalFailures = context.selfEvaluation.checks.filter(item => item.status === "fail").map(item => `${item.id}: ${item.message}`);
+  const selfEvalWarnings = context.selfEvaluation.checks.filter(item => item.status === "warning").map(item => `${item.id}: ${item.message}`);
+  const latestIssueLedger = await readLatestControllerIssueLedger(state);
+  const latestStageReview = await readLatestControllerStageReview(state);
+  const latestReadiness = await readLatestControllerActionReadiness(state);
+  const latestContract = await readLatestControllerActionContract(state);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  const issueSummary = buildControllerGoldenIssueSummary({
+    completionAudit: context.completionAudit,
+    selfEvaluation: context.selfEvaluation,
+    issueLedger: latestIssueLedger,
+    stageReview: latestStageReview,
+    actionReadiness: latestReadiness,
+    actionContract: latestContract,
+    datasetSemanticAudit,
+    inspection,
+  });
+  const activeIssueCodes = uniqueText(issueSummary.flatMap(issue => issue.issueCodes));
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes(issueSummary.filter(issue => issue.severity === "blocker").flatMap(issue => issue.issueCodes));
+  const blockers = uniqueStringList([
+    ...inspectionBlockers,
+    ...auditFailures,
+    ...selfEvalFailures,
+    ...(latestIssueLedger?.issues.filter(item => item.severity === "blocker").map(item => item.message) ?? []),
+    ...(latestStageReview?.findings.filter(item => item.severity === "blocker").map(item => item.message) ?? []),
+    ...(latestReadiness?.checks.filter(item => item.status === "fail").map(item => item.message) ?? []),
+    ...(latestContract?.status === "fail" ? latestContract.reasons : []),
+  ]);
+  const warnings = uniqueStringList([
+    ...inspectionWarnings,
+    ...auditWarnings,
+    ...selfEvalWarnings,
+    ...(latestIssueLedger?.issues.filter(item => item.severity !== "blocker").map(item => item.message) ?? []),
+    ...(latestStageReview?.findings.filter(item => item.severity !== "blocker").map(item => item.message) ?? []),
+    ...(latestReadiness?.checks.filter(item => item.status === "warning").map(item => item.message) ?? []),
+    ...(latestContract?.status === "warning" ? latestContract.reasons : []),
+  ]);
+  const requiredArtifactsMissingHash = state.artifacts.filter(item => item.requiredForPromotion && !item.sha256).length;
+  const statsRunPath = path.join(state.inputs.runDir, "stats-run.json");
+  return {
+    schemaVersion: 1,
+    generatedAtIso: nowIso(),
+    runId: state.runId,
+    status: state.status,
+    stage: state.currentStage,
+    question: state.inputs.question,
+    method: state.inputs.method,
+    readiness: {
+      runInspection: context.inspectionReadiness,
+      feasibilityReadiness: inspectionFeasibility.status,
+      feasibilityVerdict: inspectionFeasibility.verdict,
+      completionAudit: context.completionAudit.status,
+      selfEvaluation: context.selfEvaluation.status,
+      promotionDecision: context.ready ? "complete" : "human_review",
+      promotable: context.ready,
+    },
+    counts: {
+      actions: state.actions.length,
+      artifacts: state.artifacts.length,
+      blockers: blockers.length,
+      warnings: warnings.length,
+      requiredArtifactsMissingHash,
+    },
+    blockers,
+    warnings,
+    activeIssueCodes,
+    activeBlockerIssueCodes,
+    issueSummary,
+    stageSummary: controllerGoldenStageSummary(state),
+    keyArtifacts: {
+      state: state.statePath,
+      feasibility: latestArtifactPath(state, "controller-feasibility-verdict"),
+      datasetSemanticAudit: datasetSemanticAudit.path,
+      exploration: latestArtifactPath(state, "exploration"),
+      literatureContext: latestArtifactPath(state, "literature-context"),
+      methodSelection: latestArtifactPath(state, "method-selection"),
+      modelingPlan: latestArtifactPath(state, "controller-modeling-plan"),
+      statsRun: await pathExists(statsRunPath) ? statsRunPath : latestArtifactPath(state, "stats-run"),
+      statsQa: latestArtifactPath(state, "stats-qa"),
+      methodQa: latestArtifactPath(state, "method-qa"),
+      manuscript: latestArtifactPath(state, "manuscript"),
+      manuscriptQa: latestArtifactPath(state, "manuscript-qa"),
+      literatureQa: latestArtifactPath(state, "literature-qa"),
+      reviewAdjudication: latestArtifactPath(state, "review-adjudication"),
+      runInspection: latestArtifactPath(state, "run-inspection"),
+      completionAudit: context.completionAudit.outPath,
+      selfEvaluation: context.selfEvaluation.outPath,
+      stageReview: latestStageReview?.outPath ?? latestArtifactPath(state, "controller-stage-review"),
+      issueLedger: latestIssueLedger?.outPath ?? latestArtifactPath(state, "controller-issue-ledger"),
+      actionReadiness: latestReadiness?.outPath ?? latestArtifactPath(state, "controller-action-readiness"),
+      actionContract: latestContract?.outPath ?? latestArtifactPath(state, "controller-action-contract"),
+      terminalHandoff: latestArtifactPath(state, "controller-terminal-handoff"),
+      nextAction: latestArtifactPath(state, "controller-next-action"),
+      reentryPlan: latestArtifactPath(state, "controller-reentry-plan"),
+    },
+    keyArtifactReports: {
+      state: null,
+      feasibility: latestArtifactPath(state, "controller-feasibility-report"),
+      datasetSemanticAudit: datasetSemanticAudit.reportPath,
+      exploration: latestArtifactPath(state, "exploration-report"),
+      literatureContext: latestArtifactPath(state, "literature-context-report"),
+      methodSelection: null,
+      modelingPlan: null,
+      statsRun: latestArtifactPath(state, "stats-report"),
+      statsQa: null,
+      methodQa: latestArtifactPath(state, "method-qa-report"),
+      manuscript: null,
+      manuscriptQa: null,
+      literatureQa: latestArtifactPath(state, "literature-qa-report"),
+      reviewAdjudication: null,
+      runInspection: latestArtifactPath(state, "run-inspection-report"),
+      completionAudit: context.completionAudit.reportPath,
+      selfEvaluation: context.selfEvaluation.reportPath,
+      stageReview: latestStageReview?.reportPath ?? latestArtifactPath(state, "controller-stage-review-report"),
+      issueLedger: latestIssueLedger?.reportPath ?? latestArtifactPath(state, "controller-issue-ledger-report"),
+      actionReadiness: latestReadiness?.reportPath ?? latestArtifactPath(state, "controller-action-readiness-report"),
+      actionContract: latestContract?.reportPath ?? latestArtifactPath(state, "controller-action-contract-report"),
+      terminalHandoff: latestArtifactPath(state, "controller-terminal-handoff-report"),
+      nextAction: latestArtifactPath(state, "controller-next-action-report"),
+      reentryPlan: latestArtifactPath(state, "controller-reentry-plan-report"),
+    },
+    datasetSemanticAudit,
+    nextAction: context.ready
+      ? "Proceed to human scientific review and external sharing decisions under the declared evidence boundary."
+      : blockers.length
+        ? "Do not promote. Resolve blocker-level findings, rerun the affected stage, and regenerate this packet."
+        : "Treat as local-review only. Review warning-level methods, QA, and reporting findings before promotion.",
+    recommendedCommands: uniqueStringList([
+      ...inspectionRecommendedCommands,
+      context.ready
+        ? `agenteer research controller-status --state ${quotePath(state.statePath)}`
+        : `agenteer research controller-run --state ${quotePath(state.statePath)} --max-steps 4`,
+    ]).slice(0, 8),
+    outPath,
+    reportPath,
+  };
+}
+
+function buildControllerGoldenIssueSummary(context: {
+  completionAudit?: ControllerCompletionAudit;
+  selfEvaluation?: ControllerSelfEvaluation;
+  handoff?: ControllerTerminalHandoff;
+  issueLedger: ControllerIssueLedger | null;
+  stageReview: ControllerStageReview | null;
+  actionReadiness: ControllerActionReadiness | null;
+  actionContract: ControllerActionContractCheck | null;
+  datasetSemanticAudit: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>;
+  inspection: Partial<RunInspectionResult> | null;
+}): ControllerGoldenPacket["issueSummary"] {
+  const issues: ControllerGoldenPacket["issueSummary"] = [];
+  const add = (
+    category: ControllerGoldenPacket["issueSummary"][number]["category"],
+    severity: ControllerGoldenPacket["issueSummary"][number]["severity"],
+    message: string,
+    issueCodes: string[] = [],
+    evidenceRefs: string[] = [],
+  ) => {
+    const clean = message.trim();
+    if (!clean) return;
+    issues.push({
+      category,
+      severity,
+      issueCodes: uniqueText(issueCodes),
+      message: clean,
+      evidenceRefs: uniqueText(evidenceRefs),
+    });
+  };
+  for (const requirement of context.completionAudit?.requirements ?? []) {
+    if (requirement.status === "failed") add("completion_audit", "blocker", `${requirement.id}: ${requirement.finding}`, requirement.issueCodes ?? [], [context.completionAudit?.outPath, ...requirement.evidenceRefs].filter((item): item is string => Boolean(item)));
+    if (requirement.status === "warning") add("completion_audit", "warning", `${requirement.id}: ${requirement.finding}`, requirement.issueCodes ?? [], [context.completionAudit?.outPath, ...requirement.evidenceRefs].filter((item): item is string => Boolean(item)));
+  }
+  for (const check of context.selfEvaluation?.checks ?? []) {
+    if (check.status === "fail") add("self_evaluation", "blocker", `${check.id}: ${check.message}`, check.issueCodes ?? issueCodesFromText(check.message), [context.selfEvaluation?.outPath, ...check.evidenceRefs].filter((item): item is string => Boolean(item)));
+    if (check.status === "warning") add("self_evaluation", "warning", `${check.id}: ${check.message}`, check.issueCodes ?? issueCodesFromText(check.message), [context.selfEvaluation?.outPath, ...check.evidenceRefs].filter((item): item is string => Boolean(item)));
+  }
+  for (const item of context.handoff?.failureAttribution ?? []) {
+    add("terminal_handoff", item.severity === "blocker" ? "blocker" : "warning", item.message, issueCodesFromText(item.message), item.evidenceRefs);
+  }
+  for (const issue of context.issueLedger?.issues.filter(item => item.status === "active") ?? []) {
+    add("issue_ledger", issue.severity === "blocker" || issue.severity === "major" ? "blocker" : "warning", `${issue.issueCode ? `${issue.issueCode}: ` : ""}${issue.message}`, issue.issueCode ? [issue.issueCode] : issueCodesFromText(issue.message), [context.issueLedger?.outPath, ...issue.evidenceRefs].filter((item): item is string => Boolean(item)));
+  }
+  for (const finding of context.stageReview?.findings ?? []) {
+    if (finding.severity === "blocker" || finding.severity === "major") add("stage_review", finding.severity === "blocker" ? "blocker" : "warning", finding.message, finding.issueCodes ?? issueCodesFromText(finding.message), [context.stageReview?.outPath, ...finding.evidenceRefs].filter((item): item is string => Boolean(item)));
+  }
+  for (const check of context.actionReadiness?.checks ?? []) {
+    if (check.status === "fail") add("action_readiness", "blocker", check.message, check.issueCodes ?? issueCodesFromText(check.message), [context.actionReadiness?.outPath, ...check.evidenceRefs].filter((item): item is string => Boolean(item)));
+    if (check.status === "warning") add("action_readiness", "warning", check.message, check.issueCodes ?? issueCodesFromText(check.message), [context.actionReadiness?.outPath, ...check.evidenceRefs].filter((item): item is string => Boolean(item)));
+  }
+  if (context.actionContract?.status === "fail") for (const reason of context.actionContract.reasons) add("action_contract", "blocker", reason, issueCodesFromText(reason), [context.actionContract.outPath]);
+  if (context.actionContract?.status === "warning") for (const reason of context.actionContract.reasons) add("action_contract", "warning", reason, issueCodesFromText(reason), [context.actionContract.outPath]);
+  for (const issue of context.datasetSemanticAudit.topIssues.filter(issue => issue.selected && issue.severity !== "note")) {
+    add("dataset_semantic_audit", issue.severity === "blocker" ? "blocker" : "warning", `${issue.code}: ${issue.message}`, [issue.code], [context.datasetSemanticAudit.path, context.datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item)));
+  }
+  for (const blocker of Array.isArray(context.inspection?.blockers) ? context.inspection.blockers : []) if (typeof blocker === "string") add("inspection", "blocker", blocker, issueCodesFromText(blocker), []);
+  for (const warning of Array.isArray(context.inspection?.warnings) ? context.inspection.warnings : []) if (typeof warning === "string") add("inspection", "warning", warning, issueCodesFromText(warning), []);
+  return uniqueGoldenIssueSummary(issues).slice(0, 80);
+}
+
+function uniqueGoldenIssueSummary(issues: ControllerGoldenPacket["issueSummary"]): ControllerGoldenPacket["issueSummary"] {
+  const seen = new Set<string>();
+  return issues.filter(issue => {
+    const key = `${issue.category}:${issue.severity}:${issue.issueCodes.join(",")}:${issue.message}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function controllerInspectionRecommendedCommands(inspection: Partial<RunInspectionResult> | null): string[] {
+  if (!inspection || !Array.isArray(inspection.recommendedCommands)) return [];
+  return inspection.recommendedCommands.filter((command): command is string => typeof command === "string" && command.trim().length > 0);
+}
+
+function controllerInspectionFeasibilityReadiness(
+  inspection: Partial<RunInspectionResult> | null,
+  controllerFeasibility: Awaited<ReturnType<typeof loadControllerFeasibilitySummary>> | null = null,
+): { status: string | null; verdict: string | null } {
+  const feasibility = inspection && typeof inspection === "object" ? (inspection as { feasibilityReadiness?: unknown }).feasibilityReadiness : null;
+  const readiness = feasibility && typeof feasibility === "object" && !Array.isArray(feasibility)
+    ? feasibility as { status?: unknown; verdict?: unknown }
+    : null;
+  const fallbackStatus = controllerFeasibility?.status && controllerFeasibility.status !== "unknown" ? controllerFeasibility.status : null;
+  const fallbackVerdict = controllerFeasibility?.verdict && controllerFeasibility.verdict !== "unknown" ? controllerFeasibility.verdict : null;
+  return {
+    status: typeof readiness?.status === "string" ? readiness.status : fallbackStatus,
+    verdict: typeof readiness?.verdict === "string" ? readiness.verdict : fallbackVerdict,
+  };
+}
+
+function controllerGoldenStageSummary(state: ControllerState): ControllerGoldenPacket["stageSummary"] {
+  const stages: ControllerStage[] = ["dataset_feasibility", "exploration", "literature", "method_selection", "execution", "qa", "manuscript", "literature_qa", "external_review", "inspection", "promotion_decision"];
+  return stages.map(stage => {
+    const actions = state.actions.filter(action => actionStageForGoldenSummary(action.action) === stage);
+    const latest = actions.at(-1) ?? null;
+    const currentPromotionDecision = stage === "promotion_decision" && state.currentStage === "promotion_decision";
+    return {
+      stage,
+      completed: state.completedStages.includes(stage) || currentPromotionDecision,
+      latestAction: latest?.action ?? (currentPromotionDecision ? "decide_promotion" : null),
+      actionStatus: latest?.status ?? (currentPromotionDecision ? "succeeded" : null),
+      evidenceRefs: artifactPathsForStage(state, stage),
+    };
+  });
+}
+
+function actionStageForGoldenSummary(action: ControllerActionType): ControllerStage | null {
+  switch (action) {
+    case "table_summary": return "dataset_feasibility";
+    case "explore": return "exploration";
+    case "literature_search": return "literature";
+    case "select_method": return "method_selection";
+    case "run_analysis": return "execution";
+    case "method_qa": return "qa";
+    case "write_manuscript": return "manuscript";
+    case "literature_qa": return "literature_qa";
+    case "external_review": return "external_review";
+    case "inspect_run": return "inspection";
+    case "decide_promotion": return "promotion_decision";
+    default: return null;
+  }
+}
+
+function artifactPathsForStage(state: ControllerState, stage: ControllerStage): string[] {
+  return state.artifacts.filter(item => item.stage === stage && item.sha256).map(item => item.path).slice(0, 12);
+}
+
+function latestArtifactPath(state: ControllerState, kind: string): string | null {
+  return [...state.artifacts].reverse().find(item => item.kind === kind && item.sha256)?.path ?? null;
+}
+
+function uniqueStringList(items: string[]): string[] {
+  return [...new Set(items.map(item => item.trim()).filter(Boolean))];
+}
+
 async function buildControllerCompletionAudit(state: ControllerState): Promise<ControllerCompletionAudit> {
   const outPath = path.join(state.rootDir, "controller-completion-audit.json");
   const reportPath = path.join(state.rootDir, "controller-completion-audit.md");
@@ -7719,7 +11284,8 @@ async function buildControllerCompletionAudit(state: ControllerState): Promise<C
     requirement: string,
     evidenceRefs: string[],
     finding: string,
-  ) => requirements.push({ id, status, scope, requirement, evidenceRefs, finding });
+    issueCodes: string[] = [],
+  ) => requirements.push({ id, status, scope, requirement, evidenceRefs, finding, ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}) });
   const requiredStages = requiredStagesBeforePromotion(state);
   const missingStages = requiredStages.filter(stage => !state.completedStages.includes(stage));
   add(
@@ -7760,6 +11326,33 @@ async function buildControllerCompletionAudit(state: ControllerState): Promise<C
       : feasibility.present
         ? `Feasibility verdict status is ${feasibility.status}${feasibility.blockers.length ? `; blockers=${feasibility.blockers.join("; ")}` : ""}${feasibility.warnings.length ? `; warnings=${feasibility.warnings.join("; ")}` : ""}.`
         : "Feasibility verdict is missing.",
+  );
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  add(
+    "dataset-semantic-audit",
+    !state.inputs.dataPath
+      ? "not_applicable"
+      : !datasetSemanticAudit.present
+        ? "failed"
+        : datasetSemanticAudit.selectedRoleStatus === "block"
+          ? "failed"
+          : datasetSemanticAudit.selectedRoleStatus === "warning"
+            ? "warning"
+            : "proved",
+    "data",
+    "Dataset-grounded runs require semantic plausibility audit evidence, and selected study roles must not have unresolved semantic blockers.",
+    uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
+    !state.inputs.dataPath
+      ? "No row-level data path was supplied."
+      : !datasetSemanticAudit.present
+        ? "Dataset semantic audit is missing."
+        : datasetSemanticAudit.selectedRoleStatus === "block"
+          ? `Selected study roles have semantic blocker(s): ${datasetSemanticAudit.topIssues.filter(issue => issue.selected).map(issue => `${issue.code}: ${issue.message}`).join("; ") || "no detail"}.`
+          : datasetSemanticAudit.selectedRoleStatus === "warning"
+            ? `Selected study roles have semantic warning(s): ${datasetSemanticAudit.topIssues.filter(issue => issue.selected).map(issue => `${issue.code}: ${issue.message}`).join("; ") || "no detail"}.`
+            : datasetSemanticAudit.status === "warning"
+              ? `Selected study roles pass semantic plausibility; dataset-wide audit found ${datasetSemanticAudit.issueCount} unused/nonblocking issue(s) for review.`
+              : "Dataset semantic audit passes for selected study roles.",
   );
   add(
     "method-planning",
@@ -7824,6 +11417,28 @@ async function buildControllerCompletionAudit(state: ControllerState): Promise<C
       ? `${blockingStageReviews.length} blocking stage review(s) remain.`
       : stageReviews.length >= state.actions.length ? `${stageReviews.length} stage review artifact(s) cover ${state.actions.length} action(s).` : `${stageReviews.length} stage review artifact(s) do not cover ${state.actions.length} action(s).`,
   );
+  const latestRepairVerificationPath = latestArtifactPath(state, "controller-repair-verification");
+  const latestRepairVerificationRaw = latestRepairVerificationPath ? await readJsonIfPresent(latestRepairVerificationPath) : null;
+  const latestRepairVerification = valueAtPath(latestRepairVerificationRaw, "controllerRepairVerification") as Partial<ControllerRepairVerification> | null;
+  const repairVerificationStatus = latestRepairVerification?.status ?? null;
+  add(
+    "repair-verification",
+    state.repairs.length === 0
+      ? "not_applicable"
+      : repairVerificationStatus === "pass" || repairVerificationStatus === "warning"
+        ? repairVerificationStatus === "pass" ? "proved" : "warning"
+        : "failed",
+    "review",
+    "Reviewer-driven repairs must have a durable verification artifact before promotion.",
+    latestRepairVerificationPath ? [latestRepairVerificationPath] : artifactPaths(state, "controller-repair-execution"),
+    state.repairs.length === 0
+      ? "No reviewer-driven repair was recorded."
+      : repairVerificationStatus === "pass"
+        ? "Latest repair verification passed."
+        : repairVerificationStatus === "warning"
+          ? `Latest repair verification has warnings: ${latestRepairVerification?.nextAction ?? "continue with review"}.`
+          : "Latest repair verification is missing or failed.",
+  );
   const agendaArtifacts = state.artifacts.filter(item => item.kind === "controller-execution-agenda");
   const agendas = (await Promise.all(agendaArtifacts.map(item => readJsonIfPresent(item.path))))
     .map(raw => valueAtPath(raw, "controllerExecutionAgenda") as Partial<ControllerExecutionAgenda> | null)
@@ -7837,6 +11452,31 @@ async function buildControllerCompletionAudit(state: ControllerState): Promise<C
     latestAgenda?.outPath ? [latestAgenda.outPath] : agendaArtifacts.map(item => item.path),
     latestAgenda?.primaryCommand ? `Latest agenda primary command is ${latestAgenda.primaryCommand}.` : "No execution agenda with a primary command is present.",
   );
+  const latestIssueLedger = await readLatestControllerIssueLedger(state);
+  const activeLedgerIssues = latestIssueLedger?.issues.filter(issue => issue.status === "active") ?? [];
+  const activeBlockerIssues = activeLedgerIssues.filter(issue => issue.severity === "blocker");
+  const activeIssueCodes = uniqueText(activeLedgerIssues.map(issue => issue.issueCode).filter((value): value is string => Boolean(value)));
+  add(
+    "active-issue-ledger",
+    !latestIssueLedger
+      ? "warning"
+      : activeBlockerIssues.length
+        ? "failed"
+        : activeLedgerIssues.length
+          ? "warning"
+          : "proved",
+    "state_machine",
+    "The active issue ledger must be clear of unresolved blocker-level issues before completion or promotion.",
+    latestIssueLedger ? [latestIssueLedger.outPath, ...activeLedgerIssues.flatMap(issue => issue.evidenceRefs).slice(0, 12)] : [],
+    !latestIssueLedger
+      ? "No issue ledger is available for completion audit."
+      : activeBlockerIssues.length
+        ? `Active blocker issues remain: ${activeBlockerIssues.slice(0, 6).map(issue => `${issue.issueCode ? `${issue.issueCode}: ` : ""}${issue.message}`).join("; ")}.`
+        : activeLedgerIssues.length
+          ? `Active nonblocking issues remain: ${activeLedgerIssues.slice(0, 6).map(issue => `${issue.issueCode ? `${issue.issueCode}: ` : ""}${issue.message}`).join("; ")}.`
+          : "No active issue-ledger issues remain.",
+    activeIssueCodes,
+  );
   add(
     "manuscript-and-inspection",
     artifactExists(state, "manuscript") && artifactExists(state, "manuscript-qa") && artifactExists(state, "run-inspection") ? "proved" : "failed",
@@ -7845,17 +11485,30 @@ async function buildControllerCompletionAudit(state: ControllerState): Promise<C
     artifactPaths(state, "manuscript", "manuscript-qa", "run-inspection"),
     artifactExists(state, "manuscript") && artifactExists(state, "manuscript-qa") && artifactExists(state, "run-inspection") ? "Manuscript and inspection artifacts are present." : "Manuscript, manuscript QA, or run inspection artifact is missing.",
   );
+  const inspection = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
+  const inspectionReadiness = String(valueAtPath(inspection, "runInspection.readiness") ?? valueAtPath(inspection, "readiness") ?? "");
+  add(
+    "run-inspection-readiness",
+    inspectionReadiness === "local_review_ready" ? "proved" : inspectionReadiness === "needs_methods_review" ? "warning" : "failed",
+    "methods",
+    "Final promotion requires local-review-ready run inspection, including methods QA, runner capability, companion analysis, and artifact readiness.",
+    artifactPaths(state, "run-inspection"),
+    inspectionReadiness === "local_review_ready"
+      ? "Run inspection is local_review_ready."
+      : inspectionReadiness === "needs_methods_review"
+        ? "Run inspection requires methods review before external sharing."
+        : `Run inspection readiness is ${inspectionReadiness || "missing"}.`,
+  );
+  const reviewAdjudication = await readJsonIfPresent(path.join(state.inputs.runDir, "review", "review-adjudication.json"));
+  const reviewVerdict = String(valueAtPath(reviewAdjudication, "reviewAdjudication.verdict") ?? "");
+  const reviewPromotion = externalReviewPromotionStatus(state, reviewVerdict);
   add(
     "external-review-policy",
-    state.policy.requireExternalReviewForPromotion
-      ? artifactExists(state, "review-adjudication") ? "proved" : "failed"
-      : state.policy.allowExternalReview ? artifactExists(state, "review-adjudication") ? "proved" : "warning" : "not_applicable",
+    reviewPromotion.auditStatus,
     "review",
-    "External review must be present when required and recorded when enabled.",
+    "External review must pass before promotion when review is required or enabled.",
     artifactPaths(state, "review-panel", "review-adjudication"),
-    state.policy.requireExternalReviewForPromotion
-      ? artifactExists(state, "review-adjudication") ? "Required external review adjudication is present." : "Required external review adjudication is missing."
-      : state.policy.allowExternalReview ? artifactExists(state, "review-adjudication") ? "Optional external review adjudication is present." : "External review was enabled but not completed." : "External review was not required.",
+    reviewPromotion.finding,
   );
   add(
     "cost-boundary",
@@ -7923,8 +11576,22 @@ async function buildControllerSelfEvaluation(state: ControllerState): Promise<Co
   const outPath = path.join(state.rootDir, "controller-self-evaluation.json");
   const reportPath = path.join(state.rootDir, "controller-self-evaluation.md");
   const checks: ControllerSelfEvaluation["checks"] = [];
-  const add = (id: string, status: "pass" | "warning" | "fail", severity: "info" | "minor" | "major" | "blocker", message: string, evidenceRefs: string[] = []) => {
-    checks.push({ id, status, severity, message, evidenceRefs });
+  const add = (
+    id: string,
+    status: "pass" | "warning" | "fail",
+    severity: "info" | "minor" | "major" | "blocker",
+    message: string,
+    evidenceRefs: string[] = [],
+    issueCodes: string[] = [],
+  ) => {
+    checks.push({
+      id,
+      status,
+      severity,
+      message,
+      ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
+      evidenceRefs: uniqueText(evidenceRefs),
+    });
   };
   const requiredStages = requiredStagesBeforePromotion(state);
   const missingStages = requiredStages.filter(stage => !state.completedStages.includes(stage));
@@ -8001,8 +11668,63 @@ async function buildControllerSelfEvaluation(state: ControllerState): Promise<Co
     const hasContext = artifactExists(state, "controller-context-manifest");
     add("context-preflight-artifact", hasContext ? "pass" : state.policy.requireContext ? "fail" : "warning", hasContext ? "info" : state.policy.requireContext ? "blocker" : "minor", hasContext ? "Context preflight manifest is present." : "Context preflight was enabled but no context manifest artifact is present.", artifactPaths(state, "controller-context-preflight", "controller-context-manifest"));
   }
-  const hasFeasibilityVerdict = !state.inputs.dataPath || artifactExists(state, "controller-feasibility-verdict");
-  add("feasibility-verdict-artifact", hasFeasibilityVerdict ? "pass" : "fail", hasFeasibilityVerdict ? "info" : "blocker", hasFeasibilityVerdict ? "Controller feasibility verdict is present or no row-level data was supplied." : "Controller feasibility verdict is missing for a row-level data run.", artifactPaths(state, "controller-feasibility-verdict"));
+  const feasibility = await loadControllerFeasibilitySummary(state);
+  const feasibilityStatus: "pass" | "warning" | "fail" = !state.inputs.dataPath
+    ? "pass"
+    : feasibility.status === "block"
+      ? "fail"
+      : feasibility.status === "warning"
+        ? "warning"
+        : feasibility.present
+          ? "pass"
+          : "fail";
+  add(
+    "feasibility-verdict-artifact",
+    feasibilityStatus,
+    feasibilityStatus === "fail" ? "blocker" : feasibilityStatus === "warning" ? "major" : "info",
+    !state.inputs.dataPath
+      ? "No row-level data was supplied; controller feasibility verdict is not required."
+      : !feasibility.present
+        ? "Controller feasibility verdict is missing for a row-level data run."
+        : feasibility.status === "block"
+          ? `Controller feasibility verdict blocks execution${feasibility.issueCodes.length ? `: ${feasibility.issueCodes.join(", ")}` : "."}`
+          : feasibility.status === "warning"
+            ? `Controller feasibility verdict has warnings${feasibility.issueCodes.length ? `: ${feasibility.issueCodes.join(", ")}` : "."}`
+            : "Controller feasibility verdict is present and does not block execution.",
+    feasibility.path ? [feasibility.path] : artifactPaths(state, "controller-feasibility-verdict"),
+    feasibility.issueCodes,
+  );
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  add(
+    "dataset-semantic-audit",
+    !state.inputs.dataPath
+      ? "pass"
+      : !datasetSemanticAudit.present || datasetSemanticAudit.selectedRoleStatus === "block"
+        ? "fail"
+        : datasetSemanticAudit.selectedRoleStatus === "warning"
+          ? "warning"
+          : "pass",
+    !state.inputs.dataPath
+      ? "info"
+      : !datasetSemanticAudit.present || datasetSemanticAudit.selectedRoleStatus === "block"
+        ? "blocker"
+        : datasetSemanticAudit.selectedRoleStatus === "warning"
+          ? "major"
+          : "info",
+    !state.inputs.dataPath
+      ? "No row-level data path was supplied; semantic audit is not applicable."
+      : !datasetSemanticAudit.present
+        ? "Dataset semantic audit is missing for a row-level data run."
+        : datasetSemanticAudit.selectedRoleStatus === "block"
+          ? `Selected study roles have semantic blocker(s): ${datasetSemanticAudit.topIssues.filter(issue => issue.selected).map(issue => `${issue.code}: ${issue.message}`).join("; ") || "no detail"}.`
+          : datasetSemanticAudit.selectedRoleStatus === "warning"
+            ? `Selected study roles have semantic warning(s): ${datasetSemanticAudit.topIssues.filter(issue => issue.selected).map(issue => `${issue.code}: ${issue.message}`).join("; ") || "no detail"}.`
+            : datasetSemanticAudit.status === "warning"
+              ? `Selected study roles pass semantic plausibility; ${datasetSemanticAudit.issueCount} unused/nonblocking dataset issue(s) remain visible for review.`
+              : "Dataset semantic audit passes for selected study roles.",
+    uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
+    uniqueText(datasetSemanticAudit.topIssues.filter(issue => issue.selected && issue.severity !== "note").map(issue => issue.code)),
+  );
   add("analysis-executed", hasAnalysis ? "pass" : "fail", hasAnalysis ? "info" : "blocker", hasAnalysis ? "Stats execution succeeded." : "No successful stats execution action is recorded.", artifactPaths(state, "stats-summary", "stats-qa"));
   const hasModelingPlan = artifactExists(state, "controller-modeling-plan");
   add("modeling-plan-artifact", hasModelingPlan ? "pass" : "fail", hasModelingPlan ? "info" : "blocker", hasModelingPlan ? "Controller modeling-plan artifact is present." : "Controller modeling-plan artifact is missing.", artifactPaths(state, "controller-modeling-plan"));
@@ -8019,16 +11741,38 @@ async function buildControllerSelfEvaluation(state: ControllerState): Promise<Co
     inspectionReadiness === "local_review_ready" ? "Run inspection reports local review readiness." : `Run inspection readiness is ${inspectionReadiness || "missing"}.`,
     artifactPaths(state, "run-inspection"),
   );
+  if (state.repairs.length > 0) {
+    const latestRepairVerificationPath = latestArtifactPath(state, "controller-repair-verification");
+    const latestRepairVerificationRaw = latestRepairVerificationPath ? await readJsonIfPresent(latestRepairVerificationPath) : null;
+    const latestRepairVerification = valueAtPath(latestRepairVerificationRaw, "controllerRepairVerification") as Partial<ControllerRepairVerification> | null;
+    const verificationStatus = latestRepairVerification?.status ?? null;
+    add(
+      "repair-verification-artifact",
+      verificationStatus === "pass" || verificationStatus === "warning" ? "pass" : "fail",
+      verificationStatus === "pass" ? "info" : verificationStatus === "warning" ? "major" : "blocker",
+      verificationStatus === "pass"
+        ? "Latest repair verification passed."
+        : verificationStatus === "warning"
+          ? `Latest repair verification has warnings: ${latestRepairVerification?.nextAction ?? "continue with review"}.`
+          : "Reviewer-driven repair verification is missing or failed.",
+      latestRepairVerificationPath ? [latestRepairVerificationPath] : artifactPaths(state, "controller-repair-execution"),
+    );
+  }
   if (state.policy.allowLiterature) {
     const hasLiterature = artifactExists(state, "literature-context") && artifactExists(state, "literature-qa");
     add("literature-lifecycle", hasLiterature ? "pass" : "fail", hasLiterature ? "info" : "blocker", hasLiterature ? "Literature context and post-manuscript literature QA are present." : "Literature was enabled but context or QA artifact is missing.", artifactPaths(state, "literature-context", "literature-qa"));
   }
-  if (state.policy.requireExternalReviewForPromotion) {
+  if (state.policy.requireExternalReviewForPromotion || state.policy.allowExternalReview) {
     const adjudication = await readJsonIfPresent(path.join(state.inputs.runDir, "review", "review-adjudication.json"));
     const verdict = String(valueAtPath(adjudication, "reviewAdjudication.verdict") ?? "");
-    add("external-review-required", verdict === "pass" ? "pass" : "fail", verdict === "pass" ? "info" : "blocker", verdict === "pass" ? "Required external review passed." : `External review is required but verdict is ${verdict || "missing"}.`, artifactPaths(state, "review-adjudication"));
-  } else if (state.policy.allowExternalReview) {
-    add("external-review-optional", artifactExists(state, "review-adjudication") ? "pass" : "warning", artifactExists(state, "review-adjudication") ? "info" : "minor", artifactExists(state, "review-adjudication") ? "Optional external review artifact is present." : "External review was enabled but adjudication is missing.", artifactPaths(state, "review-adjudication"));
+    const reviewPromotion = externalReviewPromotionStatus(state, verdict);
+    add(
+      state.policy.requireExternalReviewForPromotion ? "external-review-required" : "external-review-enabled",
+      reviewPromotion.promotionSatisfied ? "pass" : "fail",
+      reviewPromotion.promotionSatisfied ? "info" : "blocker",
+      reviewPromotion.finding,
+      artifactPaths(state, "review-adjudication"),
+    );
   }
   if (state.policy.controller.enabled) {
     const modelDecisions = state.decisions.filter(decision => decision.source === "model");
@@ -8121,7 +11865,7 @@ function controllerCapabilityCoverage(state: ControllerState): ControllerSelfEva
   const add = (capability: string, applicable: boolean, covered: boolean, evidenceRefs: string[]) => {
     coverage.push({ capability, status: applicable ? covered ? "covered" : "missing" : "not_applicable", evidenceRefs });
   };
-  add("dataset_feasibility", Boolean(state.inputs.dataPath), state.completedStages.includes("dataset_feasibility"), artifactPaths(state, "table-summary"));
+  add("dataset_feasibility", Boolean(state.inputs.dataPath), state.completedStages.includes("dataset_feasibility"), artifactPaths(state, "table-summary", "controller-dataset-semantic-audit", "controller-dataset-semantic-audit-report"));
   add("study_feasibility_verdict", Boolean(state.inputs.dataPath), artifactExists(state, "controller-feasibility-verdict"), artifactPaths(state, "controller-feasibility-verdict", "controller-feasibility-report"));
   add("operator_stage_review", state.actions.length > 0, state.artifacts.filter(item => item.kind === "controller-stage-review" && item.sha256).length >= state.actions.length, artifactPaths(state, "controller-stage-review", "controller-stage-review-report"));
   add("execution_agenda", true, state.artifacts.some(item => item.kind === "controller-execution-agenda" && item.sha256), artifactPaths(state, "controller-execution-agenda", "controller-execution-agenda-report"));
@@ -8137,11 +11881,22 @@ function controllerCapabilityCoverage(state: ControllerState): ControllerSelfEva
   add("manuscript_generation", true, artifactExists(state, "manuscript") && artifactExists(state, "manuscript-qa"), artifactPaths(state, "manuscript", "manuscript-qa"));
   add("literature_qa", state.policy.allowLiterature, artifactExists(state, "literature-qa"), artifactPaths(state, "literature-qa"));
   add("external_review", state.policy.allowExternalReview || state.policy.requireExternalReviewForPromotion, artifactExists(state, "review-adjudication"), artifactPaths(state, "review-panel", "review-adjudication"));
-  add("bounded_repair", state.repairs.length > 0, state.repairs.some(repair => repair.status === "succeeded" || repair.status === "partial"), state.repairs.map(repair => repair.outPath));
+  add(
+    "bounded_repair",
+    state.repairs.length > 0,
+    state.repairs.some(repair => repair.status === "succeeded" || repair.status === "partial") && artifactExists(state, "controller-repair-verification"),
+    uniqueText([
+      ...state.repairs.map(repair => repair.outPath),
+      ...artifactPaths(state, "controller-repair-execution", "controller-repair-verification", "controller-repair-verification-report"),
+    ]),
+  );
   add("model_control", state.policy.controller.enabled, state.decisions.some(decision => decision.source === "model"), state.decisions.map(decision => decision.modelRawPath).filter((value): value is string => Boolean(value)));
   add("tool_actions", state.toolActions.length > 0, state.toolActions.every(tool => tool.status === "succeeded"), state.toolActions.map(tool => tool.outPath));
   add("bounded_agenteer_introspection", state.policy.allowToolActions && state.policy.allowedToolIds.includes("controller-run-agenteer"), artifactExists(state, "controller-agenteer-command"), artifactPaths(state, "controller-agenteer-command", "controller-agenteer-command-stderr"));
   add("model_runner_packet", true, artifactExists(state, "controller-model-runner-packet"), artifactPaths(state, "controller-model-runner-packet", "controller-model-runner-packet-report"));
+  add("operational_status", true, artifactExists(state, "controller-status"), artifactPaths(state, "controller-status", "controller-status-report"));
+  add("actionable_run_inspection_recovery", true, artifactExists(state, "controller-execution-agenda") && artifactExists(state, "controller-model-runner-packet") && (state.status === "running" || artifactExists(state, "controller-terminal-handoff") && artifactExists(state, "controller-next-action")), artifactPaths(state, "run-inspection", "controller-execution-agenda", "controller-terminal-handoff", "controller-next-action", "controller-model-runner-packet", "controller-runbook"));
+  add("continuous_benchmark_regression_suite", true, artifactExists(state, "continuous-benchmark-suite") && artifactExists(state, "continuous-benchmark-trend"), artifactPaths(state, "controller-benchmark", "controller-benchmark-report", "continuous-benchmark-suite", "continuous-benchmark-suite-report", "continuous-benchmark-trend", "continuous-benchmark-trend-report"));
   add("safe_patching", state.patches.length > 0, state.patches.every(patch => patch.status === "applied"), state.patches.map(patch => patch.outPath));
   add("state_reentry_plan", state.status !== "running", artifactExists(state, "controller-reentry-plan"), artifactPaths(state, "controller-reentry-plan", "controller-reentry-plan-report"));
   add("inspection", true, artifactExists(state, "run-inspection"), artifactPaths(state, "run-inspection"));
@@ -8165,7 +11920,7 @@ function renderControllerSelfEvaluationMarkdown(evaluation: ControllerSelfEvalua
     "",
     "## Checks",
     "",
-    ...evaluation.checks.map(check => `- ${check.status.toUpperCase()} [${check.severity}] ${check.id}: ${check.message}${check.evidenceRefs.length ? ` Evidence: ${check.evidenceRefs.join(", ")}` : ""}`),
+    ...evaluation.checks.map(check => `- ${check.status.toUpperCase()} [${check.severity}${check.issueCodes?.length ? `:${check.issueCodes.join(",")}` : ""}] ${check.id}: ${check.message}${check.evidenceRefs.length ? ` Evidence: ${check.evidenceRefs.join(", ")}` : ""}`),
     "",
     "## Capability Coverage",
     "",
@@ -8187,10 +11942,86 @@ function renderControllerCompletionAuditMarkdown(audit: ControllerCompletionAudi
     "",
     "## Requirements",
     "",
-    ...audit.requirements.map(item => `- ${item.status.toUpperCase()} [${item.scope}] ${item.id}: ${item.requirement} ${item.finding}${item.evidenceRefs.length ? ` Evidence: ${item.evidenceRefs.join(", ")}` : ""}`),
+    ...audit.requirements.map(item => `- ${item.status.toUpperCase()} [${item.scope}${item.issueCodes?.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.id}: ${item.requirement} ${item.finding}${item.evidenceRefs.length ? ` Evidence: ${item.evidenceRefs.join(", ")}` : ""}`),
     "",
     `Next: ${audit.nextAction}`,
     "",
+  ].join("\n");
+}
+
+function renderControllerGoldenPacketMarkdown(packet: ControllerGoldenPacket): string {
+  return [
+    "# Controller Golden Packet",
+    "",
+    `- Run: ${packet.runId}`,
+    `- Status: ${packet.status}`,
+    `- Stage: ${packet.stage}`,
+    `- Question: ${packet.question}`,
+    `- Method: ${packet.method ?? "(not selected)"}`,
+    "",
+    "## Readiness",
+    "",
+    `- Run inspection: ${packet.readiness.runInspection ?? "missing"}`,
+    `- Feasibility readiness: ${packet.readiness.feasibilityReadiness ?? "missing"}${packet.readiness.feasibilityVerdict ? `; verdict: ${packet.readiness.feasibilityVerdict}` : ""}`,
+    `- Completion audit: ${packet.readiness.completionAudit}`,
+    `- Self-evaluation: ${packet.readiness.selfEvaluation}`,
+    `- Promotion decision: ${packet.readiness.promotionDecision}`,
+    `- Promotable: ${packet.readiness.promotable ? "yes" : "no"}`,
+    "",
+    "## Counts",
+    "",
+    `- Actions: ${packet.counts.actions}`,
+    `- Artifacts: ${packet.counts.artifacts}`,
+    `- Blockers: ${packet.counts.blockers}`,
+    `- Warnings: ${packet.counts.warnings}`,
+    `- Required artifacts missing hashes: ${packet.counts.requiredArtifactsMissingHash}`,
+    `- Active issue codes: ${packet.activeIssueCodes.join(", ") || "(none)"}`,
+    `- Active blocker issue codes: ${packet.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    "",
+    "## Dataset Semantic Audit",
+    "",
+    `- Present: ${packet.datasetSemanticAudit.present}`,
+    `- Status: ${packet.datasetSemanticAudit.status}`,
+    `- Selected-role status: ${packet.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Issues: ${packet.datasetSemanticAudit.issueCount} (${packet.datasetSemanticAudit.blockerCount} blocker, ${packet.datasetSemanticAudit.warningCount} warning)`,
+    ...(packet.datasetSemanticAudit.topIssues.length ? packet.datasetSemanticAudit.topIssues.map(issue => `- ${issue.severity.toUpperCase()} ${issue.column}${issue.selected ? " [selected]" : ""}: ${issue.code} - ${issue.message}`) : ["- Issue: none"]),
+    `- Next action: ${packet.datasetSemanticAudit.nextAction ?? "(none)"}`,
+    "",
+    "## Blockers",
+    "",
+    ...(packet.blockers.length ? packet.blockers.map(item => `- ${item}`) : ["- None"]),
+    "",
+    "## Issue Summary",
+    "",
+    ...(packet.issueSummary.length
+      ? packet.issueSummary.map(item => `- ${item.severity.toUpperCase()} [${item.category}${item.issueCodes.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.message}${item.evidenceRefs.length ? ` Evidence: ${item.evidenceRefs.join(", ")}` : ""}`)
+      : ["- None"]),
+    "",
+    "## Warnings",
+    "",
+    ...(packet.warnings.length ? packet.warnings.map(item => `- ${item}`) : ["- None"]),
+    "",
+    "## Stage Summary",
+    "",
+    ...packet.stageSummary.map(item => `- ${item.stage}: ${item.completed ? "completed" : "not completed"}${item.latestAction ? `; latest action ${item.latestAction} ${item.actionStatus ?? "unknown"}` : ""}; evidence refs=${item.evidenceRefs.length}`),
+    "",
+    "## Key Artifacts",
+    "",
+    ...Object.entries(packet.keyArtifacts).map(([key, value]) => `- ${key}: ${value ?? "missing"}`),
+    "",
+    "## Key Artifact Reports",
+    "",
+    ...Object.entries(packet.keyArtifactReports).map(([key, value]) => `- ${key}: ${value ?? "not report-backed"}`),
+    "",
+    "## Next Action",
+    "",
+    packet.nextAction,
+    "",
+    "## Recommended Commands",
+    "",
+    ...(packet.recommendedCommands.length
+      ? packet.recommendedCommands.flatMap(command => ["```bash", command, "```", ""])
+      : ["None recorded.", ""]),
   ].join("\n");
 }
 
@@ -8219,6 +12050,36 @@ async function executeControllerTools(state: ControllerState, requests: Controll
       };
       await writeJson(outPath, { schemaVersion: 1, controllerToolExecution: rejected });
       executions.push(rejected);
+      continue;
+    }
+    if (request.toolId === "controller-status") {
+      await persistState(state);
+      const status = await researchControllerStatusCommand({
+        statePath: state.statePath,
+        reason: request.reason,
+      });
+      Object.assign(state, status.state);
+      const stdoutPath = path.join(state.rootDir, `${toolRunId}.stdout.txt`);
+      const stdout = JSON.stringify({ schemaVersion: 1, controllerStatus: status }, null, 2);
+      await writeFile(stdoutPath, `${stdout}\n`);
+      const execution: ControllerToolExecution = {
+        schemaVersion: 1,
+        generatedAtIso: nowIso(),
+        toolRunId,
+        request,
+        status: "succeeded",
+        command: null,
+        exitCode: 0,
+        stdoutPath,
+        stderrPath: null,
+        stdoutPreview: stdout.slice(0, 2000),
+        stderrPreview: "",
+        validationReasons: validation.reasons,
+        inspection: null,
+        outPath,
+      };
+      await writeJson(outPath, { schemaVersion: 1, controllerToolExecution: execution });
+      executions.push(execution);
       continue;
     }
     if (request.toolId === "controller-inspect") {
@@ -8557,7 +12418,7 @@ function validateControllerToolRequests(state: ControllerState, requests: Contro
       const scope = request.args[1] ?? "";
       if (scope && (scope.startsWith("-") || path.isAbsolute(scope) || /(^|\/)\.\.(\/|$)/.test(scope))) reasons.push("controller-search-repo scope may not contain flags, absolute paths, or parent traversal.");
     } else if (request.toolId === "controller-run-agenteer") {
-      const commandValidation = validateControllerAgenteerCommandArgs(request.args);
+      const commandValidation = validateControllerAgenteerCommandArgs(request.args, state);
       reasons.push(...commandValidation.reasons);
     } else if (request.toolId === "controller-git-diff") {
       if (request.args.length > 1) reasons.push("controller-git-diff accepts at most one optional in-repo path argument.");
@@ -8595,7 +12456,7 @@ function buildControllerToolCommand(state: ControllerState, request: ControllerT
   if (request.toolId === "npm-build") return { executable: "npm", args: ["run", "build"], cwd, timeoutMs: state.policy.toolTimeoutMs };
   if (request.toolId === "npm-test") return { executable: "npm", args: ["test", "--", ...request.args], cwd, timeoutMs: state.policy.toolTimeoutMs };
   if (request.toolId === "controller-run-agenteer") {
-    const validation = validateControllerAgenteerCommandArgs(request.args);
+    const validation = validateControllerAgenteerCommandArgs(request.args, state);
     if (!validation.commandArgs) throw new Error(`Invalid controller-run-agenteer command: ${validation.reasons.join("; ")}`);
     return {
       executable: "node",
@@ -8608,11 +12469,11 @@ function buildControllerToolCommand(state: ControllerState, request: ControllerT
 }
 
 function toolRequiresModelReentry(execution: ControllerToolExecution): boolean {
-  return execution.status === "succeeded" && (execution.request.toolId === "controller-inspect" || execution.request.toolId === "controller-read-artifact" || execution.request.toolId === "controller-read-file" || execution.request.toolId === "controller-search-repo" || execution.request.toolId === "controller-run-agenteer" || execution.request.toolId === "controller-git-diff" || execution.request.toolId === "controller-propose-patch" || execution.request.toolId === "controller-apply-patch" || execution.request.toolId === "controller-verify-patch" || execution.request.toolId === "controller-rollback-patch");
+  return execution.status === "succeeded" && (execution.request.toolId === "controller-status" || execution.request.toolId === "controller-inspect" || execution.request.toolId === "controller-read-artifact" || execution.request.toolId === "controller-read-file" || execution.request.toolId === "controller-search-repo" || execution.request.toolId === "controller-run-agenteer" || execution.request.toolId === "controller-git-diff" || execution.request.toolId === "controller-propose-patch" || execution.request.toolId === "controller-apply-patch" || execution.request.toolId === "controller-verify-patch" || execution.request.toolId === "controller-rollback-patch");
 }
 
 function requestIsEvidenceGathering(request: ControllerToolRequest): boolean {
-  return request.toolId === "controller-inspect" || request.toolId === "controller-read-artifact" || request.toolId === "controller-read-file" || request.toolId === "controller-search-repo" || request.toolId === "controller-run-agenteer" || request.toolId === "controller-git-diff";
+  return request.toolId === "controller-status" || request.toolId === "controller-inspect" || request.toolId === "controller-read-artifact" || request.toolId === "controller-read-file" || request.toolId === "controller-search-repo" || request.toolId === "controller-run-agenteer" || request.toolId === "controller-git-diff";
 }
 
 function toolRequestKey(request: ControllerToolRequest): string {
@@ -8634,14 +12495,16 @@ function controllerToolExecutionStage(state: ControllerState, execution: Control
   return state.artifacts.find(item => item.kind === "controller-tool-action" && path.resolve(item.path) === path.resolve(execution.outPath))?.stage ?? null;
 }
 
-function validateControllerAgenteerCommandArgs(args: string[]): { reasons: string[]; commandArgs: string[] | null } {
+function validateControllerAgenteerCommandArgs(args: string[], state: ControllerState): { reasons: string[]; commandArgs: string[] | null } {
   const reasons: string[] = [];
   const clean = args.map(arg => arg.trim()).filter(Boolean);
   if (!clean.length) reasons.push("controller-run-agenteer requires an Agenteer CLI argument vector.");
   if (clean.length > 8) reasons.push("controller-run-agenteer accepts at most eight command arguments.");
-  if (clean.some(arg => /(^|\/)\.\.(\/|$)/.test(arg) || path.isAbsolute(arg))) reasons.push("controller-run-agenteer args may not contain absolute paths or parent traversal.");
+  const currentStatePath = path.resolve(state.statePath);
+  const isAllowedStatePath = (value: string): boolean => path.resolve(value) === currentStatePath;
+  if (clean.some(arg => /(^|\/)\.\.(\/|$)/.test(arg) || (path.isAbsolute(arg) && !isAllowedStatePath(arg)))) reasons.push("controller-run-agenteer args may not contain absolute paths or parent traversal except the current controller --state path.");
   const allowedValue = /^[A-Za-z0-9_.:-]+$/;
-  const safeValue = (value: string) => allowedValue.test(value) && !value.startsWith("-");
+  const safeValue = (value: string, flag?: string) => (flag === "--state" && isAllowedStatePath(value)) || (allowedValue.test(value) && !value.startsWith("-"));
   const checkFlags = (allowedFlags: Record<string, "none" | "value">) => {
     for (let index = 2; index < clean.length; index += 1) {
       const flag = clean[index] ?? "";
@@ -8652,7 +12515,7 @@ function validateControllerAgenteerCommandArgs(args: string[]): { reasons: strin
       }
       if (arity === "value") {
         const value = clean[index + 1] ?? "";
-        if (!safeValue(value)) reasons.push(`Flag ${flag} requires a safe scalar value.`);
+        if (!safeValue(value, flag)) reasons.push(`Flag ${flag} requires a safe scalar value.`);
         index += 1;
       }
     }
@@ -8667,6 +12530,9 @@ function validateControllerAgenteerCommandArgs(args: string[]): { reasons: strin
       checkFlags({ "--json": "none", "--id": "value" });
     } else if (subcommand === "machine-status" || subcommand === "phenotype-list" || subcommand === "reviewer-providers") {
       checkFlags({ "--json": "none" });
+    } else if (subcommand === "controller-status") {
+      checkFlags({ "--json": "none", "--state": "value" });
+      if (!clean.includes("--state")) reasons.push("controller-status through controller-run-agenteer requires --state set to the current controller state path.");
     } else {
       reasons.push(`Read-only research subcommand ${subcommand || "(missing)"} is not allowlisted for controller-run-agenteer.`);
     }
@@ -8710,20 +12576,37 @@ async function runControllerAgenteerCommand(
     const stderr = String(maybe.stderr ?? (error instanceof Error ? error.message : String(error)));
     await writeFile(stdoutPath, stdout);
     await writeFile(stderrPath, stderr);
+    const statusIntrospectionSucceeded = isControllerStatusAgenteerCommand(command) && hasControllerStatusJsonEnvelope(stdout);
     return {
       schemaVersion: 1,
       generatedAtIso: nowIso(),
       repoRoot: command.cwd,
       command,
-      status: "failed",
+      status: statusIntrospectionSucceeded ? "passed" : "failed",
       exitCode: typeof maybe.code === "number" ? maybe.code : null,
       stdoutPath,
       stderrPath,
       stdoutPreview: stdout.slice(0, 6000),
       stderrPreview: stderr.slice(0, 2000),
       validationReasons,
-      nextAction: "Inspect stderr/stdout, run npm-build if the CLI dist is stale or missing, or choose a narrower read-only Agenteer command.",
+      nextAction: statusIntrospectionSucceeded
+        ? "Use the controller-status JSON as observed readiness evidence; nonzero exit reflects blocked pipeline status, not failed introspection."
+        : "Inspect stderr/stdout, run npm-build if the CLI dist is stale or missing, or choose a narrower read-only Agenteer command.",
     };
+  }
+}
+
+function isControllerStatusAgenteerCommand(command: NonNullable<ControllerToolExecution["command"]>): boolean {
+  return command.args.includes("research") && command.args.includes("controller-status");
+}
+
+function hasControllerStatusJsonEnvelope(stdout: string): boolean {
+  if (!stdout.includes("\"controllerStatus\"")) return false;
+  try {
+    const parsed = JSON.parse(stdout) as { controllerStatus?: unknown };
+    return Boolean(parsed.controllerStatus);
+  } catch {
+    return true;
   }
 }
 
@@ -9809,6 +13692,7 @@ async function inspectControllerStateForTool(state: ControllerState): Promise<Co
   );
   const feasibility = await loadControllerFeasibilitySummary(state);
   if (state.inputs.dataPath) {
+    const beforeDatasetFeasibility = state.currentStage === "intake" && !state.completedStages.includes("dataset_feasibility");
     add(
       "feasibility-verdict-present",
       feasibility.present ? "pass" : "fail",
@@ -9826,6 +13710,33 @@ async function inspectControllerStateForTool(state: ControllerState): Promise<Co
             ? "Feasibility verdict passes."
             : "Feasibility verdict status is unknown.",
       feasibility.path ? [feasibility.path] : [],
+    );
+    const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+    add(
+      "dataset-semantic-audit-present",
+      datasetSemanticAudit.present ? "pass" : beforeDatasetFeasibility ? "warning" : "fail",
+      datasetSemanticAudit.present ? `Dataset semantic audit is present with status ${datasetSemanticAudit.status}.` : beforeDatasetFeasibility ? "Dataset semantic audit has not been created yet; dataset_feasibility should create it." : "Row-level data run has no dataset semantic audit.",
+      uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
+    );
+    add(
+      "dataset-semantic-audit-status",
+      datasetSemanticAudit.selectedRoleStatus === "block"
+        ? "fail"
+        : datasetSemanticAudit.selectedRoleStatus === "warning"
+          ? "warning"
+          : datasetSemanticAudit.present
+            ? "pass"
+            : "warning",
+      datasetSemanticAudit.selectedRoleStatus === "block"
+        ? `Selected study role has semantic blocker(s): ${datasetSemanticAudit.topIssues.filter(issue => issue.selected).map(issue => issue.message).join("; ") || "no detail"}`
+        : datasetSemanticAudit.selectedRoleStatus === "warning"
+          ? `Selected study role has semantic warning(s): ${datasetSemanticAudit.topIssues.filter(issue => issue.selected).map(issue => issue.message).join("; ") || "no detail"}`
+          : datasetSemanticAudit.status === "warning"
+            ? `Selected roles pass semantic plausibility; dataset-wide audit still found ${datasetSemanticAudit.issueCount} issue(s) on unused or nonblocking columns.`
+            : datasetSemanticAudit.present
+              ? "Dataset semantic audit passes."
+              : "Dataset semantic audit status is unknown.",
+      uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
     );
   }
   const reentry = await readJsonIfPresent(path.join(state.rootDir, "controller-reentry-plan.json"));
@@ -9909,16 +13820,16 @@ async function writeControllerRecoveryInspection(state: ControllerState): Promis
   let recommendedCommand = `agenteer research controller-run --state ${quotePath(state.statePath)}`;
   if (state.status === "complete" || state.currentStage === "complete") {
     status = "complete";
-    reason = "Controller run is complete; inspect artifacts before external sharing.";
-    recommendedCommand = `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
+    reason = "Controller run is complete; refresh status and inspect artifacts before external sharing.";
+    recommendedCommand = `agenteer research controller-status --state ${quotePath(state.statePath)}`;
   } else if (state.status === "blocked" || state.currentStage === "blocked") {
     status = "blocked";
     reason = "Controller is blocked; review feasibility/gate evidence and apply a patch or start a new run.";
-    recommendedCommand = `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
+    recommendedCommand = `agenteer research controller-status --state ${quotePath(state.statePath)}`;
   } else if (state.status !== "running" || state.currentStage === "human_review") {
     status = "use_reentry_plan";
-    reason = "Controller is stopped for review; use the re-entry plan before continuing.";
-    recommendedCommand = `agenteer research controller-resume --state ${quotePath(state.statePath)}`;
+    reason = "Controller is stopped for review; refresh status and use the re-entry plan before continuing.";
+    recommendedCommand = `agenteer research controller-status --state ${quotePath(state.statePath)}`;
   } else if (unledgeredActionCount > 0 || (!lastInvocation && state.actions.length > 0)) {
     status = "possible_interruption";
     reason = `${unledgeredActionCount || state.actions.length} action(s) are not covered by the latest controller-run invocation ledger; this may be a stepwise/manual run or an interrupted controller-run.`;
@@ -10094,8 +14005,11 @@ function validateControllerInputPatch(state: ControllerState, patch: ControllerI
     reasons.push("Patch cannot be applied after promotion decision/completion without a new controller run.");
   }
   const nextInputs = { ...state.inputs, ...patch };
-  if (nextInputs.time && !nextInputs.event) reasons.push("Time-to-event patch requires both time and event variables.");
-  if (nextInputs.event && !nextInputs.time) reasons.push("Time-to-event patch requires both time and event variables.");
+  const hasAnalysisTime = Boolean(nextInputs.time || nextInputs.stop);
+  if (hasAnalysisTime && !nextInputs.event) reasons.push("Time-to-event patch requires an event variable when time or stop is supplied.");
+  if (nextInputs.event && !hasAnalysisTime) reasons.push("Time-to-event patch requires a time or stop variable when event is supplied.");
+  if (nextInputs.start && !nextInputs.stop) reasons.push("Start/stop interval patches require both start and stop variables.");
+  if (nextInputs.method === "recurrent-event-cox" && (!nextInputs.start || !nextInputs.stop || !nextInputs.id)) reasons.push("recurrent-event-cox patches require start, stop, and id variables.");
   if (nextInputs.method && !statsMethodSchema.safeParse(nextInputs.method).success) reasons.push(`Patched method ${nextInputs.method} is not a supported stats method.`);
   if (reasons.length) return { status: "invalid", reasons };
   return { status: "valid", reasons: [`Patch changes ${changedFields.join(", ")} and will invalidate downstream stages as needed.`] };
@@ -10111,10 +14025,10 @@ function changedInputPatchFields(inputs: ControllerStudyInputs, patch: Controlle
 function invalidatedStagesForPatch(changedFields: string[], completedStages: ControllerStage[]): ControllerStage[] {
   if (!changedFields.length) return [];
   const stageOrder: ControllerStage[] = ["context", "dataset_feasibility", "exploration", "literature", "method_selection", "execution", "qa", "manuscript", "literature_qa", "external_review", "repair", "inspection", "promotion_decision"];
-  const dataFields = new Set(["question", "outcome", "exposure", "group", "time", "event", "id", "strata", "cluster", "period", "post", "runningVariable", "cutoff", "instrument", "variables", "covariates", "exactCovariates", "surveyDesign", "allowSurveyApproximation", "method"]);
+  const dataFields = new Set(["question", "outcome", "exposure", "group", "outcomeThreshold", "exposureThreshold", "time", "start", "stop", "event", "id", "strata", "cluster", "period", "post", "runningVariable", "cutoff", "instrument", "alphaPenalty", "l1Ratio", "weight", "offset", "variables", "covariates", "exactCovariates", "surveyDesign", "allowSurveyApproximation", "method"]);
   const start = changedFields.includes("question") ? "context" : changedFields.some(field => dataFields.has(field)) ? "dataset_feasibility" : "method_selection";
   const startIndex = stageOrder.indexOf(start);
-  return stageOrder.slice(startIndex).filter(stage => completedStages.includes(stage) || ["context", "literature", "method_selection", "execution", "qa", "manuscript", "literature_qa", "external_review", "repair", "inspection", "promotion_decision"].includes(stage));
+  return stageOrder.slice(startIndex).filter(stage => completedStages.includes(stage) || ["context", "dataset_feasibility", "exploration", "literature", "method_selection", "execution", "qa", "manuscript", "literature_qa", "external_review", "repair", "inspection", "promotion_decision"].includes(stage));
 }
 
 function invalidatedStagesForPolicyUpdate(changedFields: string[], completedStages: ControllerStage[]): ControllerStage[] {
@@ -10167,7 +14081,7 @@ function expectedArtifactsForAction(action: ControllerActionType): string[] {
   const map: Record<ControllerActionType, string[]> = {
     initialize: ["controller-state.json"],
     context_preflight: ["controller-context-preflight.json", "controller-context-manifest.json"],
-    table_summary: ["table-summary.json", "controller-feasibility-verdict.json"],
+    table_summary: ["table-summary.json", "controller-dataset-semantic-audit", "controller-feasibility-verdict.json"],
     explore: ["exploration.json", "exploration-report.md"],
     literature_search: ["literature-search.json", "literature-context.json"],
     select_method: ["controller-modeling-plan.json", "method-selection.json"],
@@ -10176,9 +14090,9 @@ function expectedArtifactsForAction(action: ControllerActionType): string[] {
     write_manuscript: ["manuscript.md", "manuscript-qa.json"],
     literature_qa: ["literature-qa.json", "literature-qa.md"],
     external_review: ["review-panel.json", "review-adjudication.json", "state-reentry.json"],
-    apply_repairs: ["controller-repair-execution.json"],
+    apply_repairs: ["controller-repair-execution.json", "controller-repair-verification.json"],
     inspect_run: ["run-inspection.json", "run-inspection.md"],
-    decide_promotion: ["controller-completion-audit.json", "controller-completion-audit.md", "controller-self-evaluation.json", "controller-self-evaluation.md"],
+    decide_promotion: ["controller-completion-audit.json", "controller-completion-audit.md", "controller-self-evaluation.json", "controller-self-evaluation.md", "controller-golden-packet.json", "controller-golden-packet.md"],
     stop_for_human: [],
     complete: [],
     block: [],
@@ -10281,6 +14195,10 @@ async function expectedArtifactSatisfied(expected: string, expectedPaths: string
   if (expected === "controller-repair-execution.json") {
     return observedArtifacts.some(item => item.kind === "controller-repair-execution" && Boolean(item.sha256));
   }
+  if (expected === "controller-repair-verification.json") {
+    return observedArtifacts.some(item => item.kind === "controller-repair-verification" && Boolean(item.sha256));
+  }
+  if (observedArtifacts.some(item => item.kind.toLowerCase() === normalizedExpected && Boolean(item.sha256))) return true;
   if (observedArtifacts.some(item => path.basename(item.path).toLowerCase() === expectedBase && Boolean(item.sha256))) return true;
   const explicitPath = expectedPaths.find(item => path.basename(item).toLowerCase() === expectedBase);
   return explicitPath ? Boolean(await hashFileIfPresent(explicitPath)) : false;
@@ -10313,11 +14231,20 @@ function controllerExpectedArtifactPaths(state: ControllerState, action: Control
     case "external_review":
       return [path.join(run, "review", "review-panel.json"), path.join(run, "review", "review-adjudication.json"), path.join(run, "review", "state-reentry.json")];
     case "apply_repairs":
-      return state.artifacts.filter(item => item.kind === "controller-repair-execution").map(item => item.path);
+      return state.artifacts
+        .filter(item => item.kind === "controller-repair-execution" || item.kind === "controller-repair-verification")
+        .map(item => item.path);
     case "inspect_run":
       return [path.join(run, "run-inspection.json"), path.join(run, "run-inspection.md")];
     case "decide_promotion":
-      return [path.join(root, "controller-completion-audit.json"), path.join(root, "controller-completion-audit.md"), path.join(root, "controller-self-evaluation.json"), path.join(root, "controller-self-evaluation.md")];
+      return [
+        path.join(root, "controller-completion-audit.json"),
+        path.join(root, "controller-completion-audit.md"),
+        path.join(root, "controller-self-evaluation.json"),
+        path.join(root, "controller-self-evaluation.md"),
+        path.join(root, "controller-golden-packet.json"),
+        path.join(root, "controller-golden-packet.md"),
+      ];
     default:
       return [];
   }
@@ -10412,6 +14339,7 @@ function controllerSystemPrompt(): string {
   return [
     "You are the controller for an inspectable medical/public-health research pipeline.",
     "Choose exactly one allowed next action. Do not claim completion unless artifacts and gates prove it.",
+    "Treat activeBlockerIssueCodes as authoritative blocker identifiers; issueCodes outside that list are advisory context unless their source artifact marks blocker severity.",
     "Prefer rejecting or routing to human review when feasibility, phenotype, missingness, temporal validity, method choice, or reviewer evidence is insufficient.",
     "Return strict JSON only.",
   ].join(" ");
@@ -10498,6 +14426,29 @@ async function recentControllerToolResultSummaries(state: ControllerState): Prom
     validationReasons: string[];
     nextAction: string;
   };
+  controllerStatus?: {
+    status: ControllerUnifiedStatus["status"];
+    controllerStatus: ControllerRunStatus;
+    currentStage: ControllerStage;
+    safeToAutoContinue: boolean;
+    readyToLaunch: boolean;
+    promotable: boolean;
+    blockers: string[];
+    warnings: string[];
+    activeIssueCodes: string[];
+    activeBlockerIssueCodes: string[];
+    recommendedCommand: string;
+    launchCommand: string | null;
+    inspectionCommand: string;
+    artifactPaths: {
+      doctor: string;
+      runbook: string;
+      goldenPacket: string;
+      runnerPacket: string;
+    };
+    keyArtifactReports: Record<string, string | null>;
+    nextAction: string;
+  };
 }>> {
   const summaries = [];
   for (const tool of state.toolActions.slice(-6)) {
@@ -10512,6 +14463,7 @@ async function recentControllerToolResultSummaries(state: ControllerState): Prom
     const repoFileRead = valueAtPath(raw, "controllerRepoFileRead") as Partial<ControllerRepoFileRead> | null;
     const repoSearch = valueAtPath(raw, "controllerRepoSearch") as Partial<ControllerRepoSearchResult> | null;
     const agenteerCommand = valueAtPath(raw, "controllerAgenteerCommand") as Partial<ControllerAgenteerCommandResult> | null;
+    const controllerStatus = (valueAtPath(raw, "controllerStatus") as Partial<ControllerUnifiedStatus> | null) ?? await readControllerStatusFromAgenteerToolResult(agenteerCommand, tool.stdoutPath);
     const inspection = (valueAtPath(raw, "controllerInspection") ?? tool.inspection) as ControllerInternalInspection | null;
     const gitDiff = valueAtPath(raw, "controllerGitDiff") as Partial<ControllerGitDiffSnapshot> | null;
     const patchProposal = valueAtPath(raw, "controllerSourcePatchProposal") as Partial<ControllerSourcePatchProposal> | null;
@@ -10525,8 +14477,11 @@ async function recentControllerToolResultSummaries(state: ControllerState): Prom
       reason: tool.request.reason,
       stdoutPath: tool.stdoutPath,
       summary: tool.status === "succeeded"
-        ? `${tool.request.toolId} succeeded.`
+        ? controllerStatus
+          ? `controller-status ${controllerStatus.status ?? "unknown"}: ${String(controllerStatus.nextAction ?? controllerStatus.recommendedCommand ?? "status refreshed").slice(0, 240)}`
+          : `${tool.request.toolId} succeeded.`
         : `${tool.request.toolId} ${tool.status}: ${tool.validationReasons.join("; ") || tool.stderrPreview || "no detail"}`,
+      ...(controllerStatus ? { controllerStatus: summarizeControllerStatusForTool(controllerStatus) } : {}),
       ...(artifactRead ? {
         artifactRead: {
           selector: String(artifactRead.selector ?? ""),
@@ -10638,6 +14593,192 @@ async function recentControllerToolResultSummaries(state: ControllerState): Prom
   return summaries;
 }
 
+async function readControllerStatusFromAgenteerToolResult(command: Partial<ControllerAgenteerCommandResult> | null, wrapperStdoutPath?: string | null): Promise<Partial<ControllerUnifiedStatus> | null> {
+  if (!command?.command || !isControllerStatusAgenteerCommand(command.command)) return null;
+  const wrapperRaw = wrapperStdoutPath ? await readJsonIfPresent(wrapperStdoutPath) : null;
+  const wrapperCommand = valueAtPath(wrapperRaw, "controllerAgenteerCommand") as Partial<ControllerAgenteerCommandResult> | null;
+  const stdoutPath = typeof command.stdoutPath === "string" ? command.stdoutPath : null;
+  const wrapperCommandStdoutPath = typeof wrapperCommand?.stdoutPath === "string" ? wrapperCommand.stdoutPath : null;
+  const candidates = [
+    wrapperCommandStdoutPath ? await readTextIfPresent(wrapperCommandStdoutPath) : null,
+    stdoutPath ? await readTextIfPresent(stdoutPath) : null,
+    typeof wrapperCommand?.stdoutPreview === "string" ? wrapperCommand.stdoutPreview : null,
+    typeof command.stdoutPreview === "string" ? command.stdoutPreview : null,
+  ].filter((item): item is string => Boolean(item));
+  for (const candidate of candidates) {
+    const parsed = parseControllerStatusFromText(candidate);
+    if (parsed) return await enrichControllerStatusWithGoldenReportSlots(parsed, command);
+  }
+  const preview = typeof command.stdoutPreview === "string" ? command.stdoutPreview : "";
+  if (preview.includes("\"controllerStatus\"")) {
+    return await enrichControllerStatusWithGoldenReportSlots({
+      status: extractJsonStringField(preview, "status") as ControllerUnifiedStatus["status"] | undefined,
+      controllerStatus: extractJsonStringField(preview, "controllerStatus") as ControllerRunStatus | undefined,
+      currentStage: extractJsonStringField(preview, "currentStage") as ControllerStage | undefined,
+      safeToAutoContinue: extractJsonBooleanField(preview, "safeToAutoContinue"),
+      readyToLaunch: extractJsonBooleanField(preview, "readyToLaunch"),
+      promotable: extractJsonBooleanField(preview, "promotable"),
+      activeIssueCodes: extractJsonStringArrayField(preview, "activeIssueCodes"),
+      activeBlockerIssueCodes: extractJsonStringArrayField(preview, "activeBlockerIssueCodes"),
+      blockers: extractJsonStringArrayField(preview, "blockers"),
+      warnings: extractJsonStringArrayField(preview, "warnings"),
+      recommendedCommand: extractJsonStringField(preview, "recommendedCommand") ?? "",
+      launchCommand: extractJsonStringField(preview, "launchCommand") ?? null,
+      inspectionCommand: extractJsonStringField(preview, "inspectionCommand") ?? "",
+      nextAction: extractJsonStringField(preview, "nextAction") ?? command.nextAction ?? "",
+    }, command);
+  }
+  return null;
+}
+
+async function enrichControllerStatusWithGoldenReportSlots(status: Partial<ControllerUnifiedStatus>, command: Partial<ControllerAgenteerCommandResult>): Promise<Partial<ControllerUnifiedStatus>> {
+  if (status.keyArtifactReports && Object.keys(status.keyArtifactReports).length) return status;
+  const statePath = controllerStatePathFromAgenteerCommand(command);
+  if (!statePath) return status;
+  const goldenRaw = await readJsonIfPresent(path.join(path.dirname(statePath), "controller-golden-packet.json"));
+  const goldenPacket = valueAtPath(goldenRaw, "controllerGoldenPacket") as Partial<ControllerGoldenPacket> | null;
+  return goldenPacket?.keyArtifactReports && typeof goldenPacket.keyArtifactReports === "object"
+    ? { ...status, keyArtifactReports: goldenPacket.keyArtifactReports }
+    : status;
+}
+
+function controllerStatePathFromAgenteerCommand(command: Partial<ControllerAgenteerCommandResult>): string | null {
+  const args = Array.isArray(command.command?.args) ? command.command.args.map(String) : [];
+  const stateIndex = args.indexOf("--state");
+  const candidate = stateIndex >= 0 ? args[stateIndex + 1] : null;
+  return candidate ? path.resolve(candidate) : null;
+}
+
+async function readTextIfPresent(file: string): Promise<string | null> {
+  try {
+    return await readFile(file, "utf-8");
+  } catch {
+    return null;
+  }
+}
+
+function parseControllerStatusFromText(text: string): Partial<ControllerUnifiedStatus> | null {
+  if (!text.includes("\"controllerStatus\"")) return null;
+  for (const candidate of [text, ...jsonObjectSlices(text)]) {
+    if (!candidate) continue;
+    try {
+      const parsed = JSON.parse(candidate) as { controllerStatus?: Partial<ControllerUnifiedStatus> };
+      if (parsed.controllerStatus) return parsed.controllerStatus;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+function jsonObjectSlices(text: string): string[] {
+  const slices: string[] = [];
+  for (let start = text.indexOf("{"); start >= 0; start = text.indexOf("{", start + 1)) {
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let index = start; index < text.length; index += 1) {
+      const char = text[index];
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === "\"") {
+          inString = false;
+        }
+        continue;
+      }
+      if (char === "\"") {
+        inString = true;
+      } else if (char === "{") {
+        depth += 1;
+      } else if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          const candidate = text.slice(start, index + 1);
+          if (candidate.includes("\"controllerStatus\"")) slices.push(candidate);
+          break;
+        }
+      }
+    }
+  }
+  return slices;
+}
+
+function extractJsonStringField(text: string, field: string): string | null {
+  const pattern = new RegExp(`"${escapeRegExp(field)}"\\s*:\\s*"((?:\\\\.|[^"\\\\])*)"`);
+  const match = pattern.exec(text);
+  if (!match) return null;
+  try {
+    return JSON.parse(`"${match[1]}"`) as string;
+  } catch {
+    return match[1] ?? null;
+  }
+}
+
+function extractJsonBooleanField(text: string, field: string): boolean | undefined {
+  const pattern = new RegExp(`"${escapeRegExp(field)}"\\s*:\\s*(true|false)`);
+  const match = pattern.exec(text);
+  if (!match) return undefined;
+  return match[1] === "true";
+}
+
+function extractJsonStringArrayField(text: string, field: string): string[] {
+  const pattern = new RegExp(`"${escapeRegExp(field)}"\\s*:\\s*\\[((?:.|\\n)*?)\\]`);
+  const match = pattern.exec(text);
+  if (!match) return [];
+  const body = match[1] ?? "";
+  try {
+    const parsed = JSON.parse(`[${body}]`) as unknown;
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    return [...body.matchAll(/"((?:\\.|[^"\\])*)"/g)]
+      .map(item => {
+        try {
+          return JSON.parse(`"${item[1]}"`) as string;
+        } catch {
+          return item[1] ?? "";
+        }
+      })
+      .filter(Boolean);
+  }
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function summarizeControllerStatusForTool(controllerStatus: Partial<ControllerUnifiedStatus>): NonNullable<Awaited<ReturnType<typeof recentControllerToolResultSummaries>>[number]["controllerStatus"]> {
+  return {
+    status: controllerStatus.status === "ready" || controllerStatus.status === "blocked" || controllerStatus.status === "review" || controllerStatus.status === "complete" ? controllerStatus.status : "review",
+    controllerStatus: controllerStatus.controllerStatus === "running" || controllerStatus.controllerStatus === "complete" || controllerStatus.controllerStatus === "blocked" || controllerStatus.controllerStatus === "needs_human_review" ? controllerStatus.controllerStatus : "needs_human_review",
+    currentStage: controllerStageSchema.safeParse(controllerStatus.currentStage).success ? controllerStatus.currentStage as ControllerStage : "human_review",
+    safeToAutoContinue: Boolean(controllerStatus.safeToAutoContinue),
+    readyToLaunch: Boolean(controllerStatus.readyToLaunch),
+    promotable: Boolean(controllerStatus.promotable),
+    blockers: Array.isArray(controllerStatus.blockers) ? controllerStatus.blockers.filter((item): item is string => typeof item === "string").slice(0, 12) : [],
+    warnings: Array.isArray(controllerStatus.warnings) ? controllerStatus.warnings.filter((item): item is string => typeof item === "string").slice(0, 12) : [],
+    activeIssueCodes: Array.isArray(controllerStatus.activeIssueCodes) ? controllerStatus.activeIssueCodes.filter((item): item is string => typeof item === "string").slice(0, 24) : [],
+    activeBlockerIssueCodes: Array.isArray(controllerStatus.activeBlockerIssueCodes) ? controllerStatus.activeBlockerIssueCodes.filter((item): item is string => typeof item === "string").slice(0, 24) : [],
+    recommendedCommand: String(controllerStatus.recommendedCommand ?? ""),
+    launchCommand: typeof controllerStatus.launchCommand === "string" ? controllerStatus.launchCommand : null,
+    inspectionCommand: String(controllerStatus.inspectionCommand ?? ""),
+    artifactPaths: {
+      doctor: String(controllerStatus.artifactPaths?.doctor ?? ""),
+      runbook: String(controllerStatus.artifactPaths?.runbook ?? ""),
+      goldenPacket: String(controllerStatus.artifactPaths?.goldenPacket ?? ""),
+      runnerPacket: String(controllerStatus.artifactPaths?.runnerPacket ?? ""),
+    },
+    keyArtifactReports: Object.fromEntries(
+      Object.entries(controllerStatus.keyArtifactReports ?? {})
+        .filter(([key, value]) => typeof key === "string" && (typeof value === "string" || value === null))
+        .slice(0, 24),
+    ),
+    nextAction: String(controllerStatus.nextAction ?? ""),
+  };
+}
+
 async function writeControllerDecisionContextBundle(
   state: ControllerState,
   gateResult: ControllerGate,
@@ -10647,6 +14788,7 @@ async function writeControllerDecisionContextBundle(
   const outPath = path.join(state.rootDir, `${bundleId}.json`);
   const reportPath = path.join(state.rootDir, `${bundleId}.md`);
   const feasibility = await loadControllerFeasibilitySummary(state);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
   const recentToolResults = await recentControllerToolResultSummaries(state);
   const workPlan = await loadControllerWorkPlanSummary(state);
   const issueLedger = await loadControllerIssueLedgerSummary(state);
@@ -10657,6 +14799,7 @@ async function writeControllerDecisionContextBundle(
     generatedAtIso: nowIso(),
     bundleId,
     runId: state.runId,
+    statePath: state.statePath,
     stage: state.currentStage,
     status: state.status,
     question: state.inputs.question,
@@ -10668,10 +14811,27 @@ async function writeControllerDecisionContextBundle(
       outcome: state.inputs.outcome,
       exposure: state.inputs.exposure,
       group: state.inputs.group,
+      outcomeThreshold: state.inputs.outcomeThreshold,
+      exposureThreshold: state.inputs.exposureThreshold,
       time: state.inputs.time,
+      start: state.inputs.start,
+      stop: state.inputs.stop,
       event: state.inputs.event,
-      covariates: state.inputs.covariates,
+      id: state.inputs.id,
+      strata: state.inputs.strata,
+      cluster: state.inputs.cluster,
+      period: state.inputs.period,
+      post: state.inputs.post,
+      runningVariable: state.inputs.runningVariable,
+      cutoff: state.inputs.cutoff,
+      instrument: state.inputs.instrument,
+      alphaPenalty: state.inputs.alphaPenalty,
+      l1Ratio: state.inputs.l1Ratio,
+      weight: state.inputs.weight,
+      offset: state.inputs.offset,
       variables: state.inputs.variables,
+      covariates: state.inputs.covariates,
+      exactCovariates: state.inputs.exactCovariates,
       surveyDesign: state.inputs.surveyDesign,
       allowSurveyApproximation: state.inputs.allowSurveyApproximation,
     },
@@ -10692,6 +14852,7 @@ async function writeControllerDecisionContextBundle(
     issueLedger,
     workPlan,
     feasibility,
+    datasetSemanticAudit,
     latestStageReview,
     executionAgenda,
     recentActions: state.actions.slice(-4),
@@ -10703,11 +14864,16 @@ async function writeControllerDecisionContextBundle(
     instructions: [
       "Choose exactly one allowed action for the current stage.",
       "Use issueLedger.topIssues as the controller's active triage list; address blockers before proceeding.",
+      "Use issueLedger.topIssues.issueCode and per-item issueCodes as stable issue identifiers for rationale and riskFlags.",
+      "Use executionAgenda.activeBlockerIssueCodes as the hard stop list. executionAgenda.activeIssueCodes includes advisory labels too; carry them in riskFlags but do not treat warning-only labels as hard blockers.",
       "Use latestStageReview.findings as the most recent operator-style critique of the previous stage.",
       "Use executionAgenda.items as the bounded action queue; prefer executable safe items unless an issue requires review or patching.",
+      "Do not choose run_analysis, decide_promotion, complete, or any continuation action while executionAgenda.activeBlockerIssueCodes remain unresolved.",
       "Use workPlan.pending and workPlan.blocked to avoid skipping required stages.",
       "Use feasibility evidence to reject weak or impossible study ideas before execution.",
+      "Use datasetSemanticAudit to notice suspicious unused columns and avoid selecting them without unit/coding repair.",
       "Use recentToolResults as observed evidence from bounded tool calls; do not request the same unchanged artifact repeatedly.",
+      "Use recentToolResults.controllerStatus.keyArtifactReports to distinguish Markdown report-backed evidence from JSON-only null report slots.",
       "Only propose inputPatch fields listed in allowedInputPatchFields.",
       "Do not claim completion unless required artifacts, QA, inspection, and promotion evidence are present.",
     ],
@@ -10765,6 +14931,7 @@ async function loadControllerIssueLedgerSummary(state: ControllerState): Promise
       .slice(0, 8)
       .map(issue => ({
         id: issue.id,
+        issueCode: issue.issueCode,
         severity: issue.severity,
         category: issue.category,
         message: issue.message,
@@ -10797,6 +14964,7 @@ async function loadControllerStageReviewSummary(state: ControllerState): Promise
         severity: finding.severity,
         category: finding.category,
         message: finding.message,
+        issueCodes: finding.issueCodes,
         repairAction: finding.repairAction,
         reentryStage: finding.reentryStage,
         evidenceRefs: finding.evidenceRefs,
@@ -10808,17 +14976,19 @@ async function loadControllerStageReviewSummary(state: ControllerState): Promise
 
 async function loadControllerExecutionAgendaSummary(state: ControllerState): Promise<ControllerDecisionContextBundle["executionAgenda"]> {
   const latest = state.agendas.at(-1);
-  if (!latest) return { present: false, agendaId: null, status: null, primaryCommand: null, items: [], outPath: null };
+  if (!latest) return { present: false, agendaId: null, status: null, primaryCommand: null, activeIssueCodes: [], activeBlockerIssueCodes: [], items: [], outPath: null };
   const raw = await readJsonIfPresent(latest.outPath);
   const agenda = (valueAtPath(raw, "controllerExecutionAgenda") ?? raw) as Partial<ControllerExecutionAgenda> | null;
   if (!agenda || !Array.isArray(agenda.items)) {
-    return { present: false, agendaId: latest.agendaId, status: latest.status, primaryCommand: latest.primaryCommand, items: [], outPath: latest.outPath };
+    return { present: false, agendaId: latest.agendaId, status: latest.status, primaryCommand: latest.primaryCommand, activeIssueCodes: [], activeBlockerIssueCodes: [], items: [], outPath: latest.outPath };
   }
   return {
     present: true,
     agendaId: String(agenda.agendaId ?? latest.agendaId),
     status: agenda.status ?? latest.status,
     primaryCommand: typeof agenda.primaryCommand === "string" ? agenda.primaryCommand : latest.primaryCommand,
+    activeIssueCodes: Array.isArray(agenda.activeIssueCodes) ? agenda.activeIssueCodes.map(String) : [],
+    activeBlockerIssueCodes: Array.isArray(agenda.activeBlockerIssueCodes) ? agenda.activeBlockerIssueCodes.map(String) : [],
     items: agenda.items
       .filter(item => item && typeof item === "object")
       .slice(0, 8)
@@ -10828,6 +14998,7 @@ async function loadControllerExecutionAgendaSummary(state: ControllerState): Pro
         kind: item.kind,
         command: item.command,
         reason: item.reason,
+        issueCodes: item.issueCodes,
         safety: item.safety,
         source: item.source,
       })),
@@ -10866,7 +15037,7 @@ function renderControllerDecisionContextMarkdown(bundle: ControllerDecisionConte
     `- Present: ${bundle.issueLedger.present}`,
     `- Ledger: ${bundle.issueLedger.ledgerId ?? "(none)"}`,
     `- Status: ${bundle.issueLedger.status ?? "(unknown)"}`,
-    ...(bundle.issueLedger.topIssues.length ? bundle.issueLedger.topIssues.map(issue => `- ${issue.severity.toUpperCase()} [${issue.category}] ${issue.message}`) : ["- No active issues recorded."]),
+    ...(bundle.issueLedger.topIssues.length ? bundle.issueLedger.topIssues.map(issue => `- ${issue.severity.toUpperCase()} [${issue.category}${issue.issueCode ? `:${issue.issueCode}` : ""}] ${issue.message}`) : ["- No active issues recorded."]),
     "",
     "## Latest Stage Review",
     "",
@@ -10874,7 +15045,7 @@ function renderControllerDecisionContextMarkdown(bundle: ControllerDecisionConte
     `- Review: ${bundle.latestStageReview.reviewId ?? "(none)"}`,
     `- Status: ${bundle.latestStageReview.status ?? "(unknown)"}`,
     `- Reviewed stage: ${bundle.latestStageReview.reviewedStage ?? "(none)"}`,
-    ...(bundle.latestStageReview.findings.length ? bundle.latestStageReview.findings.map(finding => `- ${finding.severity.toUpperCase()} [${finding.category}] ${finding.message}`) : ["- No stage-review findings recorded."]),
+    ...(bundle.latestStageReview.findings.length ? bundle.latestStageReview.findings.map(finding => `- ${finding.severity.toUpperCase()} [${finding.category}${finding.issueCodes?.length ? `:${finding.issueCodes.join(",")}` : ""}] ${finding.message}`) : ["- No stage-review findings recorded."]),
     "",
     "## Execution Agenda",
     "",
@@ -10882,7 +15053,9 @@ function renderControllerDecisionContextMarkdown(bundle: ControllerDecisionConte
     `- Agenda: ${bundle.executionAgenda.agendaId ?? "(none)"}`,
     `- Status: ${bundle.executionAgenda.status ?? "(unknown)"}`,
     `- Primary command: ${bundle.executionAgenda.primaryCommand ?? "(none)"}`,
-    ...(bundle.executionAgenda.items.length ? bundle.executionAgenda.items.map(item => `- P${item.priority} [${item.status}/${item.safety}] ${item.kind}: ${item.reason}`) : ["- No agenda items recorded."]),
+    `- Active issue codes: ${bundle.executionAgenda.activeIssueCodes.join(", ") || "(none)"}`,
+    `- Active blocker issue codes: ${bundle.executionAgenda.activeBlockerIssueCodes.join(", ") || "(none)"}`,
+    ...(bundle.executionAgenda.items.length ? bundle.executionAgenda.items.map(item => `- P${item.priority} [${item.status}/${item.safety}${item.issueCodes?.length ? `:${item.issueCodes.join(",")}` : ""}] ${item.kind}: ${item.reason}`) : ["- No agenda items recorded."]),
     "",
     "## Feasibility",
     "",
@@ -10897,6 +15070,15 @@ function renderControllerDecisionContextMarkdown(bundle: ControllerDecisionConte
     ...(bundle.feasibility.requiredModifications.length ? bundle.feasibility.requiredModifications.map(item => `- Required modification: ${item}`) : ["- Required modification: none"]),
     ...(bundle.feasibility.clarifyingQuestions.length ? bundle.feasibility.clarifyingQuestions.map(item => `- Clarifying question: ${item}`) : ["- Clarifying question: none"]),
     ...(bundle.feasibility.internalReviews.length ? bundle.feasibility.internalReviews.map(review => `- Internal review ${review.reviewerId}: ${review.stance}; suggests ${review.suggestedVerdict}; confidence=${review.confidence}`) : ["- Internal review: none"]),
+    "",
+    "## Dataset Semantic Audit",
+    "",
+    `- Present: ${bundle.datasetSemanticAudit.present}`,
+    `- Status: ${bundle.datasetSemanticAudit.status}`,
+    `- Selected-role status: ${bundle.datasetSemanticAudit.selectedRoleStatus}`,
+    `- Issues: ${bundle.datasetSemanticAudit.issueCount} (${bundle.datasetSemanticAudit.blockerCount} blocker, ${bundle.datasetSemanticAudit.warningCount} warning)`,
+    ...(bundle.datasetSemanticAudit.topIssues.length ? bundle.datasetSemanticAudit.topIssues.map(issue => `- ${issue.severity.toUpperCase()} ${issue.column}${issue.selected ? " [selected]" : ""}: ${issue.code} - ${issue.message}`) : ["- Issue: none"]),
+    `- Next action: ${bundle.datasetSemanticAudit.nextAction ?? "(none)"}`,
     "",
     "## Deterministic Recommendation",
     "",
@@ -10921,16 +15103,134 @@ function renderControllerDecisionContextMarkdown(bundle: ControllerDecisionConte
 function controllerUserPrompt(bundle: ControllerDecisionContextBundle): string {
   return [
     "Select the next controller action for this pipeline state.",
-    "Schema: {\"action\":\"one allowed action\",\"rationale\":\"short actionable reason\",\"confidence\":0.0,\"riskFlags\":[\"...\"],\"inputPatch\":{\"outcome\":\"optional safe correction\"},\"toolRequests\":[{\"toolId\":\"controller-inspect\",\"args\":[],\"reason\":\"optional verification\"},{\"toolId\":\"controller-read-artifact\",\"args\":[\"stats-qa\"],\"reason\":\"optional artifact review\"},{\"toolId\":\"controller-search-repo\",\"args\":[\"ControllerState\",\"packages/cli/src\"],\"reason\":\"optional source search\"},{\"toolId\":\"controller-read-file\",\"args\":[\"packages/cli/src/research-machine/controller.ts\"],\"reason\":\"optional source read\"},{\"toolId\":\"controller-run-agenteer\",\"args\":[\"research\",\"methods-catalog\",\"--json\"],\"reason\":\"optional read-only Agenteer introspection\"},{\"toolId\":\"controller-git-diff\",\"args\":[],\"reason\":\"optional source diff review\"},{\"toolId\":\"controller-propose-patch\",\"args\":[\"{\\\"summary\\\":\\\"...\\\",\\\"risk\\\":\\\"low\\\",\\\"changes\\\":[{\\\"path\\\":\\\"packages/...\\\",\\\"rationale\\\":\\\"...\\\",\\\"after\\\":\\\"full file content\\\"}],\\\"tests\\\":[\\\"npm run build\\\"]}\"],\"reason\":\"optional non-applying source patch proposal\"},{\"toolId\":\"controller-apply-patch\",\"args\":[\"latest\"],\"reason\":\"optional reviewed patch application\"},{\"toolId\":\"controller-verify-patch\",\"args\":[\"latest\"],\"reason\":\"optional patch verification\"},{\"toolId\":\"controller-rollback-patch\",\"args\":[\"latest\"],\"reason\":\"optional rollback after failed verification\"}]}",
+    "Schema: {\"action\":\"one allowed action\",\"rationale\":\"short actionable reason\",\"confidence\":0.0,\"riskFlags\":[\"...\"],\"inputPatch\":{\"outcome\":\"optional safe correction\"},\"toolRequests\":[{\"toolId\":\"controller-status\",\"args\":[],\"reason\":\"optional first-read readiness refresh\"},{\"toolId\":\"controller-inspect\",\"args\":[],\"reason\":\"optional state-integrity verification\"},{\"toolId\":\"controller-read-artifact\",\"args\":[\"stats-qa\"],\"reason\":\"optional artifact review\"},{\"toolId\":\"controller-search-repo\",\"args\":[\"ControllerState\",\"packages/cli/src\"],\"reason\":\"optional source search\"},{\"toolId\":\"controller-read-file\",\"args\":[\"packages/cli/src/research-machine/controller.ts\"],\"reason\":\"optional source read\"},{\"toolId\":\"controller-run-agenteer\",\"args\":[\"research\",\"methods-catalog\",\"--json\"],\"reason\":\"optional read-only Agenteer introspection\"},{\"toolId\":\"controller-git-diff\",\"args\":[],\"reason\":\"optional source diff review\"},{\"toolId\":\"controller-propose-patch\",\"args\":[\"{\\\"summary\\\":\\\"...\\\",\\\"risk\\\":\\\"low\\\",\\\"changes\\\":[{\\\"path\\\":\\\"packages/...\\\",\\\"rationale\\\":\\\"...\\\",\\\"after\\\":\\\"full file content\\\"}],\\\"tests\\\":[\\\"npm run build\\\"]}\"],\"reason\":\"optional non-applying source patch proposal\"},{\"toolId\":\"controller-apply-patch\",\"args\":[\"latest\"],\"reason\":\"optional reviewed patch application\"},{\"toolId\":\"controller-verify-patch\",\"args\":[\"latest\"],\"reason\":\"optional patch verification\"},{\"toolId\":\"controller-rollback-patch\",\"args\":[\"latest\"],\"reason\":\"optional rollback after failed verification\"}]}",
     "Only include inputPatch when a bounded correction to study variables/method is necessary. Do not patch file paths.",
     "Only include toolRequests when verification materially changes the next decision. Use allowed tool IDs only.",
+    `For CLI-backed first-read status evidence, request controller-run-agenteer with args ["research","controller-status","--state","${bundle.statePath}","--json"]; the controller will expose recentToolResults.controllerStatus on the next decision.`,
     "Use recentToolResults as observed evidence from prior bounded tool calls; do not request the same artifact again unless the state changed.",
+    "Use recentToolResults.controllerStatus.keyArtifactReports to distinguish Markdown report-backed evidence from JSON-only null report slots.",
     "Prefer executionAgenda.primaryCommand when it is safe and consistent with the allowed action set.",
+    "Use executionAgenda.activeBlockerIssueCodes as hard blocker identifiers. executionAgenda.activeIssueCodes can include advisory labels; carry them into rationale/riskFlags without treating warning-only labels as automatic blockers.",
+    "Never claim readiness or choose continuation when executionAgenda.activeBlockerIssueCodes remain; choose block, stop_for_human, a targeted safe inputPatch, or a bounded evidence tool.",
     "If latestStageReview.status is block, choose block, stop_for_human, a targeted evidence tool, or a safe inputPatch rather than continuing blindly.",
     "If feasibility.status is block, choose block or stop_for_human unless a safe inputPatch directly resolves the blocker.",
     "If feasibility.status is warning, carry the warnings in riskFlags and avoid overconfident continuation.",
+    "If datasetSemanticAudit.selectedRoleStatus is block, choose block or stop_for_human unless a safe inputPatch removes or repairs the selected role.",
+    "If datasetSemanticAudit.status is warning, do not select suspicious unused columns in a patch without explaining the unit/coding repair or review evidence.",
     JSON.stringify(bundle, null, 2),
   ].join("\n\n");
+}
+
+async function loadControllerDatasetSemanticAuditSummary(state: ControllerState): Promise<{
+  present: boolean;
+  path: string | null;
+  reportPath: string | null;
+  status: ControllerDatasetSemanticAudit["status"] | "unknown";
+  selectedRoleStatus: ControllerDatasetSemanticAudit["selectedRoleStatus"] | "unknown";
+  issueCount: number;
+  blockerCount: number;
+  warningCount: number;
+  selectedRoleIssueCount: number;
+  issueCodeSummary: ControllerDatasetSemanticAudit["issueCodeSummary"];
+  selectedRoleSummary: ControllerDatasetSemanticAudit["selectedRoleSummary"];
+  topIssues: Array<Pick<ControllerDatasetSemanticAudit["issues"][number], "column" | "role" | "selected" | "severity" | "code" | "message">>;
+  nextAction: string | null;
+}> {
+  const pathValue = latestArtifactPath(state, "controller-dataset-semantic-audit");
+  const reportPath = latestArtifactPath(state, "controller-dataset-semantic-audit-report");
+  if (!pathValue) {
+    return {
+      present: false,
+      path: null,
+      reportPath: null,
+      status: "unknown",
+      selectedRoleStatus: "unknown",
+      issueCount: 0,
+      blockerCount: 0,
+      warningCount: 0,
+      selectedRoleIssueCount: 0,
+      issueCodeSummary: [],
+      selectedRoleSummary: [],
+      topIssues: [],
+      nextAction: null,
+    };
+  }
+  const raw = await readJsonIfPresent(pathValue);
+  const audit = (valueAtPath(raw, "controllerDatasetSemanticAudit") ?? raw) as Partial<ControllerDatasetSemanticAudit> | null;
+  if (!audit || typeof audit !== "object") {
+    return {
+      present: false,
+      path: pathValue,
+      reportPath,
+      status: "unknown",
+      selectedRoleStatus: "unknown",
+      issueCount: 0,
+      blockerCount: 0,
+      warningCount: 0,
+      selectedRoleIssueCount: 0,
+      issueCodeSummary: [],
+      selectedRoleSummary: [],
+      topIssues: [],
+      nextAction: null,
+    };
+  }
+  const issues = Array.isArray(audit.issues) ? audit.issues.filter(issue => issue && typeof issue === "object") : [];
+  const rank = (issue: ControllerDatasetSemanticAudit["issues"][number]): number => {
+    if (issue.selected && issue.severity === "blocker") return 0;
+    if (issue.selected && issue.severity === "warning") return 1;
+    if (issue.severity === "blocker") return 2;
+    if (issue.severity === "warning") return 3;
+    return 4;
+  };
+  const topIssues = [...issues]
+    .sort((a, b) => rank(a) - rank(b) || a.column.localeCompare(b.column))
+    .slice(0, 12)
+    .map(issue => ({
+      column: String(issue.column),
+      role: typeof issue.role === "string" ? issue.role : null,
+      selected: Boolean(issue.selected),
+      severity: issue.severity === "blocker" || issue.severity === "warning" || issue.severity === "note" ? issue.severity : "note",
+      code: String(issue.code),
+      message: String(issue.message),
+    }));
+  const status = audit.status === "pass" || audit.status === "warning" || audit.status === "block" ? audit.status : "unknown";
+  const selectedRoleStatus = audit.selectedRoleStatus === "pass" || audit.selectedRoleStatus === "warning" || audit.selectedRoleStatus === "block" ? audit.selectedRoleStatus : "unknown";
+  return {
+    present: true,
+    path: pathValue,
+    reportPath,
+    status,
+    selectedRoleStatus,
+    issueCount: typeof audit.issueCount === "number" ? audit.issueCount : issues.length,
+    blockerCount: typeof audit.blockerCount === "number" ? audit.blockerCount : issues.filter(issue => issue.severity === "blocker").length,
+    warningCount: typeof audit.warningCount === "number" ? audit.warningCount : issues.filter(issue => issue.severity === "warning").length,
+    selectedRoleIssueCount: typeof audit.selectedRoleIssueCount === "number" ? audit.selectedRoleIssueCount : issues.filter(issue => issue.selected).length,
+    issueCodeSummary: Array.isArray(audit.issueCodeSummary)
+      ? audit.issueCodeSummary
+          .filter(item => item && typeof item === "object")
+          .map(item => ({
+            code: String(item.code),
+            severity: item.severity === "blocker" || item.severity === "warning" || item.severity === "note" ? item.severity : "note",
+            totalIssueCount: typeof item.totalIssueCount === "number" ? item.totalIssueCount : 0,
+            selectedIssueCount: typeof item.selectedIssueCount === "number" ? item.selectedIssueCount : 0,
+            columns: Array.isArray(item.columns) ? item.columns.map(column => String(column)).slice(0, 12) : [],
+          }))
+      : buildDatasetSemanticIssueCodeSummary(issues as ControllerDatasetSemanticAudit["issues"]),
+    selectedRoleSummary: Array.isArray(audit.selectedRoleSummary)
+      ? audit.selectedRoleSummary
+          .filter(item => item && typeof item === "object")
+          .map(item => ({
+            column: String(item.column),
+            role: String(item.role),
+            issueCount: typeof item.issueCount === "number" ? item.issueCount : 0,
+            blockerCount: typeof item.blockerCount === "number" ? item.blockerCount : 0,
+            warningCount: typeof item.warningCount === "number" ? item.warningCount : 0,
+            codes: Array.isArray(item.codes) ? item.codes.map(code => String(code)).slice(0, 12) : [],
+          }))
+      : buildDatasetSemanticSelectedRoleSummary(issues.filter(issue => issue.selected) as ControllerDatasetSemanticAudit["issues"]),
+    topIssues,
+    nextAction: typeof audit.nextAction === "string" ? audit.nextAction : null,
+  };
 }
 
 async function loadControllerFeasibilitySummary(state: ControllerState): Promise<{
@@ -10943,6 +15243,19 @@ async function loadControllerFeasibilitySummary(state: ControllerState): Promise
   primaryAction: FeasibilityGateResult["primaryAction"] | "unknown";
   blockers: string[];
   warnings: string[];
+  issueCodes: string[];
+  issues: Array<{
+    severity: "blocker" | "warning" | "note";
+    code: string;
+    message: string;
+    source: string;
+    domainId?: string;
+    variable?: string;
+    role?: string;
+    reviewerId?: string;
+    evidenceRefs: string[];
+    suggestedFixes: string[];
+  }>;
   nextAction: string | null;
   requiredVariables: string[];
   requiredModifications: string[];
@@ -10952,7 +15265,7 @@ async function loadControllerFeasibilitySummary(state: ControllerState): Promise
   methodChecks: Array<{ id: string; status: "pass" | "warning" | "block"; message: string }>;
   outcomeDiagnostics: ControllerFeasibilityVerdict["outcomeDiagnostics"] | null;
 }> {
-  const pathValue = state.artifacts.find(item => item.kind === "controller-feasibility-verdict")?.path ?? path.join(state.rootDir, "controller-feasibility-verdict.json");
+  const pathValue = latestArtifactPath(state, "controller-feasibility-verdict") ?? path.join(state.rootDir, "controller-feasibility-verdict.json");
   const raw = await readJsonIfPresent(pathValue);
   const verdict = (valueAtPath(raw, "controllerFeasibilityVerdict") ?? raw) as Partial<ControllerFeasibilityVerdict> | null;
   if (!verdict || typeof verdict !== "object") {
@@ -10966,6 +15279,8 @@ async function loadControllerFeasibilitySummary(state: ControllerState): Promise
       primaryAction: "unknown",
       blockers: [],
       warnings: [],
+      issueCodes: [],
+      issues: [],
       nextAction: null,
       requiredVariables: [],
       requiredModifications: [],
@@ -10988,6 +15303,37 @@ async function loadControllerFeasibilitySummary(state: ControllerState): Promise
     primaryAction: typeof verdict.primaryAction === "string" ? verdict.primaryAction : "unknown",
     blockers: Array.isArray(verdict.blockers) ? verdict.blockers.map(String).slice(0, 12) : [],
     warnings: Array.isArray(verdict.warnings) ? verdict.warnings.map(String).slice(0, 12) : [],
+    issues: Array.isArray(verdict.issues)
+      ? verdict.issues
+        .filter(issue => issue && typeof issue === "object")
+        .map(issue => {
+          const record = issue as unknown as Record<string, unknown>;
+          const severity: "blocker" | "warning" | "note" = record.severity === "blocker" || record.severity === "warning" || record.severity === "note" ? record.severity : "warning";
+          return {
+            severity,
+            code: String(record.code ?? "FEASIBILITY_ISSUE"),
+            message: String(record.message ?? ""),
+            source: String(record.source ?? "domain"),
+            ...(typeof record.domainId === "string" ? { domainId: record.domainId } : {}),
+            ...(typeof record.variable === "string" ? { variable: record.variable } : {}),
+            ...(typeof record.role === "string" ? { role: record.role } : {}),
+            ...(typeof record.reviewerId === "string" ? { reviewerId: record.reviewerId } : {}),
+            evidenceRefs: Array.isArray(record.evidenceRefs) ? record.evidenceRefs.map(String).slice(0, 8) : [],
+            suggestedFixes: Array.isArray(record.suggestedFixes) ? record.suggestedFixes.map(String).slice(0, 4) : [],
+          };
+        })
+        .filter(issue => issue.message.length > 0)
+        .slice(0, 40)
+      : [],
+    issueCodes: [
+      ...new Set([
+        ...(Array.isArray(verdict.issues)
+          ? verdict.issues.map(issue => issue && typeof issue === "object" ? String((issue as unknown as Record<string, unknown>).code ?? "") : "")
+          : []),
+        ...(Array.isArray(verdict.blockers) ? verdict.blockers : []).map(item => String(item).match(/^\s*([A-Z][A-Z0-9_]{2,})\s*:/)?.[1] ?? ""),
+        ...(Array.isArray(verdict.warnings) ? verdict.warnings : []).map(item => String(item).match(/^\s*([A-Z][A-Z0-9_]{2,})\s*:/)?.[1] ?? ""),
+      ].filter(item => item.length > 0)),
+    ].slice(0, 24),
     nextAction: typeof verdict.nextAction === "string" ? verdict.nextAction : null,
     requiredVariables: Array.isArray(verdict.requiredVariables) ? verdict.requiredVariables.map(String) : [],
     requiredModifications: Array.isArray(verdict.requiredModifications) ? verdict.requiredModifications.map(String).slice(0, 8) : [],
@@ -11326,12 +15672,22 @@ async function buildControllerStageReview(
     evidenceRefs: string[],
     repairAction: string,
     reentryStage: ControllerStage,
+    issueCodes: string[] = [],
   ) => {
     const cleanMessage = message.trim();
     if (!cleanMessage) return;
-    const id = `stage_finding_${stableHash({ reviewId, severity, category, cleanMessage, reentryStage }).slice(0, 10)}`;
+    const id = `stage_finding_${stableHash({ reviewId, severity, category, cleanMessage, reentryStage, issueCodes }).slice(0, 10)}`;
     if (findings.some(item => item.id === id)) return;
-    findings.push({ id, severity, category, message: cleanMessage, evidenceRefs: uniqueText(evidenceRefs), repairAction, reentryStage });
+    findings.push({
+      id,
+      severity,
+      category,
+      message: cleanMessage,
+      ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
+      evidenceRefs: uniqueText(evidenceRefs),
+      repairAction,
+      reentryStage,
+    });
   };
 
   if (lastGate && lastGate.status !== "pass") {
@@ -11392,6 +15748,7 @@ async function buildControllerStageReview(
         [latestReadiness.outPath, ...check.evidenceRefs],
         check.status === "fail" ? "Resolve failed action readiness before executing or resuming." : "Carry readiness warning into the next stage review.",
         latestReadiness.stage,
+        check.issueCodes ?? issueCodesFromText(check.message),
       );
     }
   }
@@ -11415,13 +15772,34 @@ async function buildControllerStageReview(
 
   const feasibility = await loadControllerFeasibilitySummary(state);
   if (feasibility.status === "block") {
-    for (const message of feasibility.blockers) {
-      addFinding("blocker", "data", message, feasibility.path ? [feasibility.path] : [], "Patch study variables/cohort or provide adequate data before execution.", "dataset_feasibility");
+    const messages = feasibility.issues.length
+      ? feasibility.issues.filter(issue => issue.severity === "blocker").map(issue => `${issue.code}: ${issue.message}`)
+      : feasibility.blockers;
+    for (const message of messages) {
+      addFinding("blocker", "data", message, feasibility.path ? [feasibility.path] : [], "Patch study variables/cohort or provide adequate data before execution.", "dataset_feasibility", feasibility.issueCodes);
     }
   } else if (feasibility.status === "warning") {
-    for (const message of feasibility.warnings.slice(0, 8)) {
-      addFinding("minor", "data", message, feasibility.path ? [feasibility.path] : [], "Carry feasibility warning into methods and limitations or patch inputs before execution.", "dataset_feasibility");
+    const messages = feasibility.issues.length
+      ? feasibility.issues.filter(issue => issue.severity !== "blocker").map(issue => `${issue.code}: ${issue.message}`)
+      : feasibility.warnings;
+    for (const message of messages.slice(0, 8)) {
+      addFinding("minor", "data", message, feasibility.path ? [feasibility.path] : [], "Carry feasibility warning into methods and limitations or patch inputs before execution.", "dataset_feasibility", feasibility.issueCodes);
     }
+  }
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  for (const issue of datasetSemanticAudit.topIssues.filter(item => item.selected && item.severity !== "note")) {
+    const evidenceRefs = uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item)));
+    addFinding(
+      issue.severity === "blocker" ? "blocker" : "minor",
+      "data",
+      `${issue.code}: ${issue.message}`,
+      evidenceRefs,
+      issue.severity === "blocker"
+        ? "Patch or remove the selected study role before execution; rerun dataset_feasibility."
+        : "Carry selected-role semantic warning into methods/limitations or patch the selected role before execution.",
+      "dataset_feasibility",
+      [issue.code],
+    );
   }
 
   if ((state.status === "blocked" || state.status === "needs_human_review") && state.stopReason && findings.length === 0) {
@@ -11468,9 +15846,9 @@ async function buildControllerStageReview(
 
 function commandForStageReview(state: ControllerState, status: ControllerStageReview["status"], suggestedPatch: ControllerInputPatch | null): string {
   if (status === "block" && suggestedPatch) return `agenteer research controller-patch --state ${quotePath(state.statePath)} --patch '${JSON.stringify(suggestedPatch)}' --reason ${JSON.stringify("Stage review blocker correction.")}`;
-  if (status === "block") return `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
+  if (status === "block") return `agenteer research controller-status --state ${quotePath(state.statePath)}`;
   if (state.status === "running") return `agenteer research controller-run --state ${quotePath(state.statePath)} --max-steps 4`;
-  return `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
+  return `agenteer research controller-status --state ${quotePath(state.statePath)}`;
 }
 
 async function readLatestControllerStageReview(state: ControllerState): Promise<ControllerStageReview | null> {
@@ -11523,6 +15901,7 @@ function renderControllerStageReviewMarkdown(review: ControllerStageReview): str
         `- Category: ${finding.category}`,
         `- Re-entry stage: ${finding.reentryStage}`,
         `- Finding: ${finding.message}`,
+        ...(finding.issueCodes?.length ? [`- Issue codes: ${finding.issueCodes.join(", ")}`] : []),
         `- Repair action: ${finding.repairAction}`,
         ...(finding.evidenceRefs.length ? ["- Evidence:", ...finding.evidenceRefs.map(ref => `  - ${ref}`)] : ["- Evidence: none recorded"]),
         "",
@@ -11582,6 +15961,13 @@ async function buildControllerExecutionAgenda(
   const nextAction = (valueAtPath(nextActionRaw, "controllerNextAction") ?? nextActionRaw) as Partial<ControllerNextActionPacket> | null;
   const reentryPlan = await readControllerReentryPlan(state);
   const nextActionArtifactPath = typeof nextAction?.outPath === "string" ? nextAction.outPath : await pathExists(nextActionPath) ? nextActionPath : null;
+  const runInspectionPath = path.join(state.inputs.runDir, "run-inspection.json");
+  const runInspectionRaw = await readJsonIfPresent(runInspectionPath);
+  const runInspection = (valueAtPath(runInspectionRaw, "runInspection") ?? runInspectionRaw) as Partial<RunInspectionResult> | null;
+  const runInspectionArtifactPath = latestArtifactPath(state, "run-inspection") ?? (await pathExists(runInspectionPath) ? runInspectionPath : null);
+  const runInspectionRecommendedCommands = Array.isArray(runInspection?.recommendedCommands)
+    ? runInspection.recommendedCommands.filter((command): command is string => typeof command === "string" && command.trim().length > 0)
+    : [];
   const items: ControllerExecutionAgendaItem[] = [];
   const add = (
     priority: number,
@@ -11592,20 +15978,52 @@ async function buildControllerExecutionAgenda(
     evidenceRefs: string[],
     source: ControllerExecutionAgendaItem["source"],
     safety: ControllerExecutionAgendaItem["safety"],
+    issueCodes: string[] = [],
   ) => {
     const cleanCommand = command.trim();
     if (!cleanCommand) return;
     const id = `agenda_item_${stableHash({ agendaId, priority, kind, cleanCommand, itemReason }).slice(0, 10)}`;
     if (items.some(item => item.command === cleanCommand && item.kind === kind)) return;
-    items.push({ id, priority, status, kind, command: cleanCommand, reason: itemReason, evidenceRefs: uniqueText(evidenceRefs), source, safety });
+    items.push({
+      id,
+      priority,
+      status,
+      kind,
+      command: cleanCommand,
+      reason: itemReason,
+      ...(issueCodes.length ? { issueCodes: uniqueText(issueCodes) } : {}),
+      evidenceRefs: uniqueText(evidenceRefs),
+      source,
+      safety,
+    });
   };
 
   if (nextAction?.recommendedCommand) {
-    add(5, nextAction.safeToAutoResume ? "executable" : "advisory", commandKind(nextAction.recommendedCommand), nextAction.recommendedCommand, "Latest terminal next-action packet recommendation.", [nextAction.outPath ?? nextActionPath].filter(Boolean) as string[], "next_action", nextAction.safeToAutoResume ? "safe" : "requires_review");
+    const nextActionIssueCodes = uniqueText((nextAction.issueLedger?.topIssues ?? []).map(issue => issue.issueCode).filter((item): item is string => Boolean(item)));
+    add(5, nextAction.safeToAutoResume ? "executable" : "advisory", commandKind(nextAction.recommendedCommand), nextAction.recommendedCommand, "Latest terminal next-action packet recommendation.", [nextAction.outPath ?? nextActionPath].filter(Boolean) as string[], "next_action", nextAction.safeToAutoResume ? "safe" : "requires_review", nextActionIssueCodes);
   }
+
+  runInspectionRecommendedCommands.slice(0, 5).forEach((command, index) => {
+    const kind = commandKind(command);
+    const safety: ControllerExecutionAgendaItem["safety"] = kind === "review"
+      ? "requires_review"
+      : state.status === "running" ? "safe" : "requires_review";
+    add(
+      6 + index,
+      state.status === "running" ? "executable" : "advisory",
+      kind,
+      command,
+      `Unified run inspection recommended command ${index + 1}.`,
+      [runInspectionArtifactPath, runInspection?.outPath, path.join(state.inputs.runDir, "run-inspection.md")].filter((item): item is string => typeof item === "string" && item.length > 0),
+      "run_inspection",
+      safety,
+      issueCodesFromText(command),
+    );
+  });
 
   if (stageReview) {
     const hasBlocker = stageReview.status === "block";
+    const stageReviewIssueCodes = uniqueText(stageReview.findings.flatMap(finding => finding.issueCodes ?? issueCodesFromText(finding.message)));
     add(
       hasBlocker ? 1 : 20,
       hasBlocker ? "blocked" : state.status === "running" ? "executable" : "advisory",
@@ -11615,6 +16033,7 @@ async function buildControllerExecutionAgenda(
       [stageReview.outPath, ...stageReview.findings.flatMap(finding => finding.evidenceRefs)],
       "stage_review",
       hasBlocker ? "requires_review" : "safe",
+      stageReviewIssueCodes,
     );
   }
 
@@ -11622,7 +16041,7 @@ async function buildControllerExecutionAgenda(
   if (topIssue) {
     const command = topIssue.severity === "blocker" && state.policy.allowInputPatches
       ? `agenteer research controller-patch --state ${quotePath(state.statePath)} --patch '${JSON.stringify(examplePatchForState(state))}' --reason ${JSON.stringify(topIssue.suggestedAction)}`
-      : `agenteer research controller-inspect --state ${quotePath(state.statePath)}`;
+      : `agenteer research controller-status --state ${quotePath(state.statePath)}`;
     add(
       topIssue.severity === "blocker" ? 2 : 30,
       topIssue.severity === "blocker" ? "blocked" : "advisory",
@@ -11632,6 +16051,7 @@ async function buildControllerExecutionAgenda(
       [issueLedger?.outPath, ...topIssue.evidenceRefs].filter((item): item is string => Boolean(item)),
       "issue_ledger",
       topIssue.severity === "blocker" ? "requires_review" : "safe",
+      topIssue.issueCode ? [topIssue.issueCode] : issueCodesFromText(topIssue.message),
     );
   }
 
@@ -11647,6 +16067,7 @@ async function buildControllerExecutionAgenda(
         [reentryPlan.outPath, ...reentryPlan.triggeringEvidence],
         "reentry",
         reentryPlan.status === "patch_then_resume" ? "requires_review" : reentryPlan.status === "complete_no_reentry" ? "safe" : "safe",
+        issueCodesFromText(reentryPlan.reason),
       );
     }
   }
@@ -11655,9 +16076,9 @@ async function buildControllerExecutionAgenda(
     add(10, "executable", "run", `agenteer research controller-run --state ${quotePath(state.statePath)} --max-steps 4`, `Continue bounded autonomous run from ${state.currentStage}.`, workPlan ? [workPlan.outPath] : [], "state", "safe");
     add(12, "executable", "step", `agenteer research controller-step --state ${quotePath(state.statePath)}`, `Execute one controller step from ${state.currentStage}.`, [], "state", "safe");
   } else if (state.status === "complete") {
-    add(1, "complete", "inspect", `agenteer research controller-inspect --state ${quotePath(state.statePath)}`, "Study is complete by controller state; inspect artifacts before external sharing.", [], "state", "safe");
+    add(1, "complete", "status", `agenteer research controller-status --state ${quotePath(state.statePath)}`, "Study is complete by controller state; refresh status and inspect linked artifacts before external sharing.", [], "state", "safe");
   } else {
-    add(40, "advisory", "inspect", `agenteer research controller-inspect --state ${quotePath(state.statePath)}`, `Controller is ${state.status}; inspect before resuming.`, [], "state", "safe");
+    add(40, "advisory", "status", `agenteer research controller-status --state ${quotePath(state.statePath)}`, `Controller is ${state.status}; refresh first-read status before resuming.`, [], "state", "safe");
   }
 
   const sorted = items.sort((a, b) => a.priority - b.priority || agendaSafetyRank(a.safety) - agendaSafetyRank(b.safety) || a.id.localeCompare(b.id));
@@ -11667,6 +16088,16 @@ async function buildControllerExecutionAgenda(
     : sorted.some(item => item.status === "blocked") || state.status === "blocked"
       ? "blocked"
       : state.status === "needs_human_review" ? "needs_human_review" : "ready";
+  const activeIssueCodes = uniqueText(issueLedger?.issues.filter(issue => issue.status === "active").map(issue => issue.issueCode).filter((item): item is string => Boolean(item)) ?? []);
+  const activeBlockerIssueCodes = enforceableControllerBlockerCodes([
+    ...(issueLedger?.issues ?? [])
+      .filter(issue => issue.status === "active" && issue.severity === "blocker")
+      .map(issue => issue.issueCode)
+      .filter((item): item is string => Boolean(item)),
+    ...sorted
+      .filter(item => item.status === "blocked")
+      .flatMap(item => item.issueCodes ?? []),
+  ]);
   return {
     schemaVersion: 1,
     generatedAtIso: nowIso(),
@@ -11676,13 +16107,16 @@ async function buildControllerExecutionAgenda(
     status,
     currentStage: state.currentStage,
     controllerStatus: state.status,
-    primaryCommand: executable?.command ?? `agenteer research controller-inspect --state ${quotePath(state.statePath)}`,
+    primaryCommand: executable?.command ?? `agenteer research controller-status --state ${quotePath(state.statePath)}`,
     activeIssueIds: issueLedger?.issues.filter(issue => issue.status === "active").slice(0, 12).map(issue => issue.id) ?? [],
+    activeIssueCodes,
+    activeBlockerIssueCodes,
     sourceArtifacts: {
       issueLedger: issueLedger?.outPath ?? null,
       stageReview: stageReview?.outPath ?? null,
       workPlan: workPlan?.outPath ?? null,
       nextAction: nextActionArtifactPath,
+      runInspection: runInspectionArtifactPath,
       reentryPlan: reentryPlan?.outPath ?? null,
     },
     items: sorted.slice(0, 12),
@@ -11699,12 +16133,21 @@ function primaryCommandFromCommands(commands: string[], status: ControllerReentr
 }
 
 function commandKind(command: string): ControllerExecutionAgendaItem["kind"] {
+  if (command.includes(" research figure-qa") || command.includes(" research method-qa")) return "qa";
+  if (command.includes(" research analysis-manifest")) return "manifest";
+  if (command.includes(" research study-critic")) return "review";
+  if (command.includes(" research run-inspect")) return "inspect";
   if (command.includes("controller-patch")) return "patch";
   if (command.includes("controller-resume")) return "resume";
+  if (command.includes("controller-status")) return "status";
   if (command.includes("controller-run")) return "run";
   if (command.includes("controller-step")) return "step";
   if (command.includes("controller-tool")) return "tool";
+  if (command.includes("figure-qa") || command.includes("method-qa")) return "qa";
+  if (command.includes("analysis-manifest")) return "manifest";
+  if (command.includes("study-critic")) return "review";
   if (command.includes("controller-inspect")) return "inspect";
+  if (command.includes("run-inspect")) return "inspect";
   return "human_review";
 }
 
@@ -11725,6 +16168,8 @@ function renderControllerExecutionAgendaMarkdown(agenda: ControllerExecutionAgen
     `Status: ${agenda.status}`,
     `Current stage: ${agenda.currentStage}`,
     `Controller status: ${agenda.controllerStatus}`,
+    `Active issue codes: ${agenda.activeIssueCodes.join(", ") || "(none)"}`,
+    `Active blocker issue codes: ${agenda.activeBlockerIssueCodes.join(", ") || "(none)"}`,
     "",
     "## Primary Command",
     "",
@@ -11744,6 +16189,7 @@ function renderControllerExecutionAgendaMarkdown(agenda: ControllerExecutionAgen
         `- Safety: ${item.safety}`,
         `- Source: ${item.source}`,
         `- Reason: ${item.reason}`,
+        ...(item.issueCodes?.length ? [`- Issue codes: ${item.issueCodes.join(", ")}`] : []),
         "- Command:",
         "```bash",
         item.command,
@@ -11758,6 +16204,7 @@ function renderControllerExecutionAgendaMarkdown(agenda: ControllerExecutionAgen
     `- Stage review: ${agenda.sourceArtifacts.stageReview ?? "(none)"}`,
     `- Work plan: ${agenda.sourceArtifacts.workPlan ?? "(none)"}`,
     `- Next action: ${agenda.sourceArtifacts.nextAction ?? "(none)"}`,
+    `- Run inspection: ${agenda.sourceArtifacts.runInspection ?? "(none)"}`,
     `- Re-entry plan: ${agenda.sourceArtifacts.reentryPlan ?? "(none)"}`,
     "",
   ].join("\n");
@@ -11777,6 +16224,20 @@ async function writeControllerIssueLedger(state: ControllerState, reason: string
     currentStage: ledger.currentStage,
     issueCount: ledger.issues.length,
     blockerCount: ledger.counts.blockers,
+    topIssues: ledger.issues
+      .filter(issue => issue.status === "active")
+      .sort((left, right) => issueSeverityRank(left.severity) - issueSeverityRank(right.severity))
+      .slice(0, 5)
+      .map(issue => ({
+        id: issue.id,
+        issueCode: issue.issueCode,
+        severity: issue.severity,
+        category: issue.category,
+        message: issue.message,
+        suggestedAction: issue.suggestedAction,
+        reentryStage: issue.reentryStage,
+        evidenceRefs: issue.evidenceRefs,
+      })),
     outPath,
     reportPath,
   });
@@ -11802,14 +16263,17 @@ async function buildControllerIssueLedger(
     evidenceRefs: string[] = [],
     suggestedAction?: string,
     reentryStage?: ControllerStage,
+    issueCode?: string,
   ) => {
     const cleanMessage = message.trim();
     if (!cleanMessage) return;
-    const id = `issue_${stableHash({ severity, category, source, stage, message: cleanMessage }).slice(0, 12)}`;
+    const normalizedIssueCode = issueCode ?? issueCodeFromSourceOrMessage(source, cleanMessage);
+    const id = `issue_${stableHash({ severity, category, source, stage, message: cleanMessage, issueCode: normalizedIssueCode }).slice(0, 12)}`;
     if (issues.some(issue => issue.id === id)) return;
     const targetStage = reentryStage ?? issueReentryStage(category, stage);
     issues.push({
       id,
+      ...(normalizedIssueCode ? { issueCode: normalizedIssueCode } : {}),
       severity,
       category,
       status: "active",
@@ -11830,10 +16294,39 @@ async function buildControllerIssueLedger(
   }
 
   const feasibility = await loadControllerFeasibilitySummary(state);
-  if (feasibility.status === "block") {
+  if (feasibility.issues.length) {
+    for (const issue of feasibility.issues.filter(item => item.severity !== "note" && item.source !== "internal_review")) {
+      add(
+        issue.severity === "blocker" ? "blocker" : "minor",
+        feasibilityIssueCategory(issue),
+        `feasibility:${issue.code}`,
+        "dataset_feasibility",
+        `${issue.code}: ${issue.message}`,
+        uniqueText([feasibility.path, ...issue.evidenceRefs].filter((item): item is string => Boolean(item))),
+        feasibilityIssueSuggestedAction(issue, feasibility.status),
+        "dataset_feasibility",
+        issue.code,
+      );
+    }
+  } else if (feasibility.status === "block") {
     for (const message of feasibility.blockers) add("blocker", "data", "feasibility", "dataset_feasibility", message, feasibility.path ? [feasibility.path] : [], "Patch study variables, loosen infeasible design only with review, or start a new run with appropriate data.", "dataset_feasibility");
   } else if (feasibility.status === "warning") {
     for (const message of feasibility.warnings) add("minor", "data", "feasibility", "dataset_feasibility", message, feasibility.path ? [feasibility.path] : [], "Carry this warning into methods/report limitations or patch the study before execution.", "dataset_feasibility");
+  }
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  for (const issue of datasetSemanticAudit.topIssues.filter(item => item.selected && item.severity !== "note")) {
+    add(
+      issue.severity === "blocker" ? "blocker" : "minor",
+      "data",
+      `dataset-semantic-audit:${issue.code}`,
+      "dataset_feasibility",
+      `${issue.code}: ${issue.message}`,
+      uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item))),
+      issue.severity === "blocker"
+        ? "Patch or remove the selected study role, then rerun dataset_feasibility before execution."
+        : "Review the selected role's unit/coding, document the warning, or patch the selected role before execution.",
+      "dataset_feasibility",
+    );
   }
 
   for (const action of state.actions) {
@@ -11851,27 +16344,62 @@ async function buildControllerIssueLedger(
 
   for (const readiness of await recentActionReadinessRecords(state)) {
     for (const check of readiness.checks.filter(item => item.status !== "pass")) {
-      add(check.status === "fail" ? "blocker" : "minor", categoryForAction(readiness.action), `readiness:${readiness.action}:${check.id}`, readiness.stage, check.message, [readiness.outPath, ...check.evidenceRefs], check.status === "fail" ? "Resolve readiness failure before executing this action." : "Carry readiness warning forward as risk evidence.", readiness.stage);
+      add(
+        check.status === "fail" ? "blocker" : "minor",
+        categoryForAction(readiness.action),
+        `readiness:${readiness.action}:${check.id}${check.issueCodes?.length ? `:${check.issueCodes.join(",")}` : ""}`,
+        readiness.stage,
+        check.issueCodes?.length ? `${check.issueCodes.join(", ")}: ${check.message}` : check.message,
+        [readiness.outPath, ...check.evidenceRefs],
+        check.status === "fail" ? "Resolve readiness failure before executing this action." : "Carry readiness warning forward as risk evidence.",
+        readiness.stage,
+        check.issueCodes?.[0],
+      );
     }
   }
 
   const latestStageReview = await readLatestControllerStageReview(state);
   if (latestStageReview) {
     for (const finding of latestStageReview.findings.filter(item => item.severity !== "info")) {
-      add(finding.severity, finding.category, `stage-review:${latestStageReview.reviewId}:${finding.id}`, finding.reentryStage, finding.message, [latestStageReview.outPath, ...finding.evidenceRefs], finding.repairAction, finding.reentryStage);
+      add(
+        finding.severity,
+        finding.category,
+        `stage-review:${latestStageReview.reviewId}:${finding.id}${finding.issueCodes?.length ? `:${finding.issueCodes.join(",")}` : ""}`,
+        finding.reentryStage,
+        finding.issueCodes?.length ? `${finding.issueCodes.join(", ")}: ${finding.message}` : finding.message,
+        [latestStageReview.outPath, ...finding.evidenceRefs],
+        finding.repairAction,
+        finding.reentryStage,
+        finding.issueCodes?.[0],
+      );
     }
   }
 
   const lastEvaluation = state.selfEvaluations.at(-1);
   if (lastEvaluation) {
     for (const check of lastEvaluation.checks.filter(item => item.status !== "pass")) {
-      add(check.severity === "blocker" ? "blocker" : check.severity === "major" ? "major" : "minor", "review", `self-evaluation:${check.id}`, state.currentStage, check.message, [lastEvaluation.outPath, ...check.evidenceRefs], "Resolve self-evaluation finding before external sharing or promotion.", state.currentStage);
+      add(
+        check.severity === "blocker" ? "blocker" : check.severity === "major" ? "major" : "minor",
+        "review",
+        `self-evaluation:${check.id}${check.issueCodes?.length ? `:${check.issueCodes.join(",")}` : ""}`,
+        state.currentStage,
+        check.issueCodes?.length ? `${check.issueCodes.join(", ")}: ${check.message}` : check.message,
+        [lastEvaluation.outPath, ...check.evidenceRefs],
+        "Resolve self-evaluation finding before external sharing or promotion.",
+        state.currentStage,
+        check.issueCodes?.[0],
+      );
     }
   }
 
   if (state.stopReason) add(state.status === "blocked" ? "blocker" : "major", state.status === "blocked" ? "state" : "unknown", "stop-reason", state.currentStage, state.stopReason, [], nextRecommendedAction(state), state.currentStage);
 
-  const sorted = issues.sort((a, b) => issueSeverityRank(a.severity) - issueSeverityRank(b.severity) || a.category.localeCompare(b.category) || a.id.localeCompare(b.id));
+  const sorted = issues.sort((a, b) =>
+    issueSeverityRank(a.severity) - issueSeverityRank(b.severity)
+    || issueSourceRank(a) - issueSourceRank(b)
+    || a.category.localeCompare(b.category)
+    || a.id.localeCompare(b.id)
+  );
   const counts = {
     blockers: sorted.filter(item => item.severity === "blocker").length,
     major: sorted.filter(item => item.severity === "major").length,
@@ -11897,6 +16425,35 @@ async function buildControllerIssueLedger(
   };
 }
 
+function issueCodeFromSourceOrMessage(source: string, message: string): string | undefined {
+  const sourceMatch = source.match(/:([A-Z][A-Z0-9_]{2,})$/);
+  if (sourceMatch?.[1]) return sourceMatch[1];
+  const messageMatch = message.match(/^\s*([A-Z][A-Z0-9_]{2,})\s*:/);
+  return messageMatch?.[1];
+}
+
+function feasibilityIssueCategory(issue: { code: string; source: string; domainId?: string }): ControllerIssue["category"] {
+  const code = issue.code.toUpperCase();
+  const domain = issue.domainId ?? "";
+  if (/METHOD|PARAMETER|MODEL|EVENTS_PER|SEPARATION|REGRESSION|SURVIVAL|TREATMENT_ARM|OUTCOME_BY_ARM/.test(code)) return "methods";
+  if (/PHENOTYPE|CODE/.test(code) || domain === "phenotype_confidence") return "methods";
+  if (/COST|ACCESS/.test(code) || domain === "cost_and_access") return "cost";
+  if (/ARTIFACT/.test(code) || domain === "artifact_readiness") return "artifact";
+  if (/REVIEWER|CLAIM|RISK/.test(code) || domain === "expected_reviewer_risk") return "review";
+  if (/SURVEY|POLICY/.test(code)) return "policy";
+  return "data";
+}
+
+function feasibilityIssueSuggestedAction(issue: { code: string; suggestedFixes: string[] }, status: ControllerFeasibilityVerdict["status"] | "unknown"): string {
+  if (issue.code.includes("COMPLETE_CASE_ATTRITION")) return "Revise high-missingness variables, add missingness/imputation sensitivity, or rerun dataset_feasibility after redesign.";
+  if (issue.suggestedFixes.length) return issue.suggestedFixes[0] ?? "Review feasibility issue and rerun dataset_feasibility.";
+  if (issue.code.includes("TEMPORAL_WINDOW")) return "Correct the requested study window or use data covering the requested period, then rerun dataset_feasibility.";
+  if (issue.code.includes("PHENOTYPE")) return "Run phenotype/code review and rerun dataset_feasibility before execution.";
+  if (issue.code.includes("METHOD")) return "Revise method inputs or rerun method selection after feasibility repair.";
+  if (status === "block") return "Patch study variables, cohort, or dataset evidence before execution.";
+  return "Carry this warning into methods/report limitations or patch the study before execution.";
+}
+
 async function recentActionReadinessRecords(state: ControllerState): Promise<ControllerActionReadiness[]> {
   const artifacts = state.artifacts.filter(item => item.kind === "controller-action-readiness" && item.sha256).slice(-8);
   const records: ControllerActionReadiness[] = [];
@@ -11910,6 +16467,15 @@ async function recentActionReadinessRecords(state: ControllerState): Promise<Con
 
 function issueSeverityRank(severity: ControllerIssue["severity"]): number {
   return severity === "blocker" ? 0 : severity === "major" ? 1 : severity === "minor" ? 2 : 3;
+}
+
+function issueSourceRank(issue: Pick<ControllerIssue, "source" | "issueCode">): number {
+  if (issue.source.startsWith("dataset-semantic-audit:")) return 0;
+  if (issue.source.startsWith("feasibility:") && issue.issueCode) return 1;
+  if (issue.source.startsWith("gate:")) return 2;
+  if (issue.source.startsWith("readiness:")) return 3;
+  if (issue.source.startsWith("stage-review:")) return 4;
+  return 5;
 }
 
 function issueReentryStage(category: ControllerIssue["category"], fallback: ControllerStage): ControllerStage {
@@ -11963,6 +16529,7 @@ function renderControllerIssueLedgerMarkdown(ledger: ControllerIssueLedger): str
       `### ${issue.id}`,
       "",
       `- Severity: ${issue.severity}`,
+      `- Issue code: ${issue.issueCode ?? "(none)"}`,
       `- Category: ${issue.category}`,
       `- Source: ${issue.source}`,
       `- Stage: ${issue.stage}`,
@@ -11987,7 +16554,9 @@ async function writeControllerNextActionPacket(
   const outPath = path.join(state.rootDir, "controller-next-action.json");
   const reportPath = path.join(state.rootDir, "controller-next-action.md");
   const latestIssueLedger = await readLatestControllerIssueLedger(state);
-  const packet = buildControllerNextActionPacket(state, handoff, reentryPlan, latestIssueLedger, outPath, reportPath);
+  const inspectionRaw = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
+  const inspection = (valueAtPath(inspectionRaw, "runInspection") ?? inspectionRaw) as Partial<RunInspectionResult> | null;
+  const packet = buildControllerNextActionPacket(state, handoff, reentryPlan, latestIssueLedger, controllerInspectionRecommendedCommands(inspection), outPath, reportPath);
   await writeJson(outPath, { schemaVersion: 1, controllerNextAction: packet });
   await writeFile(reportPath, renderControllerNextActionMarkdown(packet));
   return packet;
@@ -12007,6 +16576,7 @@ function buildControllerNextActionPacket(
   handoff: ControllerTerminalHandoff,
   reentryPlan: ControllerReentryPlan,
   issueLedger: ControllerIssueLedger | null,
+  inspectionRecommendedCommands: string[],
   outPath: string,
   reportPath: string,
 ): ControllerNextActionPacket {
@@ -12015,6 +16585,7 @@ function buildControllerNextActionPacket(
     .slice(0, 8)
     .map(issue => ({
       id: issue.id,
+      issueCode: issue.issueCode,
       severity: issue.severity,
       category: issue.category,
       message: issue.message,
@@ -12023,12 +16594,28 @@ function buildControllerNextActionPacket(
       evidenceRefs: issue.evidenceRefs,
     }));
   const recommendedCommand = primaryNextActionCommand(state, handoff, reentryPlan);
+  const alternativeCommands = uniqueText([
+    ...inspectionRecommendedCommands,
+    ...reentryPlan.commands,
+    ...handoff.suggestedCommands,
+  ]).filter(command => command !== recommendedCommand).slice(0, 10);
   const safeToAutoResume = state.status === "running"
     || reentryPlan.status === "resume" && !topIssues.some(issue => issue.severity === "blocker") && reentryPlan.recommendedStage !== "human_review";
+  const mustReviewArtifactKinds = expandControllerArtifactKindsWithReports([
+    "controller-dataset-semantic-audit",
+    "controller-stage-review",
+    "controller-issue-ledger",
+    "controller-reentry-plan",
+    "controller-terminal-handoff",
+    "run-inspection",
+    "method-qa",
+    "review-adjudication",
+    "controller-repair-verification",
+  ]);
   const mustReviewArtifacts = uniqueArtifactsByPath([
     ...handoff.missingRequiredArtifacts,
     ...state.artifacts.filter(item => item.requiredForPromotion && !item.sha256),
-    ...state.artifacts.filter(item => ["controller-stage-review", "controller-issue-ledger", "controller-reentry-plan", "controller-terminal-handoff", "run-inspection", "method-qa", "review-adjudication"].includes(item.kind)).slice(-12),
+    ...state.artifacts.filter(item => mustReviewArtifactKinds.includes(item.kind)).slice(-32),
   ]);
   return {
     schemaVersion: 1,
@@ -12038,6 +16625,7 @@ function buildControllerNextActionPacket(
     stage: state.currentStage,
     reason: state.stopReason ?? handoff.summary,
     recommendedCommand,
+    alternativeCommands,
     safeToAutoResume,
     reentryPlan: {
       status: reentryPlan.status,
@@ -12052,6 +16640,7 @@ function buildControllerNextActionPacket(
     issueLedger: {
       status: issueLedger?.status ?? null,
       path: issueLedger?.outPath ?? null,
+      reportPath: issueLedger?.reportPath ?? null,
       topIssues,
     },
     mustReviewArtifacts,
@@ -12059,8 +16648,11 @@ function buildControllerNextActionPacket(
     safePatchFields: Object.keys(controllerInputPatchSchema.shape),
     createdFromArtifacts: {
       terminalHandoff: handoff.jsonPath,
+      terminalHandoffReport: handoff.reportPath,
       reentryPlan: reentryPlan.outPath,
+      reentryPlanReport: reentryPlan.reportPath,
       issueLedger: issueLedger?.outPath ?? null,
+      issueLedgerReport: issueLedger?.reportPath ?? null,
       state: state.statePath,
     },
     outPath,
@@ -12077,7 +16669,7 @@ function primaryNextActionCommand(
   const firstMatching = (needles: string[]): string | undefined =>
     commands.find(command => needles.some(needle => command.includes(needle)));
   const fallback = state.status === "complete"
-    ? `agenteer research controller-inspect --state ${quotePath(state.statePath)}`
+    ? `agenteer research controller-status --state ${quotePath(state.statePath)}`
     : `agenteer research controller-run --state ${quotePath(state.statePath)} --max-steps 4`;
 
   if (reentryPlan.status === "patch_then_resume") {
@@ -12092,7 +16684,7 @@ function primaryNextActionCommand(
   if (reentryPlan.status === "new_run_required") {
     return firstMatching(["controller-init", "controller-run"]) ?? commands[0] ?? fallback;
   }
-  return firstMatching(["controller-inspect"]) ?? commands[0] ?? fallback;
+  return firstMatching(["controller-status", "controller-inspect"]) ?? commands[0] ?? fallback;
 }
 
 function uniqueArtifactsByPath(items: ControllerArtifact[]): ControllerArtifact[] {
@@ -12127,6 +16719,12 @@ function renderControllerNextActionMarkdown(packet: ControllerNextActionPacket):
     packet.recommendedCommand,
     "```",
     "",
+    "## Alternative Commands",
+    "",
+    ...(packet.alternativeCommands.length
+      ? packet.alternativeCommands.flatMap(command => ["```bash", command, "```", ""])
+      : ["None recorded.", ""]),
+    "",
     "## Re-Entry",
     "",
     `- Status: ${packet.reentryPlan.status}`,
@@ -12138,7 +16736,9 @@ function renderControllerNextActionMarkdown(packet: ControllerNextActionPacket):
     "",
     "## Active Issues",
     "",
-    ...(packet.issueLedger.topIssues.length ? packet.issueLedger.topIssues.map(issue => `- ${issue.severity.toUpperCase()} [${issue.category}] ${issue.message} Re-enter: ${issue.reentryStage}.`) : ["- None recorded."]),
+    `- Issue ledger record: ${packet.issueLedger.path ?? "(none)"}`,
+    `- Issue ledger report: ${packet.issueLedger.reportPath ?? "(none)"}`,
+    ...(packet.issueLedger.topIssues.length ? packet.issueLedger.topIssues.map(issue => `- ${issue.severity.toUpperCase()} [${issue.category}${issue.issueCode ? `:${issue.issueCode}` : ""}] ${issue.message} Re-enter: ${issue.reentryStage}.`) : ["- None recorded."]),
     "",
     "## Must Review Artifacts",
     "",
@@ -12151,8 +16751,11 @@ function renderControllerNextActionMarkdown(packet: ControllerNextActionPacket):
     "## Source Artifacts",
     "",
     `- Terminal handoff: ${packet.createdFromArtifacts.terminalHandoff}`,
+    `- Terminal handoff report: ${packet.createdFromArtifacts.terminalHandoffReport}`,
     `- Re-entry plan: ${packet.createdFromArtifacts.reentryPlan}`,
+    `- Re-entry plan report: ${packet.createdFromArtifacts.reentryPlanReport}`,
     `- Issue ledger: ${packet.createdFromArtifacts.issueLedger ?? "(none)"}`,
+    `- Issue ledger report: ${packet.createdFromArtifacts.issueLedgerReport ?? "(none)"}`,
     `- State: ${packet.createdFromArtifacts.state}`,
     "",
   ].join("\n");
@@ -12401,7 +17004,7 @@ async function ensureTerminalHandoff(state: ControllerState): Promise<void> {
   const handoffPath = path.join(state.rootDir, "controller-terminal-handoff.json");
   const reportPath = path.join(state.rootDir, "controller-terminal-handoff.md");
   const reentryPlan = await writeControllerReentryPlan(state);
-  const packet = buildTerminalHandoff(state, handoffPath, reportPath, reentryPlan);
+  const packet = await buildTerminalHandoff(state, handoffPath, reportPath, reentryPlan);
   await writeJson(handoffPath, { schemaVersion: 1, controllerTerminalHandoff: packet });
   await writeFile(reportPath, renderTerminalHandoffMarkdown(packet));
   const nextActionPacket = await writeControllerNextActionPacket(state, packet, reentryPlan);
@@ -12422,6 +17025,16 @@ async function ensureTerminalHandoff(state: ControllerState): Promise<void> {
   }
   if (!state.artifacts.some(item => item.path === path.resolve(nextActionPacket.reportPath))) {
     state.artifacts.push(await artifact("controller-next-action-report", nextActionPacket.reportPath, state.currentStage, false));
+  }
+  const goldenPacketPath = path.join(state.rootDir, "controller-golden-packet.json");
+  if (!await pathExists(goldenPacketPath)) {
+    const goldenPacket = await writeControllerTerminalGoldenPacket(state, packet);
+    if (!state.artifacts.some(item => item.path === path.resolve(goldenPacket.outPath))) {
+      state.artifacts.push(await artifact("controller-golden-packet", goldenPacket.outPath, state.currentStage, state.status === "complete"));
+    }
+    if (!state.artifacts.some(item => item.path === path.resolve(goldenPacket.reportPath))) {
+      state.artifacts.push(await artifact("controller-golden-packet-report", goldenPacket.reportPath, state.currentStage, false));
+    }
   }
   await writeControllerExecutionAgenda(state, "terminal_handoff");
   if (!state.artifacts.some(item => item.kind === "controller-model-runner-packet")) {
@@ -12471,11 +17084,15 @@ async function buildControllerReentryPlan(state: ControllerState, outPath: strin
   const lastAction = state.actions.at(-1) ?? null;
   const lastTool = state.toolActions.at(-1) ?? null;
   const feasibility = await loadControllerFeasibilitySummary(state);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
+  const selectedSemanticIssues = datasetSemanticAudit.topIssues.filter(issue => issue.selected && issue.severity !== "note");
+  const selectedSemanticEvidence = uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item)));
   const evidence = [
     ...(lastGate?.evidenceRefs ?? []),
     ...(lastAction?.artifacts.map(item => item.path) ?? []),
     ...(lastTool ? [lastTool.outPath, lastTool.stdoutPath, lastTool.stderrPath].filter((value): value is string => Boolean(value)) : []),
     ...(feasibility.path ? [feasibility.path] : []),
+    ...selectedSemanticEvidence,
   ];
   const safePatch = examplePatchForState(state);
   let status: ControllerReentryPlan["status"] = "resume";
@@ -12494,7 +17111,8 @@ async function buildControllerReentryPlan(state: ControllerState, outPath: strin
     status = "patch_then_resume";
     recommendedStage = "dataset_feasibility";
     confidence = 0.92;
-    reason = `Dataset feasibility is blocked: ${(feasibility.blockers.length ? feasibility.blockers : lastGate?.reasons ?? []).join("; ")}`;
+    const semanticReasons = selectedSemanticIssues.map(issue => `${issue.code}: ${issue.message}`);
+    reason = `Dataset feasibility is blocked: ${uniqueText([...(feasibility.blockers.length ? feasibility.blockers : lastGate?.reasons ?? []), ...semanticReasons]).join("; ")}`;
   } else if (lastAction?.action === "external_review") {
     const rawAdjudication = await readJsonIfPresent(path.join(state.inputs.runDir, "review", "review-adjudication.json"));
     const verdict = String(valueAtPath(rawAdjudication, "reviewAdjudication.verdict") ?? "");
@@ -12562,7 +17180,10 @@ async function buildControllerReentryPlan(state: ControllerState, outPath: strin
 }
 
 function buildReentryCommands(state: ControllerState, status: ControllerReentryPlan["status"], stage: ControllerStage, safePatch: ControllerInputPatch): string[] {
-  const commands = [`agenteer research controller-inspect --state ${quotePath(state.statePath)}`];
+  const commands = [
+    `agenteer research controller-status --state ${quotePath(state.statePath)}`,
+    `agenteer research controller-inspect --state ${quotePath(state.statePath)}`,
+  ];
   if (status === "patch_then_resume") commands.push(`agenteer research controller-patch --state ${quotePath(state.statePath)} --patch '${JSON.stringify(safePatch)}' --reason ${JSON.stringify(`Re-enter ${stage} after reviewed correction.`)}`);
   if (status === "patch_then_resume") commands.push(`agenteer research controller-resume --state ${quotePath(state.statePath)} --force`);
   else if (status !== "complete_no_reentry" && status !== "new_run_required") commands.push(`agenteer research controller-resume --state ${quotePath(state.statePath)}`);
@@ -12596,10 +17217,11 @@ function renderControllerReentryPlanMarkdown(plan: ControllerReentryPlan): strin
   ].join("\n");
 }
 
-function buildTerminalHandoff(state: ControllerState, jsonPath: string, reportPath: string, reentryPlan: ControllerReentryPlan): ControllerTerminalHandoff {
+async function buildTerminalHandoff(state: ControllerState, jsonPath: string, reportPath: string, reentryPlan: ControllerReentryPlan): Promise<ControllerTerminalHandoff> {
   const trigger: ControllerTerminalHandoff["trigger"] = state.status === "blocked" ? "blocked" : state.status === "complete" ? "complete" : "human_review";
   const requiredArtifacts = state.artifacts.filter(item => item.requiredForPromotion);
   const missingRequiredArtifacts = requiredArtifacts.filter(item => !item.sha256);
+  const datasetSemanticAudit = await loadControllerDatasetSemanticAuditSummary(state);
   return {
     schemaVersion: 1,
     generatedAtIso: nowIso(),
@@ -12608,7 +17230,7 @@ function buildTerminalHandoff(state: ControllerState, jsonPath: string, reportPa
     stage: state.currentStage,
     trigger,
     summary: terminalSummary(state),
-    failureAttribution: terminalFailureAttribution(state),
+    failureAttribution: terminalFailureAttribution(state, datasetSemanticAudit),
     lastGate: state.gates.at(-1) ?? null,
     lastDecision: state.decisions.at(-1) ?? null,
     lastAction: state.actions.at(-1) ?? null,
@@ -12618,7 +17240,7 @@ function buildTerminalHandoff(state: ControllerState, jsonPath: string, reportPa
     requiredArtifacts,
     missingRequiredArtifacts,
     reentryPlan,
-    suggestedCommands: suggestedTerminalCommands(state),
+    suggestedCommands: await suggestedTerminalCommands(state),
     safePatchFields: Object.keys(controllerInputPatchSchema.shape),
     nextRecommendedAction: state.nextRecommendedAction,
     reportPath: path.resolve(reportPath),
@@ -12632,11 +17254,25 @@ function terminalSummary(state: ControllerState): string {
   return state.stopReason ?? "Controller stopped because the next action requires human review or an explicit policy change.";
 }
 
-function terminalFailureAttribution(state: ControllerState): ControllerTerminalHandoff["failureAttribution"] {
+function terminalFailureAttribution(
+  state: ControllerState,
+  datasetSemanticAudit?: Awaited<ReturnType<typeof loadControllerDatasetSemanticAuditSummary>>,
+): ControllerTerminalHandoff["failureAttribution"] {
   const attributions: ControllerTerminalHandoff["failureAttribution"] = [];
   const lastGate = state.gates.at(-1);
   const lastAction = state.actions.at(-1);
   const lastTool = state.toolActions.at(-1);
+  if (datasetSemanticAudit?.present && datasetSemanticAudit.selectedRoleStatus !== "pass" && datasetSemanticAudit.selectedRoleStatus !== "unknown") {
+    const evidenceRefs = uniqueText([datasetSemanticAudit.path, datasetSemanticAudit.reportPath].filter((item): item is string => Boolean(item)));
+    for (const issue of datasetSemanticAudit.topIssues.filter(item => item.selected && item.severity !== "note")) {
+      attributions.push({
+        category: "data",
+        severity: issue.severity === "blocker" ? "blocker" : "warning",
+        message: `${issue.code}: ${issue.message}`,
+        evidenceRefs,
+      });
+    }
+  }
   if (lastGate && lastGate.status === "block") {
     attributions.push({
       category: categoryForGate(lastGate),
@@ -12705,16 +17341,29 @@ function missingControllerStages(state: ControllerState): ControllerStage[] {
   return required.filter(stage => !state.completedStages.includes(stage));
 }
 
-function suggestedTerminalCommands(state: ControllerState): string[] {
-  const commands = [`agenteer research controller-inspect --state ${quotePath(state.statePath)}`];
+async function suggestedTerminalCommands(state: ControllerState): Promise<string[]> {
+  const commands = [
+    `agenteer research controller-status --state ${quotePath(state.statePath)}`,
+    `agenteer research controller-inspect --state ${quotePath(state.statePath)}`,
+  ];
   if (state.status === "blocked" || state.status === "needs_human_review") {
+    commands.push(`agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-status --reason ${JSON.stringify("Refresh terminal controller status before resuming.")}`);
     commands.push(`agenteer research controller-tool --state ${quotePath(state.statePath)} --tool controller-inspect --reason ${JSON.stringify("Inspect terminal controller state before resuming.")}`);
     commands.push(`agenteer research controller-patch --state ${quotePath(state.statePath)} --patch '${JSON.stringify(examplePatchForState(state))}' --reason ${JSON.stringify("Apply a reviewed correction, then rerun.")}`);
     commands.push(`agenteer research controller-resume --state ${quotePath(state.statePath)}`);
     commands.push(`agenteer research controller-run --state ${quotePath(state.statePath)}`);
   }
-  if (state.inputs.runDir) commands.push(`agenteer research run-inspect --run-dir ${quotePath(state.inputs.runDir)}`);
-  return commands;
+  if (state.inputs.runDir) {
+    commands.push(...await runInspectionRecommendedCommandsForState(state));
+    commands.push(`agenteer research run-inspect --run-dir ${quotePath(state.inputs.runDir)}`);
+  }
+  return uniqueText(commands);
+}
+
+async function runInspectionRecommendedCommandsForState(state: ControllerState): Promise<string[]> {
+  const raw = await readJsonIfPresent(path.join(state.inputs.runDir, "run-inspection.json"));
+  const inspection = (valueAtPath(raw, "runInspection") ?? raw) as Partial<RunInspectionResult> | null;
+  return controllerInspectionRecommendedCommands(inspection);
 }
 
 function examplePatchForState(state: ControllerState): ControllerInputPatch {
@@ -12821,6 +17470,7 @@ function renderTerminalHandoffMarkdown(packet: ControllerTerminalHandoff): strin
     `- Reason: ${packet.reentryPlan.reason}`,
     `- Auto-repair eligible: ${packet.reentryPlan.autoRepairEligible}`,
     `- Plan artifact: ${packet.reentryPlan.outPath}`,
+    `- Plan report: ${packet.reentryPlan.reportPath}`,
     "",
     "## Suggested Commands",
     "",

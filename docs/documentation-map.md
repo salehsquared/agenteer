@@ -33,7 +33,7 @@ Use this map to choose the right document before opening source. It is intention
 | Document | Covers |
 |---|---|
 | [Research Pipeline](research-pipeline.md) | Research packet ownership, stage-based workflow, AnalysisSpec-to-paper path, research machine path, audit commands, packet readiness. |
-| [Research Controller Agent](research-controller.md) | Persistent autonomous runner state machine for feasibility, execution, QA, reviewer re-entry, and promotion decisions. |
+| [Research Controller Agent](research-controller.md) | Persistent autonomous runner state machine, first-read `controller-start`/`controller-status`, runbooks, model-runner packets, feasibility/status handoff, reviewer re-entry, and promotion decisions. |
 | [Dataset Intelligence](dataset-intelligence.md) | Canonical dataset manifests, variable registries, relationship graphs, data profiles, watchouts, question seeds, and agent context files for any dataset. |
 | [Research ML Modeling](research-ml.md) | ML adapter registry, `modeling-plan`, stats runner, ML run/compare/inspect, analysis manifests, benchmark readiness, preprocessing, metrics, artifacts, explainability. |
 | [External Reviewer Panel](reviewer-panel.md) | Cold LLM reviewer providers, panels, review packets, adjudication, response decisions, state reentry, cost limits, and autonomy modes. |
@@ -81,5 +81,6 @@ When adding a new research capability:
 
 1. Update [Research ML Modeling](research-ml.md) for stats/ML/modeling execution.
 2. Update [Research Pipeline](research-pipeline.md) for packet/paper/golden-path behavior.
-3. Update [Research Methods Foundation](research-methods-foundation.md) for method selection semantics.
-4. Update [Research Machine Build Tracks](research-machine-build-tracks.md) if it changes long-term architecture.
+3. Update [Research Controller Agent](research-controller.md) when controller startup/status, runbook, model-runner handoff, repair, or promotion behavior changes.
+4. Update [Research Methods Foundation](research-methods-foundation.md) for method selection semantics.
+5. Update [Research Machine Build Tracks](research-machine-build-tracks.md) if it changes long-term architecture.

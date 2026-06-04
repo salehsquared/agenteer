@@ -981,6 +981,15 @@ export interface ResearchTableSummary {
     min?: number;
     max?: number;
     mean?: number;
+    variance?: number;
+    sd?: number;
+    median?: number;
+    q1?: number;
+    q3?: number;
+    iqr?: number;
+    zeroFraction?: number;
+    skewness?: number;
+    outlierFraction?: number;
     sampleValues: string[];
   }>;
   warnings: ResearchCritiqueIssue[];
@@ -1447,6 +1456,20 @@ export interface ResearchPaperLifecycle {
     interpretationBoundary: string | null;
     issueCodes: string[];
     path: string | null;
+    runnerCapability: {
+      method: string | null;
+      status: string | null;
+      reason: string | null;
+      requiredFollowUp: string[];
+      cannotSupport: string[];
+    };
+    companionReadiness: {
+      status: string | null;
+      requiredMethods: string[];
+      satisfiedMethods: string[];
+      missingMethods: string[];
+      path: string | null;
+    };
   };
   lifecycleStatus: "ready_for_local_review" | "needs_task_envelope" | "needs_methods_review" | "blocked";
   blockers: string[];
@@ -5252,14 +5275,32 @@ export async function researchPaperLifecycleCommand(opts: { paperDir: string; ca
     : rerunStabilityRecord && rerunStabilityRecord.status === "fail"
       ? "fail"
       : "not_checked";
-  const statsRunPath = path.join(paperDir, "stats-run.json");
-  const statsRun = unwrapResearchArtifact<StatsRunResult>(await readJsonIfPresent(statsRunPath), "statsRun");
+  const statsRunPath = await latestExistingPath([
+    path.join(paperDir, "stats-run.json"),
+    path.join(paperDir, "stats-run", "stats-run.json"),
+  ]);
+  const statsRun = statsRunPath ? unwrapResearchArtifact<StatsRunResult>(await readJsonIfPresent(statsRunPath), "statsRun") : null;
   const statsRunStatus = statsRun?.status ?? "missing";
   const statsRunIssueCodes = Array.isArray(statsRun?.issues)
     ? statsRun.issues.map(issue => issue.code).filter(Boolean)
     : [];
   const statsRunPosture = statsRun?.resultPosture?.status ?? null;
   const statsRunInterpretationBoundary = statsRun?.resultPosture?.interpretationBoundary ?? null;
+  const statsRunCapability = {
+    method: statsRun?.runnerCapability?.method ?? statsRun?.method ?? null,
+    status: statsRun?.runnerCapability?.status ?? null,
+    reason: statsRun?.runnerCapability?.reason ?? null,
+    requiredFollowUp: statsRun?.runnerCapability?.requiredFollowUp ?? [],
+    cannotSupport: statsRun?.runnerCapability?.cannotSupport ?? [],
+  };
+  const analysisRunManifestPath = await latestExistingPath([
+    path.join(paperDir, "analysis-run-manifest.json"),
+    path.join(paperDir, "stats-run", "analysis-run-manifest.json"),
+  ]);
+  const analysisRunManifest = analysisRunManifestPath
+    ? unwrapResearchArtifact<Record<string, unknown>>(await readJsonIfPresent(analysisRunManifestPath), "analysisRunManifest")
+    : null;
+  const companionReadiness = extractPaperLifecycleCompanionReadiness(analysisRunManifest, analysisRunManifestPath);
 
   const blockers: string[] = [];
   const qaStatus = typeof paperQa?.status === "string" ? paperQa.status : "missing";
@@ -5275,6 +5316,10 @@ export async function researchPaperLifecycleCommand(opts: { paperDir: string; ca
   if (capabilityDir && capabilityStatus !== "pass") blockers.push(`capability validation is ${capabilityStatus}`);
   if (rerunStabilityStatus === "fail") blockers.push("rerun stability failed");
   if (statsRunStatus === "failed") blockers.push(`stats-run failed${statsRunIssueCodes.length ? `: ${statsRunIssueCodes.join(",")}` : ""}`);
+  if (statsRunCapability.status === "backend_blocked") blockers.push(`stats-run backend blocked for ${statsRunCapability.method ?? "selected method"}`);
+  if (statsRunCapability.status === "bounded_approximation") blockers.push(`stats-run uses bounded approximation for ${statsRunCapability.method ?? "selected method"}`);
+  if (companionReadiness.status === "missing") blockers.push(`required companion analysis missing: ${companionReadiness.missingMethods.join(", ") || "unknown companion method"}`);
+  if (companionReadiness.status === "unverifiable") blockers.push("companion-analysis readiness is unverifiable");
   const lifecycleStatus: ResearchPaperLifecycle["lifecycleStatus"] = runnerBinding === "retrospective"
     ? "needs_methods_review"
     : !taskPath
@@ -5322,7 +5367,9 @@ export async function researchPaperLifecycleCommand(opts: { paperDir: string; ca
       posture: statsRunPosture,
       interpretationBoundary: statsRunInterpretationBoundary,
       issueCodes: statsRunIssueCodes,
-      path: statsRun ? statsRunPath : null,
+      path: statsRunPath,
+      runnerCapability: statsRunCapability,
+      companionReadiness,
     },
     lifecycleStatus,
     blockers,
@@ -5351,6 +5398,8 @@ export function renderResearchPaperLifecycle(result: ResearchPaperLifecycle): st
     `  capabilities: ${result.capabilities.status} count=${result.capabilities.count}`,
     `  rerun stability: ${result.rerunStability.status}${result.rerunStability.summary ? ` (${result.rerunStability.summary})` : ""}`,
     `  stats-run: ${result.statsRun.status}${result.statsRun.method ? ` method=${result.statsRun.method}` : ""} binding=${result.statsRun.binding}${result.statsRun.posture ? ` posture=${result.statsRun.posture}` : ""}${result.statsRun.issueCodes.length ? ` issues=${result.statsRun.issueCodes.join(",")}` : ""}`,
+    `  stats-runner: ${result.statsRun.runnerCapability.status ?? "(missing)"}${result.statsRun.runnerCapability.method ? ` method=${result.statsRun.runnerCapability.method}` : ""}`,
+    `  stats companions: ${result.statsRun.companionReadiness.status ?? "(missing)"}${result.statsRun.companionReadiness.missingMethods.length ? ` missing=${result.statsRun.companionReadiness.missingMethods.join(",")}` : ""}`,
     result.statsRun.interpretationBoundary ? `  stats-boundary: ${result.statsRun.interpretationBoundary}` : "",
     ...result.blockers.map(blocker => `  - blocker: ${blocker}`),
     `  next: ${result.nextAction}`,
@@ -5362,6 +5411,22 @@ export function renderResearchPaperLifecycleJson(result: ResearchPaperLifecycle)
     schemaVersion: 1,
     paperLifecycle: result,
   }, null, 2)}\n`;
+}
+
+function extractPaperLifecycleCompanionReadiness(manifest: Record<string, unknown> | null, manifestPath: string | null): ResearchPaperLifecycle["statsRun"]["companionReadiness"] {
+  const companion = manifest && isRecord(manifest.companionReadiness)
+    ? manifest.companionReadiness
+    : null;
+  const toStringArray = (value: unknown): string[] => Array.isArray(value)
+    ? value.map(item => typeof item === "string" ? item : String(item ?? "")).filter(item => item.length > 0)
+    : [];
+  return {
+    status: typeof companion?.status === "string" ? companion.status : null,
+    requiredMethods: toStringArray(companion?.requiredMethods),
+    satisfiedMethods: toStringArray(companion?.satisfiedMethods),
+    missingMethods: toStringArray(companion?.missingMethods),
+    path: manifestPath,
+  };
 }
 
 export async function researchPaperRunCommand(opts: { analysisSpecPath: string; dataRoot: string; outDir: string; python?: string; rscript?: string; backend?: "python-linearized" | "r-survey"; capabilityDir?: string }): Promise<ResearchPaperRun> {
@@ -5887,7 +5952,7 @@ export function renderResearchTableSummary(result: ResearchTableSummary): string
     ...result.warnings.map(issue => `  - [${issue.severity}] ${issue.code}: ${issue.message}`),
     ...result.columns.slice(0, 24).map(column => {
       const stats = column.inferredType === "number" && column.min !== undefined
-        ? ` min=${column.min} max=${column.max} mean=${column.mean?.toFixed(3)}`
+        ? ` min=${column.min} max=${column.max} mean=${column.mean?.toFixed(3)} median=${column.median?.toFixed(3)} sd=${column.sd?.toFixed(3)}`
         : "";
       const cardinality = column.uniqueCount !== undefined ? `, ${column.uniqueCount} unique` : "";
       const topValues = column.valueCounts?.length && (column.uniqueCount ?? Number.POSITIVE_INFINITY) <= 12
@@ -8479,11 +8544,52 @@ function summarizeColumn(name: string, rawValues: unknown[], rowCount: number): 
     sampleValues: uniqueStrings(values.slice(0, 8).map(value => String(value))).slice(0, 5),
   };
   if (numericValues.length) {
-    result.min = Math.min(...numericValues);
-    result.max = Math.max(...numericValues);
-    result.mean = numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length;
+    const sorted = [...numericValues].sort((a, b) => a - b);
+    const mean = numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length;
+    const variance = numericValues.length > 1
+      ? numericValues.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (numericValues.length - 1)
+      : 0;
+    const sd = Math.sqrt(Math.max(0, variance));
+    const q1 = percentile(sorted, 0.25);
+    const median = percentile(sorted, 0.5);
+    const q3 = percentile(sorted, 0.75);
+    const iqr = q3 - q1;
+    const lowerFence = q1 - 1.5 * iqr;
+    const upperFence = q3 + 1.5 * iqr;
+    const outliers = iqr > 0
+      ? numericValues.filter(value => value < lowerFence || value > upperFence).length
+      : 0;
+    const populationSd = numericValues.length > 0
+      ? Math.sqrt(numericValues.reduce((sum, value) => sum + (value - mean) ** 2, 0) / numericValues.length)
+      : 0;
+    result.min = sorted[0];
+    result.max = sorted[sorted.length - 1];
+    result.mean = mean;
+    result.variance = variance;
+    result.sd = sd;
+    result.q1 = q1;
+    result.median = median;
+    result.q3 = q3;
+    result.iqr = iqr;
+    result.zeroFraction = numericValues.filter(value => value === 0).length / numericValues.length;
+    result.skewness = numericValues.length > 2 && populationSd > 0
+      ? numericValues.reduce((sum, value) => sum + ((value - mean) / populationSd) ** 3, 0) / numericValues.length
+      : 0;
+    result.outlierFraction = outliers / numericValues.length;
   }
   return result;
+}
+
+function percentile(sortedValues: number[], probability: number): number {
+  if (!sortedValues.length) return Number.NaN;
+  if (sortedValues.length === 1) return sortedValues[0] ?? Number.NaN;
+  const position = (sortedValues.length - 1) * probability;
+  const lower = Math.floor(position);
+  const upper = Math.ceil(position);
+  const weight = position - lower;
+  const lowerValue = sortedValues[lower] ?? sortedValues[0] ?? Number.NaN;
+  const upperValue = sortedValues[upper] ?? sortedValues[sortedValues.length - 1] ?? Number.NaN;
+  return lowerValue + (upperValue - lowerValue) * weight;
 }
 
 function topValueCounts(values: unknown[], limit = 20): Array<{ value: string; count: number; fraction: number }> {
@@ -9106,6 +9212,21 @@ for name in df.columns:
             item["min"] = float(numeric.min())
             item["max"] = float(numeric.max())
             item["mean"] = float(numeric.mean())
+            item["variance"] = float(numeric.var(ddof=1)) if len(numeric) > 1 else 0.0
+            item["sd"] = float(numeric.std(ddof=1)) if len(numeric) > 1 else 0.0
+            item["median"] = float(numeric.quantile(0.5))
+            item["q1"] = float(numeric.quantile(0.25))
+            item["q3"] = float(numeric.quantile(0.75))
+            item["iqr"] = float(item["q3"] - item["q1"])
+            item["zeroFraction"] = float((numeric == 0).sum() / len(numeric))
+            population_sd = float(numeric.std(ddof=0)) if len(numeric) > 1 else 0.0
+            item["skewness"] = float((((numeric - numeric.mean()) / population_sd) ** 3).mean()) if population_sd > 0 and len(numeric) > 2 else 0.0
+            if item["iqr"] > 0:
+                lower = item["q1"] - 1.5 * item["iqr"]
+                upper = item["q3"] + 1.5 * item["iqr"]
+                item["outlierFraction"] = float(((numeric < lower) | (numeric > upper)).sum() / len(numeric))
+            else:
+                item["outlierFraction"] = 0.0
     columns.append(item)
 
 print(json.dumps({

@@ -1,15 +1,17 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  researchBenchmarkSuiteRunCommand,
-  researchBenchmarkTrendCommand,
-  researchExplorePlanCommand,
+	  researchBenchmarkSuiteRunCommand,
+	  researchBenchmarkTrendCommand,
+	  researchAnalysisManifestCommand,
+	  researchExplorePlanCommand,
   researchManuscriptCommand,
   researchMethodQaCommand,
   researchRunInspectCommand,
   researchSpecV2Command,
+  renderResearchRunInspect,
   renderResearchRunInspectJson,
 } from "../src/research-machine/commands.js";
 
@@ -31,6 +33,176 @@ describe("research trust layer", () => {
       expect(result.checks.map(check => check.category)).toContain("claim_alignment");
       expect(result.outPath).toBe(path.join(dir, "method-qa.json"));
       expect(result.reportPath).toBe(path.join(dir, "method-qa.md"));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("blocks method QA when stats QA fails", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-stats-qa-method-qa-"));
+    try {
+      await writeFixtureRun(dir);
+      await writeFile(path.join(dir, "stats-qa.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        status: "fail",
+        summary: "Injected failed stats QA for lifecycle regression.",
+        checks: [
+          { id: "estimate-effect-scale-consistency", status: "fail", detail: "Injected scale mismatch." },
+        ],
+      }, null, 2)}\n`);
+      const result = await researchMethodQaCommand({ runDir: dir });
+      expect(result.overallStatus).toBe("fail");
+      expect(result.readiness).toBe("blocked");
+      expect(result.checks).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          id: "stats-qa-readiness",
+          status: "fail",
+          severity: "blocker",
+        }),
+      ]));
+      expect(result.nextAction).toContain("blocker-level method QA");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("requires method-selection evidence before a stats run is locally review-ready", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-method-decision-qa-"));
+    try {
+      await writeFixtureRun(dir);
+      await writeFile(path.join(dir, "method-decision-support.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        methodDecisionSupport: {
+          requestedMethod: "logistic-regression",
+          requestedRole: "fallback",
+          verdict: "fallback_only",
+          primaryMethods: [{ method: "exact-logistic-regression", rationale: "Sparse binary outcome support favors an exact or penalized primary model." }],
+          sensitivityMethods: [{ method: "logistic-regression", rationale: "Acceptable as sensitivity only." }],
+          fallbackMethods: [{ method: "logistic-regression", rationale: "Bounded fallback when exact backend is unavailable." }],
+          nextAction: "Run the exact or penalized primary method, or keep this as a sensitivity analysis.",
+        },
+      }, null, 2)}\n`);
+      await writeFile(path.join(dir, "stats-preflight.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        statsPreflight: {
+          status: "pass",
+          method: "logistic-regression",
+          checks: [{ id: "feasibility-gate-verdict", status: "pass", detail: "Feasibility gate passed." }],
+          methodDecisionSupport: {
+            requestedMethod: "logistic-regression",
+            requestedRole: "fallback",
+            verdict: "fallback_only",
+            primaryMethods: [{ method: "exact-logistic-regression", rationale: "Sparse binary outcome support favors an exact or penalized primary model." }],
+            sensitivityMethods: [{ method: "logistic-regression", rationale: "Acceptable as sensitivity only." }],
+            fallbackMethods: [{ method: "logistic-regression", rationale: "Bounded fallback when exact backend is unavailable." }],
+            nextAction: "Run the exact or penalized primary method, or keep this as a sensitivity analysis.",
+          },
+          nextAction: "Run the exact or penalized primary method, or keep this as a sensitivity analysis.",
+        },
+      }, null, 2)}\n`);
+
+      const result = await researchMethodQaCommand({ runDir: dir });
+      const check = result.checks.find(item => item.id === "method-decision-readiness");
+
+      expect(result.overallStatus).toBe("warning");
+      expect(result.readiness).toBe("needs_methods_review");
+      expect(check).toEqual(expect.objectContaining({
+        category: "method_selection",
+        status: "warning",
+        severity: "major",
+      }));
+      expect(check?.message).toContain("Preferred method(s): exact-logistic-regression");
+      expect(result.nextAction).toContain("exact or penalized");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("warns when method-selection evidence is missing from a stats run", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-missing-method-decision-"));
+    try {
+      await mkdir(dir, { recursive: true });
+      await writeFile(path.join(dir, "stats-run.json"), `${JSON.stringify({
+        status: "succeeded",
+        method: "linear-regression",
+        resultPosture: "bound_standard_table",
+        completeCaseN: 80,
+        estimates: [{ term: "exposure", estimate: 1.2, ciLow: 0.3, ciHigh: 2.1, pValue: 0.01 }],
+        runnerCapability: { method: "linear-regression", status: "executable" },
+      }, null, 2)}\n`);
+      await writeFile(path.join(dir, "stats-qa.json"), `${JSON.stringify({ status: "pass", checks: [] }, null, 2)}\n`);
+      await writeFile(path.join(dir, "paper.md"), "# Linear Study\n\nThis local analysis estimates an association and does not establish causality.\n");
+
+      const result = await researchMethodQaCommand({ runDir: dir });
+      const check = result.checks.find(item => item.id === "method-decision-readiness");
+
+      expect(result.overallStatus).toBe("warning");
+      expect(check).toEqual(expect.objectContaining({
+        category: "method_selection",
+        status: "warning",
+        severity: "major",
+      }));
+      expect(check?.message).toContain("method-selection evidence is missing");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("uses embedded stats-run method decisions before stale sidecar artifacts", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-embedded-method-decision-"));
+    try {
+      await writeFixtureRun(dir);
+      await writeFile(path.join(dir, "stats-run.json"), `${JSON.stringify({
+        status: "succeeded",
+        method: "logistic-regression",
+        resultPosture: "bound_standard_table",
+        completeCaseN: 120,
+        estimates: [{ term: "age", oddsRatio: 1.08, ciLow: 1.01, ciHigh: 1.15, pValue: 0.02 }],
+        diagnostics: {
+          preflight: {
+            methodDecisionSupport: {
+              requestedMethod: "logistic-regression",
+              requestedRole: "fallback",
+              verdict: "fallback_only",
+              primaryMethods: [{ method: "penalized-logistic-regression", rationale: "Sparse event support favors penalized estimation." }],
+              sensitivityMethods: [{ method: "logistic-regression", rationale: "Acceptable as sensitivity evidence." }],
+              fallbackMethods: [{ method: "logistic-regression", rationale: "Fallback when penalized backend is unavailable." }],
+              nextAction: "Run penalized logistic regression before treating this as primary evidence.",
+            },
+          },
+        },
+        runnerCapability: {
+          method: "logistic-regression",
+          status: "executable",
+          reason: "Fixture standard-table runner capability.",
+          requiredFollowUp: ["Review method-specific QA gates."],
+          cannotSupport: ["claims beyond the declared design"],
+        },
+      }, null, 2)}\n`);
+
+      const result = await researchMethodQaCommand({ runDir: dir });
+      const check = result.checks.find(item => item.id === "method-decision-readiness");
+      const consistency = result.checks.find(item => item.id === "method-decision-evidence-consistency");
+      const inspection = await researchRunInspectCommand({ runDir: dir });
+
+      expect(check).toEqual(expect.objectContaining({
+        category: "method_selection",
+        status: "warning",
+        severity: "major",
+      }));
+      expect(check?.message).toContain("Preferred method(s): penalized-logistic-regression");
+      expect(check?.evidenceRefs).toEqual([path.join(dir, "stats-run.json")]);
+      expect(consistency).toEqual(expect.objectContaining({
+        category: "method_selection",
+        status: "warning",
+        severity: "major",
+      }));
+      expect(consistency?.message).toContain("contradictory");
+      expect(consistency?.message).toContain("method-decision-support");
+      expect(consistency?.message).toContain("stats-run");
+      expect(inspection.qa.methodDecisionConsistencyStatus).toBe("warning");
+      expect(inspection.qa.methodDecisionConsistencyMismatchedSources).toEqual(expect.arrayContaining(["stats-run", "method-decision-support", "stats-preflight"]));
+      expect(renderResearchRunInspectJson(inspection)).toContain("methodDecisionConsistencyStatus");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -202,12 +374,102 @@ This is a reproducible first-pass description of critically ill patients.
         outPath: path.join(dir, "run-inspection.json"),
         reportPath: path.join(dir, "run-inspection.md"),
       });
-      const parsed = JSON.parse(renderResearchRunInspectJson(result)) as { runInspection: { provenance: { artifactCount: number } } };
+      const parsed = JSON.parse(renderResearchRunInspectJson(result)) as {
+        runInspection: {
+          provenance: { artifactCount: number };
+          qa: { methodDecisionReadinessStatus: string | null; methodDecisionRequestedMethod: string | null };
+        };
+      };
       expect(result.provenance.artifactCount).toBeGreaterThan(0);
       expect(result.cost.estimatedUsd).toBe(0.01);
       expect(result.paperPath).toBe(path.join(dir, "paper.md"));
       expect(result.manuscriptPath).toBe(path.join(dir, "manuscript.md"));
+      expect(result.qa.methodDecisionReadinessStatus).toBe("preferred");
+      expect(result.qa.methodDecisionRequestedMethod).toBe("logistic-regression");
+      expect(renderResearchRunInspectJson(result)).toContain("methodDecisionReadinessStatus");
       expect(parsed.runInspection.provenance.artifactCount).toBeGreaterThan(0);
+      expect(parsed.runInspection.qa.methodDecisionReadinessStatus).toBe("preferred");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("surfaces stats QA warning check names in unified inspection output", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-run-inspect-stats-warning-"));
+    try {
+      await writeFixtureRun(dir);
+      await writeFile(path.join(dir, "stats-qa.json"), `${JSON.stringify({
+        status: "warning",
+        checks: [
+          { id: "analysis-semantic-plausibility", status: "warning", detail: "BMI unit/coding review required." },
+          { id: "analysis-complete-case-retention", status: "pass", detail: "Complete-case retention is acceptable." },
+        ],
+      }, null, 2)}\n`);
+
+      const result = await researchRunInspectCommand({ runDir: dir, reportPath: path.join(dir, "run-inspection.md") });
+
+      expect(result.readiness).toBe("needs_methods_review");
+      expect(result.qa.statsQaReadinessStatus).toBe("warning");
+      expect(result.qa.statsQaWarningChecks).toContain("analysis-semantic-plausibility");
+      expect(result.warnings.join(" ")).toContain("analysis-semantic-plausibility");
+      const report = await readFile(path.join(dir, "run-inspection.md"), "utf-8");
+      expect(report).toContain("warning checks: analysis-semantic-plausibility");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("surfaces figure readiness in unified inspection output", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "agenteer-run-inspect-figures-"));
+    try {
+      await writeFixtureRun(dir);
+      await writeFile(path.join(dir, "figures.json"), `${JSON.stringify({
+        figures: [{
+          id: "residual-plot",
+          path: "residual-plot.png",
+          title: "Residual Plot",
+          caption: "Residuals versus fitted values.",
+          sourceColumns: ["age", "mortality"],
+        }],
+      }, null, 2)}\n`);
+
+      const missingQa = await researchRunInspectCommand({ runDir: dir, reportPath: path.join(dir, "run-inspection-missing-figure-qa.md") });
+      expect(missingQa.readiness).toBe("needs_methods_review");
+      expect(missingQa.qa.figureReadinessStatus).toBe("missing");
+      expect(missingQa.qa.figureCount).toBe(1);
+      expect(missingQa.warnings.join(" ")).toContain("figure-qa.json is missing");
+      expect(missingQa.nextRecommendedAction).toContain("Run figure QA");
+      expect(missingQa.recommendedCommands.some(command => command.includes("research figure-qa") && command.includes("--figures"))).toBe(true);
+      expect(missingQa.recommendedCommands.some(command => command.includes("research run-inspect") && command.includes("--json"))).toBe(true);
+      expect(renderResearchRunInspect(missingQa)).toContain("command 1:");
+      const missingReport = await readFile(path.join(dir, "run-inspection-missing-figure-qa.md"), "utf-8");
+      expect(missingReport).toContain("Figure QA readiness: missing; figures: 1");
+      expect(missingReport).toContain("## Recommended Commands");
+      expect(missingReport).toContain("research figure-qa");
+
+      await writeFile(path.join(dir, "figure-qa.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        status: "fail",
+        summary: "0/1 figure(s) passed; status=fail.",
+        figures: [{
+          figureId: "residual-plot",
+          path: path.join(dir, "residual-plot.png"),
+          status: "fail",
+          checks: [{ id: "file-exists", status: "fail", detail: "Missing figure file." }],
+        }],
+        checks: [{ id: "all-figures-pass", status: "fail", detail: "0/1 figure(s) passed all QA checks." }],
+      }, null, 2)}\n`);
+
+      const failedQa = await researchRunInspectCommand({ runDir: dir, reportPath: path.join(dir, "run-inspection-failed-figure-qa.md") });
+      expect(failedQa.readiness).toBe("blocked");
+      expect(failedQa.qa.figureReadinessStatus).toBe("fail");
+      expect(failedQa.qa.figureFailingIds).toContain("residual-plot");
+      expect(failedQa.blockers.join(" ")).toContain("Figure QA failed");
+      expect(failedQa.nextRecommendedAction).toContain("Repair or regenerate failed figure artifact");
+      expect(failedQa.nextRecommendedAction).toContain("residual-plot");
+      expect(failedQa.recommendedCommands.some(command => command.includes("research figure-qa") && command.includes("figure-qa.json"))).toBe(true);
+      expect(failedQa.recommendedCommands.some(command => command.includes("research run-inspect"))).toBe(true);
+      expect(await readFile(path.join(dir, "run-inspection-failed-figure-qa.md"), "utf-8")).toContain("Figure QA readiness: fail; figures: 1; failing: residual-plot");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -290,7 +552,183 @@ This is a reproducible first-pass description of critically ill patients.
     }
   });
 
-  it("recognizes diagnostic accuracy performance metrics as estimate evidence", async () => {
+  it("blocks unified inspection when stats preflight blocks feasibility", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "agenteer-preflight-run-inspect-"));
+    try {
+      await writeFixtureRun(root);
+      await writeFile(path.join(root, "stats-preflight.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        statsPreflight: {
+          status: "block",
+          method: "logistic-regression",
+          checks: [{
+            id: "feasibility-blockers",
+            status: "block",
+            detail: "Only 2 outcome events were available for the requested adjusted model.",
+            evidenceRefs: ["stats-preflight.json"],
+            suggestedAction: "Use descriptive event counts or broaden the endpoint.",
+          }],
+          nextAction: "Use descriptive event counts or broaden the endpoint.",
+        },
+      }, null, 2)}\n`);
+
+      const methodQa = await researchMethodQaCommand({ runDir: root });
+      const preflightCheck = methodQa.checks.find(check => check.message.includes("Stats preflight blocked"));
+      const inspection = await researchRunInspectCommand({ runDir: root });
+
+      expect(preflightCheck?.status).toBe("fail");
+      expect(preflightCheck?.severity).toBe("blocker");
+      expect(methodQa.readiness).toBe("blocked");
+      expect(inspection.readiness).toBe("blocked");
+      expect(inspection.blockers.join(" ")).toContain("Stats preflight blocked");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("gates method QA and unified inspection on stats runner capability", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "agenteer-runner-capability-"));
+    try {
+      await writeFixtureRun(root);
+      await writeFile(path.join(root, "stats-run.json"), `${JSON.stringify({
+        status: "succeeded",
+        method: "time-varying-cox",
+        resultPosture: {
+          status: "exploratory_standard_table",
+          interpretationBoundary: "Bounded time-interaction approximation.",
+          nextAction: "Validate with a survival backend.",
+        },
+        completeCaseN: 120,
+        estimates: [{ term: "x", hazard_ratio: 1.2, ci_low: 1.01, ci_high: 1.42, p_value: 0.03 }],
+        diagnostics: {},
+        issues: [],
+        runnerCapability: {
+          method: "time-varying-cox",
+          status: "bounded_approximation",
+          reason: "The local route is not a start/stop counting-process backend.",
+          requiredFollowUp: ["Validate with a dedicated survival backend."],
+          cannotSupport: ["confirmatory inference"],
+        },
+      }, null, 2)}\n`);
+
+      const methodQa = await researchMethodQaCommand({ runDir: root });
+      const runnerCheck = methodQa.checks.find(check => check.category === "runner_capability");
+      const inspection = await researchRunInspectCommand({ runDir: root, reportPath: path.join(root, "run-inspection.md") });
+
+      expect(methodQa.runnerCapability).toMatchObject({ method: "time-varying-cox", status: "bounded_approximation" });
+      expect(runnerCheck).toMatchObject({ status: "warning", severity: "major" });
+      expect(methodQa.readiness).toBe("needs_methods_review");
+      expect(inspection.runnerCapability).toMatchObject({ method: "time-varying-cox", status: "bounded_approximation" });
+      expect(inspection.readiness).toBe("needs_methods_review");
+      expect(inspection.warnings.join(" ")).toContain("bounded_approximation");
+      const report = await readFile(path.join(root, "run-inspection.md"), "utf-8");
+      expect(report).toContain("## Runner Capability");
+      expect(report).toContain("time-varying-cox");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("blocks method QA when stats runner capability is backend-blocked", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "agenteer-backend-blocked-capability-"));
+    try {
+      await writeFixtureRun(root);
+      await writeFile(path.join(root, "stats-run.json"), `${JSON.stringify({
+        status: "failed",
+        method: "fine-gray",
+        resultPosture: {
+          status: "failed",
+          interpretationBoundary: "Fine-Gray requires a validated competing-risk backend.",
+          nextAction: "Use R cmprsk/riskRegression.",
+        },
+        completeCaseN: 0,
+        estimates: [],
+        diagnostics: {},
+        issues: [{ severity: "blocker", code: "METHOD_BACKEND_NOT_AVAILABLE", message: "Backend unavailable.", evidenceRefs: [] }],
+        runnerCapability: {
+          method: "fine-gray",
+          status: "backend_blocked",
+          reason: "Fine-Gray subdistribution hazards require a validated competing-risk backend.",
+          requiredFollowUp: ["Use R cmprsk/riskRegression."],
+          cannotSupport: ["subdistribution hazard ratio"],
+        },
+      }, null, 2)}\n`);
+
+      const methodQa = await researchMethodQaCommand({ runDir: root });
+      const inspection = await researchRunInspectCommand({ runDir: root });
+
+      expect(methodQa.overallStatus).toBe("fail");
+      expect(methodQa.readiness).toBe("blocked");
+      expect(methodQa.checks.find(check => check.category === "runner_capability")).toMatchObject({ status: "fail", severity: "blocker" });
+      expect(inspection.readiness).toBe("blocked");
+      expect(inspection.blockers.join(" ")).toContain("backend_blocked");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+	  it("surfaces enforced missing companion analyses in unified run inspection", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "agenteer-companion-run-inspect-"));
+    try {
+      await writeFixtureRun(root);
+      await writeFile(path.join(root, "analysis-run-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        analysisRunManifest: {
+          readiness: "exploratory_only",
+          companionReadiness: {
+            status: "missing",
+            requiredMethods: ["power-sample-size", "missingness-summary"],
+            satisfiedMethods: [],
+            missingMethods: ["power-sample-size", "missingness-summary"],
+            evidenceRefs: [path.join(root, "modeling-plan.json")],
+          },
+        },
+      }, null, 2)}\n`);
+
+      const result = await researchRunInspectCommand({ runDir: root, reportPath: path.join(root, "run-inspection.md") });
+
+      expect(result.readiness).toBe("blocked");
+      expect(result.companionReadiness).toMatchObject({
+        status: "missing",
+        requiredMethods: ["power-sample-size", "missingness-summary"],
+        missingMethods: ["power-sample-size", "missingness-summary"],
+      });
+      expect(result.blockers.join(" ")).toContain("Required companion analysis missing");
+      expect(renderResearchRunInspectJson(result)).toContain("companionReadiness");
+      const report = await readFile(path.join(root, "run-inspection.md"), "utf-8");
+      expect(report).toContain("## Companion Analyses");
+      expect(report).toContain("power-sample-size");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+	  });
+
+	  it("surfaces missing feasibility evidence from analysis manifests in unified inspection", async () => {
+	    const root = await mkdtemp(path.join(os.tmpdir(), "agenteer-run-inspect-feasibility-missing-"));
+	    try {
+	      await writeFixtureRun(root);
+	      await writeFile(path.join(root, "method-contract.json"), `${JSON.stringify({ statisticalMethodSpec: { method: "logistic-regression" } }, null, 2)}\n`);
+	      await writeFile(path.join(root, "stats-summary.json"), `${JSON.stringify({ completeCaseN: 120 }, null, 2)}\n`);
+	      await writeFile(path.join(root, "estimates.csv"), "term,estimate,p_value\nage,1.08,0.02\n");
+	      await writeFile(path.join(root, "stats-report.md"), "# Stats Report\n\nLogistic regression fixture.\n");
+	      const manifest = await researchAnalysisManifestCommand({ runDir: root });
+	      expect(manifest.feasibilityReadiness.status).toBe("not_supplied");
+	      expect(manifest.readiness).toBe("exploratory_only");
+
+	      const result = await researchRunInspectCommand({ runDir: root, reportPath: path.join(root, "run-inspection.md") });
+
+	      expect(result.readiness).toBe("needs_methods_review");
+	      expect(result.feasibilityReadiness.status).toBe("not_supplied");
+	      expect(result.warnings.join(" ")).toContain("Feasibility readiness evidence is not supplied");
+	      expect(result.nextRecommendedAction).toContain("Run or attach feasibility-gate");
+	      expect(result.recommendedCommands.some(command => command.includes("research analysis-manifest") && command.includes("analysis-run-manifest.json"))).toBe(true);
+	      expect(await readFile(path.join(root, "run-inspection.md"), "utf-8")).toContain("Feasibility readiness: not_supplied");
+	    } finally {
+	      await rm(root, { recursive: true, force: true });
+	    }
+	  });
+
+	  it("recognizes diagnostic accuracy performance metrics as estimate evidence", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "agenteer-diagnostic-qa-"));
     try {
       await writeFixtureRun(root);
@@ -470,6 +908,28 @@ This is a reproducible first-pass description of critically ill patients.
 
 async function writeFixtureRun(dir: string, opts: { paper?: string; issues?: unknown[] } = {}): Promise<void> {
   await mkdir(dir, { recursive: true });
+  const methodDecisionSupport = {
+    requestedMethod: "logistic-regression",
+    requestedRole: "primary",
+    verdict: "preferred",
+    confidence: "high",
+    dataSignals: {
+      outcomeKind: "binary",
+      completeCaseN: 120,
+      eventCount: 30,
+    },
+    primaryMethods: [{
+      method: "logistic-regression",
+      role: "primary",
+      rationale: "Fixture binary outcome with adequate event support for the declared predictor set.",
+      evidenceRefs: ["stats-preflight.json"],
+    }],
+    sensitivityMethods: [],
+    fallbackMethods: [],
+    notRecommendedMethods: [],
+    reasons: ["Fixture method-selection support is present so trust-layer tests exercise downstream QA rather than missing evidence."],
+    nextAction: "Proceed with local methods review.",
+  };
   const specIn = path.join(dir, "analysis-spec.json");
   const specOut = path.join(dir, "analysis-spec-v2.json");
   await writeFile(specIn, `${JSON.stringify({
@@ -496,12 +956,38 @@ async function writeFixtureRun(dir: string, opts: { paper?: string; issues?: unk
   }, null, 2)}\n`);
   await writeFile(path.join(dir, "stats-run.json"), `${JSON.stringify({
     status: "succeeded",
+    method: "logistic-regression",
     resultPosture: "bound_standard_table",
     completeCaseN: 120,
     estimates: [{ term: "age", oddsRatio: 1.08, ciLow: 1.01, ciHigh: 1.15, pValue: 0.02 }],
     issues: opts.issues ?? [],
+    runnerCapability: {
+      method: "logistic-regression",
+      status: "executable",
+      reason: "Fixture standard-table runner capability.",
+      requiredFollowUp: ["Review method-specific QA gates."],
+      cannotSupport: ["claims beyond the declared design"],
+    },
   }, null, 2)}\n`);
   await writeFile(path.join(dir, "diagnostics.json"), `${JSON.stringify({ completeCaseN: 120, missingness: [] }, null, 2)}\n`);
+  await writeFile(path.join(dir, "stats-preflight.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    statsPreflight: {
+      status: "pass",
+      method: "logistic-regression",
+      checks: [{
+        id: "feasibility-gate-verdict",
+        status: "pass",
+        detail: "Feasibility gate verdict is formal_analysis_ready with score 0.9.",
+        evidenceRefs: [dir],
+      }],
+      methodDecisionSupport,
+      nextAction: "Proceed with local methods review.",
+    },
+  }, null, 2)}\n`);
+  await writeFile(path.join(dir, "stats-preflight.md"), "# Stats Preflight\n\nFeasibility gate passed.\n");
+  await writeFile(path.join(dir, "method-decision-support.json"), `${JSON.stringify({ schemaVersion: 1, methodDecisionSupport }, null, 2)}\n`);
+  await writeFile(path.join(dir, "method-decision-support.md"), "# Method-Decision Support\n\nSelected method: logistic regression.\n\nVerdict: preferred.\n");
   await writeFile(path.join(dir, "stats-qa.json"), `${JSON.stringify({ status: "pass", checks: [] }, null, 2)}\n`);
   await writeFile(path.join(dir, "paper.md"), opts.paper ?? "# ICU Mortality Study\n\nThis local analysis estimates whether age is associated with mortality. It does not establish causality.\n");
   await writeFile(path.join(dir, "qa.json"), `${JSON.stringify({ status: "pass" }, null, 2)}\n`);

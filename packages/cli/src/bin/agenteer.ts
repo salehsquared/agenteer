@@ -82,6 +82,7 @@ import {
   researchDatasetRunIndexCommand,
   researchDatasetSpecCommand,
   researchExecutionContractFromFileCommand,
+  researchGoldenRunCommand,
   researchPhenotypeInspectCommand,
   researchPhenotypeListCommand,
   researchPhenotypeMatchCommand,
@@ -94,6 +95,7 @@ import {
   researchMethodValidateCommand,
   researchLiteratureContextCommand,
   researchMethodsCatalogCommand,
+  researchModelingFeasibilityEvidenceFromFile,
   researchModelingPlanCommand,
   researchMachineBenchmarkCommand,
   researchMachinePlanCommand,
@@ -102,12 +104,14 @@ import {
   researchBenchmarkTrendCommand,
   researchControllerAgendaCommand,
   researchControllerAuditCommand,
+  researchControllerBenchmarkCommand,
   researchControllerCapabilitiesCommand,
   researchControllerCompletionAuditCommand,
   researchControllerDoctorCommand,
   researchControllerEnvironmentCommand,
   researchControllerFollowAgendaCommand,
   researchControllerFollowLoopCommand,
+  researchControllerGoldenPacketCommand,
   researchControllerGoalAuditCommand,
   researchControllerInitCommand,
   researchControllerInspectCommand,
@@ -120,6 +124,8 @@ import {
   researchControllerRunCommand,
   researchControllerSelfTestCommand,
   researchControllerStepCommand,
+  researchControllerStartCommand,
+  researchControllerStatusCommand,
   researchControllerSupervisorCommand,
   researchControllerToolCommand,
   researchSpecV2Command,
@@ -179,6 +185,8 @@ import {
   renderResearchControllerAgendaJson,
   renderResearchControllerAudit,
   renderResearchControllerAuditJson,
+  renderResearchControllerBenchmark,
+  renderResearchControllerBenchmarkJson,
   renderResearchControllerCapabilities,
   renderResearchControllerCapabilitiesJson,
   renderResearchControllerCompletionAudit,
@@ -191,6 +199,8 @@ import {
   renderResearchControllerFollowAgendaJson,
   renderResearchControllerFollowLoop,
   renderResearchControllerFollowLoopJson,
+  renderResearchControllerGoldenPacket,
+  renderResearchControllerGoldenPacketJson,
   renderResearchControllerGoalAudit,
   renderResearchControllerGoalAuditJson,
   renderResearchControllerOperate,
@@ -205,12 +215,18 @@ import {
   renderResearchControllerSelfTestJson,
   renderResearchControllerState,
   renderResearchControllerStateJson,
+  renderResearchControllerStart,
+  renderResearchControllerStartJson,
+  renderResearchControllerStatus,
+  renderResearchControllerStatusJson,
   renderResearchControllerSupervisor,
   renderResearchControllerSupervisorJson,
   renderResearchExplorePlan,
   renderResearchExplorePlanJson,
   renderResearchFeasibilityGate,
   renderResearchFeasibilityGateJson,
+  renderResearchGoldenRun,
+  renderResearchGoldenRunJson,
   renderResearchManuscript,
   renderResearchManuscriptJson,
   renderResearchMethodQa,
@@ -842,9 +858,10 @@ Usage:
   agenteer research literature-search --question <text> [--base-url <url>] [--endpoint <path>] [--api-key <key>] [--bearer-token <token>] [--cookie <cookie>] [--auth-secret <secret>] [--user-id <id>] [--user-email <email>] [--depth quick|standard|long] [--date-range <range>] [--high-impact] [--top-k <n>] [--timeout-ms <n>] [--mock-response <json>] [--out <json>] [--report <md>] [--json]
   agenteer research literature-context --literature <literature-search.json> [--question <text>] [--out <json>] [--report <md>] [--json]
   agenteer research literature-qa --literature <literature-search.json> [--question <text>] [--paper <paper.md>] [--out <json>] [--report <md>] [--json]
-  agenteer research feasibility-gate --question <text> [--data <rows.csv|json|parquet>] [--dataset-dir <dir>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--group <col>] [--time <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--instrument <col>] [--weight <col>] [--variable <col>]* [--covariate <col>]* [--exact-covariate <col>]* [--phenotype-id <id>]* [--phenotype-confidence <n>] [--phenotype-reviewed] [--temporal-start-year <yyyy>] [--temporal-end-year <yyyy>] [--expected-followup-years <n>] [--min-rows <n>] [--min-events <n>] [--max-missingness <n>] [--survey] [--allow-survey-approximation] [--out-dir <dir>] [--python <path>] [--json]
-  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json> | --exploration-handoff <handoff.json>] [--literature <literature-search-or-context.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
-  agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--time <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--cutoff <n>] [--instrument <col>] [--alpha-penalty <n>] [--l1-ratio <n>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--exact-covariate <col>]* [--variable <col>]* [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--method-selection <json>] [--analysis-spec <json>] [--literature <literature-search.json>] [--require-bound] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
+  agenteer research feasibility-gate --question <text> [--data <rows.csv|json|parquet>] [--dataset-dir <dir>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--group <col>] [--time <col>] [--start <col>] [--stop <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--cutoff <n>] [--instrument <col>] [--weight <col>] [--offset <col>] [--variable <col>]* [--covariate <col>]* [--exact-covariate <col>]* [--phenotype-id <id>]* [--phenotype-confidence <n>] [--phenotype-reviewed] [--temporal-start-year <yyyy>] [--temporal-end-year <yyyy>] [--expected-followup-years <n>] [--min-rows <n>] [--min-events <n>] [--max-missingness <n>] [--survey] [--allow-survey-approximation] [--out-dir <dir>] [--python <path>] [--json]
+  agenteer research modeling-plan --question <text> [--goal <goal>] [--outcome <type>] [--study-design <design>] [--data-structure <name|csv>]* [--table <rows.csv|json|parquet> | --table-summary <summary.json> | --exploration-handoff <handoff.json>] [--literature <literature-search-or-context.json>] [--feasibility <feasibility-gate-or-controller-verdict.json>] [--backend-status <machine-status.json>] [--prior-run <stats-run.json|ml-run.json>]* [--target <column>] [--exposure <column>] [--group <column>] [--time <column>] [--start <column>] [--stop <column>] [--event <column>] [--period <column>] [--post <column>] [--id <column>] [--cluster <column>] [--strata <column>] [--running-variable <column>] [--instrument <column>] [--weight <column>] [--offset <column>] [--covariate <column>]* [--exact-covariate <column>]* [--variable <column>]* [--survey] [--repeated] [--clustered] [--time-to-event] [--high-dimensional] [--text] [--image] [--spatial] [--network] [--row-count <n>] [--feature-count <n>] [--class-count <n>] [--high-missingness] [--small-sample] [--predict] [--no-inference] [--max-candidates <n>] [--json]
+  agenteer research golden-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [same role flags as analysis-run] [--method-selection <json>] [--analysis-spec <json>] [--literature <json>] [--require-bound] [--require-ready] [--python <path>] [--out <golden-run.json>] [--report <golden-run.md>] [--json]
+  agenteer research analysis-run --question <text> --method <stats-method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <col>] [--exposure <col>] [--group <col>] [--time <col>] [--start <col>] [--stop <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--cutoff <n>] [--instrument <col>] [--alpha-penalty <n>] [--l1-ratio <n>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--covariate <col>]* [--exact-covariate <col>]* [--variable <col>]* [--weight <col>] [--offset <col>] [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--bootstrap-replicates <n>] [--validation-column <col> --validation-value <value> | --validation-time <col> --validation-cutoff <n>] [--method-selection <json>] [--analysis-spec <json>] [--literature <literature-search.json>] [--require-bound] [--allow-blocked-feasibility] [--survey] [--allow-survey-approximation] [--python <path>] [--json]
   agenteer research analysis-manifest --run-dir <dir> [--out <analysis-run-manifest.json>] [--require-ready] [--json]
   agenteer research analysis-benchmark --run-dir <dir>* [--require-ready] [--require-multi-route] [--out <json>] [--report <md>] [--json]
   agenteer research dataset-adapter --dataset <id> [--data-root <dir>] [--json]
@@ -855,7 +872,7 @@ Usage:
   agenteer research ml-compare --task <task> --data <rows.csv|json|parquet> --model <id>* [--target <column>] [--feature <column>]* --out-dir <dir> [--primary-metric <metric>] [--scale] [--cv <folds>] [--python <path>] [--json]
   agenteer research ml-inspect --run <ml-run.json> [--json]
   agenteer research stats-contracts [--method <stats-method>] [--json]
-  agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--time <column>] [--event <column>] [--id <column>] [--strata <column>] [--cluster <column>] [--period <column>] [--post <column>] [--running-variable <column>] [--cutoff <n>] [--instrument <column>] [--alpha-penalty <n>] [--l1-ratio <n>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--exact-covariate <column>]* [--weight <column>] [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
+  agenteer research stats-run --method <method> --data <rows.csv|json|parquet> --out-dir <dir> [--outcome <column>] [--exposure <column>] [--group <column>] [--time <column>] [--start <column>] [--stop <column>] [--event <column>] [--id <column>] [--strata <column>] [--cluster <column>] [--period <column>] [--post <column>] [--running-variable <column>] [--cutoff <n>] [--instrument <column>] [--alpha-penalty <n>] [--l1-ratio <n>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--variable <column>]* [--covariate <column>]* [--exact-covariate <column>]* [--weight <column>] [--offset <column>] [--estimand ATE|ATT] [--match-ratio <n>] [--caliper <n>] [--replacement] [--trim-threshold <n>] [--no-stabilize-weights] [--imputations <n>] [--bootstrap-replicates <n>] [--validation-column <column> --validation-value <value> | --validation-time <column> --validation-cutoff <n>] [--method-selection <json>] [--analysis-spec <json>] [--survey] [--allow-survey-approximation] [--alpha <n>] [--python <path>] [--json]
   agenteer research figure-qa --figures <figures.json> [--out <figure-qa.json>] [--report <figure-qa.md>] [--json]
   agenteer research explore --data <rows.csv|json|parquet> [--out-dir <dir>] [--target <column>] [--max-pairs <n>] [--python <path>] [--json]
   agenteer research explore-promote --exploration <exploration.json> --question <id> [--methods-review-note <text>] [--out <handoff.json>] [--json]
@@ -863,18 +880,22 @@ Usage:
   agenteer research method-qa --run-dir <dir> [--out <method-qa.json>] [--report <method-qa.md>] [--json]
   agenteer research manuscript --run-dir <dir> [--out <manuscript.md>] [--qa-out <manuscript-qa.json>] [--json]
   agenteer research run-inspect --run-dir <dir> [--out <run-inspection.json>] [--report <run-inspection.md>] [--json]
-  agenteer research controller-init --question <text> --out-dir <dir> [--data <rows.csv|json|parquet>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--covariate <col>]* [--controller openai:gpt-5.4] [--use-model] [--context] [--literature] [--json]
+  agenteer research controller-init --question <text> --out-dir <dir> [--data <rows.csv|json|parquet>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--group <col>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--time <col>] [--start <col>] [--stop <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--cutoff <n>] [--instrument <col>] [--alpha-penalty <n>] [--l1-ratio <n>] [--weight <col>] [--offset <col>] [--variable <col>]* [--covariate <col>]* [--exact-covariate <col>]* [--controller openai:gpt-5.4] [--use-model] [--context] [--literature] [--json]
+  agenteer research controller-start --question <text> --out-dir <dir> [same options as controller-init] [--operate] [--max-cycles <n>] [--max-rounds <n>] [--max-iterations-per-round <n>] [--max-steps-per-run <n>] [--force] [--json]
   agenteer research controller-step --state <controller-state.json> [--env-file <path>] [--json]
   agenteer research controller-patch --state <controller-state.json> --patch <json|file.json> [--reason <text>] [--json]
   agenteer research controller-resume --state <controller-state.json> [--force] [--reason <text>] [--json]
-  agenteer research controller-tool --state <controller-state.json> --tool npm-build|npm-test|controller-inspect|controller-read-artifact|controller-read-file|controller-search-repo|controller-run-agenteer|controller-git-diff|controller-propose-patch|controller-apply-patch|controller-verify-patch|controller-rollback-patch [--arg <test-file|artifact-kind|repo-path|query|agenteer-arg|proposal-json|proposal-selector|apply-selector>] --reason <text> [--json]
+  agenteer research controller-tool --state <controller-state.json> --tool npm-build|npm-test|controller-status|controller-inspect|controller-read-artifact|controller-read-file|controller-search-repo|controller-run-agenteer|controller-git-diff|controller-propose-patch|controller-apply-patch|controller-verify-patch|controller-rollback-patch [--arg <test-file|artifact-kind|repo-path|query|agenteer-arg|proposal-json|proposal-selector|apply-selector>] --reason <text> [--json]
   agenteer research controller-agenda --state <controller-state.json> [--reason <text>] [--json]
   agenteer research controller-audit --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-benchmark --state <controller-state.json> [--suite <dir>] [--history <dir>] [--reason <text>] [--json]
   agenteer research controller-capabilities --state <controller-state.json> [--reason <text>] [--json]
   agenteer research controller-env --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-status --state <controller-state.json> [--reason <text>] [--json]
   agenteer research controller-doctor --state <controller-state.json> [--reason <text>] [--json]
   agenteer research controller-goal-audit --state <controller-state.json> [--objective <text>] [--reason <text>] [--json]
   agenteer research controller-completion-audit --state <controller-state.json> [--reason <text>] [--json]
+  agenteer research controller-golden-packet --state <controller-state.json> [--reason <text>] [--json]
   agenteer research controller-repair-cycle --state <controller-state.json> [--max-steps <n>] [--force] [--reason <text>] [--json]
   agenteer research controller-runbook --state <controller-state.json> [--reason <text>] [--json]
   agenteer research controller-runner-packet --state <controller-state.json> [--reason <text>] [--json]
@@ -883,7 +904,7 @@ Usage:
   agenteer research controller-follow-loop --state <controller-state.json> [--max-iterations <n>] [--max-steps-per-run <n>] [--force] [--reason <text>] [--json]
   agenteer research controller-operate --state <controller-state.json> [--max-cycles <n>] [--max-rounds <n>] [--max-iterations-per-round <n>] [--max-steps-per-run <n>] [--force] [--reason <text>] [--json]
   agenteer research controller-supervise --state <controller-state.json> [--max-rounds <n>] [--max-iterations-per-round <n>] [--max-steps-per-run <n>] [--force] [--reason <text>] [--json]
-  agenteer research controller-run (--state <controller-state.json> | --question <text> --out-dir <dir>) [--data <rows.csv|json|parquet>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--covariate <col>]* [--controller openai:gpt-5.4] [--use-model] [--require-controller-model] [--context] [--require-context] [--context-repo <dir>] [--context-target <file|symbol>] [--context-bin <path>] [--context-budget <tokens>] [--literature] [--literature-mock-response <json>] [--external-review] [--mock-review] [--no-auto-repair] [--max-auto-repairs <n>] [--max-steps <n>] [--json]
+  agenteer research controller-run (--state <controller-state.json> | --question <text> --out-dir <dir>) [--data <rows.csv|json|parquet>] [--method <stats-method>] [--outcome <col>] [--exposure <col>] [--group <col>] [--outcome-threshold <n>] [--exposure-threshold <n>] [--time <col>] [--start <col>] [--stop <col>] [--event <col>] [--id <col>] [--strata <col>] [--cluster <col>] [--period <col>] [--post <col>] [--running-variable <col>] [--cutoff <n>] [--instrument <col>] [--alpha-penalty <n>] [--l1-ratio <n>] [--weight <col>] [--offset <col>] [--variable <col>]* [--covariate <col>]* [--exact-covariate <col>]* [--controller openai:gpt-5.4] [--use-model] [--require-controller-model] [--context] [--require-context] [--context-repo <dir>] [--context-target <file|symbol>] [--context-bin <path>] [--context-budget <tokens>] [--literature] [--literature-mock-response <json>] [--external-review] [--mock-review] [--no-auto-repair] [--max-auto-repairs <n>] [--max-steps <n>] [--json]
   agenteer research controller-inspect --state <controller-state.json> [--json]
   agenteer research run-autonomous --question <text> --out-dir <dir> [same options as controller-run]
   agenteer research reviewer-providers [--env-file <path>] [--json]
@@ -2163,6 +2184,8 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         exposure: flagString(flags, "exposure") ?? undefined,
         group: flagString(flags, "group") ?? undefined,
         time: flagString(flags, "time") ?? undefined,
+        start: flagString(flags, "start") ?? undefined,
+        stop: flagString(flags, "stop") ?? undefined,
         event: flagString(flags, "event") ?? undefined,
         id: flagString(flags, "id") ?? undefined,
         strata: flagString(flags, "strata") ?? undefined,
@@ -2170,8 +2193,10 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         period: flagString(flags, "period") ?? undefined,
         post: flagString(flags, "post") ?? undefined,
         runningVariable: flagString(flags, "running-variable") ?? undefined,
+        cutoff: parseOptionalNumberFlag(flags, "cutoff"),
         instrument: flagString(flags, "instrument") ?? undefined,
         weight: flagString(flags, "weight") ?? undefined,
+        offset: flagString(flags, "offset") ?? undefined,
         variables: flagList(flags, "variable"),
         covariates: flagList(flags, "covariate"),
         exactCovariates: flagList(flags, "exact-covariate"),
@@ -2270,6 +2295,11 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
           issueCodes: context.issues.filter(issue => issue.status !== "pass").map(issue => issue.id),
         };
       }
+      let feasibilityEvidence: Parameters<typeof researchModelingPlanCommand>[0]["feasibilityEvidence"];
+      const feasibilityPath = flagString(flags, "feasibility");
+      if (feasibilityPath) {
+        feasibilityEvidence = await researchModelingFeasibilityEvidenceFromFile(feasibilityPath);
+      }
       const priorRuns = await Promise.all(flagList(flags, "prior-run").map(async priorRunPath => {
         const raw = JSON.parse(await readFile(priorRunPath, "utf-8")) as Record<string, unknown>;
         const candidate = "statsRun" in raw && raw.statsRun && typeof raw.statsRun === "object"
@@ -2304,9 +2334,31 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         tableSummary: tableSummary as Parameters<typeof researchModelingPlanCommand>[0]["tableSummary"],
         backendStatus: backendStatus as Parameters<typeof researchModelingPlanCommand>[0]["backendStatus"],
         literatureEvidence,
+        feasibilityEvidence,
         priorRuns,
         explorationHandoff,
         target: flagString(flags, "target") ?? seededOutcome,
+        roleHints: {
+          outcome: flagString(flags, "target") ?? seededOutcome,
+          exposure: flagString(flags, "exposure") ?? undefined,
+          group: flagString(flags, "group") ?? undefined,
+          time: flagString(flags, "time") ?? undefined,
+          start: flagString(flags, "start") ?? undefined,
+          stop: flagString(flags, "stop") ?? undefined,
+          event: flagString(flags, "event") ?? undefined,
+          id: flagString(flags, "id") ?? undefined,
+          cluster: flagString(flags, "cluster") ?? undefined,
+          strata: flagString(flags, "strata") ?? undefined,
+          period: flagString(flags, "period") ?? undefined,
+          post: flagString(flags, "post") ?? undefined,
+          runningVariable: flagString(flags, "running-variable") ?? undefined,
+          instrument: flagString(flags, "instrument") ?? undefined,
+          weight: flagString(flags, "weight") ?? undefined,
+          offset: flagString(flags, "offset") ?? undefined,
+          variables: flagList(flags, "variable"),
+          covariates: flagList(flags, "covariate"),
+          exactCovariates: flagList(flags, "exact-covariate"),
+        },
         surveyDesign: flags.survey === true,
         repeatedMeasures: flags.repeated === true,
         clustered: flags.clustered === true,
@@ -2328,6 +2380,63 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchModelingPlanJson(result) : renderResearchModelingPlan(result));
       return result.blocked ? 1 : 0;
     }
+    case "golden-run": {
+      const result = await researchGoldenRunCommand({
+        question: requireFlagString(flags, "question"),
+        method: parseStatsMethod(requireFlagString(flags, "method")),
+        dataPath: requireFlagString(flags, "data"),
+        outDir: requireFlagString(flags, "out-dir"),
+        outcome: flagString(flags, "outcome") ?? undefined,
+        exposure: flagString(flags, "exposure") ?? undefined,
+        group: flagString(flags, "group") ?? undefined,
+        outcomeThreshold: parseOptionalNumberFlag(flags, "outcome-threshold"),
+        exposureThreshold: parseOptionalNumberFlag(flags, "exposure-threshold"),
+        variables: flagList(flags, "variable"),
+        covariates: flagList(flags, "covariate"),
+        time: flagString(flags, "time") ?? undefined,
+        start: flagString(flags, "start") ?? undefined,
+        stop: flagString(flags, "stop") ?? undefined,
+        event: flagString(flags, "event") ?? undefined,
+        id: flagString(flags, "id") ?? undefined,
+        strata: flagString(flags, "strata") ?? undefined,
+        cluster: flagString(flags, "cluster") ?? undefined,
+        period: flagString(flags, "period") ?? undefined,
+        post: flagString(flags, "post") ?? undefined,
+        runningVariable: flagString(flags, "running-variable") ?? undefined,
+        cutoff: parseOptionalNumberFlag(flags, "cutoff"),
+        instrument: flagString(flags, "instrument") ?? undefined,
+        alphaPenalty: parseOptionalNumberFlag(flags, "alpha-penalty"),
+        l1Ratio: parseOptionalNumberFlag(flags, "l1-ratio"),
+        weight: flagString(flags, "weight") ?? undefined,
+        offset: flagString(flags, "offset") ?? undefined,
+        exactCovariates: flagList(flags, "exact-covariate"),
+        estimand: parseEstimand(flagString(flags, "estimand")) ?? "ATT",
+        matchRatio: parseOptionalIntegerFlag(flags, "match-ratio") ?? 1,
+        caliper: parseOptionalNumberFlag(flags, "caliper"),
+        replacement: flags.replacement === true,
+        trimThreshold: parseOptionalNumberFlag(flags, "trim-threshold") ?? 0.01,
+        stabilizeWeights: flags["no-stabilize-weights"] === true ? false : true,
+        bootstrapReplicates: parseOptionalIntegerFlag(flags, "bootstrap-replicates"),
+        validationColumn: flagString(flags, "validation-column") ?? undefined,
+        validationValue: flagString(flags, "validation-value") ?? undefined,
+        validationTime: flagString(flags, "validation-time") ?? undefined,
+        validationCutoff: parseOptionalNumberFlag(flags, "validation-cutoff"),
+        surveyDesign: flags.survey === true,
+        allowSurveyApproximation: flags["allow-survey-approximation"] === true,
+        methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
+        analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
+        literaturePath: flagString(flags, "literature") ?? undefined,
+        requireBound: flags["require-bound"] === true,
+        allowBlockedFeasibility: flags["allow-blocked-feasibility"] === true,
+        alpha: parseMlNumber(flagString(flags, "alpha"), 0.05),
+        python: flagString(flags, "python") ?? undefined,
+        outPath: flagString(flags, "out") ?? undefined,
+        reportPath: flagString(flags, "report") ?? undefined,
+        requireReady: flags["require-ready"] === true,
+      });
+      console.log(flags.json === true ? renderResearchGoldenRunJson(result) : renderResearchGoldenRun(result));
+      return result.status === "blocked" ? 1 : 0;
+    }
     case "analysis-run": {
       const result = await researchAnalysisRunCommand({
         question: requireFlagString(flags, "question"),
@@ -2342,6 +2451,8 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         variables: flagList(flags, "variable"),
         covariates: flagList(flags, "covariate"),
         time: flagString(flags, "time") ?? undefined,
+        start: flagString(flags, "start") ?? undefined,
+        stop: flagString(flags, "stop") ?? undefined,
         event: flagString(flags, "event") ?? undefined,
         id: flagString(flags, "id") ?? undefined,
         strata: flagString(flags, "strata") ?? undefined,
@@ -2354,6 +2465,7 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         alphaPenalty: parseOptionalNumberFlag(flags, "alpha-penalty"),
         l1Ratio: parseOptionalNumberFlag(flags, "l1-ratio"),
         weight: flagString(flags, "weight") ?? undefined,
+        offset: flagString(flags, "offset") ?? undefined,
         exactCovariates: flagList(flags, "exact-covariate"),
         estimand: parseEstimand(flagString(flags, "estimand")) ?? "ATT",
         matchRatio: parseOptionalIntegerFlag(flags, "match-ratio") ?? 1,
@@ -2361,12 +2473,18 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         replacement: flags.replacement === true,
         trimThreshold: parseOptionalNumberFlag(flags, "trim-threshold") ?? 0.01,
         stabilizeWeights: flags["no-stabilize-weights"] === true ? false : true,
+        bootstrapReplicates: parseOptionalIntegerFlag(flags, "bootstrap-replicates"),
+        validationColumn: flagString(flags, "validation-column") ?? undefined,
+        validationValue: flagString(flags, "validation-value") ?? undefined,
+        validationTime: flagString(flags, "validation-time") ?? undefined,
+        validationCutoff: parseOptionalNumberFlag(flags, "validation-cutoff"),
         surveyDesign: flags.survey === true,
         allowSurveyApproximation: flags["allow-survey-approximation"] === true,
         methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
         analysisSpecPath: flagString(flags, "analysis-spec") ?? undefined,
         literaturePath: flagString(flags, "literature") ?? undefined,
         requireBound: flags["require-bound"] === true,
+        allowBlockedFeasibility: flags["allow-blocked-feasibility"] === true,
         python: flagString(flags, "python") ?? undefined,
       });
       console.log(flags.json === true ? renderResearchAnalysisRunJson(result) : renderResearchAnalysisRun(result));
@@ -2499,6 +2617,8 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         variables: flagList(flags, "variable"),
         covariates: flagList(flags, "covariate"),
         time: flagString(flags, "time") ?? undefined,
+        start: flagString(flags, "start") ?? undefined,
+        stop: flagString(flags, "stop") ?? undefined,
         event: flagString(flags, "event") ?? undefined,
         id: flagString(flags, "id") ?? undefined,
         strata: flagString(flags, "strata") ?? undefined,
@@ -2511,6 +2631,7 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         alphaPenalty: parseOptionalNumberFlag(flags, "alpha-penalty"),
         l1Ratio: parseOptionalNumberFlag(flags, "l1-ratio"),
         weight: flagString(flags, "weight") ?? undefined,
+        offset: flagString(flags, "offset") ?? undefined,
         exactCovariates: flagList(flags, "exact-covariate"),
         estimand: parseEstimand(flagString(flags, "estimand")) ?? "ATT",
         matchRatio: parseOptionalIntegerFlag(flags, "match-ratio") ?? 1,
@@ -2518,6 +2639,12 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
         replacement: flags.replacement === true,
         trimThreshold: parseOptionalNumberFlag(flags, "trim-threshold") ?? 0.01,
         stabilizeWeights: flags["no-stabilize-weights"] === true ? false : true,
+        imputations: parseOptionalIntegerFlag(flags, "imputations"),
+        bootstrapReplicates: parseOptionalIntegerFlag(flags, "bootstrap-replicates"),
+        validationColumn: flagString(flags, "validation-column") ?? undefined,
+        validationValue: flagString(flags, "validation-value") ?? undefined,
+        validationTime: flagString(flags, "validation-time") ?? undefined,
+        validationCutoff: parseOptionalNumberFlag(flags, "validation-cutoff"),
         surveyDesign: flags.survey === true,
         allowSurveyApproximation: flags["allow-survey-approximation"] === true,
         methodSelectionPath: flagString(flags, "method-selection") ?? undefined,
@@ -2603,6 +2730,21 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchControllerStateJson(result) : renderResearchControllerState(result));
       return 0;
     }
+    case "controller-start": {
+      const env = await reviewerEnv(flags);
+      const result = await researchControllerStartCommand({
+        ...controllerOptionsFromFlags(flags, { requireQuestion: true, requireOutDir: true }),
+        operate: flags.operate === true,
+        maxCycles: parseOptionalIntegerFlag(flags, "max-cycles"),
+        maxRounds: parseOptionalIntegerFlag(flags, "max-rounds"),
+        maxIterationsPerRound: parseOptionalIntegerFlag(flags, "max-iterations-per-round"),
+        maxStepsPerRun: parseOptionalIntegerFlag(flags, "max-steps-per-run"),
+        forceReviewRequired: flags.force === true,
+        env,
+      });
+      console.log(flags.json === true ? renderResearchControllerStartJson(result) : renderResearchControllerStart(result));
+      return result.status === "blocked" || result.status === "operate_failed" ? 1 : 0;
+    }
     case "controller-step": {
       const env = await reviewerEnv(flags);
       const result = await researchControllerStepCommand({
@@ -2659,6 +2801,16 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       console.log(flags.json === true ? renderResearchControllerAuditJson(result) : renderResearchControllerAudit(result));
       return result.status === "fail" ? 1 : 0;
     }
+    case "controller-benchmark": {
+      const result = await researchControllerBenchmarkCommand({
+        statePath: requireFlagString(flags, "state"),
+        suiteDir: flagString(flags, "suite") ?? undefined,
+        historyDir: flagString(flags, "history") ?? undefined,
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerBenchmarkJson(result) : renderResearchControllerBenchmark(result));
+      return result.capabilityStatus === "missing" ? 1 : 0;
+    }
     case "controller-capabilities": {
       const result = await researchControllerCapabilitiesCommand({
         statePath: requireFlagString(flags, "state"),
@@ -2674,6 +2826,14 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       });
       console.log(flags.json === true ? renderResearchControllerEnvironmentJson(result) : renderResearchControllerEnvironment(result));
       return result.readiness === "blocked" ? 1 : 0;
+    }
+    case "controller-status": {
+      const result = await researchControllerStatusCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerStatusJson(result) : renderResearchControllerStatus(result));
+      return result.status === "blocked" ? 1 : 0;
     }
     case "controller-doctor": {
       const result = await researchControllerDoctorCommand({
@@ -2699,6 +2859,14 @@ async function researchCmd(argv: readonly string[]): Promise<number> {
       });
       console.log(flags.json === true ? renderResearchControllerCompletionAuditJson(result) : renderResearchControllerCompletionAudit(result));
       return result.status === "fail" ? 1 : 0;
+    }
+    case "controller-golden-packet": {
+      const result = await researchControllerGoldenPacketCommand({
+        statePath: requireFlagString(flags, "state"),
+        reason: flagString(flags, "reason") ?? undefined,
+      });
+      console.log(flags.json === true ? renderResearchControllerGoldenPacketJson(result) : renderResearchControllerGoldenPacket(result));
+      return result.readiness.promotable ? 0 : 1;
     }
     case "controller-repair-cycle": {
       const env = await reviewerEnv(flags);
@@ -3211,7 +3379,11 @@ function controllerOptionsFromFlags(
     outcome: flagString(flags, "outcome") ?? undefined,
     exposure: flagString(flags, "exposure") ?? undefined,
     group: flagString(flags, "group") ?? undefined,
+    outcomeThreshold: parseOptionalNumberFlag(flags, "outcome-threshold"),
+    exposureThreshold: parseOptionalNumberFlag(flags, "exposure-threshold"),
     time: flagString(flags, "time") ?? undefined,
+    start: flagString(flags, "start") ?? undefined,
+    stop: flagString(flags, "stop") ?? undefined,
     event: flagString(flags, "event") ?? undefined,
     id: flagString(flags, "id") ?? undefined,
     strata: flagString(flags, "strata") ?? undefined,
@@ -3221,6 +3393,10 @@ function controllerOptionsFromFlags(
     runningVariable: flagString(flags, "running-variable") ?? undefined,
     cutoff: parseOptionalNumberFlag(flags, "cutoff"),
     instrument: flagString(flags, "instrument") ?? undefined,
+    alphaPenalty: parseOptionalNumberFlag(flags, "alpha-penalty"),
+    l1Ratio: parseOptionalNumberFlag(flags, "l1-ratio"),
+    weight: flagString(flags, "weight") ?? undefined,
+    offset: flagString(flags, "offset") ?? undefined,
     variables: flagList(flags, "variable"),
     covariates: flagList(flags, "covariate"),
     exactCovariates: flagList(flags, "exact-covariate"),
@@ -3282,8 +3458,8 @@ function parseControllerReviewPanel(raw: string | undefined): "default" | "cheap
 }
 
 function parseControllerToolId(raw: string): Parameters<typeof researchControllerToolCommand>[0]["request"]["toolId"] {
-  if (raw !== "npm-build" && raw !== "npm-test" && raw !== "controller-inspect" && raw !== "controller-read-artifact" && raw !== "controller-read-file" && raw !== "controller-search-repo" && raw !== "controller-run-agenteer" && raw !== "controller-git-diff" && raw !== "controller-propose-patch" && raw !== "controller-apply-patch" && raw !== "controller-verify-patch" && raw !== "controller-rollback-patch") {
-    throw new Error("--tool must be npm-build, npm-test, controller-inspect, controller-read-artifact, controller-read-file, controller-search-repo, controller-run-agenteer, controller-git-diff, controller-propose-patch, controller-apply-patch, controller-verify-patch, or controller-rollback-patch");
+  if (raw !== "npm-build" && raw !== "npm-test" && raw !== "controller-status" && raw !== "controller-inspect" && raw !== "controller-read-artifact" && raw !== "controller-read-file" && raw !== "controller-search-repo" && raw !== "controller-run-agenteer" && raw !== "controller-git-diff" && raw !== "controller-propose-patch" && raw !== "controller-apply-patch" && raw !== "controller-verify-patch" && raw !== "controller-rollback-patch") {
+    throw new Error("--tool must be npm-build, npm-test, controller-status, controller-inspect, controller-read-artifact, controller-read-file, controller-search-repo, controller-run-agenteer, controller-git-diff, controller-propose-patch, controller-apply-patch, controller-verify-patch, or controller-rollback-patch");
   }
   return raw;
 }

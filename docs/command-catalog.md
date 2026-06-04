@@ -230,6 +230,9 @@ The modeling plan is the front door after a research proposal exists.
 | Command | Purpose |
 |---|---|
 | `research stats-run` | Execute standard-table statistics across core inference, regression/GLM, survival, longitudinal, causal, prediction-evaluation, missing-data, diagnostics, reliability, PCA/clustering, agreement, multiple-comparison, and power routes; writes tables, diagnostics, figure manifests, QA, and typed blockers for missing validated backends. |
+| `research stats-contracts` | Inspect method contract requirements and static audits for required arguments, table artifacts, figure aliases/source roles, and QA-gate alias coverage. |
+| `research figure-qa` | Verify a `figures.json` manifest, source-data files, declared columns, and rendered figure artifacts before a run is promoted. |
+| `research golden-run` | Run the single-table local golden path: feasibility/modeling plan, stats execution, analysis manifest, method QA, manuscript, unified run inspection, benchmark, and consolidated `golden-run` report. |
 | `research analysis-run` | Compose method/spec-bound stats execution into a golden route with feasibility trial, manifest, prior-run planning, and optional MedBrevia literature context + QA via `--literature`. |
 | `research analysis-manifest` | Create readiness/hash manifest for stats, ML, or ML comparison runs. |
 | `research analysis-benchmark` | Evaluate one or more analysis run directories through manifest readiness gates. |
@@ -243,7 +246,7 @@ The modeling plan is the front door after a research proposal exists.
 | `research explore-promote` | Convert one exploration question into a modeling-plan handoff while enforcing promotion clearance and methods-review requirements. |
 | `research explore-plan` | Convert one exploration question into a formal planning artifact with an AnalysisSpec V2 draft, pre-execution gates, and promotion blockers. |
 
-Use `analysis-manifest --require-ready` in scripts when a run must be promotion-ready.
+Use `golden-run` when a user gives a single joined table plus a specific statistical method and wants one inspectable packet. Use `analysis-run`, `method-qa`, `manuscript`, and `run-inspect` separately when debugging a specific stage. Use `analysis-manifest --require-ready` in scripts when a run must be promotion-ready.
 
 ## Research Paper And Benchmark Commands
 
@@ -252,20 +255,32 @@ Use `analysis-manifest --require-ready` in scripts when a run must be promotion-
 | `research method-qa` | Run methods-aware QA over a run directory: convergence, separation, overfitting, missingness, collinearity, influence, effect/p-value consistency, claims, semantic plausibility, survey design, and artifact integrity. |
 | `research manuscript` | Generate a reader-facing publication-style manuscript and `manuscript-qa.json` from existing run artifacts. |
 | `research run-inspect` | Produce a unified readiness view across method QA, literature QA, paper/manuscript QA, lifecycle, cost, provenance, rerun stability, blockers, and next action. |
-| `research controller-init` | Create a durable research controller state with policy, model config, study inputs, and run directory. |
+| `research controller-init` | Create a durable research controller state with policy, model config, study inputs, and run directory, including method-specific fields such as diagnostic thresholds, weights, offsets, penalized-model tuning, ordinary survival roles, and interval survival roles when supplied. |
+| `research controller-start` | Golden-path controller startup: initialize state, immediately write first-read `controller-status` and `controller-runbook` artifacts, and optionally run bounded `controller-operate` with `--operate`. Use this when a user or fresh model runner wants one practical entrypoint that creates inspectable readiness evidence before spending execution cycles. |
 | `research controller-step` | Execute exactly one controller state-machine action from the saved state. |
 | `research controller-patch` | Apply a validated study-input patch to a saved controller state and invalidate stale downstream stages. |
+| `research controller-resume` | Resume a paused, blocked, or human-review controller state when re-entry evidence allows continuation or the caller explicitly forces reviewed continuation. |
 | `research controller-tool` | Run a bounded controller tool action such as internal state inspection, `npm run build`, or sanitized targeted tests, recording provenance and logs. |
-| `research controller-run` | Run the bounded controller loop through feasibility, exploration, optional literature intake/QA, method selection, execution, QA, manuscript, optional external review, bounded repair, inspection, and promotion decision. Use `--require-controller-model` when model fallback should stop rather than continue deterministically; model-controlled decisions write provider preflight and decision-quality artifacts, and every run writes a `controller_run_invocation_NNN` ledger. |
+| `research controller-agenda` | Refresh the bounded execution agenda for a saved controller state, including ranked commands, issue codes, safety status, and JSON/Markdown agenda artifacts. |
+| `research controller-audit` | Write an operator audit that checks state integrity, environment readiness, model policy, feasibility, issue-ledger blockers, capability coverage, costs, and agenda readiness. |
+| `research controller-capabilities` | Write a JSON/Markdown capability manifest showing covered, available, missing, and not-applicable controller powers with evidence refs, tests, commands, failure modes, and paired report artifact kinds only where reports actually exist. |
+| `research controller-env` | Run the controller environment preflight for local runtime, repository, CLI dist, git, and bounded tool policy evidence. |
+| `research controller-run` | Run the bounded controller loop through feasibility, exploration, optional literature intake/QA, method selection, execution, QA, manuscript, optional external review, bounded repair, inspection, and promotion decision. Feasibility writes both a selected-study verdict and a dataset-wide semantic audit so suspicious unused columns remain visible without blocking valid selected-role analyses. It carries the same core role fields as `stats-run`, including diagnostic thresholds, weights, offsets, penalized-model tuning, and `start`/`stop` interval roles for time-varying or recurrent-event survival methods. When external review is enabled, `revise` and `block` adjudications are promotion blockers until repaired, re-reviewed, or explicitly accepted by a human; a prior `pass` becomes stale after a later bounded repair. Use `--require-controller-model` when model fallback should stop rather than continue deterministically; model-controlled decisions write provider preflight and decision-quality artifacts, and every run writes a `controller_run_invocation_NNN` ledger. |
 | `research controller-inspect` | Inspect a saved controller state, write durable internal-inspection artifacts, and summarize the current stage, artifacts, gates, actions, cost, and next action. |
-| `research controller-runner-packet` | Write a fresh-model handoff packet with prompts, recommended command, safe-auto-execute flag, rules, allowed commands, evidence refs, agenda, audit, environment, and capability summaries for a GPT-style controller picking up the run without chat history. |
-| `research controller-runbook` | Write a durable launch runbook for an external or scheduled model runner, including doctor readiness, launch/readiness commands, environment requirements, budgets, stop criteria, recovery commands, verification commands, protected paths, and evidence refs. |
+| `research controller-runner-packet` | Write a JSON/Markdown fresh-model handoff packet with prompts, recommended command, safe-auto-execute flag, rules, allowed commands, evidence refs, agenda/audit/environment/capability summaries, active issue codes, blocker codes, and linked record/report paths for a GPT-style controller picking up the run without chat history. |
+| `research controller-runbook` | Write a durable JSON/Markdown launch runbook for an external or scheduled model runner, including doctor readiness, runner-packet feasibility, launch/readiness commands, environment requirements, budgets, stop criteria, recovery commands, verification commands, protected paths, active blocker codes, and named record/report paths to inspect. |
+| `research controller-status` | Refresh doctor, runbook, and golden-packet evidence, then write one first-read JSON/Markdown readiness artifact with launchability, promotability, feasibility readiness, blockers, warnings, active issue codes, active blocker issue codes, next command, key artifact paths, paired report paths, and `not report-backed` slots for JSON-only key artifacts. |
 | `research controller-completion-audit` | Rerun the promotion-readiness completion audit for a saved controller state and fail scripts when required stages, artifacts, QA, action contracts, reviews, cost, or strict-model evidence are missing. |
-| `research controller-doctor` | Write a unified controller readiness report that refreshes operator audit, completion audit, model-runner packet, capability manifest, re-entry plan, artifact integrity, supervisor/repair evidence, and cost posture. |
-| `research controller-repair-cycle` | Run an explicit bounded repair/replan cycle from a repair-stage or auto-repair-eligible controller state, refresh completion evidence, and write a durable repair-cycle report. |
-| `research controller-self-test` | Run a local controller proof suite: deterministic golden-path study, bounded supervised pickup, strict GPT-5.4-compatible model-controller smoke, external-review repair, infeasible-study rejection, bounded repo/source tools, disposable source patch apply/verify/rollback, read-only Agenteer introspection, and audit/capability/goal artifacts. |
-| `research controller-operate` | Run the doctor-driven unattended controller loop: refresh readiness, supervise safe agenda execution, run eligible bounded repair cycles, and stop with an inspectable operation report. |
-| `research controller-supervise` | Run a bounded unattended supervisor loop: refresh a model-runner packet, require a safe executable agenda command unless forced, execute a follow loop, audit the result, and write a durable supervisor report. |
+| `research controller-benchmark` | Run continuous benchmark-suite/trend checks and attach the resulting regression evidence to a saved controller state. |
+| `research controller-golden-packet` | Regenerate the controller's one-file JSON/Markdown operator summary for completed, blocked, or human-review states, including promotion readiness, blockers, warnings, stage completion, latest key artifact paths, key report paths or `not report-backed` report slots, issue ledger, stage review, action readiness, next action, and re-entry evidence. |
+| `research controller-doctor` | Write a unified JSON/Markdown controller readiness report that refreshes operator audit, completion audit, model-runner packet, runner feasibility readiness, capability manifest, re-entry plan, dataset semantic-audit posture, artifact integrity, supervisor/repair evidence, cost posture, active issue codes, and report paths. |
+| `research controller-repair-cycle` | Run an explicit bounded repair/replan cycle from a repair-stage or auto-repair-eligible controller state, refresh completion evidence, and write a durable JSON/Markdown repair-cycle report with paired re-entry, run-invocation, and completion-audit report paths when present. |
+| `research controller-self-test` | Run a local controller proof suite: one-command `controller-start` startup, deterministic golden-path study, first-read `controller-status`, bounded supervised pickup, strict GPT-5.4-compatible model-controller smoke, external-review repair, infeasible-study rejection, bounded repo/source tools, disposable source patch apply/verify/rollback, read-only Agenteer introspection, and audit/capability/goal artifacts. |
+| `research controller-goal-audit` | Audit an explicit controller-agent objective against requirements, capability evidence, operator audit evidence, blocker codes, and next-command guidance before claiming completion. |
+| `research controller-follow-agenda` | Execute or refuse exactly one safe agenda item from a saved controller state, recording selected command, issue codes, evidence refs, final state, and paired JSON/Markdown follow-agenda artifacts. |
+| `research controller-follow-loop` | Run a bounded agenda-following loop that repeatedly refreshes safe agenda items, records selected issue codes/evidence, and writes paired JSON/Markdown follow-loop artifacts. |
+| `research controller-operate` | Run the doctor-driven unattended controller loop: refresh readiness, supervise safe agenda execution, run eligible bounded repair cycles, and stop with an inspectable operation report that includes cycle-level doctor feasibility readiness. |
+| `research controller-supervise` | Run a bounded unattended supervisor loop: refresh a model-runner packet with feasibility readiness, require a safe executable agenda command unless forced, execute a follow loop, audit the result, and write a durable supervisor report. |
 | `research run-autonomous` | Alias for `research controller-run`. |
 | `research reviewer-providers` | List external reviewer providers, default models, env vars, availability, default panel, and cost ceilings. |
 | `research study-critic` | Build a cold review packet, call a reviewer panel, adjudicate findings, and write review response/state-reentry artifacts. Supports `--panel deepseek-dual` for two independent DeepSeek v4 Pro reviewers and `--panel deepseek-triple` for methods, phenotype/code, and reproducibility review. |
@@ -285,6 +300,12 @@ Use `analysis-manifest --require-ready` in scripts when a run must be promotion-
 Trust-layer golden path:
 
 ```bash
+agenteer research golden-run --question "Do groups differ in outcome?" --method welch-t-test --data ./analysis.csv --out-dir ./run --outcome outcome --group group
+```
+
+Manual trust-layer path:
+
+```bash
 agenteer research method-qa --run-dir ./run --out ./run/method-qa.json --report ./run/method-qa.md
 agenteer research manuscript --run-dir ./run
 agenteer research study-critic --run-dir ./run --stage final --panel default --autonomy aggressive
@@ -293,6 +314,11 @@ agenteer research benchmark-suite-run --suite ./.loop-memory/golden --out-dir ./
 ```
 
 These commands deliberately distinguish technical execution from scientific readiness. A run can succeed and still be `needs_methods_review` or `blocked`.
+
+## Research Packet QA Commands
+
+| Command | Purpose |
+|---|---|
 | `research qa-dashboard` | Summarize packet QA status. |
 | `research workflow-scorecard` | Score workflow quality. |
 | `research evidence-gap` | Identify missing evidence. |
@@ -318,6 +344,9 @@ Benchmarks are the truth pressure for the research machine.
 | `research suppression-policy` | Check small-cell suppression thresholds. |
 | `research progress` | Emit phase/label/detail/next-step progress object. |
 | `research job-lifecycle` | Emit queued/running/succeeded/failed/canceled job status object. |
+| `research pipeline-stages` | List the canonical research pipeline stages for scripts, docs, and controller planning. |
+| `research stage-artifacts` | List expected artifacts by pipeline stage for stage-aware verification and handoff checks. |
+| `research stage-gate` | Deterministically check whether a target pipeline stage is allowed from a supplied completed-stage list. |
 | `research repair-plan` | Produce a packet-level repair recommendation. |
 | `research real-study-readiness` | Check real-data readiness. |
 | `research real-runner-spec` | Emit real runner requirements. |

@@ -214,7 +214,7 @@ Use these docs for the newer surfaces:
 | Namespace | Docs | Use for |
 |---|---|---|
 | `agenteer agent ...` | [Agent improvement layer](agent-improvement-layer.md), [Command catalog](command-catalog.md) | Context manifests, planner-v2, plan state, node contracts, repair-run, critics, creativity, improvement loops, task envelopes, evidence receipts. |
-| `agenteer research ...` | [Research pipeline](research-pipeline.md), [Research ML modeling](research-ml.md), [Research methods foundation](research-methods-foundation.md), [Command catalog](command-catalog.md) | Protocols, AnalysisSpec, method selection, stats/ML execution, paper generation, QA, manifests, benchmarks, packet readiness. |
+| `agenteer research ...` | [Research pipeline](research-pipeline.md), [Research controller](research-controller.md), [Research ML modeling](research-ml.md), [Research methods foundation](research-methods-foundation.md), [Command catalog](command-catalog.md) | Protocols, AnalysisSpec, controller startup/status/runbooks, method selection, stats/ML execution, paper generation, QA, manifests, benchmarks, and packet readiness. |
 | `agenteer specialize ...` | [Specializations](specializations.md), [Command catalog](command-catalog.md) | Reusable specialization factories with candidate generation, evaluation, critique, repair, promotion, lineage, and reports. |
 | `agenteer lab ...` | [Research pipeline](research-pipeline.md) | Prototype lab flows. Prefer durable `research ...` commands for new work. |
 

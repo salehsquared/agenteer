@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -505,6 +505,149 @@ JSON
     expect(parsed.schemaVersion).toBe(1);
   });
 
+  it("keeps research help, switch cases, and command catalog in sync", async () => {
+    const cliSource = await readFile(path.resolve("packages/cli/src/bin/agenteer.ts"), "utf-8");
+    const commandCatalog = await readFile(path.resolve("docs/command-catalog.md"), "utf-8");
+    const helpCommands = [...cliSource.matchAll(/^\s*agenteer research ([a-z0-9-]+)/gm)].map(match => match[1]);
+    const catalogCommands = [...commandCatalog.matchAll(/\| `research ([a-z0-9-]+)` \|/g)].map(match => match[1]);
+    const researchStart = cliSource.indexOf("async function researchCmd");
+    const researchEnd = cliSource.indexOf("\nfunction collectStringList", researchStart);
+    expect(researchStart).toBeGreaterThanOrEqual(0);
+    expect(researchEnd).toBeGreaterThan(researchStart);
+    const researchSwitch = cliSource.slice(researchStart, researchEnd);
+    const switchCommands = [...researchSwitch.matchAll(/^\s*case "([a-z0-9-]+)":/gm)].map(match => match[1]);
+    const hiddenSwitchAliases = new Set(["stages"]);
+    const uniqueSorted = (values: readonly string[]) => [...new Set(values)].sort();
+    const duplicateCounts = (values: readonly string[]) => {
+      const counts = new Map<string, number>();
+      for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+      return [...counts.entries()].filter(([, count]) => count > 1).sort();
+    };
+    const help = uniqueSorted(helpCommands);
+    const catalog = uniqueSorted(catalogCommands);
+    const visibleSwitchCommands = switchCommands.filter(command => !hiddenSwitchAliases.has(command));
+    const visibleSwitch = uniqueSorted(visibleSwitchCommands);
+
+    expect(duplicateCounts(helpCommands)).toEqual([]);
+    expect(duplicateCounts(catalogCommands)).toEqual([]);
+    expect(duplicateCounts(visibleSwitchCommands)).toEqual([]);
+    expect(help).toEqual(catalog);
+    expect(help.every(command => visibleSwitch.includes(command))).toBe(true);
+    expect(visibleSwitch.every(command => help.includes(command))).toBe(true);
+  });
+
+  it("keeps command catalog tables structurally valid", async () => {
+    const commandCatalog = await readFile(path.resolve("docs/command-catalog.md"), "utf-8");
+    const tableIssues: Array<{ line: number; text: string }> = [];
+    let inTable = false;
+    let expectSeparator = false;
+    for (const [index, line] of commandCatalog.split(/\n/).entries()) {
+      const isTableLine = /^\|.*\|$/.test(line);
+      const isSeparatorLine = /^\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|$/.test(line);
+      if (!isTableLine) {
+        if (line.trim()) inTable = false;
+        expectSeparator = false;
+        continue;
+      }
+      if (!inTable) {
+        inTable = true;
+        expectSeparator = true;
+        continue;
+      }
+      if (expectSeparator) {
+        if (!isSeparatorLine) tableIssues.push({ line: index + 1, text: line });
+        expectSeparator = false;
+      }
+    }
+
+    expect(tableIssues).toEqual([]);
+  });
+
+  it("keeps packaged CLI README links valid outside the monorepo", async () => {
+    const packageReadme = await readFile(path.resolve("packages/cli/README.md"), "utf-8");
+    const markdownLinks = [...packageReadme.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)].map(match => match[1]);
+    const relativeLinks = markdownLinks.filter(link => !/^(https?:|mailto:|#)/.test(link));
+
+    expect(relativeLinks).toEqual([]);
+    expect(packageReadme).toContain("https://github.com/salehsquared/agenteer/blob/main/docs/command-catalog.md");
+    expect(packageReadme).toContain("https://github.com/salehsquared/agenteer/blob/main/docs/research-ml.md");
+  });
+
+  it("routes research controller users through docs navigation", async () => {
+    const documentationMap = await readFile(path.resolve("docs/documentation-map.md"), "utf-8");
+    const cliDocs = await readFile(path.resolve("docs/cli.md"), "utf-8");
+
+    expect(documentationMap).toContain("[Research Controller Agent](research-controller.md)");
+    expect(documentationMap).toContain("controller-start");
+    expect(documentationMap).toContain("controller-status");
+    expect(cliDocs).toContain("[Research controller](research-controller.md)");
+    expect(cliDocs).toContain("controller startup/status/runbooks");
+  });
+
+  it("re-exports aggregate research-machine commands from the package root", async () => {
+    const packageRoot = await readFile(path.resolve("packages/cli/src/index.ts"), "utf-8");
+    const packageRootRuntime = await import("../src/index.js") as Record<string, unknown>;
+    const aggregateCommands = await readFile(path.resolve("packages/cli/src/research-machine/commands.ts"), "utf-8");
+    const legacyResearchCommands = await readFile(path.resolve("packages/cli/src/commands/research.ts"), "utf-8");
+    const publicHelperNames = [...`${aggregateCommands}\n${legacyResearchCommands}`.matchAll(/\b(research[A-Za-z0-9]+Command|renderResearch[A-Za-z0-9]+(?:Json)?|researchModelingFeasibilityEvidenceFromFile)\b/g)]
+      .map(match => match[1]);
+    const sharedResearchHelpers = [
+      "buildEstimateSanityQaChecks",
+      "identifierLikeColumnReason",
+      "outcomeOrFutureLeakageReason",
+      "postTreatmentAdjustmentReason",
+      "semanticPlausibilityIssuesForColumn",
+    ];
+    const missing = [...new Set(publicHelperNames)]
+      .sort()
+      .filter(name => !new RegExp(`\\b${name}\\b`).test(packageRoot));
+    const missingSharedHelpers = sharedResearchHelpers
+      .filter(name => !new RegExp(`\\b${name}\\b`).test(packageRoot));
+    const missingRuntime = [...new Set([...publicHelperNames, ...sharedResearchHelpers])]
+      .sort()
+      .filter(name => typeof packageRootRuntime[name] !== "function");
+
+    expect(missing).toEqual([]);
+    expect(missingSharedHelpers).toEqual([]);
+    expect(missingRuntime).toEqual([]);
+  });
+
+  it("re-exports command module functions and types from the package root", async () => {
+    const packageRoot = await readFile(path.resolve("packages/cli/src/index.ts"), "utf-8");
+    const packageRootRuntime = await import("../src/index.js") as Record<string, unknown>;
+    const commandDir = path.resolve("packages/cli/src/commands");
+    const commandFiles = (await readdir(commandDir))
+      .filter(file => file.endsWith(".ts"))
+      .sort();
+    const commandModuleExports = await Promise.all(commandFiles.map(async file => {
+      const source = await readFile(path.join(commandDir, file), "utf-8");
+      return {
+        functions: [...source.matchAll(/export (?:async )?function\s+([A-Za-z0-9_]+)/g)].map(match => match[1]),
+        types: [
+          ...source.matchAll(/export interface\s+([A-Za-z0-9_]+)/g),
+          ...source.matchAll(/export type\s+([A-Za-z0-9_]+)/g),
+        ].map(match => match[1]),
+      };
+    }));
+    const exportedFunctionNames = commandModuleExports.flatMap(moduleExports => moduleExports.functions);
+    const exportedTypeNames = commandModuleExports.flatMap(moduleExports => moduleExports.types);
+    const uniqueExportedFunctionNames = [...new Set(exportedFunctionNames)].sort();
+    const uniqueExportedTypeNames = [...new Set(exportedTypeNames)].sort();
+    const missingSourceExports = uniqueExportedFunctionNames
+      .filter(name => !new RegExp(`\\b${name}\\b`).test(packageRoot));
+    const missingSourceTypeExports = uniqueExportedTypeNames
+      .filter(name => !new RegExp(`\\b${name}\\b`).test(packageRoot));
+    const missingRuntimeExports = uniqueExportedFunctionNames
+      .filter(name => typeof packageRootRuntime[name] !== "function");
+
+    expect(commandFiles).toEqual(expect.arrayContaining(["agent.ts", "research.ts", "run.ts"]));
+    expect(uniqueExportedFunctionNames.length).toBeGreaterThan(100);
+    expect(uniqueExportedTypeNames.length).toBeGreaterThan(100);
+    expect(missingSourceExports).toEqual([]);
+    expect(missingSourceTypeExports).toEqual([]);
+    expect(missingRuntimeExports).toEqual([]);
+  });
+
   it("renders reusable research pipeline stages", () => {
     const stages = researchPipelineStagesCommand();
 
@@ -922,6 +1065,9 @@ JSON
       expect(summary.format).toBe("csv");
       expect(summary.rowCount).toBe(3);
       expect(summary.columns.find(column => column.name === "LBXGH")?.missingFraction).toBeCloseTo(1 / 3);
+      expect(summary.columns.find(column => column.name === "LBXGH")?.median).toBeCloseTo(6.4);
+      expect(summary.columns.find(column => column.name === "LBXGH")?.sd).toBeGreaterThan(1);
+      expect(summary.columns.find(column => column.name === "LBXGH")?.zeroFraction).toBe(0);
       expect(summary.columns.find(column => column.name === "RIAGENDR")?.uniqueCount).toBe(2);
       expect(summary.columns.find(column => column.name === "RIAGENDR")?.valueCounts).toEqual(expect.arrayContaining([
         expect.objectContaining({ value: "2", count: 2 }),
@@ -2345,6 +2491,165 @@ JSON
       expect(lifecycle.lifecycleStatus).toBe("blocked");
       expect(lifecycle.blockers.join(" ")).toContain("stats-run failed");
       expect(renderResearchPaperLifecycle(lifecycle)).toContain("stats-run: failed method=linear-regression binding=unbound posture=blocked_survey_required");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("blocks paper lifecycle promotion when stats-run capability is bounded", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-bounded-capability-lifecycle-"));
+    try {
+      const paperDir = path.join(dir, "bounded-capability");
+      const interopDir = path.join(paperDir, "interop");
+      await mkdir(interopDir, { recursive: true });
+      await writeFile(path.join(paperDir, "analysis.json"), `${JSON.stringify({ title: "Bounded capability lifecycle" })}\n`);
+      await writeFile(path.join(paperDir, "qa-cli.json"), `${JSON.stringify({ paperQa: { status: "pass", summary: "paper QA passed" } })}\n`);
+      await writeFile(path.join(paperDir, "runner-record.json"), `${JSON.stringify({
+        paperRunnerRecord: {
+          recordType: "agenteer.research.paper-runner-record",
+          status: "succeeded",
+          analysisSpec: { binding: "spec-governed" },
+          warnings: [],
+        },
+      })}\n`);
+      await writeFile(path.join(interopDir, "task-succeeded.json"), `${JSON.stringify({ taskEnvelope: { status: "succeeded", evidenceReceipts: [{ status: "pass" }] } })}\n`);
+      await writeFile(path.join(interopDir, "task-validation-with-capabilities.json"), `${JSON.stringify({ interopValidation: { status: "pass", issues: [] } })}\n`);
+      await writeFile(path.join(paperDir, "stats-run.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        runId: "statsrun-bounded",
+        method: "time-varying-cox",
+        status: "succeeded",
+        rowCount: 100,
+        completeCaseN: 95,
+        variables: ["time", "event", "x"],
+        binding: {
+          methodSelectionPath: null,
+          methodSelectionId: null,
+          methodId: null,
+          analysisSpecPath: null,
+          specHash: null,
+          status: "bound",
+        },
+        parameters: {},
+        estimates: [{ term: "x", hazard_ratio: 1.2 }],
+        diagnostics: {},
+        issues: [],
+        warnings: [],
+        errors: [],
+        resultPosture: {
+          status: "exploratory_standard_table",
+          label: "Exploratory bounded-runner result",
+          interpretationBoundary: "This run used a bounded local approximation.",
+          supports: ["local methods debugging"],
+          cannotSupport: ["confirmatory inference"],
+          nextAction: "Validate with a dedicated survival backend.",
+        },
+        runnerCapability: {
+          method: "time-varying-cox",
+          status: "bounded_approximation",
+          reason: "Not a full start/stop survival backend.",
+          requiredFollowUp: ["Validate with a dedicated survival backend."],
+          cannotSupport: ["confirmatory inference"],
+        },
+        artifacts: [],
+        outDir: paperDir,
+      })}\n`);
+
+      const lifecycle = await researchPaperLifecycleCommand({ paperDir });
+      const rendered = renderResearchPaperLifecycle(lifecycle);
+
+      expect(lifecycle.lifecycleStatus).toBe("blocked");
+      expect(lifecycle.statsRun.runnerCapability).toMatchObject({ method: "time-varying-cox", status: "bounded_approximation" });
+      expect(lifecycle.blockers.join(" ")).toContain("bounded approximation");
+      expect(rendered).toContain("stats-runner: bounded_approximation method=time-varying-cox");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("surfaces missing required companion analyses in paper lifecycle", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "research-companion-lifecycle-"));
+    try {
+      const paperDir = path.join(dir, "companion-backed");
+      const interopDir = path.join(paperDir, "interop");
+      const statsDir = path.join(paperDir, "stats-run");
+      await mkdir(interopDir, { recursive: true });
+      await mkdir(statsDir, { recursive: true });
+      await writeFile(path.join(paperDir, "analysis.json"), `${JSON.stringify({ title: "Companion-gated lifecycle" })}\n`);
+      await writeFile(path.join(paperDir, "qa-cli.json"), `${JSON.stringify({ paperQa: { status: "pass", summary: "paper QA passed" } })}\n`);
+      await writeFile(path.join(paperDir, "runner-record.json"), `${JSON.stringify({
+        paperRunnerRecord: {
+          recordType: "agenteer.research.paper-runner-record",
+          status: "succeeded",
+          analysisSpec: { binding: "spec-governed" },
+          warnings: [],
+        },
+      })}\n`);
+      await writeFile(path.join(interopDir, "task-succeeded.json"), `${JSON.stringify({ taskEnvelope: { status: "succeeded", evidenceReceipts: [{ status: "pass" }] } })}\n`);
+      await writeFile(path.join(interopDir, "task-validation-with-capabilities.json"), `${JSON.stringify({ interopValidation: { status: "pass", issues: [] } })}\n`);
+      await writeFile(path.join(statsDir, "stats-run.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        runId: "statsrun-companion",
+        method: "linear-regression",
+        status: "succeeded",
+        rowCount: 100,
+        completeCaseN: 95,
+        variables: ["y", "x"],
+        binding: {
+          methodSelectionPath: null,
+          methodSelectionId: null,
+          methodId: null,
+          analysisSpecPath: null,
+          specHash: null,
+          status: "bound",
+        },
+        parameters: {},
+        estimates: [],
+        diagnostics: {},
+        issues: [],
+        warnings: [],
+        errors: [],
+        resultPosture: {
+          status: "local_review_ready",
+          label: "Local review ready",
+          interpretationBoundary: "The run supports local review under declared assumptions.",
+          supports: ["local inference"],
+          cannotSupport: ["causal proof"],
+          nextAction: "Review companion analyses before promotion.",
+        },
+        artifacts: [],
+        outDir: statsDir,
+      })}\n`);
+      await writeFile(path.join(statsDir, "analysis-run-manifest.json"), `${JSON.stringify({
+        schemaVersion: 1,
+        analysisRunManifest: {
+          schemaVersion: 1,
+          readiness: "exploratory_only",
+          runKind: "stats",
+          runDir: statsDir,
+          artifactCompleteness: { status: "satisfied", requiredArtifacts: [], presentArtifacts: [], missingArtifacts: [] },
+          resultPosture: { status: "local_review_ready" },
+          reproducibility: { status: "satisfied" },
+          companionReadiness: {
+            status: "missing",
+            requiredMethods: ["power-sample-size", "missingness-summary"],
+            satisfiedMethods: [],
+            missingMethods: ["power-sample-size", "missingness-summary"],
+            evidenceRefs: [],
+          },
+          nextAction: "Run required companion analyses before promotion.",
+        },
+      })}\n`);
+
+      const lifecycle = await researchPaperLifecycleCommand({ paperDir });
+      const rendered = renderResearchPaperLifecycle(lifecycle);
+
+      expect(lifecycle.statsRun.status).toBe("succeeded");
+      expect(lifecycle.statsRun.companionReadiness.status).toBe("missing");
+      expect(lifecycle.statsRun.companionReadiness.missingMethods).toEqual(["power-sample-size", "missingness-summary"]);
+      expect(lifecycle.lifecycleStatus).toBe("blocked");
+      expect(lifecycle.blockers.join(" ")).toContain("required companion analysis missing");
+      expect(rendered).toContain("stats companions: missing missing=power-sample-size,missingness-summary");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

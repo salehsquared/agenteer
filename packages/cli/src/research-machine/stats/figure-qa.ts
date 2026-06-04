@@ -21,6 +21,10 @@ export interface FigureQaItem {
   xLabel: string | null;
   yLabel: string | null;
   sourceColumns: string[];
+  sourceDataPath: string | null;
+  sourceDataColumns: string[];
+  sourceDataRows: number | null;
+  sourceDataByteSize: number;
   byteSize: number;
   sha256: string | null;
   width: number | null;
@@ -190,8 +194,13 @@ export async function buildFigureQa(opts: { manifestPath: string }): Promise<Fig
     const sourceColumns = asStringArray(figure.sourceColumns);
     const rawPath = asString(figure.path);
     const resolvedPath = rawPath ? figurePath(rawPath, manifestDir) : "";
+    const rawSourceDataPath = asString(figure.sourceDataPath);
+    const resolvedSourceDataPath = rawSourceDataPath ? figurePath(rawSourceDataPath, manifestDir) : null;
     const checks: FigureQaCheck[] = [];
     let byteSize = 0;
+    let sourceDataByteSize = 0;
+    let sourceDataRows: number | null = null;
+    let sourceDataColumns: string[] = [];
     let sha256: string | null = null;
     let width: number | null = null;
     let height: number | null = null;
@@ -227,6 +236,21 @@ export async function buildFigureQa(opts: { manifestPath: string }): Promise<Fig
     checks.push(check("x-axis-label-present", xLabel ? "pass" : "warning", xLabel ? `X axis: ${xLabel}` : "Figure metadata is missing an x-axis label."));
     checks.push(check("y-axis-label-present", yLabel ? "pass" : "warning", yLabel ? `Y axis: ${yLabel}` : "Figure metadata is missing a y-axis label."));
     checks.push(check("source-columns-recorded", sourceColumns.length > 0 ? "pass" : "warning", sourceColumns.length > 0 ? `Source columns: ${sourceColumns.join(", ")}` : "No source columns were recorded."));
+    checks.push(check("source-data-path-recorded", resolvedSourceDataPath ? "pass" : "fail", resolvedSourceDataPath ? resolvedSourceDataPath : "No machine-readable source data path was recorded for this figure."));
+    if (resolvedSourceDataPath && existsSync(resolvedSourceDataPath)) {
+      const stat = statSync(resolvedSourceDataPath);
+      sourceDataByteSize = stat.size;
+      const sourceData = await readFile(resolvedSourceDataPath, "utf-8");
+      const lines = sourceData.split(/\r?\n/).filter(line => line.trim().length > 0);
+      sourceDataColumns = parseCsvHeader(lines[0] ?? "");
+      sourceDataRows = Math.max(0, lines.length - 1);
+      const missingSourceColumns = sourceColumns.filter(column => !sourceDataColumns.includes(column));
+      checks.push(check("source-data-file-exists", "pass", `Found source data file (${sourceDataByteSize} bytes).`));
+      checks.push(check("source-data-nonempty", sourceDataRows > 0 ? "pass" : "fail", `Source data has ${sourceDataRows} row(s).`));
+      checks.push(check("source-data-columns", missingSourceColumns.length === 0 ? "pass" : "warning", missingSourceColumns.length === 0 ? `Source data columns cover the figure source columns: ${sourceColumns.join(", ") || "(none)"}.` : `Source data is missing declared figure source column(s): ${missingSourceColumns.join(", ")}.`));
+    } else if (resolvedSourceDataPath) {
+      checks.push(check("source-data-file-exists", "fail", `Missing source data file: ${resolvedSourceDataPath}`));
+    }
     const status = combineStatus(checks.map(item => item.status));
     figures.push({
       figureId: asString(figure.id) ?? path.basename(resolvedPath || `figure-${index + 1}`),
@@ -237,6 +261,10 @@ export async function buildFigureQa(opts: { manifestPath: string }): Promise<Fig
       xLabel,
       yLabel,
       sourceColumns,
+      sourceDataPath: resolvedSourceDataPath,
+      sourceDataColumns,
+      sourceDataRows,
+      sourceDataByteSize,
       byteSize,
       sha256,
       width,
@@ -261,6 +289,33 @@ export async function buildFigureQa(opts: { manifestPath: string }): Promise<Fig
     figures,
     checks,
   };
+}
+
+function parseCsvHeader(line: string): string[] {
+  const columns: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+    if (char === "\"" && inQuotes && next === "\"") {
+      current += "\"";
+      index += 1;
+      continue;
+    }
+    if (char === "\"") {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (char === "," && !inQuotes) {
+      columns.push(current);
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  columns.push(current);
+  return columns.map(column => column.trim()).filter(Boolean);
 }
 
 export async function writeFigureQa(opts: { manifestPath: string; outPath?: string; reportPath?: string }): Promise<FigureQaResult & { outPath: string | null; reportPath: string | null }> {
@@ -300,6 +355,9 @@ export function renderFigureQa(result: FigureQaResult): string {
     lines.push(`Alt text: ${figure.altText ?? "(missing)"}`);
     lines.push(`X axis: ${figure.xLabel ?? "(missing)"}`);
     lines.push(`Y axis: ${figure.yLabel ?? "(missing)"}`);
+    lines.push(`Source data: ${figure.sourceDataPath ?? "(missing)"}`);
+    lines.push(`Source rows: ${figure.sourceDataRows ?? "unknown"}`);
+    lines.push(`Source columns: ${figure.sourceDataColumns.join(", ") || "(missing)"}`);
     lines.push("");
     for (const item of figure.checks) {
       lines.push(`- ${item.status.toUpperCase()} ${item.id}: ${item.detail}`);

@@ -55,11 +55,11 @@ agenteer inspect --session ./.session --summary
 
 For the full modern command map, see:
 
-- [Agent operator guide](../../docs/agent-operator-guide.md)
-- [Command catalog](../../docs/command-catalog.md)
-- [Research pipeline](../../docs/research-pipeline.md)
-- [Research ML modeling](../../docs/research-ml.md)
-- [Specializations](../../docs/specializations.md)
+- [Agent operator guide](https://github.com/salehsquared/agenteer/blob/main/docs/agent-operator-guide.md)
+- [Command catalog](https://github.com/salehsquared/agenteer/blob/main/docs/command-catalog.md)
+- [Research pipeline](https://github.com/salehsquared/agenteer/blob/main/docs/research-pipeline.md)
+- [Research ML modeling](https://github.com/salehsquared/agenteer/blob/main/docs/research-ml.md)
+- [Specializations](https://github.com/salehsquared/agenteer/blob/main/docs/specializations.md)
 
 ## Programmatic use
 

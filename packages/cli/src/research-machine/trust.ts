@@ -26,7 +26,9 @@ export interface MethodQaCheck {
     | "claim_alignment"
     | "semantic_plausibility"
     | "survey_design"
-    | "artifact_integrity";
+    | "artifact_integrity"
+    | "method_selection"
+    | "runner_capability";
   status: MethodQaStatus;
   severity: "info" | "minor" | "major" | "blocker";
   message: string;
@@ -51,6 +53,7 @@ export interface MethodQaResult {
     predictorCount: number | null;
     resultPosture: string | null;
   };
+  runnerCapability: RunnerCapabilityInspection;
   nextAction: string;
   outPath: string | null;
   reportPath: string | null;
@@ -104,6 +107,19 @@ export interface RunInspectionResult {
   };
   qa: {
     methodQaStatus: MethodQaStatus;
+    methodDecisionReadinessStatus: string | null;
+    methodDecisionRequestedMethod: string | null;
+    methodDecisionVerdict: string | null;
+    methodDecisionConsistencyStatus: string | null;
+    methodDecisionConsistencySummary: string | null;
+    methodDecisionConsistencyMismatchedSources: string[];
+    statsQaReadinessStatus: string | null;
+    statsQaFailingChecks: string[];
+    statsQaWarningChecks: string[];
+    figureReadinessStatus: string | null;
+    figureCount: number | null;
+    figureFailingIds: string[];
+    figureWarningIds: string[];
     paperQaStatus: string | null;
     literatureQaStatus: string | null;
     manuscriptQaStatus: MethodQaStatus | null;
@@ -124,12 +140,43 @@ export interface RunInspectionResult {
     warningCount: number;
     nextAction: string | null;
   };
+  companionReadiness: {
+    status: string | null;
+    requiredMethods: string[];
+    satisfiedMethods: string[];
+    missingMethods: string[];
+    evidenceRefs: string[];
+    path: string | null;
+  };
+  feasibilityReadiness: {
+    status: string | null;
+    verdict: string | null;
+    score: number | null;
+    confidence: number | null;
+    blockers: string[];
+    warnings: string[];
+    requiredModifications: string[];
+    nextAction: string | null;
+    evidenceRefs: string[];
+    path: string | null;
+  };
+  runnerCapability: RunnerCapabilityInspection;
   paperPath: string | null;
   manuscriptPath: string | null;
   nextRecommendedAction: string;
+  recommendedCommands: string[];
   methodQa: MethodQaResult;
   outPath: string | null;
   reportPath: string | null;
+}
+
+export interface RunnerCapabilityInspection {
+  method: string | null;
+  status: "executable" | "bounded_approximation" | "backend_blocked" | null;
+  reason: string | null;
+  requiredFollowUp: string[];
+  cannotSupport: string[];
+  evidenceRefs: string[];
 }
 
 export interface ExplorationPlanResult {
@@ -232,7 +279,12 @@ const knownJsonFiles = [
   "literature-context.json",
   "manuscript-qa.json",
   "stats-config.json",
+  "stats-preflight.json",
   "stats-qa.json",
+  "figures.json",
+  "figure-qa.json",
+  "method-decision-support.json",
+  "method-contract.json",
   "diagnostics.json",
   "feasibility-trial.json",
   "analysis-run-manifest.json",
@@ -249,7 +301,7 @@ const knownJsonFiles = [
   "analysis-spec.json",
 ];
 
-const knownTextFiles = ["paper.md", "manuscript.md", "stats-report.md", "critique.md", "reviewer-context.md"];
+const knownTextFiles = ["paper.md", "manuscript.md", "stats-report.md", "stats-preflight.md", "method-decision-support.md", "critique.md", "reviewer-context.md"];
 
 export async function researchMethodQaCommand(opts: {
   runDir: string;
@@ -274,6 +326,10 @@ export async function researchMethodQaCommand(opts: {
   const issueText = JSON.stringify(allIssues).toLowerCase();
   const estimates = collectEstimateLikeRecords(evidence.json);
   const detected = detectRunSummary(evidence, estimates);
+  const runnerCapability = extractRunnerCapabilityInspection(evidence);
+  const statsQaReadiness = extractStatsQaReadinessInspection(evidence);
+  const methodDecision = extractMethodDecisionInspection(evidence);
+  const methodDecisionConsistency = inspectMethodDecisionEvidenceConsistency(evidence);
   const needsRegressionDiagnostics = detected.detectedModelFamilies.some(family => ["linear", "logistic", "count", "glm"].includes(family));
   const diagnosticRoute = detected.detectedModelFamilies.includes("diagnostic_accuracy");
   const paper = evidence.text["paper.md"] ?? evidence.text["manuscript.md"] ?? "";
@@ -297,6 +353,130 @@ export async function researchMethodQaCommand(opts: {
     evidenceRefs: requiredReaderArtifacts.map(name => path.join(evidence.runDir, name)),
     recommendedAction: hasReadableReport ? "Run manuscript QA before promotion." : "Generate a publication-grade manuscript before promotion.",
   });
+
+  const hasStatsRun = Boolean(evidence.json["stats-run.json"]);
+  const statsPreflightStatus = firstStatus(evidence.json["stats-preflight.json"]);
+  if (hasStatsRun) {
+    add({
+      id: "stats-qa-readiness",
+      category: "artifact_integrity",
+      status: statsQaReadiness.status === "fail" || statsQaReadiness.status === "missing" || statsQaReadiness.status === "unreadable"
+        ? "fail"
+        : statsQaReadiness.status === "warning" || statsQaReadiness.status === null
+          ? "warning"
+          : "pass",
+      severity: statsQaReadiness.status === "fail" || statsQaReadiness.status === "missing" || statsQaReadiness.status === "unreadable"
+        ? "blocker"
+        : statsQaReadiness.status === "warning" || statsQaReadiness.status === null
+          ? "major"
+          : "info",
+      message: statsQaReadiness.status === "fail"
+        ? `Stats QA failed: ${statsQaReadiness.failingChecks.join(", ") || "unknown failed check"}.`
+        : statsQaReadiness.status === "missing" || statsQaReadiness.status === "unreadable"
+          ? `Stats QA is ${statsQaReadiness.status}; method QA cannot treat this run as locally review-ready.`
+          : statsQaReadiness.status === "warning"
+            ? `Stats QA has warning-level checks: ${statsQaReadiness.warningChecks.join(", ") || "review stats-qa.json"}.`
+            : statsQaReadiness.status === "pass"
+              ? "Stats QA passed and is available as lifecycle evidence."
+              : "Stats-run artifact is present, but stats QA readiness is missing from stats-qa.json and analysis-run-manifest.json.",
+      evidenceRefs: statsQaReadiness.evidenceRefs.length ? statsQaReadiness.evidenceRefs : refsForExisting(evidence, ["stats-qa.json", "analysis-run-manifest.json"]),
+      recommendedAction: statsQaReadiness.status === "fail"
+        ? "Resolve failed stats QA checks, rerun the method if needed, and regenerate downstream reports."
+        : statsQaReadiness.status === "missing" || statsQaReadiness.status === "unreadable" || statsQaReadiness.status === null
+          ? "Regenerate stats-run so stats-qa.json is present, readable, and linked in the analysis manifest."
+          : statsQaReadiness.status === "warning"
+            ? "Review or justify warning-level stats QA findings before promotion."
+            : "Preserve stats QA evidence with the packet.",
+    });
+    add({
+      category: "artifact_integrity",
+      status: statsPreflightStatus === "block" ? "fail" : statsPreflightStatus === "pass" ? "pass" : "warning",
+      severity: statsPreflightStatus === "block" ? "blocker" : statsPreflightStatus === "pass" ? "info" : "major",
+      message: statsPreflightStatus === "block"
+        ? "Stats preflight blocked execution or promotion; feasibility/method suitability must be repaired."
+        : statsPreflightStatus === "warning"
+          ? "Stats preflight produced warnings; review feasibility and method-suitability warnings before promotion."
+          : statsPreflightStatus === "pass"
+            ? "Stats preflight feasibility and method-suitability evidence is present and passing."
+            : "Stats-run artifact is present, but stats-preflight evidence is missing or unreadable.",
+      evidenceRefs: refsForExisting(evidence, ["stats-preflight.json", "stats-preflight.md", "stats-run.json"]),
+      recommendedAction: statsPreflightStatus === "block"
+        ? "Resolve stats-preflight blockers, rerun the method, and keep the updated preflight artifact."
+        : statsPreflightStatus === "warning"
+          ? "Resolve or explicitly justify stats-preflight warnings before treating the run as locally review-ready."
+          : statsPreflightStatus === "pass"
+            ? "Preserve preflight artifacts with the packet."
+            : "Regenerate the stats run with the current runner so feasibility preflight artifacts are produced.",
+    });
+    add({
+      id: "method-decision-readiness",
+      category: "method_selection",
+      status: methodDecision.status === "blocked"
+        ? "fail"
+        : methodDecision.status === "preferred"
+          ? "pass"
+          : "warning",
+      severity: methodDecision.status === "blocked"
+        ? "blocker"
+        : methodDecision.status === "preferred"
+          ? "info"
+          : "major",
+      message: methodDecision.status === "blocked"
+        ? `Method-selection evidence blocked the selected method${methodDecision.requestedMethod ? ` (${methodDecision.requestedMethod})` : ""}: ${methodDecision.nextAction ?? methodDecision.verdict ?? "method decision support requires redesign"}.`
+        : methodDecision.status === "preferred"
+          ? `Method-selection evidence classified ${methodDecision.requestedMethod ?? "the selected method"} as a preferred method for this data.`
+          : methodDecision.status === "review_required"
+            ? `Method-selection evidence requires review for ${methodDecision.requestedMethod ?? "the selected method"}${methodDecision.requestedRole ? ` (${methodDecision.requestedRole})` : ""}.${methodDecision.primaryMethods.length ? ` Preferred method(s): ${methodDecision.primaryMethods.join(", ")}.` : ""}`
+            : "Stats-run artifact is present, but method-selection evidence is missing; method QA cannot verify that the selected method was data-appropriate.",
+      evidenceRefs: methodDecision.evidenceRefs.length ? methodDecision.evidenceRefs : refsForExisting(evidence, ["method-decision-support.json", "method-decision-support.md", "stats-preflight.json", "stats-run.json"]),
+      recommendedAction: methodDecision.status === "blocked"
+        ? "Redesign the analysis around a supported method or repair the data/method mismatch, then rerun before promotion."
+        : methodDecision.status === "preferred"
+          ? "Preserve method-decision evidence with the packet."
+          : methodDecision.status === "review_required"
+            ? methodDecision.nextAction ?? "Treat the run as exploratory until the preferred primary method is run or the fallback/sensitivity choice is explicitly justified."
+            : "Regenerate the stats run with current method-decision support artifacts before treating the result as locally review-ready.",
+    });
+    add({
+      id: "method-decision-evidence-consistency",
+      category: "method_selection",
+      status: methodDecisionConsistency.status,
+      severity: methodDecisionConsistency.status === "warning" ? "major" : "info",
+      message: methodDecisionConsistency.message,
+      evidenceRefs: methodDecisionConsistency.evidenceRefs,
+      recommendedAction: methodDecisionConsistency.status === "warning"
+        ? "Regenerate downstream method-decision, preflight, and manifest artifacts from the executed stats run before promotion."
+        : "Preserve consistent method-decision evidence with the packet.",
+    });
+    add({
+      category: "runner_capability",
+      status: runnerCapability.status === "backend_blocked"
+        ? "fail"
+        : runnerCapability.status === "bounded_approximation" || runnerCapability.status === null
+          ? "warning"
+          : "pass",
+      severity: runnerCapability.status === "backend_blocked"
+        ? "blocker"
+        : runnerCapability.status === "bounded_approximation" || runnerCapability.status === null
+          ? "major"
+          : "info",
+      message: runnerCapability.status === "backend_blocked"
+        ? `The selected statistical method is backend-blocked: ${runnerCapability.reason ?? "validated backend unavailable"}.`
+        : runnerCapability.status === "bounded_approximation"
+          ? `The selected statistical method ran as a bounded approximation: ${runnerCapability.reason ?? "methods review required"}.`
+          : runnerCapability.status === "executable"
+            ? `Runner capability is executable for ${runnerCapability.method ?? "the selected method"}.`
+            : "Stats-run artifact is present, but runner capability maturity was not recorded.",
+      evidenceRefs: runnerCapability.evidenceRefs.length ? runnerCapability.evidenceRefs : refsForExisting(evidence, ["stats-run.json", "method-contract.json"]),
+      recommendedAction: runnerCapability.status === "backend_blocked"
+        ? "Route to the required validated backend or redesign the analysis before promotion."
+        : runnerCapability.status === "bounded_approximation"
+          ? "Run the required follow-up backend/methods review before presenting confirmatory results."
+          : runnerCapability.status === "executable"
+            ? "Keep runner-capability evidence with the packet."
+            : "Regenerate the stats run with the current runner so packet-level method capability is recorded.",
+    });
+  }
 
   const convergenceBad = /\b(convergence|converge|singular|non[-_ ]?finite|nan|infinite|overflow)\b/.test(issueText);
   add({
@@ -412,7 +592,7 @@ export async function researchMethodQaCommand(opts: {
   const jsonText = JSON.stringify(evidence.json);
   const sparseDiagnostic = /\b(SPARSE_DIAGNOSTIC_CELL|sparse diagnostic cell)\b/i.test(jsonText);
   const clinicalCodingConcern = /\b(coding review|needs_clinical_review|invalid code|matched icd|icd9|icd10|diagnosis[-_ ]code)\b/i.test(jsonText);
-  const implausibleValueConcern = /\b(semantic|plausibility|impossible|negative los|invalid age|unprofiled required tables|unprofiled table|kdigo-derived)\b/i.test(jsonText);
+  const implausibleValueConcern = hasNonPassingSemanticPlausibilityCheck(evidence) || /\b(SEMANTIC_PLAUSIBILITY_FAIL|SEMANTIC_PLAUSIBILITY_WARNING|IMPOSSIBLE_VALUE|NEGATIVE_LOS|INVALID_AGE|UNPROFILED_REQUIRED_TABLE|KDIGO_DERIVED_WARNING)\b/i.test(jsonText);
   const semanticBad = sparseDiagnostic || clinicalCodingConcern || implausibleValueConcern;
   add({
     category: "semantic_plausibility",
@@ -454,6 +634,7 @@ export async function researchMethodQaCommand(opts: {
     blockerCount,
     warningCount,
     methodSummary: detected,
+    runnerCapability,
     nextAction: methodQaNextAction(readiness, checks),
     outPath: null,
     reportPath: null,
@@ -485,10 +666,14 @@ export async function researchManuscriptCommand(opts: {
   qaOutPath?: string;
 }): Promise<ManuscriptResult> {
   const evidence = await collectRunEvidence(opts.runDir);
-  const methodQa = await researchMethodQaCommand({ runDir: evidence.runDir });
-  const manuscriptMarkdown = renderManuscriptMarkdown(evidence, methodQa);
   const manuscriptPath = opts.outPath ? path.resolve(opts.outPath) : path.join(evidence.runDir, "manuscript.md");
   await mkdir(path.dirname(manuscriptPath), { recursive: true });
+  const draftMethodQa = await researchMethodQaCommand({ runDir: evidence.runDir });
+  const draftMarkdown = renderManuscriptMarkdown(evidence, draftMethodQa);
+  await writeFile(manuscriptPath, draftMarkdown);
+  const finalEvidence = await collectRunEvidence(opts.runDir);
+  const methodQa = await researchMethodQaCommand({ runDir: finalEvidence.runDir });
+  const manuscriptMarkdown = renderManuscriptMarkdown(finalEvidence, methodQa);
   await writeFile(manuscriptPath, manuscriptMarkdown);
   const manuscriptQa = buildManuscriptQa(manuscriptMarkdown, manuscriptPath, methodQa);
   const qaPath = opts.qaOutPath ? path.resolve(opts.qaOutPath) : path.join(evidence.runDir, "manuscript-qa.json");
@@ -533,6 +718,13 @@ export async function researchRunInspectCommand(opts: {
     firstStatus(evidence.json["qa-cli.json"]) ??
     firstStatus(evidence.json["qa.json"]);
   const literature = extractLiteratureInspection(evidence);
+  const companionReadiness = extractCompanionReadinessInspection(evidence);
+  const feasibilityReadiness = extractFeasibilityReadinessInspection(evidence);
+  const statsQaReadiness = extractStatsQaReadinessInspection(evidence);
+  const figureReadiness = extractFigureReadinessInspection(evidence);
+  const methodDecision = extractMethodDecisionInspection(evidence);
+  const methodDecisionConsistency = extractMethodDecisionConsistencyInspection(evidence, methodQa);
+  const runnerCapability = extractRunnerCapabilityInspection(evidence);
   const manuscriptQa = evidence.json["manuscript-qa.json"] ? firstStatus(evidence.json["manuscript-qa.json"]) as MethodQaStatus | null : null;
   const lifecycleStatus = firstStatus(evidence.json["lifecycle.json"], "lifecycleStatus", "status");
   const rerunStabilityStatus = firstStatus(evidence.json["rerun-stability.json"], "status", "stabilityStatus");
@@ -552,6 +744,45 @@ export async function researchRunInspectCommand(opts: {
   }
   if (literature.blockerCount > 0) blockers.push(`Literature QA has ${literature.blockerCount} blocker(s).`);
   if (literature.warningCount > 0) warnings.push(`Literature QA has ${literature.warningCount} warning(s).`);
+  if (companionReadiness.status === "missing") {
+    blockers.push(`Required companion analysis missing: ${companionReadiness.missingMethods.join(", ") || "unknown companion method"}.`);
+  } else if (companionReadiness.status === "unverifiable") {
+    blockers.push("Companion-analysis readiness could not be verified from the analysis manifest.");
+  } else if (companionReadiness.status === "advisory" && companionReadiness.missingMethods.length) {
+    warnings.push(`Advisory companion analysis not yet run: ${companionReadiness.missingMethods.join(", ")}.`);
+  }
+	  if (feasibilityReadiness.status === "blocked") {
+	    blockers.push(`Feasibility readiness blocked promotion: ${feasibilityReadiness.blockers.join("; ") || feasibilityReadiness.nextAction || feasibilityReadiness.verdict || "blocked feasibility evidence"}.`);
+	  } else if (feasibilityReadiness.status === "unverifiable") {
+	    blockers.push(`Feasibility readiness is unverifiable: ${feasibilityReadiness.nextAction ?? "repair feasibility evidence"}.`);
+	  } else if (feasibilityReadiness.status === "warning") {
+	    warnings.push(`Feasibility readiness has warnings: ${[...feasibilityReadiness.warnings, ...feasibilityReadiness.requiredModifications, feasibilityReadiness.nextAction].filter(Boolean).slice(0, 3).join("; ") || feasibilityReadiness.verdict || "review feasibility evidence"}.`);
+	  } else if (feasibilityReadiness.status === "not_supplied") {
+	    warnings.push("Feasibility readiness evidence is not supplied; run or attach feasibility-gate or analysis-run evidence before local review promotion.");
+	  }
+  if (statsQaReadiness.status === "fail") {
+    blockers.push(`Stats QA readiness failed: ${statsQaReadiness.failingChecks.join(", ") || "unknown failed check"}.`);
+  } else if (statsQaReadiness.status === "missing" || statsQaReadiness.status === "unreadable") {
+    blockers.push(`Stats QA readiness is ${statsQaReadiness.status}.`);
+  } else if (statsQaReadiness.status === "warning") {
+    warnings.push(`Stats QA readiness has warning checks: ${statsQaReadiness.warningChecks.join(", ") || "review stats-qa.json"}.`);
+  } else if (evidence.json["stats-run.json"] && !statsQaReadiness.status) {
+    warnings.push("Stats QA readiness is missing from the analysis manifest or stats QA artifact.");
+  }
+  if (figureReadiness.status === "fail") {
+    blockers.push(`Figure QA failed for figure(s): ${figureReadiness.failingFigureIds.join(", ") || "unknown figure"}.`);
+  } else if (figureReadiness.status === "warning") {
+    warnings.push(`Figure QA needs review: ${figureReadiness.warningFigureIds.join(", ") || figureReadiness.summary || "review figure-qa.json"}.`);
+  } else if (figureReadiness.status === "missing") {
+    warnings.push("Figure manifest exists but figure-qa.json is missing.");
+  }
+  if (runnerCapability.status === "backend_blocked") {
+    blockers.push(`Runner capability is backend_blocked for ${runnerCapability.method ?? "the selected method"}: ${runnerCapability.reason ?? "validated backend unavailable"}.`);
+  } else if (runnerCapability.status === "bounded_approximation") {
+    warnings.push(`Runner capability is bounded_approximation for ${runnerCapability.method ?? "the selected method"}; required follow-up: ${runnerCapability.requiredFollowUp.join("; ") || "methods review"}.`);
+  } else if (evidence.json["stats-run.json"] && runnerCapability.status === null) {
+    warnings.push("Runner capability maturity is missing from the stats-run packet.");
+  }
   if (rerunStabilityStatus && !["pass", "stable"].includes(rerunStabilityStatus)) warnings.push(`Rerun stability status is ${rerunStabilityStatus}.`);
   if (reviewerAdjudicationVerdict === "block") blockers.push("External reviewer adjudication blocked the run.");
   else if (reviewerAdjudicationVerdict === "revise") warnings.push("External reviewer adjudication requires revision.");
@@ -560,6 +791,19 @@ export async function researchRunInspectCommand(opts: {
   const artifactHash = stableHash(evidence.files.map(file => ({ path: file.relativePath, bytes: file.bytes, sha256: file.sha256 })));
   const paperPath = evidence.textPaths["paper.md"] ?? findCanonicalArtifactFile(evidence.files, "paper.md")?.path ?? null;
   const manuscriptPath = evidence.textPaths["manuscript.md"] ?? findCanonicalArtifactFile(evidence.files, "manuscript.md")?.path ?? null;
+  const nextActionContext = {
+    readiness,
+    methodQa,
+    statsQaReadiness,
+    figureReadiness,
+    literature,
+    companionReadiness,
+    feasibilityReadiness,
+    runnerCapability,
+    reviewerAdjudicationVerdict,
+    reviewerPanelStatus,
+    runDir: evidence.runDir,
+  };
   const result: RunInspectionResult = {
     schemaVersion: 1,
     generatedAtIso: new Date().toISOString(),
@@ -578,6 +822,19 @@ export async function researchRunInspectCommand(opts: {
     },
     qa: {
       methodQaStatus: methodQa.overallStatus,
+      methodDecisionReadinessStatus: methodDecision.status,
+      methodDecisionRequestedMethod: methodDecision.requestedMethod,
+      methodDecisionVerdict: methodDecision.verdict,
+      methodDecisionConsistencyStatus: methodDecisionConsistency.status,
+      methodDecisionConsistencySummary: methodDecisionConsistency.summary,
+      methodDecisionConsistencyMismatchedSources: methodDecisionConsistency.mismatchedSources,
+      statsQaReadinessStatus: statsQaReadiness.status,
+      statsQaFailingChecks: statsQaReadiness.failingChecks,
+      statsQaWarningChecks: statsQaReadiness.warningChecks,
+      figureReadinessStatus: figureReadiness.status,
+      figureCount: figureReadiness.figureCount,
+      figureFailingIds: figureReadiness.failingFigureIds,
+      figureWarningIds: figureReadiness.warningFigureIds,
       paperQaStatus: paperQa,
       literatureQaStatus: literature.status,
       manuscriptQaStatus: manuscriptQa,
@@ -587,9 +844,13 @@ export async function researchRunInspectCommand(opts: {
       reviewerAdjudicationVerdict,
     },
     literature,
+    companionReadiness,
+    feasibilityReadiness,
+    runnerCapability,
     paperPath,
     manuscriptPath,
-    nextRecommendedAction: methodQaNextAction(readiness, methodQa.checks),
+    nextRecommendedAction: runInspectionNextAction(nextActionContext),
+    recommendedCommands: runInspectionRecommendedCommands(nextActionContext),
     methodQa,
     outPath: null,
     reportPath: null,
@@ -607,14 +868,24 @@ export function renderResearchRunInspect(result: RunInspectionResult): string {
     `  cost: ${result.cost.estimatedUsd === null ? "(unknown)" : `$${formatNumber(result.cost.estimatedUsd, 4)}`}`,
     `  artifact count: ${result.provenance.artifactCount}`,
     `  method QA: ${result.qa.methodQaStatus}`,
+    `  method decision: ${result.qa.methodDecisionReadinessStatus ?? "(missing)"}${result.qa.methodDecisionRequestedMethod ? ` method=${result.qa.methodDecisionRequestedMethod}` : ""}${result.qa.methodDecisionVerdict ? ` verdict=${result.qa.methodDecisionVerdict}` : ""}`,
+    `  method decision consistency: ${result.qa.methodDecisionConsistencyStatus ?? "(missing)"}${result.qa.methodDecisionConsistencyMismatchedSources.length ? ` mismatched=${result.qa.methodDecisionConsistencyMismatchedSources.join(",")}` : ""}`,
+    `  stats QA readiness: ${result.qa.statsQaReadinessStatus ?? "(missing)"}${result.qa.statsQaFailingChecks.length ? ` failing=${result.qa.statsQaFailingChecks.join(",")}` : ""}${result.qa.statsQaWarningChecks.length ? ` warnings=${result.qa.statsQaWarningChecks.join(",")}` : ""}`,
+    `  figure QA readiness: ${result.qa.figureReadinessStatus ?? "(missing)"}${result.qa.figureCount === null ? "" : ` figures=${result.qa.figureCount}`}${result.qa.figureFailingIds.length ? ` failing=${result.qa.figureFailingIds.join(",")}` : ""}${result.qa.figureWarningIds.length ? ` warnings=${result.qa.figureWarningIds.join(",")}` : ""}`,
     `  paper QA: ${result.qa.paperQaStatus ?? "(missing)"}`,
     `  literature: ${result.literature.status ?? "(missing)"}; sources=${result.literature.sourceCount ?? "?"}; high-quality=${result.literature.highQualitySourceCount ?? "?"}`,
+    `  feasibility: ${result.feasibilityReadiness.status ?? "(missing)"}${result.feasibilityReadiness.verdict ? ` verdict=${result.feasibilityReadiness.verdict}` : ""}`,
+    `  companions: ${result.companionReadiness.status ?? "(missing)"}; missing=${result.companionReadiness.missingMethods.join(",") || "(none)"}`,
+    `  runner capability: ${result.runnerCapability.status ?? "(missing)"}${result.runnerCapability.method ? ` method=${result.runnerCapability.method}` : ""}`,
     `  lifecycle: ${result.qa.lifecycleStatus ?? "(missing)"}`,
     `  rerun stability: ${result.qa.rerunStabilityStatus ?? "(missing)"}`,
     `  external review: ${result.qa.reviewerAdjudicationVerdict ?? result.qa.reviewerPanelStatus ?? "(missing)"}`,
     `  paper: ${result.paperPath ?? "(missing)"}`,
     `  manuscript: ${result.manuscriptPath ?? "(missing)"}`,
     `  next: ${result.nextRecommendedAction}`,
+    ...(result.recommendedCommands.length
+      ? result.recommendedCommands.map((command, index) => `  command ${index + 1}: ${command}`)
+      : ["  commands: (none)"]),
   ].join("\n");
 }
 
@@ -1140,11 +1411,17 @@ function renderRunInspectionMarkdown(result: RunInspectionResult): string {
     "## QA",
     "",
     `- Method QA: ${result.qa.methodQaStatus}`,
+    `- Method decision: ${result.qa.methodDecisionReadinessStatus ?? "missing"}${result.qa.methodDecisionRequestedMethod ? `; method: ${result.qa.methodDecisionRequestedMethod}` : ""}${result.qa.methodDecisionVerdict ? `; verdict: ${result.qa.methodDecisionVerdict}` : ""}`,
+    `- Method decision consistency: ${result.qa.methodDecisionConsistencyStatus ?? "missing"}${result.qa.methodDecisionConsistencyMismatchedSources.length ? `; mismatched sources: ${result.qa.methodDecisionConsistencyMismatchedSources.join(", ")}` : ""}${result.qa.methodDecisionConsistencySummary ? `; ${result.qa.methodDecisionConsistencySummary}` : ""}`,
+    `- Stats QA readiness: ${result.qa.statsQaReadinessStatus ?? "missing"}${result.qa.statsQaFailingChecks.length ? `; failing checks: ${result.qa.statsQaFailingChecks.join(", ")}` : ""}${result.qa.statsQaWarningChecks.length ? `; warning checks: ${result.qa.statsQaWarningChecks.join(", ")}` : ""}`,
+    `- Figure QA readiness: ${result.qa.figureReadinessStatus ?? "missing"}${result.qa.figureCount === null ? "" : `; figures: ${result.qa.figureCount}`}${result.qa.figureFailingIds.length ? `; failing: ${result.qa.figureFailingIds.join(", ")}` : ""}${result.qa.figureWarningIds.length ? `; warnings: ${result.qa.figureWarningIds.join(", ")}` : ""}`,
     `- Paper QA: ${result.qa.paperQaStatus ?? "missing"}`,
     `- Literature QA: ${result.qa.literatureQaStatus ?? "missing"}`,
     `- Manuscript QA: ${result.qa.manuscriptQaStatus ?? "missing"}`,
     `- Lifecycle: ${result.qa.lifecycleStatus ?? "missing"}`,
     `- Rerun stability: ${result.qa.rerunStabilityStatus ?? "missing"}`,
+    `- Runner capability: ${result.runnerCapability.status ?? "missing"}${result.runnerCapability.method ? ` (${result.runnerCapability.method})` : ""}`,
+    `- Feasibility readiness: ${result.feasibilityReadiness.status ?? "missing"}${result.feasibilityReadiness.verdict ? `; verdict: ${result.feasibilityReadiness.verdict}` : ""}`,
     "",
     "## Literature Evidence",
     "",
@@ -1156,6 +1433,33 @@ function renderRunInspectionMarkdown(result: RunInspectionResult): string {
     `- High-quality sources: ${result.literature.highQualitySourceCount ?? "unknown"}`,
     `- Cited sources: ${result.literature.citedSourceCount ?? "unknown"}`,
     `- Next action: ${result.literature.nextAction ?? "No literature artifact was found for this run."}`,
+    "",
+    "## Feasibility Readiness",
+    "",
+    `- Manifest: ${result.feasibilityReadiness.path ?? "missing"}`,
+    `- Status: ${result.feasibilityReadiness.status ?? "missing"}`,
+    `- Verdict: ${result.feasibilityReadiness.verdict ?? "missing"}`,
+    `- Score: ${result.feasibilityReadiness.score === null ? "unknown" : formatNumber(result.feasibilityReadiness.score, 3)}`,
+    `- Blockers: ${result.feasibilityReadiness.blockers.join("; ") || "none"}`,
+    `- Warnings: ${result.feasibilityReadiness.warnings.join("; ") || "none"}`,
+    `- Required modifications: ${result.feasibilityReadiness.requiredModifications.join("; ") || "none"}`,
+    `- Next action: ${result.feasibilityReadiness.nextAction ?? "none recorded"}`,
+    "",
+    "## Companion Analyses",
+    "",
+    `- Manifest: ${result.companionReadiness.path ?? "missing"}`,
+    `- Status: ${result.companionReadiness.status ?? "missing"}`,
+    `- Required methods: ${result.companionReadiness.requiredMethods.join(", ") || "none"}`,
+    `- Satisfied methods: ${result.companionReadiness.satisfiedMethods.join(", ") || "none"}`,
+    `- Missing methods: ${result.companionReadiness.missingMethods.join(", ") || "none"}`,
+    "",
+    "## Runner Capability",
+    "",
+    `- Method: ${result.runnerCapability.method ?? "unknown"}`,
+    `- Status: ${result.runnerCapability.status ?? "missing"}`,
+    `- Reason: ${result.runnerCapability.reason ?? "No runner-capability artifact was found."}`,
+    `- Required follow-up: ${result.runnerCapability.requiredFollowUp.join("; ") || "none recorded"}`,
+    `- Cannot support: ${result.runnerCapability.cannotSupport.join("; ") || "none recorded"}`,
     "",
     "## Blockers",
     "",
@@ -1176,6 +1480,11 @@ function renderRunInspectionMarkdown(result: RunInspectionResult): string {
     "",
     result.nextRecommendedAction,
     "",
+    "## Recommended Commands",
+    "",
+    ...(result.recommendedCommands.length
+      ? result.recommendedCommands.flatMap(command => ["```bash", command, "```", ""])
+      : ["None recorded.", ""]),
   ].join("\n");
 }
 
@@ -1605,7 +1914,7 @@ function collectEstimateLikeRecords(json: Record<string, unknown | null>): Array
       return;
     }
     const record = value as Record<string, unknown>;
-    const hasEffect = ["estimate", "coefficient", "correlation", "oddsRatio", "riskRatio", "meanDifference", "effectEstimate", "auroc", "auc", "brier_score", "rmse", "r2"].some(key => numberValue(record[key]) !== null);
+    const hasEffect = ["estimate", "coefficient", "correlation", "oddsRatio", "odds_ratio", "riskRatio", "risk_ratio", "meanDifference", "mean_difference", "effectEstimate", "effect_estimate", "hazardRatio", "hazard_ratio", "auroc", "auc", "brier_score", "brierScore", "rmse", "r2"].some(key => numberValue(record[key]) !== null);
     const hasP = ["p", "pValue", "p_value", "p.value"].some(key => numberValue(record[key]) !== null);
     const hasCi = ["ciLow", "ci_high", "confidenceInterval", "lower", "upper"].some(key => record[key] !== undefined);
     if ((hasEffect && (hasP || hasCi)) || isDiagnosticEstimateRecord(record) || isPredictionEstimateRecord(record)) out.push(record);
@@ -1638,17 +1947,35 @@ function isPredictionEstimateRecord(record: Record<string, unknown>): boolean {
   return ["auroc", "auc", "brier_score", "brierScore", "calibration_slope", "calibrationSlope", "rmse", "r2"].some(key => numberValue(record[key]) !== null);
 }
 
+function hasNonPassingSemanticPlausibilityCheck(evidence: RunEvidence): boolean {
+  const seen = new Set<unknown>();
+  function walk(value: unknown): boolean {
+    if (!value || typeof value !== "object" || seen.has(value)) return false;
+    seen.add(value);
+    if (Array.isArray(value)) return value.some(walk);
+    const record = value as Record<string, unknown>;
+    const id = stringValue(record.id) ?? stringValue(record.check) ?? stringValue(record.name);
+    const status = stringValue(record.status);
+    const severity = stringValue(record.severity);
+    const detail = stringValue(record.detail) ?? stringValue(record.message) ?? "";
+    const isSemanticCheck = /\bsemantic|plausibility\b/i.test([id, detail].filter(Boolean).join(" "));
+    if (isSemanticCheck && (status === "fail" || status === "warning" || severity === "blocker" || severity === "major")) return true;
+    return Object.values(record).some(walk);
+  }
+  return walk(evidence.json["stats-qa.json"]) || walk(evidence.json["qa.json"]) || walk(evidence.json["diagnostics.json"]);
+}
+
 function detectRunSummary(evidence: RunEvidence, estimates: Array<Record<string, unknown>>): MethodQaResult["methodSummary"] {
-  const rawText = JSON.stringify(evidence.json).toLowerCase();
-  const explicitMethod = firstStringInJson(evidence.json, ["method", "modelFamily", "family"]);
+  const explicitMethod = primaryStatsMethod(evidence);
   const explicitFamily = explicitMethod ? modelFamilyFromMethodText(explicitMethod) : null;
+  const contractFamily = methodContractFamily(evidence);
   const diagnosticOnly = detectedDiagnosticOnly(explicitFamily, estimates);
   const detectedModelFamilies = uniqueStrings([
+    ...(contractFamily ? [contractFamily] : []),
     ...(explicitFamily ? [explicitFamily] : []),
     ...(estimates.some(isDiagnosticEstimateRecord) ? ["diagnostic_accuracy"] : []),
     ...(estimates.some(record => numberValue(record.oddsRatio) !== null || numberValue(record.or) !== null) ? ["logistic"] : []),
     ...(estimates.some(record => numberValue(record.riskRatio) !== null || numberValue(record.hazardRatio) !== null) ? ["logistic"] : []),
-    ...(["logistic", "linear", "poisson", "negative_binomial", "diagnostic_accuracy", "prediction", "clustering"] as const).filter(item => rawText.includes(item)).map(item => item === "poisson" || item === "negative_binomial" ? "count" : item),
     ...(evidence.spec ? [evidence.spec.model.family] : []),
   ]).filter(family => !(diagnosticOnly && ["linear", "logistic", "count", "glm"].includes(family)));
   const detectedRunKind = evidence.json["dataset-run.json"] ? "dataset-run"
@@ -1659,9 +1986,37 @@ function detectRunSummary(evidence: RunEvidence, estimates: Array<Record<string,
   const completeCaseN = bestCompleteCaseN(evidence);
   const eventCount = bestEventCount(evidence);
   const predictorCount = bestPredictorCount(evidence);
-  const resultPosture = firstStringInJson(evidence.json, ["resultPosture", "posture", "readiness"]);
+  const resultPosture = readerSafeResultPosture(evidence);
   if (!detectedModelFamilies.length && estimates.length) detectedModelFamilies.push("linear");
   return { detectedRunKind, detectedModelFamilies, completeCaseN, eventCount, predictorCount, resultPosture };
+}
+
+function primaryStatsMethod(evidence: RunEvidence): string | null {
+  const statsConfig = unwrapObject(evidence.json["stats-config.json"]);
+  const statsRun = unwrapObject(evidence.json["stats-run.json"]);
+  const methodDecision = unwrapObject(evidence.json["method-decision-support.json"]);
+  return stringValue(statsConfig.method)
+    ?? stringValue(statsRun.method)
+    ?? stringValue(methodDecision.requestedMethod)
+    ?? stringValue(methodDecision.method)
+    ?? firstStringInValue(evidence.json["method-contract.json"], ["method"]);
+}
+
+function methodContractFamily(evidence: RunEvidence): string | null {
+  const contract = unwrapObject(evidence.json["method-contract.json"]);
+  const spec = unwrapObject(contract.statisticalMethodSpec);
+  const family = stringValue(spec.family) ?? stringValue(contract.family);
+  return family ? normalizeReaderMethodFamily(family) : null;
+}
+
+function readerSafeResultPosture(evidence: RunEvidence): string | null {
+  const statsRun = unwrapObject(evidence.json["stats-run.json"]);
+  const posture = unwrapObject(statsRun.resultPosture);
+  const boundary = stringValue(posture.interpretationBoundary);
+  if (boundary) return boundary;
+  const label = stringValue(posture.label);
+  if (label && !containsInternalStatusToken(label)) return label;
+  return null;
 }
 
 function bestCompleteCaseN(evidence: RunEvidence): number | null {
@@ -1741,6 +2096,8 @@ function detectedDiagnosticOnly(explicitFamily: string | null, estimates: Array<
 
 function modelFamilyFromMethodText(method: string): string | null {
   const lower = method.toLowerCase().replace(/[-\s]+/g, "_");
+  if (["t_test", "welch_t_test", "paired_t_test", "mann_whitney", "wilcoxon", "anova", "ancova", "kruskal_wallis", "friedman", "chi_square", "fisher_exact", "mcnemar"].some(token => lower.includes(token))) return "core_inference";
+  if (lower.includes("correlation")) return "core_inference";
   if (lower.includes("diagnostic_accuracy")) return "diagnostic_accuracy";
   if (lower.includes("logistic")) return "logistic";
   if (lower.includes("linear")) return "linear";
@@ -1751,11 +2108,38 @@ function modelFamilyFromMethodText(method: string): string | null {
   return null;
 }
 
+function normalizeReaderMethodFamily(family: string): string {
+  const lower = family.toLowerCase().replace(/[-\s]+/g, "_");
+  if (lower === "hypothesis_test" || lower === "core_inference" || lower === "nonparametric") return "core_inference";
+  if (lower === "diagnostic_accuracy") return "diagnostic_accuracy";
+  if (lower === "negative_binomial" || lower === "poisson" || lower === "count") return "count";
+  return lower;
+}
+
+function readerMethodFamilyLabel(family: string): string {
+  const normalized = normalizeReaderMethodFamily(family);
+  switch (normalized) {
+    case "core_inference": return "core statistical inference";
+    case "diagnostic_accuracy": return "diagnostic accuracy";
+    case "glm": return "generalized linear modeling";
+    case "count": return "count regression";
+    default: return normalized.replace(/_/g, " ");
+  }
+}
+
+function containsInternalStatusToken(text: string): boolean {
+  return /\b(local_review_ready|needs_methods_review|bound_standard_table|exploratory_only|backend_blocked|analysis_spec|analysisspec)\b/i.test(text);
+}
+
 function methodQaNextAction(readiness: RunReadiness, checks: MethodQaCheck[]): string {
   if (readiness === "local_review_ready") return "Add this packet to the benchmark suite or proceed to human scientific review.";
   const failing = checks.filter(check => check.status !== "pass");
   const sparseDiagnostic = failing.find(check => /sparse diagnostic/i.test(check.message));
   if (sparseDiagnostic) return "Review sparse diagnostic cell stability, keep precision caveats visible, and consider exact intervals or threshold revision before promotion.";
+  const runnerCapability = failing.find(check => check.category === "runner_capability");
+  if (runnerCapability) return runnerCapability.recommendedAction;
+  const methodSelection = failing.find(check => check.category === "method_selection");
+  if (methodSelection) return methodSelection.recommendedAction;
   const claim = failing.find(check => check.category === "claim_alignment");
   if (claim) return claim.recommendedAction;
   const missingness = failing.find(check => check.category === "missingness");
@@ -1849,6 +2233,528 @@ function extractLiteratureInspection(evidence: RunEvidence): RunInspectionResult
     nextAction: stringValue(qa.nextAction) ?? (Array.isArray(context.followUpSearches) && context.followUpSearches.length
       ? `Run follow-up literature searches: ${context.followUpSearches.slice(0, 3).map(String).join("; ")}`
       : null),
+  };
+}
+
+function extractCompanionReadinessInspection(evidence: RunEvidence): RunInspectionResult["companionReadiness"] {
+  const manifest = unwrapObject(evidence.json["analysis-run-manifest.json"], "analysisRunManifest");
+  const companion = unwrapObject(manifest.companionReadiness);
+  return {
+    status: stringValue(companion.status),
+    requiredMethods: stringArray(companion.requiredMethods),
+    satisfiedMethods: stringArray(companion.satisfiedMethods),
+    missingMethods: stringArray(companion.missingMethods),
+    evidenceRefs: stringArray(companion.evidenceRefs),
+    path: evidence.jsonPaths["analysis-run-manifest.json"] ?? null,
+  };
+}
+
+function extractFeasibilityReadinessInspection(evidence: RunEvidence): RunInspectionResult["feasibilityReadiness"] {
+  const manifest = unwrapObject(evidence.json["analysis-run-manifest.json"], "analysisRunManifest");
+  const readiness = unwrapObject(manifest.feasibilityReadiness);
+  return {
+    status: stringValue(readiness.status),
+    verdict: stringValue(readiness.verdict),
+    score: numberValue(readiness.score),
+    confidence: numberValue(readiness.confidence),
+    blockers: stringArray(readiness.blockers),
+    warnings: stringArray(readiness.warnings),
+    requiredModifications: stringArray(readiness.requiredModifications),
+    nextAction: stringValue(readiness.nextAction),
+    evidenceRefs: stringArray(readiness.evidenceRefs),
+    path: evidence.jsonPaths["analysis-run-manifest.json"] ?? null,
+  };
+}
+
+function extractStatsQaReadinessInspection(evidence: RunEvidence): {
+  status: string | null;
+  failingChecks: string[];
+  warningChecks: string[];
+  evidenceRefs: string[];
+} {
+  const manifest = unwrapObject(evidence.json["analysis-run-manifest.json"], "analysisRunManifest");
+  const manifestQa = unwrapObject(manifest.qaReadiness);
+  const manifestStatus = stringValue(manifestQa.status);
+  if (manifestStatus) {
+    return {
+      status: manifestStatus,
+      failingChecks: stringArray(manifestQa.failingChecks),
+      warningChecks: stringArray(manifestQa.warningChecks),
+      evidenceRefs: stringArray(manifestQa.evidenceRefs).length
+        ? stringArray(manifestQa.evidenceRefs)
+        : evidence.jsonPaths["analysis-run-manifest.json"] ? [evidence.jsonPaths["analysis-run-manifest.json"]] : [],
+    };
+  }
+  const statsQa = unwrapObject(evidence.json["stats-qa.json"], "statsQa");
+  const statsQaStatus = stringValue(statsQa.status);
+  if (!statsQaStatus) {
+    return { status: null, failingChecks: [], warningChecks: [], evidenceRefs: [] };
+  }
+  const checks = Array.isArray(statsQa.checks)
+    ? statsQa.checks.filter((check): check is Record<string, unknown> => Boolean(check) && typeof check === "object" && !Array.isArray(check))
+    : [];
+  return {
+    status: statsQaStatus,
+    failingChecks: checks.filter(check => check.status === "fail").map(check => String(check.id ?? "(unknown)")),
+    warningChecks: checks.filter(check => check.status === "warning").map(check => String(check.id ?? "(unknown)")),
+    evidenceRefs: evidence.jsonPaths["stats-qa.json"] ? [evidence.jsonPaths["stats-qa.json"]] : [],
+  };
+}
+
+function extractFigureReadinessInspection(evidence: RunEvidence): {
+  status: "pass" | "warning" | "fail" | "missing" | null;
+  figureCount: number | null;
+  passingFigureCount: number | null;
+  failingFigureIds: string[];
+  warningFigureIds: string[];
+  summary: string | null;
+  evidenceRefs: string[];
+} {
+  const qa = unwrapObject(evidence.json["figure-qa.json"], "figureQa");
+  const manifest = unwrapObject(evidence.json["figures.json"]);
+  const manifestFigures = Array.isArray(manifest.figures) ? manifest.figures : [];
+  const qaPath = evidence.jsonPaths["figure-qa.json"];
+  if (!qaPath && evidence.jsonPaths["figures.json"]) {
+    return {
+      status: "missing",
+      figureCount: manifestFigures.length,
+      passingFigureCount: null,
+      failingFigureIds: [],
+      warningFigureIds: [],
+      summary: "Figure manifest exists but figure-qa.json is missing.",
+      evidenceRefs: [evidence.jsonPaths["figures.json"]].filter((item): item is string => Boolean(item)),
+    };
+  }
+  if (!qaPath) {
+    return {
+      status: null,
+      figureCount: null,
+      passingFigureCount: null,
+      failingFigureIds: [],
+      warningFigureIds: [],
+      summary: null,
+      evidenceRefs: [],
+    };
+  }
+  const status = stringValue(qa.status);
+  const figures = Array.isArray(qa.figures)
+    ? qa.figures.filter((figure): figure is Record<string, unknown> => Boolean(figure) && typeof figure === "object" && !Array.isArray(figure))
+    : [];
+  return {
+    status: status === "pass" || status === "warning" || status === "fail" ? status : "warning",
+    figureCount: figures.length,
+    passingFigureCount: figures.filter(figure => stringValue(figure.status) === "pass").length,
+    failingFigureIds: figures.filter(figure => stringValue(figure.status) === "fail").map(figure => stringValue(figure.figureId) ?? stringValue(figure.path) ?? "(unknown)"),
+    warningFigureIds: figures.filter(figure => stringValue(figure.status) === "warning").map(figure => stringValue(figure.figureId) ?? stringValue(figure.path) ?? "(unknown)"),
+    summary: stringValue(qa.summary),
+    evidenceRefs: [qaPath, evidence.jsonPaths["figures.json"]].filter((item): item is string => Boolean(item)),
+  };
+}
+
+function extractMethodDecisionConsistencyInspection(evidence: RunEvidence, methodQa: MethodQaResult): {
+  status: string | null;
+  summary: string | null;
+  mismatchedSources: string[];
+  evidenceRefs: string[];
+} {
+  const manifest = unwrapObject(evidence.json["analysis-run-manifest.json"], "analysisRunManifest");
+  const consistency = unwrapObject(manifest.methodDecisionEvidenceConsistency);
+  const manifestStatus = stringValue(consistency.status);
+  if (manifestStatus) {
+    return {
+      status: manifestStatus,
+      summary: stringValue(consistency.summary),
+      mismatchedSources: stringArray(consistency.mismatchedSources),
+      evidenceRefs: stringArray(consistency.evidenceRefs),
+    };
+  }
+  const check = methodQa.checks.find(item => item.id === "method-decision-evidence-consistency");
+  if (!check) return { status: null, summary: null, mismatchedSources: [], evidenceRefs: [] };
+  return {
+    status: check.status,
+    summary: check.message,
+    mismatchedSources: methodDecisionConsistencySourcesFromMessage(check.message),
+    evidenceRefs: check.evidenceRefs,
+  };
+}
+
+function methodDecisionConsistencySourcesFromMessage(message: string): string[] {
+  const known = ["analysis-run-manifest", "stats-run", "method-decision-support", "stats-preflight"];
+  return known.filter(source => message.includes(source));
+}
+
+function runInspectionNextAction(ctx: {
+  runDir: string;
+  readiness: RunReadiness;
+  methodQa: MethodQaResult;
+  statsQaReadiness: ReturnType<typeof extractStatsQaReadinessInspection>;
+  figureReadiness: ReturnType<typeof extractFigureReadinessInspection>;
+  literature: RunInspectionResult["literature"];
+  companionReadiness: RunInspectionResult["companionReadiness"];
+  feasibilityReadiness: RunInspectionResult["feasibilityReadiness"];
+  runnerCapability: RunnerCapabilityInspection;
+  reviewerAdjudicationVerdict: string | null;
+  reviewerPanelStatus: string | null;
+}): string {
+  if (ctx.figureReadiness.status === "fail") {
+    return `Repair or regenerate failed figure artifact(s), rerun figure QA, and rerun inspection: ${ctx.figureReadiness.failingFigureIds.join(", ") || "unknown figure"}.`;
+  }
+  if (ctx.statsQaReadiness.status === "fail") {
+    return `Resolve failed stats QA check(s) and rerun inspection: ${ctx.statsQaReadiness.failingChecks.join(", ") || "unknown failed check"}.`;
+  }
+  if (ctx.statsQaReadiness.status === "missing" || ctx.statsQaReadiness.status === "unreadable") {
+    return `Regenerate stats QA before promotion; stats QA readiness is ${ctx.statsQaReadiness.status}.`;
+  }
+  if (ctx.feasibilityReadiness.status === "blocked") {
+    return `Repair blocked feasibility evidence before rerun or promotion: ${ctx.feasibilityReadiness.blockers.join("; ") || ctx.feasibilityReadiness.nextAction || "blocked feasibility evidence"}.`;
+  }
+	  if (ctx.feasibilityReadiness.status === "unverifiable") {
+	    return `Repair or regenerate feasibility evidence before promotion: ${ctx.feasibilityReadiness.nextAction ?? "unverifiable feasibility evidence"}.`;
+	  }
+	  if (ctx.feasibilityReadiness.status === "not_supplied") {
+	    return "Run or attach feasibility-gate or analysis-run feasibility evidence, regenerate the analysis manifest, and rerun inspection before promotion.";
+	  }
+  if (ctx.companionReadiness.status === "missing") {
+    return `Run or attach required companion analysis before promotion: ${ctx.companionReadiness.missingMethods.join(", ") || "unknown companion method"}.`;
+  }
+  if (ctx.companionReadiness.status === "unverifiable") {
+    return "Repair or regenerate analysis manifest evidence so companion-analysis readiness can be verified.";
+  }
+  if (ctx.runnerCapability.status === "backend_blocked") {
+    return `Route to a validated backend or redesign before promotion: ${ctx.runnerCapability.requiredFollowUp.join(" ") || ctx.runnerCapability.reason || "backend unavailable"}.`;
+  }
+  if (ctx.reviewerAdjudicationVerdict === "block") {
+    return "Resolve external reviewer adjudication blockers, rerun affected stages, and re-review before promotion.";
+  }
+  if (ctx.figureReadiness.status === "missing") {
+    return "Run figure QA for the existing figure manifest, then rerun unified inspection.";
+  }
+  if (ctx.figureReadiness.status === "warning") {
+    return `Review figure QA warning(s), repair visual artifacts if needed, and rerun inspection: ${ctx.figureReadiness.warningFigureIds.join(", ") || ctx.figureReadiness.summary || "figure QA warning"}.`;
+  }
+  if (ctx.statsQaReadiness.status === "warning") {
+    return `Resolve or justify stats QA warning check(s) before promotion: ${ctx.statsQaReadiness.warningChecks.join(", ") || "review stats-qa.json"}.`;
+  }
+  if (ctx.feasibilityReadiness.status === "warning") {
+    return `Resolve or explicitly accept feasibility warning(s) before promotion: ${[...ctx.feasibilityReadiness.warnings, ...ctx.feasibilityReadiness.requiredModifications, ctx.feasibilityReadiness.nextAction].filter(Boolean).slice(0, 3).join("; ") || "review feasibility evidence"}.`;
+  }
+  if (ctx.literature.blockerCount > 0 || ctx.literature.status === "fail" || ctx.literature.status === "failed") {
+    return "Repair literature retrieval or literature QA blockers before promotion.";
+  }
+  if (ctx.literature.warningCount > 0) {
+    return "Review literature QA warnings and rerun inspection after updating literature context or claims.";
+  }
+  if (ctx.runnerCapability.status === "bounded_approximation") {
+    return `Complete required backend/method follow-up before stronger claims: ${ctx.runnerCapability.requiredFollowUp.join("; ") || ctx.runnerCapability.reason || "bounded approximation"}.`;
+  }
+  if (ctx.reviewerAdjudicationVerdict === "revise" || ctx.reviewerPanelStatus && ctx.reviewerPanelStatus !== "pass") {
+    return "Address external reviewer revisions, rerun affected stages, and re-review before promotion.";
+  }
+  return methodQaNextAction(ctx.readiness, ctx.methodQa.checks);
+}
+
+function runInspectionRecommendedCommands(ctx: {
+  runDir: string;
+  readiness: RunReadiness;
+  statsQaReadiness: ReturnType<typeof extractStatsQaReadinessInspection>;
+  figureReadiness: ReturnType<typeof extractFigureReadinessInspection>;
+  feasibilityReadiness: RunInspectionResult["feasibilityReadiness"];
+  companionReadiness: RunInspectionResult["companionReadiness"];
+  reviewerAdjudicationVerdict: string | null;
+  reviewerPanelStatus: string | null;
+}): string[] {
+  const commands: string[] = [];
+  const rerunInspection = `agenteer research run-inspect --run-dir ${quoteShellArg(ctx.runDir)} --out ${quoteShellArg(path.join(ctx.runDir, "run-inspection.json"))} --report ${quoteShellArg(path.join(ctx.runDir, "run-inspection.md"))} --json`;
+  const add = (command: string | null) => {
+    if (command && !commands.includes(command)) commands.push(command);
+  };
+
+  if (ctx.figureReadiness.status === "missing" || ctx.figureReadiness.status === "fail" || ctx.figureReadiness.status === "warning") {
+    add(figureQaCommand(ctx.figureReadiness));
+    add(rerunInspection);
+  }
+  if (ctx.statsQaReadiness.status === "missing" || ctx.statsQaReadiness.status === "unreadable" || ctx.statsQaReadiness.status === "fail" || ctx.statsQaReadiness.status === "warning") {
+    add(`agenteer research method-qa --run-dir ${quoteShellArg(ctx.runDir)} --out ${quoteShellArg(path.join(ctx.runDir, "method-qa.json"))} --report ${quoteShellArg(path.join(ctx.runDir, "method-qa.md"))} --json`);
+    add(rerunInspection);
+  }
+	  if (ctx.feasibilityReadiness.status === "blocked" || ctx.feasibilityReadiness.status === "unverifiable" || ctx.feasibilityReadiness.status === "warning" || ctx.feasibilityReadiness.status === "not_supplied") {
+	    add(`agenteer research analysis-manifest --run-dir ${quoteShellArg(ctx.runDir)} --out ${quoteShellArg(path.join(ctx.runDir, "analysis-run-manifest.json"))} --json`);
+	    add(rerunInspection);
+	  }
+  if (ctx.companionReadiness.status === "missing" || ctx.companionReadiness.status === "unverifiable") {
+    add(`agenteer research analysis-manifest --run-dir ${quoteShellArg(ctx.runDir)} --out ${quoteShellArg(path.join(ctx.runDir, "analysis-run-manifest.json"))} --json`);
+    add(rerunInspection);
+  }
+  if (ctx.reviewerAdjudicationVerdict === "block" || ctx.reviewerAdjudicationVerdict === "revise" || ctx.reviewerPanelStatus && ctx.reviewerPanelStatus !== "pass") {
+    add(`agenteer research study-critic --run-dir ${quoteShellArg(ctx.runDir)} --stage final --json`);
+    add(rerunInspection);
+  }
+  if (!commands.length && ctx.readiness !== "local_review_ready") {
+    add(rerunInspection);
+  }
+  return commands;
+}
+
+function figureQaCommand(figureReadiness: ReturnType<typeof extractFigureReadinessInspection>): string | null {
+  const manifestPath = figureReadiness.evidenceRefs.find(ref => path.basename(ref) === "figures.json");
+  if (!manifestPath) return null;
+  const dir = path.dirname(manifestPath);
+  return [
+    "agenteer research figure-qa",
+    `--figures ${quoteShellArg(manifestPath)}`,
+    `--out ${quoteShellArg(path.join(dir, "figure-qa.json"))}`,
+    `--report ${quoteShellArg(path.join(dir, "figure-qa.md"))}`,
+  ].join(" ");
+}
+
+function quoteShellArg(value: string): string {
+  return JSON.stringify(value);
+}
+
+function extractMethodDecisionInspection(evidence: RunEvidence): {
+  status: "preferred" | "review_required" | "blocked" | "missing" | null;
+  requestedMethod: string | null;
+  requestedRole: string | null;
+  verdict: string | null;
+  primaryMethods: string[];
+  sensitivityMethods: string[];
+  fallbackMethods: string[];
+  nextAction: string | null;
+  evidenceRefs: string[];
+} {
+  const manifest = unwrapObject(evidence.json["analysis-run-manifest.json"], "analysisRunManifest");
+  const manifestDecision = unwrapObject(manifest.methodDecisionReadiness);
+  const manifestStatus = stringValue(manifestDecision.status);
+  if (manifestStatus) {
+    const status = methodDecisionStatus(manifestStatus);
+    return {
+      status,
+      requestedMethod: stringValue(manifestDecision.requestedMethod),
+      requestedRole: stringValue(manifestDecision.requestedRole),
+      verdict: stringValue(manifestDecision.verdict),
+      primaryMethods: stringArray(manifestDecision.primaryMethods),
+      sensitivityMethods: stringArray(manifestDecision.sensitivityMethods),
+      fallbackMethods: stringArray(manifestDecision.fallbackMethods),
+      nextAction: stringValue(manifestDecision.nextAction),
+      evidenceRefs: uniqueStrings([
+        ...stringArray(manifestDecision.evidenceRefs),
+        ...(evidence.jsonPaths["analysis-run-manifest.json"] ? [evidence.jsonPaths["analysis-run-manifest.json"]] : []),
+      ]),
+    };
+  }
+
+  const statsRun = unwrapObject(evidence.json["stats-run.json"], "statsRun");
+  const statsRunDecision = unwrapObject(unwrapObject(unwrapObject(statsRun.diagnostics).preflight).methodDecisionSupport);
+  if (hasMethodDecisionShape(statsRunDecision)) {
+    return methodDecisionFromRecord(statsRunDecision, [evidence.jsonPaths["stats-run.json"]]);
+  }
+
+  const decisionFile = unwrapObject(evidence.json["method-decision-support.json"], "methodDecisionSupport");
+  if (hasMethodDecisionShape(decisionFile)) {
+    return methodDecisionFromRecord(decisionFile, [
+      evidence.jsonPaths["method-decision-support.json"],
+      evidence.textPaths["method-decision-support.md"],
+    ]);
+  }
+
+  const statsPreflight = unwrapObject(evidence.json["stats-preflight.json"], "statsPreflight");
+  const preflightDecision = unwrapObject(statsPreflight.methodDecisionSupport);
+  if (hasMethodDecisionShape(preflightDecision)) {
+    return methodDecisionFromRecord(preflightDecision, [
+      evidence.jsonPaths["stats-preflight.json"],
+      evidence.textPaths["stats-preflight.md"],
+    ]);
+  }
+
+  return {
+    status: evidence.json["stats-run.json"] ? "missing" : null,
+    requestedMethod: stringValue(statsRun.method),
+    requestedRole: null,
+    verdict: null,
+    primaryMethods: [],
+    sensitivityMethods: [],
+    fallbackMethods: [],
+    nextAction: evidence.json["stats-run.json"]
+      ? "Regenerate the stats run with method-decision support artifacts before promotion."
+      : null,
+    evidenceRefs: evidence.json["stats-run.json"]
+      ? uniqueStrings([
+        path.join(evidence.runDir, "method-decision-support.json"),
+        path.join(evidence.runDir, "method-decision-support.md"),
+        ...refsForExisting(evidence, ["stats-run.json", "stats-preflight.json"]),
+      ])
+      : [],
+  };
+}
+
+function inspectMethodDecisionEvidenceConsistency(evidence: RunEvidence): {
+  status: "pass" | "warning";
+  message: string;
+  evidenceRefs: string[];
+} {
+  const sources = methodDecisionEvidenceSources(evidence);
+  if (sources.length < 2) {
+    return {
+      status: "pass",
+      message: sources.length === 1
+        ? `One method-decision evidence source was found (${sources[0]?.label}).`
+        : "No method-decision evidence sources were available for consistency comparison.",
+      evidenceRefs: uniqueStrings(sources.flatMap(source => source.evidenceRefs)),
+    };
+  }
+  const signatures = new Map<string, string[]>();
+  for (const source of sources) {
+    const labels = signatures.get(source.signature) ?? [];
+    labels.push(source.label);
+    signatures.set(source.signature, labels);
+  }
+  if (signatures.size <= 1) {
+    return {
+      status: "pass",
+      message: `Method-decision evidence is consistent across ${sources.map(source => source.label).join(", ")}.`,
+      evidenceRefs: uniqueStrings(sources.flatMap(source => source.evidenceRefs)),
+    };
+  }
+  const summary = sources
+    .map(source => `${source.label}: method=${source.requestedMethod ?? "missing"}, role=${source.requestedRole ?? "missing"}, verdict=${source.verdict ?? "missing"}, primary=${source.primaryMethods.join("/") || "missing"}`)
+    .join("; ");
+  return {
+    status: "warning",
+    message: `Method-decision evidence is contradictory across artifacts. ${summary}.`,
+    evidenceRefs: uniqueStrings(sources.flatMap(source => source.evidenceRefs)),
+  };
+}
+
+function methodDecisionEvidenceSources(evidence: RunEvidence): Array<{
+  label: string;
+  requestedMethod: string | null;
+  requestedRole: string | null;
+  verdict: string | null;
+  primaryMethods: string[];
+  signature: string;
+  evidenceRefs: string[];
+}> {
+  const out: Array<{
+    label: string;
+    requestedMethod: string | null;
+    requestedRole: string | null;
+    verdict: string | null;
+    primaryMethods: string[];
+    signature: string;
+    evidenceRefs: string[];
+  }> = [];
+  const push = (label: string, record: Record<string, unknown>, evidenceRefs: Array<string | null | undefined>, manifest = false) => {
+    if (!hasMethodDecisionShape(record) && !stringValue(record.status)) return;
+    const requestedMethod = stringValue(record.requestedMethod);
+    const requestedRole = stringValue(record.requestedRole);
+    const verdict = stringValue(record.verdict) ?? (manifest ? stringValue(record.status) : null);
+    const primaryMethods = manifest ? stringArray(record.primaryMethods) : methodNamesFromDecisionRecords(record.primaryMethods);
+    const sensitivityMethods = manifest ? stringArray(record.sensitivityMethods) : methodNamesFromDecisionRecords(record.sensitivityMethods);
+    const fallbackMethods = manifest ? stringArray(record.fallbackMethods) : methodNamesFromDecisionRecords(record.fallbackMethods);
+    out.push({
+      label,
+      requestedMethod,
+      requestedRole,
+      verdict,
+      primaryMethods,
+      signature: JSON.stringify({
+        requestedMethod,
+        requestedRole,
+        verdict,
+        primaryMethods: [...primaryMethods].sort(),
+        sensitivityMethods: [...sensitivityMethods].sort(),
+        fallbackMethods: [...fallbackMethods].sort(),
+      }),
+      evidenceRefs: uniqueStrings(evidenceRefs.filter((item): item is string => Boolean(item))),
+    });
+  };
+
+  const manifest = unwrapObject(evidence.json["analysis-run-manifest.json"], "analysisRunManifest");
+  push("analysis-run-manifest", unwrapObject(manifest.methodDecisionReadiness), [evidence.jsonPaths["analysis-run-manifest.json"]], true);
+
+  const statsRun = unwrapObject(evidence.json["stats-run.json"], "statsRun");
+  const statsRunDecision = unwrapObject(unwrapObject(unwrapObject(statsRun.diagnostics).preflight).methodDecisionSupport);
+  push("stats-run", statsRunDecision, [evidence.jsonPaths["stats-run.json"]]);
+
+  const decisionFile = unwrapObject(evidence.json["method-decision-support.json"], "methodDecisionSupport");
+  push("method-decision-support", decisionFile, [
+    evidence.jsonPaths["method-decision-support.json"],
+    evidence.textPaths["method-decision-support.md"],
+  ]);
+
+  const statsPreflight = unwrapObject(evidence.json["stats-preflight.json"], "statsPreflight");
+  push("stats-preflight", unwrapObject(statsPreflight.methodDecisionSupport), [
+    evidence.jsonPaths["stats-preflight.json"],
+    evidence.textPaths["stats-preflight.md"],
+  ]);
+
+  return out;
+}
+
+function hasMethodDecisionShape(value: Record<string, unknown>): boolean {
+  return Boolean(
+    stringValue(value.verdict) ||
+    stringValue(value.requestedMethod) ||
+    stringValue(value.requestedRole) ||
+    stringArray(value.primaryMethods).length ||
+    stringArray(value.sensitivityMethods).length ||
+    stringArray(value.fallbackMethods).length ||
+    Array.isArray(value.primaryMethods) ||
+    Array.isArray(value.sensitivityMethods) ||
+    Array.isArray(value.fallbackMethods),
+  );
+}
+
+function methodDecisionFromRecord(value: Record<string, unknown>, evidenceRefs: Array<string | null | undefined>): ReturnType<typeof extractMethodDecisionInspection> {
+  const verdict = stringValue(value.verdict);
+  return {
+    status: methodDecisionStatus(verdict),
+    requestedMethod: stringValue(value.requestedMethod),
+    requestedRole: stringValue(value.requestedRole),
+    verdict,
+    primaryMethods: methodNamesFromDecisionRecords(value.primaryMethods),
+    sensitivityMethods: methodNamesFromDecisionRecords(value.sensitivityMethods),
+    fallbackMethods: methodNamesFromDecisionRecords(value.fallbackMethods),
+    nextAction: stringValue(value.nextAction),
+    evidenceRefs: uniqueStrings(evidenceRefs.filter((item): item is string => Boolean(item))),
+  };
+}
+
+function methodDecisionStatus(value: string | null): "preferred" | "review_required" | "blocked" | "missing" | null {
+  if (value === "blocked") return "blocked";
+  if (value === "preferred") return "preferred";
+  if (value === "missing") return "missing";
+  if (value === "review_required" || value === "acceptable_sensitivity" || value === "fallback_only" || value === "not_recommended") return "review_required";
+  return value ? "review_required" : "missing";
+}
+
+function methodNamesFromDecisionRecords(value: unknown): string[] {
+  if (!Array.isArray(value)) return stringArray(value);
+  return uniqueStrings(value.map(item => {
+    if (typeof item === "string") return item;
+    if (item && typeof item === "object" && !Array.isArray(item)) return stringValue((item as Record<string, unknown>).method) ?? "";
+    return "";
+  }));
+}
+
+function extractRunnerCapabilityInspection(evidence: RunEvidence): RunnerCapabilityInspection {
+  const statsRun = unwrapObject(evidence.json["stats-run.json"], "statsRun");
+  const methodContract = unwrapObject(evidence.json["method-contract.json"]);
+  const contractSpec = unwrapObject(methodContract.statisticalMethodSpec);
+  const statsCapability = unwrapObject(statsRun.runnerCapability);
+  const contractCapability = unwrapObject(methodContract.runnerCapability);
+  const capability = stringValue(statsCapability.status) ? statsCapability : contractCapability;
+  const rawStatus = stringValue(capability.status);
+  const status = rawStatus === "executable" || rawStatus === "bounded_approximation" || rawStatus === "backend_blocked"
+    ? rawStatus
+    : null;
+  return {
+    method: stringValue(capability.method) ?? stringValue(statsRun.method) ?? stringValue(contractSpec.method),
+    status,
+    reason: stringValue(capability.reason),
+    requiredFollowUp: stringArray(capability.requiredFollowUp),
+    cannotSupport: stringArray(capability.cannotSupport),
+    evidenceRefs: refsForExisting(evidence, ["stats-run.json", "method-contract.json"]),
   };
 }
 
@@ -2057,15 +2963,16 @@ function methodsSentence(evidence: RunEvidence, summary: MethodQaResult["methodS
   }
   const config = unwrapObject(evidence.json["stats-config.json"]);
   const method = typeof config.method === "string" ? config.method : null;
-  if (method) return `The statistical method was ${method}${summary.detectedModelFamilies.length ? `, within the ${summary.detectedModelFamilies.join(", ")} method family` : ""}.`;
+  const readerFamilies = uniqueStrings(summary.detectedModelFamilies.map(readerMethodFamilyLabel));
+  if (method) return `The statistical method was ${method}${readerFamilies.length ? `, a ${readerFamilies.join(", ")} approach` : ""}.`;
   return summary.detectedModelFamilies.length
-    ? `The detected model family was ${summary.detectedModelFamilies.join(", ")}.`
+    ? `The detected method family was ${readerFamilies.join(", ")}.`
     : "The statistical method was inferred from the available run artifacts and should be confirmed during review.";
 }
 
 function discussionSentence(evidence: RunEvidence, methodQa: MethodQaResult): string {
   const posture = methodQa.methodSummary.resultPosture;
-  if (posture) return `The companion artifacts classify the result as ${posture}.`;
+  if (posture) return posture.replace(/[.]\s*$/, "") + ".";
   if (evidence.spec?.claimPolicy.allowedInference === "predictive_performance") return "The result should be interpreted as local predictive performance unless external validation is added.";
   return "The result should be interpreted conservatively as local evidence from the analyzed dataset.";
 }
@@ -2132,7 +3039,7 @@ function unwrapObject(value: unknown, key?: string): Record<string, unknown> {
 function unwrapAny(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   const record = value as Record<string, unknown>;
-  for (const key of ["methodQa", "manuscriptQa", "paperQa", "literatureQa", "literatureContext", "literatureSearch", "qa", "lifecycle", "paperLifecycle", "runInspection"]) {
+  for (const key of ["methodQa", "manuscriptQa", "paperQa", "literatureQa", "literatureContext", "literatureSearch", "qa", "lifecycle", "paperLifecycle", "runInspection", "analysisRunManifest", "statsPreflight"]) {
     if (record[key] && typeof record[key] === "object") return record[key];
   }
   return value;
